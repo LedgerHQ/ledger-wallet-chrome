@@ -1,54 +1,60 @@
 # Load all required libraries.
-gulp       = require 'gulp'
-less       = require 'gulp-less'
-coffee     = require 'gulp-coffee'
-yaml       = require 'gulp-yaml'
-eco        = require 'gulp-eco'
-del        = require 'del'
-sourcemaps = require 'gulp-sourcemaps'
-uglify     = require 'gulp-uglify'
-minifyCss  = require 'gulp-minify-css'
-changed    = require 'gulp-changed'
+gulp        = require 'gulp'
+less        = require 'gulp-less'
+coffee      = require 'gulp-coffee'
+yaml        = require 'gulp-yaml'
+eco         = require 'gulp-eco'
+del         = require 'del'
+sourcemaps  = require 'gulp-sourcemaps'
+uglify      = require 'gulp-uglify'
+minifyCss   = require 'gulp-minify-css'
+changed     = require 'gulp-changed'
 
-gulp.task 'less', ->
+gulp.task 'less', ['compile:clean'], ->
   gulp.src 'app/assets/css/**/*.less'
     .pipe changed 'build/assets/css'
     .pipe less()
     .pipe gulp.dest 'build/assets/css'
 
-gulp.task 'css', ->
+gulp.task 'css', ['compile:clean'], ->
   gulp.src 'app/assets/css/**/*.css'
     .pipe changed 'build/assets/css'
     .pipe gulp.dest 'build/assets/css'
 
-gulp.task 'images', ->
+gulp.task 'images', ['compile:clean'], ->
   gulp.src 'app/assets/images/**/*'
     .pipe changed 'build/assets/images/'
     .pipe gulp.dest 'build/assets/images/'
 
-gulp.task 'html', ->
+gulp.task 'html', ['compile:clean'], ->
   gulp.src 'app/assets/views/**/*.html'
     .pipe changed 'build/assets/views'
     .pipe gulp.dest 'build/assets/views'
 
-gulp.task 'eco', ->
+gulp.task 'eco', ['compile:clean'], ->
   gulp.src 'app/assets/views/**/*.ect'
     .pipe changed 'build/assets/views'
     .pipe eco()
     .pipe gulp.dest 'build/assets/views'
 
-gulp.task 'yml', ->
-  gulp.src 'app/**/*.yml'
+gulp.task 'yml', ['compile:clean'], ->
+  gulp.src 'app/manifest.yml'
     .pipe changed 'build/'
     .pipe yaml()
     .pipe gulp.dest 'build/'
 
-gulp.task 'js', ->
+gulp.task 'translate', ['compile:clean'], ->
+  gulp.src 'app/locales/*.yml'
+  .pipe changed 'build/'
+    .pipe yaml()
+      .pipe gulp.dest 'build/_locales'
+
+gulp.task 'js', ['compile:clean'], ->
   gulp.src 'app/**/*.js'
     .pipe changed 'build/'
     .pipe gulp.dest 'build/'
 
-gulp.task 'coffee-script', ->
+gulp.task 'coffee-script', ['compile:clean'], ->
   gulp.src 'app/**/*.coffee'
     .pipe changed 'build/'
     .pipe sourcemaps.init()
@@ -92,9 +98,11 @@ gulp.task 'watch', ['compile'], ->
   watcher = gulp.watch('app/**/*', ['compile:assets', 'compile:sources'])
 
 # Default task call every tasks created so far.
-gulp.task 'compile:assets', ['less', 'css', 'eco', 'html', 'yml', 'images']
+gulp.task 'compile:assets', ['less', 'css', 'eco', 'html', 'yml', 'images', 'translate']
 gulp.task 'compile:sources', ['js', 'coffee-script']
 gulp.task 'compile', ['compile:clean', 'compile:assets', 'compile:sources']
 gulp.task 'default', ['compile']
+
+gulp.task 'clean', ['compile:clean', 'release:clean']
 
 gulp.task 'release', ['release:clean', 'release:uglify', 'release:minify', 'release:json', 'release:libs', 'release:images']
