@@ -27,9 +27,9 @@ gulp.task 'images', ['compile:clean'], ->
     .pipe gulp.dest 'build/assets/images/'
 
 gulp.task 'html', ['compile:clean'], ->
-  gulp.src 'app/assets/views/**/*.html'
-    .pipe changed 'build/assets/views'
-    .pipe gulp.dest 'build/assets/views'
+  gulp.src 'app/views/**/*.html'
+    .pipe changed 'build/views'
+    .pipe gulp.dest 'build/views'
 
 gulp.task 'eco', ['compile:clean'], ->
   gulp.src 'app/assets/views/**/*.ect'
