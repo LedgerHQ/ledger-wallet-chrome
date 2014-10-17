@@ -15,5 +15,5 @@ permissions:
         vendorId: 9601
         productId: 7036
 icons:
-  16: "icon-16.png"
-  128: "icon-128.png"
+  16: "assets/images/icon-16.png"
+  128: "assets/images/icon-128.png"
