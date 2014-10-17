@@ -1,0 +1,19 @@
+name: "Ledger Wallet"
+description: "Wallet"
+version: "0.1"
+manifest_version: 2
+minimum_chrome_version: "23"
+app:
+  background:
+    scripts:
+      - "background.js"
+permissions:
+  - "usb"
+  -
+    usbDevices:
+      -
+        vendorId: 9601
+        productId: 7036
+icons:
+  16: "icon-16.png"
+  128: "icon-128.png"

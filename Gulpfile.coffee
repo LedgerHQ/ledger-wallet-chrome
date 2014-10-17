@@ -40,6 +40,7 @@ gulp.task 'eco', ->
 gulp.task 'yml', ->
   gulp.src 'app/**/*.yml'
     .pipe changed 'build/'
+    .pipe yaml()
     .pipe gulp.dest 'build/'
 
 gulp.task 'js', ->
