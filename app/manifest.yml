@@ -7,7 +7,7 @@ default_locale: "en"
 app:
   background:
     scripts:
-      - "src/app.js"
+      - "src/background.js"
 
 permissions:
   - "usb"
