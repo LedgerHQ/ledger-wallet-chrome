@@ -44,10 +44,10 @@ gulp.task 'yml', ['compile:clean'], ->
     .pipe gulp.dest 'build/'
 
 gulp.task 'translate', ['compile:clean'], ->
-  gulp.src 'app/locales/*.yml'
-  .pipe changed 'build/'
+  gulp.src 'app/locales/**/*.yml'
+  .pipe changed 'build/_locales/'
     .pipe yaml()
-      .pipe gulp.dest 'build/_locales'
+      .pipe gulp.dest 'build/_locales/'
 
 gulp.task 'js', ['compile:clean'], ->
   gulp.src 'app/**/*.js'
