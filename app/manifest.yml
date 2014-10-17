@@ -1,12 +1,14 @@
-name: "Ledger Wallet"
-description: "Wallet"
+name: "__MSG_application_name__"
 version: "0.1"
 manifest_version: 2
 minimum_chrome_version: "23"
+default_locale: "en"
+
 app:
   background:
     scripts:
-      - "background.js"
+      - "src/app.js"
+
 permissions:
   - "usb"
   -
@@ -14,6 +16,8 @@ permissions:
       -
         vendorId: 9601
         productId: 7036
+
 icons:
   16: "assets/images/icon-16.png"
+  48: "assets/images/icon-48.png"
   128: "assets/images/icon-128.png"
