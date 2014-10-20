@@ -11,5 +11,8 @@
 
       'base/model',
       'base/view_controller',
-      'base/navigation_controller'
+      'base/navigation_controller',
+
+      'controllers/onboarding_navigation_controller',
+      'controllers/wallet_navigation_controller'
     ]

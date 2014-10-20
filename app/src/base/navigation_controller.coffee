@@ -1,7 +1,7 @@
 class @NavigationController extends @ViewController
 
   viewControllers: []
-  childViewControllerContentId: undefined # to reimplement
+  childViewControllerContentId: 'navigation_controller_content'
 
   push: (viewController) ->
     if @topViewController()?
