@@ -9,36 +9,61 @@ sourcemaps  = require 'gulp-sourcemaps'
 uglify      = require 'gulp-uglify'
 minifyCss   = require 'gulp-minify-css'
 changed     = require 'gulp-changed'
+plumber     = require 'gulp-plumber'
+through2    = require 'through2'
+
+i18n = () ->
+  through2.obj (file, encoding, callback) ->
+    i18nContent = {}
+    json = JSON.parse(file.contents.toString(encoding))
+
+    flatify = (json, path = '') ->
+      for key, value of json
+        if typeof value is "object"
+          flatify(value, "#{path}#{key}_")
+        else
+          i18nContent[path + key] = {message: value, description: "Description for #{path + key} = #{value}"}
+
+    flatify json
+    file.contents = new Buffer(JSON.stringify(i18nContent), encoding)
+    @push file
+    callback()
 
 gulp.task 'less', ['compile:clean'], ->
   gulp.src 'app/assets/css/**/*.less'
+    .pipe plumber()
     .pipe changed 'build/assets/css'
     .pipe less()
     .pipe gulp.dest 'build/assets/css'
 
 gulp.task 'css', ['compile:clean'], ->
   gulp.src 'app/assets/css/**/*.css'
+    .pipe plumber()
     .pipe changed 'build/assets/css'
     .pipe gulp.dest 'build/assets/css'
 
 gulp.task 'images', ['compile:clean'], ->
   gulp.src 'app/assets/images/**/*'
+    .pipe plumber()
     .pipe changed 'build/assets/images/'
     .pipe gulp.dest 'build/assets/images/'
 
 gulp.task 'html', ['compile:clean'], ->
   gulp.src 'app/views/**/*.html'
+    .pipe plumber()
     .pipe changed 'build/views'
     .pipe gulp.dest 'build/views'
 
 gulp.task 'eco', ['compile:clean'], ->
   gulp.src 'app/views/**/*.eco'
+    .pipe plumber()
     .pipe changed 'build/views'
     .pipe eco()
     .pipe gulp.dest 'build/views'
 
 gulp.task 'yml', ['compile:clean'], ->
   gulp.src 'app/manifest.yml'
+    .pipe plumber()
     .pipe changed 'build/'
     .pipe yaml()
     .pipe gulp.dest 'build/'
@@ -46,16 +71,19 @@ gulp.task 'yml', ['compile:clean'], ->
 gulp.task 'translate', ['compile:clean'], ->
   gulp.src 'app/locales/**/*.yml'
   .pipe changed 'build/_locales/'
-    .pipe yaml()
-      .pipe gulp.dest 'build/_locales/'
+  .pipe yaml()
+  .pipe i18n()
+  .pipe gulp.dest 'build/_locales/'
 
 gulp.task 'js', ['compile:clean'], ->
   gulp.src 'app/**/*.js'
+    .pipe plumber()
     .pipe changed 'build/'
     .pipe gulp.dest 'build/'
 
 gulp.task 'coffee-script', ['compile:clean'], ->
   gulp.src 'app/**/*.coffee'
+    .pipe plumber()
     .pipe changed 'build/'
     .pipe sourcemaps.init()
     .pipe coffee()

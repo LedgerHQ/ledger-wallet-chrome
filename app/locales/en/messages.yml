@@ -1,2 +1,2 @@
-application_name:
-  message: 'Ledger Wallet'
+application:
+  name: 'Ledger Wallet'
