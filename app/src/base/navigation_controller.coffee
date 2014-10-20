@@ -1,5 +1,6 @@
 class @NavigationController extends @ViewController
 
+  _historyLength: 1
   viewControllers: []
   childViewControllerContentId: 'navigation_controller_content'
 
@@ -7,6 +8,8 @@ class @NavigationController extends @ViewController
     if @topViewController()?
       @topViewController().onDetach()
       @topViewController().parentViewController = undefined
+    if @viewControllers.length >= @_historyLength
+      @viewController.splice(0, 1)
     @viewControllers.push viewController
     viewController.parentViewController = @
     viewController.onAttach()
