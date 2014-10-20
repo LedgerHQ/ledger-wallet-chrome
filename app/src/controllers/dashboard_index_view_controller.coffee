@@ -1,1 +1,1 @@
-class @DashboardIndexViewController extends @ViewController 
+class @DashboardIndexViewController extends @ViewController

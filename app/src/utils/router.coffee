@@ -12,6 +12,7 @@ class @Router extends @EventEmitter
       @_currentUrl = url
       @emit 'routed', {url: url, data: data}
     @_router.bypassed.add (url, data) =>
+      e "No route found for #{url}"
       @emit 'bypassed', {url: url, data: data}
 
     # add routes
