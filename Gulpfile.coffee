@@ -32,10 +32,10 @@ gulp.task 'html', ['compile:clean'], ->
     .pipe gulp.dest 'build/views'
 
 gulp.task 'eco', ['compile:clean'], ->
-  gulp.src 'app/assets/views/**/*.ect'
-    .pipe changed 'build/assets/views'
+  gulp.src 'app/views/**/*.eco'
+    .pipe changed 'build/views'
     .pipe eco()
-    .pipe gulp.dest 'build/assets/views'
+    .pipe gulp.dest 'build/views'
 
 gulp.task 'yml', ['compile:clean'], ->
   gulp.src 'app/manifest.yml'

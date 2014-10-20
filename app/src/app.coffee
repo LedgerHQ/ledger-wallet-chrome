@@ -1,10 +1,22 @@
 require @ledger.imports, ->
 
   class Application
-    _navigationController = new @LedgerNavigationController()
+
+    constructor: ->
+      @_navigationController = null
+      @router = new Router(@)
 
     start: ->
-      _navigationController.render $('body')
+      @router.go('/dashboard/index')
+
+    navigate: (layoutName, viewController) ->
+      if @_navigationController == null or @_navigationController.constructor.name != layoutName
+        @_navigationController = new window[layoutName]()
+        @_navigationController.push viewController
+        @_navigationController.render $('body')
+
+  @WALLET_LAYOUT = 'WalletNavigationController'
+  @ONBOARDING_LAYOUT = 'OnboardingNavigationController'
 
   @ledger.application = new Application()
   @ledger.application.start()
