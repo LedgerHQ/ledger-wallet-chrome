@@ -12,6 +12,7 @@
         'utils/render',
         'utils/event_emitter',
         'utils/http_client',
+        'utils/url',
         'utils/router',
 
         'base/model',
