@@ -3,5 +3,5 @@
 # @param [String] messageId Unique identifier of the message
 # @return [String] localized message
 #
-t = (messageId) ->
+@t = (messageId) ->
   chrome.i18n.getMessage(messageId.replace('.', '_'))
