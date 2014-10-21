@@ -18,7 +18,11 @@ class @ViewController extends @EventEmitter
 
   viewName: ->
     className = @constructor.name.replace 'ViewController', ''
-    viewName = _.string.underscored(className)
+    _.string.underscored(className)
+
+  handleAction: (actionName) ->
+    do @[actionName] if @[actionName]?
+    yes
 
   onBeforeRender: ->
 

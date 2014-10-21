@@ -9,7 +9,7 @@ class @NavigationController extends @ViewController
       @topViewController().onDetach()
       @topViewController().parentViewController = undefined
     if @viewControllers.length >= @_historyLength
-      @viewController.splice(0, 1)
+      @viewControllers.splice(0, 1)
     @viewControllers.push viewController
     viewController.parentViewController = @
     viewController.onAttach()

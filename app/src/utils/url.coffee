@@ -14,7 +14,5 @@
     search = if parsedFragmentedUrl.search.length > 0 then parsedFragmentedUrl.search else parsedUrl.search
     pathname + hash + search
 
-
-
 String::parseAsUrl = () ->
   ledger.url.parseAsUrl(@)

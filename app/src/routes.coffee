@@ -1,7 +1,7 @@
 @declareRoutes = (route, app) ->
 
-  route '/dashboard/index', (params) ->
-    app.navigate @WALLET_LAYOUT, new @DashboardIndexViewController()
+  route '/dashboard/index:#action:', (params) ->
+    app.navigate WALLET_LAYOUT, DashboardIndexViewController
 
   route '/accounts/index{#action}{?params}', (params) ->
     l 'Accounts'

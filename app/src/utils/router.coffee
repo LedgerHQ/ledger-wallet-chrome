@@ -9,9 +9,9 @@ class @Router extends @EventEmitter
 
     # listen events
     @_router.routed.add (url, data) =>
-      l url, data
+      oldUrl = @_currentUrl
       @_currentUrl = url
-      @emit 'routed', {url: url, data: data}
+      @emit 'routed', {oldUrl, url, data}
     @_router.bypassed.add (url, data) =>
       e "No route found for #{url}"
       @emit 'bypassed', {url: url, data: data}
@@ -27,7 +27,8 @@ class @Router extends @EventEmitter
     @_router.parse(url)
 
   _addRoute: (url, callback) ->
-    @_router.addRoute url, callback
+    route = @_router.addRoute url
+    route.matched.add callback.bind(route)
 
   _listenClickEvents: () ->
     self = @
@@ -39,7 +40,6 @@ class @Router extends @EventEmitter
           url = ledger.url.createRelativeUrlWithFragmentedUrl(self._currentUrl, @href)
         else
           url = @pathname + @search + @hash
-        l self._currentUrl, url
         self.go url
         return no
       yes

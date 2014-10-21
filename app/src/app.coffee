@@ -9,12 +9,34 @@ require @ledger.imports, ->
     start: ->
       @router.go('/dashboard/index')
 
-
     navigate: (layoutName, viewController) ->
-      if @_navigationController == null or @_navigationController.constructor.name != layoutName
-        @_navigationController = new window[layoutName]()
-        @_navigationController.push viewController
-        @_navigationController.render $('body')
+      @router.once 'routed', (event, data) =>
+        oldUrl = if data.oldUrl? then data.oldUrl.parseAsUrl() else {hash: '', pathname: '', params: ''}
+        newUrl = data.url.parseAsUrl()
+        @currentUrl = data.url
+
+        controller = null
+
+        actionName = _.str.splice(newUrl.hash, 0, 1)
+        l actionName
+        onControllerRendered = () ->
+          # Callback when the controller has been rendered
+           controller.handleAction(actionName) if newUrl.hash.length > 0
+
+        if @_navigationController == null or @_navigationController.constructor.name != layoutName
+          @_navigationController = new window[layoutName]()
+          controller = new viewController
+          controller.on 'afterRender', onControllerRendered.bind(@)
+          @_navigationController.push new viewController()
+          @_navigationController.render $('body')
+        else
+          if @_navigationController.topViewController().constructor.name == viewController.name and oldUrl.pathname == newUrl.pathname and newUrl.params == oldUrl.params # Check if only hash part of url change
+            @_navigationController.topViewController().handleAction(actionName)
+          else
+            controller = new viewController
+            controller.on 'afterRender', onControllerRendered.bind(@)
+            @_navigationController.push controller
+
 
   @WALLET_LAYOUT = 'WalletNavigationController'
   @ONBOARDING_LAYOUT = 'OnboardingNavigationController'
