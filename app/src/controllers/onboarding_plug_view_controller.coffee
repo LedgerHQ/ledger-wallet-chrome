@@ -1,0 +1,1 @@
+class @OnboardingPlugViewController extends @ViewController 
