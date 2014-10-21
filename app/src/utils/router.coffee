@@ -1,5 +1,7 @@
 class @Router extends @EventEmitter
 
+  # @private
+  # @property [String] The currently routed url (private)
   _currentUrl: null
 
   constructor: (app) ->

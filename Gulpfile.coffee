@@ -90,6 +90,14 @@ gulp.task 'coffee-script', ['compile:clean'], ->
     .pipe sourcemaps.write '/'
     .pipe gulp.dest 'build/'
 
+gulp.task 'doc', (cb) ->
+  {exec} = require 'child_process'
+  child = exec './node_modules/.bin/codo -p -v app/src/', {}, () ->
+    do cb
+  child.stdin.pipe process.stdin
+  child.stdout.pipe process.stdout
+  child.stderr.pipe process.stderr
+
 gulp.task 'compile:clean', (cb) ->
   del ['build/'], cb
 

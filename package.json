@@ -23,6 +23,7 @@
         "coffee-script": "1.8.0",
         "del": "0.1.3",
         "gulp-plumber": "0.6.6",
-        "through2": "1.1.1"
+        "through2": "1.1.1",
+        "codo": "2.0.9"
     }
 }
