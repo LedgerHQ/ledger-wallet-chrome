@@ -20,6 +20,10 @@ class @ViewController extends @EventEmitter
     className = @constructor.name.replace 'ViewController', ''
     _.string.underscored(className)
 
+  cssName: ->
+    className = @constructor.name.replace 'ViewController', ''
+    _.string.underscored(className)
+
   handleAction: (actionName) ->
     do @[actionName] if @[actionName]?
     yes
