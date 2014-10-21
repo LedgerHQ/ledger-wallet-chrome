@@ -15,6 +15,8 @@
         'utils/url',
         'utils/router',
 
+        'manager/device_manager'
+
         'base/model',
         'base/view_controller',
         'base/navigation_controller',
