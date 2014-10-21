@@ -4,11 +4,11 @@ require @ledger.imports, ->
 
     constructor: ->
       @_navigationController = null
-      @_usbObserver = new UsbObserver()
+      @devicesManager = new DevicesManager()
       @router = new Router(@)
 
     start: ->
-      @_usbObserver.start()
+      @devicesManager.start()
       @router.go('/dashboard/index')
 
     navigate: (layoutName, viewController) ->
