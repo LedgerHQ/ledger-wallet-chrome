@@ -2,7 +2,7 @@
 # It emits events when a wallet is plugged in and when it is unplugged
 # @event plug Emitted when the ledger wallet is plugged in
 # @event unplug Emitted when the ledger wallet is unplugged
-class DevicesManager extends EventEmitter
+class @DevicesManager extends EventEmitter
 
   _running: no
   _devicesList: []
