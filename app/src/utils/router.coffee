@@ -6,6 +6,7 @@ class @Router extends @EventEmitter
     # initialize router
     @_router = crossroads.create()
     @_router.normalizeFn = crossroads.NORM_AS_OBJECT
+    @_router.ignoreState = on
 
     # listen events
     @_router.routed.add (url, data) =>

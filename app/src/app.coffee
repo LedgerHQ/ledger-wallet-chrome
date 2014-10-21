@@ -18,7 +18,6 @@ require @ledger.imports, ->
         controller = null
 
         actionName = _.str.splice(newUrl.hash, 0, 1)
-        l actionName
         onControllerRendered = () ->
           # Callback when the controller has been rendered
            controller.handleAction(actionName) if newUrl.hash.length > 0
