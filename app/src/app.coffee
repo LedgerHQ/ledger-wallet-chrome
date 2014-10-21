@@ -8,6 +8,12 @@ require @ledger.imports, ->
       @router = new Router(@)
 
     start: ->
+      @devicesManager.on 'plug', (event, device) ->
+        l 'Plug'
+        l device
+      @devicesManager.on 'unplug', (event, device) ->
+        l 'Unplug'
+        l device
       @devicesManager.start()
       @router.go('/dashboard/index')
 
