@@ -10,7 +10,6 @@ class @NavigationController extends @ViewController
       @topViewController().parentViewController = undefined
     if @viewControllers.length >= @_historyLength
       @viewControllers.splice(0, 1)
-    @setControllerStylesheetPath(viewController.cssName())
     @viewControllers.push viewController
     viewController.parentViewController = @
     viewController.onAttach()

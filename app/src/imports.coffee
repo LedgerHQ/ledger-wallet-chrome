@@ -23,11 +23,11 @@
 
 
         ## Wallet controllers
-        'controllers/wallet_navigation_controller',
-        'controllers/dashboard/dashboard_index_view_controller'
+        'controllers/wallet/wallet_navigation_controller',
+        'controllers/wallet/dashboard/dashboard_index_view_controller'
 
         ## Onboarding controllers
-        'controllers/onboarding_navigation_controller',
-        'controllers/onboarding_plug_view_controller',
-        'controllers/onboarding_unplug_view_controller'
+        'controllers/onboarding/onboarding_navigation_controller',
+        'controllers/onboarding/onboarding_plug_view_controller',
+        'controllers/onboarding/onboarding_unplug_view_controller'
       ]
