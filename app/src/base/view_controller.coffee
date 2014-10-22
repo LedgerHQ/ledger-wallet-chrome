@@ -8,29 +8,36 @@ class @ViewController extends @EventEmitter
 
   render: (selector) ->
     @setControllerStylesheet()
-    viewName = @viewName()
     @renderedSelector = selector
     do @onBeforeRender
     @emit 'beforeRender', {sender: @}
-    render viewName, @, (html) =>
+    render @viewPath(), @, (html) =>
       selector.html(html)
       do @onAfterRender
       @emit 'afterRender', {sender: @}
 
-  viewName: ->
-    className = @constructor.name.replace 'ViewController', ''
-    _.string.underscored(className)
+  identifier: () ->
+    @className().replace 'ViewController', ''
 
-  cssName: ->
-    className = @constructor.name.replace 'ViewController', ''
-    _.string.underscored(className)
+  assetPath: () ->
+    finalName = ''
+    segments = _.string.underscored(@identifier()).split('_')
+    for segment in segments
+      finalName += '/' + segment
+    finalName
+
+  viewPath: () ->
+    @assetPath()
+
+  cssPath: () ->
+    @assetPath()
 
   handleAction: (actionName) ->
     do @[actionName] if @[actionName]?
     yes
 
   setControllerStylesheet: () ->
-    $("link[id='controller_style']").attr('href', '../assets/css/' + @cssName() + '.css')
+    $("link[id='view_controller_style']").attr('href', '../assets/css' + @cssPath() + '.css')
 
   onBeforeRender: ->
 

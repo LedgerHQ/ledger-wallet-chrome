@@ -1,4 +1,5 @@
 @render = (template, params, callback) =>
-  require('../views/' + template, =>
+  console.log(template)
+  require('../views' + template, =>
     callback(JST[template](params))
   )

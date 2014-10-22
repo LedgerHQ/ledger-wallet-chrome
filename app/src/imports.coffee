@@ -8,6 +8,7 @@
 
         'routes',
 
+        'utils/object',
         'utils/log',
         'utils/render',
         'utils/event_emitter',
@@ -24,7 +25,8 @@
 
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller',
-        'controllers/wallet/dashboard/dashboard_index_view_controller'
+        # Dashboard
+        'controllers/wallet/dashboard/wallet_dashboard_index_view_controller'
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_navigation_controller',

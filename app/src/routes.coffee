@@ -1,15 +1,16 @@
 @declareRoutes = (route, app) ->
 
-  # Onboarding
+  ## Onboarding
   route '/onboarding/plug', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingPlugViewController
   route '/onboarding/unplug', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingUnplugViewController
 
+  ## Wallet
   # Dashboard
-  route '/dashboard/index:#action:', (params) ->
-    app.navigate WALLET_LAYOUT, DashboardIndexViewController
+  route '/wallet/dashboard/index:#action:', (params) ->
+    app.navigate WALLET_LAYOUT, WalletDashboardIndexViewController
 
   # Accounts
-  route '/accounts/index{#action}{?params}', (params) ->
+  route '/wallet/accounts/index{#action}{?params}', (params) ->
     l 'Accounts'
