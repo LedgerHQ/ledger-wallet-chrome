@@ -20,8 +20,8 @@ permissions:
 commands:
     reload-page:
       suggested_key:
-        default: "Ctrl+Y"
-        mac: "Ctrl+R"
+        default: "Ctrl+R"
+        mac: "Command+R"
       description: "Reload the current page"
 
 

@@ -1,3 +1,11 @@
-<div id="navigation_controller_content" class="main-container">
+<div class="main-container">
+
+    <div id="wallet_top_menu">
+        Test 2
+    </div>
+
+    <div id="navigation_controller_content" >
+
+    </div>
 
 </div>

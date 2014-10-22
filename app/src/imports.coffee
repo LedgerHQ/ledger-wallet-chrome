@@ -8,7 +8,6 @@
 
         'routes',
 
-        'utils/object',
         'utils/log',
         'utils/render',
         'utils/event_emitter',
