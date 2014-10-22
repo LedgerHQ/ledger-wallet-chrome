@@ -64,7 +64,7 @@ gulp.task 'eco', ['compile:clean'], ->
   gulp.src 'app/views/**/*.eco'
     .pipe plumber()
     .pipe changed 'build/views'
-    .pipe eco()
+    .pipe eco({basePath: 'app/views/'})
     .pipe gulp.dest 'build/views'
 
 gulp.task 'yml', ['compile:clean'], ->

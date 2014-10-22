@@ -51,7 +51,7 @@ class @NavigationController extends @ViewController
     @viewControllers[@viewControllers.length - 1]
 
   setControllerStylesheet: () ->
-    $("link[id='navigation_controller_style']").attr('href', '../assets/css' + @cssPath() + '.css')
+    $("link[id='navigation_controller_style']").attr('href', '../assets/css/' + @cssPath() + '.css')
 
   renderChild: ->
     return if @viewControllers.length == 0 || !@renderedSelector?

@@ -16,6 +16,9 @@ class @ViewController extends @EventEmitter
       do @onAfterRender
       @emit 'afterRender', {sender: @}
 
+  className: ->
+    @.constructor.name
+
   identifier: () ->
     @className().replace 'ViewController', ''
 
@@ -37,7 +40,7 @@ class @ViewController extends @EventEmitter
     yes
 
   setControllerStylesheet: () ->
-    $("link[id='view_controller_style']").attr('href', '../assets/css' + @cssPath() + '.css')
+    $("link[id='view_controller_style']").attr('href', '../assets/css/' + @cssPath() + '.css')
 
   onBeforeRender: ->
 
