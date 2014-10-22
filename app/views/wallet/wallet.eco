@@ -1,7 +1,14 @@
 <div class="main-container">
 
-    <div id="wallet_top_menu">
+    <div id="wallet_top_menu" class="top-main-menu">
         Test 2
+
+        <div>
+            <div>
+                <a class="settings-icon" href="/wallet/settings"></a>
+            </div>
+        </div>
+
     </div>
 
     <div id="navigation_controller_content" >
