@@ -40,7 +40,7 @@ class @ViewController extends @EventEmitter
     yes
 
   setControllerStylesheet: () ->
-    $("link[id='view_controller_style']").attr('href', '../assets/css/' + @cssPath() + '.css')
+    $("link[id='view_controller_style']").attr('href', '../assets/css/' + @cssPath() + '.css?' + (new Date()).getTime())
 
   onBeforeRender: ->
 
