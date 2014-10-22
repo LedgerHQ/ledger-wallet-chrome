@@ -3,3 +3,5 @@ build/
 node_modules/
 release/
 .DS_Store
+doc/
+*.html
