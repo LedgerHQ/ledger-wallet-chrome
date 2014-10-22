@@ -9,3 +9,6 @@ class @WalletNavigationController extends @NavigationController
       do @renderChild
       do @onAfterRender
       @emit 'afterRender', @
+
+  cssName: () ->
+    'wallet'

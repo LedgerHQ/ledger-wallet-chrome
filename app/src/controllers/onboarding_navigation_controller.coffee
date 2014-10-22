@@ -7,3 +7,6 @@ class @OnboardingNavigationController extends @NavigationController
     @topViewController.render selector
     do @onAfterRender
     @emit 'afterRender', @
+
+  @cssName: () ->
+    'onboarding'

@@ -7,6 +7,7 @@ class @ViewController extends @EventEmitter
     $(@renderedSelector).find(selectorString)
 
   render: (selector) ->
+    @setControllerStylesheet()
     viewName = @viewName()
     @renderedSelector = selector
     do @onBeforeRender
@@ -27,6 +28,9 @@ class @ViewController extends @EventEmitter
   handleAction: (actionName) ->
     do @[actionName] if @[actionName]?
     yes
+
+  setControllerStylesheet: () ->
+    $("link[id='controller_style']").attr('href', '../assets/css/' + @cssName() + '.css')
 
   onBeforeRender: ->
 
