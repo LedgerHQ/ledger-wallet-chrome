@@ -21,9 +21,13 @@
         'base/view_controller',
         'base/navigation_controller',
 
-        'controllers/wallet_navigation_controller',
-        'controllers/onboarding_navigation_controller',
 
-        # dashboard controllers
-        'controllers/dashboard_index_view_controller'
+        ## Wallet controllers
+        'controllers/wallet_navigation_controller',
+        'controllers/dashboard/dashboard_index_view_controller'
+
+        ## Onboarding controllers
+        'controllers/onboarding_navigation_controller',
+        'controllers/onboarding_plug_view_controller',
+        'controllers/onboarding_unplug_view_controller'
       ]
