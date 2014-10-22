@@ -24,6 +24,12 @@ commands:
         mac: "Command+R"
       description: "Reload the current page"
 
+    reload-application:
+      suggested_key:
+        default: "Ctrl+Shift+R"
+        mac: "Command+Shift+R"
+      description: "Reload the application"
+
 
 
 icons:

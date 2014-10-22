@@ -10,7 +10,10 @@ require @ledger.imports, ->
     start: ->
 
       chrome.commands.onCommand.addListener (command) =>
-        @_navigationController.render $('body') if @_navigationController?
+        switch command
+          when 'reload-page' then do @reloadUi
+          when 'reload-application' then chrome.runtime.reload()
+
 
       @devicesManager.on 'plug', (event, device) ->
         l 'Plug'
@@ -47,6 +50,14 @@ require @ledger.imports, ->
             controller = new viewController
             controller.on 'afterRender', onControllerRendered.bind(@)
             @_navigationController.push controller
+
+    reloadUi: () ->
+      $('link').each (_, link) ->
+        if link.href?
+          cleanHref = link.href
+          cleanHref = cleanHref.replace(/\?[0-9]*/i, '')
+          link.href = cleanHref + '?' + (new Date).getTime()
+      @_navigationController.render $('body') if @_navigationController?
 
 
   @WALLET_LAYOUT = 'WalletNavigationController'
