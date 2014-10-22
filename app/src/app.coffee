@@ -8,6 +8,10 @@ require @ledger.imports, ->
       @router = new Router(@)
 
     start: ->
+
+      chrome.commands.onCommand.addListener (command) =>
+        @_navigationController.render $('body') if @_navigationController?
+
       @devicesManager.on 'plug', (event, device) ->
         l 'Plug'
         l device
