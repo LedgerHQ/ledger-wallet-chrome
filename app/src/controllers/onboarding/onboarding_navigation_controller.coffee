@@ -1,4 +1,4 @@
 class @OnboardingNavigationController extends @NavigationController
 
-  layout: ''
+  layout: 'onboarding_navigation_controller_layout'
   css: 'onboarding'
