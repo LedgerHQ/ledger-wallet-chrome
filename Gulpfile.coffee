@@ -76,10 +76,11 @@ gulp.task 'yml', ['compile:clean'], ->
 
 gulp.task 'translate', ['compile:clean'], ->
   gulp.src 'app/locales/**/*.yml'
-  .pipe changed 'build/_locales/'
-  .pipe yaml()
-  .pipe i18n()
-  .pipe gulp.dest 'build/_locales/'
+    .pipe plumber()
+    .pipe changed 'build/_locales/'
+    .pipe yaml()
+    .pipe i18n()
+    .pipe gulp.dest 'build/_locales/'
 
 gulp.task 'js', ['compile:clean'], ->
   gulp.src 'app/**/*.js'
