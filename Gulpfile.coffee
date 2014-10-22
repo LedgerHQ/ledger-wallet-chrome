@@ -48,6 +48,12 @@ gulp.task 'images', ['compile:clean'], ->
     .pipe changed 'build/assets/images/'
     .pipe gulp.dest 'build/assets/images/'
 
+gulp.task 'fonts', ['compile:clean'], ->
+  gulp.src 'app/assets/fonts/**/*'
+  .pipe plumber()
+  .pipe changed 'build/assets/fonts/'
+  .pipe gulp.dest 'build/assets/fonts/'
+
 gulp.task 'html', ['compile:clean'], ->
   gulp.src 'app/views/**/*.html'
     .pipe plumber()
@@ -134,7 +140,7 @@ gulp.task 'watch', ['compile'], ->
   watcher = gulp.watch('app/**/*', ['compile:assets', 'compile:sources'])
 
 # Default task call every tasks created so far.
-gulp.task 'compile:assets', ['less', 'css', 'eco', 'html', 'yml', 'images', 'translate']
+gulp.task 'compile:assets', ['less', 'css', 'eco', 'html', 'yml', 'images', 'fonts', 'translate']
 gulp.task 'compile:sources', ['js', 'coffee-script']
 gulp.task 'compile', ['compile:clean', 'compile:assets', 'compile:sources']
 gulp.task 'default', ['compile']
