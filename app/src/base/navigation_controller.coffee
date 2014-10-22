@@ -27,12 +27,22 @@ class @NavigationController extends @ViewController
     @emit 'pop', {sender: @, viewController: viewController}
     viewController
 
-  topViewController: ->
-    @viewControllers[@viewControllers.length - 1]
+  cssName: () ->
+    @css
 
   render: (selector) ->
     @setControllerStylesheet()
     @renderedSelector = selector
+    do @onBeforeRender
+    @emit 'beforeRender', @
+    render @layout, @, (html) =>
+      selector.html(html)
+      do @renderChild
+      do @onAfterRender
+      @emit 'afterRender', @
+
+  topViewController: ->
+    @viewControllers[@viewControllers.length - 1]
 
   setControllerStylesheet: () ->
     $("link[id='navigation_controller_style']").attr('href', '../assets/css/' + @cssName() + '.css')

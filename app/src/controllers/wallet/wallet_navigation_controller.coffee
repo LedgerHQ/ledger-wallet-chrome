@@ -1,14 +1,5 @@
 class @WalletNavigationController extends @NavigationController
 
-  render: (selector) ->
-    super
-    do @onBeforeRender
-    @emit 'beforeRender', @
-    render 'wallet_navigation_controller_layout', @, (html) =>
-      selector.html(html)
-      do @renderChild
-      do @onAfterRender
-      @emit 'afterRender', @
+  layout: 'wallet_navigation_controller_layout'
+  css: 'wallet'
 
-  cssName: () ->
-    'wallet'

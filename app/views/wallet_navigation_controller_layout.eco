@@ -1,3 +1,11 @@
-<div id="navigation_controller_content">
+<div>
+
+    <div id="top_wallet_menu">
+        Dashboard
+    </div>
+
+    <div id="navigation_controller_content">
+
+    </div>
 
 </div>
