@@ -56,3 +56,9 @@ class @NavigationController extends @ViewController
   renderChild: ->
     return if @viewControllers.length == 0 || !@renderedSelector?
     @topViewController().render($('#' + @childViewControllerContentId))
+
+  handleAction: (actionName) ->
+    if @[actionName]?
+      do @[actionName]
+    else
+      return @topViewController()?.handleAction(actionName)

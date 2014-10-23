@@ -2,7 +2,7 @@
 
   <div id="wallet_top_menu" class="top-main-menu">
     <ul class="left">
-      <li class="menu-item selected">
+      <li id="dashboard-item" class="menu-item selected">
         <a href="/wallet/dashboard/index">
           <img src="../assets/images/wallet/dashboard_icon.png"/>
           <span><%= t('wallet.top_menu.items.dashboard') %></span>
@@ -10,7 +10,7 @@
         <div class="spacer" />
         <div class="selector" />
       </li>
-      <li class="menu-item">
+      <li id="send-item" class="menu-item">
         <a href="/wallet/send/index">
           <img src="../assets/images/wallet/send_icon.png" />
           <span><%= t('wallet.top_menu.items.send') %></span>
@@ -18,7 +18,7 @@
         <div class="spacer" />
         <div class="selector" />
       </li>
-      <li class="menu-item">
+      <li id="receive-item" class="menu-item">
         <a href="/wallet/receive/index">
           <img src="../assets/images/wallet/receive_icon.png" />
           <span><%= t('wallet.top_menu.items.receive') %></span>
@@ -26,7 +26,7 @@
         <div class="spacer" />
         <div class="selector" />
       </li>
-      <li class="menu-item">
+      <li id="accounts-item" class="menu-item">
         <a href="/wallet/accounts/index">
           <img src="../assets/images/wallet/accounts_icon.png" />
           <span><%= t('wallet.top_menu.items.accounts') %></span>
@@ -34,7 +34,7 @@
         <div class="spacer" />
         <div class="selector" />
       </li>
-      <li class="menu-item right">
+      <li id="signout-item" class="menu-item right">
         <a href="#signOut">
           <img src="../assets/images/wallet/signout_icon.png" />
           <span><%= t('wallet.top_menu.items.signout') %></span>
