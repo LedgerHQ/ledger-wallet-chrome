@@ -1,0 +1,33 @@
+@import "../constants";
+
+// containers
+.logo-container {
+  margin: 0 auto;
+  padding: @metrics-extra-large-padding;
+  width: 244px;
+}
+
+.greyed-container {
+  background-color: @color-extra-light-grey;
+  width: 100%;
+  padding: @metrics-large-padding 0;
+}
+
+.actions-container {
+  padding: @metrics-large-padding 0;
+  text-align: center;
+}
+
+// texts
+.greyed-action {
+  color: @color-soft-grey;
+  text-decoration: none;
+}
+.greyed-action:hover {
+  color: darken(@color-soft-grey, @color-default-darken-value);
+}
+
+.black-indication {
+  font-size: @font-size-very-large;
+  font-weight: @font-weight-light;
+}

@@ -1,5 +1,9 @@
 @declareRoutes = (route, app) ->
 
+  ## Default
+  route '/', ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingPlugViewController
+
   ## Onboarding
   route '/onboarding/plug', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingPlugViewController

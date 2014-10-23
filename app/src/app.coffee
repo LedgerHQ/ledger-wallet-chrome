@@ -22,7 +22,7 @@ require @ledger.imports, ->
         l 'Unplug'
         l device
       @devicesManager.start()
-      @router.go('/wallet/dashboard/index')
+      @router.go('/')
 
     navigate: (layoutName, viewController) ->
       @router.once 'routed', (event, data) =>
