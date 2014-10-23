@@ -1,5 +1,5 @@
 @ledger.pin_codes ?= {}
-class @ledger.pin_codes.PinCode
+class @ledger.pin_codes.PinCode extends EventEmitter
 
   _el: null
 
@@ -20,8 +20,11 @@ class @ledger.pin_codes.PinCode
 
   clear: ->
     return unless @_el?
-    $(@_input()).value = ''
+    $(@_input()).val('')
     do @_updateDigits
+
+  isComplete: ->
+    return @_input().value.length == @_digits().length
 
   _input: ->
     return undefined unless @_el?
@@ -55,10 +58,16 @@ class @ledger.pin_codes.PinCode
     for digit in @_digits()
       $(digit).on 'click', ->
         do self.focus
+      $(digit).on 'mousedown', (e) ->
+        e.preventDefault()
 
     # listen changes in input
-    $(@_input()).on 'change keyup keydown focus blur click', ->
+    $(@_input()).on 'change keyup keydown focus blur', (e) ->
+      @value = @value.replace(/[^0-9]/g, '')
       do self._updateDigits
+
+      if e.type == 'keyup' and self.isComplete()
+        emit 'complete' if /[0-9]/g.test @value
 
   _updateDigits: ->
     for index in [0..@_digits().length - 1]
@@ -69,7 +78,7 @@ class @ledger.pin_codes.PinCode
         if @_input().value.length >= @_digits().length
           @_setDigitSelected(digit, no)
         else
-          @_setDigitSelected(digit, index <= @_input().value.length)
+          @_setDigitSelected(digit, index == @_input().value.length)
       else
         @_setDigitFocused(digit, no)
         @_setDigitSelected(digit, no)
