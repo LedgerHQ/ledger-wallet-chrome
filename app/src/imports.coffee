@@ -17,6 +17,7 @@
         'utils/url',
         'utils/router',
         'utils/i18n',
+        'utils/spinners',
 
         'managers/devices_manager'
 
