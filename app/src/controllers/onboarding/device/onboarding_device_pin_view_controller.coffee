@@ -1,0 +1,1 @@
+class @OnboardingDevicePinViewController extends @ViewController 

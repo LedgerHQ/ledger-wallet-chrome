@@ -35,5 +35,6 @@
         'controllers/onboarding/onboarding_navigation_controller',
         # Device
         'controllers/onboarding/device/onboarding_device_plug_view_controller',
-        'controllers/onboarding/device/onboarding_device_unplug_view_controller'
+        'controllers/onboarding/device/onboarding_device_unplug_view_controller',
+        'controllers/onboarding/device/onboarding_device_pin_view_controller'
       ]
