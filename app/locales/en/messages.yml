@@ -2,8 +2,10 @@ application:
   name: 'Ledger Wallet'
 
 onboarding:
-  plug:
-    to_start: "To begin, connect your Ledger Wallet into the USB port of your computer"
-    i_lost_my_wallet: "I lost my Ledger Wallet"
-    unlock_my_wallet: "Unlock my wallet"
-    you_can_unplug: "You can now safely disconnect your Ledger Wallet"
+  device:
+    plug:
+      to_start: "To begin, connect your Ledger Wallet into the USB port of your computer"
+      i_lost_my_wallet: "I lost my Ledger Wallet"
+    unplug:
+      unlock_my_wallet: "Unlock my wallet"
+      you_can_unplug: "You can now safely disconnect your Ledger Wallet"

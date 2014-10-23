@@ -4,9 +4,9 @@
 <div class="greyed-container">
   <img src="../../assets/images/common/large_check.png" width="50" height="50" />
   <div>
-    <span class="black-indication"><%= t 'onboarding.plug.you_can_unplug' %></span>
+    <span class="black-indication"><%= t 'onboarding.device.unplug.you_can_unplug' %></span>
   </div>
 </div>
 <div class="actions-container">
-  <a href="#" class="greyed-action"><%= t 'onboarding.plug.unlock_my_wallet' %></a>
+  <a href="#" class="greyed-action"><%= t 'onboarding.device.unplug.unlock_my_wallet' %></a>
 </div>
