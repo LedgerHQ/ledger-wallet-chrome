@@ -1,2 +1,3 @@
 this is a test
 <a href="#test">Go to accounts</a>
+<button id="test">Click</button>
