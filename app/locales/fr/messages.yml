@@ -9,3 +9,6 @@ onboarding:
     unplug:
       unlock_my_wallet: "Dévérouiller mon portefeuille"
       you_can_unplug: "Vous pouvez maintenant débrancher votre Ledger Wallet en toute sécurité"
+    pin:
+      enter_your_pin_code: "Entez votre code PIN pour dévérouiller votre portefeuille :"
+      i_lost_my_pin_code: "J'ai perdu mon code PIN"

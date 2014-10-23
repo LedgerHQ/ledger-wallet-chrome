@@ -3,14 +3,13 @@
 // containers
 .logo-container {
   margin: 0 auto;
-  padding: @metrics-extra-large-padding;
+  padding: @metrics-extra-large-padding 0;
   width: 244px;
 }
 
 .greyed-container {
   background-color: @color-extra-light-grey;
-  width: 100%;
-  padding: @metrics-very-large-padding 0;
+  padding: @metrics-large-padding 0;
 }
 
 .actions-container {
@@ -20,14 +19,49 @@
 
 // texts
 .greyed-action {
-  color: @color-soft-grey;
+  @color: @color-soft-grey;
+  color: @color;
   text-decoration: none;
-}
-.greyed-action:hover {
-  color: darken(@color-soft-grey, @color-default-darken-value);
+
+  &:hover {
+    color: darken(@color, @color-default-darken-value);
+  }
 }
 
 .black-indication {
   font-size: @font-size-very-large;
   font-weight: @font-weight-light;
+}
+
+// widgets
+.pin-code {
+  font-size: 0;
+
+  div {
+    background-color: @color-white;
+    height: 85px;
+    width: 55px;
+    display: inline-block;
+    margin-left: 6px;
+    border: solid 1px @color-light-grey;
+    border-radius: 10px;
+
+    &.focused {
+      border-color: @color-soft-grey;
+    }
+
+    &.selected {
+      border-color: @color-dark-grey-blue;
+    }
+
+    &.filled {
+      background-position: center center;
+    }
+  }
+
+  input {
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
 }

@@ -18,6 +18,7 @@
         'utils/router',
         'utils/i18n',
         'utils/spinners',
+        'utils/pin_codes',
 
         'managers/devices_manager'
 
