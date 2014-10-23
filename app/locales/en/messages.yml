@@ -1,6 +1,9 @@
 application:
   name: 'Ledger Wallet'
 
+common:
+  bitcoin_acronym: 'BTC'
+
 onboarding:
   plug:
     to_start: "To begin, plug your Ledger Wallet into the USB port of your computer"
@@ -8,6 +11,7 @@ onboarding:
 
 wallet:
   top_menu:
+    balance: 'SOLDE'
     items:
       dashboard: 'DASHBOARD'
       send: 'SEND'

@@ -17,5 +17,5 @@
     app.navigate WALLET_LAYOUT, WalletDashboardIndexViewController
 
   # Accounts
-  route '/wallet/accounts/index{#action}{?params}', (params) ->
+  route '/wallet/accounts/index:#action::?params:', (params) ->
     l 'Accounts'
