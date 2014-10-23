@@ -2,7 +2,7 @@
 
   ## Default
   route '/', ->
-    app.navigate ONBOARDING_LAYOUT, OnboardingPlugViewController
+    app.navigate ONBOARDING_LAYOUT, OnboardingUnplugViewController
 
   ## Onboarding
   route '/onboarding/plug', (params) ->
