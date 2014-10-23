@@ -2,7 +2,8 @@
 
   ## Default
   route '/', ->
-    app.navigate ONBOARDING_LAYOUT, OnboardingPlugViewController
+    app.router.go '/wallet/dashboard/index'
+    #app.navigate ONBOARDING_LAYOUT, OnboardingPlugViewController
 
   ## Onboarding
   route '/onboarding/plug', (params) ->

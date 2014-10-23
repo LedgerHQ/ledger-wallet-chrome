@@ -1,13 +1,48 @@
 <div class="main-container">
 
   <div id="wallet_top_menu" class="top-main-menu">
-    <div class="left">
-      <div class="menu-item"><%= t('wallet.top_menu.items.dashboard') %></div>
-      <div class="menu-item"><%= t('wallet.top_menu.items.send') %></div>
-      <div class="menu-item"><%= t('wallet.top_menu.items.receive') %></div>
-      <div class="menu-item"><%= t('wallet.top_menu.items.accounts') %></div>
-      <div class="menu-item right"><%= t('wallet.top_menu.items.signout') %></div>
-    </div>
+    <ul class="left">
+      <li class="menu-item selected">
+        <a href="/wallet/dashboard/index">
+          <img src="../assets/images/wallet/dashboard_icon.png"/>
+          <span><%= t('wallet.top_menu.items.dashboard') %></span>
+        </a>
+        <div class="spacer" />
+        <div class="selector" />
+      </li>
+      <li class="menu-item">
+        <a href="/wallet/dashboard/index">
+          <img src="../assets/images/wallet/send_icon.png" />
+          <span><%= t('wallet.top_menu.items.send') %></span>
+        </a>
+        <div class="spacer" />
+        <div class="selector" />
+      </li>
+      <li class="menu-item">
+        <a href="/wallet/dashboard/index">
+          <img src="../assets/images/wallet/receive_icon.png" />
+          <span><%= t('wallet.top_menu.items.receive') %></span>
+        </a>
+        <div class="spacer" />
+        <div class="selector" />
+      </li>
+      <li class="menu-item">
+        <a href="/wallet/dashboard/index">
+          <img src="../assets/images/wallet/accounts_icon.png" />
+          <span><%= t('wallet.top_menu.items.accounts') %></span>
+        </a>
+        <div class="spacer" />
+        <div class="selector" />
+      </li>
+      <li class="menu-item right">
+        <a href="/wallet/dashboard/index">
+          <img src="../assets/images/wallet/signout_icon.png" />
+          <span><%= t('wallet.top_menu.items.signout') %></span>
+        </a>
+        <div class="spacer" />
+        <div class="selector" />
+      </li>
+    </ul>
 
     <div class="right">
       <div>
