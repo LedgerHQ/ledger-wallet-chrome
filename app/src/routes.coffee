@@ -2,13 +2,14 @@
 
   ## Default
   route '/', ->
-    app.navigate ONBOARDING_LAYOUT, OnboardingUnplugViewController
+    app.router.go '/onboarding/device/plug'
 
   ## Onboarding
-  route '/onboarding/plug', (params) ->
-    app.navigate ONBOARDING_LAYOUT, OnboardingPlugViewController
-  route '/onboarding/unplug', (params) ->
-    app.navigate ONBOARDING_LAYOUT, OnboardingUnplugViewController
+  # Device
+  route '/onboarding/device/plug', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDevicePlugViewController
+  route '/onboarding/device/unplug', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUnplugViewController
 
   ## Wallet
   # Dashboard

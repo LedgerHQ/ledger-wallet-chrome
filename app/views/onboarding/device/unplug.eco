@@ -1,8 +1,8 @@
 <div class="logo-container">
-  <img src="../assets/images/onboarding/large_logo.png" width="244" height="181">
+  <img src="../../assets/images/onboarding/large_logo.png" width="244" height="181">
 </div>
 <div class="greyed-container">
-  <img src="../assets/images/common/large_check.png" width="50" height="50" />
+  <img src="../../assets/images/common/large_check.png" width="50" height="50" />
   <div>
     <span class="black-indication"><%= t 'onboarding.plug.you_can_unplug' %></span>
   </div>

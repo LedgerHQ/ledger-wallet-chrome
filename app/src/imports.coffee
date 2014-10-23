@@ -29,10 +29,11 @@
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller',
         # Dashboard
-        'controllers/wallet/dashboard/wallet_dashboard_index_view_controller'
+        'controllers/wallet/dashboard/wallet_dashboard_index_view_controller',
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_navigation_controller',
-        'controllers/onboarding/onboarding_plug_view_controller',
-        'controllers/onboarding/onboarding_unplug_view_controller'
+        # Device
+        'controllers/onboarding/device/onboarding_device_plug_view_controller',
+        'controllers/onboarding/device/onboarding_device_unplug_view_controller'
       ]
