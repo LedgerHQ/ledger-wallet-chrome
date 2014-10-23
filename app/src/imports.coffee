@@ -5,15 +5,19 @@
         '../libs/underscore.string.min',
         '../libs/signals.min',
         '../libs/crossroads.min',
+        '../libs/spin.min',
 
         'routes',
 
         'utils/log',
+        'utils/string',
         'utils/render',
         'utils/event_emitter',
         'utils/http_client',
         'utils/url',
         'utils/router',
+        'utils/i18n',
+        'utils/spinners',
 
         'managers/devices_manager'
 

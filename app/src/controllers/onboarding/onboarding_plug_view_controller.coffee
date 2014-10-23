@@ -1,1 +1,7 @@
-class @OnboardingPlugViewController extends @ViewController 
+class @OnboardingPlugViewController extends @ViewController
+
+  _spinner: null
+
+  onAfterRender: ->
+    super
+    @_spinner = ledger.spinners.createLargeSpinner(@select('div.greyed-container')[0])

@@ -1,6 +1,11 @@
 application:
   name: 'Ledger Wallet'
 
+onboarding:
+  plug:
+    to_start: "To begin, plug your Ledger Wallet into the USB port of your computer"
+    i_lost_my_wallet: "I lost my Ledger Wallet"
+
 wallet:
   top_menu:
     items:
@@ -9,3 +14,5 @@ wallet:
       receive: 'RECEIVE'
       accounts: 'ACCOUNTS'
       signout: 'SIGN OUT'
+
+

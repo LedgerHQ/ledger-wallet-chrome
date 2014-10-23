@@ -30,8 +30,6 @@ commands:
       mac: "Command+Shift+R"
     description: "Reload the application"
 
-
-
 icons:
   16: "assets/images/icon-16.png"
   48: "assets/images/icon-48.png"
