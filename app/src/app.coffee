@@ -35,7 +35,7 @@ require @ledger.imports, ->
         actionName = _.str.splice(newUrl.hash, 0, 1)
         onControllerRendered = () ->
           # Callback when the controller has been rendered
-           controller.handleAction(actionName) if newUrl.hash.length > 0
+          @_navigationController.handleAction(actionName) if newUrl.hash.length > 0
 
         if @_navigationController == null or @_navigationController.constructor.name != layoutName
           @_navigationController = new window[layoutName]()
@@ -45,7 +45,7 @@ require @ledger.imports, ->
           @_navigationController.render $('body')
         else
           if @_navigationController.topViewController().constructor.name == viewController.name and oldUrl.pathname == newUrl.pathname and newUrl.params == oldUrl.params # Check if only hash part of url change
-            @_navigationController.topViewController().handleAction(actionName)
+            @_navigationController.handleAction(actionName)
           else
             controller = new viewController
             controller.on 'afterRender', onControllerRendered.bind(@)

@@ -1,6 +1,9 @@
 application:
   name: 'Ledger Wallet'
 
+common:
+  bitcoin_acronym: 'BTC'
+
 onboarding:
   device:
     plug:
@@ -12,3 +15,13 @@ onboarding:
     pin:
       enter_your_pin_code: "Enter you PIN code to unlock your wallet:"
       i_lost_my_pin_code: "I lost my PIN code"
+
+wallet:
+  top_menu:
+    balance: 'SOLDE'
+    items:
+      dashboard: 'DASHBOARD'
+      send: 'SEND'
+      receive: 'RECEIVE'
+      accounts: 'ACCOUNTS'
+      signout: 'SIGN OUT'
