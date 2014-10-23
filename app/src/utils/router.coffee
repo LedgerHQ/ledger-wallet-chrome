@@ -2,7 +2,7 @@ class @Router extends @EventEmitter
 
   # @private
   # @property [String] The currently routed url (private)
-  _currentUrl: null
+  currentUrl: null
 
   constructor: (app) ->
     # initialize router
@@ -12,8 +12,8 @@ class @Router extends @EventEmitter
 
     # listen events
     @_router.routed.add (url, data) =>
-      oldUrl = @_currentUrl
-      @_currentUrl = url
+      oldUrl = @currentUrl
+      @currentUrl = url
       @emit 'routed', {oldUrl, url, data}
     @_router.bypassed.add (url, data) =>
       e "No route found for #{url}"
@@ -25,9 +25,11 @@ class @Router extends @EventEmitter
     declareRoutes(@_addRoute.bind(@), app)
 
   go: (url, params) ->
-    url = url + '?' + jQuery.params(params) if params?
+    setTimeout( =>
+      url = url + '?' + jQuery.params(params) if params?
 
-    @_router.parse(url)
+      @_router.parse(url)
+    , 0)
 
   _addRoute: (url, callback) ->
     route = @_router.addRoute url
@@ -39,8 +41,8 @@ class @Router extends @EventEmitter
     $('body').delegate 'a', 'click', ->
       if @href? and @protocol == 'chrome-extension:'
         url = null
-        if  _.str.startsWith(@pathname, '/views/') and self._currentUrl?
-          url = ledger.url.createRelativeUrlWithFragmentedUrl(self._currentUrl, @href)
+        if  _.str.startsWith(@pathname, '/views/') and self.currentUrl?
+          url = ledger.url.createRelativeUrlWithFragmentedUrl(self.currentUrl, @href)
         else
           url = @pathname + @search + @hash
         self.go url

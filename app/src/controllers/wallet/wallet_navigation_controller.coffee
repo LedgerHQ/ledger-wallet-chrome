@@ -14,6 +14,11 @@ class @WalletNavigationController extends @NavigationController
       @updateMenu url
       @updateBreadcrumbs url
 
+  onAfterRender: () ->
+    url = ledger.application.router.currentUrl
+    @updateMenu url
+    @updateBreadcrumbs url
+
   updateMenu: (url) ->
     for baseUrl, itemSelector of @_menuItemBaseUrl
       if _.str.startsWith url, baseUrl
@@ -37,7 +42,12 @@ class @WalletNavigationController extends @NavigationController
         break
 
   updateBreadcrumbs: (url) ->
-
-
-  onAfterRender: () ->
+    return unless url?
+    breadcrumbs = $('#breadcrumbs')
+    return if breadcrumbs.length == 0
+    $('breadcrumbs').empty()
+    breadcrumbs.html(url)
+    fragmentedUrl = url.split('/')
+    fragmentedUrl.splice(0, 2)
+    fragmentedUrl.splice(fragmentedUrl.length - 1, 1) if fragmentedUrl[fragmentedUrl.length - 1] == 'index'
 

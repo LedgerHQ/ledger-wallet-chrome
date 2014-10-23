@@ -55,7 +55,7 @@
     </div>
 
   </div>
-  <div id="breadcrumbs">/wallet/dashboard/index</div>
+  <!-- Uncomment for displaying breadcrumbs <div id="breadcrumbs">/div>-->
   <div id="navigation_controller_content" >
 
   </div>

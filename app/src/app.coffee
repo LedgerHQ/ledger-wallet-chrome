@@ -64,4 +64,5 @@ require @ledger.imports, ->
   @ONBOARDING_LAYOUT = 'OnboardingNavigationController'
 
   @ledger.application = new Application()
+  @ledger.app = @ledger.application
   @ledger.application.start()
