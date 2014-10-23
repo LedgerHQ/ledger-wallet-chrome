@@ -1,2 +1,11 @@
 application:
   name: 'Ledger Wallet'
+
+wallet:
+  top_menu:
+    items:
+      dashboard: 'SYNTHÈSE'
+      send: 'ENVOYER'
+      receive: 'RECEVOIR'
+      accounts: 'COMPTES'
+      signout: 'VÉROUILLER'

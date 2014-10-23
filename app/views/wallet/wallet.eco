@@ -1,18 +1,24 @@
 <div class="main-container">
 
-    <div id="wallet_top_menu" class="top-main-menu">
-        Test 2
-
-        <div>
-            <div>
-                <a class="settings-icon" href="/wallet/settings"></a>
-            </div>
-        </div>
-
+  <div id="wallet_top_menu" class="top-main-menu">
+    <div class="left">
+      <div class="menu-item"><%= t('wallet.top_menu.items.dashboard') %></div>
+      <div class="menu-item"><%= t('wallet.top_menu.items.send') %></div>
+      <div class="menu-item"><%= t('wallet.top_menu.items.receive') %></div>
+      <div class="menu-item"><%= t('wallet.top_menu.items.accounts') %></div>
+      <div class="menu-item right"><%= t('wallet.top_menu.items.signout') %></div>
     </div>
 
-    <div id="navigation_controller_content" >
-
+    <div class="right">
+      <div>
+        <a class="settings-icon" href="/wallet/settings"></a>
+      </div>
     </div>
+
+  </div>
+
+  <div id="navigation_controller_content" >
+
+  </div>
 
 </div>
