@@ -15,6 +15,7 @@ onboarding:
     pin:
       enter_your_pin_code: "Enter you PIN code to unlock your wallet:"
       i_lost_my_pin_code: "I lost my PIN code"
+  management:
     done:
       you_can_access_your_wallet: "You can now start using your wallet"
       configuration_is_complete: "Configuration is complete"
