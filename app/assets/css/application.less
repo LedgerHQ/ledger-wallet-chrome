@@ -8,3 +8,37 @@
   background-color: @color-background-color;
   .fullsize
 }
+
+// buttons
+.rounded-button(@color) {
+  font-size: @font-size-large;
+  text-transform: uppercase;
+  border-radius: @border-radius-default-value;
+  padding: 9px 14px;
+  color: @color-white;
+  background-color: @color;
+  display: inline-block;
+  letter-spacing: -0.5px;
+
+  transition: background-color @animation-short-duration @animation-default-timing-function;
+
+  a& {
+    text-decoration: none;
+  }
+
+  a&:hover {
+    background-color: darken(@color, @color-default-darken-value);
+  }
+}
+
+.action-rounded-button {
+  .rounded-button(@color-action-green);
+}
+
+.cancel-rounded-button {
+  .rounded-button(@color-light-grey);
+}
+
+.important-rounded-button {
+  .rounded-button(@color-invalid-red);
+}

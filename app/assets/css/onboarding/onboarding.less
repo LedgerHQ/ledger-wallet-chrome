@@ -3,31 +3,75 @@
 // containers
 .logo-container {
   margin: 0 auto;
-  padding: @metrics-extra-large-padding;
+  padding: @metrics-extra-large-padding 0;
   width: 244px;
 }
 
 .greyed-container {
   background-color: @color-extra-light-grey;
-  width: 100%;
   padding: @metrics-large-padding 0;
 }
 
 .actions-container {
-  padding: @metrics-large-padding 0;
+  padding: @metrics-very-large-padding 0;
   text-align: center;
 }
 
 // texts
 .greyed-action {
-  color: @color-soft-grey;
+  @color: @color-soft-grey;
+  color: @color;
   text-decoration: none;
-}
-.greyed-action:hover {
-  color: darken(@color-soft-grey, @color-default-darken-value);
+
+  a&:hover {
+    color: darken(@color, @color-default-darken-value);
+  }
 }
 
 .black-indication {
   font-size: @font-size-very-large;
   font-weight: @font-weight-light;
+  letter-spacing: -0.5px;
+}
+
+.black-title {
+  font-size: @font-size-very-very-very-large;
+  letter-spacing: -0.5px;
+}
+
+// widgets
+.pin-code {
+  font-size: 0;
+
+  div {
+    background-color: @color-white;
+    height: 85px;
+    width: 55px;
+    display: inline-block;
+    margin-left: 6px;
+    border: solid 1px @color-light-grey;
+    border-radius: 10px;
+
+    &.focused {
+      border-color: @color-soft-grey;
+    }
+
+    &.selected {
+      border-color: @color-dark-grey-blue;
+    }
+
+    &.filled {
+      background-size: 17px 19px;
+      background-image: url("@{images-url}onboarding/pin_value.png");
+      background-position: center center;
+      background-repeat: no-repeat;
+    }
+  }
+
+  input {
+    width: 1;
+    height: 1;
+    opacity: 0;
+    position: absolute;
+  }
 }
