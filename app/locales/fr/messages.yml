@@ -1,6 +1,9 @@
 application:
   name: 'Ledger Wallet'
 
+common:
+  bitcoin_acronym: 'BTC'
+
 onboarding:
   device:
     plug:
@@ -12,9 +15,15 @@ onboarding:
     pin:
       enter_your_pin_code: "Entez votre code PIN pour dévérouiller votre portefeuille :"
       i_lost_my_pin_code: "J'ai perdu mon code PIN"
+    done:
+      you_can_access_your_wallet: "Vous pouvez maintenant commencer à utiliser votre portefeuille"
+      configuration_is_complete: "Configuration terminée"
+      open_my_wallet: "Ouvrir mon portefeuille"
+      later_lock_my_wallet: "Plus tard, vérouiller mon portefeuille"
 
 wallet:
   top_menu:
+    balance: 'SOLDE'
     items:
       dashboard: 'SYNTHÈSE'
       send: 'ENVOYER'

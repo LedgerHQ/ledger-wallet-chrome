@@ -44,7 +44,7 @@
         letter-spacing: -0.5px;
         font-weight: @font-weight-regular;
         opacity: 0.3;
-        transition: opacity @animation-short-duration ease-in-out;
+        transition: opacity @animation-short-duration @animation-default-timing-function;
 
         &:hover {
           opacity: 0.75;
@@ -125,7 +125,7 @@
         height: 24px;
       }
       opacity: 0.3;
-      transition: opacity @animation-short-duration ease-in-out;
+      transition: opacity @animation-short-duration @animation-default-timing-function;
 
       &:hover {
         opacity: 0.7;
