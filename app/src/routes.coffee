@@ -2,10 +2,7 @@
 
   ## Default
   route '/', ->
-    #ledger.storage.local.get()["Hello"] = "World"
-    #ledger.storage.local.save()
     app.router.go '/wallet/dashboard/index'
-    #app.navigate ONBOARDING_LAYOUT, OnboardingPlugViewController
 
   ## Onboarding
   route '/onboarding/plug', (params) ->

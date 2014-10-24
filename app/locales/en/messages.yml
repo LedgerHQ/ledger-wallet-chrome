@@ -5,9 +5,21 @@ common:
   bitcoin_acronym: 'BTC'
 
 onboarding:
-  plug:
-    to_start: "To begin, plug your Ledger Wallet into the USB port of your computer"
-    i_lost_my_wallet: "I lost my Ledger Wallet"
+  device:
+    plug:
+      to_start: "To begin, connect your Ledger Wallet into the USB port of your computer"
+      i_lost_my_wallet: "I lost my Ledger Wallet"
+    unplug:
+      unlock_my_wallet: "Unlock my wallet"
+      you_can_unplug: "You can now safely disconnect your Ledger Wallet"
+    pin:
+      enter_your_pin_code: "Enter you PIN code to unlock your wallet:"
+      i_lost_my_pin_code: "I lost my PIN code"
+    done:
+      you_can_access_your_wallet: "You can now start using your wallet"
+      configuration_is_complete: "Configuration is complete"
+      open_my_wallet: "Open my wallet"
+      later_lock_my_wallet: "Later, lock my wallet"
 
 wallet:
   top_menu:
@@ -17,6 +29,4 @@ wallet:
       send: 'SEND'
       receive: 'RECEIVE'
       accounts: 'ACCOUNTS'
-      signout: 'SIGN OUT'
-
-
+      signout: 'LOCK'

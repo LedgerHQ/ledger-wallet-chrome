@@ -43,6 +43,7 @@ class @NavigationController extends @ViewController
     @emit 'beforeRender', @
     do selector.empty
     render @viewPath(), @, (html) =>
+      selector.empty()
       selector.html(html)
       do @renderChild
       do @onAfterRender
