@@ -30,3 +30,13 @@ wallet:
       receive: 'RECEVOIR'
       accounts: 'COMPTES'
       signout: 'VÉROUILLER'
+
+  dashboard:
+
+    index:
+      accounts:
+        title: "APERÇU DES COMPTES"
+        manage: "GÉRER LES COMPTES"
+        account_name: "NOM DU COMPTE"
+        account_type: "TYPE"
+        account_balance: "SOLDE"

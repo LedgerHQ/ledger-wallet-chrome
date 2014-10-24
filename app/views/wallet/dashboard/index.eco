@@ -1,4 +1,44 @@
-this is a test
-<a href="#test">Go to accounts</a>
-<a href="#">Go to #</a>
-<button id="test">Click</button>
+<section id="accounts" class="table-section">
+
+  <header>
+    <h1><%= t 'wallet.dashboard.index.accounts.title' %></h1>
+    <a href="/wallet/accounts/index"><%= t 'wallet.dashboard.index.accounts.manage' %></a>
+  </header>
+
+  <table>
+    <thead>
+      <tr>
+        <td class="fit-content" ><%= t 'wallet.dashboard.index.accounts.account_name' %></td>
+        <td ><%= t 'wallet.dashboard.index.accounts.account_type' %></td>
+        <td class="fit-content" ><%= t 'wallet.dashboard.index.accounts.account_balance' %></td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="fit-content">Compte courant</td>
+        <td>courant</td>
+        <td class="fit-content">2.0000 BTC</td>
+      </tr>
+      <tr>
+        <td class="fit-content">Compte pas courant</td>
+        <td>épargne</td>
+        <td class="fit-content">945.9406 BTC</td>
+      </tr>
+      <tr>
+        <td class="fit-content">Compte peu courant</td>
+        <td>travail</td>
+        <td class="fit-content">289.0000 BTC</td>
+      </tr>
+      <tr>
+        <td class="fit-content">Compte très courant</td>
+        <td>courant</td>
+        <td class="fit-content">24.0000 BTC</td>
+      </tr>
+    </tbody>
+  </table>
+
+</section>
+
+<div id="operations">
+
+</div>

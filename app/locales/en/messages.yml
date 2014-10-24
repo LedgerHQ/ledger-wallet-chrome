@@ -30,3 +30,13 @@ wallet:
       receive: 'RECEIVE'
       accounts: 'ACCOUNTS'
       signout: 'LOCK'
+
+  dashboard:
+
+    index:
+      accounts:
+        title: "ACCOUNTS PREVIEW"
+        manage: "MANAGE ACCOUNTS"
+        account_name: "ACCOUNT NAME"
+        account_type: "TYPE"
+        account_balance: "BALANCE"
