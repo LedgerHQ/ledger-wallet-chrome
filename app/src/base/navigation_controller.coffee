@@ -41,6 +41,7 @@ class @NavigationController extends @ViewController
     @renderedSelector = selector
     do @onBeforeRender
     @emit 'beforeRender', @
+    do selector.empty
     render @viewPath(), @, (html) =>
       selector.empty()
       selector.html(html)
@@ -56,7 +57,7 @@ class @NavigationController extends @ViewController
 
   renderChild: ->
     return if @viewControllers.length == 0 || !@renderedSelector?
-    $('#' + @childViewControllerContentId).empty()
+    do $('#' + @childViewControllerContentId).empty
     @topViewController().render($('#' + @childViewControllerContentId))
 
   handleAction: (actionName) ->

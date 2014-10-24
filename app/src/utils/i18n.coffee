@@ -4,4 +4,6 @@
 # @return [String] localized message
 #
 @t = (messageId) ->
-  chrome.i18n.getMessage(_.string.replace(messageId, '.', '_'))
+  message = chrome.i18n.getMessage(_.string.replace(messageId, '.', '_'))
+  return message if message? and message.length > 0
+  return messageId
