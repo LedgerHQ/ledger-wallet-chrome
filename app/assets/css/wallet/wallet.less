@@ -16,11 +16,10 @@
     padding-left: @metrics-medium-padding;
 
     .menu-item {
-      width: 70px;
+      width: 80px;
       color: @color-white;
-      margin-right: @metrics-large-padding;
+      margin-right: @metrics-medium-padding;
       display: flex;
-      flex-direction: column;
       padding-top: 24px;
 
       &.selected {
@@ -33,58 +32,63 @@
         }
       }
 
-      >a {
-        font-size: @font-size-large;
-        text-decoration: none;
-        color: @color-white;
-        align-self: flex-start;
+      >div {
+
         display: flex;
         flex-direction: column;
-        align-items: center;
-        letter-spacing: -0.5px;
-        font-weight: @font-weight-regular;
-        opacity: 0.3;
-        transition: opacity @animation-short-duration @animation-default-timing-function;
 
-        &:hover {
-          opacity: 0.75;
+        >a {
+          font-size: @font-size-large;
+          text-decoration: none;
+          color: @color-white;
+          align-self: flex-start;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          letter-spacing: -0.5px;
+          font-weight: @font-weight-regular;
+          opacity: 0.3;
+          transition: opacity @animation-short-duration @animation-default-timing-function;
+
+          &:hover {
+            opacity: 0.75;
+          }
+
+          img {
+            width: 24px;
+            height: 24px;
+          }
+
+          span {
+            margin-top: @metrics-very-small-padding;
+          }
+
+          .icon-spacer {
+            height: 24px;
+          }
+
+          .text-spacer {
+            height: 10px;
+          }
+        }
+        .selector {
+          position: relative;
+          width: 100%;
+          height: 5px;
         }
 
-        img {
-          width: 24px;
-          height: 24px;
+        .spacer {
+          flex-grow: 1;
         }
-
-        span {
-          margin-top: @metrics-very-small-padding;
-        }
-
-        .icon-spacer {
-          height: 24px;
-        }
-
-        .text-spacer {
-          height: 10px;
-        }
-
       }
 
-      .selector {
-        position: relative;
-        width: 100%;
-        height: 5px;
-        align-self: flex-end;
-      }
 
-      .spacer {
-        flex-grow: 1;
-      }
 
     }
 
     .right {
       margin-left: auto;
-      margin-right: @metrics-large-padding;
+      margin-right: @metrics-medium-padding;
     }
 
   }
