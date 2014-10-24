@@ -1,3 +1,4 @@
 this is a test
 <a href="#test">Go to accounts</a>
+<a href="#">Go to #</a>
 <button id="test">Click</button>

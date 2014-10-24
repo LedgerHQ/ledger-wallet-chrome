@@ -10,6 +10,7 @@ app:
       - "src/background.js"
 
 permissions:
+  - "storage"
   - "usb"
   -
     usbDevices:
