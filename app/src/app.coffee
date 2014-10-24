@@ -39,15 +39,15 @@ require @ledger.imports, ->
 
         if @_navigationController == null or @_navigationController.constructor.name != layoutName
           @_navigationController = new window[layoutName]()
-          controller = new viewController
+          controller = new viewController(newUrl.params())
           controller.on 'afterRender', onControllerRendered.bind(@)
-          @_navigationController.push new viewController()
+          @_navigationController.push controller
           @_navigationController.render $('body')
         else
           if @_navigationController.topViewController().constructor.name == viewController.name and oldUrl.pathname == newUrl.pathname and newUrl.params == oldUrl.params # Check if only hash part of url change
             @_navigationController.handleAction(actionName)
           else
-            controller = new viewController
+            controller = new viewController(newUrl.params())
             controller.on 'afterRender', onControllerRendered.bind(@)
             @_navigationController.push controller
 

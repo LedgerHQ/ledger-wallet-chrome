@@ -8,4 +8,4 @@
 </div>
 <div class="actions-container">
   <a href="#" class="greyed-action"><%= t 'onboarding.device.done.later_lock_my_wallet' %></a>
-</div
+</div>

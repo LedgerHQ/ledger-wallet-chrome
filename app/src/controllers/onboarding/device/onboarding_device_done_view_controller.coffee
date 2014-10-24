@@ -1,1 +1,1 @@
-class @OnboardingDeviceDoneViewController extends @ViewController 
+class @OnboardingDeviceDoneViewController extends @ViewController
