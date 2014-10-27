@@ -39,5 +39,6 @@
         'controllers/onboarding/device/onboarding_device_unplug_view_controller',
         'controllers/onboarding/device/onboarding_device_pin_view_controller',
         # Management
-        'controllers/onboarding/management/onboarding_management_done_view_controller'
+        'controllers/onboarding/management/onboarding_management_done_view_controller',
+        'controllers/onboarding/management/onboarding_management_welcome_view_controller'
       ]
