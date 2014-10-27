@@ -4,6 +4,12 @@
   parseAsUrl: (str) ->
     parser = document.createElement('a')
     parser.href = str
+    parser.params = ->
+      params = parser.search.substring(1)
+      _.chain(params.split('&')).map (params) ->
+        p = params.split '='
+        [p[0], decodeURIComponent(p[1])]
+      .object().value()
     parser
 
   createRelativeUrlWithFragmentedUrl: (url, fragmentedUrl) ->
