@@ -36,7 +36,15 @@ wallet:
     index:
       accounts:
         title: "APERÇU DES COMPTES"
-        manage: "GÉRER LES COMPTES"
+        action: "GÉRER LES COMPTES"
         account_name: "NOM DU COMPTE"
         account_type: "TYPE"
         account_balance: "SOLDE"
+
+      operations:
+        title: "DERNIÈRES OPERATIONS"
+        action: "VOIR TOUTES LES OPÉRATIONS"
+        time: "DATE ET HEURE"
+        account_name: "NOM DU COMPTE"
+        bitcoin_address: "ADRESSE BITCOIN"
+        amount: "MONTANT"

@@ -5,7 +5,7 @@
   padding: @metrics-large-padding @metrics-medium-padding;
 }
 
-.table-section {
+section {
   width: 100%;
   display: table;
 
@@ -23,7 +23,7 @@
       letter-spacing: -0.4px;
       margin-left: auto;
       text-decoration: none;
-      font-size: @font-size-medium;
+      font-size: @font-size-small;
       font-weight: @font-weight-regular;
       color: @color-action-purple;
 
@@ -54,14 +54,50 @@
     tr td.fit-content {
       width: 1%;
       white-space:nowrap;
-      padding-right: @metrics-very-large-padding;
     }
 
     tr td:last-child {
-      text-align: right;
       padding-right: 0px;
+    }
+
+    .price {
       font-weight: @font-weight-semibold;
       letter-spacing: -0.3px;
+    }
+
+    .positive-price {
+      .price;
+      color: @color-valid-green;
+    }
+
+    .negative-price {
+      .price;
+      color: @color-invalid-red;
+    }
+
+    .align-right {
+      text-align: right;
+      padding-right: 0px;
+    }
+
+    .padding-right-very-small {
+      padding-right: @metrics-very-small-padding;
+    }
+
+    .padding-right-small {
+      padding-right: @metrics-small-padding;
+    }
+
+    .padding-right-very-large {
+      padding-right: @metrics-very-large-padding;
+    }
+
+    .padding-right-extra-large {
+      padding-right: @metrics-extra-large-padding;
+    }
+
+    .padding-right-ultra-large {
+      padding-right: @metrics-ultra-large-padding;
     }
 
     thead tr td {
@@ -72,6 +108,37 @@
       font-size: @font-size-very-small;
     }
 
+    .weak-text {
+      color: @color-dark-grey;
+    }
+
   }
 
+}
+
+.account-type-tag {
+  border-radius: 5px;
+  padding: 3px 4px;
+  padding-top: 1.5px;
+  font-size: @font-size-very-small;
+  color: @color-white;
+}
+
+.account-type-orange {
+  .account-type-tag();
+  background-color: #ffa200;
+}
+
+.account-type-green {
+  .account-type-tag();
+  background-color: #3fb34f;
+}
+
+.account-type-blue {
+  .account-type-tag();
+  background-color: #0099ff;
+}
+
+.very-small-text {
+  font-size: @font-size-very-small;
 }
