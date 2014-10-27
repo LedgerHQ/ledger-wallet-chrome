@@ -1,7 +1,7 @@
 name: "__MSG_application_name__"
 version: "0.1"
 manifest_version: 2
-minimum_chrome_version: "35"
+minimum_chrome_version: "38"
 default_locale: "en"
 
 app:
@@ -10,6 +10,7 @@ app:
       - "src/background.js"
 
 permissions:
+  - "storage"
   - "usb"
   -
     usbDevices:

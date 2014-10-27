@@ -22,6 +22,7 @@
   route '/onboarding/management/welcome', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementWelcomeViewController
 
+
   ## Wallet
   # Dashboard
   route '/wallet/dashboard/index:#action:', (params) ->
