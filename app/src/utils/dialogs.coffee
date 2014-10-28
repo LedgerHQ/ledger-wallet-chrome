@@ -78,7 +78,7 @@ class @ledger.dialogs.DialogsController
     dialog.render @_selector.find("#dialog_#{dialog._id}"), =>
       @_selector.find("#dialog_#{dialog._id}").css('visibility', 'visible')
       @_selector.find("#dialog_#{dialog._id}").css('top', window.innerHeight / 2 + 'px')
-      @_selector.find("#dialog_#{dialog._id}").css('opacity', '0.7')
+      @_selector.find("#dialog_#{dialog._id}").css('opacity', '1')
       @_selector.find("#dialog_#{dialog._id}").animate {'top': 0, 'opacity': 1}, 500, 'smooth', ->
           dialog.onShow()
 
@@ -92,7 +92,7 @@ class @ledger.dialogs.DialogsController
     dialog = @_dialogs[0]
     @_dialogs.splice(0, 1)
     @_selector.fadeOut(300)
-    @_selector.find("#dialog_#{dialog._id}").animate {top: window.innerHeight / 2, opacity: 0.7}, 300,  =>
+    @_selector.find("#dialog_#{dialog._id}").animate {top: window.innerHeight / 2, opacity: 1}, 300,  =>
       @_selector.find("#dialog_#{dialog._id}").remove()
       dialog.onDismiss()
 

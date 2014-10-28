@@ -3,31 +3,44 @@
     <header>
       <h1><%= t 'wallet.dashboard.operations.detail.title' %></h1>
     </header>
-    <table>
-      <tr>
-        <td class="very-weak-text"><%= t 'wallet.dashboard.operations.detail.amount' %></td>
-        <td class="align-right positive-price">+200.1234BTC</td>
-      </tr>
-      <tr>
-        <td class="very-weak-text"><%= t 'wallet.dashboard.operations.detail.time' %></td>
-        <td class="align-right">21/05/2014 à 15:30</td>
-      </tr>
-      <tr>
-        <td class="very-weak-text"><%= t 'wallet.dashboard.operations.detail.status' %></td>
-        <td class="align-right positive">Confirmée</td>
-      </tr>
-      <tr>
-        <td class="very-weak-text"><%= t 'wallet.dashboard.operations.detail.sender' %></td>
-        <td class="align-right">1AgMRZBzMo6kDAirgRsZ9RYDea3uuUHjxy</td>
-      </tr>
-      <tr>
-        <td class="very-weak-text"><%= t 'wallet.dashboard.operations.detail.receiver' %></td>
-        <td class="align-right">+200.1234BTC</td>
-      </tr>
-      <tr class="no-border">
-        <td class="very-weak-text"><%= t 'wallet.dashboard.operations.detail.identifier' %></td>
-        <td class="align-right">94b293fa7d9463e6a37c9c29826f145a22a83b0f295fe8935d5a9831018919db</td>
-      </tr>
+    <table class="no-table-head">
+      <tbody>
+        <tr>
+          <td class="very-weak-text"><%= t 'wallet.dashboard.operations.detail.amount' %></td>
+          <td class="align-right positive-price">+200.1234BTC</td>
+        </tr>
+        <tr>
+          <td class="very-weak-text"><%= t 'wallet.dashboard.operations.detail.time' %></td>
+          <td class="align-right">21/05/2014 à 15:30</td>
+        </tr>
+        <tr>
+          <td class="very-weak-text"><%= t 'wallet.dashboard.operations.detail.status' %></td>
+          <td class="align-right positive">Confirmée</td>
+        </tr>
+        <tr>
+          <td class="very-weak-text"><%= t 'wallet.dashboard.operations.detail.sender' %></td>
+          <td class="align-right">1AgMRZBzMo6kDAirgRsZ9RYDea3uuUHjxy</td>
+        </tr>
+        <tr>
+          <td class="very-weak-text top-align"><%= t 'wallet.dashboard.operations.detail.receiver' %></td>
+          <td class="align-right top-align">
+            <div class="mutiple-addresses-section">
+              <div>
+                <div>Épargne de Lucie</div>
+                <div class="positive">+100.0000BTC</div>
+              </div>
+              <div>
+                <div>Compte courant de Maxime</div>
+                <div class="positive">+100.1234BTC</div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr class="no-border">
+          <td class="very-weak-text"><%= t 'wallet.dashboard.operations.detail.identifier' %></td>
+          <td class="align-right very-small-text">94b293fa7d9463e6a37c9c29826f145a22a83b0f295fe8935d5a9831018919db</td>
+        </tr>
+      </tbody>
     </table>
   </section>
   <div class="dialog-actions-bar">

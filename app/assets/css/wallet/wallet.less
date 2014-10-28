@@ -11,7 +11,7 @@ section {
 
   >header {
     display: flex;
-    margin-bottom: @metrics-very-small-padding + 8px;
+    margin-bottom: 0px;
 
     >h1 {
       letter-spacing: -0.5px;
@@ -39,12 +39,21 @@ section {
     width: 100%;
     vertical-align: middle;
 
-    thead {
-
+    thead tr td {
+      letter-spacing: -0.3px;
+      border-bottom: 1px solid transparent;
+      font-weight: @font-weight-semibold;
+      font-size: @font-size-very-small;
+      padding-top: @metrics-medium-padding - 5px;
     }
 
-    tr td {
-      height: 40px;
+    tbody tr:first-child td {
+      padding-top: @metrics-medium-padding - 5px;
+    }
+
+    tbody tr td {
+      padding-top: 14px;
+      padding-bottom: 14px;
       vertical-align:middle;
       padding-right: @metrics-very-large-padding;
       border-bottom: 1px solid @color-very-light-grey;
@@ -62,6 +71,10 @@ section {
 
     tr td:last-child {
       padding-right: 0px;
+    }
+
+    &.no-table-head tr:first-child td {
+      padding-top: @metrics-large-padding;
     }
 
     .price {
@@ -111,16 +124,6 @@ section {
     .padding-right-ultra-large {
       padding-right: @metrics-ultra-large-padding;
     }
-
-    thead tr td {
-      height: 32px;
-      letter-spacing: -0.3px;
-      border-bottom: 1px solid transparent;
-      font-weight: @font-weight-semibold;
-      font-size: @font-size-very-small;
-    }
-
-
 
     .weak-text {
       color: @color-dark-grey;
