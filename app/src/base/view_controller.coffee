@@ -48,8 +48,10 @@ class @ViewController extends @EventEmitter
   # @param [Object] params The parameters applied to the action
   # @return [Boolean] yes if the controller is able to handle the action no otherwise
   handleAction: (actionName, params) ->
-    do @[actionName](params) if @[actionName]?
-    yes
+    if @[actionName]? and _.isFunction(@[actionName])
+      @[actionName](params)
+      return yes
+    no
 
   # Set the current stylesheet need for the controller
   setControllerStylesheet: () ->

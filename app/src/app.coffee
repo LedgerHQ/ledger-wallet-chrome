@@ -30,7 +30,7 @@ require @ledger.imports, ->
       @router.once 'routed', (event, data) =>
         oldUrl = if @_lastUrl? then @_lastUrl.parseAsUrl() else {hash: '', pathname: '', params: -> ''}
         newUrl = data.url.parseAsUrl()
-        @_lastUrl = newUrl
+        @_lastUrl = data.url
         @currentUrl = data.url
 
         controller = null
@@ -40,7 +40,7 @@ require @ledger.imports, ->
 
         onControllerRendered = () ->
           # Callback when the controller has been rendered
-          @_navigationController.handleAction(actionName, parameters) if newUrl.hash.length > 0
+          @handleAction(actionName, parameters) if newUrl.hash.length > 0
 
         if @_navigationController == null or @_navigationController.constructor.name != layoutName
           @_navigationController = new window[layoutName]()
@@ -50,7 +50,7 @@ require @ledger.imports, ->
           @_navigationController.render @_navigationControllerSelector()
         else
           if @_navigationController.topViewController().constructor.name == viewController.name and oldUrl.pathname == newUrl.pathname and _.isEqual(newUrl.params(), oldUrl.params()) # Check if only hash part of url change
-            @_navigationController.handleAction(actionName, parameters)
+           @handleAction(actionName, parameters)
           else
             controller = new viewController(newUrl.params())
             controller.on 'afterRender', onControllerRendered.bind(@)
@@ -63,6 +63,13 @@ require @ledger.imports, ->
           cleanHref = cleanHref.replace(/\?[0-9]*/i, '')
           link.href = cleanHref + '?' + (new Date).getTime()
       @_navigationController.render @_navigationControllerSelector() if @_navigationController?
+
+    handleAction: (actionName, params) ->
+      handled = no
+      if ledger.dialogs.manager.displayedDialog?
+        handled = ledger.dialogs.manager.displayedDialog.handleAction actionName, params
+      handled = @_navigationController.handleAction(actionName, params) unless handled
+      handled
 
 
   @WALLET_LAYOUT = 'WalletNavigationController'

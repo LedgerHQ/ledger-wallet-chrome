@@ -1,8 +1,5 @@
 class @WalletDashboardIndexViewController extends @ViewController
 
-  onAfterRender: ()->
-    $('#test').on 'click', ->
-      l 'Salut'
-
-  test: () ->
-    l 'Test'
+  showOperation: (params) ->
+    dialog = new WalletOperationsDetailDialogViewController(params)
+    dialog.show()

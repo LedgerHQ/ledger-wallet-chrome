@@ -69,7 +69,6 @@ class @NavigationController extends @ViewController
   # @override ViewController.handleAction
   # Dispatch the action to the view controller
   handleAction: (actionName, params) ->
-    if @[actionName]?
-      do @[actionName]
-    else
-      return @topViewController()?.handleAction(actionName)
+    unless super
+      return @topViewController()?.handleAction(actionName, params)
+    yes

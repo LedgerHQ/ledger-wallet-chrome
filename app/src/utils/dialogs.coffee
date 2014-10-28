@@ -80,6 +80,8 @@ class @ledger.dialogs.DialogsController
       @_selector.find("#dialog_#{dialog._id}").animate {'top': 0, 'opacity': 1}, 500, 'smooth', ->
           dialog.onShow()
 
+  handleAction: (actionName, params) -> @_viewController.handleAction(actionName, params)
+
   # Dismiss a dialog
   # @param dialog [ledger.dialogs.DialogController] the dialog to dismiss
   dismiss: (dialog) ->
@@ -93,5 +95,8 @@ class @ledger.dialogs.DialogsController
     @_selector.find("#dialog_#{dialog._id}").animate {top: window.innerHeight / 2, opacity: 0.7}, 300,  =>
       @_selector.find("#dialog_#{dialog._id}").remove()
       dialog.onDismiss()
+
+  displayedDialog: () ->
+    @_dialogs[0]
 
 @ledger.dialogs.manager = new ledger.dialogs.DialogsController()
