@@ -2,7 +2,7 @@
 
   ## Default
   route '/', ->
-    app.router.go '/onboarding/device/plug'
+    app.router.go '/onboarding/management/welcome'
 
   ## Onboarding
   # Device
@@ -22,6 +22,8 @@
   route '/onboarding/management/welcome', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementWelcomeViewController
 
+  route '/onboarding/management/locked', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingManagementLockedViewController
 
   ## Wallet
   # Dashboard

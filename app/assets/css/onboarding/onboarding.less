@@ -11,6 +11,7 @@
     font-size: @font-size-very-large;
     font-weight: @font-weight-light;
     letter-spacing: -0.5px;
+    line-height: 25px;
   }
 
   .black-title {
@@ -22,20 +23,25 @@
     display: flex;
     text-decoration: none;
     color: @color-black;
-    align-items: center;
     padding: 35px @metrics-ultra-large-padding;
+    padding-bottom: 30px;
     margin-bottom: 20px;
 
     .black-indication {
-      margin-top: 15px;
+      margin-top: 10px;
     }
 
-    & :first-child {
-      margin-right: 25px;
+    > img:first-child {
+      width: 46px;
     }
 
-    & :last-child {
+    > div {
+      padding: 0 @metrics-medium-padding;
+    }
+
+    > img:last-child {
       margin-left: auto;
+      align-self: center;
     }
 
     &:hover {

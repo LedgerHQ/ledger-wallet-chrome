@@ -21,6 +21,21 @@ onboarding:
       configuration_is_complete: "Configuration terminée"
       open_my_wallet: "Ouvrir mon portefeuille"
       later_lock_my_wallet: "Plus tard, vérouiller mon portefeuille"
+    welcome:
+      welcome_to_your_new_wallet: "Bienvenue sur votre nouveau portefeuille"
+      create_or_recover: "Souhaitez-vous créer un nouveau portefeuille ou restaurer un portefeuille existant ?"
+      use_as_new: "Utiliser comme nouveau portefeuille"
+      if_its_your_first_wallet: "S’il s’agit de votre premier Ledger Wallet"
+      recover_wallet: "Restaurer mon portefeuille existant"
+      if_you_lost_your_wallet: "Si vous avez bloqué ou perdu votre Ledger Wallet"
+    locked:
+      wallet_is_locked: "Portefeuille bloqué"
+      wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN, mais vos Bitcoins restent en sécurité."
+      unlock_or_create: "Pour retrouver l'accès à vos comptes, vous devez débloquer votre portefeuille à l’aide de votre phrase de restauration."
+      unlock_my_wallet: "Débloquer mon portefeuille"
+      retreive_access: "Retrouvez l’accès à vos comptes à l’aide de votre phrase de restauration"
+      create_a_new_wallet: "Créer un nouveau portefeuille"
+      you_can_always_retreive_your_accounts: "Vos comptes et Bitcoins actuels pourront être restaurés à tout moment sur un autre Ledger Wallet"
 
 wallet:
   top_menu:

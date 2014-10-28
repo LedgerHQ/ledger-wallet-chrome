@@ -21,6 +21,21 @@ onboarding:
       configuration_is_complete: "Configuration is complete"
       open_my_wallet: "Open my wallet"
       later_lock_my_wallet: "Later, lock my wallet"
+    welcome:
+      welcome_to_your_new_wallet: "Welcome to your new wallet"
+      create_or_recover: "Would you like to create a new wallet or restore an existing one?"
+      use_as_new: "Use as a new wallet"
+      if_its_your_first_wallet: "If you just bought your first Ledger Wallet"
+      recover_wallet: "Restore my existing wallet"
+      if_you_lost_your_wallet: "If you froze or lost your Ledger Wallet"
+    locked:
+      wallet_is_locked: "Your wallet is frozen"
+      wrong_pin_codes: "Your wallet has frozen due to 3 incorrect PIN entries, but your Bitcoins remain safe."
+      unlock_or_create: "To regain access to your accounts, you must unfreeze your wallet with your recover phrase."
+      unlock_my_wallet: "Unfreeze my wallet"
+      retreive_access: "Regain access to your accounts using your recover phrase"
+      create_a_new_wallet: "Create a new wallet"
+      you_can_always_retreive_your_accounts: "Your current Bitcoins and accounts remain fully restorable at any time to another Ledger Wallet"
 
 wallet:
   top_menu:
