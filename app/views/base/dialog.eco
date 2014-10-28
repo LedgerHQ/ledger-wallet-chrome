@@ -1,0 +1,3 @@
+<div id="dialog_<%= @dialog_id %>" class="dialog" style="visibility: hidden">
+
+</div>

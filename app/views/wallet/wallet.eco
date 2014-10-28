@@ -1,0 +1,73 @@
+<div class="main-container">
+
+  <div id="wallet_top_menu" class="top-main-menu">
+    <ul class="left">
+      <li id="dashboard-item" class="menu-item selected">
+        <div>
+          <a href="/wallet/dashboard/index">
+            <img src="../assets/images/wallet/dashboard_icon.png"/>
+            <span><%= t('wallet.top_menu.items.dashboard') %></span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
+      <li id="send-item" class="menu-item">
+        <div>
+          <a href="/wallet/send/index">
+            <img src="../assets/images/wallet/send_icon.png" />
+            <span><%= t('wallet.top_menu.items.send') %></span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
+      <li id="receive-item" class="menu-item">
+        <div>
+          <a href="/wallet/receive/index">
+            <img src="../assets/images/wallet/receive_icon.png" />
+            <span><%= t('wallet.top_menu.items.receive') %></span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
+      <li id="accounts-item" class="menu-item">
+        <div>
+          <a href="/wallet/accounts/index">
+            <img src="../assets/images/wallet/accounts_icon.png" />
+            <span><%= t('wallet.top_menu.items.accounts') %></span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
+      <li id="signout-item" class="menu-item right">
+        <div>
+          <a href="#signOut">
+            <img src="../assets/images/wallet/signout_icon.png" />
+            <span><%= t('wallet.top_menu.items.signout') %></span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
+    </ul>
+
+    <div class="right">
+      <div>
+        <p class="balance-label"><%= t 'wallet.top_menu.balance' %></p>
+        <p class="balance-value"><span id="balance-value">2.0325</span><sup><%= t 'common.bitcoin_acronym' %></sup></p>
+      </div>
+      <a class="settings-icon" href="/wallet/settings/index">
+        <img src="../assets/images/wallet/settings_icon.png" />
+      </a>
+    </div>
+
+  </div>
+  <!-- Uncomment for displaying breadcrumbs <div id="breadcrumbs">/div>-->
+  <div id="navigation_controller_content" >
+
+  </div>
+
+</div>

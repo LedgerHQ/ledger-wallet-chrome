@@ -1,0 +1,1 @@
+class @OnboardingNavigationController extends @NavigationController
