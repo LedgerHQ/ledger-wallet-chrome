@@ -18,6 +18,8 @@
   route '/wallet/send/index:#action::?params:', (params) ->
 
   route '/wallet/receive/index:#action::?params:', (params) ->
+    d = new WalletOperationsDetailDialogViewController()
+    d.show()
 
   # Accounts
   route '/wallet/accounts/index:#action::?params:', (params) ->

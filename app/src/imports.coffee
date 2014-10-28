@@ -15,6 +15,7 @@
         'utils/event_emitter',
         'utils/http_client',
         'utils/url',
+        'utils/easing',
         'utils/router',
         'utils/i18n',
         'utils/spinners',
@@ -31,11 +32,17 @@
         'base/view_controller',
         'base/navigation_controller',
 
+        ## Dialog Management
+        'utils/dialogs',
+        '../views/base/dialog',
+        'base/dialog_view_controller'
 
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller',
         # Dashboard
         'controllers/wallet/dashboard/wallet_dashboard_index_view_controller',
+        # Operations
+        'controllers/wallet/operations/wallet_operations_detail_dialog_view_controller',
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_navigation_controller',

@@ -2,13 +2,15 @@ require @ledger.imports, ->
 
   class Application
 
+    _navigationControllerSelector: -> $('#controllers_container')
+
     constructor: ->
       @_navigationController = null
       @devicesManager = new DevicesManager()
       @router = new Router(@)
+      ledger.dialogs.manager.initialize($('#dialogs_container'))
 
     start: ->
-
       chrome.commands.onCommand.addListener (command) =>
         switch command
           when 'reload-page' then do @reloadUi
@@ -42,7 +44,7 @@ require @ledger.imports, ->
           controller = new viewController
           controller.on 'afterRender', onControllerRendered.bind(@)
           @_navigationController.push new viewController()
-          @_navigationController.render $('body')
+          @_navigationController.render @_navigationControllerSelector()
         else
           if @_navigationController.topViewController().constructor.name == viewController.name and oldUrl.pathname == newUrl.pathname and newUrl.params == oldUrl.params # Check if only hash part of url change
             @_navigationController.handleAction(actionName)
@@ -57,7 +59,7 @@ require @ledger.imports, ->
           cleanHref = link.href
           cleanHref = cleanHref.replace(/\?[0-9]*/i, '')
           link.href = cleanHref + '?' + (new Date).getTime()
-      @_navigationController.render $('body') if @_navigationController?
+      @_navigationController.render @_navigationControllerSelector() if @_navigationController?
 
 
   @WALLET_LAYOUT = 'WalletNavigationController'

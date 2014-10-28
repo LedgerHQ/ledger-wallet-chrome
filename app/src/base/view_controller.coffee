@@ -50,4 +50,5 @@ class @ViewController extends @EventEmitter
 
   onDetach: ->
 
+
 jQuery.extend(@ViewController.prototype, jQuery.EventEmitter.prototype)
