@@ -25,6 +25,8 @@ class @ledger.dialogs.DialogController extends EventEmitter
     @_viewController.once 'afterRender', done
     @_viewController.render selector
 
+  handleAction: (actionName, params) -> @_viewController.handleAction(actionName, params)
+
   push: (viewController) ->
     @_viewController = viewController
     viewController.parentViewController = @
@@ -80,12 +82,10 @@ class @ledger.dialogs.DialogsController
       @_selector.find("#dialog_#{dialog._id}").animate {'top': 0, 'opacity': 1}, 500, 'smooth', ->
           dialog.onShow()
 
-  handleAction: (actionName, params) -> @_viewController.handleAction(actionName, params)
-
   # Dismiss a dialog
   # @param dialog [ledger.dialogs.DialogController] the dialog to dismiss
   dismiss: (dialog) ->
-    dismissAll()
+    @dismissAll()
 
   dismissAll: () ->
     return if @_dialogs.length == 0

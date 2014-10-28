@@ -42,6 +42,24 @@
   .rounded-button(@color-invalid-red);
 }
 
+.dialog-actions-bar {
+  display: flex;
+  margin-top: @metrics-medium-padding;
+
+  > a {
+    margin-right: @metrics-very-small-padding;
+  }
+
+  > a:last-child {
+    margin-right: 0px;
+  }
+
+  .cancel-rounded-button {
+    margin-left: auto;
+  }
+
+}
+
 [data-href] {
 
   &:hover {

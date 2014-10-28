@@ -49,3 +49,16 @@ wallet:
         account_name: "ACCOUNT NAME"
         bitcoin_address: "BITCOIN ADDRESS"
         amount: "AMOUNT"
+
+    operations:
+      detail:
+        title: "OPERATION DETAIL"
+        amount: "Amount"
+        time: "Time"
+        status: "Status"
+        sender: "From"
+        receiver: "To"
+        identifier: "Transaction identifier"
+        send_by_email: "SEND BY EMAIL"
+        print: "PRINT"
+        close: "CLOSE"

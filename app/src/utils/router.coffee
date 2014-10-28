@@ -39,7 +39,6 @@ class @Router extends @EventEmitter
     self = @
     # Redirect every in-app link with our router
     $('body').delegate 'a', 'click', (e) ->
-      l 'Salut'
       if @href? and @protocol == 'chrome-extension:'
         url = null
         if  _.str.startsWith(@pathname, '/views/') and self.currentUrl?

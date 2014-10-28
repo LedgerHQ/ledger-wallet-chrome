@@ -49,3 +49,16 @@ wallet:
         account_name: "NOM DU COMPTE"
         bitcoin_address: "ADRESSE BITCOIN"
         amount: "MONTANT"
+
+    operations:
+      detail:
+        title: "DÉTAIL DE L'OPÉRATION"
+        amount: "Montant"
+        time: "Date et heure"
+        status: "État"
+        sender: "Depuis"
+        receiver: "Vers"
+        identifier: "Identifiant"
+        send_by_email: "ENVOYER PAR EMAIL"
+        print: "IMPRIMER"
+        close: "FERMER"

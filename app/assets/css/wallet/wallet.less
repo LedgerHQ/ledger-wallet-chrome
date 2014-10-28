@@ -51,6 +51,10 @@ section {
       font-size: @font-size-medium;
     }
 
+    tr.no-border td {
+      border-bottom: 0px solid transparent;
+    }
+
     tr td.fit-content {
       width: 1%;
       white-space:nowrap;
@@ -65,14 +69,22 @@ section {
       letter-spacing: -0.3px;
     }
 
+    .positive {
+      color: @color-valid-green;
+    }
+
+    .negative {
+      color: @color-invalid-red;
+    }
+
     .positive-price {
       .price;
-      color: @color-valid-green;
+      .positive;
     }
 
     .negative-price {
       .price;
-      color: @color-invalid-red;
+      .negative;
     }
 
     .align-right {
@@ -108,8 +120,14 @@ section {
       font-size: @font-size-very-small;
     }
 
+
+
     .weak-text {
       color: @color-dark-grey;
+    }
+
+    .very-weak-text {
+      color: @color-soft-grey;
     }
 
   }
