@@ -1,1 +1,2 @@
 Operation Detail <%= @params.operation %>
+<a href="#toto">Click</a>

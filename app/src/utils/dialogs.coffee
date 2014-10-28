@@ -55,8 +55,8 @@ class @ledger.dialogs.DialogsController
     @_selector = selector
     @_selector.hide()
     @_selector.css 'visibility', 'visible'
-    @_selector.on 'click', =>
-      @dismissAll()
+    @_selector.click (e) =>
+      @dismissAll() unless e.isDefaultPrevented()
 
   # Create a new instance of a dialog controller
   # @param options [Hash] Set of options for creating the dialog controller
@@ -69,7 +69,7 @@ class @ledger.dialogs.DialogsController
   show: (dialog) ->
     dialog._id = _.uniqueId()
     @_selector.append(JST['base/dialog']({dialog_id: dialog._id}))
-    @_selector.find("#dialog_#{dialog._id}").click((e) -> e.stopPropagation())
+    @_selector.find("#dialog_#{dialog._id}").on 'click', ((e) -> e.preventDefault())
     if @_dialogs.length == 0
       @_selector.fadeIn(500)
     @_dialogs.push dialog

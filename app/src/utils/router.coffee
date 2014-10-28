@@ -38,7 +38,8 @@ class @Router extends @EventEmitter
   _listenClickEvents: () ->
     self = @
     # Redirect every in-app link with our router
-    $('body').delegate 'a', 'click', ->
+    $('body').delegate 'a', 'click', (e) ->
+      l 'Salut'
       if @href? and @protocol == 'chrome-extension:'
         url = null
         if  _.str.startsWith(@pathname, '/views/') and self.currentUrl?
@@ -49,7 +50,7 @@ class @Router extends @EventEmitter
         return no
       yes
 
-    $('body').delegate '[data-href]', 'click', ->
+    $('body').delegate '[data-href]', 'click', (e) ->
       href = $(this).attr('data-href')
       if href? and href.length > 0
         parser = href.parseAsUrl()
@@ -58,5 +59,5 @@ class @Router extends @EventEmitter
         else
           url = parser.pathname + parser.search + parser.hash
         self.go url
-        return yes
-      no
+        return no
+      yes

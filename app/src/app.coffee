@@ -32,7 +32,6 @@ require @ledger.imports, ->
         newUrl = data.url.parseAsUrl()
         @_lastUrl = data.url
         @currentUrl = data.url
-
         controller = null
 
         ## Create action name and action parameters
@@ -66,8 +65,8 @@ require @ledger.imports, ->
 
     handleAction: (actionName, params) ->
       handled = no
-      if ledger.dialogs.manager.displayedDialog?
-        handled = ledger.dialogs.manager.displayedDialog.handleAction actionName, params
+      if ledger.dialogs.manager.displayedDialog()?
+        handled = ledger.dialogs.manager.displayedDialog().handleAction actionName, params
       handled = @_navigationController.handleAction(actionName, params) unless handled
       handled
 
