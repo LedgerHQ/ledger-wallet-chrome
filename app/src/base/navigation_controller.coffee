@@ -1,3 +1,9 @@
+# Base class for navigation controllers. This class is responsible of layouting view controllers inside its
+# selector. The navigation controllers may be able to handle the navigation history (pushing/popping view controllers)
+# It dispatch routing action action to its child...
+#
+# @event push Called when a view controller is pushed
+# @event pop Called when a view controller is popped
 class @NavigationController extends @ViewController
 
   _historyLength: 1
@@ -60,7 +66,9 @@ class @NavigationController extends @ViewController
     do $('#' + @childViewControllerContentId).empty
     @topViewController().render($('#' + @childViewControllerContentId))
 
-  handleAction: (actionName) ->
+  # @override ViewController.handleAction
+  # Dispatch the action to the view controller
+  handleAction: (actionName, params) ->
     if @[actionName]?
       do @[actionName]
     else

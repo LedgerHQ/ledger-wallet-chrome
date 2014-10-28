@@ -71,13 +71,13 @@ class @ledger.dialogs.DialogsController
     @_selector.append(JST['base/dialog']({dialog_id: dialog._id}))
     @_selector.find("#dialog_#{dialog._id}").click((e) -> e.stopPropagation())
     if @_dialogs.length == 0
-      @_selector.fadeIn(200)
+      @_selector.fadeIn(500)
     @_dialogs.push dialog
     dialog.render @_selector.find("#dialog_#{dialog._id}"), =>
       @_selector.find("#dialog_#{dialog._id}").css('visibility', 'visible')
-      @_selector.find("#dialog_#{dialog._id}").css('top', '200px')
+      @_selector.find("#dialog_#{dialog._id}").css('top', window.innerHeight / 2 + 'px')
       @_selector.find("#dialog_#{dialog._id}").css('opacity', '0.7')
-      @_selector.find("#dialog_#{dialog._id}").animate {'top': 0, 'opacity': 1}, 250, "accelerate_deccelerate", ->
+      @_selector.find("#dialog_#{dialog._id}").animate {'top': 0, 'opacity': 1}, 500, 'smooth', ->
           dialog.onShow()
 
   # Dismiss a dialog
@@ -89,8 +89,8 @@ class @ledger.dialogs.DialogsController
     return if @_dialogs.length == 0
     dialog = @_dialogs[0]
     @_dialogs.splice(0, 1)
-    @_selector.fadeOut(200)
-    @_selector.find("#dialog_#{dialog._id}").animate {top: 200, opacity: 0.7}, 250, "accelerate_deccelerate", =>
+    @_selector.fadeOut(300)
+    @_selector.find("#dialog_#{dialog._id}").animate {top: window.innerHeight / 2, opacity: 0.7}, 300,  =>
       @_selector.find("#dialog_#{dialog._id}").remove()
       dialog.onDismiss()
 

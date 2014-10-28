@@ -48,3 +48,15 @@ class @Router extends @EventEmitter
         self.go url
         return no
       yes
+
+    $('body').delegate '[data-href]', 'click', ->
+      href = $(this).attr('data-href')
+      if href? and href.length > 0
+        parser = href.parseAsUrl()
+        if  _.str.startsWith(parser.pathname, '/views/') and self.currentUrl?
+          url = ledger.url.createRelativeUrlWithFragmentedUrl(self.currentUrl, href)
+        else
+          url = parser.pathname + parser.search + parser.hash
+        self.go url
+        return yes
+      no

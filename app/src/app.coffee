@@ -34,10 +34,12 @@ require @ledger.imports, ->
 
         controller = null
 
-        actionName = _.str.splice(newUrl.hash, 0, 1)
+        ## Create action name and action parameters
+        [actionName, parameters] = ledger.url.parseAction(newUrl.hash)
+
         onControllerRendered = () ->
           # Callback when the controller has been rendered
-          @_navigationController.handleAction(actionName) if newUrl.hash.length > 0
+          @_navigationController.handleAction(actionName, parameters) if newUrl.hash.length > 0
 
         if @_navigationController == null or @_navigationController.constructor.name != layoutName
           @_navigationController = new window[layoutName]()
@@ -47,7 +49,7 @@ require @ledger.imports, ->
           @_navigationController.render @_navigationControllerSelector()
         else
           if @_navigationController.topViewController().constructor.name == viewController.name and oldUrl.pathname == newUrl.pathname and newUrl.params == oldUrl.params # Check if only hash part of url change
-            @_navigationController.handleAction(actionName)
+            @_navigationController.handleAction(actionName, parameters)
           else
             controller = new viewController(newUrl.params())
             controller.on 'afterRender', onControllerRendered.bind(@)
@@ -55,7 +57,7 @@ require @ledger.imports, ->
 
     reloadUi: () ->
       $('link').each (_, link) ->
-        if link.href?
+        if link.href? && link.href.length > 0
           cleanHref = link.href
           cleanHref = cleanHref.replace(/\?[0-9]*/i, '')
           link.href = cleanHref + '?' + (new Date).getTime()
