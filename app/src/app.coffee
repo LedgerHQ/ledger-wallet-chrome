@@ -28,8 +28,9 @@ require @ledger.imports, ->
 
     navigate: (layoutName, viewController) ->
       @router.once 'routed', (event, data) =>
-        oldUrl = if data.oldUrl? then data.oldUrl.parseAsUrl() else {hash: '', pathname: '', params: ''}
+        oldUrl = if @_lastUrl? then @_lastUrl.parseAsUrl() else {hash: '', pathname: '', params: -> ''}
         newUrl = data.url.parseAsUrl()
+        @_lastUrl = newUrl
         @currentUrl = data.url
 
         controller = null
@@ -48,7 +49,7 @@ require @ledger.imports, ->
           @_navigationController.push new viewController()
           @_navigationController.render @_navigationControllerSelector()
         else
-          if @_navigationController.topViewController().constructor.name == viewController.name and oldUrl.pathname == newUrl.pathname and newUrl.params == oldUrl.params # Check if only hash part of url change
+          if @_navigationController.topViewController().constructor.name == viewController.name and oldUrl.pathname == newUrl.pathname and _.isEqual(newUrl.params(), oldUrl.params()) # Check if only hash part of url change
             @_navigationController.handleAction(actionName, parameters)
           else
             controller = new viewController(newUrl.params())
