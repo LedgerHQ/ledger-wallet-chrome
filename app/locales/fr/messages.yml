@@ -15,6 +15,7 @@ onboarding:
     pin:
       enter_your_pin_code: "Entez votre code PIN pour dévérouiller votre portefeuille :"
       i_lost_my_pin_code: "J'ai perdu mon code PIN"
+  management:
     done:
       you_can_access_your_wallet: "Vous pouvez maintenant commencer à utiliser votre portefeuille"
       configuration_is_complete: "Configuration terminée"

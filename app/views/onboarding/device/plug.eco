@@ -5,5 +5,5 @@
   <span class="black-indication"><%= t 'onboarding.device.plug.to_start' %></span>
 </div>
 <div class="actions-container">
-  <a href="#" class="greyed-action"><%= t 'onboarding.device.plug.i_lost_my_wallet' %></a>
+  <a href="/onboarding/device/pin" class="greyed-action"><%= t 'onboarding.device.plug.i_lost_my_wallet' %></a>
 </div>

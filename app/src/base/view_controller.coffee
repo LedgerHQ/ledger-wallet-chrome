@@ -3,6 +3,9 @@ class @ViewController extends @EventEmitter
   renderedSelector: undefined
   parentViewController: undefined
 
+  constructor: (params) ->
+    @params = params
+
   select: (selectorString) ->
     $(@renderedSelector).find(selectorString)
 
