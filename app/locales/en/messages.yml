@@ -31,9 +31,9 @@ onboarding:
     locked:
       wallet_is_locked: "Your wallet is frozen"
       wrong_pin_codes: "Your wallet has frozen due to 3 incorrect PIN entries, but your Bitcoins remain safe."
-      unlock_or_create: "To regain access to your accounts, you must unfreeze your wallet with your recover phrase."
+      unlock_or_create: "To regain access to your accounts, you must unfreeze your wallet with your recovery phrase."
       unlock_my_wallet: "Unfreeze my wallet"
-      retreive_access: "Regain access to your accounts using your recover phrase"
+      retreive_access: "Regain access to your accounts using your recovery phrase"
       create_a_new_wallet: "Create a new wallet"
       you_can_always_retreive_your_accounts: "Your current Bitcoins and accounts remain fully restorable at any time to another Ledger Wallet"
 
