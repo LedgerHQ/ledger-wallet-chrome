@@ -43,12 +43,14 @@ wallet:
         account_balance: "SOLDE"
 
       operations:
-        title: "DERNIÈRES OPERATIONS"
+        title: "DERNIÈRES OPÉRATIONS"
         action: "VOIR TOUTES LES OPÉRATIONS"
         time: "DATE ET HEURE"
         account_name: "NOM DU COMPTE"
         bitcoin_address: "ADRESSE BITCOIN"
         amount: "MONTANT"
+        sender: "depuis"
+        receiver: "vers"
 
     operations:
       detail:
@@ -62,3 +64,24 @@ wallet:
         send_by_email: "ENVOYER PAR EMAIL"
         print: "IMPRIMER"
         close: "FERMER"
+
+    accounts:
+
+      account:
+        detail:
+          action: "PARAMÈTRES DE COMPTE"
+          balance: "SOLDE"
+          balance_in_progress: "DONT NON CONFIRMÉ"
+          actions: "ACTIONS"
+          receive: "RECEVOIR"
+          send: "ENVOYER"
+
+        operations:
+          title: "DERNIÈRES OPÉRATIONS"
+          action: "VOIR TOUTES LES OPÉRATIONS"
+          time: "DATE ET HEURE"
+          sender: "depuis"
+          receiver: "vers"
+          bitcoin_address: "ADRESSE BITCOIN"
+          amount: "MONTANT"
+          balance: "SOLDE"

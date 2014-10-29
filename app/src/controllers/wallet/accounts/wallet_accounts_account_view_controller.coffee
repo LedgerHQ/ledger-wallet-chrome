@@ -1,0 +1,1 @@
+class @WalletAccountsAccountViewController extends @ViewController

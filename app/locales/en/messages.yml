@@ -62,3 +62,24 @@ wallet:
         send_by_email: "SEND BY EMAIL"
         print: "PRINT"
         close: "CLOSE"
+
+    accounts:
+
+      account:
+        detail:
+          action: "ACCOUNT SETTINGS"
+          balance: "BALANCE"
+          balance_in_progress: "INCLUDING UNCONFIRMED"
+          actions: "ACTIONS"
+          receive: "RECEIVE"
+          send: "SEND"
+
+        operations:
+          title: "LAST OPERATIONS"
+          action: "SEE ALL OPERATIONS"
+          time: "TIME"
+          sender: "from"
+          receiver: "to"
+          bitcoin_address: "BITCOIN ADDRESS"
+          amount: "AMOUNT"
+          balance: "BALANCE"

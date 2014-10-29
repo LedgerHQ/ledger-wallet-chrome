@@ -37,4 +37,4 @@
 
   # Accounts
   route '/wallet/accounts/index:#action::?params:', (params) ->
-    l 'Accounts'
+    app.navigate WALLET_LAYOUT, WalletAccountsAccountViewController
