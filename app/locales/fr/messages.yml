@@ -69,7 +69,7 @@ wallet:
 
     account:
       detail:
-        action: "PARAMÈTRES DE COMPTE"
+        action: "PARAMÈTRES DU COMPTE"
         balance: "SOLDE"
         balance_in_progress: "DONT NON CONFIRMÉ"
         actions: "ACTIONS"
