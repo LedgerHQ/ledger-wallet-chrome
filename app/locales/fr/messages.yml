@@ -52,36 +52,36 @@ wallet:
         sender: "depuis"
         receiver: "vers"
 
-    operations:
+  operations:
+    detail:
+      title: "DÉTAIL DE L'OPÉRATION"
+      amount: "Montant"
+      time: "Date et heure"
+      status: "État"
+      sender: "Depuis"
+      receiver: "Vers"
+      identifier: "Identifiant"
+      send_by_email: "ENVOYER PAR EMAIL"
+      print: "IMPRIMER"
+      close: "FERMER"
+
+  accounts:
+
+    account:
       detail:
-        title: "DÉTAIL DE L'OPÉRATION"
-        amount: "Montant"
-        time: "Date et heure"
-        status: "État"
-        sender: "Depuis"
-        receiver: "Vers"
-        identifier: "Identifiant"
-        send_by_email: "ENVOYER PAR EMAIL"
-        print: "IMPRIMER"
-        close: "FERMER"
+        action: "PARAMÈTRES DE COMPTE"
+        balance: "SOLDE"
+        balance_in_progress: "DONT NON CONFIRMÉ"
+        actions: "ACTIONS"
+        receive: "RECEVOIR"
+        send: "ENVOYER"
 
-    accounts:
-
-      account:
-        detail:
-          action: "PARAMÈTRES DE COMPTE"
-          balance: "SOLDE"
-          balance_in_progress: "DONT NON CONFIRMÉ"
-          actions: "ACTIONS"
-          receive: "RECEVOIR"
-          send: "ENVOYER"
-
-        operations:
-          title: "DERNIÈRES OPÉRATIONS"
-          action: "VOIR TOUTES LES OPÉRATIONS"
-          time: "DATE ET HEURE"
-          sender: "depuis"
-          receiver: "vers"
-          bitcoin_address: "ADRESSE BITCOIN"
-          amount: "MONTANT"
-          balance: "SOLDE"
+      operations:
+        title: "DERNIÈRES OPÉRATIONS"
+        action: "VOIR TOUTES LES OPÉRATIONS"
+        time: "DATE ET HEURE"
+        sender: "depuis"
+        receiver: "vers"
+        bitcoin_address: "ADRESSE BITCOIN"
+        amount: "MONTANT"
+        balance: "SOLDE"

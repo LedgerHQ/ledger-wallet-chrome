@@ -1,5 +1,8 @@
 <section>
-
+  <header>
+    <h1>COMPTE COURANT</h1> <span class="account-type-orange">courant</span>
+    <a href="#displaySettings" ><%= t 'wallet.accounts.account.detail.action' %></a>
+  </header>
 </section>
 <section>
 

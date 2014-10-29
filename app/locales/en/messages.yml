@@ -49,37 +49,39 @@ wallet:
         account_name: "ACCOUNT NAME"
         bitcoin_address: "BITCOIN ADDRESS"
         amount: "AMOUNT"
+        sender: "from"
+        receiver: "to"
 
-    operations:
+  operations:
+    detail:
+      title: "OPERATION DETAIL"
+      amount: "Amount"
+      time: "Time"
+      status: "Status"
+      sender: "From"
+      receiver: "To"
+      identifier: "Transaction identifier"
+      send_by_email: "SEND BY EMAIL"
+      print: "PRINT"
+      close: "CLOSE"
+
+  accounts:
+
+    account:
       detail:
-        title: "OPERATION DETAIL"
-        amount: "Amount"
-        time: "Time"
-        status: "Status"
-        sender: "From"
-        receiver: "To"
-        identifier: "Transaction identifier"
-        send_by_email: "SEND BY EMAIL"
-        print: "PRINT"
-        close: "CLOSE"
+        action: "ACCOUNT SETTINGS"
+        balance: "BALANCE"
+        balance_in_progress: "INCLUDING UNCONFIRMED"
+        actions: "ACTIONS"
+        receive: "RECEIVE"
+        send: "SEND"
 
-    accounts:
-
-      account:
-        detail:
-          action: "ACCOUNT SETTINGS"
-          balance: "BALANCE"
-          balance_in_progress: "INCLUDING UNCONFIRMED"
-          actions: "ACTIONS"
-          receive: "RECEIVE"
-          send: "SEND"
-
-        operations:
-          title: "LAST OPERATIONS"
-          action: "SEE ALL OPERATIONS"
-          time: "TIME"
-          sender: "from"
-          receiver: "to"
-          bitcoin_address: "BITCOIN ADDRESS"
-          amount: "AMOUNT"
-          balance: "BALANCE"
+      operations:
+        title: "LAST OPERATIONS"
+        action: "SEE ALL OPERATIONS"
+        time: "TIME"
+        sender: "from"
+        receiver: "to"
+        bitcoin_address: "BITCOIN ADDRESS"
+        amount: "AMOUNT"
+        balance: "BALANCE"
