@@ -5,7 +5,6 @@ class @WalletAccountsAccountViewController extends @ViewController
     dialog.show()
 
   onAfterRender: ->
-    l @select('#unconfirmed_balance_tooltip')
     @select('#unconfirmed_balance_tooltip').tooltipster
       content: 'Hello world'
       theme: 'tooltipster-light'
