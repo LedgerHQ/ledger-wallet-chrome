@@ -6,6 +6,7 @@
         '../libs/signals.min',
         '../libs/crossroads.min',
         '../libs/spin.min',
+        '../public/tooltipster/js/jquery.tooltipster.min',
 
         'routes',
 

@@ -1,7 +1,7 @@
 <section id="accounts">
 
   <header>
-    <h1><%= t 'wallet.dashboard.index.accounts.title' %></h1>
+    <h1><%= t 'wallet.dashboard.index.accounts.title' %></h1><span class="account-type-orange transparent">courant</span>
     <a href="/wallet/accounts/index"><%= t 'wallet.dashboard.index.accounts.action' %></a>
   </header>
 
