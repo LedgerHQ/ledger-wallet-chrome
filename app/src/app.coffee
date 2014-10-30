@@ -16,6 +16,7 @@ require @ledger.imports, ->
           when 'reload-page' then do @reloadUi
           when 'reload-application' then chrome.runtime.reload()
 
+      application = @
 
       @devicesManager.on 'plug', (event, device) ->
         l 'Plug'
@@ -23,6 +24,20 @@ require @ledger.imports, ->
       @devicesManager.on 'unplug', (event, device) ->
         l 'Unplug'
         l device
+      @devicesManager.on 'LW.CardConnected', (event, param) ->
+        #param.lW.setDriverMode(0x01);
+        param.lW.recoverFirmwareVersion();
+      @devicesManager.on 'LW.FirmwareVersionRecovered', (event, param) ->
+        param.lW.getOperationMode();
+        param.lW.plugged();
+      @devicesManager.on 'LW.PINRequired', (event, param) ->
+        application.router.go('/onboarding/device/pin')
+      @devicesManager.on 'LW.SetupCardLaunched', (event, param) ->
+        l "CHANGEMENT DE PAGE..."
+        application.router.go('/onboarding/management/welcome')
+
+      
+
       @devicesManager.start()
       @router.go('/')
 

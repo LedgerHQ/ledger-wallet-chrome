@@ -8,20 +8,28 @@ class @DevicesManager extends EventEmitter
   _devicesList: []
   _devices: {}
 
+  constructor: ->
+    @cardFactory = new ChromeapiPlugupCardTerminalFactory()
+
   # Start observing if devices are plugged in or unnplugged
   start: () ->
     return if @_running
 
     checkIfWalletIsPluggedIn = () ->
+      #chrome.usb.getDevices {productId: 0x1b7c, vendorId: 0x2581}, (devices) =>
+        #@cardFactory.list_async().then (devices) ->
+      deviceManager = @
       chrome.usb.getDevices {productId: 0x1b7c, vendorId: 0x2581}, (devices) =>
+        l devices
         oldDevices = @_devices
         @_devices = {}
         for device in devices
           device_id = device.device
+          l device_id
           if oldDevices[device_id]?
             @_devices[device_id] = oldDevices[device_id]
           else
-            @_devices[device.device] = {id: device.device}
+            @_devices[device_id] = {id: device_id}
         oldDevicesList = _.values(oldDevices)
         devicesList = _.values(@_devices)
         oldDifferences = (item for item in devicesList when _.indexOf(oldDevicesList, item) == -1)
@@ -32,6 +40,17 @@ class @DevicesManager extends EventEmitter
             @emit 'unplug', difference
           else
             @emit 'plug', difference
+            deviceManager.stop()
+            @cardFactory.list_async().then (result) ->
+              l result
+              if result.length > 0
+                deviceManager.cardFactory.getCardTerminal(result[0]).getCard_async().then (card) ->
+                  deviceManager._devices[difference.id]['lwCard'] = new LW(0, new BTChip(card), deviceManager)
+                  
+                  
+
+            
+
 
     @_interval = setInterval checkIfWalletIsPluggedIn.bind(this), 500
 
