@@ -2,7 +2,8 @@
 
   ## Default
   route '/', ->
-    app.router.go '/onboarding/device/plug'
+    # app.router.go '/onboarding/device/plug'
+    app.router.go '/wallet/dashboard/index'
 
   ## Onboarding
   # Device
@@ -36,4 +37,4 @@
 
   # Accounts
   route '/wallet/accounts/index:#action::?params:', (params) ->
-    l 'Accounts'
+    app.navigate WALLET_LAYOUT, WalletAccountsAccountViewController

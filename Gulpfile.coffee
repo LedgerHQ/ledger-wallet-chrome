@@ -88,6 +88,12 @@ gulp.task 'js', ['compile:clean'], ->
     .pipe changed 'build/'
     .pipe gulp.dest 'build/'
 
+gulp.task 'public', ['compile:clean'], ->
+  gulp.src 'app/public/**/*'
+  .pipe plumber()
+    .pipe changed 'build/'
+      .pipe gulp.dest 'build/public'
+
 gulp.task 'coffee-script', ['compile:clean'], ->
   gulp.src 'app/**/*.coffee'
     .pipe plumber()
@@ -141,7 +147,7 @@ gulp.task 'watch', ['compile'], ->
   watcher = gulp.watch('app/**/*', ['compile:assets', 'compile:sources'])
 
 # Default task call every tasks created so far.
-gulp.task 'compile:assets', ['less', 'css', 'eco', 'html', 'yml', 'images', 'fonts', 'translate']
+gulp.task 'compile:assets', ['less', 'css', 'eco', 'html', 'yml', 'images', 'fonts', 'translate', 'public']
 gulp.task 'compile:sources', ['js', 'coffee-script']
 gulp.task 'compile', ['compile:clean', 'compile:assets', 'compile:sources']
 gulp.task 'default', ['compile']

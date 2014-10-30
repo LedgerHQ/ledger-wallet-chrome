@@ -5,120 +5,9 @@
   padding: @metrics-large-padding @metrics-medium-padding;
 }
 
-section {
-  width: 100%;
-  display: table;
-
-  >header {
-    display: flex;
-    margin-bottom: @metrics-very-small-padding + 8px;
-
-    >h1 {
-      letter-spacing: -0.5px;
-      font-size: @font-size-large;
-      font-weight: @font-weight-semibold;
-    }
-
-    >a {
-      letter-spacing: -0.4px;
-      margin-left: auto;
-      text-decoration: none;
-      font-size: @font-size-small;
-      font-weight: @font-weight-regular;
-      color: @color-action-purple;
-
-      &:hover {
-        color: darken(@color-action-purple, 20%);
-      }
-
-    }
-
-  }
-
-  >table {
-    width: 100%;
-    vertical-align: middle;
-
-    thead {
-
-    }
-
-    tr td {
-      height: 40px;
-      vertical-align:middle;
-      padding-right: @metrics-very-large-padding;
-      border-bottom: 1px solid @color-very-light-grey;
-      font-size: @font-size-medium;
-    }
-
-    tr td.fit-content {
-      width: 1%;
-      white-space:nowrap;
-    }
-
-    tr td:last-child {
-      padding-right: 0px;
-    }
-
-    .price {
-      font-weight: @font-weight-semibold;
-      letter-spacing: -0.3px;
-    }
-
-    .positive-price {
-      .price;
-      color: @color-valid-green;
-    }
-
-    .negative-price {
-      .price;
-      color: @color-invalid-red;
-    }
-
-    .align-right {
-      text-align: right;
-      padding-right: 0px;
-    }
-
-    .padding-right-very-small {
-      padding-right: @metrics-very-small-padding;
-    }
-
-    .padding-right-small {
-      padding-right: @metrics-small-padding;
-    }
-
-    .padding-right-very-large {
-      padding-right: @metrics-very-large-padding;
-    }
-
-    .padding-right-extra-large {
-      padding-right: @metrics-extra-large-padding;
-    }
-
-    .padding-right-ultra-large {
-      padding-right: @metrics-ultra-large-padding;
-    }
-
-    thead tr td {
-      height: 32px;
-      letter-spacing: -0.3px;
-      border-bottom: 1px solid transparent;
-      font-weight: @font-weight-semibold;
-      font-size: @font-size-very-small;
-    }
-
-    .weak-text {
-      color: @color-dark-grey;
-    }
-
-  }
-
-}
-
 .account-type-tag {
   border-radius: 5px;
-  padding: 3px 4px;
+  padding: 5px 4px;
   padding-top: 1.5px;
   font-size: @font-size-very-small;
   color: @color-white;
@@ -141,4 +30,170 @@ section {
 
 .very-small-text {
   font-size: @font-size-very-small;
+}
+
+section {
+  width: 100%;
+  display: table;
+
+  >header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0px;
+
+    >h1 {
+      letter-spacing: -0.5px;
+      font-size: @font-size-large;
+      font-weight: @font-weight-semibold;
+      color: @color-night-blue;
+      margin-right: @metrics-very-small-padding;
+    }
+
+    .account-type-tag {
+      border-radius: 5px;
+      padding: 6px 4px;
+      padding-top: 4px;
+      font-size: @font-size-very-small;
+      color: @color-white;
+    }
+
+    .account-type-orange {
+      .account-type-tag();
+      background-color: #ffa200;
+    }
+
+    .account-type-green {
+      .account-type-tag();
+      background-color: #3fb34f;
+    }
+
+    .account-type-blue {
+      .account-type-tag();
+      background-color: #0099ff;
+    }
+
+    .very-small-text {
+      font-size: @font-size-very-small;
+    }
+
+    >a {
+      letter-spacing: -0.4px;
+      margin-left: auto;
+      text-decoration: none;
+      font-size: @font-size-small;
+      font-weight: @font-weight-regular;
+      color: @color-action-purple;
+
+      &:hover {
+        color: darken(@color-action-purple, 20%);
+      }
+
+    }
+
+  }
+
+  >table {
+    width: 100%;
+    vertical-align: middle;
+
+    thead tr td {
+      letter-spacing: -0.3px;
+      border-bottom: 1px solid transparent;
+      font-weight: @font-weight-semibold;
+      font-size: @font-size-very-small;
+      padding-top: @metrics-medium-padding - 5px;
+    }
+
+    tbody tr:first-child td {
+      padding-top: @metrics-medium-padding - 5px;
+    }
+
+    tbody tr td {
+      padding-top: 14px;
+      padding-bottom: 14px;
+      vertical-align:middle;
+      padding-right: @metrics-very-large-padding;
+      border-bottom: 1px solid @color-very-light-grey;
+      font-size: @font-size-medium;
+    }
+
+    tr.no-border td {
+      border-bottom: 0px solid transparent;
+    }
+
+    tr td.fit-content {
+      width: 1%;
+      white-space:nowrap;
+    }
+
+    tr td:last-child {
+      padding-right: 0px;
+    }
+
+    &.no-table-head tr:first-child td {
+      padding-top: @metrics-large-padding;
+    }
+
+    .price {
+      font-weight: @font-weight-semibold;
+      letter-spacing: -0.3px;
+    }
+
+    .positive {
+      color: @color-valid-green;
+    }
+
+    .negative {
+      color: @color-invalid-red;
+    }
+
+    .positive-price {
+      .price;
+      .positive;
+    }
+
+    .negative-price {
+      .price;
+      .negative;
+    }
+
+    .align-right {
+      text-align: right;
+      padding-right: 0px;
+    }
+
+    .padding-right-very-small {
+      padding-right: @metrics-very-small-padding;
+    }
+
+    .padding-right-small {
+      padding-right: @metrics-small-padding;
+    }
+
+    .padding-right-medium {
+      padding-right: @metrics-medium-padding;
+    }
+
+    .padding-right-very-large {
+      padding-right: @metrics-very-large-padding;
+    }
+
+    .padding-right-extra-large {
+      padding-right: @metrics-extra-large-padding;
+    }
+
+    .padding-right-ultra-large {
+      padding-right: @metrics-ultra-large-padding;
+    }
+
+    .weak-text {
+      color: @color-dark-grey;
+    }
+
+    .very-weak-text {
+      color: @color-soft-grey;
+    }
+
+  }
+
 }

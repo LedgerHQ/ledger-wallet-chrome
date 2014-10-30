@@ -41,3 +41,56 @@
 .important-rounded-button {
   .rounded-button(@color-invalid-red);
 }
+
+.action-bar {
+  display: flex;
+
+  > a {
+    margin-right: @metrics-very-small-padding;
+  }
+
+  > a:last-child {
+    margin-right: 0px;
+  }
+
+  .cancel-rounded-button {
+    margin-left: auto;
+  }
+}
+
+.dialog-actions-bar {
+ .action-bar;
+  margin-top: @metrics-medium-padding;
+}
+
+[data-href] {
+
+  &:hover {
+    cursor: pointer;
+  }
+
+}
+
+.tooltip-holder {
+
+  &:hover {
+    cursor: help;
+  }
+
+}
+
+.transparent {
+  opacity: 0;
+}
+
+.tooltipster-light {
+  border-radius: 5px;
+  background-color: @color-background-color;
+  border-radius: 5px;
+  padding: @metrics-small-padding;
+  box-shadow: 0px 0px 50px rgba(0, 0, 0, 0.1);
+}
+.tooltipster-light .tooltipster-content {
+  font-size: @font-size-medium;
+  line-height: @font-size-medium + 2px;
+}

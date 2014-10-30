@@ -25,6 +25,8 @@ class @ledger.dialogs.DialogController extends EventEmitter
     @_viewController.once 'afterRender', done
     @_viewController.render selector
 
+  handleAction: (actionName, params) -> @_viewController.handleAction(actionName, params)
+
   push: (viewController) ->
     @_viewController = viewController
     viewController.parentViewController = @
@@ -55,8 +57,8 @@ class @ledger.dialogs.DialogsController
     @_selector = selector
     @_selector.hide()
     @_selector.css 'visibility', 'visible'
-    @_selector.on 'click', =>
-      @dismissAll()
+    @_selector.click (e) =>
+      @dismissAll() unless e.isDefaultPrevented()
 
   # Create a new instance of a dialog controller
   # @param options [Hash] Set of options for creating the dialog controller
@@ -69,29 +71,32 @@ class @ledger.dialogs.DialogsController
   show: (dialog) ->
     dialog._id = _.uniqueId()
     @_selector.append(JST['base/dialog']({dialog_id: dialog._id}))
-    @_selector.find("#dialog_#{dialog._id}").click((e) -> e.stopPropagation())
+    @_selector.find("#dialog_#{dialog._id}").on 'click', ((e) -> e.preventDefault())
     if @_dialogs.length == 0
-      @_selector.fadeIn(200)
+      @_selector.fadeIn(500)
     @_dialogs.push dialog
     dialog.render @_selector.find("#dialog_#{dialog._id}"), =>
       @_selector.find("#dialog_#{dialog._id}").css('visibility', 'visible')
-      @_selector.find("#dialog_#{dialog._id}").css('top', '200px')
-      @_selector.find("#dialog_#{dialog._id}").css('opacity', '0.7')
-      @_selector.find("#dialog_#{dialog._id}").animate {'top': 0, 'opacity': 1}, 250, "accelerate_deccelerate", ->
+      @_selector.find("#dialog_#{dialog._id}").css('top', window.innerHeight / 2 + 'px')
+      @_selector.find("#dialog_#{dialog._id}").css('opacity', '1')
+      @_selector.find("#dialog_#{dialog._id}").animate {'top': 0, 'opacity': 1}, 500, 'smooth', ->
           dialog.onShow()
 
   # Dismiss a dialog
   # @param dialog [ledger.dialogs.DialogController] the dialog to dismiss
   dismiss: (dialog) ->
-    dismissAll()
+    @dismissAll()
 
   dismissAll: () ->
     return if @_dialogs.length == 0
     dialog = @_dialogs[0]
     @_dialogs.splice(0, 1)
-    @_selector.fadeOut(200)
-    @_selector.find("#dialog_#{dialog._id}").animate {top: 200, opacity: 0.7}, 250, "accelerate_deccelerate", =>
+    @_selector.fadeOut(300)
+    @_selector.find("#dialog_#{dialog._id}").animate {top: window.innerHeight / 2, opacity: 1}, 300,  =>
       @_selector.find("#dialog_#{dialog._id}").remove()
       dialog.onDismiss()
+
+  displayedDialog: () ->
+    @_dialogs[0]
 
 @ledger.dialogs.manager = new ledger.dialogs.DialogsController()

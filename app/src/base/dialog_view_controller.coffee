@@ -22,6 +22,9 @@ class @DialogViewController extends ViewController
   onShow: ->
     @emit 'show'
 
+  setControllerStylesheet: () ->
+    $("link[id='dialog_view_controller_style']").attr('href', '../assets/css/' + @cssPath() + '.css?' + (new Date()).getTime())
+
   # Called once the dialog is dismissed
   onDismiss: ->
     @emit 'dismiss'
