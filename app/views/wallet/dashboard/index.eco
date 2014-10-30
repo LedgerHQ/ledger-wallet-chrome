@@ -43,7 +43,7 @@
 
   <header>
     <h1><%= t 'wallet.dashboard.index.operations.title' %></h1>
-    <a href="/wallet/accounts/index"><%= t 'wallet.dashboard.index.operations.action' %></a>
+    <a href="/wallet/accounts/operations/index"><%= t 'wallet.dashboard.index.operations.action' %></a>
   </header>
 
   <table>
