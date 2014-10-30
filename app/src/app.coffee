@@ -11,11 +11,6 @@ require @ledger.imports, ->
       ledger.dialogs.manager.initialize($('#dialogs_container'))
 
     start: ->
-      store = new ledger.storage.SecureStore('test', 'merguez')
-      store.setItem {toto: 'yo'}, (f) ->
-        store.getItem 'toto', (items) ->
-          l items
-
       chrome.commands.onCommand.addListener (command) =>
         switch command
           when 'reload-page' then do @reloadUi
