@@ -168,7 +168,6 @@ LW.prototype = {
             /* Event : LW.LWPINVerified */
             lW.event('LW.LWPINVerified',  {lW: lW});
 
-            lW.getWallet();
 
         }).fail(function(error) {
             

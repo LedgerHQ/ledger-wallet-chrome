@@ -18,7 +18,7 @@ class @DevicesManager extends EventEmitter
     checkIfWalletIsPluggedIn = () ->
       #chrome.usb.getDevices {productId: 0x1b7c, vendorId: 0x2581}, (devices) =>
         #@cardFactory.list_async().then (devices) ->
-      deviceManager = @
+      self = @
       chrome.usb.getDevices {productId: 0x1b7c, vendorId: 0x2581}, (devices) =>
         l devices
         oldDevices = @_devices
@@ -40,12 +40,12 @@ class @DevicesManager extends EventEmitter
             @emit 'unplug', difference
           else
             @emit 'plug', difference
-            deviceManager.stop()
+            self.stop()
             @cardFactory.list_async().then (result) ->
               l result
               if result.length > 0
-                deviceManager.cardFactory.getCardTerminal(result[0]).getCard_async().then (card) ->
-                  deviceManager._devices[difference.id]['lwCard'] = new LW(0, new BTChip(card), deviceManager)
+                self.cardFactory.getCardTerminal(result[0]).getCard_async().then (card) ->
+                  self._devices[difference.id]['lwCard'] = new LW(0, new BTChip(card), self)
                   
                   
 
