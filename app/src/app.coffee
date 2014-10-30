@@ -11,15 +11,17 @@ require @ledger.imports, ->
       ledger.dialogs.manager.initialize($('#dialogs_container'))
 
     start: ->
-      store = new ledger.storage.ChromeStore('test')
-      store.setItem 're-toto', 'yo', (f) ->
+      store = new ledger.storage.SecureStore('test', 'merguez')
+      store.setItem 'toto', 'yo', (f) ->
         store.getItem 'toto', (items) ->
           l items
+          chrome.storage.local.get null, (all) ->
+            l all
+
       chrome.commands.onCommand.addListener (command) =>
         switch command
           when 'reload-page' then do @reloadUi
           when 'reload-application' then chrome.runtime.reload()
-
 
       @devicesManager.on 'plug', (event, device) ->
         l 'Plug'

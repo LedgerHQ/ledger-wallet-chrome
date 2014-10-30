@@ -6,6 +6,7 @@
         '../libs/signals.min',
         '../libs/crossroads.min',
         '../libs/spin.min',
+        '../libs/sjcl',
         '../public/tooltipster/js/jquery.tooltipster.min',
 
         'routes',
@@ -22,8 +23,12 @@
         'utils/spinners',
         'utils/pin_codes',
 
+        'utils/crypto/aes',
+
         'utils/storage/store',
         'utils/storage/chrome_store',
+        'utils/storage/secure_store',
+        #'utils/storage/synced_store',
         'utils/storage/storage',
 
         'managers/devices_manager'
