@@ -23,8 +23,7 @@
         'utils/pin_codes',
 
         'utils/storage/store',
-        'utils/storage/persistent_store',
-        'utils/storage/synchronized_store',
+        'utils/storage/chrome_store',
         'utils/storage/storage',
 
         'managers/devices_manager'

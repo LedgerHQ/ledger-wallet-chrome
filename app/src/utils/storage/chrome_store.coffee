@@ -10,8 +10,16 @@ class @ledger.storage.ChromeStore extends ledger.storage.Store
   # @param [String] key The key you need to translate
   # @return [String] The translated key
   # @private
-  _translateKeyToStoreKey: (key) ->
+  _encryptKey: (key) ->
     "#{@_name}_#{key}"
+
+  # Decrypt a given key store to a readable key. This method is private and is only used internally.
+  # It may be override by child store class if they need custom key mangling
+  # @param [String] value The key you need to decrypt
+  # @return [String] The decrypted key
+  # @private
+  _decryptKey: (key) ->
+    key.substr(key.indexOf('_') + 1)
 
   # Encrypt a given value to a store value. This method is private and is only used internally.
   # It may be override by child store class if they need custom value encryption
@@ -30,12 +38,17 @@ class @ledger.storage.ChromeStore extends ledger.storage.Store
   # @see ledger.storage.Store#getItem
   getItem: (key, cb) ->
     keys = []
-    keys.push @_getStoreKey(k) for k in key if _.isArray(key)
-    keys.push @_getStoreKey(key) if _.isString(key)
-    chrome.storage.local.getItem keys, (items) =>
-      decryptedItems = []
-      decryptedItems.push @_decryptData(data) for data in items
-      cp(decryptedItems) if decryptedItems?
+    keys.push @_encryptKey for k in key  if _.isArray(key)
+    keys.push @_encryptKey(key) if _.isString(key)
+    chrome.storage.local.get keys, (items) =>
+      decryptedItems = {}
+      decryptedItems[@_decryptKey(key)] = @_decryptData(data) for key, data of items
+      l items
+      l decryptedItems
+      cb(decryptedItems) if cb?
 
   # @see ledger.storage.Store#setItem
-  setItem: (key, value, cb) -> chrome.storage.local.setItem @_translateKeyToStoreKey(key), @_encryptData(value), cb
+  setItem: (key, value, cb = ->) ->
+    obj = {}
+    obj[@_encryptKey(key)] = @_encryptData(value)
+    chrome.storage.local.set obj, cb
