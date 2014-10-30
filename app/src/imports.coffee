@@ -1,6 +1,7 @@
 @ledger =
       imports: [
         '../libs/jquery-2.1.1.min',
+        '../libs/jquery.color',
         '../libs/underscore-min',
         '../libs/underscore.string.min',
         '../libs/signals.min',
