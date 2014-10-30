@@ -40,20 +40,14 @@ class @ledger.storage.ChromeStore extends ledger.storage.Store
     keys = []
     keys.push @_encryptKey for k in key  if _.isArray(key)
     keys.push @_encryptKey(key) if _.isString(key)
-    l @_encryptKey(key)
-    try
-      l @_decryptKey(@_encryptKey(key))
-    catch er
-      e er
     chrome.storage.local.get keys, (items) =>
-      l items
-      l @_encryptKey(key)
       decryptedItems = {}
       decryptedItems[@_decryptKey(key)] = @_decryptData(data) for key, data of items
       cb(decryptedItems) if cb?
 
   # @see ledger.storage.Store#setItem
-  setItem: (key, value, cb = ->) ->
+  setItem: (item, cb = ->) ->
     obj = {}
-    obj[@_encryptKey(key)] = @_encryptData(value)
+    for key, value in item
+      obj[@_encryptKey(key)] = @_encryptData(value)
     chrome.storage.local.set obj, cb

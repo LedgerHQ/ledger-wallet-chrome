@@ -12,12 +12,11 @@ class @ledger.storage.Store
   # @param [Function] cb Callback with storage items. Should look like (item) ->
   getItem: (key, cb) ->
 
-  # Sets a value
+  # Sets an item
   #
-  # @param [String] key The key to set
-  # @param [Object] value The value to set
+  # @param [Object] item The value to set
   # @param [Function] cb A callback invoked once the insertion is done
-  setItem: (key, value, cb) ->
+  setItem: (item, cb) ->
 
   # Removes one or more items from storage.
   #

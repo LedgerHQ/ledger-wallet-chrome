@@ -28,7 +28,7 @@
         'utils/storage/store',
         'utils/storage/chrome_store',
         'utils/storage/secure_store',
-        #'utils/storage/synced_store',
+        'utils/storage/synced_store',
         'utils/storage/storage',
 
         'managers/devices_manager'

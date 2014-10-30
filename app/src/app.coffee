@@ -12,11 +12,9 @@ require @ledger.imports, ->
 
     start: ->
       store = new ledger.storage.SecureStore('test', 'merguez')
-      store.setItem 'toto', 'yo', (f) ->
+      store.setItem {toto: 'yo'}, (f) ->
         store.getItem 'toto', (items) ->
           l items
-          chrome.storage.local.get null, (all) ->
-            l all
 
       chrome.commands.onCommand.addListener (command) =>
         switch command
