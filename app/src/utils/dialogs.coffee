@@ -57,6 +57,8 @@ class @ledger.dialogs.DialogsController
     @_selector = selector
     @_selector.css('visibility', 'visible') # To remove 'visibility: hidden' in layout.html (prevent clipping)
     @_selector.hide()
+    @_selector.on 'click', (e) =>
+      @dismissAll() unless e.isDefaultPrevented()
 
   # Create a new instance of a dialog controller
   # @param options [Hash] Set of options for creating the dialog controller
@@ -67,14 +69,10 @@ class @ledger.dialogs.DialogsController
   # Shpw a dialog
   # @param dialog [ledger.dialogs.DialogController] the dialog to show
   show: (dialog) ->
+    return if @_dialogs.length > 1
+
     dialog._id = _.uniqueId()
-
-
-
     @_selector.show(0, =>  @_selector.addClass('display'))
-
-    @_selector.one 'click', (e) =>
-      @dismissAll() unless e.isDefaultPrevented()
 
     @_selector.append(JST['base/dialog']({dialog_id: dialog._id}))
     @_selector.find("#dialog_#{dialog._id}").on 'click', ((e) -> e.preventDefault())
