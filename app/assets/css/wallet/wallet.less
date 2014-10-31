@@ -76,7 +76,7 @@ section {
       font-size: @font-size-very-small;
     }
 
-    >a {
+    .action-item {
       letter-spacing: -0.4px;
       margin-left: auto;
       text-decoration: none;
@@ -87,6 +87,10 @@ section {
       &:hover {
         color: darken(@color-action-purple, 20%);
       }
+    }
+
+    > a {
+      .action-item();
 
     }
 

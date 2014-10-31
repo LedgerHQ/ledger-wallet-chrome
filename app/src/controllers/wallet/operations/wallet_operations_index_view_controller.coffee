@@ -6,6 +6,9 @@ class @WalletOperationsIndexViewController extends ViewController
     }
     @displayAllAccount = not @params.account_name?
 
+  onAfterRender: ->
+    @select('#sort-order').selectric()
+
   showOperation: (params) ->
     dialog = new WalletOperationsDetailDialogViewController(params)
     dialog.show()

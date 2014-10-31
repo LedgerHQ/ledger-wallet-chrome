@@ -3,7 +3,12 @@
   <header>
     <h1><%= t 'wallet.operations.index.title' if @displayAllAccount == yes %><%= _.str.sprintf(t('wallet.operations.index.title_with_account_name'), @account.name.toUpperCase()) unless @displayAllAccount == yes %></h1>
     <span class="account-type-orange <%= 'transparent' if @displayAllAccount is on %>">courant</span>
-    <a href="#toggleSort"><%= t 'wallet.operations.index.filter_sort_desc' %></a>
+    <div class="action-item">
+      <select id="sort-order">
+        <option><%= t 'wallet.operations.index.filter_sort_desc' %></option>
+        <option><%= t 'wallet.operations.index.filter_sort_asc' %></option>
+      </select>
+     </div>
   </header>
 
   <table>

@@ -8,6 +8,7 @@
         '../libs/crossroads.min',
         '../libs/spin.min',
         '../libs/sjcl',
+        '../libs/jquery.selectric.min',
         '../public/tooltipster/js/jquery.tooltipster.min',
 
         'routes',
