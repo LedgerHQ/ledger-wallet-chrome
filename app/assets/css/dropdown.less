@@ -8,7 +8,6 @@
   position: relative;
   margin: 0 0 10px;
   cursor: pointer;
-  //height: 12px;
 }
 
 .selectricResponsive {
@@ -22,11 +21,11 @@
 .selectric .label {
   display: block;
   white-space: pre;
-  overflow: hidden;
+  overflow: visible;
   padding-left: 30px;
-  font-size: 12px;
+  font-size: @font-size-small;
   line-height: 18px;
-  min-height: 18px;
+  height: 12px;
 }
 .selectric .button {
   display: block;
@@ -52,7 +51,7 @@
 }
 
 .selectricOpen {
-  z-index: 9999;
+  z-index: 7000;
 }
 .selectricOpen .selectric {
 
