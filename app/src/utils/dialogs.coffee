@@ -55,10 +55,8 @@ class @ledger.dialogs.DialogsController
 
   initialize: (selector) ->
     @_selector = selector
+    @_selector.css('visibility', 'visible') # To remove 'visibility: hidden' in layout.html (prevent clipping)
     @_selector.hide()
-    @_selector.css 'visibility', 'visible'
-    @_selector.click (e) =>
-      @dismissAll() unless e.isDefaultPrevented()
 
   # Create a new instance of a dialog controller
   # @param options [Hash] Set of options for creating the dialog controller
@@ -70,16 +68,27 @@ class @ledger.dialogs.DialogsController
   # @param dialog [ledger.dialogs.DialogController] the dialog to show
   show: (dialog) ->
     dialog._id = _.uniqueId()
+
+
+
+    @_selector.show(0, =>  @_selector.addClass('display'))
+
+    @_selector.one 'click', (e) =>
+      @dismissAll() unless e.isDefaultPrevented()
+
     @_selector.append(JST['base/dialog']({dialog_id: dialog._id}))
     @_selector.find("#dialog_#{dialog._id}").on 'click', ((e) -> e.preventDefault())
     if @_dialogs.length == 0
-      @_selector.fadeIn(500)
+      @_selector.show()
+      @_selector.addClass('display')
+
     @_dialogs.push dialog
     dialog.render @_selector.find("#dialog_#{dialog._id}"), =>
-      @_selector.find("#dialog_#{dialog._id}").css('visibility', 'visible')
-      @_selector.find("#dialog_#{dialog._id}").css('top', window.innerHeight / 2 + 'px')
-      @_selector.find("#dialog_#{dialog._id}").css('opacity', '1')
-      @_selector.find("#dialog_#{dialog._id}").animate {'top': 0, 'opacity': 1}, 500, 'smooth', ->
+      dialogSelector = @_selector.find("#dialog_#{dialog._id}")
+      dialogSelector.css('visibility', 'visible')
+      dialogSelector.css('top', (window.innerHeight + dialogSelector.height()) / 2 + 'px')
+      dialogSelector.css('opacity', '1')
+      dialogSelector.animate {'top': 0, 'opacity': 1}, 500, 'smooth', ->
           dialog.onShow()
 
   # Dismiss a dialog
@@ -91,9 +100,11 @@ class @ledger.dialogs.DialogsController
     return if @_dialogs.length == 0
     dialog = @_dialogs[0]
     @_dialogs.splice(0, 1)
-    @_selector.fadeOut(300)
-    @_selector.find("#dialog_#{dialog._id}").animate {top: window.innerHeight / 2, opacity: 1}, 300,  =>
+    @_selector.removeClass('display')
+    dialogSelector = @_selector.find("#dialog_#{dialog._id}")
+    dialogSelector.animate {top:(window.innerHeight) / 2 + dialogSelector.height() * 0.8, opacity: 0.6}, 400,  =>
       @_selector.find("#dialog_#{dialog._id}").remove()
+      @_selector.hide()
       dialog.onDismiss()
 
   displayedDialog: () ->
