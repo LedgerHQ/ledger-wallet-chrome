@@ -24,7 +24,7 @@
     actionName = _.str.splice(hash, 0, 1)
     matches = (/([a-zA-Z0-9-_-]+)\((.*)\)/i).exec(actionName)
     [__, actionName, parameters] = matches if matches
-    parameters = _.parseParamList parameters
+    parameters = _.str.parseParamList parameters
     [actionName, parameters]
 
 String::parseAsUrl = () ->
