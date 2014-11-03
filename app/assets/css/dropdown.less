@@ -59,11 +59,7 @@
 .selectricOpen .selectricItems {
   visibility: visible;
   opacity: 1;
-  -webkit-transform: translateY(0);
-  -ms-transform: translateY(0);
-  -o-transform: translateY(0);
-  transform: translateY(0);
-  -webkit-transition: .3s cubic-bezier(0.19, 1, 0.22, 1);
+  transform: translateY(@metrics-very-small-padding);
   transition: .3s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
@@ -71,10 +67,6 @@
   filter: alpha(opacity=50);
   opacity: 0.5;
   cursor: default;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
 }
 
@@ -116,9 +108,6 @@
 .selectricItems {
   visibility: hidden;
   opacity: 0;
-  -webkit-transform: translateY(-20px);
-  -ms-transform: translateY(-20px);
-  -o-transform: translateY(-20px);
   transform: translateY(-20px);
   position: absolute;
   top: 100%;

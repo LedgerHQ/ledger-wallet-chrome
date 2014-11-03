@@ -106,19 +106,26 @@ section {
       font-weight: @font-weight-semibold;
       font-size: @font-size-very-small;
       padding-top: @metrics-medium-padding - 5px;
+      padding-bottom: @metrics-very-small-padding;
     }
 
     tbody tr:first-child td {
-      padding-top: @metrics-medium-padding - 8px;
+
     }
 
     tbody tr td {
-      padding-top: 13px;
-      padding-bottom: 13px;
+      padding-top: 12px;
+      padding-bottom: 12px;
       vertical-align:middle;
       padding-right: @metrics-very-large-padding;
       border-bottom: 1px solid @color-very-light-grey;
       font-size: @font-size-medium;
+    }
+
+    tbody tr[data-href] {
+      &:hover {
+        background-color: #f5f5f5;
+      }
     }
 
     tr.no-border td {
