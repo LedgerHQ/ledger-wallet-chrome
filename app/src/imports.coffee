@@ -26,12 +26,13 @@
         'utils/pin_codes',
 
         'utils/crypto/aes',
+        'utils/crypto/sha256',
 
         'utils/storage/store',
         'utils/storage/chrome_store',
         'utils/storage/secure_store',
         'utils/storage/synced_store',
-        'utils/storage/indexed_store',
+        'utils/storage/object_store',
         'utils/storage/storage',
 
         'managers/devices_manager'
