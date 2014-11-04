@@ -38,7 +38,7 @@ class @ledger.storage.ChromeStore extends ledger.storage.Store
   # @see ledger.storage.Store#getItem
   getItem: (key, cb) ->
     keys = []
-    keys.push @_encryptKey for k in key  if _.isArray(key)
+    keys.push @_encryptKey(k) for k in key  if _.isArray(key)
     keys.push @_encryptKey(key) if _.isString(key)
     chrome.storage.local.get keys, (items) =>
       decryptedItems = {}
