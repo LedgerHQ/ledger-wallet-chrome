@@ -22,18 +22,14 @@ _.str.parseParamList = (string) ->
 # @param [String] string The string to parse formated like this 'node.node[].node.node[12].node' (where 'node' is a node name)
 # @return [Object] The root node
 _.str.parseObjectPath = (string) ->
-  matcher = /([a-z0-9]+)(?:\[([0-9]*)\]\.)?\.?/i
+  matcher = /([a-z0-9]+)(?:\[([0-9]*)\])?(?:\.|$)/ig
   rootPath = {}
   path = rootPath
-  while string.length > 0
-    matches = matcher.exec string
-    if matches?
-      path.name = matches[1]
-      path.type = if matches[2]? then 'array' else 'object'
-      path.index = parseInt _.str.clean(matches[2])
-      string = string.substr matches[0].length
-      path.next = if string.length > 0 then {} else null
-      path = path.next
-    else
-      string = ''
-  rootPath
+  while (matches = matcher.exec string)?
+    path.next = {}
+    path = path.next
+    path.name = matches[1]
+    path.type = if matches[2]? then 'array' else 'object'
+    path.index = parseInt _.str.clean(matches[2])
+  path.next = null
+  rootPath.next
