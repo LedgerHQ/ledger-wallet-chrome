@@ -1,10 +1,17 @@
+# This store is able to store objects in a 'slave store' (i.e. you can use an object store with a secure store or synced
+# store). Each inserted object must have a unique object identifier ('__uid' property). If they do not, the store assigns
+# them a unique id. Objects can be retrieved later by using their unique identifier.
 class @ledger.storage.ObjectStore extends EventEmitter
 
+  # ObjectStore constructor
+  # @param [ledger.storage.Store] store The slave store used to save data within
   constructor: (@store) ->
     @store.getItem '__lastUniqueIdentifier', (result) =>
       @_lastUniqueIdentifier = if result?.__lastUniqueIdentifier? then result.__lastUniqueIdentifier else 0
       @emit 'initialized'
 
+  # Perform an operation on the store safely
+  # @private
   perform: (cb) ->
     if @__lastUniqueIdentifier?
       do cb
@@ -12,16 +19,27 @@ class @ledger.storage.ObjectStore extends EventEmitter
       @once 'initialized', =>
         setTimeout(cb, 0)
 
+  # Saves one or many objects in the store. Once data are inserted, it calls back the closure with the given objects assigned
+  # with their ids.
+  # @param [Array|Object] objects One or many object(s) to save in the store
+  # @param [Function] callback A function to fire up when data are inserted.
   setItems: (objects, callback) ->
     return @setItems([objects], callback) unless _.isArray(objects)
     @perform =>
       insertionBatch = {}
       for object in objects
         @_flattenStructure(object, insertionBatch)
-      l JSON.stringify(insertionBatch, undefined, 2)
+
+      onInserted = (->
+        callback?(insertionBatch)
+      ).bind(this)
+
       @store.setItem insertionBatch, ->
         setTimeout callback, 0
 
+  # Gets items from the store using their unique object identifiers and returns them by calling back a closure.
+  # @param [Array|Value] ids Id(s) of the item(s) to fetch
+  # @param [Function] callback Called with an object containing all requested objects
   getItems: (ids, callback) ->
     return @getItems([ids], callback) unless _.isArray(ids)
 
@@ -39,11 +57,16 @@ class @ledger.storage.ObjectStore extends EventEmitter
     @store.getItem ids, (result) ->
       setTimeout(( -> onGetItems result ), 0)
 
+  # Creates a unique identifier for a new object
+  # @private
   createUniqueObjectIdentifier: ->
     id = @_lastUniqueIdentifier++
     @store.setItem({__lastUniqueIdentifier: @_lastUniqueIdentifier})
     ledger.crypto.SHA256.hashString('auto_' + id)
 
+  # Breaks a complex object (with properties, sub-objects, arrays) into a list of simple objects and replaces sub-objects
+  # into reference. (.i.e. {name: 'ledger', and: {name: 'wallet'}} becomes {id01: {name: 'ledger', and: ref id02} id02: {name: 'wallet'}})
+  # @private
   _flattenStructure: (structure, destination) ->
     object = {}
     for key, value of structure
@@ -62,6 +85,8 @@ class @ledger.storage.ObjectStore extends EventEmitter
     destination[object.__uid] = object
     object
 
+  # Used by _flattenStructure to break array in reference
+  # @private
   _flattenArray: (structure, destination) ->
     array = []
     for value in structure
@@ -81,5 +106,6 @@ class @ledger.storage.ObjectStore extends EventEmitter
     array
 
 _.mixin
+  # Tests if the given object is an ObjectStore reference or not
   isStoreReference: (object) -> object?.__type? == 'ref'
 
