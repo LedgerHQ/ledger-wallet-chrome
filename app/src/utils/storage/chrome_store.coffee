@@ -36,7 +36,7 @@ class @ledger.storage.ChromeStore extends ledger.storage.Store
   _decryptData: (value) -> value
 
   # @see ledger.storage.Store#getItem
-  getItem: (key, cb) ->
+  get: (key, cb) ->
     keys = []
     keys.push @_encryptKey(k) for k in key  if _.isArray(key)
     keys.push @_encryptKey(key) if _.isString(key)
@@ -46,8 +46,24 @@ class @ledger.storage.ChromeStore extends ledger.storage.Store
       cb(decryptedItems) if cb?
 
   # @see ledger.storage.Store#setItem
-  setItem: (item, cb = ->) ->
+  set: (item, cb = ->) ->
     obj = {}
     for key, value of item
       obj[@_encryptKey(key)] = @_encryptData(JSON.stringify(value))
     chrome.storage.local.set obj, cb
+
+  remove: (keys, cb) ->
+    keys = []
+    keys.push @_encryptKey(k) for k in key  if _.isArray(key)
+    keys.push @_encryptKey(key) if _.isString(key)
+    chrome.storage.local.remove keys, (items) =>
+      decryptedItems = {}
+      decryptedItems[@_decryptKey(key)] = @_decryptData(data) for key, data of items
+      cb(decryptedItems) if cb?
+
+  clear: (keys, cb) ->
+    keys = []
+    chrome.storage.local.get null, (result) ->
+      for k, v in result
+        keys.push k if _.str.startsWith(k, @_name)
+      chrome.storage.local.remove keys, callback

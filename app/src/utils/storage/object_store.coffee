@@ -1,12 +1,12 @@
 # This store is able to store objects in a 'slave store' (i.e. you can use an object store with a secure store or synced
 # store). Each inserted object must have a unique object identifier ('__uid' property). If they do not, the store assigns
 # them a unique id. Objects can be retrieved later by using their unique identifier.
-class @ledger.storage.ObjectStore extends EventEmitter
+class @ledger.storage.ObjectStore extends ledger.storage.Store
 
   # ObjectStore constructor
   # @param [ledger.storage.Store] store The slave store used to save data within
   constructor: (@store) ->
-    @store.getItem '__lastUniqueIdentifier', (result) =>
+    @store.get '__lastUniqueIdentifier', (result) =>
       @_lastUniqueIdentifier = if result?.__lastUniqueIdentifier? then result.__lastUniqueIdentifier else 0
       @emit 'initialized'
 
@@ -23,8 +23,8 @@ class @ledger.storage.ObjectStore extends EventEmitter
   # with their ids.
   # @param [Array|Object] objects One or many object(s) to save in the store
   # @param [Function] callback A function to fire up when data are inserted.
-  setItems: (objects, callback) ->
-    return @setItems([objects], callback) unless _.isArray(objects)
+  set: (objects, callback) ->
+    return @set([objects], callback) unless _.isArray(objects)
     @perform =>
       insertionBatch = {}
       for object in objects
@@ -34,14 +34,14 @@ class @ledger.storage.ObjectStore extends EventEmitter
         callback?(insertionBatch)
       ).bind(this)
 
-      @store.setItem insertionBatch, ->
+      @store.set insertionBatch, ->
         setTimeout callback, 0
 
   # Gets items from the store using their unique object identifiers and returns them by calling back a closure.
   # @param [Array|Value] ids Id(s) of the item(s) to fetch
   # @param [Function] callback Called with an object containing all requested objects
-  getItems: (ids, callback) ->
-    return @getItems([ids], callback) unless _.isArray(ids)
+  get: (ids, callback) ->
+    return @get([ids], callback) unless _.isArray(ids)
 
     onGetItems = ( (result) ->
       objects = {}
@@ -54,14 +54,26 @@ class @ledger.storage.ObjectStore extends EventEmitter
       callback(objects)
     ).bind(this)
 
-    @store.getItem ids, (result) ->
+    @store.get ids, (result) ->
       setTimeout(( -> onGetItems result ), 0)
+
+  # Removes items from the store using their unique object identifiers.
+  # @param [Array|Value] ids Id(s) of the item(s) to fetch
+  # @param [Function] callback Called once items are removed from the store.
+  remove: (ids, callback) ->
+    return @remove([ids], callback) unless _.isArray(ids)
+
+    @store.get ids, (result) ->
+      setTimeout(( -> callback?() ), 0)
+
+  clear: (callback) ->
+    @store.clear(callback)
 
   # Creates a unique identifier for a new object
   # @private
   createUniqueObjectIdentifier: ->
     id = @_lastUniqueIdentifier++
-    @store.setItem({__lastUniqueIdentifier: @_lastUniqueIdentifier})
+    @store.set({__lastUniqueIdentifier: @_lastUniqueIdentifier})
     ledger.crypto.SHA256.hashString('auto_' + id)
 
   # Breaks a complex object (with properties, sub-objects, arrays) into a list of simple objects and replaces sub-objects

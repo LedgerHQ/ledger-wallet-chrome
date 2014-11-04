@@ -7,9 +7,9 @@ class @ledger.storage.SecureStore extends ledger.storage.ChromeStore
     super
     @_aes = new ledger.crypto.AES(key)
 
-  _encryptKey: (key) -> @_aes.encrypt super(key)
+  _encryptKey: (key) -> super @_aes.encrypt(key)
 
-  _decryptKey: (key) -> super @_aes.decrypt(key)
+  _decryptKey: (key) -> @_aes.decrypt(super(key))
 
   _encryptData: (data) -> @_aes.encrypt super(data)
 
