@@ -6,7 +6,7 @@
 
 @ledger.storage.openStores = (passphrase) ->
   localStorage = new ledger.storage.SecureStore 'ledger.local', passphrase
-  ledger.storage.local =  new ledger.storage.IndexedStore localStorage
+  ledger.storage.local =  new ledger.storage.ObjectStore localStorage
   ledger.storage.sync = new ledger.storage.SyncedStore('ledger.meta', 'invalidpassword')
 
 
