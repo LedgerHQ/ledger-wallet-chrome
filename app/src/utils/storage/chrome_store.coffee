@@ -48,6 +48,6 @@ class @ledger.storage.ChromeStore extends ledger.storage.Store
   # @see ledger.storage.Store#setItem
   setItem: (item, cb = ->) ->
     obj = {}
-    for key, value in item
-      obj[@_encryptKey(key)] = @_encryptData(value)
+    for key, value of item
+      obj[@_encryptKey(key)] = @_encryptData(JSON.stringify(value))
     chrome.storage.local.set obj, cb
