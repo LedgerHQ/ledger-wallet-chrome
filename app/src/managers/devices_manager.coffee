@@ -16,43 +16,39 @@ class @DevicesManager extends EventEmitter
     return if @_running
 
     checkIfWalletIsPluggedIn = () ->
-      #chrome.usb.getDevices {productId: 0x1b7c, vendorId: 0x2581}, (devices) =>
-        #@cardFactory.list_async().then (devices) ->
       self = @
-      chrome.usb.getDevices {productId: 0x1b7c, vendorId: 0x2581}, (devices) =>
-        l devices
-        oldDevices = @_devices
-        @_devices = {}
-        for device in devices
-          device_id = device.device
-          l device_id
-          if oldDevices[device_id]?
-            @_devices[device_id] = oldDevices[device_id]
-          else
-            @_devices[device_id] = {id: device_id}
-        oldDevicesList = _.values(oldDevices)
-        devicesList = _.values(@_devices)
-        oldDifferences = (item for item in devicesList when _.indexOf(oldDevicesList, item) == -1)
-        newDifferences = (item for item in oldDevicesList when _.indexOf(devicesList, item) == -1)
-        differences = newDifferences.concat(oldDifferences)
-        for difference in differences
-          if _.where(oldDevices, {id: difference.id}).length > 0
-            @emit 'unplug', difference
-          else
-            @emit 'plug', difference
-            self.stop()
-            @cardFactory.list_async().then (result) ->
-              l result
-              if result.length > 0
-                self.cardFactory.getCardTerminal(result[0]).getCard_async().then (card) ->
-                  self._devices[difference.id]['lwCard'] = new LW(0, new BTChip(card), self)
-                  
-                  
+      chrome.usb.getDevices {productId: 0x1b7c, vendorId: 0x2581}, (devicesUSB) =>
+        chrome.hid.getDevices {productId: 0x2b7c, vendorId: 0x2581}, (devicesHID) =>
+          devices = devicesUSB.concat(devicesHID)
+          oldDevices = @_devices
+          @_devices = {}
+          for device in devices
+            if device.device
+              device_id = device.device
+            else
+              device_id = device.deviceId
+            l device_id
+            if oldDevices[device_id]?
+              @_devices[device_id] = oldDevices[device_id]
+            else
+              @_devices[device_id] = {id: device_id}
+          oldDevicesList = _.values(oldDevices)
+          devicesList = _.values(@_devices)
+          oldDifferences = (item for item in devicesList when _.indexOf(oldDevicesList, item) == -1)
+          newDifferences = (item for item in oldDevicesList when _.indexOf(devicesList, item) == -1)
+          differences = newDifferences.concat(oldDifferences)
+          for difference in differences
+            if _.where(oldDevices, {id: difference.id}).length > 0
+              @emit 'unplug', difference
+            else
+              @emit 'plug', difference
+              self.stop()
+              @cardFactory.list_async().then (result) ->
+                if result.length > 0
+                  self.cardFactory.getCardTerminal(result[0]).getCard_async().then (card) ->
+                    self._devices[difference.id]['lwCard'] = new LW(0, new BTChip(card), self)
 
-            
-
-
-    @_interval = setInterval checkIfWalletIsPluggedIn.bind(this), 500
+    @_interval = setInterval checkIfWalletIsPluggedIn.bind(this), 2000
 
   # Stop observing devices state
   stop: () ->
