@@ -52,7 +52,7 @@ class @ViewController extends @EventEmitter
       return yes
     no
 
-  # Set the current stylesheet need for the controller
+  # Set the curre=nt stylesheet need for the controller
   setControllerStylesheet: () ->
     $("link[id='view_controller_style']").attr('href', '../assets/css/' + @cssPath() + '.css?' + (new Date()).getTime())
 

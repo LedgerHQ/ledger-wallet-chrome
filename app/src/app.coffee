@@ -31,6 +31,8 @@ require @ledger.imports, ->
           l result
           ledger.storage.local.get result['1'].array.__uid, (result) ->
             l result
+            chrome.storage.local.get null, (r) ->
+              l r
 
 
     navigate: (layoutName, viewController) ->
