@@ -15,6 +15,7 @@
 
         'utils/log',
         'utils/string',
+        'utils/object',
         'utils/render',
         'utils/event_emitter',
         'utils/http_client',

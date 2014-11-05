@@ -6,8 +6,8 @@ _.mixin
   # @param [Function] The class to test
   # @return [Boolean] true if the object is a subtype of class otherwise false
   isKindOf: (object, clazz) ->
-    while clazz?.constructor?.name?
-      return yes if clazz == clazz.constructor.name
+    while clazz?.constructor?
+      return yes if object.constructor == clazz
       clazz = clazz.constructor.__super__
     no
 
