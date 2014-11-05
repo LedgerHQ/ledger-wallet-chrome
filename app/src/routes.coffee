@@ -2,7 +2,7 @@
 
   ## Default
   route '/', ->
-    app.router.go '/onboarding/management/welcome'
+    app.router.go '/onboarding/management/pin'
 
   ## Onboarding
   # Device
@@ -24,6 +24,9 @@
 
   route '/onboarding/management/locked', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementLockedViewController
+
+  route '/onboarding/management/pin', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingManagementPinViewController
 
   ## Wallet
   # Dashboard

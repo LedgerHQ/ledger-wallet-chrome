@@ -1,0 +1,1 @@
+class @OnboardingManagementPinViewController extends @ViewController 

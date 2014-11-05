@@ -1,0 +1,20 @@
+<div id="content-container">
+  <div class="title-container">
+    <div class="page-title"><%= t 'onboarding.management.pin.create_my_wallet' %></div>
+    <div class="page-subtitle"><%= t 'application.name' %></div>
+  </div>
+  <div class="greyed-container detailed">
+    <div class="index">
+      1.
+    </div>
+    <div class="texts">
+      <span class="black-title"><%= t 'onboarding.management.pin.choose_your' %></span> <span class="black-strong-title"><%= t 'onboarding.management.pin.pin_code' %></span>
+      <div class="black-indication"><%= t 'onboarding.management.pin.to_protect_your_wallet' %></div>
+    </div>
+  </div>
+  test
+  <div class="navigation-controller">
+    <a class="back" href="#"><%= t 'onboarding.management.back' %></a>
+    <a class="continue" href="#"><%= t 'onboarding.management.continue' %></a>
+  </div>
+</div>

@@ -1,0 +1,23 @@
+@import (reference) "../constants";
+
+// device styles
+> .logo-container {
+  margin: 0 auto;
+  padding: @metrics-extra-large-padding 0;
+  padding-top: @metrics-ultra-large-padding;
+  width: 244px;
+}
+
+> .actions-container {
+  padding: @metrics-very-large-padding 0;
+  text-align: center;
+
+  .greyed-action {
+    color: @color-soft-grey;
+    text-decoration: none;
+  }
+
+  a.greyed-action:hover {
+    color: darken(@color-soft-grey, @color-strong-darken-value);
+  }
+}
