@@ -34,8 +34,13 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
         callback?(insertionBatch)
       ).bind(this)
 
-      @store.set insertionBatch, ->
-        setTimeout callback, 0
+      idsToUpdate = (uid for uid, value of insertionBatch)
+
+      @store.get idsToUpdate, (items) =>
+        for uid, value of items
+          insertionBatch[uid] = _.extend(value, insertionBatch[uid])
+        @store.set insertionBatch, ->
+          setTimeout callback, 0
 
   # Gets items from the store using their unique object identifiers and returns them by calling back a closure.
   # @param [Array|Value] ids Id(s) of the item(s) to fetch
@@ -71,10 +76,10 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
 
   # Creates a unique identifier for a new object
   # @private
-  createUniqueObjectIdentifier: ->
-    id = @_lastUniqueIdentifier++
+  createUniqueObjectIdentifier: (prefix = 'auto', id = @_lastUniqueIdentifier) ->
+    id = id++
     @store.set({__lastUniqueIdentifier: @_lastUniqueIdentifier})
-    ledger.crypto.SHA256.hashString('auto_' + id)
+    ledger.crypto.SHA256.hashString(prefix + id)
 
   # Breaks a complex object (with properties, sub-objects, arrays) into a list of simple objects and replaces sub-objects
   # into reference. (.i.e. {name: 'ledger', and: {name: 'wallet'}} becomes {id01: {name: 'ledger', and: ref id02} id02: {name: 'wallet'}})
