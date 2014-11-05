@@ -22,6 +22,14 @@ LWWallet.prototype = {
 
     constructor: LWWallet,
 
+    event: function (eventName, data) {
+        var lWWallet = this;
+
+        lWWallet.lW.deviceManager.emit(eventName, data);
+
+        //window.dispatchEvent(new CustomEvent(eventName, data));
+    },
+
     setAddress : function (address) {
         LWTools.console("LWWallet.setAddress", 3);
         var lWWallet = this;
@@ -75,7 +83,7 @@ LWWallet.prototype = {
                 lWWallet.balance = (balance + unconfirmedBalance) / 100000000;
 
                 /* Event : LWWallet.BalanceRecovered */
-                window.dispatchEvent(new CustomEvent('LWWallet.BalanceRecovered', { detail: {lWWallet: lWWallet} }));
+                lWWallet.event('LWWallet.BalanceRecovered', {lWWallet: lWWallet});
 
                 LWTools.ajax("GET", urlTransactions, {limit: 50 }).then(function(t) {
                     lWWallet.addTransactions(t);
@@ -83,7 +91,7 @@ LWWallet.prototype = {
                     lWWallet.transactionsLoading = false;
 
                     /* Event : LWWallet.TransactionsRecovered */
-                    window.dispatchEvent(new CustomEvent('LWWallet.TransactionsRecovered', { detail: {lWWallet: lWWallet} }));
+                    lWWallet.event('LWWallet.TransactionsRecovered', {lWWallet: lWWallet});
 
                     if(firstRecovery == true){
 

@@ -24,19 +24,19 @@ require @ledger.imports, ->
       @devicesManager.on 'unplug', (event, device) ->
         l 'Unplug'
         l device
-      @devicesManager.on 'LW.CardConnected', (event, param) ->
-        #param.lW.setDriverMode(0x01);
-        param.lW.recoverFirmwareVersion();
-      @devicesManager.on 'LW.FirmwareVersionRecovered', (event, param) ->
-        param.lW.getOperationMode();
-        param.lW.plugged();
-      @devicesManager.on 'LW.PINRequired', (event, param) ->
+      @devicesManager.on 'LW.CardConnected', (event, data) ->
+        #data.lW.setDriverMode(0x01);
+        data.lW.recoverFirmwareVersion();
+      @devicesManager.on 'LW.FirmwareVersionRecovered', (event, data) ->
+        data.lW.getOperationMode();
+        data.lW.plugged();
+      @devicesManager.on 'LW.PINRequired', (event, data) ->
         self.router.go('/onboarding/device/pin')
-      @devicesManager.on 'LW.LWPINVerified', (event, param) ->
-        param.lW.getWallet();
+      @devicesManager.on 'LW.LWPINVerified', (event, data) ->
+        data.lW.getWallet();
         self.router.go('/wallet/dashboard/index')
 
-      @devicesManager.on 'LW.SetupCardLaunched', (event, param) ->
+      @devicesManager.on 'LW.SetupCardLaunched', (event, data) ->
         self.router.go('/onboarding/management/welcome')
 
 
