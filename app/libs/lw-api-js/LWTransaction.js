@@ -14,6 +14,14 @@ LWTransaction.prototype = {
 
     constructor: LWTransaction,
 
+    event: function (eventName, data) {
+        var lWTransaction = this;
+
+        lWTransaction.wallet.lW.deviceManager.emit(eventName, data);
+
+        //window.dispatchEvent(new CustomEvent(eventName, data));
+    },
+
     reset: function (){
         LWTools.console("LWTransaction.reset", 3);
         var lWTransaction = this;
@@ -115,7 +123,7 @@ LWTransaction.prototype = {
                 if(result["unspent"].length == 0){
 
                     /* Event : LWTransaction.ErrorOccured */
-                    window.dispatchEvent(new CustomEvent('LWTransaction.ErrorOccured', { detail: {lWTransaction: lWTransaction, title: 'unspentMinConfirm'} }));
+                    lWTransaction.event('LWTransaction.ErrorOccured', {lWTransaction: lWTransaction, title: 'unspentMinConfirm'});
 
                     return;
                 }
@@ -154,7 +162,7 @@ LWTransaction.prototype = {
                             LWTools.console(lWTransaction.txHex, 3);
 
                             /* Event : LWTransaction.Generated */
-                            window.dispatchEvent(new CustomEvent('LWTransaction.Generated', { detail: {lWTransaction: lWTransaction} }));
+                            lWTransaction.event('LWTransaction.Generated', {lWTransaction: lWTransaction});
 
                         }else{
 
@@ -188,14 +196,14 @@ LWTransaction.prototype = {
                                 LWTools.console("Mode Wallet", 3);
 
                                 /* Event : LWTransaction.WaitSignatureToValidate */
-                                window.dispatchEvent(new CustomEvent('LWTransaction.WaitSignatureToValidate', { detail: {lWTransaction: lWTransaction, authorization: result.authorizationRequired} }));
+                                lWTransaction.event('LWTransaction.WaitSignatureToValidate', {lWTransaction: lWTransaction, authorization: result.authorizationRequired});
 
                             }else if(result.authorizationRequired == 0x02){
                                 lWTransaction.validation = "keycard";
                                 LWTools.console("Mode KeyCard", 3);
 
                                 /* Event : LWTransaction.WaitSignatureToValidate */
-                                window.dispatchEvent(new CustomEvent('LWTransaction.WaitSignatureToValidate', { detail: {lWTransaction: lWTransaction, authorization: result.authorizationRequired, keyCardIndexesAddr: result.indexesKeyCard} }));
+                                lWTransaction.event('LWTransaction.WaitSignatureToValidate', {lWTransaction: lWTransaction, authorization: result.authorizationRequired, keyCardIndexesAddr: result.indexesKeyCard});
 
                             }
                         }
@@ -204,8 +212,7 @@ LWTransaction.prototype = {
                         LWTools.console(error, 1);
 
                         /* Event : LWTransaction.ErrorOccured */
-                        window.dispatchEvent(new CustomEvent('LWTransaction.ErrorOccured', { detail: {lWTransaction: lWTransaction, title: 'signingFailed', message: error} }));
-                        
+                        lWTransaction.event('LWTransaction.ErrorOccured', {lWTransaction: lWTransaction, title: 'signingFailed', message: error});                        
 
                     });
             });
@@ -214,7 +221,7 @@ LWTransaction.prototype = {
             LWTools.console(error, 1);
 
             /* Event : LWTransaction.ErrorOccured */
-            window.dispatchEvent(new CustomEvent('LWTransaction.ErrorOccured', { detail: {lWTransaction: lWTransaction, title: 'signingFailed', message: error} }));
+            lWTransaction.event('LWTransaction.ErrorOccured', {lWTransaction: lWTransaction, title: 'signingFailed', message: error});
 
         });
     },
@@ -274,14 +281,14 @@ LWTransaction.prototype = {
                 LWTools.console(lWTransaction.txHex, 3);
 
                 /* Event : LWTransaction.Generated */
-                window.dispatchEvent(new CustomEvent('LWTransaction.Generated', { detail: {lWTransaction: lWTransaction} }));
+                lWTransaction.event('LWTransaction.Generated', {lWTransaction: lWTransaction});
 
             }).fail(function(error) {
                 LWTools.console("createPaymentTransaction error", 1);
                 LWTools.console(error, 1);
 
                 /* Event : LWTransaction.ErrorOccured */
-                window.dispatchEvent(new CustomEvent('LWTransaction.ErrorOccured', { detail: {lWTransaction: lWTransaction, title: 'signingFailed', message: error} }));
+                lWTransaction.event('LWTransaction.ErrorOccured', {lWTransaction: lWTransaction, title: 'signingFailed', message: error});
 
             });
     },
@@ -298,13 +305,13 @@ LWTransaction.prototype = {
         ).then(function(data) {
 
             /* Event : LWTransaction.Sent */
-            window.dispatchEvent(new CustomEvent('LWTransaction.Sent', { detail: {lWTransaction: lWTransaction} }));
+            lWTransaction.event('LWTransaction.Sent', {lWTransaction: lWTransaction});
 
         }, function(error){
             LWTools.console("There seems to be a problem with building the transaction. This in no way affects the safety of your Bitcoins.", 1);
 
             /* Event : LWTransaction.NotSent */
-            window.dispatchEvent(new CustomEvent('LWTransaction.NotSent', { detail: {lWTransaction: lWTransaction} }));
+            lWTransaction.event('LWTransaction.NotSent', {lWTransaction: lWTransaction});
         });
 
     },
@@ -385,7 +392,7 @@ LWTransaction.prototype = {
                             LWTools.console(err, 1);
 
                             /* Event : LWTransaction.ErrorOccured */
-                            window.dispatchEvent(new CustomEvent('LWTransaction.ErrorOccured', { detail: {lWTransaction: lWTransaction, title: problemGetData, message: err} }));
+                            lWTransaction.event('LWTransaction.ErrorOccured', {lWTransaction: lWTransaction, title: problemGetData, message: err});
 
 
                         });

@@ -1,11 +1,15 @@
 @ledger =
       imports: [
         '../libs/jquery-2.1.1.min',
+        '../libs/jquery.color',
         '../libs/underscore-min',
         '../libs/underscore.string.min',
         '../libs/signals.min',
         '../libs/crossroads.min',
         '../libs/spin.min',
+        '../libs/sjcl',
+        '../libs/jquery.selectric.min',
+        '../public/tooltipster/js/jquery.tooltipster.min',
         '../libs/lw-api-js/lib/bitcoinjs-min',
         '../libs/lw-api-js/lib/util',
         '../libs/lw-api-js/lib/inheritance',
@@ -38,9 +42,7 @@
         '../libs/lw-api-js/LWTools',
         '../libs/lw-api-js/LW',
         '../libs/lw-api-js/LWWallet',
-        '../libs/lw-api-js/LWTransaction',
-        '../public/tooltipster/js/jquery.tooltipster.min',
-
+        '../libs/lw-api-js/LWTransaction',   
 
         'routes',
 
@@ -56,9 +58,14 @@
         'utils/spinners',
         'utils/pin_codes',
 
+        'utils/crypto/aes',
+        'utils/crypto/sha256',
+
         'utils/storage/store',
-        'utils/storage/persistent_store',
-        'utils/storage/synchronized_store',
+        'utils/storage/chrome_store',
+        'utils/storage/secure_store',
+        'utils/storage/synced_store',
+        'utils/storage/object_store',
         'utils/storage/storage',
 
         'managers/devices_manager'
@@ -78,6 +85,7 @@
         'controllers/wallet/dashboard/wallet_dashboard_index_view_controller',
         # Operations
         'controllers/wallet/operations/wallet_operations_detail_dialog_view_controller',
+        'controllers/wallet/operations/wallet_operations_index_view_controller',
         # Accounts
         'controllers/wallet/accounts/wallet_accounts_account_view_controller',
 

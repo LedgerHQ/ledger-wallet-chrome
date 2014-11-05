@@ -38,3 +38,7 @@
   # Accounts
   route '/wallet/accounts/index:#action::?params:', (params) ->
     app.navigate WALLET_LAYOUT, WalletAccountsAccountViewController
+
+  # Operations
+  route '/wallet/accounts/operations/index:#action::?params::#action:', (params) ->
+    app.navigate WALLET_LAYOUT, WalletOperationsIndexViewController

@@ -105,7 +105,7 @@ gulp.task 'coffee-script', ['compile:clean'], ->
 
 gulp.task 'doc', (cb) ->
   {exec} = require 'child_process'
-  child = exec './node_modules/.bin/codo -p -v app/src/', {}, () ->
+  child = exec './node_modules/.bin/codo -v app/src/', {}, () ->
     do cb
   child.stdin.pipe process.stdin
   child.stdout.pipe process.stdout

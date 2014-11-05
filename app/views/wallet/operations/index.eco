@@ -1,0 +1,153 @@
+<section id="operations">
+
+  <header>
+    <h1><%= t 'wallet.operations.index.title' if @displayAllAccount == yes %><%= _.str.sprintf(t('wallet.operations.index.title_with_account_name'), @account.name.toUpperCase()) unless @displayAllAccount == yes %></h1>
+    <span class="account-type-orange <%= 'transparent' if @displayAllAccount is on %>">courant</span>
+    <div class="action-item">
+      <select id="sort-order">
+        <option><%= t 'wallet.operations.index.filter_sort_desc' %></option>
+        <option><%= t 'wallet.operations.index.filter_sort_asc' %></option>
+      </select>
+     </div>
+  </header>
+
+  <table>
+    <thead>
+    <tr>
+      <td class="fit-content" ><%= t 'wallet.operations.index.time' %></td>
+      <% if @displayAllAccount is on: %>
+      <td class="fit-content padding-right-ultra-large" ><%= t 'wallet.operations.index.account_name' %></td>
+      <% end %>
+      <td class="fit-content align-right padding-right-very-small"></td>
+      <td ><%= t 'wallet.operations.index.bitcoin_address' %></td>
+      <td class="fit-content align-right price <%= 'padding-right-medium' unless @displayAllAccount is on %>" ><%= t 'wallet.operations.index.amount' %></td>
+      <% unless @displayAllAccount is on: %>
+        <td class="fit-content align-right price" ><%= t 'wallet.operations.index.balance' %></td>
+      <% end %>
+    </tr>
+    </thead>
+    <tbody>
+    <tr data-href="#showOperation(operation=1)">
+      <td class="fit-content weak-text">21/05/2014 à 15:30</td>
+      <% if @displayAllAccount is on: %>
+      <td class="fit-content padding-right-ultra-large">Épargne de Lucie</td>
+      <% end %>
+      <td class="fit-content align-right padding-right-very-small weak-text very-small-text"><%= t 'wallet.operations.index.sender' %></td>
+      <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+      <td class="fit-content positive-price <%= 'padding-right-medium' unless @displayAllAccount is on %>">+1.0892 BTC</td>
+      <% unless @displayAllAccount is on: %>
+      <td class="fit-content align-right price" >12.0000 BTC</td>
+      <% end %>
+    </tr>
+    <tr data-href="#showOperation(operation=2)">
+      <td class="fit-content weak-text">18/05/2014 à 21:30</td>
+      <% if @displayAllAccount is on: %>
+      <td class="fit-content padding-right-ultra-large">Compte courant de Maxime</td>
+      <% end %>
+      <td class="fit-content align-right padding-right-very-small weak-text very-small-text"><%= t 'wallet.operations.index.receiver' %></td>
+      <td>1KZVDwiebwwuAPbzUtJ3Zdu5G9ab5FvBi5q</td>
+      <td class="fit-content negative-price <%= 'padding-right-medium' unless @displayAllAccount is on %>">-0.0892 BTC</td>
+      <% unless @displayAllAccount is on: %>
+      <td class="fit-content align-right price" >12.0000 BTC</td>
+      <% end %>
+    </tr>
+    <tr data-href="#showOperation(operation=3)">
+      <td class="fit-content weak-text">17/05/2014 à 02:36</td>
+      <% if @displayAllAccount is on: %>
+      <td class="fit-content padding-right-ultra-large">Épargne de Lucie</td>
+      <% end %>
+      <td class="fit-content align-right padding-right-very-small weak-text very-small-text"><%= t 'wallet.operations.index.sender' %></td>
+      <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+      <td class="fit-content positive-price <%= 'padding-right-medium' unless @displayAllAccount is on %>">+1.0892 BTC</td>
+      <% unless @displayAllAccount is on: %>
+      <td class="fit-content align-right price" >12.0000 BTC</td>
+      <% end %>
+    </tr>
+    <tr data-href="#showOperation(operation=3)">
+      <td class="fit-content weak-text">17/05/2014 à 02:36</td>
+      <% if @displayAllAccount is on: %>
+      <td class="fit-content padding-right-ultra-large">Épargne de Lucie</td>
+      <% end %>
+      <td class="fit-content align-right padding-right-very-small weak-text very-small-text"><%= t 'wallet.operations.index.sender' %></td>
+      <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+      <td class="fit-content positive-price <%= 'padding-right-medium' unless @displayAllAccount is on %>">+1.0892 BTC</td>
+      <% unless @displayAllAccount is on: %>
+      <td class="fit-content align-right price" >12.0000 BTC</td>
+      <% end %>
+    </tr>
+    <tr data-href="#showOperation(operation=3)">
+      <td class="fit-content weak-text">17/05/2014 à 02:36</td>
+      <% if @displayAllAccount is on: %>
+      <td class="fit-content padding-right-ultra-large">Épargne de Lucie</td>
+      <% end %>
+      <td class="fit-content align-right padding-right-very-small weak-text very-small-text"><%= t 'wallet.operations.index.sender' %></td>
+      <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+      <td class="fit-content positive-price <%= 'padding-right-medium' unless @displayAllAccount is on %>">+1.0892 BTC</td>
+      <% unless @displayAllAccount is on: %>
+      <td class="fit-content align-right price" >12.0000 BTC</td>
+      <% end %>
+    </tr>
+    <tr data-href="#showOperation(operation=3)">
+      <td class="fit-content weak-text">17/05/2014 à 02:36</td>
+      <% if @displayAllAccount is on: %>
+      <td class="fit-content padding-right-ultra-large">Épargne de Lucie</td>
+      <% end %>
+      <td class="fit-content align-right padding-right-very-small weak-text very-small-text"><%= t 'wallet.operations.index.sender' %></td>
+      <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+      <td class="fit-content positive-price <%= 'padding-right-medium' unless @displayAllAccount is on %>">+1.0892 BTC</td>
+      <% unless @displayAllAccount is on: %>
+      <td class="fit-content align-right price" >12.0000 BTC</td>
+      <% end %>
+    </tr>
+    <tr data-href="#showOperation(operation=3)">
+      <td class="fit-content weak-text">17/05/2014 à 02:36</td>
+      <% if @displayAllAccount is on: %>
+      <td class="fit-content padding-right-ultra-large">Épargne de Lucie</td>
+      <% end %>
+      <td class="fit-content align-right padding-right-very-small weak-text very-small-text"><%= t 'wallet.operations.index.sender' %></td>
+      <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+      <td class="fit-content positive-price <%= 'padding-right-medium' unless @displayAllAccount is on %>">+1.0892 BTC</td>
+      <% unless @displayAllAccount is on: %>
+      <td class="fit-content align-right price" >12.0000 BTC</td>
+      <% end %>
+    </tr>
+    <tr data-href="#showOperation(operation=3)">
+      <td class="fit-content weak-text">17/05/2014 à 02:36</td>
+      <% if @displayAllAccount is on: %>
+      <td class="fit-content padding-right-ultra-large">Épargne de Lucie</td>
+      <% end %>
+      <td class="fit-content align-right padding-right-very-small weak-text very-small-text"><%= t 'wallet.operations.index.sender' %></td>
+      <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+      <td class="fit-content positive-price <%= 'padding-right-medium' unless @displayAllAccount is on %>">+1.0892 BTC</td>
+      <% unless @displayAllAccount is on: %>
+      <td class="fit-content align-right price" >12.0000 BTC</td>
+      <% end %>
+    </tr>
+    <tr data-href="#showOperation(operation=3)">
+      <td class="fit-content weak-text">17/05/2014 à 02:36</td>
+      <% if @displayAllAccount is on: %>
+      <td class="fit-content padding-right-ultra-large">Épargne de Lucie</td>
+      <% end %>
+      <td class="fit-content align-right padding-right-very-small weak-text very-small-text"><%= t 'wallet.operations.index.sender' %></td>
+      <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+      <td class="fit-content positive-price <%= 'padding-right-medium' unless @displayAllAccount is on %>">+1.0892 BTC</td>
+      <% unless @displayAllAccount is on: %>
+      <td class="fit-content align-right price" >12.0000 BTC</td>
+      <% end %>
+    </tr>
+    <tr data-href="#showOperation(operation=3)">
+      <td class="fit-content weak-text">17/05/2014 à 02:36</td>
+      <% if @displayAllAccount is on: %>
+      <td class="fit-content padding-right-ultra-large">Épargne de Lucie</td>
+      <% end %>
+      <td class="fit-content align-right padding-right-very-small weak-text very-small-text"><%= t 'wallet.operations.index.sender' %></td>
+      <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+      <td class="fit-content positive-price <%= 'padding-right-medium' unless @displayAllAccount is on %>">+1.0892 BTC</td>
+      <% unless @displayAllAccount is on: %>
+      <td class="fit-content align-right price" >12.0000 BTC</td>
+      <% end %>
+    </tr>
+    </tbody>
+  </table>
+
+</section>

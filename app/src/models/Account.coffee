@@ -1,0 +1,2 @@
+class @Account extends Model
+

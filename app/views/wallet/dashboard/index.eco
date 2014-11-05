@@ -14,22 +14,22 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
+      <tr data-href="/wallet/accounts/operations/index?account_name=Compte courant">
         <td class="fit-content">Compte courant</td>
         <td><span class="account-type-orange">courant</span></td>
         <td class="fit-content align-right price">2.0000 BTC</td>
       </tr>
-      <tr>
+      <tr data-href="/wallet/accounts/operations/index?account_name=Compte pas courant">
         <td class="fit-content">Compte pas courant</td>
         <td><span class="account-type-blue">épargne</span></td>
         <td class="fit-content align-right price">945.9406 BTC</td>
       </tr>
-      <tr>
+      <tr data-href="/wallet/accounts/operations/index?account_name=Compte peu courant">
         <td class="fit-content">Compte peu courant</td>
         <td><span class="account-type-green">travail</span></td>
         <td class="fit-content align-right price">289.0000 BTC</td>
       </tr>
-      <tr>
+      <tr data-href="/wallet/accounts/operations/index?account_name=Compte très courant">
         <td class="fit-content">Compte très courant</td>
         <td><span class="account-type-orange">courant</span></td>
         <td class="fit-content align-right price">24.0000 BTC</td>
@@ -43,7 +43,7 @@
 
   <header>
     <h1><%= t 'wallet.dashboard.index.operations.title' %></h1>
-    <a href="/wallet/accounts/index"><%= t 'wallet.dashboard.index.operations.action' %></a>
+    <a href="/wallet/accounts/operations/index"><%= t 'wallet.dashboard.index.operations.action' %></a>
   </header>
 
   <table>

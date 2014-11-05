@@ -17,7 +17,7 @@ require @ledger.imports, ->
           when 'reload-application' then chrome.runtime.reload()
 
       self = @
-
+      
       @devicesManager.on 'plug', (event, device) ->
         l 'Plug'
         l device
@@ -44,6 +44,14 @@ require @ledger.imports, ->
 
       @devicesManager.start()
       @router.go('/')
+
+      ledger.storage.openStores('merguez')
+      ledger.storage.local.set {__uid: '1', name: 'Test', job: 'Test', test: {a: '1', plus: '+', b: '1'}, array: [1, 2, 3]}, ->
+        ledger.storage.local.get '1', (result) =>
+          l result
+          ledger.storage.local.get result['1'].array.__uid, (result) ->
+            l result
+
 
     navigate: (layoutName, viewController) ->
       @router.once 'routed', (event, data) =>

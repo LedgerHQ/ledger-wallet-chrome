@@ -23,6 +23,17 @@ onboarding:
       later_lock_my_wallet: "Later, lock my wallet"
 
 wallet:
+
+  defaults:
+    operations: &default-operations-translation
+      time: "TIME"
+      sender: "from"
+      receiver: "to"
+      account_name: "ACCOUNT NAME"
+      bitcoin_address: "BITCOIN ADDRESS"
+      amount: "AMOUNT"
+      balance: "BALANCE"
+
   top_menu:
     balance: 'SOLDE'
     items:
@@ -43,14 +54,9 @@ wallet:
         account_balance: "BALANCE"
 
       operations:
+        <<: *default-operations-translation
         title: "LAST OPERATIONS"
         action: "SEE ALL OPERATIONS"
-        time: "TIME"
-        account_name: "ACCOUNT NAME"
-        bitcoin_address: "BITCOIN ADDRESS"
-        amount: "AMOUNT"
-        sender: "from"
-        receiver: "to"
 
   operations:
     detail:
@@ -65,6 +71,13 @@ wallet:
       print: "PRINT"
       close: "CLOSE"
 
+    index:
+      <<: *default-operations-translation
+      title: "ALL OPERATIONS"
+      title_with_account_name: 'ALL %s OPERATIONS'
+      filter_sort_desc: "DESCENDANT SORTNG"
+      filter_sort_asc: "ASCENDANT SORTING"
+
   accounts:
 
     account:
@@ -77,11 +90,8 @@ wallet:
         send: "SEND"
 
       operations:
+        <<: *default-operations-translation
         title: "LAST OPERATIONS"
         action: "SEE ALL OPERATIONS"
-        time: "TIME"
-        sender: "from"
-        receiver: "to"
-        bitcoin_address: "BITCOIN ADDRESS"
-        amount: "AMOUNT"
-        balance: "BALANCE"
+
+
