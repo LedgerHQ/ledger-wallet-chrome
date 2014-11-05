@@ -83,7 +83,7 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
     object = {}
     for key, value of structure
       _value = _(value)
-      continue if _value.isFunction()
+      continue if _value.isFunction() or _value.isStoreReference()
       if _value.isArray()
         arrayId = @_flattenArray(value, destination).__uid
         object[key] = {__type: 'ref', __uid:arrayId}
@@ -103,7 +103,7 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
     array = []
     for value in structure
       _value = _(value)
-      continue if _value.isFunction()
+      continue if _value.isFunction() or _value.isStoreReference()
       if _value.isArray()
         arrayId = @_flattenArray(value, destination).__uid
         array.push arrayId

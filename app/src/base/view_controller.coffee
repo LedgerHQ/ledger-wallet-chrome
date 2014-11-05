@@ -3,7 +3,7 @@ class @ViewController extends @EventEmitter
   renderedSelector: undefined
   parentViewController: undefined
 
-  constructor: (params) ->
+  constructor: (params = {}) ->
     @params = params
 
   select: (selectorString) ->
@@ -24,7 +24,6 @@ class @ViewController extends @EventEmitter
 
   identifier: () ->
     @className().replace 'ViewController', ''
-
 
   assetPath: () ->
     finalName = ''
