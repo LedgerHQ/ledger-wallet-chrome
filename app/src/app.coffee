@@ -39,9 +39,6 @@ require @ledger.imports, ->
       @devicesManager.on 'LW.SetupCardLaunched', (event, data) ->
         self.router.go('/onboarding/management/welcome')
 
-
-      
-
       @devicesManager.start()
       @router.go('/')
 
