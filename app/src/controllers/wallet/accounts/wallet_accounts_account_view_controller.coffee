@@ -5,6 +5,9 @@ class @WalletAccountsAccountViewController extends @ViewController
     dialog.show()
 
   onAfterRender: ->
+  	ledger.application.devicesManager.on 'LWWallet.BalanceRecovered', (event, data) ->
+      l "BALANCE !"
+
     @select('#unconfirmed_balance_tooltip').tooltipster
       content: 'Hello world'
       theme: 'tooltipster-light'

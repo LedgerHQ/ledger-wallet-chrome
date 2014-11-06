@@ -16,12 +16,32 @@ require @ledger.imports, ->
           when 'reload-page' then do @reloadUi
           when 'reload-application' then chrome.runtime.reload()
 
+      self = @
+      
       @devicesManager.on 'plug', (event, device) ->
         l 'Plug'
         l device
       @devicesManager.on 'unplug', (event, device) ->
         l 'Unplug'
         l device
+      @devicesManager.on 'LW.CardConnected', (event, data) ->
+        #data.lW.setDriverMode(0x01);
+        data.lW.recoverFirmwareVersion();
+      @devicesManager.on 'LW.FirmwareVersionRecovered', (event, data) ->
+        data.lW.getOperationMode();
+        data.lW.plugged();
+      @devicesManager.on 'LW.PINRequired', (event, data) ->
+        self.router.go('/onboarding/device/pin')
+      @devicesManager.on 'LW.LWPINVerified', (event, data) ->
+        data.lW.getWallet();
+        self.router.go('/wallet/dashboard/index')
+
+      @devicesManager.on 'LW.SetupCardLaunched', (event, data) ->
+        self.router.go('/onboarding/management/welcome')
+
+
+      
+
       @devicesManager.start()
       @router.go('/')
 

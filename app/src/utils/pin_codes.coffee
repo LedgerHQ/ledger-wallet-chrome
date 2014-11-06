@@ -67,7 +67,7 @@ class @ledger.pin_codes.PinCode extends EventEmitter
       do self._updateDigits
 
       if e.type == 'keyup' and self.isComplete()
-        emit 'complete' if /[0-9]/g.test @value
+        self.emit 'complete', @value if /[0-9]/g.test @value
 
   _updateDigits: ->
     for index in [0..@_digits().length - 1]

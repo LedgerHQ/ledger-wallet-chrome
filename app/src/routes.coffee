@@ -2,8 +2,8 @@
 
   ## Default
   route '/', ->
-    # app.router.go '/onboarding/device/plug'
-    app.router.go '/wallet/dashboard/index'
+    app.router.go '/onboarding/device/plug'
+    #app.router.go '/wallet/dashboard/index'
 
   ## Onboarding
   # Device
