@@ -41,7 +41,7 @@
       color: @color-black;
       padding: 35px @metrics-ultra-large-padding;
       padding-bottom: 30px;
-      margin-bottom: 20px;
+      margin-top: 20px;
 
       .black-indication {
         margin-top: 10px;
@@ -62,25 +62,32 @@
         margin-left: auto;
         align-self: center;
       }
-
-      a&:hover {
-        background-color: darken(@color-extra-light-grey, 2%);
-      }
     }
+  }
+  a.greyed-container.detailed:hover {
+    background-color: darken(@color-extra-light-grey, 2%);
   }
 
   // widgets
-  .pin-code {
+  .pincode {
     font-size: 0;
+    display: flex;
 
     > div {
       background-color: @color-white;
       height: 85px;
-      width: 55px;
-      display: inline-block;
-      margin-left: 6px;
+      width: 53px;
+      margin-right: 6px;
       border: solid 1px @color-light-grey;
       border-radius: 10px;
+      font-weight: @font-weight-light;
+      text-align: center;
+      font-size: 40px;
+      line-height: 82px;
+
+      &:last-of-type {
+        margin-right: 0;
+      }
 
       &.focused {
         border-color: @color-soft-grey;
@@ -96,6 +103,11 @@
         background-position: center center;
         background-repeat: no-repeat;
       }
+
+      &.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+      }
     }
 
     > input {
@@ -107,6 +119,5 @@
   }
 
   @import "device";
-
   @import "management";
 }

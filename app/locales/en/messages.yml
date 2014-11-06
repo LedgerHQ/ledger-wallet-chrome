@@ -16,8 +16,9 @@ onboarding:
       enter_your_pin_code: "Enter you PIN code to unlock your wallet:"
       i_lost_my_pin_code: "I lost my PIN code"
   management:
-    back: "RETOUR"
-    continue: "CONTINUER"
+    back: "BACK"
+    continue: "CONTINUE"
+    or: "OR"
     done:
       you_can_access_your_wallet: "You can now start using your wallet"
       configuration_is_complete: "Configuration is complete"
@@ -44,7 +45,10 @@ onboarding:
       choose_your: "Choose your"
       pin_code: "PIN code"
       to_protect_your_wallet: "It allows you to secure the access of your wallet"
-      new_pin_code: "Suggest another PIN code"
+      new_pin_code: "GENERATE ANOTHER PIN CODE"
+      auto: "AUTOMATIC PIN CODE"
+      manual: "MANUAL PIN CODE"
+      warning_weak_pin_codes: "Please note, your birth year and your debit/credit card numbers are not secure PIN codes."
 
 wallet:
   top_menu:

@@ -12,6 +12,10 @@
   //  background-image: url("@{onboarding-images-url}/management/ledger_icon.png");
   //  background-origin: content-box;
 
+  & + .greyed-container.detailed {
+    margin-top: 0px;
+  }
+
   > .page-title {
     font-weight: @font-weight-light;
     font-size: @font-size-mega-mega-large;
@@ -45,24 +49,81 @@
   }
 }
 
-> .navigation-controller {
+> .page-content-container {
+  padding: @metrics-medium-padding @metrics-ultra-large-padding + 46px + @metrics-medium-padding;
+  padding-bottom: 0;
+  padding-right: @metrics-ultra-large-padding;
+
+  .grey-indication {
+    color: @color-dark-grey;
+    line-height: 25px;
+    letter-spacing: -0.3px;
+    position: relative;
+    top: -6px;
+
+    &.hidden {
+      visibility: hidden;
+    }
+  }
+
+  .separator {
+    opacity: 0.75;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    color: @color-light-grey;
+
+    > div.line {
+      flex-grow: 1;
+      width: 50%;
+      border-right: 1px solid @color-light-grey;
+
+      &:first-child {
+        margin-bottom: @metrics-small-padding;
+      }
+
+      &:last-child {
+        margin-top: @metrics-small-padding;
+      }
+    }
+  }
+}
+
+> .navigation-container {
   margin-top: auto;
+  display: flex;
   padding: @metrics-very-large-padding @metrics-ultra-large-padding;
+  padding-top: 0;
+  justify-content: space-between;
 
   > a {
-    font-size: @font-size-very-large;
-    font-weight: @font-weight-light;
-    color: @color-soft-grey;
-    text-decoration: underline;
-    text-transform: uppercase;
-    letter-spacing: -1px;
+    .colored(@color, @font-weight: @font-weight-light) {
+      font-size: @font-size-very-large;
+      font-weight: @font-weight;
+      color: @color;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+
+      &:hover {
+        color: darken(@color, @color-strong-darken-value);
+      }
+
+      &.disabled {
+        color: @color-light-grey;
+        pointer-events: none;
+        font-weight: @font-weight;
+      }
+    }
 
     &.back {
+      .colored(@color-soft-grey);
 
     }
 
     &.continue {
-
+      .colored(@color-action-green, @font-weight-semibold);
+      font-weight: @font-weight-semibold;
     }
   }
 }

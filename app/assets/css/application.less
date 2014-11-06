@@ -38,7 +38,16 @@
   .rounded-button(@color-invalid-red);
 }
 
-// checkboxes
-.rounded-radio-button {
+// texts
+.uppercase-action {
+  font-size: @font-size-small;
+  color: @color-action-purple;
 
+  a& {
+    text-decoration: none;
+
+    &:hover {
+      color: darken(@color-action-purple, 15%)
+    }
+  }
 }
