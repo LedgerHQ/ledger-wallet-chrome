@@ -51,6 +51,17 @@ onboarding:
       warning_weak_pin_codes: "Please note, your birth year and your debit/credit card numbers are not secure PIN codes."
 
 wallet:
+
+  defaults:
+    operations: &default-operations-translation
+      time: "TIME"
+      sender: "from"
+      receiver: "to"
+      account_name: "ACCOUNT NAME"
+      bitcoin_address: "BITCOIN ADDRESS"
+      amount: "AMOUNT"
+      balance: "BALANCE"
+
   top_menu:
     balance: 'SOLDE'
     items:
@@ -71,9 +82,44 @@ wallet:
         account_balance: "BALANCE"
 
       operations:
+        <<: *default-operations-translation
         title: "LAST OPERATIONS"
         action: "SEE ALL OPERATIONS"
-        time: "TIME"
-        account_name: "ACCOUNT NAME"
-        bitcoin_address: "BITCOIN ADDRESS"
-        amount: "AMOUNT"
+
+  operations:
+    detail:
+      title: "OPERATION DETAIL"
+      amount: "Amount"
+      time: "Time"
+      status: "Status"
+      sender: "From"
+      receiver: "To"
+      identifier: "Transaction identifier"
+      send_by_email: "SEND BY EMAIL"
+      print: "PRINT"
+      close: "CLOSE"
+
+    index:
+      <<: *default-operations-translation
+      title: "ALL OPERATIONS"
+      title_with_account_name: 'ALL %s OPERATIONS'
+      filter_sort_desc: "DESCENDANT SORTNG"
+      filter_sort_asc: "ASCENDANT SORTING"
+
+  accounts:
+
+    account:
+      detail:
+        action: "ACCOUNT SETTINGS"
+        balance: "BALANCE"
+        balance_in_progress: "INCLUDING UNCONFIRMED"
+        actions: "ACTIONS"
+        receive: "RECEIVE"
+        send: "SEND"
+
+      operations:
+        <<: *default-operations-translation
+        title: "LAST OPERATIONS"
+        action: "SEE ALL OPERATIONS"
+
+

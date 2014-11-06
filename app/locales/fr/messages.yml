@@ -51,6 +51,17 @@ onboarding:
       warning_weak_pin_codes: "Attention, votre année de naissance et votre code de carte bancaire ne constituent pas des codes PIN sécurisés."
 
 wallet:
+
+  defaults:
+    operations: &default-operations-translation
+      time: "DATE ET HEURE"
+      account_name: "NOM DU COMPTE"
+      bitcoin_address: "ADRESSE BITCOIN"
+      amount: "MONTANT"
+      sender: "depuis"
+      receiver: "vers"
+      balance: "SOLDE"
+
   top_menu:
     balance: 'SOLDE'
     items:
@@ -71,9 +82,42 @@ wallet:
         account_balance: "SOLDE"
 
       operations:
-        title: "DERNIÈRES OPERATIONS"
+        <<: *default-operations-translation
+        title: "DERNIÈRES OPÉRATIONS"
         action: "VOIR TOUTES LES OPÉRATIONS"
-        time: "DATE ET HEURE"
-        account_name: "NOM DU COMPTE"
-        bitcoin_address: "ADRESSE BITCOIN"
-        amount: "MONTANT"
+
+  operations:
+
+    detail:
+      title: "DÉTAIL DE L'OPÉRATION"
+      amount: "Montant"
+      time: "Date et heure"
+      status: "État"
+      sender: "Depuis"
+      receiver: "Vers"
+      identifier: "Identifiant"
+      send_by_email: "ENVOYER PAR EMAIL"
+      print: "IMPRIMER"
+      close: "FERMER"
+
+    index:
+       <<: *default-operations-translation
+       title: "TOUTES LES OPÉRATIONS"
+       title_with_account_name: 'TOUTES LES OPÉRATIONS DE %s'
+       filter_sort_desc: "TRI DÉCROISSANT"
+       filter_sort_asc: "TRI CROISSANT"
+
+  accounts:
+    account:
+      detail:
+        action: "PARAMÈTRES DU COMPTE"
+        balance: "SOLDE"
+        balance_in_progress: "DONT NON CONFIRMÉ"
+        actions: "ACTIONS"
+        receive: "RECEVOIR"
+        send: "ENVOYER"
+
+      operations:
+        <<: *default-operations-translation
+        title: "DERNIÈRES OPÉRATIONS"
+        action: "VOIR TOUTES LES OPÉRATIONS"

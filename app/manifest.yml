@@ -12,11 +12,15 @@ app:
 permissions:
   - "storage"
   - "usb"
+  - "hid"
   -
     usbDevices:
       -
         vendorId: 9601
         productId: 7036
+      -
+        vendorId: 9601
+        productId: 11132
 
 commands:
   reload-page:
