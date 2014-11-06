@@ -3,7 +3,7 @@ class @ViewController extends @EventEmitter
   renderedSelector: undefined
   parentViewController: undefined
 
-  constructor: (params) ->
+  constructor: (params = {}) ->
     @params = params
 
   select: (selectorString) ->
@@ -24,7 +24,6 @@ class @ViewController extends @EventEmitter
 
   identifier: () ->
     @className().replace 'ViewController', ''
-
 
   assetPath: () ->
     finalName = ''
@@ -53,7 +52,7 @@ class @ViewController extends @EventEmitter
       return yes
     no
 
-  # Set the current stylesheet need for the controller
+  # Set the curre=nt stylesheet need for the controller
   setControllerStylesheet: () ->
     $("link[id='view_controller_style']").attr('href', '../assets/css/' + @cssPath() + '.css?' + (new Date()).getTime())
 

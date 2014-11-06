@@ -39,19 +39,30 @@ require @ledger.imports, ->
       @devicesManager.on 'LW.SetupCardLaunched', (event, data) ->
         self.router.go('/onboarding/management/welcome')
 
-
-      
-
       @devicesManager.start()
       @router.go('/')
 
       ledger.storage.openStores('merguez')
-      ledger.storage.local.set {__uid: '1', name: 'Test', job: 'Test', test: {a: '1', plus: '+', b: '1'}, array: [1, 2, 3]}, ->
+
+      account = Account.findOrCreate 1, {name: 'Toto', balance: 16}
+      account.get ['name', 'balance'], (result) =>
+        l result
+        account.set 'name', result.name + '1'
+        account.set 'balance', result.balance * 2
+        account.save () =>
+          account = Account.findOrCreate 1, {name: 'Toto', balance: 16}
+          account.get ['name', 'balance'], (result) =>
+            l result
+
+      ###
+      ledger.storage.local.set {__uid: '1', name: 'Test', second: 'Toto', test: {a: '1', plus: '+', b: '1'}, array: [1, 2, 3]}, ->
         ledger.storage.local.get '1', (result) =>
           l result
           ledger.storage.local.get result['1'].array.__uid, (result) ->
             l result
-
+            chrome.storage.local.get null, (r) ->
+              l r
+      ###
 
     navigate: (layoutName, viewController) ->
       @router.once 'routed', (event, data) =>

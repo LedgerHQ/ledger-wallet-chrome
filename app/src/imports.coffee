@@ -4,6 +4,7 @@
         '../libs/jquery.color',
         '../libs/underscore-min',
         '../libs/underscore.string.min',
+        '../libs/underscore.inflection',
         '../libs/signals.min',
         '../libs/crossroads.min',
         '../libs/spin.min',
@@ -48,6 +49,7 @@
 
         'utils/log',
         'utils/string',
+        'utils/object',
         'utils/render',
         'utils/event_emitter',
         'utils/http_client',
@@ -71,8 +73,12 @@
         'managers/devices_manager'
 
         'base/model',
+        'base/collection',
         'base/view_controller',
         'base/navigation_controller',
+
+        ## Models
+        'models/account',
 
         ## Dialog Management
         'utils/dialogs',
