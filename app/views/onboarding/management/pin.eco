@@ -1,7 +1,7 @@
 <div id="content-container">
   <div class="title-container">
     <div class="page-title"><%= t 'onboarding.management.pin.create_my_wallet' %></div>
-    <div class="page-subtitle"><%= t 'application.name' %></div>
+    <div class="page-subtitle"><%= t 'application.name' %><a href="/onboarding/management/pin?pin_kind=auto">AUTO</a></div>
   </div>
   <div class="greyed-container detailed">
     <div class="index">
