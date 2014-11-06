@@ -2,7 +2,7 @@
 
   ## Default
   route '/', ->
-    app.router.go '/onboarding/device/pin'
+    app.router.go '/onboarding/management/pin'
 
   ## Onboarding
   # Device
@@ -36,14 +36,14 @@
   route '/wallet/send/index', (params) ->
 
 
-  route '/wallet/receive/index:#action::?params:', (params) ->
+  route '/wallet/receive/index', (params) ->
     d = new WalletOperationsDetailDialogViewController()
     d.show()
 
   # Accounts
-  route '/wallet/accounts/index:#action::?params:', (params) ->
+  route '/wallet/accounts/index', (params) ->
     app.navigate WALLET_LAYOUT, WalletAccountsAccountViewController
 
   # Operations
-  route '/wallet/accounts/operations/index:#action::?params::#action:', (params) ->
+  route '/wallet/accounts/operations/index', (params) ->
     app.navigate WALLET_LAYOUT, WalletOperationsIndexViewController
