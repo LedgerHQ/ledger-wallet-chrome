@@ -7,13 +7,13 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
   # @param [ledger.storage.Store] store The slave store used to save data within
   constructor: (@store) ->
     @store.get '__lastUniqueIdentifier', (result) =>
-      @_lastUniqueIdentifier = if result?.__lastUniqueIdentifier? then result.__lastUniqueIdentifier else 0
+      @_lastUniqueIdentifier = if result?.__lastUniqueIdentifier? and not isNaN(result?.__lastUniqueIdentifier) then result.__lastUniqueIdentifier else 0
       @emit 'initialized'
 
   # Perform an operation on the store safely
   # @private
   perform: (cb) ->
-    if @__lastUniqueIdentifier?
+    if @_lastUniqueIdentifier?
       do cb
     else
       @once 'initialized', =>
@@ -38,7 +38,7 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
 
       @store.get idsToUpdate, (items) =>
         for uid, value of items
-          insertionBatch[uid] = _.extend(value, insertionBatch[uid])
+          insertionBatch[uid] = _.extend(JSON.parse(value), insertionBatch[uid])
         @store.set insertionBatch, ->
           setTimeout callback, 0
 
@@ -47,7 +47,6 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
   # @param [Function] callback Called with an object containing all requested objects
   get: (ids, callback) ->
     return @get([ids], callback) unless _.isArray(ids)
-
     onGetItems = ( (result) ->
       objects = {}
       for uid, value of result
@@ -56,6 +55,18 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
           object = object.content
           object.__uid = uid
         objects[uid] = object
+      callback(objects)
+    ).bind(this)
+
+    @store.get ids, (result) ->
+      setTimeout(( -> onGetItems result ), 0)
+
+  exists: (ids, callback) ->
+    return @exists([ids], callback) unless _.isArray(ids)
+    onGetItems = ( (result) ->
+      objects = {}
+      for id in ids
+        objects[id] = if result[id]? then yes else no
       callback(objects)
     ).bind(this)
 
@@ -76,10 +87,10 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
 
   # Creates a unique identifier for a new object
   # @private
-  createUniqueObjectIdentifier: (prefix = 'auto', id = @_lastUniqueIdentifier) ->
-    id = id++
-    @store.set({__lastUniqueIdentifier: @_lastUniqueIdentifier})
-    ledger.crypto.SHA256.hashString(prefix + id)
+  createUniqueObjectIdentifier: (prefix = 'auto', id) ->
+    @store.set({__lastUniqueIdentifier: @_lastUniqueIdentifier + 1}) if id?
+    id = if id? then id else @_lastUniqueIdentifier++
+    [id, ledger.crypto.SHA256.hashString(prefix + id)]
 
   # Breaks a complex object (with properties, sub-objects, arrays) into a list of simple objects and replaces sub-objects
   # into reference. (.i.e. {name: 'ledger', and: {name: 'wallet'}} becomes {id01: {name: 'ledger', and: ref id02} id02: {name: 'wallet'}})
@@ -98,7 +109,8 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
       else
         object[key] = value
     unless object.__uid?
-      object.__uid = @createUniqueObjectIdentifier()
+      [id, uid] = @createUniqueObjectIdentifier()
+      object.__uid = uid
     destination[object.__uid] = object
     object
 
@@ -118,7 +130,8 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
       else
         array.push value
     unless array.__uid?
-      array.__uid = @createUniqueObjectIdentifier()
+      [id, uid] = @createUniqueObjectIdentifier()
+      array.__uid = uid
     destination[array.__uid] = {__type: 'array', __uid: array.__uid, content: array}
     array
 
