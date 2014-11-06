@@ -16,7 +16,7 @@ class ledger.collections.Collection extends EventEmitter
 
   @global: () ->
     globalCollection = new @
-    globalCollection.__uid =  ledger.storage.local.createUniqueObjectIdentifier("global_#{_.str.underscored(@name)}", 42)
+   # globalCollection.__uid =  ledger.storage.local.createUniqueObjectIdentifier("global_#{_.str.underscored(@name)}", 42)
     globalCollection.isGlobal = () -> yes
     globalCollection
 
