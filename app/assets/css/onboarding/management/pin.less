@@ -1,0 +1,36 @@
+@import (reference) "../../constants";
+
+.page-content-container {
+  display: flex;
+  align-items: flex-start;
+
+   > .choice {
+     display: flex;
+     flex-direction: column;
+
+     &:first-child {
+       flex-shrink: 0;
+     }
+
+     > .pincode {
+       margin-top: @metrics-small-padding;
+     }
+
+     > .uppercase-action, > .grey-indication {
+       margin-top: @metrics-medium-padding;
+     }
+  }
+
+  > .separator {
+    width: 120px;
+    height: 105px;
+    margin-top: @metrics-medium-padding;
+    flex-shrink: 0;
+  }
+}
+
+.uppercase-action {
+  &.hidden {
+    visibility: hidden;
+  }
+}

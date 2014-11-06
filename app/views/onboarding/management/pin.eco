@@ -1,0 +1,40 @@
+<div id="content-container">
+  <div class="title-container">
+    <div class="page-title"><%= t 'onboarding.management.pin.create_my_wallet' %></div>
+    <div class="page-subtitle"><%= t 'application.name' %></div>
+  </div>
+  <div class="greyed-container detailed">
+    <div class="index">
+      1.
+    </div>
+    <div class="texts">
+      <span class="black-title"><%= t 'onboarding.management.pin.choose_your' %></span> <span class="black-strong-title"><%= t 'onboarding.management.pin.pin_code' %></span>
+      <div class="black-indication"><%= t 'onboarding.management.pin.to_protect_your_wallet' %></div>
+    </div>
+  </div>
+  <div class="page-content-container">
+    <div class="choice" id="choice-auto">
+      <label>
+        <input type="radio" name="pin_kind" value="auto">
+        <span class="uppercase-title"><%= t 'onboarding.management.pin.auto' %></span>
+      </label>
+      <a href="#" class="uppercase-action"><%= t 'onboarding.management.pin.new_pin_code' %></a>
+    </div>
+    <div class="separator">
+      <div class="line"></div>
+      <%= t 'onboarding.management.or' %>
+      <div class="line"></div>
+    </div>
+    <div class="choice" id="choice-manual">
+      <label>
+        <input type="radio" name="pin_kind" value="manual">
+        <span class="uppercase-title"><%= t 'onboarding.management.pin.manual' %></span>
+      </label>
+      <span class="grey-indication"><%= t 'onboarding.management.pin.warning_weak_pin_codes' %></span>
+    </div>
+  </div>
+  <div class="navigation-container">
+    <a class="back" href="#"><%= t 'onboarding.management.back' %></a>
+    <a class="continue" href="#"><%= t 'onboarding.management.continue' %></a>
+  </div>
+</div>

@@ -37,5 +37,7 @@ commands:
 
 icons:
   16: "assets/images/icon-16.png"
+  48: "assets/images/icon-32.png"
   48: "assets/images/icon-48.png"
+  48: "assets/images/icon-64.png"
   128: "assets/images/icon-128.png"

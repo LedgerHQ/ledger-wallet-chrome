@@ -30,17 +30,28 @@
     background-color: darken(@color, @color-default-darken-value);
   }
 }
-
 .action-rounded-button {
   .rounded-button(@color-action-green);
 }
-
 .cancel-rounded-button {
   .rounded-button(@color-light-grey);
 }
-
 .important-rounded-button {
   .rounded-button(@color-invalid-red);
+}
+
+// texts
+.uppercase-action {
+  font-size: @font-size-small;
+  color: @color-action-purple;
+
+  a& {
+    text-decoration: none;
+
+    &:hover {
+      color: darken(@color-action-purple, 15%)
+    }
+  }
 }
 
 .action-bar {

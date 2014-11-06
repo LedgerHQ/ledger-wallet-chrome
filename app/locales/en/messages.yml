@@ -16,11 +16,39 @@ onboarding:
       enter_your_pin_code: "Enter you PIN code to unlock your wallet:"
       i_lost_my_pin_code: "I lost my PIN code"
   management:
+    back: "BACK"
+    continue: "CONTINUE"
+    or: "OR"
     done:
       you_can_access_your_wallet: "You can now start using your wallet"
       configuration_is_complete: "Configuration is complete"
       open_my_wallet: "Open my wallet"
       later_lock_my_wallet: "Later, lock my wallet"
+    welcome:
+      new_wallet: "New wallet"
+      welcome_to_your_new_wallet: "Welcome to your new Ledger Wallet!"
+      create_or_recover: "Would you like to create a new wallet or restore an existing one?"
+      use_as_new: "Use as a new wallet"
+      if_its_your_first_wallet: "If you just bought your first Ledger Wallet"
+      recover_wallet: "Restore my existing wallet"
+      if_you_lost_your_wallet: "If you froze or lost your Ledger Wallet"
+    locked:
+      wallet_is_locked: "Your wallet is frozen"
+      wrong_pin_codes: "Your wallet has frozen due to 3 incorrect PIN entries, but your bitcoins remain safe."
+      unlock_or_create: "To regain access to your accounts, you must unfreeze your wallet with your recovery phrase."
+      unlock_my_wallet: "Unfreeze my wallet"
+      retreive_access: "Regain access to your accounts using your recovery phrase"
+      create_a_new_wallet: "Create a new wallet"
+      you_can_always_retreive_your_accounts: "Your current bitcoins and accounts remain fully restorable at any time to another Ledger Wallet"
+    pin:
+      create_my_wallet: "Create my wallet"
+      choose_your: "Choose your"
+      pin_code: "PIN code"
+      to_protect_your_wallet: "It allows you to secure the access of your wallet"
+      new_pin_code: "GENERATE ANOTHER PIN CODE"
+      auto: "AUTOMATIC PIN CODE"
+      manual: "MANUAL PIN CODE"
+      warning_weak_pin_codes: "Please note, your birth year and your debit/credit card numbers are not secure PIN codes."
 
 wallet:
 

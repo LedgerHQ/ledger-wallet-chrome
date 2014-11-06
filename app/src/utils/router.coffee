@@ -32,7 +32,7 @@ class @Router extends @EventEmitter
     , 0)
 
   _addRoute: (url, callback) ->
-    route = @_router.addRoute url
+    route = @_router.addRoute url + ':?params::#action::?params:'
     route.matched.add callback.bind(route)
 
   _listenClickEvents: () ->
