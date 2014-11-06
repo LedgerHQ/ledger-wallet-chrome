@@ -79,6 +79,7 @@ class @Model extends @EventEmitter
     data.__uid = if inserted then @getUid() else ledger.storage.local.createUniqueObjectIdentifier(data.__type, data._id)[1]
     data = _(data).omit(['_id']) if inserted and data._id?
     ledger.storage.local.set data, () =>
+      @__uid = data.__uid unless inserted
       callback(yes)
 
   _performFind: (callback) ->
@@ -96,7 +97,7 @@ class @Model extends @EventEmitter
         @__uid = _findOrCreate.__uid
         return @_performGet(keys, callback)
       @_data = _findOrCreate.base
-      @_data.__uid = _findOrCreate.__uid
+      @__uid = _findOrCreate.__uid
       @save () =>
         @_performGet keys, callback
 
