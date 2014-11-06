@@ -45,7 +45,7 @@
         'base/navigation_controller',
 
         ## Models
-        'models/account'
+        'models/account',
 
         ## Dialog Management
         'utils/dialogs',
