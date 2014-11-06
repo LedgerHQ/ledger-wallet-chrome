@@ -30,13 +30,13 @@
 
   ## Wallet
   # Dashboard
-  route '/wallet/dashboard/index:#action:', (params) ->
+  route '/wallet/dashboard/index', (params) ->
     app.navigate WALLET_LAYOUT, WalletDashboardIndexViewController
 
-  route '/wallet/send/index:#action::?params:', (params) ->
+  route '/wallet/send/index', (params) ->
 
-  route '/wallet/receive/index:#action::?params:', (params) ->
+  route '/wallet/receive/index', (params) ->
 
   # Accounts
-  route '/wallet/accounts/index:#action::?params:', (params) ->
+  route '/wallet/accounts/index', (params) ->
     l 'Accounts'
