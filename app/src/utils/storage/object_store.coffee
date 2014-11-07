@@ -7,7 +7,7 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
   # @param [ledger.storage.Store] store The slave store used to save data within
   constructor: (@store) ->
     @store.get '__lastUniqueIdentifier', (result) =>
-      @_lastUniqueIdentifier = if result?.__lastUniqueIdentifier? and not isNaN(result?.__lastUniqueIdentifier) then result.__lastUniqueIdentifier else 0
+      @_lastUniqueIdentifier = if result?.__lastUniqueIdentifier? and not isNaN(result?.__lastUniqueIdentifier) then result.__lastUniqueIdentifier else 1
       @emit 'initialized'
 
   # Perform an operation on the store safely
@@ -28,8 +28,10 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
     @perform =>
       insertionBatch = {}
       for object in objects
-        @_flattenStructure(object, insertionBatch)
-
+        if _.isArray(object)
+          @_flattenArray(object, insertionBatch)
+        else if _.isObject(object)
+          @_flattenStructure(object, insertionBatch)
       onInserted = (->
         callback?(insertionBatch)
       ).bind(this)
@@ -89,7 +91,7 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
   # @private
   createUniqueObjectIdentifier: (prefix = 'auto', id) ->
     @store.set({__lastUniqueIdentifier: @_lastUniqueIdentifier + 1}) if id?
-    id = if id? then id else @_lastUniqueIdentifier++
+    id = if id? then id else - (@_lastUniqueIdentifier++)
     [id, ledger.crypto.SHA256.hashString(prefix + id)]
 
   # Breaks a complex object (with properties, sub-objects, arrays) into a list of simple objects and replaces sub-objects
@@ -123,12 +125,14 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
       continue if _value.isFunction() or _value.isStoreReference()
       if _value.isArray()
         arrayId = @_flattenArray(value, destination).__uid
-        array.push arrayId
+        array.push {__type: 'ref', __uid:arrayId}
       else if _value.isObject()
         valueId = @_flattenStructure(value, destination).__uid
-        array.push valueId
+        array.push {__type: 'ref', __uid:valueId}
       else
         array.push value
+    array.__uid = structure.__uid
+    array.__modCount = if structure.__modCount? then structure.__modCount else 0
     unless array.__uid?
       [id, uid] = @createUniqueObjectIdentifier()
       array.__uid = uid

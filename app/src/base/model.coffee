@@ -10,25 +10,26 @@ class @Model extends @EventEmitter
   constructor: (base) ->
     @_data = base
     @_id = @_data?._id
+    @_initializeRelationships()
+    @initilialize?()
 
   getUid: () -> @__uid
 
   getId: () -> @_id
 
-  get: (keys, callback) ->
-    return @_performFindOrCreate(keys, callback) if @_findOrCreate?
-    @_performGet(keys, callback)
+  get: (callback) ->
+    return @_performFindOrCreate(callback) if @_findOrCreate?
+    @_performGet(callback)
 
-  _performGet: (keys, callback) ->
+  _performGet: (callback) ->
     throw 'Object without id cannot perform get operation' unless @getUid()
-    _keys = _(keys)
     ledger.storage.local.get @getUid(), (results) =>
       results = results[@getUid()]
       return callback(null) unless results?
       finalResults = {}
       relationships = []
       for k, v of results
-        if _(v).isStoreReference() and _keys.contains(k)
+        if _(v).isStoreReference()
           relationships.push v.__uid
         else
           finalResults[k] = v
@@ -76,11 +77,19 @@ class @Model extends @EventEmitter
     data = @_data
     @_data = null
     data.__type = _(this).getClassName()
-    data.__uid = if inserted then @getUid() else ledger.storage.local.createUniqueObjectIdentifier(data.__type, data._id)[1]
+    data.__uid = switch
+      when inserted then @getUid()
+      when not inserted and data.__uid? then data.__uid
+      else ledger.storage.local.createUniqueObjectIdentifier(data.__type, data._id)[1]
     data = _(data).omit(['_id']) if inserted and data._id?
-    ledger.storage.local.set data, () =>
-      @__uid = data.__uid unless inserted
-      callback(yes)
+    if not inserted
+      @_data = data
+      @getCollection().insert this, () =>
+        @_data = null
+        @__uid = data.__uid
+        callback(yes)
+    else
+      ledger.storage.local.set data, () => callback(yes)
 
   _performFind: (callback) ->
     @exists (exists) ->
@@ -89,17 +98,21 @@ class @Model extends @EventEmitter
       else
         callback(no)
 
-  _performFindOrCreate: (keys, callback) ->
+  _performFindOrCreate: (callback) ->
     ledger.storage.local.exists @_findOrCreate.__uid, (result) =>
       _findOrCreate = @_findOrCreate
       @_findOrCreate = undefined
       if result[_findOrCreate.__uid]
         @__uid = _findOrCreate.__uid
-        return @_performGet(keys, callback)
+        return @_performGet(callback)
       @_data = _findOrCreate.base
-      @__uid = _findOrCreate.__uid
+      @_data._id = _findOrCreate._id
+      @_data.__uid = _findOrCreate.__uid
       @save () =>
-        @_performGet keys, callback
+        @_performGet callback
+
+  _initializeRelationships: () ->
+
 
   @create: (base = {}) -> new @(base)
 
@@ -129,3 +142,10 @@ class @Model extends @EventEmitter
 
   # Safely performs a callback on the current model
   _perform: (cb = _.noop) ->
+
+_.mixin
+  model: (object) ->
+    return null unless object.__type?
+    model = new window[object.__type]()
+    model.__uid = object.__uid
+    model

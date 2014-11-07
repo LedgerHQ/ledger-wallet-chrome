@@ -45,14 +45,25 @@ require @ledger.imports, ->
       ledger.storage.openStores('merguez')
 
       account = Account.findOrCreate 1, {name: 'Toto', balance: 16}
-      account.get ['name', 'balance'], (result) =>
+      account.get (result) =>
         l result
+        account.set '_id', result._id + 1
         account.set 'name', result.name + '1'
         account.set 'balance', result.balance * 2
         account.save () =>
           account = Account.findOrCreate 1, {name: 'Toto', balance: 16}
-          account.get ['name', 'balance'], (result) =>
+          account.get (result) =>
             l result
+            Account.create({name: 'Test'}).save () =>
+              ledger.collections.accounts.toArray (a) =>
+                l a
+                chrome.storage.local.get null, (r) =>
+                  l r
+              ledger.collections.accounts.each (object) =>
+                l object
+
+
+
 
       ###
       ledger.storage.local.set {__uid: '1', name: 'Test', second: 'Toto', test: {a: '1', plus: '+', b: '1'}, array: [1, 2, 3]}, ->
