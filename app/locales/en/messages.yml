@@ -122,4 +122,12 @@ wallet:
         title: "LAST OPERATIONS"
         action: "SEE ALL OPERATIONS"
 
-
+      receive:
+        title: "RECEIVE BITCOINS"
+        amount: "AMOUNT (OPTIONAL)"
+        receiver_account: "RECIPIENT ACCOUNT"
+        receiver_address: "RECEPTION ADDRESS"
+        qr_code_explanation: "This QR code can be scanned by the person who want to send you bitcoins"
+        send_by_email: "SEND BY EMAIL"
+        print: "PRINT"
+        close: "CLOSE"

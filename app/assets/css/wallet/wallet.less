@@ -120,6 +120,24 @@ section {
       padding-right: @metrics-very-large-padding;
       border-bottom: 1px solid @color-very-light-grey;
       font-size: @font-size-medium;
+
+      .row-title() {
+        text-transform: uppercase;
+        font-weight: @font-weight-semibold;
+        font-size: @font-size-very-small;
+        color: @color-black;
+      }
+
+      &.row-title {
+        .row-title;
+        &-optional {
+          .row-title;
+          color: @color-soft-grey;
+        }
+
+      }
+
+
     }
 
     tbody tr[data-href] {
@@ -204,6 +222,8 @@ section {
     .very-weak-text {
       color: @color-soft-grey;
     }
+
+
 
   }
 
