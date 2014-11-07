@@ -1,18 +1,3 @@
-
-# Creates a relationship object from a store object or array reference. This fucntion is private to this file
-# @return [Model|Collection]
-# @private
-relationship = (relationName, item) ->
-  unless _(item).isArray()
-    obj = new window[item.__type]()
-    obj.__uid = item.__uid
-    return obj
-  else
-    collection = new ledger.collections[@getClass()._relations.many[relationName]]()
-    collection.__uid = item.__uid
-    return collection
-
-
 class @Model extends @EventEmitter
 
   constructor: (base) ->
@@ -45,7 +30,7 @@ class @Model extends @EventEmitter
           finalResults[k] = v
       return callback(finalResults) if relationships.length == 0
       ledger.storage.local.get relationships, (results) =>
-        finalResults[relationshipNames[k]] = relationship(relationshipNames[k], v) for k, v of results
+        finalResults[relationshipNames[k]] = @relationship(relationshipNames[k], v) for k, v of results
         callback(finalResults)
 
   exists: (callback) ->
@@ -61,6 +46,7 @@ class @Model extends @EventEmitter
         callback(yes)
       else
         callback(no)
+    @
 
   set: (key, value) ->
     @_data ?= {}
@@ -74,9 +60,9 @@ class @Model extends @EventEmitter
         value._data.__type = _(value).getClassName()
         value._data.__uid ?= ledger.storage.local.createUniqueObjectIdentifier(value._data.__type, value._data._id)[1]
         @_data[key] = value._data
-        l @_data
     else
       @_data[key] = value
+    @
 
   isInserted: () -> if @__uid? then yes else no
 
@@ -93,6 +79,12 @@ class @Model extends @EventEmitter
 
     return @_performFind(onDone) if @_find?
     @_performSave(onDone)
+    @
+
+  remove: (callback = _.noop) ->
+    throw 'Cannot remove a model never inserted' unless @isInserted()
+    ledger.storage.local.remove [@getUid()], callback
+    @
 
   _performSave: (callback) ->
     inserted = @isInserted()
@@ -152,6 +144,21 @@ class @Model extends @EventEmitter
 
   @getCollectionName: () -> _.pluralize(_.str.underscored(@name))
 
+  # Creates a relationship object from a store object or array reference. This fucntion is private to this file
+  # @return [Model|Collection]
+  # @private
+  relationship: (relationName, item) ->
+    unless _(item).isArray()
+      obj = new window[item.__type]()
+      obj.__uid = item.__uid
+      return obj
+    else
+      collectionName = _(@).getClass()._relations.many[relationName]
+      throw "Unknown hasMany relation '#{relationName}'" unless collectionName?
+      collection = new ledger.collections[collectionName.className]()
+      collection.__uid = item.__uid
+      return collection
+
   getCollectionName: () -> _(@).getClass().getCollectionName()
 
   getCollection: () -> ledger.collections[@getCollectionName()]
@@ -190,7 +197,7 @@ class @Model extends @EventEmitter
             obj.__uid = result[@getUid()][relationName].__uid
             callback(obj)
           else
-            callback(new ledger.collections[relationClass]())
+            callback(null)
 
 _.mixin
   model: (object) ->

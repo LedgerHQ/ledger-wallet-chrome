@@ -5,7 +5,6 @@
   unless ledger.collections[className]?
     ledger.collections[className] = class Collection extends ledger.collections.Collection
     ledger.collections[className]._name = className
-    l ledger.collections[className].name
   ledger.collections[collectionName] ?= ledger.collections[className].global()
 
 class Iterator
@@ -65,7 +64,26 @@ class ledger.collections.Collection extends EventEmitter
             ledger.storage.local.set [collection], =>
               callback(yes)
 
-  remove: (object, callback) ->
+  removeItemById: (objectId, callback) ->
+    uid = ledger.storage.local.createUniqueObjectIdentifier(_.singularize(_(@).getClassName()), objectId)
+    @removeItemByUid(uid, callback)
+
+
+  removeItemByUid: (objectUid, callback) ->
+    @iterator (it) =>
+      collection = _(it.collection).reject (item) -> item.__uid == objectUid
+      if collection.length != it.collection.length
+        collection.__uid = @getUid()
+        ledger.storage.local.set [collection], () =>
+          callback?(yes)
+      else
+        callback?(no)
+
+
+  remove: (callback = _.noop) ->
+    throw 'Cannot remove a collection never inserted' unless @getUid()
+    ledger.storage.local.remove [@getUid()], callback
+
 
   length: (callback) -> @iterator (it) -> callback it.length()
 

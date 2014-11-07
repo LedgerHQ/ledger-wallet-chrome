@@ -44,7 +44,7 @@ require @ledger.imports, ->
 
       ledger.storage.openStores('merguez')
 
-      account = Account.findOrCreate 1, {name: 'Toto', balance: 16}
+      account = Account.findOrCreate 1, {name: 'Toto', balance: 16, operations: [{_id: 1, name: 'opTest'}]}
       account.get (result) =>
         l result
         account.getOperations (operations) =>
@@ -60,11 +60,13 @@ require @ledger.imports, ->
             account = Account.findOrCreate 1, {name: 'Toto', balance: 16}
             account.get (result) =>
               l result
-              Account.create({name: 'Test'}).save () =>
-                ledger.collections.accounts.toArray (a) =>
-                  l a
-                ledger.collections.accounts.each (object) =>
-                  l object
+              toRemove = Account.create(name: 'ToRemove').save =>
+                toRemove.remove =>
+                  Account.create({name: 'Test'}).save () =>
+                    ledger.collections.accounts.toArray (a) =>
+                      l a
+                    ledger.collections.accounts.each (object) =>
+                      l object
 
 
     navigate: (layoutName, viewController) ->
