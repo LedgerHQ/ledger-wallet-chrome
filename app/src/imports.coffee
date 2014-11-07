@@ -97,6 +97,7 @@
         'controllers/wallet/operations/wallet_operations_index_view_controller',
         # Accounts
         'controllers/wallet/accounts/wallet_accounts_account_view_controller',
+        'controllers/wallet/accounts/wallet_accounts_account_receive_dialog_view_controller',
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_navigation_controller',
