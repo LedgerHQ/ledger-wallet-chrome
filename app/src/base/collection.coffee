@@ -5,6 +5,9 @@
   unless ledger.collections[className]?
     ledger.collections[className] = class Collection extends ledger.collections.Collection
     ledger.collections[className]._name = className
+    modelClassName = _.singularize(className)
+    ledger.collections[className]::getModelClass = () -> window[modelClassName]
+    ledger.collections[className]::getModelClassName = () -> window[modelClassName]
   ledger.collections[collectionName] ?= ledger.collections[className].global()
 
 class Iterator
@@ -44,9 +47,10 @@ class ledger.collections.Collection extends EventEmitter
   insert: (object, callback = _.noop) ->
     @_perform =>
       ledger.storage.local.get @getUid(), (result) =>
+        object = new (@getModelClass())(object) unless object.getUid?
 
         object._data = {} unless object._data
-        object._data.__uid = object.getUid() unless object._data.__uid?
+        object._data.__uid = ledger.storage.local.createUniqueObjectIdentifier(@getModelClass(), object._data._id)[1] unless object._data.__uid?
 
         collection = result[@getUid()]
 
@@ -65,7 +69,7 @@ class ledger.collections.Collection extends EventEmitter
               callback(yes)
 
   removeItemById: (objectId, callback) ->
-    uid = ledger.storage.local.createUniqueObjectIdentifier(_.singularize(_(@).getClassName()), objectId)
+    uid = ledger.storage.local.createUniqueObjectIdentifier(_.singularize(_(@).getClassName()), objectId)[1]
     @removeItemByUid(uid, callback)
 
 
@@ -112,6 +116,8 @@ class ledger.collections.Collection extends EventEmitter
 
   reverseIterator: (callback) ->
     ledger.storage.local.get @getUid(), (result) => callback(new Iterator(result[@getUid()], -1, -1))
+
+  getUid: () -> @__uid
 
   @global: () ->
     globalCollection = new @

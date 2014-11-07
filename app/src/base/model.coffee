@@ -3,6 +3,7 @@ class @Model extends @EventEmitter
   constructor: (base) ->
     @_data = base
     @_id = @_data?._id
+    @__uid = @_data?.__uid
     @_initializeRelationships()
     @initilialize?()
 
@@ -83,7 +84,8 @@ class @Model extends @EventEmitter
 
   remove: (callback = _.noop) ->
     throw 'Cannot remove a model never inserted' unless @isInserted()
-    ledger.storage.local.remove [@getUid()], callback
+    @getCollection().removeItemByUid @getUid(), () =>
+      ledger.storage.local.remove [@getUid()], callback
     @
 
   _performSave: (callback) ->

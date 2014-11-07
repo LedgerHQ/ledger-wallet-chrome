@@ -46,27 +46,30 @@ require @ledger.imports, ->
 
       account = Account.findOrCreate 1, {name: 'Toto', balance: 16, operations: [{_id: 1, name: 'opTest'}]}
       account.get (result) =>
-        l result
-        account.getOperations (operations) =>
-          l operations
-        account.getOperation (operation) =>
-          if operation == null
-            account.set 'operation', new Operation({_id: 'abcdefghij'})
-          l operation
-          account.set '_id', result._id + 1
-          account.set 'name', result.name + '1'
-          account.set 'balance', result.balance * 2
-          account.save () =>
-            account = Account.findOrCreate 1, {name: 'Toto', balance: 16}
-            account.get (result) =>
-              l result
-              toRemove = Account.create(name: 'ToRemove').save =>
-                toRemove.remove =>
-                  Account.create({name: 'Test'}).save () =>
-                    ledger.collections.accounts.toArray (a) =>
-                      l a
-                    ledger.collections.accounts.each (object) =>
-                      l object
+       account.getOperations (operations) =>
+         operations.iterator (it) =>
+            operations.insert {_id: it.length(), name: 'Auto'}
+
+            operations.toArray (array) => l array
+
+            account.getOperation (operation) =>
+              unless operation?
+                account.set 'operation', new Operation({_id: 'abcdefghij'})
+              l operation
+              account.set '_id', result._id + 1
+              account.set 'name', result.name + '1'
+              account.set 'balance', result.balance * 2
+              account.save () =>
+                account = Account.findOrCreate 1, {name: 'Toto', balance: 16}
+                account.get (result) =>
+                  l result
+                  toRemove = Account.create(name: 'ToRemove').save =>
+                    toRemove.remove =>
+                      Account.create({name: 'Test'}).save () =>
+                        ledger.collections.accounts.toArray (a) =>
+                          l a
+                        ledger.collections.accounts.each (object) =>
+                          l object
 
 
     navigate: (layoutName, viewController) ->
