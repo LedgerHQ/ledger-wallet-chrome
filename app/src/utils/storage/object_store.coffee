@@ -36,7 +36,6 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
         callback?(insertionBatch)
       ).bind(this)
       idsToUpdate = (uid for uid, value of insertionBatch)
-
       @store.get idsToUpdate, (items) =>
         for uid, value of items
           insertionBatch[uid] = _.extend(JSON.parse(value), insertionBatch[uid])

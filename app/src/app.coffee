@@ -47,31 +47,25 @@ require @ledger.imports, ->
       account = Account.findOrCreate 1, {name: 'Toto', balance: 16}
       account.get (result) =>
         l result
-        account.set '_id', result._id + 1
-        account.set 'name', result.name + '1'
-        account.set 'balance', result.balance * 2
-        account.save () =>
-          account = Account.findOrCreate 1, {name: 'Toto', balance: 16}
-          account.get (result) =>
-            l result
-            Account.create({name: 'Test'}).save () =>
-              ledger.collections.accounts.toArray (a) =>
-                l a
-              ledger.collections.accounts.each (object) =>
-                l object
+        account.getOperations (operations) =>
+          l operations
+        account.getOperation (operation) =>
+          if operation == null
+            account.set 'operation', new Operation({_id: 'abcdefghij'})
+          l operation
+          account.set '_id', result._id + 1
+          account.set 'name', result.name + '1'
+          account.set 'balance', result.balance * 2
+          account.save () =>
+            account = Account.findOrCreate 1, {name: 'Toto', balance: 16}
+            account.get (result) =>
+              l result
+              Account.create({name: 'Test'}).save () =>
+                ledger.collections.accounts.toArray (a) =>
+                  l a
+                ledger.collections.accounts.each (object) =>
+                  l object
 
-
-
-
-      ###
-      ledger.storage.local.set {__uid: '1', name: 'Test', second: 'Toto', test: {a: '1', plus: '+', b: '1'}, array: [1, 2, 3]}, ->
-        ledger.storage.local.get '1', (result) =>
-          l result
-          ledger.storage.local.get result['1'].array.__uid, (result) ->
-            l result
-            chrome.storage.local.get null, (r) ->
-              l r
-      ###
 
     navigate: (layoutName, viewController) ->
       @router.once 'routed', (event, data) =>

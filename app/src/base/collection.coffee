@@ -2,9 +2,11 @@
 @ledger.collections ?= {}
 @ledger.collections.createCollection = (collectionName) ->
   className = _.str.classify(collectionName)
-  ledger.collections[className] = class Collection extends ledger.collections.Collection
-  ledger.collections[className].name =
-  ledger.collections[collectionName] = ledger.collections[className].global()
+  unless ledger.collections[className]?
+    ledger.collections[className] = class Collection extends ledger.collections.Collection
+    ledger.collections[className]._name = className
+    l ledger.collections[className].name
+  ledger.collections[collectionName] ?= ledger.collections[className].global()
 
 class Iterator
 

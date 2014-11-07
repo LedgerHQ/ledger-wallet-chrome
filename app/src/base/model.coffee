@@ -2,8 +2,16 @@
 # Creates a relationship object from a store object or array reference. This fucntion is private to this file
 # @return [Model|Collection]
 # @private
-relationship = (item) ->
-  l item
+relationship = (relationName, item) ->
+  unless _(item).isArray()
+    obj = new window[item.__type]()
+    obj.__uid = item.__uid
+    return obj
+  else
+    collection = new ledger.collections[@getClass()._relations.many[relationName]]()
+    collection.__uid = item.__uid
+    return collection
+
 
 class @Model extends @EventEmitter
 
@@ -28,14 +36,16 @@ class @Model extends @EventEmitter
       return callback(null) unless results?
       finalResults = {}
       relationships = []
+      relationshipNames = {}
       for k, v of results
         if _(v).isStoreReference()
           relationships.push v.__uid
+          relationshipNames[ v.__uid] = k
         else
           finalResults[k] = v
       return callback(finalResults) if relationships.length == 0
       ledger.storage.local.get relationships, (results) =>
-        finalResults[k] = relationship(v) for k, v of results
+        finalResults[relationshipNames[k]] = relationship(relationshipNames[k], v) for k, v of results
         callback(finalResults)
 
   exists: (callback) ->
@@ -54,13 +64,25 @@ class @Model extends @EventEmitter
 
   set: (key, value) ->
     @_data ?= {}
-    @_data[key] = value
+    if _(value).isKindOf Model
+      if value.isInserted()
+        @_data[key] = _(value).modelReference()
+      else
+        value._data ?= {}
+        value._data.__uid ?= value.__uid
+        value._data._id ?= value._id
+        value._data.__type = _(value).getClassName()
+        value._data.__uid ?= ledger.storage.local.createUniqueObjectIdentifier(value._data.__type, value._data._id)[1]
+        @_data[key] = value._data
+        l @_data
+    else
+      @_data[key] = value
 
-  isInserted: () -> @__uid?
+  isInserted: () -> if @__uid? then yes else no
 
-  isUpdated: () -> @_data?
+  isUpdated: () -> if @_data? then yes else no
 
-  isSaving: () -> @_saving?
+  isSaving: () -> if @_saving? then yes else no
 
   save: (callback = _.noop) ->
     @_saving = yes
@@ -136,12 +158,39 @@ class @Model extends @EventEmitter
 
   @getCollection: () -> ledger.collections[@getCollectionName()]
 
-  @init: (modelClass) ->
-    unless modelClass.getCollection()
-      ledger.collections.createCollection(modelClass.getCollectionName())
+  @init: ->
+    unless @getCollection()
+      ledger.collections.createCollection(@getCollectionName())
 
-  # Safely performs a callback on the current model
-  _perform: (cb = _.noop) ->
+  ## Relations
+
+  @hasOne: (relations) ->
+    @._relations ?= {}
+    @._relations.one ?= {}
+    for relationName, relationClass of relations
+      @_relations.one[relationName] = {className: relationClass}
+      @::["get#{_.str.classify(relationName)}"] = (callback) ->
+        ledger.storage.local.get @getUid(), (result) =>
+          if result[@getUid()]?[relationName]?
+            obj = new window[relationClass]()
+            obj.__uid = result[@getUid()][relationName].__uid
+            callback(obj)
+          else
+            callback()
+
+  @hasMany: (relations) ->
+    @._relations ?= {}
+    @._relations.many ?= {}
+    for relationName, relationClass of relations
+      @_relations.many[relationName] = {className: relationClass}
+      @::["get#{_.str.classify(relationName)}"] = (callback) ->
+        ledger.storage.local.get @getUid(), (result) =>
+          if result[@getUid()]?[relationName]?
+            obj = new ledger.collections[relationClass]()
+            obj.__uid = result[@getUid()][relationName].__uid
+            callback(obj)
+          else
+            callback(new ledger.collections[relationClass]())
 
 _.mixin
   model: (object) ->
@@ -149,3 +198,7 @@ _.mixin
     model = new window[object.__type]()
     model.__uid = object.__uid
     model
+
+  modelReference: (object) ->
+    return null unless object?.__uid?
+    {__type: 'ref', __uid: object.__uid}
