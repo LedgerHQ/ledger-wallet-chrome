@@ -44,6 +44,7 @@ require @ledger.imports, ->
 
       ledger.storage.openStores('merguez')
 
+      ### MODELS/COLLECTIONS LEGACY TESTS DO NOT REMOVE
       account = Account.findOrCreate 1, {name: 'Toto', balance: 16, operations: [{_id: 1, name: 'opTest'}]}
       account.get (result) =>
        account.getOperations (operations) =>
@@ -70,7 +71,7 @@ require @ledger.imports, ->
                           l a
                         ledger.collections.accounts.each (object) =>
                           l object
-
+      ###
 
     navigate: (layoutName, viewController) ->
       @router.once 'routed', (event, data) =>
