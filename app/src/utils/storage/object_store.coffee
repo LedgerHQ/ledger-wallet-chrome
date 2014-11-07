@@ -35,7 +35,6 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
       onInserted = (->
         callback?(insertionBatch)
       ).bind(this)
-
       idsToUpdate = (uid for uid, value of insertionBatch)
 
       @store.get idsToUpdate, (items) =>
@@ -122,8 +121,10 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
     array = []
     for value in structure
       _value = _(value)
-      continue if _value.isFunction() or _value.isStoreReference()
-      if _value.isArray()
+      continue if _value.isFunction()
+      if _value.isStoreReference()
+        array.push value
+      else if _value.isArray()
         arrayId = @_flattenArray(value, destination).__uid
         array.push {__type: 'ref', __uid:arrayId}
       else if _value.isObject()
@@ -141,5 +142,5 @@ class @ledger.storage.ObjectStore extends ledger.storage.Store
 
 _.mixin
   # Tests if the given object is an ObjectStore reference or not
-  isStoreReference: (object) -> object?.__type? == 'ref'
+  isStoreReference: (object) -> if object? and object.__type == 'ref' then yes else no
 

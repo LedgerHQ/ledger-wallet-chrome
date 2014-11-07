@@ -57,8 +57,6 @@ require @ledger.imports, ->
             Account.create({name: 'Test'}).save () =>
               ledger.collections.accounts.toArray (a) =>
                 l a
-                chrome.storage.local.get null, (r) =>
-                  l r
               ledger.collections.accounts.each (object) =>
                 l object
 
