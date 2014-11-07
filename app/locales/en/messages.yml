@@ -48,7 +48,7 @@ onboarding:
       new_pin_code: "GENERATE ANOTHER PIN CODE"
       auto: "AUTOMATIC PIN CODE"
       manual: "MANUAL PIN CODE"
-      warning_weak_pin_codes: "Please note, your birth year and your debit/credit card numbers are not secure PIN codes."
+      warning_weak_pin_codes: "Please note, your birth year or your debit/credit card pin are not secure PIN codes."
 
 wallet:
 
