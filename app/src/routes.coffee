@@ -2,7 +2,7 @@
 
   ## Default
   route '/', ->
-    app.router.go '/onboarding/management/pin'
+    app.router.go '/onboarding/management/frozen'
 
   ## Onboarding
   # Device
@@ -22,8 +22,8 @@
   route '/onboarding/management/welcome', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementWelcomeViewController
 
-  route '/onboarding/management/locked', (params) ->
-    app.navigate ONBOARDING_LAYOUT, OnboardingManagementLockedViewController
+  route '/onboarding/management/frozen', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingManagementFrozenViewController
 
   route '/onboarding/management/pin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementPinViewController

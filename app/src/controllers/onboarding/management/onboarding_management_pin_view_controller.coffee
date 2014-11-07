@@ -1,6 +1,6 @@
 class @OnboardingManagementPinViewController extends @ViewController
 
-  defaultParams: {wallet_mode: 'create', pin_kind: 'auto', pin: undefined, back: '/onboarding/management/welcome'}
+  defaultParams: {pin_kind: 'auto'}
   view:
     autoRadio: '#auto_radio'
     manualRadio: '#manual_radio'
