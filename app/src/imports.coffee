@@ -10,6 +10,7 @@
         '../libs/spin.min',
         '../libs/sjcl',
         '../libs/jquery.selectric.min',
+        '../libs/qrcode.min',
         '../public/tooltipster/js/jquery.tooltipster.min',
         '../libs/lw-api-js/lib/bitcoinjs-min',
         '../libs/lw-api-js/lib/util',
@@ -43,7 +44,7 @@
         '../libs/lw-api-js/LWTools',
         '../libs/lw-api-js/LW',
         '../libs/lw-api-js/LWWallet',
-        '../libs/lw-api-js/LWTransaction',   
+        '../libs/lw-api-js/LWTransaction',
 
         'routes',
 

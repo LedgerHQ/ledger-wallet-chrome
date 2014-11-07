@@ -1,4 +1,4 @@
-<div id="operation_detail_dialog">
+<div id="receive_dialog">
   <section>
     <header>
       <h1><%= t 'wallet.accounts.account.receive.title' %></h1>
@@ -7,7 +7,7 @@
       <tbody>
         <tr>
           <td class="row-title-optional"><%= t 'wallet.accounts.account.receive.amount' %></td>
-          <td class="align-right"><input />BTC</td>
+          <td class="align-right"><input id="amount_input" />BTC</td>
         </tr>
         <tr>
           <td class="row-title"><%= t 'wallet.accounts.account.receive.receiver_account' %></td>
@@ -19,6 +19,14 @@
         </tr>
       </tbody>
     </table>
+    <div id="qrcode_container">
+
+      <div>
+        <div id="qrcode_frame"></div>
+      </div>
+      <p><%- t 'wallet.accounts.account.receive.qr_code_explanation' %></p>
+
+    </div>
   </section>
   <div class="dialog-actions-bar">
     <a class="action-rounded-button" href="#send"><%= t 'wallet.accounts.account.receive.send_by_email' %></a>
