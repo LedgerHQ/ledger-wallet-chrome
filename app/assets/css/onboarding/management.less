@@ -61,8 +61,8 @@
     position: relative;
     top: -6px;
 
-    &.hidden {
-      visibility: hidden;
+    &-strong {
+      font-weight: @font-weight-semibold;
     }
   }
 }
@@ -94,14 +94,25 @@
       }
     }
 
-    &.back {
+    > i {
+      font-size: @font-size-very-very-very-large;
+    }
+
+      &.back {
       .colored(@color-soft-grey);
 
+      > i {
+        margin-right: 5px;
+      }
     }
 
     &.continue {
       .colored(@color-action-green, @font-weight-semibold);
       font-weight: @font-weight-semibold;
+
+      > i {
+        margin-left: 5px;
+      }
     }
   }
 }

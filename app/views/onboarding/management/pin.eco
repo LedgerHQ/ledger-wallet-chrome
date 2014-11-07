@@ -1,7 +1,7 @@
 <div id="content-container">
   <div class="title-container">
     <div class="page-title"><%= t 'onboarding.management.pin.create_my_wallet' %></div>
-    <div class="page-subtitle"><%= t 'application.name' %><a href="/onboarding/management/pin?pin_kind=auto">AUTO</a></div>
+    <div class="page-subtitle"></div>
   </div>
   <div class="greyed-container detailed">
     <div class="index">
@@ -15,10 +15,10 @@
   <div class="page-content-container">
     <div class="choice" id="choice-auto">
       <label>
-        <input type="radio" name="pin_kind" value="auto">
+        <input type="radio" name="pin_kind" value="auto" id="auto_radio">
         <span class="uppercase-title"><%= t 'onboarding.management.pin.auto' %></span>
       </label>
-      <a href="#" class="uppercase-action"><%= t 'onboarding.management.pin.new_pin_code' %></a>
+      <a href="#randomizePinCode" class="uppercase-action" id="generate_link"><%= t 'onboarding.management.pin.new_pin_code' %> <i class="fa fa-refresh"></i></a>
     </div>
     <div class="separator">
       <div class="line"></div>
@@ -27,14 +27,14 @@
     </div>
     <div class="choice" id="choice-manual">
       <label>
-        <input type="radio" name="pin_kind" value="manual">
+        <input type="radio" name="pin_kind" value="manual" id="manual_radio">
         <span class="uppercase-title"><%= t 'onboarding.management.pin.manual' %></span>
       </label>
-      <span class="grey-indication"><%= t 'onboarding.management.pin.warning_weak_pin_codes' %></span>
+      <span class="grey-indication" id="weak_pins"><span class="grey-indication-strong"><%= t 'onboarding.management.pin.please_note' %></span><%= t 'onboarding.management.pin.warning_weak_pin_codes' %></span>
     </div>
   </div>
   <div class="navigation-container">
-    <a class="back" href="#"><%= t 'onboarding.management.back' %></a>
-    <a class="continue" href="#"><%= t 'onboarding.management.continue' %></a>
+    <a class="back" href="<%= @params.back %>" id="back_button"><i class="fa fa-angle-left"></i> <%= t 'onboarding.management.back' %></a>
+    <a class="continue" href="#sff" id="continue_button"><%= t 'onboarding.management.continue' %> <i class="fa fa-angle-right"></i></a>
   </div>
 </div>

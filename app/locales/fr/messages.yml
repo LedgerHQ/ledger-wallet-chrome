@@ -42,13 +42,16 @@ onboarding:
       you_can_always_retreive_your_accounts: "Vos comptes et bitcoins actuels pourront être restaurés à tout moment sur un autre Ledger Wallet"
     pin:
       create_my_wallet: "Créer mon portefeuille"
+      restore_my_wallet: "Restaurer mon portefeuille"
+      unlock_my_wallet: "Débloquer mon portefeuille"
       choose_your: "Choisissez votre"
       pin_code: "code PIN"
       to_protect_your_wallet: "Il vous permet de protéger l’accès à votre portefeuille"
       new_pin_code: "GÉNÉRER UN AUTRE CODE PIN"
       auto: "CODE PIN AUTOMATIQUE"
       manual: "CODE PIN MANUEL"
-      warning_weak_pin_codes: "Attention, votre année de naissance et votre code de carte bancaire ne constituent pas des codes PIN sécurisés."
+      please_note: "Attention"
+      warning_weak_pin_codes: ", votre année de naissance et votre code de carte bancaire ne constituent pas des codes PIN sécurisés."
 
 wallet:
 

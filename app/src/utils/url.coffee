@@ -9,6 +9,7 @@
     parser = document.createElement('a')
     parser.href = str
     parser.params = ->
+      return {} if parser.search == ""
       params = parser.search.substring(1)
       _.chain(params.split('&')).map (params) ->
         p = params.split '='
@@ -35,6 +36,17 @@
     [__, actionName, parameters] = matches if matches
     parameters = _.str.parseParamList parameters
     [actionName, parameters]
+
+  createUrlWithParams: (url, params) ->
+    return url unless params?
+    url = url + '?'
+    first = yes
+    for key, value of params
+      continue if not value? or (_(value).isString() and value.length == 0)
+      url += '&' if not first
+      url += encodeURIComponent(key) + '=' + encodeURIComponent(value)
+      first = no
+    url
 
 String::parseAsUrl = () ->
   ledger.url.parseAsUrl(@)
