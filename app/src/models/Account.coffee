@@ -1,4 +1,6 @@
 class @Account extends Model
+  do @init
 
-  @init this
+  @hasOne operation: 'Operation'
+  @hasMany operations: 'Operations'
 

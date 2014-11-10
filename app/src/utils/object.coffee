@@ -12,9 +12,9 @@ _.mixin
       when Function then return _.isFunction(object)
       when Number then return _.isNumber(object)
       when Object then return _.isObject(object)
-    while clazz?.constructor?
+    while object?.constructor?
       return yes if object.constructor == clazz
-      clazz = clazz.constructor.__super__
+      object = object.constructor.__super__
     no
 
   # Get the name of the given instance (Note that this only works for coffeescript class objects)
