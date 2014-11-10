@@ -9,6 +9,7 @@
     parser = document.createElement('a')
     parser.href = str
     parser.params = ->
+      return {} if parser.search == ""
       params = parser.search.substring(1)
       _.chain(params.split('&')).map (params) ->
         p = params.split '='
@@ -35,6 +36,14 @@
     [__, actionName, parameters] = matches if matches
     parameters = _.str.parseParamList parameters
     [actionName, parameters]
+
+  # Crates a URL given a specific path and parameters. Parameters are URL encoded in the returned string.
+  # @param [String] url The URL path
+  # @param [Array] params The URL parameters to be encoded
+  # @return [String] The newly created URL
+  createUrlWithParams: (url, params) ->
+    return url if not params? or _.isEmpty(params)
+    url + '?' + jQuery.param(params)
 
 String::parseAsUrl = () ->
   ledger.url.parseAsUrl(@)

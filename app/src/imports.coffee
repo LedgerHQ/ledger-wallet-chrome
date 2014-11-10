@@ -99,6 +99,7 @@
         'controllers/wallet/accounts/wallet_accounts_account_view_controller',
 
         ## Onboarding controllers
+        'controllers/onboarding/onboarding_view_controller'
         'controllers/onboarding/onboarding_navigation_controller',
         # Device
         'controllers/onboarding/device/onboarding_device_plug_view_controller',
@@ -107,6 +108,7 @@
         # Management
         'controllers/onboarding/management/onboarding_management_done_view_controller',
         'controllers/onboarding/management/onboarding_management_welcome_view_controller',
-        'controllers/onboarding/management/onboarding_management_locked_view_controller',
-        'controllers/onboarding/management/onboarding_management_pin_view_controller'
+        'controllers/onboarding/management/onboarding_management_frozen_view_controller',
+        'controllers/onboarding/management/onboarding_management_pin_view_controller',
+        'controllers/onboarding/management/onboarding_management_pin_confirmation_view_controller'
       ]

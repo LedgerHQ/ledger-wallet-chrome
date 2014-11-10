@@ -28,27 +28,34 @@ onboarding:
       new_wallet: "Nouveau portefeuille"
       welcome_to_your_new_wallet: "Bienvenue dans votre nouveau Ledger Wallet !"
       create_or_recover: "Souhaitez-vous créer un nouveau portefeuille ou en restaurer un existant ?"
-      use_as_new: "Utiliser comme nouveau portefeuille"
+      use_as_new: "Créer mon nouveau portefeuille"
       if_its_your_first_wallet: "S’il s’agit de votre premier Ledger Wallet"
       recover_wallet: "Restaurer mon portefeuille existant"
       if_you_lost_your_wallet: "Si vous avez bloqué ou perdu votre Ledger Wallet"
-    locked:
-      wallet_is_locked: "Portefeuille bloqué"
+    frozen:
+      wallet_is_frozen: "Portefeuille bloqué"
       wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN, mais vos bitcoins restent en sécurité."
-      unlock_or_create: "Pour retrouver l'accès à vos comptes, vous devez débloquer votre portefeuille à l’aide de votre phrase de restauration."
-      unlock_my_wallet: "Débloquer mon portefeuille"
+      unfreeze_or_create: "Pour retrouver l'accès à vos comptes, vous devez débloquer votre portefeuille à l’aide de votre phrase de restauration."
+      unfreeze_my_wallet: "Débloquer mon portefeuille"
       retreive_access: "Retrouvez l’accès à vos comptes à l’aide de votre phrase de restauration"
       create_a_new_wallet: "Créer un nouveau portefeuille"
       you_can_always_retreive_your_accounts: "Vos comptes et bitcoins actuels pourront être restaurés à tout moment sur un autre Ledger Wallet"
     pin:
       create_my_wallet: "Créer mon portefeuille"
+      recover_my_wallet: "Restaurer mon portefeuille"
+      unfreeze_my_wallet: "Débloquer mon portefeuille"
       choose_your: "Choisissez votre"
+      choose_your_new: "Choisissez votre nouveau"
       pin_code: "code PIN"
       to_protect_your_wallet: "Il vous permet de protéger l’accès à votre portefeuille"
       new_pin_code: "GÉNÉRER UN AUTRE CODE PIN"
       auto: "CODE PIN AUTOMATIQUE"
       manual: "CODE PIN MANUEL"
-      warning_weak_pin_codes: "Attention, votre année de naissance et votre code de carte bancaire ne constituent pas des codes PIN sécurisés."
+      please_note: "Attention"
+      warning_weak_pin_codes: ", votre année de naissance et votre code de carte bancaire ne constituent pas des codes PIN sécurisés."
+    pin_confirmation:
+      confirm_your: "Confirmez votre"
+      pin_code: "code PIN"
 
 wallet:
 

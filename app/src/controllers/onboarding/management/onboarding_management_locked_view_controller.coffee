@@ -1,1 +1,0 @@
-class @OnboardingManagementLockedViewController extends @ViewController 

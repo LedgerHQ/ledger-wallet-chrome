@@ -1,4 +1,4 @@
-class @OnboardingDevicePinViewController extends @ViewController
+class @OnboardingDevicePinViewController extends @OnboardingViewController
 
   onAfterRender: ->
     super
