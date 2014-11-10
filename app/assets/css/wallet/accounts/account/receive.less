@@ -1,5 +1,29 @@
 @import (reference) "../../../constants";
 
+#amount_row {
+  .text-properties() {
+    color: @color-soft-grey;
+    font-size: @font-size-extra-large;
+  }
+
+  input {
+    .text-properties;
+    border: 0;
+    background-color: transparent;
+    font-size: @font-size-extra-large;
+    outline: none;
+    text-align: right;
+    margin-right: @metrics-very-small-padding - 3px;
+  }
+
+  > span {
+    .text-properties;
+    font-weight: @font-weight-light;
+    text-transform: uppercase;
+  }
+
+}
+
 #qrcode_container {
 
   display: flex;

@@ -20,7 +20,7 @@ class @ViewController extends @EventEmitter
       @emit 'afterRender', {sender: @}
 
   className: ->
-    @.constructor.name
+    @constructor.name
 
   identifier: () ->
     @className().replace 'ViewController', ''
