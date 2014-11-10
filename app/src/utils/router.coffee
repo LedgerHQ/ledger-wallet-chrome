@@ -26,8 +26,7 @@ class @Router extends @EventEmitter
 
   go: (url, params) ->
     setTimeout( =>
-      url = url + '?' + jQuery.params(params) if params?
-
+      url = ledger.url.createUrlWithParams(url, params)
       @_router.parse(url)
     , 0)
 

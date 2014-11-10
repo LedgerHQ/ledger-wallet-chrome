@@ -5,7 +5,7 @@
     <div class="page-warning"><%= t 'onboarding.management.frozen.wrong_pin_codes' %></div>
     <div class="page-indication"><%= t 'onboarding.management.frozen.unfreeze_or_create' %></div>
   </div>
-  <a class="greyed-container detailed" href="/onboarding/management/pin?wallet_mode=unfreeze&back=<%= @representativeUrl() %>">
+  <a class="greyed-container detailed" href="<%= @url '/onboarding/management/pin', wallet_mode: 'unfreeze', back: @representativeUrl() %>">
     <img class="index" src="../../assets/images/onboarding/management/unlock_icon.png" width="46" height="46"/>
     <div class="texts">
       <div class="black-title"><%= t 'onboarding.management.frozen.unfreeze_my_wallet' %></div>
@@ -13,7 +13,7 @@
     </div>
     <img class="arrow" src="../assets/images/onboarding/large_right_arrow.png" width="16" height="30"/>
   </a>
-  <a class="greyed-container detailed" href="/onboarding/management/pin?wallet_mode=create&back=<%= @representativeUrl() %>">
+  <a class="greyed-container detailed" href="<%= @url '/onboarding/management/pin', wallet_mode: 'create', back: @representativeUrl() %>">
     <img class="index" src="../../assets/images/onboarding/management/wallet_icon.png" width="46" height="46"/>
     <div class="texts">
       <div class="black-title"><%= t 'onboarding.management.frozen.create_a_new_wallet' %></div>

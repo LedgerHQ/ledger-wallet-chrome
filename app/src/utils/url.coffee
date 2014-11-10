@@ -37,16 +37,13 @@
     parameters = _.str.parseParamList parameters
     [actionName, parameters]
 
+  # Crates a URL given a specific path and parameters. Parameters are URL encoded in the returned string.
+  # @param [String] url The URL path
+  # @param [Array] params The URL parameters to be encoded
+  # @return [String] The newly created URL
   createUrlWithParams: (url, params) ->
-    return url unless params?
-    url = url + '?'
-    first = yes
-    for key, value of params
-      continue if not value? or (_(value).isString() and value.length == 0)
-      url += '&' if not first
-      url += encodeURIComponent(key) + '=' + encodeURIComponent(value)
-      first = no
-    url
+    return url if not params? or _.isEmpty(params)
+    url + '?' + jQuery.param(params)
 
 String::parseAsUrl = () ->
   ledger.url.parseAsUrl(@)

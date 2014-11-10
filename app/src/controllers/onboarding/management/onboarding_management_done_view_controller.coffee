@@ -1,1 +1,1 @@
-class @OnboardingManagementDoneViewController extends @ViewController
+class @OnboardingManagementDoneViewController extends @OnboardingViewController

@@ -53,6 +53,9 @@ onboarding:
       manual: "MANUAL PIN CODE"
       please_note: "Please note"
       warning_weak_pin_codes: ", your birth year or your debit/credit card pin are not secure PIN codes."
+    pin_confirmation:
+      confirm_your: "Confirm your"
+      pin_code: "PIN code"
 
 wallet:
 

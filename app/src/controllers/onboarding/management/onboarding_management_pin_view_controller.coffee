@@ -1,4 +1,4 @@
-class @OnboardingManagementPinViewController extends @ViewController
+class @OnboardingManagementPinViewController extends @OnboardingViewController
 
   defaultParams: {pin_kind: 'auto'}
   view:
@@ -8,6 +8,8 @@ class @OnboardingManagementPinViewController extends @ViewController
     generateLinkButton: '#generate_link'
     continueButton: '#continue_button'
     backButton: '#back_button'
+  navigation:
+    continueUrl: '/onboarding/management/pinconfirmation'
 
   initialize: ->
     if @_isPinKindAuto() and not @params.pin?
@@ -22,6 +24,11 @@ class @OnboardingManagementPinViewController extends @ViewController
   randomizePinCode: ->
     @params.pin = @_randomPinCode()
     do @_updateUI
+
+  navigationContinueParams: ->
+    wallet_mode: @params.wallet_mode
+    pin: @params.pin
+    back: @representativeUrl()
 
   _insertPinCodes: ->
     @view.autoPinCode = new ledger.pin_codes.PinCode()
