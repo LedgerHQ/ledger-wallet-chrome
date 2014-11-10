@@ -126,8 +126,16 @@ wallet:
         title: "RECEIVE BITCOINS"
         amount: "AMOUNT (OPTIONAL)"
         receiver_account: "RECIPIENT ACCOUNT"
-        receiver_address: "RECEPTION ADDRESS"
+        receiver_address: "RECIPTIENT ADDRESS"
         qr_code_explanation: "This QR code can be scanned <br/> by the person who want to send you bitcoins"
         send_by_email: "SEND BY EMAIL"
         print: "PRINT"
         close: "CLOSE"
+
+      send:
+        title: "SEND BITCOINS"
+        amount: "AMOUNT"
+        sender_account: "DEBIT ACCOUNT"
+        receiver_address: "RECIPIENT ADDRESS"
+        transaction_fees: "TRANSACTION FEES"
+        transaction_fees_text: "0.0001 BTC (transfer made under 10 minutes)"

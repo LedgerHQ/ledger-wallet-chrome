@@ -5,7 +5,8 @@ class @WalletAccountsAccountViewController extends @ViewController
     dialog.show()
 
   send: () ->
-    l 'send'
+    dialog = new WalletAccountsAccountSendDialogViewController()
+    dialog.show()
 
   showOperation: (params) ->
     dialog = new WalletOperationsDetailDialogViewController(params)

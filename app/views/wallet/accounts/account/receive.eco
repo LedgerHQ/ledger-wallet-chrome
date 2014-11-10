@@ -7,7 +7,7 @@
       <tbody>
         <tr>
           <td class="row-title-optional"><%= t 'wallet.accounts.account.receive.amount' %></td>
-          <td class="align-right" id="amount_row" ><input id="amount_input" /><span>BTC</span></td>
+          <td class="align-right" id="amount_row" ><input id="amount_input" class="optional"/><span class="optional">BTC</span></td>
         </tr>
         <tr>
           <td class="row-title"><%= t 'wallet.accounts.account.receive.receiver_account' %></td>

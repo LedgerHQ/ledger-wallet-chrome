@@ -45,11 +45,16 @@
         '../libs/lw-api-js/LW',
         '../libs/lw-api-js/LWWallet',
         '../libs/lw-api-js/LWTransaction',
+        '../libs/bs58',
+        '../libs/BigInt',
+        '../libs/sha256',
+        '../libs/checkBitcoinAddress',
 
         'routes',
 
         'utils/log',
         'utils/string',
+        'utils/number',
         'utils/object',
         'utils/render',
         'utils/event_emitter',
@@ -58,11 +63,15 @@
         'utils/easing',
         'utils/router',
         'utils/i18n',
+        'utils/jquery',
         'utils/spinners',
         'utils/pin_codes',
 
         'utils/crypto/aes',
         'utils/crypto/sha256',
+        'utils/crypto/base58',
+
+        'utils/bitcoin',
 
         'utils/storage/store',
         'utils/storage/chrome_store',
@@ -99,6 +108,7 @@
         # Accounts
         'controllers/wallet/accounts/wallet_accounts_account_view_controller',
         'controllers/wallet/accounts/wallet_accounts_account_receive_dialog_view_controller',
+        'controllers/wallet/accounts/wallet_accounts_account_send_dialog_view_controller',
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_navigation_controller',

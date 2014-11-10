@@ -131,3 +131,11 @@ wallet:
         send_by_email: "ENVOYER PAR EMAIL"
         print: "IMPRIMER"
         close: "FERMER"
+
+      send:
+        title: "ENVOYER DES BITCOINS"
+        amount: "MONTANT"
+        sender_account: "COMPTE À DÉBITER"
+        receiver_address: "ADRESSE À CRÉDITER"
+        transaction_fees: "FRAIS DE TRANSACTION"
+        transaction_fees_text: "0.0001 BTC (virement effectué sous 10 minutes)"
