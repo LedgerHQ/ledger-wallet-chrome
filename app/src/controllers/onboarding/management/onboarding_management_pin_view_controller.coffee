@@ -79,7 +79,7 @@ class @OnboardingManagementPinViewController extends @OnboardingViewController
       else
         @view.manualPinCode.setValue(@params.pin)
 
-    # buttons
+    # navigation
     if @_isPinValid()
       @view.continueButton.removeClass 'disabled'
     else

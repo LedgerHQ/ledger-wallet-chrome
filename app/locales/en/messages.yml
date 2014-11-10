@@ -34,8 +34,8 @@ onboarding:
       if_you_lost_your_wallet: "If you froze or lost your Ledger Wallet"
     frozen:
       wallet_is_frozen: "Your wallet is frozen"
-      wrong_pin_codes: "Your wallet has frozen due to 3 incorrect PIN entries, but your bitcoins remain safe."
-      unfreeze_or_create: "To regain access to your accounts, you must unfreeze your wallet with your recovery phrase."
+      wrong_pin_codes: "Your wallet has frozen due to 3 incorrect PIN entries, but your bitcoins remain safe"
+      unfreeze_or_create: "To regain access to your accounts, you must unfreeze your wallet with your recovery phrase"
       unfreeze_my_wallet: "Unfreeze my wallet"
       retreive_access: "Regain access to your accounts using your recovery phrase"
       create_a_new_wallet: "Create a new wallet"
@@ -52,10 +52,13 @@ onboarding:
       auto: "AUTOMATIC PIN CODE"
       manual: "MANUAL PIN CODE"
       please_note: "Please note"
-      warning_weak_pin_codes: ", your birth year or your debit/credit card pin are not secure PIN codes."
+      warning_weak_pin_codes: ", your birth year or your debit/credit card pin are not secure PIN codes"
     pin_confirmation:
       confirm_your: "Confirm your"
       pin_code: "PIN code"
+      your_pin_code: "Your PIN code:"
+      enter_again: "Re-enter the PIN code chosen in the previous step"
+      pin_codes_do_not_match: "The entered PIN code does not match the one chosen in the previous step"
 
 wallet:
 

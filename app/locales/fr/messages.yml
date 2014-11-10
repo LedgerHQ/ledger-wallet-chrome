@@ -19,6 +19,9 @@ onboarding:
     back: "RETOUR"
     continue: "CONTINUER"
     or: "OU"
+    create_my_wallet: "Créer mon portefeuille"
+    recover_my_wallet: "Restaurer mon portefeuille"
+    unfreeze_my_wallet: "Débloquer mon portefeuille"
     done:
       you_can_access_your_wallet: "Vous pouvez maintenant commencer à utiliser votre portefeuille"
       configuration_is_complete: "Configuration terminée"
@@ -34,16 +37,13 @@ onboarding:
       if_you_lost_your_wallet: "Si vous avez bloqué ou perdu votre Ledger Wallet"
     frozen:
       wallet_is_frozen: "Portefeuille bloqué"
-      wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN, mais vos bitcoins restent en sécurité."
-      unfreeze_or_create: "Pour retrouver l'accès à vos comptes, vous devez débloquer votre portefeuille à l’aide de votre phrase de restauration."
+      wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN, mais vos bitcoins restent en sécurité"
+      unfreeze_or_create: "Pour retrouver l'accès à vos comptes, vous devez débloquer votre portefeuille à l’aide de votre phrase de restauration"
       unfreeze_my_wallet: "Débloquer mon portefeuille"
       retreive_access: "Retrouvez l’accès à vos comptes à l’aide de votre phrase de restauration"
       create_a_new_wallet: "Créer un nouveau portefeuille"
       you_can_always_retreive_your_accounts: "Vos comptes et bitcoins actuels pourront être restaurés à tout moment sur un autre Ledger Wallet"
     pin:
-      create_my_wallet: "Créer mon portefeuille"
-      recover_my_wallet: "Restaurer mon portefeuille"
-      unfreeze_my_wallet: "Débloquer mon portefeuille"
       choose_your: "Choisissez votre"
       choose_your_new: "Choisissez votre nouveau"
       pin_code: "code PIN"
@@ -52,10 +52,13 @@ onboarding:
       auto: "CODE PIN AUTOMATIQUE"
       manual: "CODE PIN MANUEL"
       please_note: "Attention"
-      warning_weak_pin_codes: ", votre année de naissance et votre code de carte bancaire ne constituent pas des codes PIN sécurisés."
+      warning_weak_pin_codes: ", votre année de naissance et votre code de carte bancaire ne constituent pas des codes PIN sécurisés"
     pin_confirmation:
       confirm_your: "Confirmez votre"
       pin_code: "code PIN"
+      your_pin_code: "Votre code PIN :"
+      enter_again: "Entrez à nouveau le code PIN choisi lors de l’étape précédente"
+      pin_codes_do_not_match: "Le code PIN saisi ne correspond pas avec celui choisi lors de l'étape précédente"
 
 wallet:
 

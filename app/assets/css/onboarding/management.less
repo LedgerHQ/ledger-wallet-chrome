@@ -50,12 +50,15 @@
 }
 
 > .page-content-container {
-  padding: @metrics-medium-padding @metrics-ultra-large-padding + 46px + @metrics-medium-padding;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  padding: @metrics-large-padding @metrics-ultra-large-padding + 46px + @metrics-medium-padding;
   padding-bottom: 0;
   padding-right: @metrics-ultra-large-padding;
 
-  .grey-indication {
-    color: @color-dark-grey;
+  .indication(@color) {
+    color: @color;
     line-height: 25px;
     letter-spacing: -0.3px;
     position: relative;
@@ -64,6 +67,18 @@
     &-strong {
       font-weight: @font-weight-semibold;
     }
+  }
+
+  .grey-indication {
+    .indication(@color-dark-grey);
+  }
+
+  .invalid-indication {
+    .indication(@color-invalid-red);
+  }
+
+  .uppercase-title {
+    text-transform: uppercase;
   }
 }
 
