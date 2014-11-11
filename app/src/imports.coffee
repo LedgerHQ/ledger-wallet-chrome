@@ -71,7 +71,8 @@
         'utils/crypto/sha256',
         'utils/crypto/base58',
 
-        'utils/bitcoin',
+        'utils/bitcoin/bitcoin',
+        'utils/bitcoin/bip39',
 
         'utils/storage/store',
         'utils/storage/chrome_store',

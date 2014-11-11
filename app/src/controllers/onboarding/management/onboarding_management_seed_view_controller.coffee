@@ -7,7 +7,6 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     continueButton: "#continue_button"
   navigation:
     continueUrl: '/onboarding/management/provisioning'
-  _numberOfWords: 24
 
   initialize: ->
     if @params.wallet_mode == 'create'
@@ -25,7 +24,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
 
   _generateInputs: ->
     @view.inputs = []
-    for i in [0..@_numberOfWords - 1]
+    for i in [0..ledger.bitcoin.bip39.MNEMONIC_WORDS_NUMBER - 1]
       div = document.createElement("div")
       div.className = 'seed-word'
       span = document.createElement("span")
@@ -38,44 +37,50 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       @view.seedContainer.append div
 
   _listenEvents: ->
-    return if @params.wallet_mode == 'create'
     for input in @view.inputs
       input.on 'keydown', =>
+        return if @params.wallet_mode == 'create'
         setTimeout =>
           @params.mnemonic = @_writtenMnemonic()
           do @_updateUI
         , 0
 
   _updateUI: (animated = yes) ->
-    if animated == no
-      # hide invalid label
-      @view.invalidLabel.hide()
-
-      # hide indication label
-      if @params.wallet_mode == 'create'
-        @view.indicationLabel.show()
-      else
-        @view.indicationLabel.hide()
-
-      # switch to readonly
-      if @params.wallet_mode == 'create'
-        for input in @view.inputs
-          input.prop 'readonly', yes
-
-      # write words
-      if @params.mnemonic?
-        words = @params.mnemonic.split(' ')
-        for i in [0 .. words.length - 1]
-          @view.inputs[i].val(words[i])
+    # hide indication label
+    if @params.wallet_mode == 'create'
+      @view.indicationLabel.show()
     else
-      # continue button
-      if @params.wallet_mode != 'create'
-        if @_mnemonicIsValid()
-          @view.invalidLabel.fadeOut(250)
-          @view.continueButton.removeClass 'disabled'
+      @view.indicationLabel.hide()
+
+    # switch of readonly
+    for input in @view.inputs
+      if @params.wallet_mode == 'create'
+        input.prop 'readonly', yes
+        input.prop 'disabled', yes
+      else
+        input.prop 'readonly', no
+        input.prop 'disabled', no
+
+    # write words
+    if @params.mnemonic?
+      words = @params.mnemonic.split(' ')
+      for i in [0 .. words.length - 1]
+        @view.inputs[i].val(words[i])
+
+    # validate mnemonic
+    if @params.wallet_mode != 'create'
+      if @_mnemonicIsValid()
+        @view.invalidLabel.fadeOut(if animated then 250 else 0)
+        @view.continueButton.removeClass 'disabled'
+      else
+        if ledger.bitcoin.bip39.numberOfWordsInMnemonic(@params.mnemonic) == ledger.bitcoin.bip39.MNEMONIC_WORDS_NUMBER
+          @view.invalidLabel.fadeIn(if animated then 250 else 0)
         else
-          @view.invalidLabel.fadeIn(250)
-          @view.continueButton.addClass 'disabled'
+          @view.invalidLabel.fadeOut(if animated then 250 else 0)
+        @view.continueButton.addClass 'disabled'
+    else
+      @view.invalidLabel.fadeOut(if animated then 250 else 0)
+      @view.continueButton.removeClass 'disabled'
 
   _writtenMnemonic: ->
     mnemonic = ''
@@ -87,4 +92,4 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     mnemonic
 
   _mnemonicIsValid: ->
-    return @params.mnemonic[@params.mnemonic.length - 1] != ' '
+    ledger.bitcoin.bip39.mnemonicIsValid(@params.mnemonic)
