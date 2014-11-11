@@ -1,0 +1,24 @@
+<div id="content-container">
+  <div class="title-container">
+    <div class="page-title"><%= t 'onboarding.management.frozen.wallet_is_frozen' %></div>
+    <div class="page-subtitle"><%= t 'application.name' %></div>
+    <div class="page-warning"><%= t 'onboarding.management.frozen.wrong_pin_codes' %></div>
+    <div class="page-indication"><%= t 'onboarding.management.frozen.unfreeze_or_create' %></div>
+  </div>
+  <a class="greyed-container detailed" href="<%= @url '/onboarding/management/pin', wallet_mode: 'unfreeze', back: @representativeUrl() %>">
+    <img class="index" src="../../assets/images/onboarding/management/unlock_icon.png" width="46" height="46"/>
+    <div class="texts">
+      <div class="black-title"><%= t 'onboarding.management.frozen.unfreeze_my_wallet' %></div>
+      <div class="black-indication"><%= t 'onboarding.management.frozen.retreive_access' %></div>
+    </div>
+    <img class="arrow" src="../assets/images/onboarding/large_right_arrow.png" width="16" height="30"/>
+  </a>
+  <a class="greyed-container detailed" href="<%= @url '/onboarding/management/pin', wallet_mode: 'create', back: @representativeUrl() %>">
+    <img class="index" src="../../assets/images/onboarding/management/wallet_icon.png" width="46" height="46"/>
+    <div class="texts">
+      <div class="black-title"><%= t 'onboarding.management.frozen.create_a_new_wallet' %></div>
+      <div class="black-indication"><%= t 'onboarding.management.frozen.you_can_always_retreive_your_accounts' %></div>
+    </div>
+    <img class="arrow" src="../assets/images/onboarding/large_right_arrow.png" width="16" height="30"/>
+  </a>
+</div>

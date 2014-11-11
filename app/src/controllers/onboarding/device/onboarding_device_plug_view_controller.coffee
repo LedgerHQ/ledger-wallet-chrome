@@ -1,4 +1,4 @@
-class @OnboardingDevicePlugViewController extends @ViewController
+class @OnboardingDevicePlugViewController extends @OnboardingViewController
 
   _spinner: null
 

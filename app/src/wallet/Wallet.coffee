@@ -33,7 +33,7 @@ class @ledger.wallet.Wallet extends EventEmitter
 
   unlockWithPinCode: (pin, callback) ->
     throw 'Cannot unlock a device if its current state is not equal to "ledger.wallet.States.LOCKED"' if @_state isnt ledger.wallet.States.LOCKED
-    onSuccess = () => 
+    onSuccess = () =>
       do unbind
       callback?(yes)
 

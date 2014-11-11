@@ -2,9 +2,12 @@ class @ViewController extends @EventEmitter
 
   renderedSelector: undefined
   parentViewController: undefined
+  view: {}
 
-  constructor: (params = {}) ->
-    @params = params
+  constructor: (params = {}, routedUrl = "") ->
+    @params = _.defaults(params, @defaultParams)
+    @routedUrl = routedUrl
+    @initialize?()
 
   select: (selectorString) ->
     $(@renderedSelector).find(selectorString)
@@ -32,13 +35,18 @@ class @ViewController extends @EventEmitter
       finalName += '/' + segment
     finalName
 
-  # Get the path to the view template file of the controller
+  # Gets the path to the view template file of the controller.
   viewPath: () ->
     @assetPath()
 
-  # Get the path to the css stylesheet of the controller
+  # Gets the path to the css stylesheet of the controller.
   cssPath: () ->
     @assetPath()
+
+  # Gets a url representation of the current view controller with its actual params
+  # @return [String] The representative URL
+  representativeUrl: ->
+    ledger.url.createUrlWithParams(@routedUrl.parseAsUrl().pathname, @params)
 
   # Request a view controller to perform an action. By default this tries to invoke a method with the name given by the
   # actionName string
@@ -61,6 +69,8 @@ class @ViewController extends @EventEmitter
 
   # Called after the view controller is rendered
   onAfterRender: ->
+    for key, value of @view
+      @view[key] = if value.selector? then $(value.selector) else @select(value)
 
   # Called when the view controller is attached to a parent view controller
   onAttach: ->

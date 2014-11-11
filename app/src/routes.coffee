@@ -22,8 +22,11 @@
   route '/onboarding/management/welcome', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementWelcomeViewController
 
-  route '/onboarding/management/locked', (params) ->
-    app.navigate ONBOARDING_LAYOUT, OnboardingManagementLockedViewController
+  route '/onboarding/management/frozen', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingManagementFrozenViewController
+
+  route '/onboarding/management/pinconfirmation', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingManagementPinconfirmationViewController
 
   route '/onboarding/management/pin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementPinViewController
