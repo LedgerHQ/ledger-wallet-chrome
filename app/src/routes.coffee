@@ -31,6 +31,9 @@
   route '/onboarding/management/pin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementPinViewController
 
+  route '/onboarding/management/seed', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingManagementSeedViewController
+
   ## Wallet
   # Dashboard
   route '/wallet/dashboard/index', (params) ->

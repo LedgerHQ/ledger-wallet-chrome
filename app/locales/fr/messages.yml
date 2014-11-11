@@ -5,16 +5,20 @@ common:
   bitcoin_acronym: 'BTC'
 
 onboarding:
+
   device:
     plug:
       to_start: "Pour commencer, branchez votre Ledger Wallet au port USB de votre ordinateur"
       i_lost_my_wallet: "J'ai perdu mon Ledger Wallet"
+
     unplug:
       unlock_my_wallet: "Dévérouiller mon portefeuille"
       you_can_unplug: "Vous pouvez maintenant débrancher votre Ledger Wallet en toute sécurité"
+
     pin:
       enter_your_pin_code: "Entez votre code PIN pour dévérouiller votre portefeuille :"
       i_lost_my_pin_code: "J'ai perdu mon code PIN"
+
   management:
     back: "RETOUR"
     continue: "CONTINUER"
@@ -22,11 +26,13 @@ onboarding:
     create_my_wallet: "Créer mon portefeuille"
     recover_my_wallet: "Restaurer mon portefeuille"
     unfreeze_my_wallet: "Débloquer mon portefeuille"
+
     done:
       you_can_access_your_wallet: "Vous pouvez maintenant commencer à utiliser votre portefeuille"
       configuration_is_complete: "Configuration terminée"
       open_my_wallet: "Ouvrir mon portefeuille"
       later_lock_my_wallet: "Plus tard, vérouiller mon portefeuille"
+
     welcome:
       new_wallet: "Nouveau portefeuille"
       welcome_to_your_new_wallet: "Bienvenue dans votre nouveau Ledger Wallet !"
@@ -35,6 +41,7 @@ onboarding:
       if_its_your_first_wallet: "S’il s’agit de votre premier Ledger Wallet"
       recover_wallet: "Restaurer mon portefeuille existant"
       if_you_lost_your_wallet: "Si vous avez bloqué ou perdu votre Ledger Wallet"
+
     frozen:
       wallet_is_frozen: "Portefeuille bloqué"
       wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN, mais vos bitcoins restent en sécurité"
@@ -43,6 +50,7 @@ onboarding:
       retreive_access: "Retrouvez l’accès à vos comptes à l’aide de votre phrase de restauration"
       create_a_new_wallet: "Créer un nouveau portefeuille"
       you_can_always_retreive_your_accounts: "Vos comptes et bitcoins actuels pourront être restaurés à tout moment sur un autre Ledger Wallet"
+
     pin:
       choose_your: "Choisissez votre"
       choose_your_new: "Choisissez votre nouveau"
@@ -53,12 +61,23 @@ onboarding:
       manual: "CODE PIN MANUEL"
       please_note: "Attention"
       warning_weak_pin_codes: ", votre année de naissance et votre code de carte bancaire ne constituent pas des codes PIN sécurisés"
+
     pin_confirmation:
       confirm_your: "Confirmez votre"
       pin_code: "code PIN"
       your_pin_code: "Votre code PIN :"
       enter_again: "Entrez à nouveau le code PIN choisi lors de l’étape précédente"
       pin_codes_do_not_match: "Le code PIN saisi ne correspond pas avec celui choisi lors de l'étape précédente"
+
+    seed:
+      usecase_word_group: "Cet ensemble de mots vous permet de restaurer votre portefeuille en cas de perte ou oubli du code PIN"
+      given_word_group: "Cet ensemble de mots vous a été communiqué lors de la création de votre portefeuille"
+      write_down_your: "Notez votre"
+      enter_your: "Entrez votre"
+      recovery_phrase: "phrase de restauration"
+      recovery_sheet: "Livret de restauration"
+      your_recovery_phrase: "Votre phrase de restauration :"
+      invalid_recovery_phrase: "La phrase de restauration est invalide"
 
 wallet:
 

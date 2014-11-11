@@ -5,25 +5,31 @@ common:
   bitcoin_acronym: 'BTC'
 
 onboarding:
+
   device:
     plug:
       to_start: "To begin, connect your Ledger Wallet into the USB port of your computer"
       i_lost_my_wallet: "I lost my Ledger Wallet"
+
     unplug:
       unlock_my_wallet: "Unlock my wallet"
       you_can_unplug: "You can now safely disconnect your Ledger Wallet"
+
     pin:
       enter_your_pin_code: "Enter you PIN code to unlock your wallet:"
       i_lost_my_pin_code: "I lost my PIN code"
+
   management:
     back: "BACK"
     continue: "CONTINUE"
     or: "OR"
+
     done:
       you_can_access_your_wallet: "You can now start using your wallet"
       configuration_is_complete: "Configuration is complete"
       open_my_wallet: "Open my wallet"
       later_lock_my_wallet: "Later, lock my wallet"
+
     welcome:
       new_wallet: "New wallet"
       welcome_to_your_new_wallet: "Welcome to your new Ledger Wallet!"
@@ -32,6 +38,7 @@ onboarding:
       if_its_your_first_wallet: "If you just bought your first Ledger Wallet"
       recover_wallet: "Recover my existing wallet"
       if_you_lost_your_wallet: "If you froze or lost your Ledger Wallet"
+
     frozen:
       wallet_is_frozen: "Your wallet is frozen"
       wrong_pin_codes: "Your wallet has frozen due to 3 incorrect PIN entries, but your bitcoins remain safe"
@@ -40,6 +47,7 @@ onboarding:
       retreive_access: "Regain access to your accounts using your recovery phrase"
       create_a_new_wallet: "Create a new wallet"
       you_can_always_retreive_your_accounts: "Your current bitcoins and accounts remain fully restorable at any time to another Ledger Wallet"
+
     pin:
       create_my_wallet: "Create my wallet"
       recover_my_wallet: "Recover my wallet"
@@ -53,12 +61,23 @@ onboarding:
       manual: "MANUAL PIN CODE"
       please_note: "Please note"
       warning_weak_pin_codes: ", your birth year or your debit/credit card pin are not secure PIN codes"
+
     pin_confirmation:
       confirm_your: "Confirm your"
       pin_code: "PIN code"
       your_pin_code: "Your PIN code:"
       enter_again: "Re-enter the PIN code chosen in the previous step"
       pin_codes_do_not_match: "The entered PIN code does not match the one chosen in the previous step"
+
+    seed:
+      usecase_word_group: "This set of words allows you to recover your wallet in case of loss or forgotten PIN code"
+      given_word_group: "This set of words was provided to you when creating your wallet"
+      write_down_your: "Write down"
+      enter_your: "Enter your"
+      recovery_phrase: "recovery phrase"
+      recovery_sheet: "recovery sheet"
+      your_recovery_phrase: "Your recovery phrase:"
+      invalid_recovery_phrase: "The recovery phrase is invalid"
 
 wallet:
 

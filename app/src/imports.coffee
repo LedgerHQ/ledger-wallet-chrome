@@ -110,5 +110,6 @@
         'controllers/onboarding/management/onboarding_management_welcome_view_controller',
         'controllers/onboarding/management/onboarding_management_frozen_view_controller',
         'controllers/onboarding/management/onboarding_management_pin_view_controller',
-        'controllers/onboarding/management/onboarding_management_pin_confirmation_view_controller'
+        'controllers/onboarding/management/onboarding_management_pin_confirmation_view_controller',
+        'controllers/onboarding/management/onboarding_management_seed_view_controller'
       ]
