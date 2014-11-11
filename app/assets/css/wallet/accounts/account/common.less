@@ -1,0 +1,52 @@
+@import (reference) "../../../constants";
+
+.text-input {
+  border: 0;
+  background-color: transparent;
+  font-size: @font-size-extra-large;
+  font-weight: @font-weight-regular;
+  outline: none;
+  text-align: right;
+  width: auto;
+
+  &::-webkit-input-placeholder {
+    text-transform: capitalize;
+    font-weight: @font-weight-light;
+    color: @color-light-grey;
+  }
+
+  &.fullwidth {
+    width: 100%;
+  }
+
+}
+
+.small-text-input {
+  .text-input;
+  font-size: @font-size-medium;
+  letter-spacing: -0.3px;
+}
+
+#amount_row {
+  .text-properties() {
+    color: @color-black;
+    font-size: @font-size-extra-large;
+
+    &.optional {
+      color: @color-soft-grey;
+    }
+
+  }
+
+  input {
+    .text-properties;
+    .text-input;
+    margin-right: @metrics-very-small-padding - 3px;
+  }
+
+  > span {
+    .text-properties;
+    font-weight: @font-weight-light;
+    text-transform: uppercase;
+  }
+}

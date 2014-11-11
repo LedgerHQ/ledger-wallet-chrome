@@ -10,6 +10,7 @@
         '../libs/spin.min',
         '../libs/sjcl',
         '../libs/jquery.selectric.min',
+        '../libs/qrcode.min',
         '../public/tooltipster/js/jquery.tooltipster.min',
         '../libs/lw-api-js/lib/bitcoinjs-min',
         '../libs/lw-api-js/lib/util',
@@ -43,12 +44,17 @@
         '../libs/lw-api-js/LWTools',
         '../libs/lw-api-js/LW',
         '../libs/lw-api-js/LWWallet',
-        '../libs/lw-api-js/LWTransaction',   
+        '../libs/lw-api-js/LWTransaction',
+        '../libs/bs58',
+        '../libs/BigInt',
+        '../libs/sha256',
+        '../libs/checkBitcoinAddress',
 
         'routes',
 
         'utils/log',
         'utils/string',
+        'utils/number',
         'utils/object',
         'utils/render',
         'utils/event_emitter',
@@ -57,11 +63,15 @@
         'utils/easing',
         'utils/router',
         'utils/i18n',
+        'utils/jquery',
         'utils/spinners',
         'utils/pin_codes',
 
         'utils/crypto/aes',
         'utils/crypto/sha256',
+        'utils/crypto/base58',
+
+        'utils/bitcoin',
 
         'utils/storage/store',
         'utils/storage/chrome_store',
@@ -71,6 +81,10 @@
         'utils/storage/storage',
 
         'managers/devices_manager'
+
+        ## Wallet
+        'managers/wallets_manager'
+        'wallet/wallet'
 
         'base/model',
         'base/collection',
@@ -97,6 +111,8 @@
         'controllers/wallet/operations/wallet_operations_index_view_controller',
         # Accounts
         'controllers/wallet/accounts/wallet_accounts_account_view_controller',
+        'controllers/wallet/accounts/wallet_accounts_account_receive_dialog_view_controller',
+        'controllers/wallet/accounts/wallet_accounts_account_send_dialog_view_controller',
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'

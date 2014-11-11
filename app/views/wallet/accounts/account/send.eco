@@ -1,0 +1,31 @@
+<div id="receive_dialog">
+  <section>
+    <header>
+      <h1><%= t 'wallet.accounts.account.send.title' %></h1>
+    </header>
+    <table class="no-table-head">
+      <tbody>
+        <tr>
+          <td class="row-title"><%= t 'wallet.accounts.account.send.amount' %></td>
+          <td class="align-right" id="amount_row" ><input id="amount_input" placeholder="<%= t 'wallet.accounts.account.send.amount_placeholder' %>"/><span>BTC</span></td>
+        </tr>
+        <tr>
+          <td class="row-title"><%= t 'wallet.accounts.account.send.sender_account' %></td>
+          <td class="align-right">Mon compte - 10.0000 BTC</td>
+        </tr>
+        <tr>
+          <td class="row-title"><%= t 'wallet.accounts.account.send.receiver_address' %></td>
+          <td class="align-right"><input class="small-text-input fullwidth" maxlength="34" placeholder="<%= t 'wallet.accounts.account.send.receiver_address_placeholder' %>" /></td>
+        </tr>
+        <tr class="no-border">
+          <td class="row-title-optional"><%= t 'wallet.accounts.account.send.transaction_fees' %></td>
+          <td class="align-right"><%= t 'wallet.accounts.account.send.transaction_fees_text' %></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <div class="dialog-actions-bar">
+    <a class="action-rounded-button" href="#print"><%= t 'wallet.accounts.account.receive.print' %></a>
+    <a class="cancel-rounded-button" href="#dismiss"><%= t 'wallet.accounts.account.receive.close' %></a>
+  </div>
+</div>

@@ -1,12 +1,20 @@
 class @WalletAccountsAccountViewController extends @ViewController
 
+  receive: () ->
+    dialog = new WalletAccountsAccountReceiveDialogViewController()
+    dialog.show()
+
+  send: () ->
+    dialog = new WalletAccountsAccountSendDialogViewController()
+    dialog.show()
+
   showOperation: (params) ->
     dialog = new WalletOperationsDetailDialogViewController(params)
     dialog.show()
 
   onAfterRender: ->
-  	ledger.application.devicesManager.on 'LWWallet.BalanceRecovered', (event, data) ->
-      l "BALANCE !"
+  	#ledger.application.devicesManager.on 'LWWallet.BalanceRecovered', (event, data) ->
+    #  l "BALANCE !"
 
     @select('#unconfirmed_balance_tooltip').tooltipster
       content: 'Hello world'

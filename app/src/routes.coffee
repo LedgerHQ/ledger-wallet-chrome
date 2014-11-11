@@ -2,7 +2,7 @@
 
   ## Default
   route '/', ->
-    app.router.go '/onboarding/management/welcome'
+    app.router.go '/wallet/accounts/index'
 
   ## Onboarding
   # Device

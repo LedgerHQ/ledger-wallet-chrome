@@ -1,7 +1,7 @@
 <section id="account">
   <header>
     <h1>COMPTE COURANT</h1> <span class="account-type-orange">courant</span>
-    <a href="#displaySettings" ><%= t 'wallet.accounts.account.detail.action' %></a>
+    <a href="#displaySettings" visibility="hidden" ><%= t 'wallet.accounts.account.detail.action' %></a>
   </header>
   <table>
     <thead>
@@ -17,7 +17,7 @@
         <td class="unconfirmed-balance" ><span>0.9878</span> <span>BTC</span></td>
         <td class="fit-content">
           <div class="action-bar">
-            <a class="action-rounded-button" href="#print"><%= t 'wallet.accounts.account.detail.receive' %></a>
+            <a class="action-rounded-button" href="#receive"><%= t 'wallet.accounts.account.detail.receive' %></a>
             <a class="action-rounded-button" href="#send"><%= t 'wallet.accounts.account.detail.send' %></a>
           </div>
         </td>

@@ -150,3 +150,23 @@ wallet:
         <<: *default-operations-translation
         title: "DERNIÈRES OPÉRATIONS"
         action: "VOIR TOUTES LES OPÉRATIONS"
+
+      receive:
+        title: "RECEVOIR DES BITCOINS"
+        amount: "MONTANT (OPTIONNEL)"
+        receiver_account: "COMPTE À CRÉDITER"
+        receiver_address: "ADDRESSE DE RÉCEPTION"
+        qr_code_explanation: "Code QR à scanner par la personne <br /> qui souhaite vous envoyer des bitcoins"
+        send_by_email: "ENVOYER PAR EMAIL"
+        print: "IMPRIMER"
+        close: "FERMER"
+
+      send:
+        title: "ENVOYER DES BITCOINS"
+        amount: "MONTANT"
+        amount_placeholder: "montant"
+        sender_account: "COMPTE À DÉBITER"
+        receiver_address: "ADRESSE À CRÉDITER"
+        receiver_address_placeholder: "adresse bitcoin"
+        transaction_fees: "FRAIS DE TRANSACTION"
+        transaction_fees_text: "0.0001 BTC (virement effectué sous 10 minutes)"
