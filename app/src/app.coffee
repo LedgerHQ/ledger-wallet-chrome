@@ -1,12 +1,13 @@
 require @ledger.imports, ->
 
-  class Application
+  class Application extends EventEmitter
 
     _navigationControllerSelector: -> $('#controllers_container')
 
     constructor: ->
       @_navigationController = null
       @devicesManager = new DevicesManager()
+      @walletsManager = new WalletsManager(this)
       @router = new Router(@)
       ledger.dialogs.manager.initialize($('#dialogs_container'))
 
@@ -16,28 +17,13 @@ require @ledger.imports, ->
           when 'reload-page' then do @reloadUi
           when 'reload-application' then chrome.runtime.reload()
 
-      self = @
-      
-      @devicesManager.on 'plug', (event, device) ->
-        l 'Plug'
-        l device
-      @devicesManager.on 'unplug', (event, device) ->
-        l 'Unplug'
-        l device
-      @devicesManager.on 'LW.CardConnected', (event, data) ->
-        #data.lW.setDriverMode(0x01);
-        data.lW.recoverFirmwareVersion();
-      @devicesManager.on 'LW.FirmwareVersionRecovered', (event, data) ->
-        data.lW.getOperationMode();
-        data.lW.plugged();
-      @devicesManager.on 'LW.PINRequired', (event, data) ->
-        self.router.go('/onboarding/device/pin')
-      @devicesManager.on 'LW.LWPINVerified', (event, data) ->
-        data.lW.getWallet();
-        self.router.go('/wallet/dashboard/index')
-
-      @devicesManager.on 'LW.SetupCardLaunched', (event, data) ->
-        self.router.go('/onboarding/management/welcome')
+      @walletsManager.on 'connecting', (event, card) =>
+        l 'connecting', card
+      @walletsManager.on 'connected', (event, wallet) =>
+        l 'connected'
+        wallet.getState (state) =>
+          wallet.unlockWithPinCode '0000', (success) =>
+            l success
 
       @devicesManager.start()
       @router.go('/')

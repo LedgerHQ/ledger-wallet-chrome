@@ -82,6 +82,10 @@
 
         'managers/devices_manager'
 
+        ## Wallet
+        'managers/wallets_manager'
+        'wallet/wallet'
+
         'base/model',
         'base/collection',
         'base/view_controller',

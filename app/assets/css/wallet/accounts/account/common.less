@@ -9,6 +9,12 @@
   text-align: right;
   width: auto;
 
+  &::-webkit-input-placeholder {
+    text-transform: capitalize;
+    font-weight: @font-weight-light;
+    color: @color-light-grey;
+  }
+
   &.fullwidth {
     width: 100%;
   }
@@ -18,6 +24,7 @@
 .small-text-input {
   .text-input;
   font-size: @font-size-medium;
+  letter-spacing: -0.3px;
 }
 
 #amount_row {
