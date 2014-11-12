@@ -74,7 +74,7 @@ class @ledger.wallet.Wallet extends EventEmitter
     @_vents.on 'LW.SetupCardInProgress', onSuccess
     @_vents.on 'LW.ErrorOccured', onFailure
     ###
-    @_lwCard.performSetup(pincode, seed, 'querty')
+    @_lwCard.performSetup(pincode, seed, 'qwerty')
 
   getBitIdAddress: (callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED

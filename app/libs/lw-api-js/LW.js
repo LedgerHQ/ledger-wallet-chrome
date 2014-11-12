@@ -294,11 +294,10 @@ LW.prototype = {
                     else {
                         LWTools.console("Seed restored, please reopen the extension", 2);
 
-                        lW.unplugged();
-                        LWList.checkCard();
-
                         /* Event : LW.SetupCardInProgress */
                         lW.event('LW.SetupCardInProgress',  {lW: lW, state: 'seedRestored'});
+
+                        //rebrancher la carte...
                         
                     }
             }).fail(function(errorMessage) {
