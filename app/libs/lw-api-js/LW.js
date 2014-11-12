@@ -154,7 +154,6 @@ LW.prototype = {
         var lW = this;
 
         lW.unplugged();
-        LWList.checkCard();
     },
 
     verifyPIN: function(PIN){
@@ -297,7 +296,7 @@ LW.prototype = {
                         /* Event : LW.SetupCardInProgress */
                         lW.event('LW.SetupCardInProgress',  {lW: lW, state: 'seedRestored'});
 
-                        //rebrancher la carte...
+                        lW.unplugged();
                         
                     }
             }).fail(function(errorMessage) {
