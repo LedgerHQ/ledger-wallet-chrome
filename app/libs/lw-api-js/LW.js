@@ -480,7 +480,7 @@ LW.prototype = {
                 });
             })
         } else {
-            return lW.getBitIdPublicAddress().then(function(result) {
+            return lW.getBitIDAddress().then(function(result) {
                 return lW.getMessageSignature(message);
             });
 
