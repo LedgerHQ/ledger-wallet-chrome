@@ -4,3 +4,5 @@
 class @ledger.crypto.SHA256
 
   @hashString: (string) -> sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(string))
+
+  @hashWordsArray: (array) -> sjcl.hash.sha256.hash array

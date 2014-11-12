@@ -72,6 +72,7 @@
         'utils/crypto/base58',
 
         'utils/bitcoin/bitcoin',
+        'utils/bitcoin/bip39_wordlist',
         'utils/bitcoin/bip39',
 
         'utils/storage/store',

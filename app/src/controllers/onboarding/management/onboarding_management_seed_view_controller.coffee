@@ -10,7 +10,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
 
   initialize: ->
     if @params.wallet_mode == 'create'
-      @params.mnemonic = "nimble heady busy request pigs annoy bikes angle discover obeisant abrasive unbiased grotesque nut pies allow groan oranges spell mine measure offend turn direction"
+      @params.mnemonic = ledger.bitcoin.bip39.generateMnemonic()
 
   navigationContinueParams: ->
     back: @representativeUrl()
