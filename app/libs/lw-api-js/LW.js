@@ -165,8 +165,8 @@ LW.prototype = {
 
         lW.dongle.verifyPin_async(new ByteString(lW.PIN, ASCII)).then(function(result){
 
-            /* Event : LW.LWPINVerified */
-            lW.event('LW.LWPINVerified',  {lW: lW});
+            /* Event : LW.PINVerified */
+            lW.event('LW.PINVerified',  {lW: lW});
 
 
         }).fail(function(error) {
