@@ -21,6 +21,7 @@ onboarding:
 
   management:
     back: "RETOUR"
+    cancel: "ANNULER"
     continue: "CONTINUER"
     or: "OU"
     create_my_wallet: "Créer mon portefeuille"

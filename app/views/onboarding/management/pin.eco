@@ -35,7 +35,7 @@
     </div>
   </div>
   <div class="navigation-container">
-    <a class="back" href="#navigateBack" id="back_button"><i class="fa fa-angle-left"></i> <%= t 'onboarding.management.back' %></a>
+    <a class="back" href="#navigateRoot" id="back_button"><i class="fa fa-angle-left"></i> <%= t 'onboarding.management.cancel' %></a>
     <a class="continue" href="#navigateContinue" id="continue_button"><%= t 'onboarding.management.continue' %> <i class="fa fa-angle-right"></i></a>
   </div>
 </div>

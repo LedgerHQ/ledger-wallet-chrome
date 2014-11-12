@@ -15,6 +15,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
   navigationContinueParams: ->
     back: @representativeUrl()
     pin: @params.pin
+    rootUrl: @params.rootUrl
 
   onAfterRender: ->
     super

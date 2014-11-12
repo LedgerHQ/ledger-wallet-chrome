@@ -29,6 +29,7 @@ class @OnboardingManagementPinViewController extends @OnboardingViewController
     wallet_mode: @params.wallet_mode
     pin: @params.pin
     back: @representativeUrl()
+    rootUrl: @params.rootUrl
 
   _insertPinCodes: ->
     @view.autoPinCode = new ledger.pin_codes.PinCode()

@@ -9,6 +9,9 @@ class @OnboardingViewController extends @ViewController
   navigationContinueParams: ->
     undefined
 
+  navigateRoot: ->
+    ledger.app.router.go @params.rootUrl
+
   navigateBack: ->
     ledger.app.router.go @params.back, @navigationBackParams()
 
