@@ -1,3 +1,7 @@
+<a href="#badpin">Enter wrong pin</a>
+<a href="#goodpin">Enter good pin</a>
+<a href="#setup">Setup</a>
+<p>State: <span id="toto"></span></p>
 <section id="account">
   <header>
     <h1>COMPTE COURANT</h1> <span class="account-type-orange">courant</span>

@@ -21,9 +21,11 @@ require @ledger.imports, ->
         l 'connecting', card
       @walletsManager.on 'connected', (event, wallet) =>
         l 'connected'
-        wallet.getState (state) =>
-          wallet.unlockWithPinCode '0000', (success) =>
-            l success
+        # TODO If wallet is null
+        wallet.once 'disconnected', =>
+          @wallet = null
+        @wallet = wallet
+
 
       @devicesManager.start()
       @router.go('/')
