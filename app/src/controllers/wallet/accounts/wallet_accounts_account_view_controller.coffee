@@ -29,7 +29,7 @@ class @WalletAccountsAccountViewController extends @ViewController
     #  l "BALANCE !"
     state = () =>
       ledger.app.wallet.getState (state) =>
-        @select("#toto").text(state)
+        @select("#toto").text(state + ' retry: ' + ledger.app.wallet?._numberOfRetry)
     ledger.app.walletsManager.on 'connected', (ev, wallet) =>
       wallet.on('state:changed', state)
       state()

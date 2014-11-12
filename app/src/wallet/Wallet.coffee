@@ -8,12 +8,13 @@
   FROZEN: 'frozen'
   BLANK: 'blank'
   UNPLUGGED: 'unplugged'
+  DISCONNECTED: 'disconnected'
 
 class @ledger.wallet.Wallet extends EventEmitter
 
   _state: ledger.wallet.States.UNDEFINED
 
-  constructor: (@id, @lwCard) ->
+  constructor: (@manager, @id, @lwCard) ->
     @_vents = new EventEmitter()
     do @_listenStateChanges
 
@@ -27,7 +28,12 @@ class @ledger.wallet.Wallet extends EventEmitter
     @_lwCard = new LW(0, new BTChip(@lwCard), @_vents)
 
   disconnect: () ->
-
+    @_setState(ledger.wallet.States.DISCONNECTED)
+    @emit 'disconnected'
+    @manager.addRestorableState({label: 'frozen'}, 45000) if @_frozen?
+    if @_numberOfRetry?
+      @manager.removeRestorableState(state) for state in @manager.findRestorableStates({label: 'numberOfRetry'})
+      @manager.addRestorableState({label: 'numberOfRetry', numberOfRetry: @_numberOfRetry}, 45000)
 
   getState: (callback) ->
     if @_state is ledger.wallet.States.UNDEFINED
@@ -39,7 +45,7 @@ class @ledger.wallet.Wallet extends EventEmitter
     throw 'Cannot unlock a device if its current state is not equal to "ledger.wallet.States.LOCKED"' if @_state isnt ledger.wallet.States.LOCKED
     unbind = @_performLwOperation
       onSuccess:
-        events: ['LW.LWPINVerified']
+        events: ['LW.PINVerified']
         do:  =>
           @_setState(ledger.wallet.States.UNLOCKED)
           do unbind
@@ -49,15 +55,16 @@ class @ledger.wallet.Wallet extends EventEmitter
         do: (error) =>
           if error.title is 'wrongPIN'
             retryNumber = parseInt(error.message.substr(-1))
+            @_numberOfRetry = retryNumber
             do unbind
             callback?(no, retryNumber)
     @_lwCard.verifyPIN pin
 
   setup: (pincode, seed, callback) ->
-    ###
-      onSuccess = () =>
+    throw 'Cannot setup if the wallet is not blank' if @_state isnt ledger.wallet.States.BLANK and @_state isnt ledger.wallet.States.FROZEN
+    onSuccess = () =>
       @once 'connected', =>
-        #callback?(yes)
+      callback?(yes)
 
     onFailure = (ev, error) =>
       e error.title
@@ -73,7 +80,6 @@ class @ledger.wallet.Wallet extends EventEmitter
       @_vents.off 'LW.ErrorOccured', onFailure
     @_vents.on 'LW.SetupCardInProgress', onSuccess
     @_vents.on 'LW.ErrorOccured', onFailure
-    ###
     @_lwCard.performSetup(pincode, seed, 'qwerty')
 
   getBitIdAddress: (callback) ->
@@ -106,20 +112,30 @@ class @ledger.wallet.Wallet extends EventEmitter
     switch newState
       when ledger.wallet.States.LOCKED then @emit 'state:locked', @_state
       when ledger.wallet.States.UNLOCKED then @emit 'state:unlocked', @_state
-      when ledger.wallet.States.FROZEN then @emit 'state:freezed', @_state
-      when ledger.wallet.States.BLANK then @emit 'state:freezed', @_state
+      when ledger.wallet.States.FROZEN then @emit 'state:frozen', @_state
+      when ledger.wallet.States.BLANK then @emit 'state:blank', @_state
+      when ledger.wallet.States.UNPLUGGED then @emit 'state:unplugged', @_state
+      when ledger.wallet.States.DISCONNECTED then @emit 'state:disconnected', @_state
     @emit 'state:changed', @_state
 
   _listenStateChanges: () ->
     @_vents.on 'LW.PINRequired', (e, data) =>
+      restoreStates = @manager.findRestorableStates({label: 'numberOfRetry'})
+      if restoreStates.length > 0
+        @_numberOfRetry = restoreStates[0].numberOfRetry
       @_setState ledger.wallet.States.LOCKED
     @_vents.on 'LW.SetupCardLaunched', (e, data) =>
-      @_setState ledger.wallet.States.BLANK
+      if @manager.findRestorableStates({label: 'frozen'}).length == 0
+        @_setState ledger.wallet.States.BLANK
+      else
+        @_setState ledger.wallet.States.FROZEN
     @_vents.on 'LW.unplugged', () =>
       @_setState ledger.wallet.States.UNPLUGGED
     @_vents.on 'LW.ErrorOccured', (e, data) =>
-      switch data.title
-        when 'dongleLocked' then @_setState ledger.wallet.States.FROZEN
+      switch
+        when (data.title is 'dongleLocked' or (data.title is 'wrongPIN' and data.message.indexOf('63c0') != -1))
+          @_frozen = yes
+          @_setState ledger.wallet.States.FROZEN
 
   _performLwOperation: (operation) ->
     unbind = () =>
