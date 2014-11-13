@@ -111,10 +111,12 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     try
       @_lwCard.dongle.getWalletPublicKey_async(derivationPath)
       .then (result) =>
-        callback?(result)
+          callback?(result)
+          return
       .fail (error) =>
-        e error
-        callback(null, error)
+          e error
+          callback?(null, error)
+          return
     catch error
       @_updateStateFromError(error)
       callback?(null, error)

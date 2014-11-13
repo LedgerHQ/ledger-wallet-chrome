@@ -10,13 +10,16 @@ _.extend ledger.wallet,
     notFound = []
     _.async.each paths, (path, done, hasNext) ->
       # Hit the cache first
-
       # No result from cache perform the derivation on the chip
       ledger.app.wallet.getPublicAddress path, (publicKey) ->
         if publicKey?
-          addresses[path] = publicKey.bitcoinAddress.value
+          addresses[path] = publicKey?.bitcoinAddress?.value
         else
           notFound.push path
         unless hasNext
-          callback(addresses, notFound)
+          try
+            callback?(addresses, notFound)
+          catch error
+            e error
         do done
+    return
