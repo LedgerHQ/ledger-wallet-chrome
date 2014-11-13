@@ -8,6 +8,49 @@ _.extend ledger.bitcoin.bip39,
   BIT_IN_BYTES: 8
   BYTES_IN_INTEGER: 4
 
+  mnemonicIsValid: (mnemonic) ->
+    numberOfWords = @numberOfWordsInMnemonic(mnemonic)
+    return no if (numberOfWords % 3 != 0) or (numberOfWords != @MNEMONIC_WORDS_NUMBER)
+    return no if not @_allWordsInMnemonicAreValid(mnemonic)
+    # convert wordlist to words indexes
+    words = mnemonic.split(' ')
+    wordsIndexes = @_mnemonicArrayToWordsIndexes words
+    # generate binary array from words indexes
+    binaryArray = @_integersArrayToBinaryArray wordsIndexes, 11
+    # extract checksum
+    entropyBitLength = @_nearest32Multiple binaryArray.length
+    extractedBinaryChecksum = @_lastBitsOfBinaryArray binaryArray, entropyBitLength / 32
+    extractedChecksum = @_binaryArrayToInteger extractedBinaryChecksum
+    # compute checksum
+    binaryEntropy = @_firstBitsOfBinaryArray binaryArray, entropyBitLength
+    integersEntropy = @_binaryArrayToIntegersArray binaryEntropy
+    hashedIntegersEntropy = sjcl.hash.sha256.hash integersEntropy
+    hashedEntropyBinaryArray = @_integersArrayToBinaryArray hashedIntegersEntropy
+    computedBinaryChecksum = @_firstBitsOfBinaryArray(hashedEntropyBinaryArray, entropyBitLength / 32)
+    computedChecksum = @_binaryArrayToInteger computedBinaryChecksum
+    # verify checksum
+    return computedChecksum == extractedChecksum
+
+  generateMnemonic: (entropyBitLength = @ENTROPY_BIT_LENGTH) ->
+    # generate entropy bytes array
+    entropyBytesArray = @_randomEntropyBytesArray(entropyBitLength / @BIT_IN_BYTES)
+    # convert it to integers array
+    entropyIntegersArray = @_bytesArrayToIntegersArray entropyBytesArray
+    # apply sha256 to hash
+    hashedEntropyIntegersArray = sjcl.hash.sha256.hash entropyIntegersArray
+    # get first x bits of hash
+    hashedEntropyBinaryArray = @_integersArrayToBinaryArray hashedEntropyIntegersArray
+    checksum = @_firstBitsOfBinaryArray(hashedEntropyBinaryArray, entropyBitLength / 32)
+    # compute entropy binary array
+    entropyBinaryArray = @_integersArrayToBinaryArray entropyIntegersArray
+    # append checksum to entropy
+    finalEntropyBinaryArray = @_appendBitsToBinaryArray entropyBinaryArray, checksum
+    # extract words indexes
+    wordsIndexes = @_binaryArrayToIntegersArray finalEntropyBinaryArray, 11
+    # generate wordlist
+    wordlist = @_wordsIndexesToMnemonicArray wordsIndexes
+    wordlist.join(' ')
+
   numberOfWordsInMnemonic: (mnemonic) ->
     return 0 if not mnemonic? or mnemonic.length == 0
     count = 0
@@ -16,39 +59,23 @@ _.extend ledger.bitcoin.bip39,
       count++ if word? and word.length > 0
     count
 
-  mnemonicIsValid: (mnemonic) ->
-    return no
+  _allWordsInMnemonicAreValid: (mnemonic) ->
+    return 0 if not mnemonic? or mnemonic.length == 0
+    words = mnemonic.split ' '
+    for word in words
+      return no if ledger.bitcoin.bip39.wordlist.indexOf(word) == -1
+    return yes
 
-  generateMnemonic: ->
-    # generate entropy bytes array
-    entropyBytesArray = @_randomEntropyBytesArray(@ENTROPY_BIT_LENGTH / @BIT_IN_BYTES)
-    # convert it to integers array
-    entropyIntegersArray = @_bytesArrayToIntegersArray entropyBytesArray
-    # apply sha256 to hash
-    hashedEntropyIntegersArray = sjcl.hash.sha256.hash entropyIntegersArray
-    # get first x bits of hash
-    hashedEntropyBinaryArray = @_integersArrayToBinaryArray hashedEntropyIntegersArray
-    checksum = @_firstBitsOfBinaryArray(hashedEntropyBinaryArray, @ENTROPY_BIT_LENGTH / 32)
-    # compute entropy binary array
-    entropyBinaryArray = @_integersArrayToBinaryArray entropyIntegersArray
-    # append checksum to entropy
-    finalEntropyBinaryArray = @_appendBitsToBinaryArray entropyBinaryArray, checksum
-    # extract words indexes
-    wordsIndexes = @_binaryArrayToIntegers finalEntropyBinaryArray, 11
-    # generate wordlist
-    wordlist = @_wordsIndexesToMnemonicArray wordsIndexes
-    wordlist.join(' ')
-
-  _integersArrayToBinaryArray: (integersArray) ->
+  _integersArrayToBinaryArray: (integersArray, integerBitLength = @BYTES_IN_INTEGER * @BIT_IN_BYTES) ->
     binaryArray = []
     for integer in integersArray
-      partialBinaryArray = @_integerToBinaryArray integer
+      partialBinaryArray = @_integerToBinaryArray integer, integerBitLength
       @_appendBitsToBinaryArray binaryArray, partialBinaryArray
     binaryArray
 
-  _integerToBinaryArray: (integer, integerLength = 32) ->
+  _integerToBinaryArray: (integer, integerBitLength = @BYTES_IN_INTEGER * @BIT_IN_BYTES) ->
     binaryArray = []
-    for power in [integerLength - 1 .. 0]
+    for power in [integerBitLength - 1 .. 0]
       val = Math.abs ((integer & (1 << power)) >> power)
       binaryArray.push val
     binaryArray
@@ -63,7 +90,7 @@ _.extend ledger.bitcoin.bip39,
       multiplier *= 2
     integer
 
-  _binaryArrayToIntegers: (binaryArray, integerBitLength) ->
+  _binaryArrayToIntegersArray: (binaryArray, integerBitLength = @BYTES_IN_INTEGER * @BIT_IN_BYTES) ->
     integersArray = []
     workingArray = binaryArray.slice()
     while workingArray.length > 0
@@ -75,13 +102,16 @@ _.extend ledger.bitcoin.bip39,
     i = 0
     integerArray = []
     while i < bytesArray.length
-      integer = (bytesArray[i] << 24) + (bytesArray[i + 1] << 16) + (bytesArray[i + 2] << 8) + bytesArray[i + 3]
+      integer = (bytesArray[i] << (@BIT_IN_BYTES * 3)) + (bytesArray[i + 1] << (@BIT_IN_BYTES * 2)) + (bytesArray[i + 2] << (@BIT_IN_BYTES * 1)) + bytesArray[i + 3]
       integerArray.push integer
       i += @BYTES_IN_INTEGER
     integerArray
 
   _firstBitsOfBinaryArray: (binaryArray, numberOfFirstBits) ->
-    binaryArray.slice binaryArray, numberOfFirstBits
+    binaryArray.slice 0, numberOfFirstBits
+
+  _lastBitsOfBinaryArray: (binaryArray, numberOfLastBits) ->
+    binaryArray.slice -numberOfLastBits
 
   _appendBitsToBinaryArray: (binaryArray, bitsToAppend) ->
     for bit in bitsToAppend
@@ -93,6 +123,18 @@ _.extend ledger.bitcoin.bip39,
     for index in indexes
       mnemonicArray.push ledger.bitcoin.bip39.wordlist[index]
     mnemonicArray
+
+  _mnemonicArrayToWordsIndexes: (mnemonicArray) ->
+    indexes = []
+    for word in mnemonicArray
+      indexes.push ledger.bitcoin.bip39.wordlist.indexOf word
+    indexes
+
+  _nearest32Multiple: (length) ->
+    power = 0
+    while (power + 32) <= length
+      power += 32
+    power
 
   _randomEntropyBytesArray: (bytesLength) ->
     entropy = new Uint8Array(bytesLength)

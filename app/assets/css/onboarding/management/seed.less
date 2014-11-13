@@ -26,7 +26,10 @@
           font-family: "Open Sans";
           letter-spacing: -0.5px;
           color: @color-grey-blue;
-          -webkit-user-select: none;
+
+          &[readonly] {
+            -webkit-user-select: none;
+          }
         }
 
         > span {
