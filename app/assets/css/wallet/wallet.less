@@ -1,5 +1,6 @@
 @import "../constants";
 @import "top-menu";
+@import (reference) "../application";
 
 #navigation_controller_content {
   padding: @metrics-large-padding @metrics-medium-padding;
@@ -42,10 +43,7 @@ section {
     margin-bottom: 0px;
 
     >h1 {
-      letter-spacing: -0.5px;
-      font-size: @font-size-large;
-      font-weight: @font-weight-semibold;
-      color: @color-night-blue;
+      .uppercase-section-title;
       margin-right: @metrics-very-small-padding;
     }
 

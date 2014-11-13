@@ -10,7 +10,12 @@ class @OnboardingViewController extends @ViewController
     undefined
 
   navigateRoot: ->
-    ledger.app.router.go @params.rootUrl
+    dialog = new CommonDialogsConfirmationDialogViewController()
+    dialog.setAbstractLocalizableKey 'onboarding.management.cancel_wallet_configuration'
+    dialog.setMessageLocalizableKey 'onboarding.management.wallet_not_affected'
+    dialog.once 'click:negative', =>
+      ledger.app.router.go @params.rootUrl
+    dialog.show()
 
   navigateBack: ->
     ledger.app.router.go @params.back, @navigationBackParams()

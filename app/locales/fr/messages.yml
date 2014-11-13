@@ -4,8 +4,12 @@ application:
 common:
   bitcoin_acronym: 'BTC'
 
-onboarding:
+  dialogs:
+    yes: "Oui"
+    no: "Non"
+    confirmation: "Confirmation"
 
+onboarding:
   device:
     plug:
       to_start: "Pour commencer, branchez votre Ledger Wallet au port USB de votre ordinateur"
@@ -27,6 +31,8 @@ onboarding:
     create_my_wallet: "Créer mon portefeuille"
     recover_my_wallet: "Restaurer mon portefeuille"
     unfreeze_my_wallet: "Débloquer mon portefeuille"
+    cancel_wallet_configuration: "Souhaitez-vous annuler la configuration de votre Ledger Wallet ?"
+    wallet_not_affected: "Aucune modification ne sera apportée à votre portefeuille."
 
     done:
       you_can_access_your_wallet: "Vous pouvez maintenant commencer à utiliser votre portefeuille"

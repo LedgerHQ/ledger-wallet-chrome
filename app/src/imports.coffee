@@ -104,6 +104,10 @@
         '../views/base/dialog',
         'base/dialog_view_controller'
 
+        ## Common controllers
+        # Dialogs
+        'controllers/common/dialogs/common_dialogs_confirmation_dialog_view_controller',
+
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller',
         # Dashboard

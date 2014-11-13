@@ -1,4 +1,5 @@
-@import "constants";
+@import (reference) "constants";
+@import (reference) "application";
 
 #dialogs_container {
   display: flex;
@@ -34,4 +35,9 @@
   &:hover {
     cursor: auto;
   }
+}
+
+.dialog-actions-bar {
+  .action-bar;
+  margin-top: @metrics-medium-padding;
 }
