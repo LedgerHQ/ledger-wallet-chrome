@@ -4,13 +4,12 @@ ledger.bitcoin.bip39 ?= {}
 _.extend ledger.bitcoin.bip39,
 
   ENTROPY_BIT_LENGTH: 256
-  MNEMONIC_WORDS_NUMBER: 24
   BIT_IN_BYTES: 8
   BYTES_IN_INTEGER: 4
 
   mnemonicIsValid: (mnemonic) ->
     numberOfWords = @numberOfWordsInMnemonic(mnemonic)
-    return no if (numberOfWords % 3 != 0) or (numberOfWords != @MNEMONIC_WORDS_NUMBER)
+    return no if (numberOfWords % 3 != 0) or (numberOfWords != @mnemonicWordsNumber())
     return no if not @_allWordsInMnemonicAreValid(mnemonic)
     # convert wordlist to words indexes
     words = mnemonic.split(' ')
@@ -51,6 +50,22 @@ _.extend ledger.bitcoin.bip39,
     wordlist = @_wordsIndexesToMnemonicArray wordsIndexes
     wordlist.join(' ')
 
+  generateSeed: (mnemonic, passphrase = "") ->
+    return undefined if !@mnemonicIsValid mnemonic
+    hmacSHA512 = (key) ->
+      hasher = new sjcl.misc.hmac(key, sjcl.hash.sha512)
+      @encrypt = ->
+        return hasher.encrypt.apply(hasher, arguments)
+      @
+
+    password = mnemonic.normalize('NFKD')
+    salt = "mnemonic" + passphrase.normalize('NFKD')
+    passwordBits = sjcl.codec.utf8String.toBits(password)
+    saltBits = sjcl.codec.utf8String.toBits(salt)
+    result = sjcl.misc.pbkdf2(passwordBits, saltBits, 2048, 512, hmacSHA512)
+    hashHex = sjcl.codec.hex.fromBits(result)
+    return hashHex
+
   numberOfWordsInMnemonic: (mnemonic) ->
     return 0 if not mnemonic? or mnemonic.length == 0
     count = 0
@@ -58,6 +73,9 @@ _.extend ledger.bitcoin.bip39,
     for word in words
       count++ if word? and word.length > 0
     count
+
+  mnemonicWordsNumber: ->
+    return (@ENTROPY_BIT_LENGTH + @ENTROPY_BIT_LENGTH / 32) / 11
 
   _allWordsInMnemonicAreValid: (mnemonic) ->
     return 0 if not mnemonic? or mnemonic.length == 0

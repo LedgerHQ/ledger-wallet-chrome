@@ -25,7 +25,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
 
   _generateInputs: ->
     @view.inputs = []
-    for i in [0..ledger.bitcoin.bip39.MNEMONIC_WORDS_NUMBER - 1]
+    for i in [0..ledger.bitcoin.bip39.mnemonicWordsNumber() - 1]
       div = document.createElement("div")
       div.className = 'seed-word'
       span = document.createElement("span")
@@ -74,7 +74,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       @view.invalidLabel.fadeOut(if animated then 250 else 0)
       @view.continueButton.removeClass 'disabled'
     else
-      if ledger.bitcoin.bip39.numberOfWordsInMnemonic(@params.mnemonic) == ledger.bitcoin.bip39.MNEMONIC_WORDS_NUMBER
+      if ledger.bitcoin.bip39.numberOfWordsInMnemonic(@params.mnemonic) == ledger.bitcoin.bip39.mnemonicWordsNumber()
         @view.invalidLabel.fadeIn(if animated then 250 else 0)
       else
         @view.invalidLabel.fadeOut(if animated then 250 else 0)
