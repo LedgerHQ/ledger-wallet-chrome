@@ -1,7 +1,14 @@
 <a href="#badpin">Enter wrong pin</a>
 <a href="#goodpin">Enter good pin</a>
 <a href="#setup">Setup</a>
+<a href="#bitid">Get bitId address</a>
 <p>State: <span id="toto"></span></p>
+<p>BitId: <span id="bitid">undefined</span></p>
+<div>
+  <input id="deriv" />
+  <button data-href="#pub">Get</button>
+  <p>Public Key: <span id="pk"></span></p>
+</div>
 <section id="account">
   <header>
     <h1>COMPTE COURANT</h1> <span class="account-type-orange">courant</span>

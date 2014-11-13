@@ -17,6 +17,7 @@ class @HttpClient
       type: method
       success: success
       error: error
+      crossDomain: true
       complete: complete
       headers: @headers
       data: parameters

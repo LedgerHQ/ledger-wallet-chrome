@@ -56,6 +56,7 @@
         'utils/string',
         'utils/number',
         'utils/object',
+        'utils/async',
         'utils/render',
         'utils/event_emitter',
         'utils/http_client',
@@ -82,9 +83,14 @@
 
         'managers/devices_manager'
 
+        ## Rest clients
+        'restclients/restclient',
+        'restclients/unspent_outputs_restclient'
+
         ## Wallet
         'managers/wallets_manager'
-        'wallet/wallet'
+        'wallet/hardware_wallet'
+        'wallet/utils'
 
         'base/model',
         'base/collection',

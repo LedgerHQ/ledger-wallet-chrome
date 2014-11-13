@@ -16,7 +16,7 @@ class @WalletsManager extends EventEmitter
         if result.length > 0
           @cardFactory.getCardTerminal(result[0]).getCard_async().then (lwCard) =>
             setTimeout () =>
-              @_wallets[card.id] = new ledger.wallet.Wallet(this, card.id, lwCard)
+              @_wallets[card.id] = new ledger.wallet.HardwareWallet(this, card.id, lwCard)
               @_wallets[card.id].once 'connected', (event, wallet) => @emit 'connected', wallet
               @_wallets[card.id].connect()
       , 0

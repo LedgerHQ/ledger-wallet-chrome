@@ -10,7 +10,7 @@
   UNPLUGGED: 'unplugged'
   DISCONNECTED: 'disconnected'
 
-class @ledger.wallet.Wallet extends EventEmitter
+class @ledger.wallet.HardwareWallet extends EventEmitter
 
   _state: ledger.wallet.States.UNDEFINED
 
@@ -106,6 +106,70 @@ class @ledger.wallet.Wallet extends EventEmitter
       @_vents.on 'LW.ErrorOccured', onFailure
       @_lwCard.getBitIDAddress()
 
+  getPublicAddress: (derivationPath, callback) ->
+    throw 'Cannot get a public while the key is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
+    try
+      @_lwCard.dongle.getWalletPublicKey_async(derivationPath)
+      .then (result) =>
+        callback?(result)
+      .fail (error) =>
+        e error
+        callback(null, error)
+    catch error
+      @_updateStateFromError(error)
+      callback?(null, error)
+
+    ###
+        try {
+        return lW.dongle.getWalletPublicKey_async("0'/0/0xb11e").then(function(result) {
+        LWTools.console("BitID public key :", 3);
+          LWTools.console(result, 3);
+          lW.bitIdPubKey = result.publicKey;
+          lW.event('LW.getBitIDAddress', {lW: lW, result: result});
+        return result;
+        }).fail(function(error) {
+      LWTools.console("BitID public key fail", 2);
+        LWTools.console(error, 2);
+
+        if (error.indexOf("6982") >= 0) {
+
+        LWTools.console("PINRequired", 2);
+
+          // Event : LW.PINRequired
+          lW.event('LW.PINRequired',  {lW: lW});
+
+        } else if (error.indexOf("6985") >= 0) {
+
+      LWTools.console("BlankCard", 2);
+
+        lW.setupCard();
+
+        } else if (error.indexOf("6faa") >= 0) {
+
+      LWTools.console("CardLocked", 2);
+
+        // Event : LW.ErrorOccured
+        lW.event('LW.ErrorOccured', {lW: lW, title: 'dongleLocked', message: error});
+
+        } else {
+
+      LWTools.console("public key fail", 1);
+        LWTools.console(error, 1);
+
+        // Event : LW.ErrorOccured
+        lW.event('LW.ErrorOccured', {lW: lW, title: 'error', message: error});
+
+        }
+
+
+        return false;
+        });
+      }
+      catch(e) {
+    LWTools.console("Get public key failed", 1);
+      LWTools.console(e, 1);
+      }
+    ###
 
   _setState: (newState) ->
     @_state = newState
@@ -136,6 +200,14 @@ class @ledger.wallet.Wallet extends EventEmitter
         when (data.title is 'dongleLocked' or (data.title is 'wrongPIN' and data.message.indexOf('63c0') != -1))
           @_frozen = yes
           @_setState ledger.wallet.States.FROZEN
+
+  _updateStateFromError: (error) ->
+    errors = (/(6982)|(6faa)|(6985)/g).exec(error)
+    return unless errors
+    switch
+      when errors[1]? then @_setState(ledger.wallet.States.LOCKED)
+      when errors[2]? then @_setState(ledger.wallet.States.FROZEN)
+      when errors[3]? then @_setState(ledger.wallet.States.BLANK)
 
   _performLwOperation: (operation) ->
     unbind = () =>
