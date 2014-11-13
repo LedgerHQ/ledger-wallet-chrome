@@ -1,5 +1,6 @@
 application:
   name: 'Ledger Wallet'
+  small_description: "Ledger Wallet manages your Bitcoin accounts efficiently and securely."
 
 common:
   bitcoin_acronym: 'BTC'
@@ -8,7 +9,6 @@ common:
     yes: "Yes"
     no: "No"
     confirmation: "Confirmation"
-
 
 onboarding:
   device:

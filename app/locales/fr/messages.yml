@@ -1,5 +1,6 @@
 application:
   name: 'Ledger Wallet'
+  small_description: "Ledger Wallet gère vos comptes Bitcoin de façon efficace et sécurisée."
 
 common:
   bitcoin_acronym: 'BTC'
