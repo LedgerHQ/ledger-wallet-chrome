@@ -28,6 +28,7 @@ onboarding:
     back: "RETOUR"
     cancel: "ANNULER"
     continue: "CONTINUER"
+    finish: "TERMINER"
     or: "OU"
     create_my_wallet: "Créer mon portefeuille"
     recover_my_wallet: "Restaurer mon portefeuille"
@@ -89,8 +90,20 @@ onboarding:
       it_wont_be_displayed_again: "Votre phrase de restauration ne sera pas affichée à nouveau."
       without_it: "Sans elle, vous n'aurez plus accès à votre portefeuille en cas de perte."
 
-wallet:
+    summary:
+      your_wallet_is: "Votre portefeuille est"
+      almost_ready: "bientôt prêt"
+      use_your_bitcoins: "Vous allez maintenant pouvoir utiliser vos bitcoins de la façon la plus sécurisée possible"
+      by_clicking_finish: "En cliquant sur TERMINER, vous confirmez avoir choisi un code PIN sécurisé et noté votre phrase de restauration."
+      your_wallet_mode_create: "Votre portefeuille sera crée."
+      your_wallet_mode_recover: "Votre portefeuille sera restauré."
+      your_wallet_mode_unfreeze: "Votre portefeuille sera débloqué."
+      during_the_operation: "Pendant l’opération, ne débranchez pas votre Ledger Wallet du port USB de l’ordinateur."
 
+    provisioning:
+
+
+wallet:
   defaults:
     operations: &default-operations-translation
       time: "DATE ET HEURE"
@@ -111,7 +124,6 @@ wallet:
       signout: 'VERROUILLER'
 
   dashboard:
-
     index:
       accounts:
         title: "APERÇU DES COMPTES"
@@ -126,7 +138,6 @@ wallet:
         action: "VOIR TOUTES LES OPÉRATIONS"
 
   operations:
-
     detail:
       title: "DÉTAIL DE L'OPÉRATION"
       amount: "Montant"

@@ -63,18 +63,26 @@
     letter-spacing: -0.4px;
     position: relative;
     top: -6px;
+  }
 
-    &-strong {
-      font-weight: @font-weight-semibold;
-    }
+  .strong {
+    font-weight: @font-weight-semibold;
   }
 
   .grey-indication {
     .indication(@color-dark-grey);
   }
+  .grey-indication-strong {
+    .grey-indication;
+    .strong;
+  }
 
   .invalid-indication {
     .indication(@color-invalid-red);
+  }
+  .invalid-indication-strong {
+    .invalid-indication;
+    .strong;
   }
 
   .uppercase-title {

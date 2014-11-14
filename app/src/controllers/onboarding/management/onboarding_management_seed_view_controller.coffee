@@ -2,17 +2,18 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
 
   view:
     seedContainer: '#seed_container'
-    invalidLabel: '#invalid_indication'
+    invalidLabel: '#invalid_label'
     indicationLabel: '#indication_label'
-    continueButton: "#continue_button"
+    continueButton: '#continue_button'
   navigation:
-    continueUrl: '/onboarding/management/provisioning'
+    continueUrl: '/onboarding/management/summary'
 
   initialize: ->
     if @params.wallet_mode == 'create'
       @params.mnemonic = ledger.bitcoin.bip39.generateMnemonic()
 
   navigationContinueParams: ->
+    wallet_mode: @params.wallet_mode
     back: @representativeUrl()
     pin: @params.pin
     rootUrl: @params.rootUrl

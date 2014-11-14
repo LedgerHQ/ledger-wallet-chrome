@@ -28,6 +28,7 @@ onboarding:
     back: "BACK"
     cancel: "CANCEL"
     continue: "CONTINUE"
+    finish: "FINISH"
     or: "OR"
     create_my_wallet: "Create my wallet"
     recover_my_wallet: "Recover my wallet"
@@ -89,8 +90,20 @@ onboarding:
       it_wont_be_displayed_again: "Your recovery phrase won't be displayed again."
       without_it: "Without it, you will not be able to access your wallet in case of loss."
 
-wallet:
+    summary:
+      your_wallet_is: "Your wallet is"
+      almost_ready: "almost ready"
+      use_your_bitcoins: "You will soon be able to use your bitcoins in the fastest possible way"
+      by_clicking_finish: "By clicking FINISH, you confirm that you have chosen a secured PIN code and written down your recovery phrase."
+      your_wallet_mode_create: "Your wallet will be created."
+      your_wallet_mode_recover: "Your wallet will be recovered."
+      your_wallet_mode_unfreeze: "Your wallet will be unfrozen."
+      during_the_operation: "During the operation, do not unplug your Ledger Wallet from the USB port of your computer."
 
+    provisioning:
+
+
+wallet:
   defaults:
     operations: &default-operations-translation
       time: "TIME"
@@ -111,7 +124,6 @@ wallet:
       signout: 'LOCK'
 
   dashboard:
-
     index:
       accounts:
         title: "ACCOUNTS PREVIEW"
@@ -146,7 +158,6 @@ wallet:
       filter_sort_asc: "ASCENDANT SORTING"
 
   accounts:
-
     account:
       detail:
         action: "ACCOUNT SETTINGS"
