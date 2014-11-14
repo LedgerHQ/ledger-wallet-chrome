@@ -13,12 +13,12 @@ common:
 onboarding:
   device:
     plug:
-      to_start: "To begin, connect your Ledger Wallet into the USB port of your computer"
+      to_start: "To begin, plug your Ledger Wallet into the USB port of the computer."
       i_lost_my_wallet: "I lost my Ledger Wallet"
 
     unplug:
       unlock_my_wallet: "Unlock my wallet"
-      you_can_unplug: "You can now safely disconnect your Ledger Wallet"
+      you_can_unplug: "You can now safely unplug your Ledger Wallet."
 
     pin:
       enter_your_pin_code: "Enter you PIN code to unlock your wallet:"
@@ -98,7 +98,7 @@ onboarding:
       your_wallet_mode_create: "Your wallet will be created."
       your_wallet_mode_recover: "Your wallet will be recovered."
       your_wallet_mode_unfreeze: "Your wallet will be unfrozen."
-      during_the_operation: "During the operation, do not unplug your Ledger Wallet from the USB port of your computer."
+      during_the_operation: "During the operation, do not unplug your Ledger Wallet from the USB port of the computer."
 
     provisioning:
 
