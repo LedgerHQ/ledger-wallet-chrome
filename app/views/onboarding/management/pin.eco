@@ -31,7 +31,7 @@
         <input type="radio" name="pin_kind" value="manual" id="manual_radio">
         <span class="uppercase-title"><%= t 'onboarding.management.pin.manual' %></span>
       </label>
-      <span class="grey-indication" id="weak_pins"><span class="grey-indication-strong"><%= t 'onboarding.management.pin.please_note' %></span><%= t 'onboarding.management.pin.warning_weak_pin_codes' %></span>
+      <span class="grey-indication" id="weak_pins"><%= t 'onboarding.management.pin.please_note' %> <%= t 'onboarding.management.pin.warning_weak_pin_codes' %></span>
     </div>
   </div>
   <div class="navigation-container">

@@ -63,19 +63,19 @@ onboarding:
       choose_your: "Choisissez votre"
       choose_your_new: "Choisissez votre nouveau"
       pin_code: "code PIN"
-      to_protect_your_wallet: "Il vous permet de protéger l’accès à votre portefeuille"
+      to_protect_your_wallet: "Ce code à 4 chiffres vous permet de protéger l’accès à votre portefeuille"
       new_pin_code: "GÉNÉRER UN AUTRE CODE PIN"
       auto: "CODE PIN AUTOMATIQUE"
       manual: "CODE PIN MANUEL"
-      please_note: "Attention"
-      warning_weak_pin_codes: ", votre année de naissance et votre code de carte bancaire ne constituent pas des codes PIN sécurisés"
+      please_note: "Attention :"
+      warning_weak_pin_codes: "votre année de naissance et votre code de carte bancaire ne constituent pas des codes PIN sécurisés."
 
     pin_confirmation:
       confirm_your: "Confirmez votre"
       pin_code: "code PIN"
       your_pin_code: "Votre code PIN :"
       enter_again: "Entrez à nouveau le code PIN choisi lors de l’étape précédente"
-      pin_codes_do_not_match: "Le code PIN saisi ne correspond pas avec celui choisi lors de l'étape précédente"
+      pin_codes_do_not_match: "Le code PIN saisi ne correspond pas avec celui choisi lors de l'étape précédente."
 
     seed:
       usecase_word_group: "Cet ensemble de mots vous permet de restaurer votre portefeuille en cas de perte ou oubli du code PIN"
@@ -85,7 +85,9 @@ onboarding:
       recovery_phrase: "phrase de restauration"
       recovery_sheet: "Livret de restauration"
       your_recovery_phrase: "Votre phrase de restauration :"
-      invalid_recovery_phrase: "La phrase de restauration est invalide"
+      invalid_recovery_phrase: "La phrase de restauration est invalide."
+      it_wont_be_displayed_again: "Votre phrase de restauration ne sera pas affichée à nouveau."
+      without_it: "Sans elle, vous n'aurez plus accès à votre portefeuille en cas de perte."
 
 wallet:
 

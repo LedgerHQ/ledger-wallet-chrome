@@ -19,7 +19,7 @@
 
     </div>
     <span class="invalid-indication" id="invalid_indication"><%= t 'onboarding.management.seed.invalid_recovery_phrase' %></span>
-    <span class="grey-indication" id="indication_label"><span class="grey-indication-strong">Votre phrase de restauration ne sera pas affichée à nouveau.</span> Sans elle, vous n'aurez plus accès à votre portefeuille en cas de perte.</span>
+    <span class="grey-indication" id="indication_label"><span class="grey-indication-strong"><%= t 'onboarding.management.seed.it_wont_be_displayed_again' %></span> <%= t 'onboarding.management.seed.without_it' %></span>
   </div>
   <div class="navigation-container">
     <a class="back" href="#navigateRoot" id="back_button"><i class="fa fa-angle-left"></i> <%= t 'onboarding.management.cancel' %></a>

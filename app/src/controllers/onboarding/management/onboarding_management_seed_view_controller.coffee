@@ -16,6 +16,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     back: @representativeUrl()
     pin: @params.pin
     rootUrl: @params.rootUrl
+    seed: ledger.bitcoin.bip39.generateSeed @params.mnemonic
 
   onAfterRender: ->
     super
@@ -36,6 +37,8 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       div.appendChild(input)
       @view.inputs.push $(input)
       @view.seedContainer.append div
+      if i == 0
+        input.focus()
 
   _listenEvents: ->
     for input in @view.inputs
@@ -85,7 +88,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     first = yes
     for input in @view.inputs
       mnemonic += ' ' if not first
-      mnemonic += _.string.trim(input.val())
+      mnemonic += _.string.trim(input.val()).toLowerCase()
       first = no
     mnemonic
 

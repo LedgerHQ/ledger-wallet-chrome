@@ -63,19 +63,19 @@ onboarding:
       choose_your: "Choose your"
       choose_your_new: "Choose your new"
       pin_code: "PIN code"
-      to_protect_your_wallet: "It allows you to secure the access of your wallet"
+      to_protect_your_wallet: "This 4 digits code allows you to secure the access of your wallet"
       new_pin_code: "GENERATE ANOTHER PIN CODE"
       auto: "AUTOMATIC PIN CODE"
       manual: "MANUAL PIN CODE"
-      please_note: "Please note"
-      warning_weak_pin_codes: ", your birth year or your debit/credit card pin are not secure PIN codes"
+      please_note: "Please note:"
+      warning_weak_pin_codes: "your birth year or your debit/credit card pin are not secure PIN codes."
 
     pin_confirmation:
       confirm_your: "Confirm your"
       pin_code: "PIN code"
       your_pin_code: "Your PIN code:"
       enter_again: "Re-enter the PIN code chosen in the previous step"
-      pin_codes_do_not_match: "The entered PIN code does not match the one chosen in the previous step"
+      pin_codes_do_not_match: "The entered PIN code does not match the one chosen in the previous step."
 
     seed:
       usecase_word_group: "This set of words allows you to recover your wallet in case of loss or forgotten PIN code"
@@ -85,7 +85,9 @@ onboarding:
       recovery_phrase: "recovery phrase"
       recovery_sheet: "recovery sheet"
       your_recovery_phrase: "Your recovery phrase:"
-      invalid_recovery_phrase: "The recovery phrase is invalid"
+      invalid_recovery_phrase: "The recovery phrase is invalid."
+      it_wont_be_displayed_again: "Your recovery phrase won't be displayed again."
+      without_it: "Without it, you will not be able to access your wallet in case of loss."
 
 wallet:
 
