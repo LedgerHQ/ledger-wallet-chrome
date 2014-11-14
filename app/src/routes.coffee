@@ -34,7 +34,7 @@
   route '/onboarding/management/seed', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementSeedViewController
 
-  route '/onboarding/management/summar', (params) ->
+  route '/onboarding/management/summary', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementSummaryViewController
 
   route '/onboarding/management/provisioning', (params) ->
