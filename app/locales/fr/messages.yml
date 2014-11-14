@@ -36,12 +36,6 @@ onboarding:
     cancel_wallet_configuration: "Souhaitez-vous annuler la configuration de votre Ledger Wallet ?"
     wallet_not_affected: "Aucune modification ne sera apportée à votre portefeuille."
 
-    done:
-      you_can_access_your_wallet: "Vous pouvez maintenant commencer à utiliser votre portefeuille"
-      configuration_is_complete: "Configuration terminée"
-      open_my_wallet: "Ouvrir mon portefeuille"
-      later_lock_my_wallet: "Plus tard, vérouiller mon portefeuille"
-
     welcome:
       new_wallet: "Nouveau portefeuille"
       welcome_to_your_new_wallet: "Bienvenue dans votre nouveau Ledger Wallet !"
@@ -53,8 +47,8 @@ onboarding:
 
     frozen:
       wallet_is_frozen: "Portefeuille bloqué"
-      wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN, mais vos bitcoins restent en sécurité"
-      unfreeze_or_create: "Pour retrouver l'accès à vos comptes, vous devez débloquer votre portefeuille à l’aide de votre phrase de restauration"
+      wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN, mais vos bitcoins restent en sécurité."
+      unfreeze_or_create: "Pour retrouver l'accès à vos comptes, vous devez débloquer votre portefeuille à l’aide de votre phrase de restauration."
       unfreeze_my_wallet: "Débloquer mon portefeuille"
       retreive_access: "Retrouvez l’accès à vos comptes à l’aide de votre phrase de restauration"
       create_a_new_wallet: "Créer un nouveau portefeuille"
@@ -79,8 +73,8 @@ onboarding:
       pin_codes_do_not_match: "Le code PIN saisi ne correspond pas avec celui choisi lors de l'étape précédente."
 
     seed:
-      usecase_word_group: "Cet ensemble de mots vous permet de restaurer votre portefeuille en cas de perte ou oubli du code PIN"
-      given_word_group: "Cet ensemble de mots vous a été communiqué lors de la création de votre portefeuille"
+      usecase_word_group: "Cet ensemble de 24 mots vous permet de restaurer votre portefeuille en cas de perte ou oubli du code PIN"
+      given_word_group: "Cet ensemble de 24 mots vous a été communiqué lors de la création de votre portefeuille"
       write_down_your: "Notez votre"
       enter_your: "Entrez votre"
       recovery_phrase: "phrase de restauration"
@@ -93,15 +87,25 @@ onboarding:
     summary:
       your_wallet_is: "Votre portefeuille est"
       almost_ready: "bientôt prêt"
-      use_your_bitcoins: "Vous allez maintenant pouvoir utiliser vos bitcoins de la façon la plus sécurisée possible"
-      by_clicking_finish: "En cliquant sur TERMINER, vous confirmez avoir choisi un code PIN sécurisé et noté votre phrase de restauration."
+      use_your_bitcoins_create: "Dans quelques instants, vous pourrez utiliser vos bitcoins de la façon la plus sécurisée possible"
+      use_your_bitcoins_other: "Dans quelques instants, vous pourrez de nouveau utiliser vos bitcoins de la façon la plus sécurisée possible"
+      by_clicking_finish_create: "En cliquant sur TERMINER, vous confirmez avoir choisi un code PIN sécurisé et noté votre phrase de restauration."
+      by_clicking_finish_other: "En cliquant sur TERMINER, vous confirmez avoir choisi un nouveau code PIN sécurisé."
       your_wallet_mode_create: "Votre portefeuille sera crée."
       your_wallet_mode_recover: "Votre portefeuille sera restauré."
       your_wallet_mode_unfreeze: "Votre portefeuille sera débloqué."
       during_the_operation: "Pendant l’opération, ne débranchez pas votre Ledger Wallet du port USB de l’ordinateur."
 
     provisioning:
+      dont_unplug: "Ne débranchez pas votre Ledger Wallet du port USB de l’ordinateur."
+      provisioning: "Configuration en cours..."
 
+    done:
+      you_can_access_your_wallet: "Vous pouvez maintenant accéder à votre portefeuille en toute sécurité."
+      configuration_is_complete_create: "Création terminée"
+      configuration_is_complete_recover: "Restauration terminée"
+      configuration_is_complete_unfreeze: "Débloquage terminé"
+      unplug_plug: "Débrancher puis rebranchez votre Ledger Wallet pour accéder à vos comptes."
 
 wallet:
   defaults:

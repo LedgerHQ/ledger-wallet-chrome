@@ -12,6 +12,7 @@ class @OnboardingManagementPinViewController extends @OnboardingViewController
     continueUrl: '/onboarding/management/pinconfirmation'
 
   initialize: ->
+    super
     if @_isPinKindAuto() and not @params.pin?
       @params.pin = @_randomPinCode()
 

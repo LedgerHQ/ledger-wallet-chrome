@@ -10,12 +10,12 @@
     <div class="texts">
       <span class="black-title"><%= t 'onboarding.management.summary.your_wallet_is' %></span>
       <span class="black-strong-title"><%= t 'onboarding.management.summary.almost_ready' %></span>
-      <div class="black-indication"><%= t 'onboarding.management.summary.use_your_bitcoins' %></div>
+      <div class="black-indication"><%= if @params.wallet_mode == 'create' then t 'onboarding.management.summary.use_your_bitcoins_create' else t 'onboarding.management.summary.use_your_bitcoins_other' %></div>
     </div>
   </div>
   <div class="page-content-container">
     <img src="../assets/images/onboarding/management/ledger_wallet.png" width="379" height="80" />
-    <div class="grey-indication-strong"><%= t 'onboarding.management.summary.by_clicking_finish' %></div>
+    <div class="grey-indication-strong"><%= if @params.wallet_mode == 'create' then t 'onboarding.management.summary.by_clicking_finish_create' else t 'onboarding.management.summary.by_clicking_finish_other' %></div>
     <div class="grey-indication"><%= t 'onboarding.management.summary.your_wallet_mode_' + @params.wallet_mode %> <%= t 'onboarding.management.summary.during_the_operation' %></div>
   </div>
   <div class="navigation-container">

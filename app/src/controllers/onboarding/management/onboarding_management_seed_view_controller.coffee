@@ -9,6 +9,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     continueUrl: '/onboarding/management/summary'
 
   initialize: ->
+    super
     if @params.wallet_mode == 'create'
       @params.mnemonic = ledger.bitcoin.bip39.generateMnemonic()
 
