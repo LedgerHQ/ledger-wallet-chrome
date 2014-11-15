@@ -81,16 +81,21 @@
         'utils/storage/object_store',
         'utils/storage/storage',
 
+        'base/errors'
+
         'managers/devices_manager'
 
         ## Rest clients
-        'restclients/restclient',
+        'restclients/restclient'
         'restclients/unspent_outputs_restclient'
+        'restclients/transactions_restclient'
 
         ## Wallet
         'managers/wallets_manager'
         'wallet/hardware_wallet'
         'wallet/utils'
+        'wallet/transaction'
+        'wallet/value'
 
         'base/model',
         'base/collection',

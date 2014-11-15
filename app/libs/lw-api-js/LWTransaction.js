@@ -166,7 +166,6 @@ LWTransaction.prototype = {
 
                         }else{
 
-
                             lWTransaction.pendingSignature['out'] = result;
 
                             var pendingTransaction = {};

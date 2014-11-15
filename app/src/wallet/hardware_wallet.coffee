@@ -121,58 +121,6 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       @_updateStateFromError(error)
       callback?(null, error)
 
-    ###
-        try {
-        return lW.dongle.getWalletPublicKey_async("0'/0/0xb11e").then(function(result) {
-        LWTools.console("BitID public key :", 3);
-          LWTools.console(result, 3);
-          lW.bitIdPubKey = result.publicKey;
-          lW.event('LW.getBitIDAddress', {lW: lW, result: result});
-        return result;
-        }).fail(function(error) {
-      LWTools.console("BitID public key fail", 2);
-        LWTools.console(error, 2);
-
-        if (error.indexOf("6982") >= 0) {
-
-        LWTools.console("PINRequired", 2);
-
-          // Event : LW.PINRequired
-          lW.event('LW.PINRequired',  {lW: lW});
-
-        } else if (error.indexOf("6985") >= 0) {
-
-      LWTools.console("BlankCard", 2);
-
-        lW.setupCard();
-
-        } else if (error.indexOf("6faa") >= 0) {
-
-      LWTools.console("CardLocked", 2);
-
-        // Event : LW.ErrorOccured
-        lW.event('LW.ErrorOccured', {lW: lW, title: 'dongleLocked', message: error});
-
-        } else {
-
-      LWTools.console("public key fail", 1);
-        LWTools.console(error, 1);
-
-        // Event : LW.ErrorOccured
-        lW.event('LW.ErrorOccured', {lW: lW, title: 'error', message: error});
-
-        }
-
-
-        return false;
-        });
-      }
-      catch(e) {
-    LWTools.console("Get public key failed", 1);
-      LWTools.console(e, 1);
-      }
-    ###
-
   _setState: (newState) ->
     @_state = newState
     switch newState
