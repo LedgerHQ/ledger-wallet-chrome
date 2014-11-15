@@ -2,7 +2,7 @@
 
   ## Default
   route '/', ->
-    app.router.go '/onboarding/device/pin'
+    app.router.go '/onboarding/device/frozen'
 
   ## Onboarding
   # Device

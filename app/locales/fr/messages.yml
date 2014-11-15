@@ -1,6 +1,7 @@
 application:
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet gère vos comptes Bitcoin de façon efficace et sécurisée."
+  support_url: 'http://support.ledgerwallet.com/'
 
 common:
   bitcoin_acronym: 'BTC'
@@ -14,7 +15,7 @@ onboarding:
   device:
     plug:
       to_start: "Pour commencer, branchez votre Ledger Wallet au port USB de l'ordinateur."
-      i_lost_my_wallet: "J'ai perdu mon Ledger Wallet"
+      is_not_recognized: "Mon Ledger Wallet n'est pas reconnu"
 
     unplug:
       unlock_my_wallet: "Dévérouiller mon portefeuille"
@@ -27,7 +28,7 @@ onboarding:
     frozen:
       wallet_is_frozen: "Portefeuille bloqué"
       wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN, mais vos bitcoins restent en sécurité."
-      unplug_plug: "Débrancher puis rebranchez votre Ledger Wallet pour restaurer vos comptes et bitcoins."
+      unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour restaurer vos comptes et bitcoins."
 
   management:
     back: "RETOUR"
@@ -98,7 +99,7 @@ onboarding:
       you_can_access_your_wallet: "Vous pouvez maintenant accéder à votre portefeuille en toute sécurité."
       configuration_is_complete_create: "Création terminée"
       configuration_is_complete_recover: "Restauration terminée"
-      unplug_plug: "Débrancher puis rebranchez votre Ledger Wallet pour accéder à vos comptes."
+      unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder à vos comptes et bitcoins."
 
 wallet:
   defaults:
