@@ -24,6 +24,11 @@ onboarding:
       enter_your_pin_code: "Enter you PIN code to unlock your wallet:"
       i_lost_my_pin_code: "I lost my PIN code"
 
+    frozen:
+      wallet_is_frozen: "Your wallet is frozen"
+      wrong_pin_codes: "Your wallet has frozen due to 3 incorrect PIN entries, but your bitcoins remain safe."
+      unplug_plug: "Unplug then plug back your Ledger Wallet to recover your accounts and bitcoins."
+
   management:
     back: "BACK"
     cancel: "CANCEL"
@@ -32,7 +37,6 @@ onboarding:
     or: "OR"
     create_my_wallet: "Create my wallet"
     recover_my_wallet: "Recover my wallet"
-    unfreeze_my_wallet: "Unfreeze my wallet"
     cancel_wallet_configuration: "Do you want to cancel the configuration of your Ledger Wallet?"
     wallet_not_affected: "No changes will be made to your wallet."
 
@@ -40,19 +44,10 @@ onboarding:
       new_wallet: "New wallet"
       welcome_to_your_new_wallet: "Welcome to your new Ledger Wallet!"
       create_or_recover: "Would you like to create a new wallet or restore an existing one?"
-      use_as_new: "Create my new wallet"
-      if_its_your_first_wallet: "If you just bought your first Ledger Wallet"
-      recover_wallet: "Recover my existing wallet"
-      if_you_lost_your_wallet: "If you froze or lost your Ledger Wallet"
-
-    frozen:
-      wallet_is_frozen: "Your wallet is frozen"
-      wrong_pin_codes: "Your wallet has frozen due to 3 incorrect PIN entries, but your bitcoins remain safe."
-      unfreeze_or_create: "To regain access to your accounts, you must unfreeze your wallet with your recovery phrase."
-      unfreeze_my_wallet: "Unfreeze my wallet"
-      retreive_access: "Regain access to your accounts using your recovery phrase"
-      create_a_new_wallet: "Create a new wallet"
-      you_can_always_retreive_your_accounts: "Your current bitcoins and accounts remain fully restorable at any time to another Ledger Wallet"
+      use_as_new: "Create a new wallet"
+      if_its_your_first_wallet: "Configure your new Ledger Wallet if it's your first purchase"
+      recover_wallet: "Recover an existing wallet"
+      if_you_lost_your_wallet: "Regain access to your accounts and bitcoins if you froze or lost your Ledger Wallet"
 
     pin:
       choose_your: "Choose your"
@@ -93,7 +88,6 @@ onboarding:
       by_clicking_finish_other: "By clicking FINISH, you confirm that you have chosen a new secured PIN code."
       your_wallet_mode_create: "Your wallet will be created."
       your_wallet_mode_recover: "Your wallet will be recovered."
-      your_wallet_mode_unfreeze: "Your wallet will be unfrozen."
       during_the_operation: "During the operation, do not unplug your Ledger Wallet from the USB port of the computer."
 
     provisioning:
@@ -104,7 +98,6 @@ onboarding:
       you_can_access_your_wallet: "You can now access your wallet safely."
       configuration_is_complete_create: "Creation completed"
       configuration_is_complete_recover: "Recovery completed"
-      configuration_is_complete_unfreeze: "Unlocking completed"
       unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts."
 
 wallet:

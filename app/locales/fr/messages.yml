@@ -24,6 +24,11 @@ onboarding:
       enter_your_pin_code: "Entez votre code PIN pour dévérouiller votre portefeuille :"
       i_lost_my_pin_code: "J'ai perdu mon code PIN"
 
+    frozen:
+      wallet_is_frozen: "Portefeuille bloqué"
+      wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN, mais vos bitcoins restent en sécurité."
+      unplug_plug: "Débrancher puis rebranchez votre Ledger Wallet pour restaurer vos comptes et bitcoins."
+
   management:
     back: "RETOUR"
     cancel: "ANNULER"
@@ -32,7 +37,6 @@ onboarding:
     or: "OU"
     create_my_wallet: "Créer mon portefeuille"
     recover_my_wallet: "Restaurer mon portefeuille"
-    unfreeze_my_wallet: "Débloquer mon portefeuille"
     cancel_wallet_configuration: "Souhaitez-vous annuler la configuration de votre Ledger Wallet ?"
     wallet_not_affected: "Aucune modification ne sera apportée à votre portefeuille."
 
@@ -40,19 +44,10 @@ onboarding:
       new_wallet: "Nouveau portefeuille"
       welcome_to_your_new_wallet: "Bienvenue dans votre nouveau Ledger Wallet !"
       create_or_recover: "Souhaitez-vous créer un nouveau portefeuille ou en restaurer un existant ?"
-      use_as_new: "Créer mon nouveau portefeuille"
-      if_its_your_first_wallet: "S’il s’agit de votre premier Ledger Wallet"
-      recover_wallet: "Restaurer mon portefeuille existant"
-      if_you_lost_your_wallet: "Si vous avez bloqué ou perdu votre Ledger Wallet"
-
-    frozen:
-      wallet_is_frozen: "Portefeuille bloqué"
-      wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN, mais vos bitcoins restent en sécurité."
-      unfreeze_or_create: "Pour retrouver l'accès à vos comptes, vous devez débloquer votre portefeuille à l’aide de votre phrase de restauration."
-      unfreeze_my_wallet: "Débloquer mon portefeuille"
-      retreive_access: "Retrouvez l’accès à vos comptes à l’aide de votre phrase de restauration"
-      create_a_new_wallet: "Créer un nouveau portefeuille"
-      you_can_always_retreive_your_accounts: "Vos comptes et bitcoins actuels pourront être restaurés à tout moment sur un autre Ledger Wallet"
+      use_as_new: "Créer un nouveau portefeuille"
+      if_its_your_first_wallet: "Configurez votre nouveau Ledger Wallet s'il s'agit de votre premier achat"
+      recover_wallet: "Restaurer un portefeuille existant"
+      if_you_lost_your_wallet: "Retrouvez l'accès à vos comptes et bitcoins si vous avez bloqué ou perdu votre Ledger Wallet"
 
     pin:
       choose_your: "Choisissez votre"
@@ -93,7 +88,6 @@ onboarding:
       by_clicking_finish_other: "En cliquant sur TERMINER, vous confirmez avoir choisi un nouveau code PIN sécurisé."
       your_wallet_mode_create: "Votre portefeuille sera crée."
       your_wallet_mode_recover: "Votre portefeuille sera restauré."
-      your_wallet_mode_unfreeze: "Votre portefeuille sera débloqué."
       during_the_operation: "Pendant l’opération, ne débranchez pas votre Ledger Wallet du port USB de l’ordinateur."
 
     provisioning:
@@ -104,7 +98,6 @@ onboarding:
       you_can_access_your_wallet: "Vous pouvez maintenant accéder à votre portefeuille en toute sécurité."
       configuration_is_complete_create: "Création terminée"
       configuration_is_complete_recover: "Restauration terminée"
-      configuration_is_complete_unfreeze: "Débloquage terminé"
       unplug_plug: "Débrancher puis rebranchez votre Ledger Wallet pour accéder à vos comptes."
 
 wallet:
