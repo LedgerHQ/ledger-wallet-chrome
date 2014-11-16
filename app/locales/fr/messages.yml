@@ -30,6 +30,11 @@ onboarding:
       wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN, mais vos bitcoins restent en sécurité."
       unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour restaurer vos comptes et bitcoins."
 
+    wrongpin:
+      wrong_pin: "Code PIN erroné"
+      tries_left: "Il vous reste %s essai(s) avant de bloquer votre portefeuille."
+      unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder vos comptes et bitcoins."
+
   management:
     back: "RETOUR"
     cancel: "ANNULER"

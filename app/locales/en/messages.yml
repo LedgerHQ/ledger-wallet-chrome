@@ -30,6 +30,11 @@ onboarding:
       wrong_pin_codes: "Your wallet has frozen due to 3 incorrect PIN entries, but your bitcoins remain safe."
       unplug_plug: "Unplug then plug back your Ledger Wallet to recover your accounts and bitcoins."
 
+    wrongpin:
+      wrong_pin: "Wrong PIN code"
+      tries_left: "%s attempt(s) left before freezing your wallet."
+      unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and bitcoins."
+
   management:
     back: "BACK"
     cancel: "CANCEL"

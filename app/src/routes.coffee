@@ -2,7 +2,7 @@
 
   ## Default
   route '/', ->
-    app.router.go '/onboarding/device/frozen'
+    app.router.go '/onboarding/device/wrongpin', {tries_left: 3}
 
   ## Onboarding
   # Device
@@ -17,6 +17,9 @@
 
   route '/onboarding/device/frozen', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceFrozenViewController
+
+  route '/onboarding/device/wrongpin', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceWrongpinViewController
 
   # Management
   route '/onboarding/management/done', (params) ->
