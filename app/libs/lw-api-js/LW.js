@@ -109,7 +109,6 @@ LW.prototype = {
             lW.event('LW.PINRequired', {lW: lW});
 
         }).fail(function(error) {
-           
             if (error.indexOf("6982") >= 0) {
 
                 LWTools.console("PINRequired", 2);
@@ -147,6 +146,7 @@ LW.prototype = {
         var lW = this;
 
         lW.card = null;
+        lW.event("LW.unplugged", {lW: lW});
     },
 
     reset: function(){
@@ -154,7 +154,6 @@ LW.prototype = {
         var lW = this;
 
         lW.unplugged();
-        LWList.checkCard();
     },
 
     verifyPIN: function(PIN){
@@ -165,8 +164,8 @@ LW.prototype = {
 
         lW.dongle.verifyPin_async(new ByteString(lW.PIN, ASCII)).then(function(result){
 
-            /* Event : LW.LWPINVerified */
-            lW.event('LW.LWPINVerified',  {lW: lW});
+            /* Event : LW.PINVerified */
+            lW.event('LW.PINVerified',  {lW: lW});
 
 
         }).fail(function(error) {
@@ -176,6 +175,9 @@ LW.prototype = {
 
             /* Event : LW.ErrorOccured */
             lW.event('LW.ErrorOccured',  {lW: lW, title: 'wrongPIN', message: error});
+
+            if (error.indexOf('6faa') != -1)
+                lW.event('LW.ErrorOccured',  {lW: lW, title: 'dongleLocked', message: error});
 
             lW.reset();
 
@@ -291,11 +293,10 @@ LW.prototype = {
                     else {
                         LWTools.console("Seed restored, please reopen the extension", 2);
 
-                        lW.unplugged();
-                        LWList.checkCard();
-
                         /* Event : LW.SetupCardInProgress */
                         lW.event('LW.SetupCardInProgress',  {lW: lW, state: 'seedRestored'});
+
+                        lW.unplugged();
                         
                     }
             }).fail(function(errorMessage) {
@@ -364,6 +365,7 @@ LW.prototype = {
                 LWTools.console("BitID public key :", 3);
                 LWTools.console(result, 3);
                 lW.bitIdPubKey = result.publicKey;
+                lW.event('LW.getBitIDAddress', {lW: lW, result: result});
                 return result;
             }).fail(function(error) {
                 LWTools.console("BitID public key fail", 2);
@@ -480,7 +482,7 @@ LW.prototype = {
                 });
             })
         } else {
-            return lW.getBitIdPublicAddress().then(function(result) {
+            return lW.getBitIDAddress().then(function(result) {
                 return lW.getMessageSignature(message);
             });
 

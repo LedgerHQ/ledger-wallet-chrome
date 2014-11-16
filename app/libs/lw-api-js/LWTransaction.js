@@ -166,7 +166,6 @@ LWTransaction.prototype = {
 
                         }else{
 
-
                             lWTransaction.pendingSignature['out'] = result;
 
                             var pendingTransaction = {};
@@ -328,93 +327,85 @@ LWTransaction.prototype = {
 
         return LWTools.ajax("GET", url).then(function (result) {
 
-            /* if another pending request, then abort the current one */
-            if (1 == 1) {
+            var deferred = Q.defer();
 
-                /* only proceed to deep unspent inspection if the cached walletbalance is different */
-                if (1 == 1) {
+            /* compute trusted inputs */
+            async.each( result, function (unspent, finishedCallback) {
+            
+                if (unspent['confirmations'] < lWTransaction.minConfirm) {
 
-                    // TODO : Gérer la promesse en VanillaJS
-                    var deferred = Q.defer();
+                    /* Chain.com ne mettant pas à jour au même instant les conf des tx et des unspent, on vérife si la tx n'est pas confirmée: */
 
-                    /* compute trusted inputs */
-                    async.each( result, function (unspent, finishedCallback) {
-                    
-                        if (unspent['confirmations'] < lWTransaction.minConfirm) {
-
-                            /* Chain.com ne mettant pas à jour au même instant les conf des tx et des unspent, on vérife si la tx n'est pas confirmée: */
-
-                            var tmpTX = null;
-                            lWTransaction.wallet.transactions.forEach(function(t){
-                                if(lWTransaction.wallet.transactions[t].hash == unspent['transaction_hash']){
-                                    tmpTX = lWTransaction.wallet.transactions[t];
-                                }
-                            });
-
-                            if(tmpTX){
-                                if(tmpTX.confirmations < lWTransaction.minConfirm){
-                                    /* Contains the list of wallets */
-                                    finishedCallback();
-                                    return;
-                                }else{
-                                    unspent['confirmations'] = tmpTX.confirmations;
-                                }
-                            }else{
-                                /* Contains the list of wallets */
-                                finishedCallback();
-                                return;
-                            }
+                    var tmpTX = null;
+                    lWTransaction.wallet.transactions.forEach(function(t){
+                        if(lWTransaction.wallet.transactions[t].hash == unspent['transaction_hash']){
+                            tmpTX = lWTransaction.wallet.transactions[t];
                         }
+                    });
 
-                        var url = lWTransaction.wallet.blockchain+'/chain/transactions/'+unspent['transaction_hash']+'/hex';
-
-                        LWTools.ajax("GET", url).then(function (rawtx) {
-
-                            rawtx = rawtx.hex;
-
-                            LWTools.console('rawtx :', 3);
-                            LWTools.console(rawtx, 3);
-
-                            /* append the raw transaction that generated each unspent output (for later selection) */
-                            var transactionElement = {};
-                            transactionElement['rawtx'] = rawtx;
-                            transactionElement['index'] = unspent['output_index'];
-                            transactionElement['value'] = unspent['value'].toString(16);
-
-
-                            transactionElement['internalAddress'] = internalAddress;
-                            resultData['unspent'].push(transactionElement);
-
+                    if(tmpTX){
+                        if(tmpTX.confirmations < lWTransaction.minConfirm){
+                            /* Contains the list of wallets */
                             finishedCallback();
-
-                        }, function (err) {
-                            LWTools.console("error gettxraw", 1);
-                            LWTools.console(err, 1);
-
-                            /* Event : LWTransaction.ErrorOccured */
-                            lWTransaction.event('LWTransaction.ErrorOccured', {lWTransaction: lWTransaction, title: problemGetData, message: err});
-
-
-                        });
-                    }, function (enderr) {
-                        if ((typeof enderr != "undefined") && (enderr != null)) {
-                            deferred.reject(enderr);
+                            return;
+                        }else{
+                            unspent['confirmations'] = tmpTX.confirmations;
                         }
-                        /* if another pending request, then abort the current one */
-                        if (1 == 1) {
-                            deferred.resolve(resultData);
-                        } else {
-                            deferred.reject("Another address is being processed");
-                        }
-                    });
-
-                    return deferred.promise.fail(function (err) {
-                        LWTools.console("Can't process unspent outputs for that address", 1);
-                        LWTools.console(err, 1);
-                        throw (err, "Can't process unspent outputs for that address");
-                    });
+                    }else{
+                        /* Contains the list of wallets */
+                        finishedCallback();
+                        return;
+                    }
                 }
-            }
+
+                var url = lWTransaction.wallet.blockchain+'/chain/transactions/'+unspent['transaction_hash']+'/hex';
+
+                LWTools.ajax("GET", url).then(function (rawtx) {
+
+                    rawtx = rawtx.hex;
+
+                    LWTools.console('rawtx :', 3);
+                    LWTools.console(rawtx, 3);
+
+                    /* append the raw transaction that generated each unspent output (for later selection) */
+                    var transactionElement = {};
+                    transactionElement['rawtx'] = rawtx;
+                    transactionElement['index'] = unspent['output_index'];
+                    transactionElement['value'] = unspent['value'].toString(16);
+
+
+                    transactionElement['internalAddress'] = internalAddress;
+                    resultData['unspent'].push(transactionElement);
+
+                    finishedCallback();
+
+                }, function (err) {
+                    LWTools.console("error gettxraw", 1);
+                    LWTools.console(err, 1);
+
+                    /* Event : LWTransaction.ErrorOccured */
+                    lWTransaction.event('LWTransaction.ErrorOccured', {lWTransaction: lWTransaction, title: problemGetData, message: err});
+
+
+                });
+            }, function (enderr) {
+                if ((typeof enderr != "undefined") && (enderr != null)) {
+                    deferred.reject(enderr);
+                }
+                /* if another pending request, then abort the current one */
+                if (1 == 1) {
+                    deferred.resolve(resultData);
+                } else {
+                    deferred.reject("Another address is being processed");
+                }
+            });
+
+            return deferred.promise.fail(function (err) {
+                LWTools.console("Can't process unspent outputs for that address", 1);
+                LWTools.console(err, 1);
+                throw (err, "Can't process unspent outputs for that address");
+            });
+
         }, function (err) {
             LWTools.console("Can't retrieve balance for that address :"+address, 1);
             LWTools.console(err, 1);

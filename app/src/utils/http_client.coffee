@@ -11,18 +11,39 @@ class @HttpClient
   constructor: (baseUrl = '') ->
     @baseUrl = baseUrl
 
-  performHttpRequest: (method, url, headers, parameters, success, error, complete) ->
+  do: (r) ->
     request =
-      url: @baseUrl + url
-      type: method
-      success: success
-      error: error
-      complete: complete
+      url: @baseUrl + r.url
+      type: r.method
+      success: r.onSuccess
+      error: r.onError
+      crossDomain: true
+      complete: r.onComplete
       headers: @headers
-      data: parameters
-    for key, value of headers
+      data: r.params
+    for key, value of r.headers
       request[key] = value
     $.ajax request
+
+  performHttpRequest: (method, url, headers, parameters, success, error, complete) ->
+    if _.isObject method
+      method.header = headers
+      this.do method
+    else if _.isObject url
+      url.method = method
+      url.headers = headers
+      this.do url
+    else
+      this.do
+        method: method
+        url: url
+        headers: headers
+        params: parameters
+        onSuccess: success
+        onError: error
+        onComplete: complete
+
+
 
   get: (url, parameters, success, error, complete) ->
     @performHttpRequest 'GET', url, @_headerJson, parameters, success, error, complete

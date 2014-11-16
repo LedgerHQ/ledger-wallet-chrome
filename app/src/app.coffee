@@ -17,13 +17,7 @@ require @ledger.imports, ->
           when 'reload-page' then do @reloadUi
           when 'reload-application' then chrome.runtime.reload()
 
-      @walletsManager.on 'connecting', (event, card) =>
-        l 'connecting', card
-      @walletsManager.on 'connected', (event, wallet) =>
-        l 'connected'
-        wallet.getState (state) =>
-          wallet.unlockWithPinCode '0000', (success) =>
-            l success
+      @_listenWalletEvents()
 
       @devicesManager.start()
       @router.go('/')
@@ -102,6 +96,26 @@ require @ledger.imports, ->
         handled = ledger.dialogs.manager.displayedDialog().handleAction actionName, params
       handled = @_navigationController.handleAction(actionName, params) unless handled
       handled
+
+    _listenWalletEvents: () ->
+      # Wallet management & wallet events re-dispatching
+
+      @walletsManager.on 'connecting', (event, card) =>
+        @emit 'dongle:connecting', card
+      @walletsManager.on 'connected', (event, wallet) =>
+        @wallet = wallet
+        wallet.once 'disconnected', =>
+          @emit 'dongle:disconnected'
+          @wallet = null
+        wallet.once 'unplugged', =>
+          @emit 'dongle:unplugged', @wallet
+        wallet.once 'state:unlocked', =>
+          @emit 'dongle:unlocked', @wallet
+          @emit 'wallet:initializing'
+          ledger.wallet.initialize @wallet, =>
+            @emit 'wallet:initialized'
+        @emit 'dongle:connected', @wallet
+
 
 
   @WALLET_LAYOUT = 'WalletNavigationController'

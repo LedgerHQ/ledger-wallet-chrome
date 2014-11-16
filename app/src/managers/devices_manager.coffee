@@ -41,7 +41,7 @@ class @DevicesManager extends EventEmitter
               @emit 'plug', difference
 
 
-    @_interval = setInterval checkIfWalletIsPluggedIn.bind(this), 2000
+    @_interval = setInterval checkIfWalletIsPluggedIn.bind(this), 200
 
   # Stop observing devices state
   stop: () ->
