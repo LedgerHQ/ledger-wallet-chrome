@@ -99,6 +99,7 @@
         'wallet/utils'
         'wallet/transaction'
         'wallet/value'
+        'wallet/hdwallet'
 
         'base/model',
         'base/collection',

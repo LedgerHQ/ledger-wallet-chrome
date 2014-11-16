@@ -7,16 +7,16 @@ class ledger.wallet.HDWallet
 
 class ledger.wallet.HDWallet.Account
 
-
   getAllChangeAddressesPath: () ->
 
   getAllPublicAddressesPath: () ->
 
 class ledger.wallet.HDWallet.Account.Structure
 
-_.extend
+_.extend ledger.wallet,
 
   initialize:  (wallet, callback) ->
+
     callback?()
 
   release: (wallet, callback) ->
