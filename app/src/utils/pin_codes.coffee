@@ -148,10 +148,10 @@ class @ledger.pin_codes.PinCode extends EventEmitter
       do self._updateDigits
 
       if e.type == 'keyup'
-        self.emit 'change' if (@value.length >= 0 && @value.length <= 4 and /[0-9]/g.test @value) or (@value == '')
+        self.emit 'change', @value if (@value.length >= 0 && @value.length <= 4 and /[0-9]/g.test @value) or (@value == '')
 
       if e.type == 'keyup' and self.isComplete()
-        self.emit 'complete' if /[0-9]/g.test @value
+        self.emit 'complete', @value if /[0-9]/g.test @value
 
       if e.type == 'blur'
         if self.stealsFocus()
