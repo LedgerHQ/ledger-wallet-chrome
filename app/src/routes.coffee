@@ -2,7 +2,7 @@
 
   ## Default
   route '/', ->
-    app.router.go '/onboarding/device/opening'
+    app.router.go '/onboarding/device/plug', {animateIntro: yes}
 
   ## Onboarding
   # Device

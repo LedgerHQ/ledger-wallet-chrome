@@ -107,6 +107,7 @@ require @ledger.imports, ->
         wallet.once 'disconnected', =>
           @emit 'dongle:disconnected'
           @wallet = null
+          @router.go '/onboarding/device/plug'
         wallet.once 'unplugged', =>
           @emit 'dongle:unplugged', @wallet
         wallet.once 'state:unlocked', =>
