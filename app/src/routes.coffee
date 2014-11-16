@@ -2,7 +2,7 @@
 
   ## Default
   route '/', ->
-    app.router.go '/onboarding/device/wrongpin', {tries_left: 3}
+    app.router.go '/onboarding/device/plug', {animateIntro: yes}
 
   ## Onboarding
   # Device

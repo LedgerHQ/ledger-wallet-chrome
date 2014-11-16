@@ -1,5 +1,7 @@
 class @OnboardingDevicePlugViewController extends @OnboardingViewController
 
+  defaultParams:
+    animateIntro: no
   view:
     contentContainer: '#content-container'
     logoContainer: '.logo-container'
@@ -9,7 +11,8 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
   onAfterRender: ->
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@select('div.greyed-container')[0])
-    do @_animateIntro
+    if @params.animateIntro
+      do @_animateIntro
 
   _hideContent: (hidden, animated = yes) ->
     @view.contentContainer.children().each (index, node) =>
