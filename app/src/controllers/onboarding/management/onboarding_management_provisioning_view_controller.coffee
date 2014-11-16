@@ -3,12 +3,6 @@ class @OnboardingManagementProvisioningViewController extends @OnboardingViewCon
   navigation:
     continueUrl: '/onboarding/management/done'
 
-  initialize: ->
-    super
-    setTimeout =>
-      do @navigateContinue
-    , 3000
-
   navigationContinueParams: ->
     wallet_mode: @params.wallet_mode
     back: @representativeUrl()
@@ -17,3 +11,7 @@ class @OnboardingManagementProvisioningViewController extends @OnboardingViewCon
   onAfterRender: ->
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@select('div.greyed-container')[0])
+    ledger.app.wallet.setup @params.pin, @params.seed, (success) =>
+      setTimeout =>
+        do @navigateContinue
+      , 3000
