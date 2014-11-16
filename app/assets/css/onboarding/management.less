@@ -18,7 +18,7 @@
 
   > .page-title {
     font-weight: @font-weight-light;
-    font-size: @font-size-mega-mega-large;
+    font-size: @font-size-ultra-ultra-ultra-large;
     color: @color-dark-grey-blue;
     letter-spacing: -2px;
   }
@@ -50,20 +50,44 @@
 }
 
 > .page-content-container {
-  padding: @metrics-medium-padding @metrics-ultra-large-padding + 46px + @metrics-medium-padding;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  padding: @metrics-large-padding @metrics-ultra-large-padding + 46px + @metrics-medium-padding;
   padding-bottom: 0;
   padding-right: @metrics-ultra-large-padding;
 
-  .grey-indication {
-    color: @color-dark-grey;
+  .indication(@color) {
+    color: @color;
     line-height: 25px;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.4px;
     position: relative;
     top: -6px;
+  }
 
-    &-strong {
-      font-weight: @font-weight-semibold;
-    }
+  .strong {
+    font-weight: @font-weight-semibold;
+    letter-spacing: -0.5px;
+  }
+
+  .grey-indication {
+    .indication(@color-dark-grey);
+  }
+  .grey-indication-strong {
+    .grey-indication;
+    .strong;
+  }
+
+  .invalid-indication {
+    .indication(@color-invalid-red);
+  }
+  .invalid-indication-strong {
+    .invalid-indication;
+    .strong;
+  }
+
+  .uppercase-title {
+    text-transform: uppercase;
   }
 }
 

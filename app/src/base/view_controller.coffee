@@ -7,7 +7,10 @@ class @ViewController extends @EventEmitter
   constructor: (params = {}, routedUrl = "") ->
     @params = _.defaults(params, @defaultParams)
     @routedUrl = routedUrl
-    @initialize?()
+    @initialize()
+
+  initialize: ->
+
 
   select: (selectorString) ->
     $(@renderedSelector).find(selectorString)

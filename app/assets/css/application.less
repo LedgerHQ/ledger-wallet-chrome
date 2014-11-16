@@ -4,7 +4,6 @@
 @import "reset";
 @import "dialog";
 @import "dropdown";
-@import "../../public/font-awesome/css/font-awesome.min.css";
 
 // containers classes
 .main-container {
@@ -54,6 +53,13 @@
     }
   }
 }
+.uppercase-section-title {
+  letter-spacing: -0.5px;
+  font-size: @font-size-large;
+  font-weight: @font-weight-semibold;
+  color: @color-night-blue;
+  text-transform: uppercase;
+}
 
 .action-bar {
   display: flex;
@@ -69,11 +75,6 @@
   .cancel-rounded-button {
     margin-left: auto;
   }
-}
-
-.dialog-actions-bar {
- .action-bar;
-  margin-top: @metrics-medium-padding;
 }
 
 [data-href] {
