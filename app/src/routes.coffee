@@ -2,7 +2,7 @@
 
   ## Default
   route '/', ->
-    app.router.go '/onboarding/device/plug', {animateIntro: yes}
+    app.router.go '/onboarding/device/opening'
 
   ## Onboarding
   # Device
@@ -20,6 +20,9 @@
 
   route '/onboarding/device/wrongpin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceWrongpinViewController
+
+  route '/onboarding/device/opening', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceOpeningViewController
 
   # Management
   route '/onboarding/management/done', (params) ->

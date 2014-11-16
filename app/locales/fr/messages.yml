@@ -35,6 +35,10 @@ onboarding:
       tries_left: "Il vous reste %s essai(s) avant de bloquer votre portefeuille."
       unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder vos comptes et bitcoins."
 
+    opening:
+      is_opening: "Veuillez patienter pendant l'ouverture de votre portefeuille..."
+      not_opening: "Mon Ledger Wallet ne s'ouvre pas"
+
   management:
     back: "RETOUR"
     cancel: "ANNULER"

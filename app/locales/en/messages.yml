@@ -35,6 +35,10 @@ onboarding:
       tries_left: "%s attempt(s) left before freezing your wallet."
       unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and bitcoins."
 
+    opening:
+      is_opening: "Please wait while your wallet is opening..."
+      not_opening: "My Ledger Wallet won't open"
+
   management:
     back: "BACK"
     cancel: "CANCEL"
