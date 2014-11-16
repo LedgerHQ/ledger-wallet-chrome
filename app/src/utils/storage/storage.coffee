@@ -10,5 +10,6 @@
   localStorage = new ledger.storage.ChromeStore 'ledger.local', passphrase
   ledger.storage.local =  new ledger.storage.ObjectStore localStorage
   ledger.storage.sync = new ledger.storage.SyncedStore('ledger.meta', 'invalidpassword')
+  ledger.storage.wallet = new ledger.storage.ChromeStore 'ledger.wallet', passphrase
 
 
