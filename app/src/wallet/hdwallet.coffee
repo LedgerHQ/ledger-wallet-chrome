@@ -10,16 +10,26 @@ class ledger.wallet.HDWallet
     @_store = store
     @_store.get ['accounts'], (result) =>
       @_accounts = []
-      return unless result.accouts?
-      _.async.each [0..result.accounts - 1], (accountIndex, done) =>
+      return callback()? unless result.accouts?
+      _.async.each [0..result.accounts - 1], (accountIndex, done, hasNext) =>
         account = new Account(@, accountIndex, @_store)
         account.initialize () =>
           @_accounts.push account
           do done
+          callback?() unless hasNext
 
-  isEmpty: () -> @_accounts?.length > 0
+  release: () ->
+    account.release() for account in @_accounts
+    @_accounts = null
+    @cache = null
+
+  isEmpty: () -> @_accounts?.length == 0
+
+  isInitialized: no
 
   getRootDerivationPath: () -> "44'/0'"
+
+  getAccountsCount: () -> @_accounts.length
 
   @instance: undefined
 
@@ -37,6 +47,12 @@ class ledger.wallet.HDWallet.Account
       @_account = JSON.parse(accountJsonString) if accountJsonString?
       @_account = {} unless @_account
       callback?()
+
+  release: () ->
+    @wallet = null
+    @_store = null
+    @_storeId = null
+    @index = null
 
   getAllChangeAddressesPaths: () ->
     paths = []
@@ -68,30 +84,37 @@ class ledger.wallet.HDWallet.Account
 openStores = (wallet, done) ->
   wallet.getBitIdAddress (bitIdAddress) =>
     wallet.getPublicAddress "44'/0xDEAD/0xFACE/0xCAFE", (pubKey) =>
-     ledger.storage.openStores bitIdAddress, pubKey, done
+      ledger.storage.openStores bitIdAddress, pubKey, done
 
 openHdWallet = (wallet, done) ->
   ledger.wallet.HDWallet.instance = new ledger.wallet.HDWallet()
   ledger.wallet.HDWallet.instance.initialize(ledger.storage.wallet, done)
 
 openAddressCache = (wallet, done) ->
-  ledger.wallet.HDWallet.instance.cache = new ledger.wallet.HDWallet.Cache()
-  ledger.wallet.HDWallet.instance.cache.initialize done
+  try
+    ledger.wallet.HDWallet.instance.cache = new ledger.wallet.HDWallet.Cache(ledger.wallet.HDWallet.instance)
+    ledger.wallet.HDWallet.instance.cache.initialize done
+  catch er
+    e er
 
 restoreStructure = (wallet, done) ->
   if ledger.wallet.HDWallet.instance.isEmpty()
     l 'Restore Wallet'
+  done?()
+
+completeInitialization = (wallet, done) ->
+  ledger.wallet.HDWallet.instance.isInitialized = yes
+  do done
 
 _.extend ledger.wallet,
 
   initialize:  (wallet, callback) ->
-    intializationMethods = [openStores, openHdWallet, openAddressCache, restoreStructure]
-    notifyMethodDone = _.after intializationMethods.length, () => callback?()
-    _.async.each intializationMethods, (method , next) =>
-      done = ->
-        do notifyMethodDone
-        do next
+    intializationMethods = [openStores, openHdWallet, openAddressCache, restoreStructure, completeInitialization]
+    _.async.each intializationMethods, (method , done, hasNext) =>
       method wallet, done
+      callback?() unless hasNext
 
   release: (wallet, callback) ->
-    callback?()
+    ledger.storage.closeStores()
+    ledger.wallet.HDWallet.instance.release()
+    ledger.wallet.HDWallet.instance = null

@@ -13,4 +13,9 @@
   ledger.storage.wallet = new ledger.storage.ChromeStore 'ledger.wallet.' + userId, passphrase
   callback?()
 
+@ledger.storage.closeStores = () ->
+  ledger.storage.local = null
+  ledger.storage.sync = null
+  ledger.storage.wallet = null
+
 

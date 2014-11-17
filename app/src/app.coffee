@@ -22,8 +22,6 @@ require @ledger.imports, ->
       @devicesManager.start()
       @router.go('/')
 
-      ledger.storage.openStores('merguez')
-
       ### MODELS/COLLECTIONS LEGACY TESTS DO NOT REMOVE
       account = Account.findOrCreate 1, {name: 'Toto', balance: 16, operations: [{_id: 1, name: 'opTest'}]}
       account.get (result) =>
@@ -106,6 +104,8 @@ require @ledger.imports, ->
         @wallet = wallet
         wallet.once 'disconnected', =>
           @emit 'dongle:disconnected'
+          Wallet.releaseWallet()
+          ledger.wallet.release(wallet)
           @wallet = null
           @router.go '/onboarding/device/plug'
         wallet.once 'unplugged', =>
@@ -114,7 +114,8 @@ require @ledger.imports, ->
           @emit 'dongle:unlocked', @wallet
           @emit 'wallet:initializing'
           ledger.wallet.initialize @wallet, =>
-            @emit 'wallet:initialized'
+            Wallet.initializeWallet =>
+              @emit 'wallet:initialized'
         @emit 'dongle:connected', @wallet
 
 

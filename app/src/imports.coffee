@@ -69,6 +69,7 @@
         'utils/jquery'
         'utils/spinners'
         'utils/pin_codes'
+        'utils/lru'
 
         'utils/crypto/aes'
         'utils/crypto/sha256'
@@ -111,6 +112,7 @@
         ## Collections (must absolutely be imported here before models)
 
         ## Models
+        'models/wallet'
         'models/account'
         'models/operation'
 

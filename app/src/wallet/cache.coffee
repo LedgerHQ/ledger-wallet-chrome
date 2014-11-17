@@ -11,6 +11,7 @@ class ledger.wallet.HDWallet.Cache
         @_cache = LRUCache.fromJson(JSON.parse(result.cache), cacheLimitSize)
       else
         @_cache = new LRUCache(cacheLimitSize)
+      callback?()
 
   get: (path) -> @_cache.get(path)
 
