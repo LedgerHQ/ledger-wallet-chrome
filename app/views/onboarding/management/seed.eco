@@ -5,7 +5,7 @@
   </div>
   <div class="greyed-container detailed">
     <div class="index">
-      3.
+      4.
     </div>
     <div class="texts">
       <span class="black-title"><%= if @params.wallet_mode == 'create' then t 'onboarding.management.seed.write_down_your' else t 'onboarding.management.seed.enter_your' %>

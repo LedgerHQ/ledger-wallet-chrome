@@ -5,7 +5,7 @@
   </div>
   <div class="greyed-container detailed">
     <div class="index">
-      4.
+      5.
     </div>
     <div class="texts">
       <span class="black-title"><%= t 'onboarding.management.summary.your_wallet_is' %></span>
