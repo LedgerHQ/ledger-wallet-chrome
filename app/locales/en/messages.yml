@@ -90,9 +90,8 @@ onboarding:
     seed:
       usecase_word_group: "This set of 24 words allows you to recover your wallet in case of loss or forgotten PIN code"
       given_word_group: "This set of 24 words was provided to you when creating your wallet"
-      write_down_your: "Write down"
-      enter_your: "Enter your"
-      recovery_phrase: "recovery phrase"
+      write_down_your: "Write down your <b>recovery phrase</b> in the given sheet"
+      enter_your: "Enter your <b>recovery phrase</b>"
       recovery_sheet: "recovery sheet"
       your_recovery_phrase: "Your recovery phrase:"
       invalid_recovery_phrase: "The recovery phrase is invalid."
