@@ -118,6 +118,10 @@ onboarding:
       configuration_is_complete_create: "Création terminée"
       configuration_is_complete_recover: "Restauration terminée"
       unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder à vos comptes et bitcoins."
+      configuration_failed_create: "Création échouée"
+      configuration_failed_recover: "Restauration échouée"
+      error_occured: "Une erreur sérieuse est survenue. Contactez le support pour obtenir de l'aide."
+      contact_support: "CONTACTER LE SUPPORT"
 
 wallet:
   defaults:
