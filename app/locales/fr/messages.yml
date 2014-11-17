@@ -28,7 +28,7 @@ onboarding:
     frozen:
       wallet_is_frozen: "Portefeuille bloqué"
       wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN."
-      blank_next_time: "La configuration de Ledger Wallet a été effacée mais vos comptes et bitcoins restent en sécurité."
+      blank_next_time: "La configuration de votre Ledger Wallet a été effacée mais vos comptes et bitcoins restent en sécurité."
       unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour restaurer vos comptes et bitcoins."
 
     wrongpin:
