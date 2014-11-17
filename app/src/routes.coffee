@@ -25,6 +25,9 @@
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceOpeningViewController
 
   # Management
+  route '/onboarding/management/security', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingManagementSecurityViewController
+
   route '/onboarding/management/done', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementDoneViewController
 

@@ -27,7 +27,8 @@ onboarding:
 
     frozen:
       wallet_is_frozen: "Portefeuille bloqué"
-      wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN, mais vos bitcoins restent en sécurité."
+      wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN."
+      blank_next_time: "La configuration de Ledger Wallet a été effacée mais vos comptes et bitcoins restent en sécurité."
       unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour restaurer vos comptes et bitcoins."
 
     wrongpin:
@@ -49,6 +50,15 @@ onboarding:
     recover_my_wallet: "Restaurer mon portefeuille"
     cancel_wallet_configuration: "Souhaitez-vous annuler la configuration de votre Ledger Wallet ?"
     wallet_not_affected: "Aucune modification ne sera apportée à votre portefeuille."
+
+    security:
+      security_informations: "Informations de <b>sécurité</b>"
+      trusted_computer_required: "Un ordinateur de confiance est requis pour configurer votre Ledger Wallet"
+      line1: "Cet assistant de configuration manipule des données sensibles concernant votre portefeuille."
+      line2_create: "Il est très important de continuer la procédure de création depuis un ordinateur privé (ou de confiance) afin d’empêcher que quelqu'un accède à ces informations de façon illicite."
+      line2_other: "Il est très important de continuer la procédure de restauration depuis un ordinateur privé (ou de confiance) afin d’empêcher que quelqu'un accède à ces informations de façon illicite."
+      line3: "En cas de doute, nous vous conseillons de retirer votre Ledger Wallet du port USB de l’ordinateur et réouvrir cet assistant depuis un autre poste plus sûr."
+      by_clicking_continue: "En cliquant sur CONTINUER, vous confirmez utiliser un ordinateur de confiance pour configurer votre Ledger Wallet."
 
     welcome:
       new_wallet: "Nouveau portefeuille"
