@@ -26,8 +26,10 @@ class @Router extends @EventEmitter
 
   go: (url, params) ->
     setTimeout( =>
-      url = ledger.url.createUrlWithParams(url, params)
-      @_router.parse(url)
+      path = url.parseAsUrl().pathname
+      if ledger.app.wallet? or ledger.router.pluggedWalletRoutesExceptions.indexOf(path) != -1 or (ledger.router.ignorePluggedWalletRoutesExceptions? and ledger.router.ignorePluggedWalletRoutesExceptions == yes)
+        url = ledger.url.createUrlWithParams(url, params)
+        @_router.parse(url)
     , 0)
 
   _addRoute: (url, callback) ->
