@@ -142,6 +142,8 @@ wallet:
       receive: 'RECEIVE'
       accounts: 'ACCOUNTS'
       signout: 'LOCK'
+      help: 'HELP'
+      account: 'ACCOUNT'
 
   dashboard:
     index:

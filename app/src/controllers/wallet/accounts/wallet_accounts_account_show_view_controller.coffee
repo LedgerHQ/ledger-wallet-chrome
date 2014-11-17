@@ -1,4 +1,4 @@
-class @WalletAccountsAccountViewController extends @ViewController
+class @WalletAccountsAccountShowViewController extends @ViewController
 
   badpin: () ->
     ledger.app.wallet.unlockWithPinCode '0001', (success, numberOfRetry) =>
@@ -19,14 +19,6 @@ class @WalletAccountsAccountViewController extends @ViewController
   pub: ->
     ledger.app.wallet.getPublicAddress @select("#deriv").val(), (pubKey, error) =>
       @select('#pk').text(pubKey.bitcoinAddress.value)
-
-  receive: () ->
-    dialog = new WalletAccountsAccountReceiveDialogViewController()
-    dialog.show()
-
-  send: () ->
-    dialog = new WalletAccountsAccountSendDialogViewController()
-    dialog.show()
 
   showOperation: (params) ->
     dialog = new WalletOperationsDetailDialogViewController(params)

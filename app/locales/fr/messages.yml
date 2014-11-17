@@ -142,6 +142,8 @@ wallet:
       receive: 'RECEVOIR'
       accounts: 'COMPTES'
       signout: 'VERROUILLER'
+      help: 'AIDE'
+      account: 'COMPTE'
 
   dashboard:
     index:

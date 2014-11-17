@@ -1,4 +1,4 @@
-@import "../constants";
+@import (reference) "../constants";
 
 @wallet-images-url: '@{images-url}/wallet';
 
@@ -16,9 +16,8 @@
     padding-left: @metrics-medium-padding;
 
     .menu-item {
-      width: 80px;
       color: @color-white;
-      margin-right: @metrics-small-padding;
+      margin-right: @metrics-large-padding;
       display: flex;
       padding-top: 24px;
 
@@ -123,7 +122,6 @@
     }
 
     .settings-icon {
-
       margin-left: @metrics-medium-padding;
 
       img {
@@ -138,6 +136,10 @@
       }
     }
 
+    .ledger-icon {
+      .settings-icon;
+      pointer-events: none;
+    }
   }
 
 }
