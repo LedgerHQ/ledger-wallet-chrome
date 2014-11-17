@@ -103,11 +103,12 @@ require @ledger.imports, ->
       @walletsManager.on 'connected', (event, wallet) =>
         @wallet = wallet
         wallet.once 'disconnected', =>
-          @emit 'dongle:disconnected'
-          Wallet.releaseWallet()
-          ledger.wallet.release(wallet)
-          @wallet = null
-          @router.go '/onboarding/device/plug'
+          _.defer =>
+            @emit 'dongle:disconnected'
+            Wallet.releaseWallet()
+            ledger.wallet.release(wallet)
+            @wallet = null
+            @router.go '/onboarding/device/plug'
         wallet.once 'unplugged', =>
           @emit 'dongle:unplugged', @wallet
         wallet.once 'state:unlocked', =>

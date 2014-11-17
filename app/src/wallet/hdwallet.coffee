@@ -116,5 +116,5 @@ _.extend ledger.wallet,
 
   release: (wallet, callback) ->
     ledger.storage.closeStores()
-    ledger.wallet.HDWallet.instance.release()
+    ledger.wallet.HDWallet.instance?.release()
     ledger.wallet.HDWallet.instance = null
