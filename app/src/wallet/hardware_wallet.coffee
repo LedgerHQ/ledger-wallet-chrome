@@ -111,6 +111,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     try
       @_lwCard.dongle.getWalletPublicKey_async(derivationPath)
       .then (result) =>
+          ledger.wallet.HDWallet.instance?.cache?.set [[derivationPath, result.bitcoinAddress.value]]
           callback?(result)
           return
       .fail (error) =>

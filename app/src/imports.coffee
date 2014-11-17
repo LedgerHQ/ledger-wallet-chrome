@@ -8,7 +8,8 @@
         '../libs/signals.min'
         '../libs/crossroads.min'
         '../libs/spin.min'
-        '../libs/sjcl'
+        '../libs/sjcl/sjcl'
+        '../libs/sjcl/sha512'
         '../libs/jquery.selectric.min'
         '../libs/qrcode.min'
         '../public/tooltipster/js/jquery.tooltipster.min'
@@ -100,6 +101,7 @@
         'wallet/transaction'
         'wallet/value'
         'wallet/hdwallet'
+        'wallet/cache'
 
         'base/model'
         'base/collection'

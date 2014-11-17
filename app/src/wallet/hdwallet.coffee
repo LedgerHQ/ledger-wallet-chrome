@@ -2,7 +2,7 @@
 
 class ledger.wallet.HDWallet
 
-  getAccount: (walletIndex) ->
+  getAccount: (walletIndex) -> @_accounts[walletIndex]
 
   createAccount: () ->
 
@@ -66,7 +66,6 @@ class ledger.wallet.HDWallet.Account
     @_store.set saveHash, callback
 
 openStores = (wallet, done) ->
-
   wallet.getBitIdAddress (bitIdAddress) =>
     wallet.getPublicAddress "44'/0xDEAD/0xFACE/0xCAFE", (pubKey) =>
      ledger.storage.openStores bitIdAddress, pubKey, done
@@ -75,6 +74,10 @@ openHdWallet = (wallet, done) ->
   ledger.wallet.HDWallet.instance = new ledger.wallet.HDWallet()
   ledger.wallet.HDWallet.instance.initialize(ledger.storage.wallet, done)
 
+openAddressCache = (wallet, done) ->
+  ledger.wallet.HDWallet.instance.cache = new ledger.wallet.HDWallet.Cache()
+  ledger.wallet.HDWallet.instance.cache.initialize done
+
 restoreStructure = (wallet, done) ->
   if ledger.wallet.HDWallet.instance.isEmpty()
     l 'Restore Wallet'
@@ -82,7 +85,7 @@ restoreStructure = (wallet, done) ->
 _.extend ledger.wallet,
 
   initialize:  (wallet, callback) ->
-    intializationMethods = [openStores, openHdWallet, restoreStructure]
+    intializationMethods = [openStores, openHdWallet, openAddressCache, restoreStructure]
     notifyMethodDone = _.after intializationMethods.length, () => callback?()
     _.async.each intializationMethods, (method , next) =>
       done = ->

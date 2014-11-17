@@ -10,6 +10,14 @@ _.extend ledger.wallet,
     notFound = []
     _.async.each paths, (path, done, hasNext) ->
       # Hit the cache first
+      address = ledger.wallet.HDWallet.instance.cache.get(path)
+
+      if address?
+        addresses.push address
+        callback?(addresses, notFound) unless hasNext is true
+        do done
+        return
+
       # No result from cache perform the derivation on the chip
       ledger.app.wallet.getPublicAddress path, (publicKey) ->
         if publicKey?
@@ -23,8 +31,6 @@ _.extend ledger.wallet,
             e error
         do done
     return
-
-  addPathDerivationToCache: (path, address, callback) ->
 
 
 
