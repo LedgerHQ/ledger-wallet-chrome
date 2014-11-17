@@ -13,6 +13,7 @@ _.extend ledger.wallet,
       address = ledger.wallet.HDWallet.instance.cache.get(path)
 
       if address?
+        l addresses
         addresses.push address
         callback?(addresses, notFound) unless hasNext is true
         do done
@@ -25,10 +26,7 @@ _.extend ledger.wallet,
         else
           notFound.push path
         unless hasNext
-          try
-            callback?(addresses, notFound)
-          catch error
-            e error
+          callback?(addresses, notFound)
         do done
     return
 

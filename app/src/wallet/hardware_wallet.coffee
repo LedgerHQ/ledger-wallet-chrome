@@ -112,11 +112,13 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       @_lwCard.dongle.getWalletPublicKey_async(derivationPath)
       .then (result) =>
           ledger.wallet.HDWallet.instance?.cache?.set [[derivationPath, result.bitcoinAddress.value]]
-          callback?(result)
+          _.defer ->
+            callback?(result)
           return
       .fail (error) =>
           e error
-          callback?(null, error)
+          _.defer ->
+            callback?(null, error)
           return
     catch error
       @_updateStateFromError(error)

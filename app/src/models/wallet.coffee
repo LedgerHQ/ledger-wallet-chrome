@@ -6,6 +6,12 @@ class @Wallet extends Model
   instance: undefined
 
   @initializeWallet: (callback) ->
+    @instance = @findOrCreate 0,
+      accounts: [
+        {
+          _id: 0
+        }
+      ]
     callback?()
 
   @releaseWallet: () ->

@@ -20,4 +20,4 @@ class ledger.wallet.HDWallet.Cache
     for tuple in tuples
       [key, value] = tuple
       @_cache.set key, value
-    @hdwallet._store.set {cache: JSON.stringify(@_cache.toJSON()), callback}
+    @hdwallet._store.set {cache: @_cache.toJSON(), callback}

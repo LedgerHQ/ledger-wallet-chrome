@@ -117,6 +117,7 @@ require @ledger.imports, ->
           ledger.wallet.initialize @wallet, =>
             Wallet.initializeWallet =>
               @emit 'wallet:initialized'
+              ledger.api.BalanceRestClient.instance.getAccountBalance(0)
         @emit 'dongle:connected', @wallet
 
 

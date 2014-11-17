@@ -5,18 +5,28 @@ class ledger.wallet.HDWallet
   getAccount: (walletIndex) -> @_accounts[walletIndex]
 
   createAccount: () ->
+    account = new ledger.wallet.HDWallet.Account(@, @getAccountsCount(), @_store)
+    @_accounts.push account
+    account._account = {}
+    do @save
+    account
+
 
   initialize: (store, callback) ->
     @_store = store
     @_store.get ['accounts'], (result) =>
       @_accounts = []
-      return callback()? unless result.accouts?
+      result.accounts = parseInt(result.accounts) if result.accounts?
+      return callback()? unless result.accounts?
       _.async.each [0..result.accounts - 1], (accountIndex, done, hasNext) =>
-        account = new Account(@, accountIndex, @_store)
-        account.initialize () =>
-          @_accounts.push account
-          do done
-          callback?() unless hasNext
+        try
+          account = new ledger.wallet.HDWallet.Account(@, accountIndex, @_store)
+          account.initialize () =>
+            @_accounts.push account
+            do done
+            callback?() unless hasNext
+        catch er
+          e er
 
   release: () ->
     account.release() for account in @_accounts
@@ -30,6 +40,9 @@ class ledger.wallet.HDWallet
   getRootDerivationPath: () -> "44'/0'"
 
   getAccountsCount: () -> @_accounts.length
+
+  save: (callback = _.noop) ->
+    @_store.set {'accounts': @getAccountsCount()}, callback
 
   @instance: undefined
 
@@ -60,7 +73,7 @@ class ledger.wallet.HDWallet.Account
     if @_account.currentChangeIndex?
       for index in [0..@_account.currentChangeIndex]
         paths.push "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index}"
-    paths = _.difference(@_account.excludedChangePaths)
+    paths = _.difference(paths, @_account.excludedChangePaths)
     paths
 
   getAllPublicAddressesPaths: () ->
@@ -69,16 +82,24 @@ class ledger.wallet.HDWallet.Account
     if @_account.currentChangeIndex?
       for index in [0..@_account.currentPublicIndex]
         paths.push "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
-    paths = _.difference(@_account.excludedPublicPaths)
+    paths = _.difference(paths, @_account.excludedPublicPaths)
     paths
 
   getCurrentPublicAddressPath: () ->
 
   getCurrentChandeAddressPath: () ->
 
+  importPublicAddressPath: (addressPath) ->
+    @_account.importedPublicPaths ?= []
+    @_account.importedPublicPaths.push addressPath
+
+  importChangeAddressPath: (addressPath) ->
+    @_account.importedChangePaths ?= []
+    @_account.importedChangePaths.push addressPath
+
   save: (callback = _.noop) ->
     saveHash = {}
-    saveHash[@_storeId] = JSON.stringify(@_account)
+    saveHash[@_storeId] = @_account
     @_store.set saveHash, callback
 
 openStores = (wallet, done) ->
@@ -99,8 +120,21 @@ openAddressCache = (wallet, done) ->
 
 restoreStructure = (wallet, done) ->
   if ledger.wallet.HDWallet.instance.isEmpty()
-    l 'Restore Wallet'
-  done?()
+    wallet.getPublicAddress "0'/0/0", (publicAddress) ->
+      wallet.getPublicAddress "0'/1/0", (changeAddress) ->
+        ledger.api.TransactionsRestClient.instance.getTransactions [publicAddress.bitcoinAddress.value, changeAddress.bitcoinAddress.value], (transactions, error) ->
+          if transactions?.length > 0
+            account = ledger.wallet.HDWallet.instance.createAccount()
+            account.importChangeAddressPath("0'/1/0")
+            account.importPublicAddressPath("0'/0/0")
+            account.save()
+          else if error?
+            ledger.app.emit 'wallet:initialization:failed'
+          else
+            ledger.wallet.HDWallet.instance.createAccount()
+          done?()
+  else
+    done?()
 
 completeInitialization = (wallet, done) ->
   ledger.wallet.HDWallet.instance.isInitialized = yes

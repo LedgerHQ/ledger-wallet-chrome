@@ -57,6 +57,7 @@
         'utils/log'
         'utils/string'
         'utils/number'
+        'utils/array'
         'utils/object'
         'utils/async'
         'utils/render'
@@ -94,6 +95,7 @@
         'restclients/restclient'
         'restclients/unspent_outputs_restclient'
         'restclients/transactions_restclient'
+        'restclients/balance_restclient'
 
         ## Wallet
         'managers/wallets_manager'
