@@ -107,6 +107,9 @@ require @ledger.imports, ->
         wallet.once 'disconnected', =>
           @emit 'dongle:disconnected'
           @wallet = null
+
+          #actions when ledger wallet is unplugged
+          ledger.dialogs.manager.dismissAll(no)
           @router.go '/onboarding/device/plug'
         wallet.once 'unplugged', =>
           @emit 'dongle:unplugged', @wallet
