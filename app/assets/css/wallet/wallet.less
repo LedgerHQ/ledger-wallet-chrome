@@ -36,6 +36,11 @@
 section {
   width: 100%;
   display: table;
+  margin-top: @metrics-large-padding - 5px;
+
+  &:first-child {
+    margin-top: 0px;
+  }
 
   >header {
     display: flex;
@@ -74,24 +79,9 @@ section {
       font-size: @font-size-very-small;
     }
 
-    .action-item {
-      letter-spacing: -0.4px;
+    a.uppercase-action {
       margin-left: auto;
-      text-decoration: none;
-      font-size: @font-size-small;
-      font-weight: @font-weight-regular;
-      color: @color-action-purple;
-
-      &:hover {
-        color: darken(@color-action-purple, 20%);
-      }
     }
-
-    > a {
-      .action-item();
-
-    }
-
   }
 
   >table {
@@ -103,7 +93,7 @@ section {
       border-bottom: 1px solid transparent;
       font-weight: @font-weight-semibold;
       font-size: @font-size-very-small;
-      padding-top: @metrics-medium-padding - 5px;
+      padding-top: @metrics-medium-padding;
       padding-bottom: @metrics-very-small-padding;
     }
 
@@ -113,7 +103,7 @@ section {
 
     tbody tr td {
       padding-top: 12px;
-      padding-bottom: 12px;
+      padding-bottom: 13px;
       vertical-align:middle;
       padding-right: @metrics-very-large-padding;
       border-bottom: 1px solid @color-very-light-grey;
@@ -132,10 +122,7 @@ section {
           .row-title;
           color: @color-soft-grey;
         }
-
       }
-
-
     }
 
     tbody tr[data-href] {

@@ -6,7 +6,6 @@ section#account {
 
     > thead tr:first-child td {
       padding-bottom: 0px;
-      font-size: @font-size-small;
 
       &.unconfirmed-balance {
         color: @color-dark-grey;
@@ -15,11 +14,9 @@ section#account {
     }
 
     > tbody tr:first-child td {
-      padding-top: @metrics-very-small-padding;
-
       .price {
         font-size: @font-size-giga-large;
-        font-weight: @font-weight-bold;
+        font-weight: @font-weight-semibold;
         letter-spacing: -2px;
       }
 
@@ -40,8 +37,4 @@ section#account {
 
   }
 
-}
-
-#operations {
-  margin-top: @metrics-large-padding - 2px;
 }

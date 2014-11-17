@@ -25,6 +25,7 @@ class @WalletAccountsAccountShowViewController extends @ViewController
     dialog.show()
 
   onAfterRender: ->
+    super
   	#ledger.application.devicesManager.on 'LWWallet.BalanceRecovered', (event, data) ->
     #  l "BALANCE !"
     state = () =>
@@ -33,7 +34,7 @@ class @WalletAccountsAccountShowViewController extends @ViewController
     ledger.app.walletsManager.on 'connected', (ev, wallet) =>
       wallet.on('state:changed', state)
       state()
-
-    @select('#unconfirmed_balance_tooltip').tooltipster
-      content: 'Hello world'
-      theme: 'tooltipster-light'
+#
+#    @select('#unconfirmed_balance_tooltip').tooltipster
+#      content: 'Hello world'
+#      theme: 'tooltipster-light'

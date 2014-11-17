@@ -1,35 +1,34 @@
-<a href="#badpin">Enter wrong pin</a>
-<a href="#goodpin">Enter good pin</a>
-<a href="#setup">Setup</a>
-<a href="#bitid">Get bitId address</a>
-<p>State: <span id="toto"></span></p>
-<p>BitId: <span id="bitid">undefined</span></p>
-<div>
-  <input id="deriv" />
-  <button data-href="#pub">Get</button>
-  <p>Public Key: <span id="pk"></span></p>
-</div>
+<!--<a href="#badpin">Enter wrong pin</a>-->
+<!--<a href="#goodpin">Enter good pin</a>-->
+<!--<a href="#setup">Setup</a>-->
+<!--<a href="#bitid">Get bitId address</a>-->
+<!--<p>State: <span id="toto"></span></p>-->
+<!--<p>BitId: <span id="bitid">undefined</span></p>-->
+<!--<div>-->
+  <!--<input id="deriv" />-->
+  <!--<button data-href="#pub">Get</button>-->
+  <!--<p>Public Key: <span id="pk"></span></p>-->
+<!--</div>-->
 <section id="account">
   <header>
-    <h1>COMPTE COURANT</h1> <span class="account-type-orange">courant</span>
-    <a href="#displaySettings" visibility="hidden" ><%= t 'wallet.accounts.account.detail.action' %></a>
+    <h1>COMPTE COURANT</h1>
   </header>
   <table>
     <thead>
       <tr>
         <td class="fit-content"><%= t 'wallet.accounts.account.detail.balance' %></td>
-        <td class="unconfirmed-balance"><%= t 'wallet.accounts.account.detail.balance_in_progress' %> <span class="tooltip-holder" id="unconfirmed_balance_tooltip">(?)</span></td>
-        <td class="fit-content align-right"><%= t 'wallet.accounts.account.detail.actions' %></td>
+        <td class="unconfirmed-balance"><%= t 'wallet.accounts.account.detail.balance_in_progress' %></td>
+        <td class="fit-content align-right" ><%= t 'wallet.accounts.account.detail.actions' %></td>
       </tr>
     </thead>
     <tbody>
       <tr class="no-border">
-        <td class="fit-content"><span class="price">2.9878</span><span class="btc-acronyme"> BTC</span></td>
-        <td class="unconfirmed-balance" ><span>0.9878</span> <span>BTC</span></td>
+        <td class="fit-content"><span class="price">0.0</span><span class="btc-acronyme"> BTC</span></td>
+        <td class="unconfirmed-balance" ><span>0.0</span> <span>BTC</span></td>
         <td class="fit-content">
           <div class="action-bar">
-            <a class="action-rounded-button" href="#receive"><%= t 'wallet.accounts.account.detail.receive' %></a>
-            <a class="action-rounded-button" href="#send"><%= t 'wallet.accounts.account.detail.send' %></a>
+            <a class="action-rounded-button" href="/wallet/send/index"><%= t 'wallet.accounts.account.detail.send' %></a>
+            <a class="action-rounded-button" href="/wallet/receive/index"><%= t 'wallet.accounts.account.detail.receive' %></a>
           </div>
         </td>
       </tr>
@@ -39,7 +38,7 @@
 <section id="operations">
   <header>
     <h1><%= t 'wallet.accounts.account.operations.title' %></h1>
-    <a href="#displaySettings" ><%= t 'wallet.accounts.account.operations.action' %></a>
+    <a href="#displaySettings" class="uppercase-action"><%= t 'wallet.accounts.account.operations.action' %></a>
   </header>
   <table>
     <thead>
