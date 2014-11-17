@@ -23,3 +23,8 @@ _.extend ledger.wallet,
             e error
         do done
     return
+
+  addPathDerivationToCache: (path, address, callback) ->
+
+
+
