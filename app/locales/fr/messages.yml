@@ -28,7 +28,7 @@ onboarding:
     frozen:
       wallet_is_frozen: "Portefeuille bloqué"
       wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN."
-      blank_next_time: "La configuration de Ledger Wallet a été effacée mais vos comptes et bitcoins restent en sécurité."
+      blank_next_time: "La configuration de votre Ledger Wallet a été effacée mais vos comptes et bitcoins restent en sécurité."
       unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour restaurer vos comptes et bitcoins."
 
     wrongpin:
@@ -90,9 +90,8 @@ onboarding:
     seed:
       usecase_word_group: "Cet ensemble de 24 mots vous permet de restaurer votre portefeuille en cas de perte ou oubli du code PIN"
       given_word_group: "Cet ensemble de 24 mots vous a été communiqué lors de la création de votre portefeuille"
-      write_down_your: "Notez votre"
-      enter_your: "Entrez votre"
-      recovery_phrase: "phrase de restauration"
+      write_down_your: "Notez votre <b>phrase de restauration</b> dans le livret fourni"
+      enter_your: "Entrez votre <b>phrase de restauration</b>"
       recovery_sheet: "Livret de restauration"
       your_recovery_phrase: "Votre phrase de restauration :"
       invalid_recovery_phrase: "La phrase de restauration est invalide."

@@ -8,9 +8,7 @@
       4.
     </div>
     <div class="texts">
-      <span class="black-title"><%= if @params.wallet_mode == 'create' then t 'onboarding.management.seed.write_down_your' else t 'onboarding.management.seed.enter_your' %>
-        <span class="black-strong-title"><%= t 'onboarding.management.seed.recovery_phrase' %></span>
-      </span>
+      <span class="black-title"><%- if @params.wallet_mode == 'create' then t 'onboarding.management.seed.write_down_your' else t 'onboarding.management.seed.enter_your' %></span>
       <div class="black-indication"><%= if @params.wallet_mode == 'create' then t 'onboarding.management.seed.usecase_word_group' else t 'onboarding.management.seed.given_word_group' %></div>
     </div>
   </div>
