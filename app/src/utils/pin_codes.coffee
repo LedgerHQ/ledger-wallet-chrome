@@ -5,6 +5,7 @@ class @ledger.pin_codes.PinCode extends EventEmitter
 
   _el: null
   _isProtected: yes
+  _stealsFocus: no
 
   # Convenience method to insert the pin code inside a given parent node.
   # The pin code is always appended at the bottom child list.
@@ -30,6 +31,7 @@ class @ledger.pin_codes.PinCode extends EventEmitter
 
   # Sets focus to the pin code.
   focus: ->
+    return if !@isEnabled()
     $(@_input()).focus()
     do @_updateDigits
 
@@ -70,6 +72,11 @@ class @ledger.pin_codes.PinCode extends EventEmitter
     @_isProtected = protect
     do @_updateDigits
 
+  setStealsFocus: (steals) ->
+    @_stealsFocus = steals
+    if steals
+      @focus()
+
   # Gets the current enabled flag.
   # @return [Boolean] The current enabled flag.
   isEnabled: ->
@@ -89,6 +96,9 @@ class @ledger.pin_codes.PinCode extends EventEmitter
   # @return [Boolean] The current complete flag.
   isComplete: ->
     return @_input().value.length == @_digits().length
+
+  stealsFocus: ->
+    return @_stealsFocus
 
   # @private
   _input: ->
@@ -138,10 +148,14 @@ class @ledger.pin_codes.PinCode extends EventEmitter
       do self._updateDigits
 
       if e.type == 'keyup'
-        self.emit 'change' if (@value.length >= 0 && @value.length <= 4 and /[0-9]/g.test @value) or (@value == '')
+        self.emit 'change', @value if (@value.length >= 0 && @value.length <= 4 and /[0-9]/g.test @value) or (@value == '')
 
       if e.type == 'keyup' and self.isComplete()
-        self.emit 'complete' if /[0-9]/g.test @value
+        self.emit 'complete', @value if /[0-9]/g.test @value
+
+      if e.type == 'blur'
+        if self.stealsFocus()
+          self.focus()
 
   # @private
   _updateDigits: ->

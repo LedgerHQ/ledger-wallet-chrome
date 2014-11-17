@@ -12,6 +12,7 @@ class @OnboardingManagementPinViewController extends @OnboardingViewController
     continueUrl: '/onboarding/management/pinconfirmation'
 
   initialize: ->
+    super
     if @_isPinKindAuto() and not @params.pin?
       @params.pin = @_randomPinCode()
 
@@ -29,6 +30,7 @@ class @OnboardingManagementPinViewController extends @OnboardingViewController
     wallet_mode: @params.wallet_mode
     pin: @params.pin
     back: @representativeUrl()
+    rootUrl: @params.rootUrl
 
   _insertPinCodes: ->
     @view.autoPinCode = new ledger.pin_codes.PinCode()
@@ -79,7 +81,7 @@ class @OnboardingManagementPinViewController extends @OnboardingViewController
       else
         @view.manualPinCode.setValue(@params.pin)
 
-    # buttons
+    # navigation
     if @_isPinValid()
       @view.continueButton.removeClass 'disabled'
     else

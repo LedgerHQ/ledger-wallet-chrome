@@ -1,64 +1,116 @@
 application:
   name: 'Ledger Wallet'
+  small_description: "Ledger Wallet manages your Bitcoin accounts efficiently and securely."
+  support_url: 'http://support.ledgerwallet.com/'
 
 common:
   bitcoin_acronym: 'BTC'
 
+  dialogs:
+    yes: "Yes"
+    no: "No"
+    confirmation: "Confirmation"
+
 onboarding:
   device:
     plug:
-      to_start: "To begin, connect your Ledger Wallet into the USB port of your computer"
-      i_lost_my_wallet: "I lost my Ledger Wallet"
+      to_start: "To begin, plug your Ledger Wallet into the USB port of the computer."
+      is_not_recognized: "My Ledger Wallet is not recognized"
+
     unplug:
       unlock_my_wallet: "Unlock my wallet"
-      you_can_unplug: "You can now safely disconnect your Ledger Wallet"
+      you_can_unplug: "You can now safely unplug your Ledger Wallet."
+
     pin:
       enter_your_pin_code: "Enter you PIN code to unlock your wallet:"
       i_lost_my_pin_code: "I lost my PIN code"
+
+    frozen:
+      wallet_is_frozen: "Your wallet is frozen"
+      wrong_pin_codes: "Your wallet has frozen due to 3 incorrect PIN entries, but your bitcoins remain safe."
+      unplug_plug: "Unplug then plug back your Ledger Wallet to recover your accounts and bitcoins."
+
+    wrongpin:
+      wrong_pin: "Wrong PIN code"
+      tries_left: "%s attempt(s) left before freezing your wallet."
+      unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and bitcoins."
+
+    opening:
+      is_opening: "Please wait while your wallet is opening..."
+      not_opening: "My Ledger Wallet won't open"
+
   management:
     back: "BACK"
+    cancel: "CANCEL"
     continue: "CONTINUE"
+    finish: "FINISH"
     or: "OR"
-    done:
-      you_can_access_your_wallet: "You can now start using your wallet"
-      configuration_is_complete: "Configuration is complete"
-      open_my_wallet: "Open my wallet"
-      later_lock_my_wallet: "Later, lock my wallet"
+    create_my_wallet: "Create my wallet"
+    recover_my_wallet: "Recover my wallet"
+    cancel_wallet_configuration: "Do you want to cancel the configuration of your Ledger Wallet?"
+    wallet_not_affected: "No changes will be made to your wallet."
+
     welcome:
       new_wallet: "New wallet"
       welcome_to_your_new_wallet: "Welcome to your new Ledger Wallet!"
       create_or_recover: "Would you like to create a new wallet or restore an existing one?"
-      use_as_new: "Create my new wallet"
-      if_its_your_first_wallet: "If you just bought your first Ledger Wallet"
-      recover_wallet: "Recover my existing wallet"
-      if_you_lost_your_wallet: "If you froze or lost your Ledger Wallet"
-    frozen:
-      wallet_is_frozen: "Your wallet is frozen"
-      wrong_pin_codes: "Your wallet has frozen due to 3 incorrect PIN entries, but your bitcoins remain safe."
-      unfreeze_or_create: "To regain access to your accounts, you must unfreeze your wallet with your recovery phrase."
-      unfreeze_my_wallet: "Unfreeze my wallet"
-      retreive_access: "Regain access to your accounts using your recovery phrase"
-      create_a_new_wallet: "Create a new wallet"
-      you_can_always_retreive_your_accounts: "Your current bitcoins and accounts remain fully restorable at any time to another Ledger Wallet"
+      use_as_new: "Create a new wallet"
+      if_its_your_first_wallet: "Configure your new Ledger Wallet if it's your first purchase"
+      recover_wallet: "Recover an existing wallet"
+      if_you_lost_your_wallet: "Regain access to your accounts and bitcoins if you froze or lost your Ledger Wallet"
+
     pin:
-      create_my_wallet: "Create my wallet"
-      recover_my_wallet: "Recover my wallet"
-      unfreeze_my_wallet: "Unfreeze my wallet"
       choose_your: "Choose your"
       choose_your_new: "Choose your new"
       pin_code: "PIN code"
-      to_protect_your_wallet: "It allows you to secure the access of your wallet"
+      to_protect_your_wallet: "This 4 digits code allows you to secure the access of your wallet"
       new_pin_code: "GENERATE ANOTHER PIN CODE"
       auto: "AUTOMATIC PIN CODE"
       manual: "MANUAL PIN CODE"
-      please_note: "Please note"
-      warning_weak_pin_codes: ", your birth year or your debit/credit card pin are not secure PIN codes."
+      please_note: "Please note:"
+      warning_weak_pin_codes: "your birth year or your debit/credit card pin are not secure PIN codes."
+
     pin_confirmation:
       confirm_your: "Confirm your"
       pin_code: "PIN code"
+      your_pin_code: "Your PIN code:"
+      enter_again: "Re-enter the PIN code chosen in the previous step"
+      pin_codes_do_not_match: "The entered PIN code does not match the one chosen in the previous step."
+
+    seed:
+      usecase_word_group: "This set of 24 words allows you to recover your wallet in case of loss or forgotten PIN code"
+      given_word_group: "This set of 24 words was provided to you when creating your wallet"
+      write_down_your: "Write down"
+      enter_your: "Enter your"
+      recovery_phrase: "recovery phrase"
+      recovery_sheet: "recovery sheet"
+      your_recovery_phrase: "Your recovery phrase:"
+      invalid_recovery_phrase: "The recovery phrase is invalid."
+      it_wont_be_displayed_again: "Your recovery phrase won't be displayed again."
+      without_it: "Without it, you will not be able to access your wallet in case of loss."
+
+    summary:
+      your_wallet_is: "Your wallet is"
+      almost_ready: "almost ready"
+      use_your_bitcoins_create: "In a few moments, you will be able to use your bitcoins in the fastest possible way"
+      use_your_bitcoins_other: "In a few moments, you will be able to use your bitcoins in the fastest possible way again"
+      by_clicking_finish_create: "By clicking FINISH, you confirm that you have chosen a secured PIN code and written down your recovery phrase."
+      by_clicking_finish_other: "By clicking FINISH, you confirm that you have chosen a new secured PIN code."
+      your_wallet_mode_create: "Your wallet will be created."
+      your_wallet_mode_recover: "Your wallet will be recovered."
+      during_the_operation: "During the operation, do not unplug your Ledger Wallet from the USB port of the computer."
+
+    provisioning:
+      dont_unplug: "Do not unplug your Ledger Wallet from the USB port of the computer."
+      provisioning: "Configuration in progress..."
+
+    done:
+      you_can_access_your_wallet: "You can now access your wallet safely."
+      configuration_is_complete_create: "Creation completed"
+      configuration_is_complete_recover: "Recovery completed"
+      unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and bitcoins."
 
 wallet:
-
   defaults:
     operations: &default-operations-translation
       time: "TIME"
@@ -79,7 +131,6 @@ wallet:
       signout: 'LOCK'
 
   dashboard:
-
     index:
       accounts:
         title: "ACCOUNTS PREVIEW"
@@ -114,7 +165,6 @@ wallet:
       filter_sort_asc: "ASCENDANT SORTING"
 
   accounts:
-
     account:
       detail:
         action: "ACCOUNT SETTINGS"

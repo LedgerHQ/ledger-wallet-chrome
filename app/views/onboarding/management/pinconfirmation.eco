@@ -1,6 +1,6 @@
 <div id="content-container">
   <div class="title-container">
-    <div class="page-title"><%= t 'onboarding.management.pin.' + @params.wallet_mode + '_my_wallet' %></div>
+    <div class="page-title"><%= t 'onboarding.management.' + @params.wallet_mode + '_my_wallet' %></div>
     <div class="page-subtitle"><%= t 'application.name' %></div>
   </div>
   <div class="greyed-container detailed">
@@ -10,14 +10,15 @@
     <div class="texts">
       <span class="black-title"><%= t 'onboarding.management.pin_confirmation.confirm_your' %></span>
       <span class="black-strong-title"><%= t 'onboarding.management.pin_confirmation.pin_code' %></span>
-      <div class="black-indication"><%= t 'onboarding.management.pin.to_protect_your_wallet' %></div>
+      <div class="black-indication"><%= t 'onboarding.management.pin_confirmation.enter_again' %></div>
     </div>
     </div>
     <div class="page-content-container">
-      f
+      <div class="uppercase-title"><%= t 'onboarding.management.pin_confirmation.your_pin_code' %></div>
+      <span class="invalid-indication" id="invalid_pins"><%= t 'onboarding.management.pin_confirmation.pin_codes_do_not_match' %></span>
     </div>
   <div class="navigation-container">
-    <a class="back" href="#navigateBack" id="back_button"><i class="fa fa-angle-left"></i> <%= t 'onboarding.management.back' %></a>
+    <a class="back" href="#navigateRoot" id="back_button"><i class="fa fa-angle-left"></i> <%= t 'onboarding.management.cancel' %></a>
     <a class="continue" href="#navigateContinue" id="continue_button"><%= t 'onboarding.management.continue' %> <i class="fa fa-angle-right"></i></a>
   </div>
 </div>

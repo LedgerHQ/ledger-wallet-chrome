@@ -3,11 +3,9 @@
     <img src="../assets/images/onboarding/large_logo.png" width="244" height="181">
   </div>
   <div class="greyed-container">
-    <div class="black-title"><%= t 'onboarding.management.done.configuration_is_complete' %></div>
+    <img src="../../assets/images/common/large_check.png" width="50" height="50" />
+    <div class="black-title"><%= t 'onboarding.management.done.configuration_is_complete_' + @params.wallet_mode %></div>
     <div class="black-indication"><%= t 'onboarding.management.done.you_can_access_your_wallet' %></div>
-    <a class="action-rounded-button" href="#"><%= t 'onboarding.management.done.open_my_wallet' %></a>
-  </div>
-  <div class="actions-container">
-    <a href="#" class="greyed-action"><%= t 'onboarding.management.done.later_lock_my_wallet' %></a>
+    <div class="small-indication"><%= t 'onboarding.management.done.unplug_plug' %></div>
   </div>
 </div>
