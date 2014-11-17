@@ -62,6 +62,12 @@
   text-transform: uppercase;
 }
 
+// common
+.transparent {
+  opacity: 0;
+}
+
+// action bar
 .action-bar {
   display: flex;
 
@@ -78,26 +84,19 @@
   }
 }
 
+// links
 [data-href] {
-
   &:hover {
     cursor: pointer;
   }
-
 }
 
+// tooltip
 .tooltip-holder {
-
   &:hover {
     cursor: help;
   }
-
 }
-
-.transparent {
-  opacity: 0;
-}
-
 .tooltipster-light {
   border-radius: 5px;
   background-color: @color-background-color;
