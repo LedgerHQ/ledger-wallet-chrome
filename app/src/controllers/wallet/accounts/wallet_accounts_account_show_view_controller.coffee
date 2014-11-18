@@ -1,4 +1,4 @@
-class @WalletAccountsAccountViewController extends @ViewController
+class @WalletAccountsAccountShowViewController extends @ViewController
 
   badpin: () ->
     ledger.app.wallet.unlockWithPinCode '0001', (success, numberOfRetry) =>
@@ -20,19 +20,12 @@ class @WalletAccountsAccountViewController extends @ViewController
     ledger.app.wallet.getPublicAddress @select("#deriv").val(), (pubKey, error) =>
       @select('#pk').text(pubKey.bitcoinAddress.value)
 
-  receive: () ->
-    dialog = new WalletAccountsAccountReceiveDialogViewController()
-    dialog.show()
-
-  send: () ->
-    dialog = new WalletAccountsAccountSendDialogViewController()
-    dialog.show()
-
   showOperation: (params) ->
     dialog = new WalletOperationsDetailDialogViewController(params)
     dialog.show()
 
   onAfterRender: ->
+    super
   	#ledger.application.devicesManager.on 'LWWallet.BalanceRecovered', (event, data) ->
     #  l "BALANCE !"
     state = () =>
@@ -41,7 +34,7 @@ class @WalletAccountsAccountViewController extends @ViewController
     ledger.app.walletsManager.on 'connected', (ev, wallet) =>
       wallet.on('state:changed', state)
       state()
-
-    @select('#unconfirmed_balance_tooltip').tooltipster
-      content: 'Hello world'
-      theme: 'tooltipster-light'
+#
+#    @select('#unconfirmed_balance_tooltip').tooltipster
+#      content: 'Hello world'
+#      theme: 'tooltipster-light'

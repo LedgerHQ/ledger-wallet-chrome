@@ -94,13 +94,13 @@ class @ledger.dialogs.DialogsController
   dismiss: (dialog) ->
     @dismissAll()
 
-  dismissAll: () ->
+  dismissAll: (animated = yes) ->
     return if @_dialogs.length == 0
     dialog = @_dialogs[0]
     @_dialogs.splice(0, 1)
     @_selector.removeClass('display')
     dialogSelector = @_selector.find("#dialog_#{dialog._id}")
-    dialogSelector.animate {top:(window.innerHeight) / 2 + dialogSelector.height() * 0.8, opacity: 0.6}, 400,  =>
+    dialogSelector.animate {top:(window.innerHeight) / 2 + dialogSelector.height() * 0.8, opacity: 0.6}, (if animated then 400 else 0),  =>
       @_selector.find("#dialog_#{dialog._id}").remove()
       @_selector.hide()
       dialog.onDismiss()

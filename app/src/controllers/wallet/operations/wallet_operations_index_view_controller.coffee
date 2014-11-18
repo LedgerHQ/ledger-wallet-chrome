@@ -7,6 +7,7 @@ class @WalletOperationsIndexViewController extends ViewController
     @displayAllAccount = not @params.account_name?
 
   onAfterRender: ->
+    super
     @select('#sort-order').selectric()
 
   showOperation: (params) ->

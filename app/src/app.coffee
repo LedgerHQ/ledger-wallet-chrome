@@ -108,6 +108,7 @@ require @ledger.imports, ->
             Wallet.releaseWallet()
             ledger.wallet.release(wallet)
             @wallet = null
+            ledger.dialogs.manager.dismissAll(no)
             @router.go '/onboarding/device/plug'
         wallet.once 'unplugged', =>
           @emit 'dongle:unplugged', @wallet

@@ -1,11 +1,12 @@
 class @WalletNavigationController extends @NavigationController
 
   _menuItemBaseUrl: {
-    '/wallet/dashboard/': '#dashboard-item'
-    '/wallet/send/': '#send-item'
-    '/wallet/receive/': '#receive-item'
-    '/wallet/accounts/': '#accounts-item'
-    '/wallet/signout/': '#signout-item'
+#    '/wallet/dashboard/': '#dashboard-item'
+#    '/wallet/send/': '#send-item'
+#    '/wallet/receive/': '#receive-item'
+#    '/wallet/accounts/': '#accounts-item'
+#    '/wallet/signout/': '#signout-item'
+    '/wallet/accounts/': '#account-item'
   }
 
   constructor: () ->

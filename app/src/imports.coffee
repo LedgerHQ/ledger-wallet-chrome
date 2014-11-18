@@ -135,7 +135,7 @@
         'controllers/wallet/operations/wallet_operations_detail_dialog_view_controller'
         'controllers/wallet/operations/wallet_operations_index_view_controller'
         # Accounts
-        'controllers/wallet/accounts/wallet_accounts_account_view_controller'
+        'controllers/wallet/accounts/wallet_accounts_account_show_view_controller'
         'controllers/wallet/accounts/wallet_accounts_account_receive_dialog_view_controller'
         'controllers/wallet/accounts/wallet_accounts_account_send_dialog_view_controller'
 
@@ -143,7 +143,6 @@
         'controllers/onboarding/onboarding_view_controller'
         'controllers/onboarding/onboarding_navigation_controller'
         # Device
-
         'controllers/onboarding/device/onboarding_device_plug_view_controller'
         'controllers/onboarding/device/onboarding_device_unplug_view_controller'
         'controllers/onboarding/device/onboarding_device_pin_view_controller'

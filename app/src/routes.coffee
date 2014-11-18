@@ -1,5 +1,13 @@
-@declareRoutes = (route, app) ->
+# routes that do not need a plugged ledger wallet
+ledger.router ?= {}
+ledger.router.ignorePluggedWalletRoutesExceptions = no
+ledger.router.pluggedWalletRoutesExceptions = [
+  '/',
+  '/onboarding/device/plug'
+]
 
+# routes declarations
+@declareRoutes = (route, app) ->
   ## Default
   route '/', ->
     app.router.go '/onboarding/device/plug', {animateIntro: yes}

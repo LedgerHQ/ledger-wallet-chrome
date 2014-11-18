@@ -44,6 +44,7 @@
 .uppercase-action {
   font-size: @font-size-small;
   color: @color-action-purple;
+  letter-spacing: -0.1px;
 
   a& {
     text-decoration: none;
@@ -61,11 +62,17 @@
   text-transform: uppercase;
 }
 
+// common
+.transparent {
+  opacity: 0;
+}
+
+// action bar
 .action-bar {
   display: flex;
 
   > a {
-    margin-right: @metrics-very-small-padding;
+    margin-right: 8px;
   }
 
   > a:last-child {
@@ -77,26 +84,19 @@
   }
 }
 
+// links
 [data-href] {
-
   &:hover {
     cursor: pointer;
   }
-
 }
 
+// tooltip
 .tooltip-holder {
-
   &:hover {
     cursor: help;
   }
-
 }
-
-.transparent {
-  opacity: 0;
-}
-
 .tooltipster-light {
   border-radius: 5px;
   background-color: @color-background-color;

@@ -118,6 +118,10 @@ onboarding:
       configuration_is_complete_create: "Creation completed"
       configuration_is_complete_recover: "Recovery completed"
       unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and bitcoins."
+      configuration_failed_create: "Creation failed"
+      configuration_failed_recover: "Recovery failed"
+      error_occured: "A serious error occured. Please contact support for further assistance."
+      contact_support: "CONTACT SUPPORT"
 
 wallet:
   defaults:
@@ -138,6 +142,8 @@ wallet:
       receive: 'RECEIVE'
       accounts: 'ACCOUNTS'
       signout: 'LOCK'
+      help: 'HELP'
+      account: 'ACCOUNT'
 
   dashboard:
     index:
