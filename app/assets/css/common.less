@@ -1,0 +1,144 @@
+@import (reference) "constants";
+@import (reference) "mixins";
+
+// containers classes
+.main-container {
+  background-color: @color-background-color;
+  .fullsize
+}
+
+// buttons
+.rounded-button(@color) {
+  font-size: @font-size-large;
+  text-transform: uppercase;
+  border-radius: @border-radius-default-value;
+  padding: 9px 14px;
+  color: @color-white;
+  background-color: @color;
+  display: inline-block;
+  letter-spacing: -0.5px;
+
+  a& {
+    text-decoration: none;
+  }
+
+  a&:hover {
+    background-color: darken(@color, @color-default-darken-value);
+  }
+}
+.action-rounded-button {
+  .rounded-button(@color-action-green);
+}
+.cancel-rounded-button {
+  .rounded-button(@color-light-grey);
+}
+.important-rounded-button {
+  .rounded-button(@color-invalid-red);
+}
+
+// texts
+.uppercase-action {
+  font-size: @font-size-small;
+  color: @color-action-purple;
+  letter-spacing: -0.1px;
+
+  a& {
+    text-decoration: none;
+
+    &:hover {
+      color: darken(@color-action-purple, 15%)
+    }
+  }
+}
+.uppercase-section-title {
+  letter-spacing: -0.5px;
+  font-size: @font-size-large;
+  font-weight: @font-weight-semibold;
+  color: @color-night-blue;
+  text-transform: uppercase;
+}
+.uppercase-section-column {
+  font-weight: @font-weight-semibold;
+  font-size: @font-size-very-small;
+  letter-spacing: -0.3px;
+  text-transform: uppercase;
+}
+.small-regular-text {
+  font-size: @font-size-very-small;
+}
+.small-regular-grey-text {
+  .small-regular-text;
+  color: @color-dark-grey;
+}
+
+// inputs
+.text-input {
+  border: 0;
+  background-color: transparent;
+  outline: none;
+  text-align: right;
+  font-size: @font-size-medium;
+
+  &::-webkit-input-placeholder {
+    font-weight: @font-weight-light;
+    color: @color-light-grey;
+    text-transform: capitalize;
+  }
+
+  &.optional {
+    color: @color-soft-grey;
+  }
+}
+.large-text-input {
+  .text-input;
+  font-size: @font-size-extra-large;
+  font-weight: @font-weight-light;
+  letter-spacing: -0.8px;
+}
+
+// common
+.transparent {
+  opacity: 0;
+}
+
+// action bar
+.action-bar {
+  display: flex;
+
+  > a {
+    margin-right: 8px;
+  }
+
+  > a:last-child {
+    margin-right: 0px;
+  }
+
+  .cancel-rounded-button {
+    margin-left: auto;
+  }
+}
+
+// links
+[data-href] {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+// tooltip
+.tooltip-holder {
+  &:hover {
+    cursor: help;
+  }
+}
+.tooltipster-light {
+  border-radius: 5px;
+  background-color: @color-background-color;
+  border-radius: 5px;
+  padding: @metrics-small-padding;
+  box-shadow: 0px 0px 50px rgba(0, 0, 0, 0.1);
+}
+.tooltipster-light .tooltipster-content {
+  font-size: @font-size-medium;
+  line-height: @font-size-medium + 2px;
+}

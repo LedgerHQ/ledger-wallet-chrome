@@ -7,8 +7,8 @@
       <tr id="amount_row">
         <td class="row-title-optional"><%= t 'wallet.accounts.account.receive.amount' %></td>
         <td class="align-right">
-          <input id="amount_input" class="large-text-input optional" />
-          <label class="large-text-input optional" >BTC</label>
+          <input id="amount_input" class="large-text-input optional" placeholder="<%= t 'wallet.accounts.account.receive.amount_placeholder' %>"/>
+          <label class="large-text-input optional">BTC</label>
         </td>
       </tr>
       <tr class="no-border">
@@ -21,7 +21,7 @@
     <div>
       <div id="qrcode_frame"></div>
     </div>
-    <p><%- t 'wallet.accounts.account.receive.qr_code_explanation' %></p>
+    <p class="small-regular-grey-text"><%- t 'wallet.accounts.account.receive.qr_code_explanation' %></p>
   </div>
 </section>
 <div class="dialog-actions-bar">

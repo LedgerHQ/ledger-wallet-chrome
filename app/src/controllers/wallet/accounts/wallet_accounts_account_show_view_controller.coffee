@@ -44,4 +44,4 @@ class @WalletAccountsAccountShowViewController extends @ViewController
 #      theme: 'tooltipster-light'
 
     _.defer =>
-      ledger.app.router.go '/wallet/receive/index'
+      ledger.app.router.go '/wallet/send/index'
