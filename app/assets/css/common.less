@@ -6,6 +6,12 @@
   background-color: @color-background-color;
   .fullsize
 }
+.error-container {
+  .bold-invalid-text;
+  padding: @metrics-large-padding 0;
+  letter-spacing: -0.5px;
+  text-align: center;
+}
 
 // buttons
 .rounded-button(@color) {
@@ -63,13 +69,15 @@
   letter-spacing: -0.3px;
   text-transform: uppercase;
 }
-.text(@color) {
+.text(@color, @weight: @font-weight-regular) {
   font-size: @font-size-medium;
   color: @color;
+  font-weight: @weight;
 
   &-small {
     color: @color;
     font-size: @font-size-very-small;
+    font-weight: @weight;
   }
 }
 .regular-text {
@@ -83,6 +91,9 @@
 }
 .regular-invalid-text {
   .text(@color-invalid-red);
+}
+.bold-invalid-text {
+  .text(@color-invalid-red, @font-weight-semibold);
 }
 
 // inputs
