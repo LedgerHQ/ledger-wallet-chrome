@@ -62,7 +62,6 @@ require @ledger.imports, ->
 
     handleAction: (actionName, params) ->
       handled = no
-      l actionName
       if ledger.dialogs.manager.displayedDialog()?
         handled = ledger.dialogs.manager.displayedDialog().handleAction actionName, params
       handled = @_navigationController.handleAction(actionName, params) unless handled
@@ -70,7 +69,6 @@ require @ledger.imports, ->
 
     _listenWalletEvents: () ->
       # Wallet management & wallet events re-dispatching
-
       @walletsManager.on 'connecting', (event, card) =>
         @emit 'dongle:connecting', card
       @walletsManager.on 'connected', (event, wallet) =>
