@@ -104,7 +104,7 @@ class ledger.wallet.HDWallet.Account
 
 openStores = (wallet, done) ->
   wallet.getBitIdAddress (bitIdAddress) =>
-    wallet.getPublicAddress "44'/0xDEAD/0xFACE/0xCAFE", (pubKey) =>
+    wallet.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>
       ledger.storage.openStores bitIdAddress, pubKey, done
 
 openHdWallet = (wallet, done) ->

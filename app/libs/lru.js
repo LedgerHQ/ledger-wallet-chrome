@@ -227,9 +227,11 @@ LRUCache.prototype.forEach = function(fun, context, desc) {
 
 /** Returns a JSON (array) representation */
 LRUCache.prototype.toJSON = function() {
-    var s = [], entry = this.head;
+    var s = [], entry = this.head, key, value;
     while (entry) {
-        s.push({key:entry.key.toJSON(), value:entry.value.toJSON()});
+        key = (typeof entry.key.toJSON != 'undefined') ?  entry.key.toJSON() : entry.key;
+        value = (typeof entry.value.toJSON != 'undefined') ?  entry.value.toJSON() : entry.value;
+        s.push({key: key, value: value});
         entry = entry.newer;
     }
     return s;

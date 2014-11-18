@@ -10,7 +10,7 @@ class ledger.api.BalanceRestClient extends ledger.api.RestClient
     l addressesPaths
     ledger.wallet.pathsToAddresses addressesPaths, (addresses) =>
       l addresses
-      _.async.eachBatch addresses, 20, (addresses, done, hasNext) =>
+      _.async.eachBatch _.values(addresses), 20, (addresses, done, hasNext) =>
         @http().get
           url: "blockchain/addresses/#{addresses.join(',')}"
           onSuccess: (response) ->
