@@ -64,14 +64,17 @@ ledger.router.pluggedWalletRoutesExceptions = [
   # Accounts
   route '/wallet/accounts/{id}/show', (params) ->
     app.navigate WALLET_LAYOUT, WalletAccountsAccountShowViewController
+
   # Send
   route '/wallet/send/index', (params) ->
     dialog = new WalletAccountsAccountSendDialogViewController()
     dialog.show()
+
   # Receive
   route '/wallet/receive/index', (params) ->
     dialog = new WalletAccountsAccountReceiveDialogViewController()
     dialog.show()
+
   # Help
   route '/wallet/help/index', (params) ->
     window.open t 'application.support_url'

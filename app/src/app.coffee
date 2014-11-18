@@ -18,38 +18,10 @@ require @ledger.imports, ->
           when 'reload-application' then chrome.runtime.reload()
 
       @_listenWalletEvents()
+      @_listenClickEvents()
 
       @devicesManager.start()
       @router.go('/')
-
-      ### MODELS/COLLECTIONS LEGACY TESTS DO NOT REMOVE
-      account = Account.findOrCreate 1, {name: 'Toto', balance: 16, operations: [{_id: 1, name: 'opTest'}]}
-      account.get (result) =>
-       account.getOperations (operations) =>
-         operations.iterator (it) =>
-            operations.insert {_id: it.length(), name: 'Auto'}
-
-            operations.toArray (array) => l array
-
-            account.getOperation (operation) =>
-              unless operation?
-                account.set 'operation', new Operation({_id: 'abcdefghij'})
-              l operation
-              account.set '_id', result._id + 1
-              account.set 'name', result.name + '1'
-              account.set 'balance', result.balance * 2
-              account.save () =>
-                account = Account.findOrCreate 1, {name: 'Toto', balance: 16}
-                account.get (result) =>
-                  l result
-                  toRemove = Account.create(name: 'ToRemove').save =>
-                    toRemove.remove =>
-                      Account.create({name: 'Test'}).save () =>
-                        ledger.collections.accounts.toArray (a) =>
-                          l a
-                        ledger.collections.accounts.each (object) =>
-                          l object
-      ###
 
     navigate: (layoutName, viewController) ->
       @router.once 'routed', (event, data) =>
@@ -90,6 +62,7 @@ require @ledger.imports, ->
 
     handleAction: (actionName, params) ->
       handled = no
+      l actionName
       if ledger.dialogs.manager.displayedDialog()?
         handled = ledger.dialogs.manager.displayedDialog().handleAction actionName, params
       handled = @_navigationController.handleAction(actionName, params) unless handled
@@ -122,6 +95,31 @@ require @ledger.imports, ->
                 l balance
         @emit 'dongle:connected', @wallet
 
+    _listenClickEvents: () ->
+      self = @
+      # Redirect every in-app link with our router
+      $('body').delegate 'a', 'click', (e) ->
+        if @href? and @protocol == 'chrome-extension:'
+          url = null
+          if  _.str.startsWith(@pathname, '/views/') and self.currentUrl?
+            url = ledger.url.createRelativeUrlWithFragmentedUrl(self.currentUrl, @href)
+          else
+            url = @pathname + @search + @hash
+          self.router.go url
+          return no
+        yes
+
+      $('body').delegate '[data-href]', 'click', (e) ->
+        href = $(this).attr('data-href')
+        if href? and href.length > 0
+          parser = href.parseAsUrl()
+          if  _.str.startsWith(parser.pathname, '/views/') and self.currentUrl?
+            url = ledger.url.createRelativeUrlWithFragmentedUrl(self.currentUrl, href)
+          else
+            url = parser.pathname + parser.search + parser.hash
+          self.router.go url
+          return no
+        yes
 
 
   @WALLET_LAYOUT = 'WalletNavigationController'

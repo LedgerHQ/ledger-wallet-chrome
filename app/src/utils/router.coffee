@@ -19,7 +19,6 @@ class @Router extends @EventEmitter
       e "No route found for #{url}"
       @emit 'bypassed', {url: url, data: data}
 
-    do @_listenClickEvents
 
     # add routes
     declareRoutes(@_addRoute.bind(@), app)
@@ -36,28 +35,4 @@ class @Router extends @EventEmitter
     route = @_router.addRoute url + ':?params::#action::?params:'
     route.matched.add callback.bind(route)
 
-  _listenClickEvents: () ->
-    self = @
-    # Redirect every in-app link with our router
-    $('body').delegate 'a', 'click', (e) ->
-      if @href? and @protocol == 'chrome-extension:'
-        url = null
-        if  _.str.startsWith(@pathname, '/views/') and self.currentUrl?
-          url = ledger.url.createRelativeUrlWithFragmentedUrl(self.currentUrl, @href)
-        else
-          url = @pathname + @search + @hash
-        self.go url
-        return no
-      yes
 
-    $('body').delegate '[data-href]', 'click', (e) ->
-      href = $(this).attr('data-href')
-      if href? and href.length > 0
-        parser = href.parseAsUrl()
-        if  _.str.startsWith(parser.pathname, '/views/') and self.currentUrl?
-          url = ledger.url.createRelativeUrlWithFragmentedUrl(self.currentUrl, href)
-        else
-          url = parser.pathname + parser.search + parser.hash
-        self.go url
-        return no
-      yes
