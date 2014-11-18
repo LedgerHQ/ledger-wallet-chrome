@@ -1,6 +1,6 @@
 # routes that do not need a plugged ledger wallet
 ledger.router ?= {}
-ledger.router.ignorePluggedWalletRoutesExceptions = no
+ledger.router.ignorePluggedWalletRoutesExceptions = yes
 ledger.router.pluggedWalletRoutesExceptions = [
   '/',
   '/onboarding/device/plug'
@@ -10,7 +10,7 @@ ledger.router.pluggedWalletRoutesExceptions = [
 @declareRoutes = (route, app) ->
   ## Default
   route '/', ->
-    app.router.go '/onboarding/device/plug', {animateIntro: yes}
+    app.router.go '/wallet/accounts/0/show', {animateIntro: yes}
 
   ## Onboarding
   # Device
@@ -61,18 +61,20 @@ ledger.router.pluggedWalletRoutesExceptions = [
   # Dashboard
   route '/wallet/dashboard/index', (params) ->
     app.navigate WALLET_LAYOUT, WalletDashboardIndexViewController
-
-  route '/wallet/send/index', (params) ->
-
-
-  route '/wallet/receive/index', (params) ->
-    d = new WalletOperationsDetailDialogViewController()
-    d.show()
-
   # Accounts
-  route '/wallet/accounts/index', (params) ->
-    app.navigate WALLET_LAYOUT, WalletAccountsAccountViewController
-
+  route '/wallet/accounts/{id}/show', (params) ->
+    app.navigate WALLET_LAYOUT, WalletAccountsAccountShowViewController
+  # Send
+  route '/wallet/send/index', (params) ->
+    dialog = new WalletAccountsAccountSendDialogViewController()
+    dialog.show()
+  # Receive
+  route '/wallet/receive/index', (params) ->
+    dialog = new WalletAccountsAccountReceiveDialogViewController()
+    dialog.show()
+  # Help
+  route '/wallet/help/index', (params) ->
+    window.open t 'application.support_url'
   # Operations
   route '/wallet/accounts/operations/index', (params) ->
     app.navigate WALLET_LAYOUT, WalletOperationsIndexViewController

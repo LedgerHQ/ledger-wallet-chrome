@@ -1,5 +1,9 @@
 class @WalletAccountsAccountShowViewController extends @ViewController
 
+  view:
+    confirmedBalanceSubtitle: '#confirmed_balance_subtitle'
+    unconfirmedBalanceSubtitle: '#unconfirmed_balance_subtitle'
+
   badpin: () ->
     ledger.app.wallet.unlockWithPinCode '0001', (success, numberOfRetry) =>
       l success, numberOfRetry
@@ -38,3 +42,6 @@ class @WalletAccountsAccountShowViewController extends @ViewController
 #    @select('#unconfirmed_balance_tooltip').tooltipster
 #      content: 'Hello world'
 #      theme: 'tooltipster-light'
+
+    _.defer =>
+      ledger.app.router.go '/wallet/receive/index'
