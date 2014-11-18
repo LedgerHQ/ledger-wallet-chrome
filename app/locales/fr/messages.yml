@@ -180,7 +180,7 @@ wallet:
       filter_sort_asc: "TRI CROISSANT"
 
   accounts:
-    account:
+    show:
       detail:
         action: "PARAMÈTRES DU COMPTE"
         balance: "SOLDE"

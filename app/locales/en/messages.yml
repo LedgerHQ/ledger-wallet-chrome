@@ -180,7 +180,7 @@ wallet:
       filter_sort_asc: "ASCENDANT SORTING"
 
   accounts:
-    account:
+    show:
       detail:
         action: "ACCOUNT SETTINGS"
         balance: "BALANCE"
