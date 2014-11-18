@@ -5,7 +5,7 @@
   <table class="no-table-head">
     <tbody>
       <tr id="amount_row">
-        <td class="row-title-optional"><%= t 'wallet.accounts.account.receive.amount' %></td>
+        <td class="row-title optional"><%= t 'wallet.accounts.account.receive.amount' %></td>
         <td class="align-right">
           <input id="amount_input" class="large-text-input optional" placeholder="<%= t 'wallet.accounts.account.receive.amount_placeholder' %>"/>
           <label class="large-text-input optional">BTC</label>
@@ -13,7 +13,7 @@
       </tr>
       <tr class="no-border">
         <td class="row-title"><%= t 'wallet.accounts.account.receive.receiver_address' %></td>
-        <td class="align-right">1DDGTMZUxwYwRdWcyVBmSrGEoVXkVTd6xS</td>
+        <td class="align-right" id="receiver_address">1DDGTMZUxwYwRdWcyVBmSrGEoVXkVTd6xS</td>
       </tr>
     </tbody>
   </table>

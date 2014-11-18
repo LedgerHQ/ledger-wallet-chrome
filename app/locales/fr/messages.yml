@@ -167,7 +167,7 @@ wallet:
       status: "État"
       sender: "Depuis"
       receiver: "Vers"
-      identifier: "Identifiant"
+      identifier: "Identifiant de transaction"
       send_by_email: "ENVOYER PAR EMAIL"
       print: "IMPRIMER"
       close: "FERMER"

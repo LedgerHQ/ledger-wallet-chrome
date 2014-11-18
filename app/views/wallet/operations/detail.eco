@@ -17,14 +17,14 @@
         <td class="align-right regular-valid-text" id="operation_status">Confirmée</td>
       </tr>
       <tr>
-        <td class="row-title"><%= t 'wallet.operations.detail.sender' %></td>
+        <td class="row-title top-aligned"><%= t 'wallet.operations.detail.sender' %></td>
         <td class="align-right regular-text" id="operation_inputs">
           1DDGTMZUxwYwRdWcyVBmSrGEoVXkVTd6xS<br />
           1DDGTMZUxwYwRdWcyVBmSrGEoVXkVTd6xS
         </td>
       </tr>
       <tr>
-        <td class="row-title"><%= t 'wallet.operations.detail.receiver' %></td>
+        <td class="row-title top-aligned"><%= t 'wallet.operations.detail.receiver' %></td>
         <td class="align-right" id="operation_outputs">
           1DDGTMZUxwYwRdWcyVBmSrGEoVXkVTd6xS<br />
           1DDGTMZUxwYwRdWcyVBmSrGEoVXkVTd6xS

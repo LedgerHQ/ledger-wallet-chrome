@@ -44,19 +44,17 @@ section {
     tbody tr td {
       padding-top: 12px;
       padding-bottom: 12px;
-      vertical-align:middle;
+      vertical-align: middle;
       padding-right: @metrics-very-large-padding;
       border-bottom: 1px solid @color-very-light-grey;
       font-size: @font-size-medium;
 
-      .row-title() {
-        .uppercase-section-column;
-      }
-
       &.row-title {
-        .row-title;
-        &-optional {
-          .row-title;
+        .uppercase-section-column;
+        &.top-aligned {
+          vertical-align: top;
+        }
+        &.optional {
           color: @color-soft-grey;
         }
       }

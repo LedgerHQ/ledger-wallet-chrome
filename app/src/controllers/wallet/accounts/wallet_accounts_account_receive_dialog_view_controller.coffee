@@ -16,7 +16,6 @@ class @WalletAccountsAccountReceiveDialogViewController extends DialogViewContro
         colorDark : "#000000"
         colorLight : "#ffffff"
         correctLevel : QRCode.CorrectLevel.H
-    @view.amountInput.keepFocus()
     @view.amountInput.amountInput()
     do @_listenEvents
 
