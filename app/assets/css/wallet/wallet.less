@@ -101,17 +101,14 @@ section {
 
     tbody tr td {
       padding-top: 12px;
-      padding-bottom: 13px;
+      padding-bottom: 12px;
       vertical-align:middle;
       padding-right: @metrics-very-large-padding;
       border-bottom: 1px solid @color-very-light-grey;
       font-size: @font-size-medium;
 
       .row-title() {
-        text-transform: uppercase;
-        font-weight: @font-weight-semibold;
-        font-size: @font-size-very-small;
-        color: @color-black;
+        .uppercase-section-column;
       }
 
       &.row-title {

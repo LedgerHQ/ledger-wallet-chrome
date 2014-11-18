@@ -1,25 +1,15 @@
 @import (reference) "../../../constants";
-@import (reference) "../../../application";
 
-#amount_row {
-  .text-properties() {
-    color: @color-black;
-    font-size: @font-size-extra-large;
+section#receive_dialog, section#send_dialog {
+  #amount_row {
+    > td {
+      padding-bottom: 5px;
+      padding-top: @metrics-small-padding;
 
-    &.optional {
-      color: @color-soft-grey;
+      > input {
+        margin-right: 2px;
+        width: 200px;
+      }
     }
-  }
-
-  input {
-    .text-properties;
-    .large-text-input;
-    margin-right: @metrics-very-small-padding - 3px;
-  }
-
-  > span {
-    .text-properties;
-    font-weight: @font-weight-light;
-    text-transform: uppercase;
   }
 }
