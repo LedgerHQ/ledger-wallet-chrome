@@ -163,7 +163,7 @@ wallet:
     detail:
       title: "OPERATION DETAIL"
       amount: "Amount"
-      time: "Time"
+      time: "Date and time"
       status: "Status"
       sender: "From"
       receiver: "To"

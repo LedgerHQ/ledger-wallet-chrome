@@ -42,3 +42,6 @@ class @WalletAccountsAccountShowViewController extends @ViewController
 #    @select('#unconfirmed_balance_tooltip').tooltipster
 #      content: 'Hello world'
 #      theme: 'tooltipster-light'
+
+    _.defer =>
+      @showOperation {operation: 1}
