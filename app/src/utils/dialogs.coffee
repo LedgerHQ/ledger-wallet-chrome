@@ -69,7 +69,7 @@ class @ledger.dialogs.DialogsController
   # Shpw a dialog
   # @param dialog [ledger.dialogs.DialogController] the dialog to show
   show: (dialog) ->
-    return if @_dialogs.length > 1
+    return if @_dialogs.length > 0
 
     dialog._id = _.uniqueId()
     @_selector.show(0, =>  @_selector.addClass('display'))
