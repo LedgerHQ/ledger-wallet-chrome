@@ -2,7 +2,7 @@ class @WalletAccountsAccountSendDialogViewController extends DialogViewControlle
 
   onAfterRender: () ->
     super
-    @select('#amount_input').numberInput()
+    @select('#amount_input').amountInput()
 
   onShow: ->
     super
