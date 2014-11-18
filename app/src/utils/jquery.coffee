@@ -22,7 +22,7 @@ $.fn.extend
       if (@value.indexOf('.') != -1 or @value.length == 0) and e.keyCode == 110
         e.preventDefault
         return no
-      return if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) != -1 or (e.keyCode == 65 && (e.ctrlKey is on or e.metaKey is on)) or (e.keyCode >= 35 && e.keyCode <= 39) or (e.keyCode == 86 && (e.ctrlKey is on or e.metaKey is on)) or (e.keyCode == 67 && (e.ctrlKey is on or e.metaKey is on)) (e.keyCode == 88 && (e.ctrlKey is on or e.metaKey is on)))
+      return if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) != -1 or (e.keyCode == 65 && (e.ctrlKey is on or e.metaKey is on)) or (e.keyCode >= 35 && e.keyCode <= 39) or (e.keyCode == 86 && (e.ctrlKey is on or e.metaKey is on)) or (e.keyCode == 67 && (e.ctrlKey is on or e.metaKey is on)) or (e.keyCode == 88 && (e.ctrlKey is on or e.metaKey is on)))
       if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105))
         e.preventDefault()
 

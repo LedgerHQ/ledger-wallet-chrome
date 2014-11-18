@@ -10,7 +10,7 @@ ledger.router.pluggedWalletRoutesExceptions = [
 @declareRoutes = (route, app) ->
   ## Default
   route '/', ->
-    app.router.go '/wallet/accounts/0/show', {animateIntro: yes}
+    app.router.go '/onboarding/device/plug', {animateIntro: yes}
 
   ## Onboarding
   # Device
