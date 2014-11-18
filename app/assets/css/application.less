@@ -65,6 +65,7 @@
   font-weight: @font-weight-semibold;
   font-size: @font-size-very-small;
   letter-spacing: -0.3px;
+  text-transform: uppercase;
 }
 
 // inputs
@@ -73,22 +74,21 @@
   background-color: transparent;
   outline: none;
   text-align: right;
-  width: auto;
 
   &::-webkit-input-placeholder {
     font-weight: @font-weight-light;
     color: @color-light-grey;
+    text-transform: capitalize;
   }
 
-  &.fullwidth {
-    width: 100%;
+  &.optional {
+    color: @color-soft-grey;
   }
-
 }
 .large-text-input {
   .text-input;
   font-size: @font-size-extra-large;
-  font-weight: @font-weight-regular;
+  font-weight: @font-weight-light;
 }
 
 // common
