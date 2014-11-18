@@ -10,7 +10,15 @@ section#account {
       &.unconfirmed-balance {
         color: @color-dark-grey;
       }
+    }
 
+    > thead {
+      > tr {
+        > td {
+          .tinySpinner {
+          }
+        }
+      }
     }
 
     > tbody tr:first-child td {

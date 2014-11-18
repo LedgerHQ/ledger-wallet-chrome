@@ -198,7 +198,7 @@ wallet:
         title: "RECEVOIR DES BITCOINS"
         amount: "MONTANT (OPTIONNEL)"
         receiver_account: "COMPTE À CRÉDITER"
-        receiver_address: "ADDRESSE DE RÉCEPTION"
+        receiver_address: "ADRESSE DE RÉCEPTION"
         qr_code_explanation: "Code QR à scanner par la personne <br /> qui souhaite vous envoyer des bitcoins"
         send_by_email: "ENVOYER PAR EMAIL"
         print: "IMPRIMER"

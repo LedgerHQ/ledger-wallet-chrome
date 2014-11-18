@@ -61,6 +61,35 @@
   color: @color-night-blue;
   text-transform: uppercase;
 }
+.uppercase-section-column {
+  font-weight: @font-weight-semibold;
+  font-size: @font-size-very-small;
+  letter-spacing: -0.3px;
+}
+
+// inputs
+.text-input {
+  border: 0;
+  background-color: transparent;
+  outline: none;
+  text-align: right;
+  width: auto;
+
+  &::-webkit-input-placeholder {
+    font-weight: @font-weight-light;
+    color: @color-light-grey;
+  }
+
+  &.fullwidth {
+    width: 100%;
+  }
+
+}
+.large-text-input {
+  .text-input;
+  font-size: @font-size-extra-large;
+  font-weight: @font-weight-regular;
+}
 
 // common
 .transparent {

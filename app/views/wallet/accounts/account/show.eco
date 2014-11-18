@@ -16,9 +16,9 @@
   <table>
     <thead>
       <tr>
-        <td class="fit-content"><%= t 'wallet.accounts.account.detail.balance' %></td>
-        <td class="unconfirmed-balance"><%= t 'wallet.accounts.account.detail.balance_in_progress' %></td>
-        <td class="fit-content align-right" ><%= t 'wallet.accounts.account.detail.actions' %></td>
+        <td class="fit-content" id="confirmed_balance_subtitle"><%= t 'wallet.accounts.account.detail.balance' %></td>
+        <td class="unconfirmed-balance" id="unconfirmed_balance_subtitle"><%= t 'wallet.accounts.account.detail.balance_in_progress' %></td>
+        <td class="fit-content align-right"><%= t 'wallet.accounts.account.detail.actions' %></td>
       </tr>
     </thead>
     <tbody>
