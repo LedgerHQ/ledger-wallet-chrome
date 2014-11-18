@@ -1,4 +1,4 @@
-class @WalletAccountsAccountReceiveDialogViewController extends DialogViewController
+class @WalletReceiveIndexDialogViewController extends DialogViewController
 
   view:
     amountInput: '#amount_input'

@@ -1,4 +1,4 @@
-class @WalletAccountsAccountShowViewController extends @ViewController
+class @WalletAccountsShowViewController extends @ViewController
 
   view:
     confirmedBalanceSubtitle: '#confirmed_balance_subtitle'

@@ -1,4 +1,4 @@
-class @WalletAccountsAccountSendDialogViewController extends DialogViewController
+class @WalletSendIndexDialogViewController extends DialogViewController
 
   view:
     amountInput: '#amount_input'
@@ -10,3 +10,6 @@ class @WalletAccountsAccountSendDialogViewController extends DialogViewControlle
   onShow: ->
     super
     @view.amountInput.focus()
+
+  send: ->
+    @dismiss()

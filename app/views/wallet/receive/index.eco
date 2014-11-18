@@ -1,0 +1,29 @@
+<section id="receive_dialog">
+  <header>
+    <h1><%= t 'wallet.receive.title' %></h1>
+  </header>
+  <table class="no-table-head">
+    <tbody>
+      <tr id="amount_row">
+        <td class="row-title optional"><%= t 'wallet.receive.amount' %></td>
+        <td class="align-right">
+          <input id="amount_input" class="large-text-input optional" placeholder="<%= t 'wallet.receive.amount_placeholder' %>"/>
+          <label class="large-text-input optional">BTC</label>
+        </td>
+      </tr>
+      <tr class="no-border">
+        <td class="row-title"><%= t 'wallet.receive.receiver_address' %></td>
+        <td class="align-right" id="receiver_address">1DDGTMZUxwYwRdWcyVBmSrGEoVXkVTd6xS</td>
+      </tr>
+    </tbody>
+  </table>
+  <div id="qrcode_container">
+    <div>
+      <div id="qrcode_frame"></div>
+    </div>
+    <p class="regular-grey-text-small"><%- t 'wallet.receive.qr_code_explanation' %></p>
+  </div>
+</section>
+<div class="dialog-actions-bar">
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'wallet.receive.close' %></a>
+</div>

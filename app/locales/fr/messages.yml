@@ -173,11 +173,11 @@ wallet:
       close: "FERMER"
 
     index:
-       <<: *default-operations-translation
-       title: "TOUTES LES OPÉRATIONS"
-       title_with_account_name: 'TOUTES LES OPÉRATIONS DE %s'
-       filter_sort_desc: "TRI DÉCROISSANT"
-       filter_sort_asc: "TRI CROISSANT"
+      <<: *default-operations-translation
+      title: "TOUTES LES OPÉRATIONS"
+      title_with_account_name: 'TOUTES LES OPÉRATIONS DE %s'
+      filter_sort_desc: "TRI DÉCROISSANT"
+      filter_sort_asc: "TRI CROISSANT"
 
   accounts:
     account:
@@ -194,25 +194,25 @@ wallet:
         title: "DERNIÈRES OPÉRATIONS"
         action: "VOIR TOUTES LES OPÉRATIONS"
 
-      receive:
-        title: "RECEVOIR DES BITCOINS"
-        amount: "MONTANT (OPTIONNEL)"
-        amount_placeholder: "montant"
-        receiver_account: "COMPTE À CRÉDITER"
-        receiver_address: "ADRESSE BITCOIN DE RÉCEPTION"
-        qr_code_explanation: "Code QR à scanner par la personne<br />qui souhaite vous envoyer des bitcoins"
-        send_by_email: "ENVOYER PAR EMAIL"
-        print: "IMPRIMER"
-        close: "ANNULER"
+  receive:
+    title: "RECEVOIR DES BITCOINS"
+    amount: "MONTANT (OPTIONNEL)"
+    amount_placeholder: "montant"
+    receiver_account: "COMPTE À CRÉDITER"
+    receiver_address: "ADRESSE BITCOIN DE RÉCEPTION"
+    qr_code_explanation: "Code QR à scanner par la personne<br />qui souhaite vous envoyer des bitcoins"
+    send_by_email: "ENVOYER PAR EMAIL"
+    print: "IMPRIMER"
+    close: "ANNULER"
 
-      send:
-        title: "ENVOYER DES BITCOINS"
-        amount: "MONTANT"
-        amount_placeholder: "montant"
-        sender_account: "COMPTE À DÉBITER"
-        receiver_address: "ADRESSE BITCOIN À CRÉDITER"
-        receiver_address_placeholder: "adresse bitcoin"
-        transaction_fees: "FRAIS DE TRANSACTION"
-        transaction_fees_text: "0.0001 BTC (virement confirmé sous 10 minutes)"
-        send: "ENVOYER"
-        close: "ANNULER"
+  send:
+    title: "ENVOYER DES BITCOINS"
+    amount: "MONTANT"
+    amount_placeholder: "montant"
+    sender_account: "COMPTE À DÉBITER"
+    receiver_address: "ADRESSE BITCOIN À CRÉDITER"
+    receiver_address_placeholder: "adresse bitcoin"
+    transaction_fees: "FRAIS DE TRANSACTION"
+    transaction_fees_text: "0.0001 BTC (virement confirmé sous 10 minutes)"
+    send: "ENVOYER"
+    close: "ANNULER"
