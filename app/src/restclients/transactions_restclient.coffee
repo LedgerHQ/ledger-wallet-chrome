@@ -7,7 +7,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
       url: "blockchain/transactions/#{transactionHash}/hex"
       onSuccess: (response) ->
         callback?(response.hex)
-      onError: @errorCallback(callback)
+      onError: @networkErrorCallback(callback)
 
   getTransactions: (addresses, callback) ->
     transactions = []
@@ -18,7 +18,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
           transactions = transactions.concat(response)
           callback(transactions) unless hasNext is true
           do done
-        onFailure: @errorCallback(callback)
+        onFailure: @networkErrorCallback(callback)
 
 
   postTransaction: (transaction, callback) ->
@@ -28,5 +28,5 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
       onSuccess: (response) ->
         transaction.setHash(response.transaction_hash)
         callback?(transaction)
-      onError: @errorCallback(callback)
+      onError: @networkErrorCallback(callback)
 

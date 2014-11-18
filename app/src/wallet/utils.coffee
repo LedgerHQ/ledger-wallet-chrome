@@ -20,7 +20,6 @@ _.extend ledger.wallet,
 
       # No result from cache perform the derivation on the chip
       ledger.app.wallet.getPublicAddress path, (publicKey) ->
-        l publicKey.bitcoinAddress.value
         if publicKey?
           addresses[path] = publicKey?.bitcoinAddress?.value
         else

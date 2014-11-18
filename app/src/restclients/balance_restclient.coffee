@@ -5,13 +5,18 @@ class ledger.api.BalanceRestClient extends ledger.api.RestClient
 
   getAccountBalance: (account, callback) ->
     account = ledger.wallet.HDWallet.instance.getAccount(account) unless _.isKindOf(account, ledger.wallet.HDWallet.instance)
-    l account
     addressesPaths = [].concat(account.getAllChangeAddressesPaths()).concat(account.getAllPublicAddressesPaths())
-    l addressesPaths
+    accountBalance = {total: 0, confirmed: 0, unconfirmed: 0}
     ledger.wallet.pathsToAddresses addressesPaths, (addresses) =>
-      l addresses
       _.async.eachBatch _.values(addresses), 20, (addresses, done, hasNext) =>
         @http().get
           url: "blockchain/addresses/#{addresses.join(',')}"
-          onSuccess: (response) ->
-            l response
+          onSuccess: (addressesBalances) ->
+            for addressBalance in addressesBalances
+              accountBalance.total += addressBalance.total.balance
+              accountBalance.confirmed += addressBalance.confirmed.balance
+            unless hasNext
+              accountBalance.unconfirmed = accountBalance.total - accountBalance.confirmed
+              callback?(accountBalance)
+            do done
+          onError: @networkErrorCallback(callback)
