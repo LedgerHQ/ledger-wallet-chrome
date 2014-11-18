@@ -72,7 +72,9 @@ class @ViewController extends @EventEmitter
 
   # Called after the view controller is rendered
   onAfterRender: ->
-    for key, value of @view
+    view = @view
+    @view = {}
+    for key, value of view
       @view[key] = if value.selector? then $(value.selector) else @select(value)
 
   # Called when the view controller is attached to a parent view controller

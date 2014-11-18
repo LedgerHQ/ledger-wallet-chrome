@@ -21,6 +21,7 @@ class @WalletAccountsAccountReceiveDialogViewController extends DialogViewContro
 
   onShow: ->
     super
+    l @view.amountInput
     @view.amountInput.focus()
 
   _listenEvents: ->
