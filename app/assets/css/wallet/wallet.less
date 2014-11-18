@@ -1,36 +1,9 @@
 @import (reference) "../constants";
-@import "top-menu";
 @import (reference) "../application";
+@import "top-menu";
 
 #navigation_controller_content {
   padding: @metrics-large-padding @metrics-medium-padding;
-}
-
-.account-type-tag {
-  border-radius: 5px;
-  padding: 5px 4px;
-  padding-top: 1.5px;
-  font-size: @font-size-very-small;
-  color: @color-white;
-}
-
-.account-type-orange {
-  .account-type-tag();
-  background-color: #ffa200;
-}
-
-.account-type-green {
-  .account-type-tag();
-  background-color: #3fb34f;
-}
-
-.account-type-blue {
-  .account-type-tag();
-  background-color: #0099ff;
-}
-
-.very-small-text {
-  font-size: @font-size-very-small;
 }
 
 section {
@@ -42,41 +15,14 @@ section {
     margin-top: 0px;
   }
 
-  >header {
+  > header {
     display: flex;
     align-items: center;
     margin-bottom: 0px;
 
-    >h1 {
+    > h1 {
       .uppercase-section-title;
       margin-right: @metrics-very-small-padding;
-    }
-
-    .account-type-tag {
-      border-radius: 5px;
-      padding: 6px 4px;
-      padding-top: 4px;
-      font-size: @font-size-very-small;
-      color: @color-white;
-    }
-
-    .account-type-orange {
-      .account-type-tag();
-      background-color: #ffa200;
-    }
-
-    .account-type-green {
-      .account-type-tag();
-      background-color: #3fb34f;
-    }
-
-    .account-type-blue {
-      .account-type-tag();
-      background-color: #0099ff;
-    }
-
-    .very-small-text {
-      font-size: @font-size-very-small;
     }
 
     a.uppercase-action {
@@ -84,7 +30,7 @@ section {
     }
   }
 
-  >table {
+  > table {
     width: 100%;
     vertical-align: middle;
 
@@ -93,10 +39,6 @@ section {
       border-bottom: 1px solid transparent;
       padding-top: @metrics-medium-padding;
       padding-bottom: @metrics-very-small-padding;
-    }
-
-    tbody tr:first-child td {
-
     }
 
     tbody tr td {
@@ -143,28 +85,6 @@ section {
       padding-top: @metrics-large-padding;
     }
 
-    .price {
-      letter-spacing: -0.3px;
-    }
-
-    .positive {
-      color: @color-valid-green;
-    }
-
-    .negative {
-      color: @color-invalid-red;
-    }
-
-    .positive-price {
-      .price;
-      .positive;
-    }
-
-    .negative-price {
-      .price;
-      .negative;
-    }
-
     .align-right {
       text-align: right;
       padding-right: 0px;
@@ -193,15 +113,6 @@ section {
     .padding-right-ultra-large {
       padding-right: @metrics-ultra-large-padding;
     }
-
-    .weak-text {
-      color: @color-dark-grey;
-    }
-
-    .very-weak-text {
-      color: @color-soft-grey;
-    }
-
   }
 
 }

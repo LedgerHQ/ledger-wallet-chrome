@@ -21,7 +21,7 @@
     <div>
       <div id="qrcode_frame"></div>
     </div>
-    <p class="small-regular-grey-text"><%- t 'wallet.accounts.account.receive.qr_code_explanation' %></p>
+    <p class="regular-grey-text-small"><%- t 'wallet.accounts.account.receive.qr_code_explanation' %></p>
   </div>
 </section>
 <div class="dialog-actions-bar">

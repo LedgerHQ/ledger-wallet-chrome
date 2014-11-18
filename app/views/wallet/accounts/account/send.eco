@@ -19,7 +19,7 @@
       </tr>
       <tr class="no-border">
         <td class="row-title-optional"><%= t 'wallet.accounts.account.send.transaction_fees' %></td>
-        <td class="align-right small-regular-grey-text"><%= t 'wallet.accounts.account.send.transaction_fees_text' %></td>
+        <td class="align-right regular-grey-text-small"><%= t 'wallet.accounts.account.send.transaction_fees_text' %></td>
       </tr>
     </tbody>
   </table>

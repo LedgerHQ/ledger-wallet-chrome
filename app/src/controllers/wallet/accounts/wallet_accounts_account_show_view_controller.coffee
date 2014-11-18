@@ -42,6 +42,3 @@ class @WalletAccountsAccountShowViewController extends @ViewController
 #    @select('#unconfirmed_balance_tooltip').tooltipster
 #      content: 'Hello world'
 #      theme: 'tooltipster-light'
-
-    _.defer =>
-      ledger.app.router.go '/wallet/send/index'

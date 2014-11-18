@@ -63,12 +63,26 @@
   letter-spacing: -0.3px;
   text-transform: uppercase;
 }
-.small-regular-text {
-  font-size: @font-size-very-small;
+.text(@color) {
+  font-size: @font-size-medium;
+  color: @color;
+
+  &-small {
+    color: @color;
+    font-size: @font-size-very-small;
+  }
 }
-.small-regular-grey-text {
-  .small-regular-text;
-  color: @color-dark-grey;
+.regular-text {
+  .text(@color-black);
+}
+.regular-grey-text {
+  .text(@color-dark-grey);
+}
+.regular-valid-text {
+  .text(@color-valid-green);
+}
+.regular-invalid-text {
+  .text(@color-invalid-red);
 }
 
 // inputs
