@@ -11,11 +11,16 @@ common:
     no: "No"
     confirmation: "Confirmation"
 
+  keycard:
+    uppercase_letters: "Uppercase letters"
+    lowercase_letters: "Lowercase letters"
+    digits: "Digits"
+
 onboarding:
   device:
     plug:
       to_start: "To begin, plug your Ledger Wallet into the USB port of the computer."
-      is_not_recognized: "My Ledger Wallet is not recognized"
+      is_not_recognized: "Your Ledger Wallet is not recognized?"
 
     unplug:
       unlock_my_wallet: "Unlock my wallet"
@@ -38,7 +43,7 @@ onboarding:
 
     opening:
       is_opening: "Please wait while your wallet is opening..."
-      not_opening: "My Ledger Wallet won't open"
+      not_opening: "Your Ledger Wallet won't open?"
 
   management:
     back: "BACK"
@@ -215,6 +220,11 @@ wallet:
       receiver_address: "RECIPIENT BITCOIN ADDRESS"
       receiver_address_placeholder: "bitcoin address"
       transaction_fees: "TRANSACTION FEES"
-      transaction_fees_text: "0.0001 BTC (transfer is confirmed under 10 minutes)"
+      transaction_fees_text: "0.0001 BTC (operation is confirmed under 10 minutes)"
       send: "SEND"
       close: "CLOSE"
+
+    validation:
+      title: "Required validation code"
+      grab_your_card: "Grab your <b>security card</b> (black card) and type on your keyboard the letter or digit in the black box for each highlighted value:"
+      entered_code: "Entered code:"

@@ -69,22 +69,29 @@
   letter-spacing: -0.3px;
   text-transform: uppercase;
 }
-.text(@color, @weight: @font-weight-regular) {
-  font-size: @font-size-medium;
+.text(@color, @size: @font-size-medium, @weight: @font-weight-regular) {
+  font-size: @size;
   color: @color;
   font-weight: @weight;
 
-  &-small {
-    color: @color;
-    font-size: @font-size-very-small;
-    font-weight: @weight;
+  b {
+    font-weight: @font-weight-semibold;
   }
 }
 .regular-text {
   .text(@color-black);
 }
+.regular-text-small {
+  .text(@color-black, @font-size-very-small);
+}
+.bold-regular-text {
+  .text(@color-black, @font-size-medium, @font-weight-semibold);
+}
 .regular-grey-text {
   .text(@color-dark-grey);
+}
+.regular-grey-text-small {
+  .text(@color-dark-grey, @font-size-very-small);
 }
 .regular-valid-text {
   .text(@color-valid-green);
@@ -93,7 +100,7 @@
   .text(@color-invalid-red);
 }
 .bold-invalid-text {
-  .text(@color-invalid-red, @font-weight-semibold);
+  .text(@color-invalid-red, @font-size-medium, @font-weight-semibold);
 }
 
 // inputs

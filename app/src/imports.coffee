@@ -142,6 +142,7 @@
 
         # Send
         'controllers/wallet/send/wallet_send_index_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_validation_dialog_view_controller'
 
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'
@@ -159,12 +160,12 @@
         'controllers/onboarding/device/onboarding_device_opening_view_controller'
 
         # Management
-        'controllers/onboarding/management/onboarding_management_security_view_controller',
-        'controllers/onboarding/management/onboarding_management_welcome_view_controller',
-        'controllers/onboarding/management/onboarding_management_pin_view_controller',
-        'controllers/onboarding/management/onboarding_management_pin_confirmation_view_controller',
-        'controllers/onboarding/management/onboarding_management_seed_view_controller',
-        'controllers/onboarding/management/onboarding_management_summary_view_controller',
-        'controllers/onboarding/management/onboarding_management_provisioning_view_controller',
+        'controllers/onboarding/management/onboarding_management_security_view_controller'
+        'controllers/onboarding/management/onboarding_management_welcome_view_controller'
+        'controllers/onboarding/management/onboarding_management_pin_view_controller'
+        'controllers/onboarding/management/onboarding_management_pin_confirmation_view_controller'
+        'controllers/onboarding/management/onboarding_management_seed_view_controller'
+        'controllers/onboarding/management/onboarding_management_summary_view_controller'
+        'controllers/onboarding/management/onboarding_management_provisioning_view_controller'
         'controllers/onboarding/management/onboarding_management_done_view_controller'
       ]
