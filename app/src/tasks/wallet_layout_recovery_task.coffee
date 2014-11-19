@@ -64,7 +64,9 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       ledger.wallet.pathsToAddresses paths, (addresses) =>
         ledger.api.TransactionsRestClient.instance.getTransactions _.values(addresses), 1, (transactions, error) =>
           return @emit 'bip44:fatal' if error?
-          l transactions
+          for transaction in transactions
+            l transaction
+
 
 
 

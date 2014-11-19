@@ -110,6 +110,9 @@ class ledger.wallet.HDWallet.Account
       when 'change' then @getChangeAddressPath(index)
       when 'public' then @getPublicAddressPath(index)
 
+  getCurrentChangeAddress: () -> ledger.wallet.HDWallet.instance.cache?.get(@getCurrentChangeAddressPath())
+  getCurrentPublicAddress: () -> ledger.wallet.HDWallet.instance.cache?.get(@getCurrentPublicAddressPath())
+
   shiftCurrentPublicAddressPath: (callback) ->
     index = @_account.currentPublicIndex
     index = 0 unless index?
