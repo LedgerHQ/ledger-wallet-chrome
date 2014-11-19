@@ -15,17 +15,11 @@ class ledger.tasks.BalanceTask extends ledger.tasks.Task
         @emit "failure", @
         ledger.app.emit "wallet:balance:failed"
       else
-        l balance
-        l @_accountId
-        a = Account.find(@_accountId).exists (exists) =>
-          l exists, a.getUid()
         account = Account.find(@_accountId)
         account.set('total_balance', balance.total)
         account.set('unconfirmed_balance', balance.unconfirmed)
         l account
         account.save =>
-          l 'Get'
-          account.get ['total_balance'], ->
           @emit "success", @
           ledger.app.emit "wallet:balance:changed",
             wallet:

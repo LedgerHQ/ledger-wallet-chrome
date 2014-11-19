@@ -10,7 +10,6 @@ class @Wallet extends Model
   retrieveAccountsBalances: () ->
     @getAccounts (accounts) =>
       accounts.each (account) =>
-        l account
         _.model(account).retrieveBalance() if account?
 
   getBalance: (callback = _.noop) ->
@@ -22,7 +21,6 @@ class @Wallet extends Model
 
     @getAccounts (accounts) =>
       accounts.each (account) =>
-        l account
         if account?
           balance.wallet.total += account.total_balance
           balance.wallet.unconfirmed += account.unconfirmed_balance
@@ -37,7 +35,6 @@ class @Wallet extends Model
     @instance = @find(0)
     _.defer =>
       @instance.exists (exists) =>
-        l exists
         if exists is true
           callback?()
         else
@@ -45,7 +42,6 @@ class @Wallet extends Model
           @instance.save =>
             account = Account.create {_id: 0, name: 'Il faut changer ce nom'}
             account.save =>
-              l account.getUid()
               @instance.getAccounts (accounts) =>
                 accounts.insert account, =>
                   accounts.toArray (a) => l a

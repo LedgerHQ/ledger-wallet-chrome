@@ -15,6 +15,10 @@ class ledger.wallet.HDWallet.Cache
 
   get: (path) -> @_cache.get(path)
 
+  hasPublicKey: (publicKey) -> if @getDerivationPath()? then yes else no
+
+  getDerivationPath: (publicKey) -> _(@_cache.toJSON()).where({value: publicKey})[0]
+
   # @param [Array] tuples An array array of tuple [path, address] to cache
   set: (tuples, callback = _.noop) ->
     for tuple in tuples

@@ -88,6 +88,7 @@ require @ledger.imports, ->
             @emit 'dongle:disconnected'
             Wallet.releaseWallet()
             ledger.wallet.release(wallet)
+            ledger.tasks.TransactionObserverTask.instance.stop()
             @wallet = null
             ledger.dialogs.manager.dismissAll(no)
             @router.go '/onboarding/device/plug'
@@ -100,6 +101,7 @@ require @ledger.imports, ->
             Wallet.initializeWallet =>
               @emit 'wallet:initialized'
               Wallet.instance.retrieveAccountsBalances()
+              ledger.tasks.TransactionObserverTask.instance.start()
         @emit 'dongle:connected', @wallet
 
     _listenClickEvents: () ->
