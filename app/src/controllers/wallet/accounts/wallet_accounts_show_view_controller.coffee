@@ -39,4 +39,4 @@ class @WalletAccountsShowViewController extends @ViewController
       wallet.on('state:changed', state)
       state()
 
-    ledger.app.router.go '/wallet/send/validation'
+    ledger.app.router.go '/wallet/send/processing'
