@@ -10,7 +10,7 @@ ledger.router.pluggedWalletRoutesExceptions = [
 @declareRoutes = (route, app) ->
   ## Default
   route '/', ->
-    app.router.go '/onboarding/device/plug', {animateIntro: yes}
+    app.router.go '/wallet/accounts/0/show', {animateIntro: yes}
 
   ## Onboarding
   # Device
@@ -77,6 +77,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   route '/wallet/send/error', (params) ->
     dialog = new WalletSendErrorDialogViewController()
+    dialog.show()
+
+  route '/wallet/send/success', (params) ->
+    dialog = new WalletSendSuccessDialogViewController()
     dialog.show()
 
   # Receive

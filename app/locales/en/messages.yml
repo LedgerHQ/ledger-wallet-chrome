@@ -243,3 +243,9 @@ wallet:
       title: "Sending failed"
       unable_to_send_bitcoins: "The transaction could not be completed."
       close: "Close"
+
+    success:
+      title: "Sending succeeded"
+      able_to_send_bitcoins: "The transaction successfully completed."
+      close: "Close"
+      confirmed_in_a_few_minutes: "The operation will appear as confirmed in a few minutes."

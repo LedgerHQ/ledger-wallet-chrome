@@ -1,0 +1,7 @@
+<section id="send_success_dialog">
+  <img src="../assets/images/common/large_success.png" width="50" height="50" />
+  <div class="uppercase-section-title"><%= t 'wallet.send.success.title' %></div>
+  <div class="regular-text"><%= t 'wallet.send.success.able_to_send_bitcoins' %></div>
+  <div class="regular-grey-text-small"><%= t 'wallet.send.success.confirmed_in_a_few_minutes' %></div>
+  <a href="#dismiss" class="cancel-rounded-button"><%= t 'wallet.send.success.close' %></a>
+</section>
