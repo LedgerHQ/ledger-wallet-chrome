@@ -38,5 +38,3 @@ class @WalletAccountsShowViewController extends @ViewController
     ledger.app.walletsManager.on 'connected', (ev, wallet) =>
       wallet.on('state:changed', state)
       state()
-
-    ledger.app.router.go '/wallet/send/success'
