@@ -114,20 +114,22 @@ class ledger.wallet.HDWallet.Account
   getCurrentPublicAddress: () -> ledger.wallet.HDWallet.instance.cache?.get(@getCurrentPublicAddressPath())
 
   shiftCurrentPublicAddressPath: (callback) ->
+    l 'shift public'
     index = @_account.currentPublicIndex
     index = 0 unless index?
     index = parseInt(index) if _.isString(index)
     @_account.currentPublicIndex = index + 1
     @save()
-    ledger.app.wallet?.getPublicAddress @getCurrentPublicAddressPath(), => callback
+    ledger.app.wallet?.getPublicAddress @getCurrentPublicAddressPath(), => callback?()
 
   shiftCurrentChangeAddressPath: (callback) ->
+    l 'shift change'
     index = @_account.currentChangeIndex
     index = 0 unless index?
     index = parseInt(index) if _.isString(index)
     @_account.currentChangeIndex = index + 1
     @save()
-    ledger.app.wallet?.getPublicAddress @getCurrentChangeAddressPath(), => callback
+    ledger.app.wallet?.getPublicAddress @getCurrentChangeAddressPath(), => callback?()
 
   importPublicAddressPath: (addressPath) ->
     @_account.importedPublicPaths ?= []

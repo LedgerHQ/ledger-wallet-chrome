@@ -5,7 +5,7 @@ class @WalletReceiveIndexDialogViewController extends DialogViewController
 
   initialize: ->
     super
-    @params.address = '1DDGTMZUxwYwRdWcyVBmSrGEoVXkVTd6xS'
+    @params.address = ledger.wallet.HDWallet.instance.getAccount(0).getCurrentPublicAddress()
 
   onAfterRender: ->
     super
