@@ -1,1 +1,5 @@
-hello
+<section id="send_processing_dialog">
+  <div id="spinner_container"></div>
+  <div class="uppercase-section-title" id="title"></div>
+  <div class="regular-grey-text-small"><%= t 'wallet.send.processing.may_take_a_while' %></div>
+</section>
