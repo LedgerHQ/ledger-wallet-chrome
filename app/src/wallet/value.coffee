@@ -9,9 +9,9 @@ class ledger.wallet.Value
         [integerPart, fractionalPart] = value.split('.')
 
         fractionalPart = _.str.rpad(fractionalPart, 8, '0')
-        v = Bitcoin.BigInteger.valueOf(parseInt(integerPart))
+        v = new Bitcoin.BigInteger(integerPart)
         .multiply Bitcoin.BigInteger.valueOf(10e+7)
-        .add(Bitcoin.BigInteger.valueOf(parseInt(fractionalPart)))
+        .add(new Bitcoin.BigInteger(fractionalPart))
         new ledger.wallet.Value(v)
       when _.isNumber value then new Value(value)
 
@@ -19,7 +19,7 @@ class ledger.wallet.Value
     if _(value).isKindOf(Bitcoin.BigInteger)
       @_number = value
       return this
-    @_number = Bitcoin.BigInteger.valueOf value
+    @_number = new Bitcoin.BigInteger(value)
 
   add: (value) ->
     value = Value.from(value) unless _(value).isKindOf(ledger.wallet.Value)
