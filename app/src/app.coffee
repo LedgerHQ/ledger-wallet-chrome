@@ -88,7 +88,7 @@ require @ledger.imports, ->
             @emit 'dongle:disconnected'
             Wallet.releaseWallet()
             ledger.wallet.release(wallet)
-            ledger.tasks.TransactionObserverTask.instance.stop()
+            ledger.tasks.Task.stopAllRunningTasks()
             @wallet = null
             ledger.dialogs.manager.dismissAll(no)
             @router.go '/onboarding/device/plug'

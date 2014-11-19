@@ -18,9 +18,9 @@ _.async =
     done = ->
       return if batchIndex >= batchCount
       batchIndex += 1
-      hasNext = index < length
+      hasNext = batchIndex < batchCount
       firstIndex = (batchIndex - 1) * batchSize
       lastIndex = Math.min(batchIndex * batchSize - 1, length - 1)
       batch = (array[index] for index in [firstIndex..lastIndex])
-      iteratee(batch, (if hasNext then done else _.noop), hasNext)
+      iteratee(batch, (if hasNext then done else _.noop), hasNext, batchIndex, batchCount)
     done()

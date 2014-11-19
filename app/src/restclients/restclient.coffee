@@ -8,7 +8,6 @@ class ledger.api.RestClient
     new HttpClient('https://api.ledgerwallet.com/')
 
   networkErrorCallback: (callback) ->
-    errorCallback = () ->
-      (xhr, status, message) =>
+    errorCallback = (xhr, status, message) ->
         callback(null, {xhr, status, message, code: ledger.errors.NetworkError})
     errorCallback

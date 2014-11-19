@@ -162,9 +162,9 @@ restoreStructure = (wallet, done) ->
   if ledger.wallet.HDWallet.instance.isEmpty()
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'done', () => done?()
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'fatal_error', () => ledger.app.emit 'wallet:initialization:failed'
-    ledger.tasks.WalletLayoutRecoveryTask.instance.start()
+    ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
   else
-    ledger.tasks.WalletLayoutRecoveryTask.instance.start()
+    ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
     done?()
 
 completeInitialization = (wallet, done) ->

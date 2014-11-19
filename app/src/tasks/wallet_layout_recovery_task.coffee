@@ -4,8 +4,12 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   @instance: new @()
 
   onStart: () ->
-    @once 'bip44:done', => @emit 'done'
-    @once 'bip44:fatal chronocoin:fatal', => @emit 'fatal_error'
+    @once 'bip44:done', =>
+      @emit 'done'
+      @stopIfNeccessary()
+    @once 'bip44:fatal chronocoin:fatal', =>
+      @emit 'fatal_error'
+      @stopIfNeccessary()
 
     if ledger.wallet.HDWallet.instance.getAccountsCount() == 0
       @once 'chronocoin:done', => @_restoreBip44Layout()
@@ -26,6 +30,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
             account.importPublicAddressPath("0'/0/0")
             account.save()
           else if error?
+            l 'Error'
             @emit 'chronocoin:fatal'
           else
             ledger.wallet.HDWallet.instance.createAccount()
@@ -37,7 +42,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     recoverAccount = =>
       return @emit 'bip44:done' if accountIndex is 1 # App first version limitiation
 
-      account = ledger.HDWallet.instance.getOrCreateAccount(accountIndex)
+      account = ledger.wallet.HDWallet.instance.getOrCreateAccount(accountIndex)
 
       done = =>
         @emit 'bip44:account:done'
@@ -48,7 +53,22 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     do recoverAccount
 
   _restoreBip44AccountChainsLayout: (account, done) ->
-    index = account.getCurrentAddressIndex(chain)
+    isRestoringChangeChain = yes
+    isRestoringPublicChain = yes
+
+    testIndex = (index) =>
+      paths = []
+      paths.push account.getCurrentPublicAddressPath() if isRestoringPublicChain
+      paths.push account.getCurrentChangeAddressPath() if isRestoringPublicChain
+
+      ledger.wallet.pathsToAddresses paths, (addresses) =>
+        ledger.api.TransactionsRestClient.instance.getTransactions _.values(addresses), 1, (transactions, error) =>
+          return @emit 'bip44:fatal' if error?
+          l transactions
+
+
+
+    testIndex(0)
 
 
 

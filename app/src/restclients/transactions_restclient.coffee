@@ -9,16 +9,20 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
         callback?(response.hex)
       onError: @networkErrorCallback(callback)
 
-  getTransactions: (addresses, callback) ->
+  getTransactions: (addresses, batchSize, callback) ->
+    if _.isFunction(batchSize)
+      callback = batchSize
+      batchSize = null
+    batchSize ?= 20
     transactions = []
-    _.async.eachBatch addresses, 20, (batch, done, hasNext) =>
+    _.async.eachBatch addresses, batchSize, (batch, done, hasNext, batchIndex, batchCount) =>
       @http().get
         url: "blockchain/addresses/#{batch.join(',')}/transactions"
         onSuccess: (response) ->
           transactions = transactions.concat(response)
-          callback(transactions) unless hasNext is true
+          callback(transactions) unless hasNext
           do done
-        onFailure: @networkErrorCallback(callback)
+        onError: @networkErrorCallback(callback)
 
 
   postTransaction: (transaction, callback) ->
