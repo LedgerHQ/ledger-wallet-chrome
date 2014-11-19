@@ -224,10 +224,11 @@ wallet:
       sender_account: "DEBIT ACCOUNT"
       receiver_address: "RECIPIENT BITCOIN ADDRESS"
       receiver_address_placeholder: "bitcoin address"
-      transaction_fees: "TRANSACTION FEES"
-      transaction_fees_text: "0.0001 BTC (operation is confirmed under 10 minutes)"
+      total_spent: "TOTAL SPENT"
+      transaction_fees_text: "(+0.00001 BTC transaction fees)"
       send: "SEND"
       close: "CLOSE"
+      confirm: "CONFIRM"
 
     validation:
       title: "Required validation code"

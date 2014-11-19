@@ -224,10 +224,11 @@ wallet:
       sender_account: "COMPTE À DÉBITER"
       receiver_address: "ADRESSE BITCOIN À CRÉDITER"
       receiver_address_placeholder: "adresse bitcoin"
-      transaction_fees: "FRAIS DE TRANSACTION"
-      transaction_fees_text: "0.0001 BTC (opération confirmée sous 10 minutes)"
+      total_spent: "TOTAL DÉPENSÉ"
+      transaction_fees_text: "(+0.00001 BTC frais de transaction)"
       send: "ENVOYER"
       close: "ANNULER"
+      confirm: "CONFIRMER"
 
     validation:
       title: "Code de validation nécessaire"
