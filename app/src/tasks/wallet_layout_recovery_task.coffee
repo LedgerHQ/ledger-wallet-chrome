@@ -44,17 +44,11 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
         accountIndex += 1
         do recoverAccount
 
-      done = _.after(done, 2)
-      @_restoreBip44AccountChangeLayout account, => do done
-      @_restoreBip44AccountPublicLayout account, => do done
+      @_restoreBip44AccountChainsLayout account, => do done
     do recoverAccount
 
-  _restoreBip44AccountPublicLayout: (account, done) ->
-    index = account.getCurrentPublicAddressIndex()
+  _restoreBip44AccountChainsLayout: (account, done) ->
+    index = account.getCurrentAddressIndex(chain)
 
-  _restoreBip44AccountChangeLayout: (account, done) ->
-    index = account.getCurrentChangeAddressIndex()
-
-  _restoreBip44AccountChainLayout: (account, chain, done) ->
 
 

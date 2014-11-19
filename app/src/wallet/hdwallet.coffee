@@ -97,6 +97,11 @@ class ledger.wallet.HDWallet.Account
 
   getCurrentPublicAddressPath: () -> @getPublicAddressPath(@getCurrentPublicAddressIndex())
   getCurrentChangeAddressPath: () -> @getChangeAddressPath(@getCurrentChangeAddressIndex())
+  getCurrentAddressPath: (type) ->
+    switch type
+      when 'change' then @getCurrentChangeAddressPath(index)
+      when 'public' then @getCurrentPublicAddressPath(index)
+
 
   getPublicAddressPath: (index) -> "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
   getChangeAddressPath: (index) -> "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index}"
