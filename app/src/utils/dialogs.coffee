@@ -15,6 +15,9 @@ class @ledger.dialogs.DialogController extends EventEmitter
     @_viewController.onShow()
     @emit 'show'
 
+  isShown: ->
+    @ == ledger.dialogs.manager.displayedDialog()
+
   onDismiss: ->
     @_viewController.onDismiss()
     @emit 'dismiss'

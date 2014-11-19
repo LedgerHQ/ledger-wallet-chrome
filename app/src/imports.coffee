@@ -135,19 +135,29 @@
 
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller'
+
         # Dashboard
         'controllers/wallet/dashboard/wallet_dashboard_index_view_controller'
+
         # Operations
         'controllers/wallet/operations/wallet_operations_detail_dialog_view_controller'
         'controllers/wallet/operations/wallet_operations_index_view_controller'
+
         # Accounts
-        'controllers/wallet/accounts/wallet_accounts_account_show_view_controller'
-        'controllers/wallet/accounts/wallet_accounts_account_receive_dialog_view_controller'
-        'controllers/wallet/accounts/wallet_accounts_account_send_dialog_view_controller'
+        'controllers/wallet/accounts/wallet_accounts_show_view_controller'
+
+        # Send
+        'controllers/wallet/send/wallet_send_index_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_validation_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_processing_dialog_view_controller'
+
+        # Receive
+        'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
         'controllers/onboarding/onboarding_navigation_controller'
+
         # Device
         'controllers/onboarding/device/onboarding_device_plug_view_controller'
         'controllers/onboarding/device/onboarding_device_unplug_view_controller'
@@ -157,12 +167,12 @@
         'controllers/onboarding/device/onboarding_device_opening_view_controller'
 
         # Management
-        'controllers/onboarding/management/onboarding_management_security_view_controller',
-        'controllers/onboarding/management/onboarding_management_welcome_view_controller',
-        'controllers/onboarding/management/onboarding_management_pin_view_controller',
-        'controllers/onboarding/management/onboarding_management_pin_confirmation_view_controller',
-        'controllers/onboarding/management/onboarding_management_seed_view_controller',
-        'controllers/onboarding/management/onboarding_management_summary_view_controller',
-        'controllers/onboarding/management/onboarding_management_provisioning_view_controller',
+        'controllers/onboarding/management/onboarding_management_security_view_controller'
+        'controllers/onboarding/management/onboarding_management_welcome_view_controller'
+        'controllers/onboarding/management/onboarding_management_pin_view_controller'
+        'controllers/onboarding/management/onboarding_management_pin_confirmation_view_controller'
+        'controllers/onboarding/management/onboarding_management_seed_view_controller'
+        'controllers/onboarding/management/onboarding_management_summary_view_controller'
+        'controllers/onboarding/management/onboarding_management_provisioning_view_controller'
         'controllers/onboarding/management/onboarding_management_done_view_controller'
       ]

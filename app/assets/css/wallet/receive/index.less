@@ -1,7 +1,11 @@
-@import (reference) "../../../constants";
-@import "common";
+@import (reference) "../../constants";
+@import (reference) "../../mixins";
 
 section#receive_dialog {
+ #receiver_address {
+    .selectable;
+  }
+
   #qrcode_container {
     display: flex;
     flex-direction: column;
@@ -14,11 +18,8 @@ section#receive_dialog {
     }
 
     > p {
-      width: 224px;
       margin-top: @metrics-small-padding - 9px;
       text-align: center;
-      color: @color-dark-grey;
-      font-size: @font-size-very-small;
       line-height: 20px;
     }
   }

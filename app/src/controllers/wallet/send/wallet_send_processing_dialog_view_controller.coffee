@@ -1,0 +1,3 @@
+class @WalletSendProcessingDialogViewController extends @DialogViewController
+
+  

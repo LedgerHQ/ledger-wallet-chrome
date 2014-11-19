@@ -1,5 +1,121 @@
 @ledger.pin_codes ?= {}
 
+class @ledger.pin_codes.KeyCard extends EventEmitter
+
+  _el: undefined
+  _input: undefined
+  _valuesNodes: undefined
+
+  _validableValues: undefined
+  _currentValidableValueNode: undefined
+
+  @values = [
+    'ABCDEFGHJKLMNPQRSTUVWXYZ',
+    'abcdefghijkmnopqrstuvwxyz',
+    '0123456789'
+  ]
+
+  insertIn: (parent) ->
+    @_buildEl() if not @_el?
+    parent.appendChild @_el
+
+  remove: ->
+    $(@_el).remove()
+    @_el = undefined
+    @_input = undefined
+    @_valuesNodes = undefined
+    @_validableValues = undefined
+    @_currentValidableValueNode = undefined
+
+  setValidableValues: (values) ->
+    @_validableValues = if values? then values else []
+    @_currentValidableValueNode = undefined
+    @_updateCurrentValidableValue()
+
+  focus: ->
+    @_buildEl() if not @_el?
+    @_input.focus()
+
+  stealFocus: ->
+    @_buildEl() if not @_el?
+    @focus()
+    $(@_input).on 'blur', =>
+      @focus()
+
+  _buildEl: ->
+    @_el = document.createElement('div')
+    @_el.className = 'keycard'
+    @_valuesNodes = []
+    for i in [0..2]
+      section = document.createElement('div')
+      section.className = 'section-title'
+      section.innerText = @_sectionTitle i
+      values = document.createElement('div')
+      values.className = 'section-values'
+      for j in [0..(@_sectionValue(i).length - 1)]
+        value = document.createElement('div')
+        value.className = 'value'
+        value.innerText = ledger.pin_codes.KeyCard.values[i][j]
+        values.appendChild value
+      @_el.appendChild section
+      @_el.appendChild values
+      @_valuesNodes.push values
+    @_input = document.createElement('input')
+    @_input.type = 'password'
+    @_el.appendChild @_input
+    @_updateCurrentValidableValue()
+    do @_listenEvents
+
+  _listenEvents: (listen = yes) ->
+    if listen
+      $(@_input).on 'input', (e) =>
+        reg = /[0-9a-zA-Z]/g
+        if reg.test @_input.value
+          @_processNextValidableValue()
+        else
+          @_input.value = @_input.value.replace(/[^0-9a-zA-Z]/g, '')
+    else
+      $(@_input).off 'input'
+
+  _updateCurrentValidableValue: ->
+    if @_currentValidableValueNode?
+      $(@_currentValidableValueNode).removeClass 'selected'
+      @_currentValidableValueNode = undefined
+    return if not @_el? or not @_validableValues? or @_validableValues.length == 0
+    [index, offset] = @_indexesOfSectionValue @_validableValues[0]
+    return if not index? or not offset?
+    valueNode = @_sectionValueNodeAtIndexes index, offset
+    return if not valueNode?
+    @_currentValidableValueNode = valueNode
+    $(valueNode).addClass 'selected'
+
+  _processNextValidableValue: ->
+    return if not @_validableValues? or @_validableValues.length == 0
+    @_validableValues.splice 0, 1
+    @emit 'character', @_input.value
+    @_updateCurrentValidableValue()
+    if @_validableValues.length == 0
+      @emit 'completed', @_input.value
+      @_listenEvents no
+
+  _sectionTitle: (index) ->
+    t (['common.keycard.uppercase_letters', 'common.keycard.lowercase_letters', 'common.keycard.digits'][index])
+
+  _sectionValue: (index, offset) ->
+    return ledger.pin_codes.KeyCard.values[index] if not offset?
+    ledger.pin_codes.KeyCard.values[index][offset]
+
+  _sectionValueNodeAtIndexes: (index, offset) ->
+    return $(@_valuesNodes[index]).children()[offset]
+
+  _indexesOfSectionValue: (char) ->
+    for i in [0..ledger.pin_codes.KeyCard.values.length - 1]
+      str = ledger.pin_codes.KeyCard.values[i]
+      for j in [0..str.length - 1]
+        if @_sectionValue(i, j) == char
+          return [i, j]
+    return [undefined , undefined]
+
 # This class represents a visual pin code input composed of 4 digits.
 class @ledger.pin_codes.PinCode extends EventEmitter
 

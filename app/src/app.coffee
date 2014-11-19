@@ -78,7 +78,6 @@ require @ledger.imports, ->
 
     _listenWalletEvents: () ->
       # Wallet management & wallet events re-dispatching
-
       @walletsManager.on 'connecting', (event, card) =>
         @emit 'dongle:connecting', card
       @walletsManager.on 'connected', (event, wallet) =>

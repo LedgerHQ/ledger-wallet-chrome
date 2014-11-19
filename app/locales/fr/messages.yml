@@ -11,11 +11,16 @@ common:
     no: "Non"
     confirmation: "Confirmation"
 
+  keycard:
+    uppercase_letters: "Majuscules"
+    lowercase_letters: "Minuscules"
+    digits: "Chiffres"
+
 onboarding:
   device:
     plug:
       to_start: "Pour commencer, branchez votre Ledger Wallet au port USB de l'ordinateur."
-      is_not_recognized: "Mon Ledger Wallet n'est pas reconnu"
+      is_not_recognized: "Votre Ledger Wallet n'est pas reconnu ?"
 
     unplug:
       unlock_my_wallet: "Dévérouiller mon portefeuille"
@@ -38,7 +43,7 @@ onboarding:
 
     opening:
       is_opening: "Veuillez patienter pendant l'ouverture de votre portefeuille..."
-      not_opening: "Mon Ledger Wallet ne s'ouvre pas"
+      not_opening: "Votre Ledger Wallet ne s'ouvre pas ?"
 
   management:
     back: "RETOUR"
@@ -167,20 +172,20 @@ wallet:
       status: "État"
       sender: "Depuis"
       receiver: "Vers"
-      identifier: "Identifiant"
+      identifier: "Identifiant de transaction"
       send_by_email: "ENVOYER PAR EMAIL"
       print: "IMPRIMER"
       close: "FERMER"
 
     index:
-       <<: *default-operations-translation
-       title: "TOUTES LES OPÉRATIONS"
-       title_with_account_name: 'TOUTES LES OPÉRATIONS DE %s'
-       filter_sort_desc: "TRI DÉCROISSANT"
-       filter_sort_asc: "TRI CROISSANT"
+      <<: *default-operations-translation
+      title: "TOUTES LES OPÉRATIONS"
+      title_with_account_name: 'TOUTES LES OPÉRATIONS DE %s'
+      filter_sort_desc: "TRI DÉCROISSANT"
+      filter_sort_asc: "TRI CROISSANT"
 
   accounts:
-    account:
+    show:
       detail:
         action: "PARAMÈTRES DU COMPTE"
         balance: "SOLDE"
@@ -194,22 +199,32 @@ wallet:
         title: "DERNIÈRES OPÉRATIONS"
         action: "VOIR TOUTES LES OPÉRATIONS"
 
-      receive:
-        title: "RECEVOIR DES BITCOINS"
-        amount: "MONTANT (OPTIONNEL)"
-        receiver_account: "COMPTE À CRÉDITER"
-        receiver_address: "ADRESSE BITCOIN DE RÉCEPTION"
-        qr_code_explanation: "Code QR à scanner par la personne<br />qui souhaite vous envoyer des bitcoins"
-        send_by_email: "ENVOYER PAR EMAIL"
-        print: "IMPRIMER"
-        close: "FERMER"
+  receive:
+    index:
+      title: "RECEVOIR DES BITCOINS"
+      amount: "MONTANT (OPTIONNEL)"
+      amount_placeholder: "montant"
+      receiver_account: "COMPTE À CRÉDITER"
+      receiver_address: "ADRESSE BITCOIN DE RÉCEPTION"
+      qr_code_explanation: "Code QR à scanner par la personne<br />qui souhaite vous envoyer des bitcoins"
+      send_by_email: "ENVOYER PAR EMAIL"
+      print: "IMPRIMER"
+      close: "ANNULER"
 
-      send:
-        title: "ENVOYER DES BITCOINS"
-        amount: "MONTANT"
-        amount_placeholder: "montant"
-        sender_account: "COMPTE À DÉBITER"
-        receiver_address: "ADRESSE À CRÉDITER"
-        receiver_address_placeholder: "adresse bitcoin"
-        transaction_fees: "FRAIS DE TRANSACTION"
-        transaction_fees_text: "0.0001 BTC (virement effectué sous 10 minutes)"
+  send:
+    index:
+      title: "ENVOYER DES BITCOINS"
+      amount: "MONTANT"
+      amount_placeholder: "montant"
+      sender_account: "COMPTE À DÉBITER"
+      receiver_address: "ADRESSE BITCOIN À CRÉDITER"
+      receiver_address_placeholder: "adresse bitcoin"
+      transaction_fees: "FRAIS DE TRANSACTION"
+      transaction_fees_text: "0.0001 BTC (opération confirmée sous 10 minutes)"
+      send: "ENVOYER"
+      close: "ANNULER"
+
+    validation:
+      title: "Code de validation nécessaire"
+      grab_your_card: "Munissez-vous de votre <b>carte de sécurité</b> (carte noire) et tapez sur votre clavier la lettre ou chiffre indiqué dans la case noire pour chaque valeur en surbrillance :"
+      entered_code: "Code entré :"

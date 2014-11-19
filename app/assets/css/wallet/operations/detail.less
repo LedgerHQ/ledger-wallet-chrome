@@ -1,27 +1,12 @@
-@import "../../constants";
+@import (reference) "../../constants";
+@import (reference) "../../mixins";
 
-#operation_detail_dialog {
-  width: 560px;
-}
-
-.top-align {
-  vertical-align: top;
-}
-
-.mutiple-addresses-section {
-
-  > div {
-    display: flex;
-    margin-top: @metrics-very-small-padding;
-
-    > div:first-child {
-      margin-left: auto;
-      margin-right: @metrics-small-padding;
-    }
+section#operation_detail_dialog {
+  #operation_inputs, #operation_outputs {
+    line-height: 20px;
+    .selectable;
   }
-
-  > div:first-child {
-     margin-top: 0px;
+  #operation_identifier {
+    .selectable;
   }
-
 }
