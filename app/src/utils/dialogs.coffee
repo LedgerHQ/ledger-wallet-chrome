@@ -46,8 +46,8 @@ class @ledger.dialogs.DialogController extends EventEmitter
     viewController
 
   # Ask to its DialogsController to dismiss its UI
-  dismiss: ->
-    @_controller.dismiss this
+  dismiss: (animated = yes) ->
+    @_controller.dismiss this, animated
 
 
 # Dialogs controller is responsible of managing every modal dialogs of the application.
@@ -94,12 +94,8 @@ class @ledger.dialogs.DialogsController
 
   # Dismiss a dialog
   # @param dialog [ledger.dialogs.DialogController] the dialog to dismiss
-  dismiss: (dialog) ->
-    @dismissAll()
-
-  dismissAll: (animated = yes) ->
-    return if @_dialogs.length == 0
-    dialog = @_dialogs[0]
+  dismiss: (dialog, animated = yes) ->
+    return if not dialog.isShown()
     @_dialogs.splice(0, 1)
     @_selector.removeClass('display')
     dialogSelector = @_selector.find("#dialog_#{dialog._id}")
@@ -107,6 +103,11 @@ class @ledger.dialogs.DialogsController
       @_selector.find("#dialog_#{dialog._id}").remove()
       @_selector.hide()
       dialog.onDismiss()
+
+  dismissAll: (animated = yes) ->
+    return if @_dialogs.length == 0
+    dialog = @_dialogs[0]
+    dialog.dismiss(animated)
 
   displayedDialog: () ->
     @_dialogs[0]

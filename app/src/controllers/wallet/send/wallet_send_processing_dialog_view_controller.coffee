@@ -12,11 +12,11 @@ class @WalletSendProcessingDialogViewController extends @DialogViewController
   _startSignature: ->
     @view.title.text t 'wallet.send.processing.preparing'
     _.delay =>
-      do @_startSending
+      do @_startSending if @isShown()
     , 3000
 
   _startSending: ->
     @view.title.text t 'wallet.send.processing.sending'
     _.delay =>
-      do @dismiss
+      do @dismiss if @isShown()
     , 3000
