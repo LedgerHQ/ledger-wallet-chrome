@@ -16,7 +16,7 @@ class @DialogViewController extends ViewController
 
   # Dismiss the current view controller
   dismiss: () ->
-    @parentViewController.dismiss()
+    @_dialog.dismiss()
 
   # Called once the dialog has been shown
   onShow: ->
