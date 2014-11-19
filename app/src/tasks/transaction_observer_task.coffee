@@ -7,7 +7,7 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
     @_listenTransactions()
 
   onStop: () ->
-
+    @newTransactionStream.close()
 
   _listenNewTransactions: () ->
     @newTransactionStream = new WebSocket "wss://ws.chain.com/v2/notifications"
@@ -20,12 +20,14 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
         transaction = data.payload.transaction
 
         for input in transaction.inputs
-          for address in input.addresses when ledger.wallet.HDWallet.instance?.cache?.hasPublicKey(address)
-
+          for address in input.addresses
+            derivation = ledger.wallet.HDWallet.instance?.cache?.getDerivationPath(address)
+            l derivation if derivation?
 
         for output in transaction.outputs
           for address in output.addresses
-
+            derivation = ledger.wallet.HDWallet.instance?.cache?.getDerivationPath(address)
+            l derivation if derivation?
 
     @newTransactionStream.onclose = => @_listenNewTransactions() if @isRunning()
 

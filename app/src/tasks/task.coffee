@@ -18,7 +18,7 @@ class ledger.tasks.Task extends EventEmitter
 
   stop: () ->
     throw "The task '#{@taskId}' is not running" unless @isRunning()
-    delete RUNNING_TASKS[@taskId]
+    delete ledger.tasks.Task.RUNNING_TASKS[@taskId]
     do @onStop
     @emit 'stop', @
 

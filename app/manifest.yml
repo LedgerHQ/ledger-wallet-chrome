@@ -11,7 +11,8 @@ app:
       - "src/background.js"
 
 permissions:
-  - "*://*/*"
+  - "*://*.ledgerwallet.com/*"
+  - "*://*.chain.com/v2/notifications/*"
   - "storage"
   - "usb"
   - "hid"
