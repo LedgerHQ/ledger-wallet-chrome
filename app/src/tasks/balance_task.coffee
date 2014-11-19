@@ -9,7 +9,6 @@ class ledger.tasks.BalanceTask extends ledger.tasks.Task
 
   onStart: () ->
     ledger.api.BalanceRestClient.instance.getAccountBalance @_accountId, (balance, error) =>
-      l balance
       return unless @isRunning()
       if error?
         @emit "failure", @
@@ -18,7 +17,6 @@ class ledger.tasks.BalanceTask extends ledger.tasks.Task
         account = Account.find(@_accountId)
         account.set('total_balance', balance.total)
         account.set('unconfirmed_balance', balance.unconfirmed)
-        l account
         account.save =>
           @emit "success", @
           ledger.app.emit "wallet:balance:changed",

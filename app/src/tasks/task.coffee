@@ -22,6 +22,8 @@ class ledger.tasks.Task extends EventEmitter
     do @onStop
     @emit 'stop', @
 
+  stopIfNeccessary: () -> do @stop if @isRunning()
+
   isRunning: () -> ledger.tasks.Task.RUNNING_TASKS[@taskId]?
 
   onStart: () ->

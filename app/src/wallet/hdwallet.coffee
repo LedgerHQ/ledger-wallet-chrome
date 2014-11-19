@@ -82,15 +82,23 @@ class ledger.wallet.HDWallet.Account
   getAllPublicAddressesPaths: () ->
     paths = []
     paths = paths.concat(@_account.importedPublicPaths)
-    if @_account.currentChangeIndex?
+    if @_account.currentPublicIndex?
       for index in [0..@_account.currentPublicIndex]
         paths.push "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
     paths = _.difference(paths, @_account.excludedPublicPaths)
     paths
 
   getCurrentPublicAddressPath: () ->
+    index = @_account.currentPublicIndex or 0
+    "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
 
-  getCurrentChandeAddressPath: () ->
+  getCurrentChangeAddressPath: () ->
+    index = @_account.currentChangeIndex or 0
+    "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index}"
+
+  shiftCurrentPublicAddressPath: (callback) ->
+
+  shiftCurrentChangeAddressPath: (callback) ->
 
   importPublicAddressPath: (addressPath) ->
     @_account.importedPublicPaths ?= []
@@ -126,24 +134,11 @@ openAddressCache = (wallet, done) ->
 
 restoreStructure = (wallet, done) ->
   if ledger.wallet.HDWallet.instance.isEmpty()
-    #ledger.tasks.WalletLayoutRecoveryTask.instance.on 'success', () => done?()
-    #ledger.tasks.WalletLayoutRecoveryTask.instance.start()
-    wallet.getPublicAddress "0'/0/0", (publicAddress) ->
-      wallet.getPublicAddress "0'/1/0", (changeAddress) ->
-        ledger.api.TransactionsRestClient.instance.getTransactions [publicAddress.bitcoinAddress.value, changeAddress.bitcoinAddress.value], (transactions, error) ->
-          if transactions?.length > 0
-            account = ledger.wallet.HDWallet.instance.getOrCreateAccount(0)
-            account.importChangeAddressPath("0'/1/0")
-            account.importPublicAddressPath("0'/0/0")
-            account.save()
-          else if error?
-            ledger.app.emit 'wallet:initialization:failed'
-          else
-            ledger.wallet.HDWallet.instance.createAccount()
-          done?()
-
+    ledger.tasks.WalletLayoutRecoveryTask.instance.on 'done', () => done?()
+    ledger.tasks.WalletLayoutRecoveryTask.instance.on 'fatal_error', () => ledger.app.emit 'wallet:initialization:failed'
+    ledger.tasks.WalletLayoutRecoveryTask.instance.start()
   else
-    #ledger.tasks.WalletLayoutRecoveryTask.instance.start()
+    ledger.tasks.WalletLayoutRecoveryTask.instance.start()
     done?()
 
 completeInitialization = (wallet, done) ->
