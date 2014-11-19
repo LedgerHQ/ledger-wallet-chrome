@@ -11,6 +11,9 @@ class ledger.wallet.HDWallet
     do @save
     account
 
+  getOrCreateAccount: (id) ->
+    return @getAccount(id) if @getAccount(id)
+    do @createAccount
 
   initialize: (store, callback) ->
     @_store = store
@@ -123,11 +126,13 @@ openAddressCache = (wallet, done) ->
 
 restoreStructure = (wallet, done) ->
   if ledger.wallet.HDWallet.instance.isEmpty()
+    #ledger.tasks.WalletLayoutRecoveryTask.instance.on 'success', () => done?()
+    #ledger.tasks.WalletLayoutRecoveryTask.instance.start()
     wallet.getPublicAddress "0'/0/0", (publicAddress) ->
       wallet.getPublicAddress "0'/1/0", (changeAddress) ->
         ledger.api.TransactionsRestClient.instance.getTransactions [publicAddress.bitcoinAddress.value, changeAddress.bitcoinAddress.value], (transactions, error) ->
           if transactions?.length > 0
-            account = ledger.wallet.HDWallet.instance.createAccount()
+            account = ledger.wallet.HDWallet.instance.getOrCreateAccount(0)
             account.importChangeAddressPath("0'/1/0")
             account.importPublicAddressPath("0'/0/0")
             account.save()
@@ -136,7 +141,9 @@ restoreStructure = (wallet, done) ->
           else
             ledger.wallet.HDWallet.instance.createAccount()
           done?()
+
   else
+    #ledger.tasks.WalletLayoutRecoveryTask.instance.start()
     done?()
 
 completeInitialization = (wallet, done) ->
