@@ -150,6 +150,7 @@
         'controllers/wallet/send/wallet_send_index_dialog_view_controller'
         'controllers/wallet/send/wallet_send_validation_dialog_view_controller'
         'controllers/wallet/send/wallet_send_processing_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_error_dialog_view_controller'
 
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'

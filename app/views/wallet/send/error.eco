@@ -1,0 +1,9 @@
+<section id="send_error_dialog">
+  <img src="../assets/images/common/large_error.png" width="50" height="50" />
+  <div class="uppercase-section-title"><%= t 'wallet.send.error.title' %></div>
+  <div class="regular-text"><%= t 'wallet.send.error.unable_to_send_bitcoins' %></div>
+  <% if @params.reason?: %>
+    <div class="regular-grey-text-small"><%= t 'common.error.' + @params.reason %></div>
+  <% end %>
+  <a href="#dismiss" class="cancel-rounded-button"><%= t 'wallet.send.error.close' %></a>
+</section>

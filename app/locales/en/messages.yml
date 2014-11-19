@@ -16,6 +16,11 @@ common:
     lowercase_letters: "Lowercase letters"
     digits: "Digits"
 
+  errors:
+    unsufficient_amount: "The balance of your wallet is too low."
+    wrong_keycode: "The validation code is incorrect."
+    network_no_response: "The transactions server did not respond."
+
 onboarding:
   device:
     plug:
@@ -233,3 +238,8 @@ wallet:
       sending: "Sending..."
       preparing: "Preparing transaction..."
       may_take_a_while: "Please wait, this operation may take a few moments."
+
+    error:
+      title: "Sending failed"
+      unable_to_send_bitcoins: "The transaction could not be completed."
+      close: "Close"

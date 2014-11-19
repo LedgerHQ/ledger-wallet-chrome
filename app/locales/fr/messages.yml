@@ -16,6 +16,11 @@ common:
     lowercase_letters: "Minuscules"
     digits: "Chiffres"
 
+  errors:
+    unsufficient_amount: "Le solde de votre portefeuille n’est pas suffisant."
+    wrong_keycode: "Le code de validation n'est pas correct."
+    network_no_response: "Le serveur de transactions n'a pas répondu."
+
 onboarding:
   device:
     plug:
@@ -233,3 +238,8 @@ wallet:
       sending: "Envoi en cours..."
       preparing: "Préparation de la transaction..."
       may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
+
+    error:
+      title: "Envoi échoué"
+      unable_to_send_bitcoins: "La transaction n’a pas pu être effectuée."
+      close: "Fermer"

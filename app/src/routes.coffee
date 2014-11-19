@@ -75,6 +75,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new WalletSendProcessingDialogViewController()
     dialog.show()
 
+  route '/wallet/send/error', (params) ->
+    dialog = new WalletSendErrorDialogViewController()
+    dialog.show()
+
   # Receive
   route '/wallet/receive/index', (params) ->
     dialog = new WalletReceiveIndexDialogViewController()
