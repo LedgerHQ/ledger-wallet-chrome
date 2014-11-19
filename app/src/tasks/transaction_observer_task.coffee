@@ -18,19 +18,27 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
       data = JSON.parse(event.data)
       if data?.payload.transaction?
         transaction = data.payload.transaction
+        @_handleTransactionIO(transaction, transaction.inputs)
+        @_handleTransactionIO(transaction, transaction.outputs)
 
-        for input in transaction.inputs
-          for address in input.addresses
-            derivation = ledger.wallet.HDWallet.instance?.cache?.getDerivationPath(address)
-            l derivation if derivation?
-
-        for output in transaction.outputs
-          for address in output.addresses
-            derivation = ledger.wallet.HDWallet.instance?.cache?.getDerivationPath(address)
-            l derivation if derivation?
 
     @newTransactionStream.onclose = => @_listenNewTransactions() if @isRunning()
 
+  _handleTransactionIO: (transaction, io) ->
+    found = no
+    if io?
+      for input in io
+        continue unless input.addresses?
+        for address in input.addresses
+          derivation = ledger.wallet.HDWallet.instance?.cache?.getDerivationPath(address)
+          if derivation?
+            l derivation
+            account = ledger.wallet.HDWallet.instance?.getAccountFromDerivationPath(derivation)
+            if account?
+              account.shiftCurrentPublicAddressPath() if account.getCurrentPublicAddressPath() == derivation
+              account.shiftCurrentChangeAddressPath() if account.getCurrentChangeAddressPath() == derivation
+              Account.fromHDWalletAccount(account)?.addRawTransaction(transaction)
+    found
 
   _listenTransactions: () ->
 

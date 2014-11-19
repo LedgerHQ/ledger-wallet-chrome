@@ -2,7 +2,26 @@
 
 class ledger.wallet.HDWallet
 
-  getAccount: (walletIndex) -> @_accounts[walletIndex]
+  getAccount: (accountIndex) -> @_accounts[accountIndex]
+
+  getAccountFromDerivationPath: (derivationPath) ->
+    return null unless derivationPath?
+    account = null
+    # Easy way
+    if _.str.startsWith(derivationPath, "44'")
+      parts = derivationPath.split(',')
+      accountIndex = parts[2]
+      if accountIndex?
+        accountIndex = parseInt(accountIndex.substr(0, accountIndex.length - 1))
+        account = @getAccount(accountIndex)
+
+    return account if account?
+    # Crappy way
+    for account in @_accounts
+      return account if _.contains(account.getAllChangeAddressesPaths(), derivationPath)
+      return account if _.contains(account.getAllPublicAddressesPaths(), derivationPath)
+
+  getAccountFromAddress: (address) -> @getAccountFromDerivationPath(@cache?.getDerivationPath(address))
 
   createAccount: () ->
     account = new ledger.wallet.HDWallet.Account(@, @getAccountsCount(), @_store)

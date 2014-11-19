@@ -201,7 +201,9 @@ class @Model extends @EventEmitter
             obj.__uid = result[@getUid()][relationName].__uid
             callback(obj)
           else
-            callback(null)
+            @set relationName, []
+            @save =>
+              @["get#{_.str.classify(relationName)}"](callback)
 
 _.mixin
   model: (object) ->
