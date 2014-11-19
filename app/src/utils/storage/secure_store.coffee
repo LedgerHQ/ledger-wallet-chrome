@@ -11,6 +11,7 @@ class @ledger.storage.SecureStore extends ledger.storage.ChromeStore
 
   _decryptKey: (key) -> @_aes.decrypt(super(key))
 
-  _encryptData: (data) -> @_aes.encrypt super(data)
+  _encryptData: (data) ->
+    @_aes.encrypt super(data)
 
   _decryptData: (data) -> @_aes.decrypt super(data)

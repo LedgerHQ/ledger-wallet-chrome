@@ -6,3 +6,8 @@ class @Account extends Model
   createTransaction: (amount, fees, callback) ->
     transaction = new ledger.wallet.Transaction()
     transaction.init amount, fees
+
+  ## Balance management
+
+  retrieveBalance: () ->
+    ledger.tasks.BalanceTask.get(@getId()).startIfNeccessary()

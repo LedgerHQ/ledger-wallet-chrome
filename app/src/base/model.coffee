@@ -19,6 +19,7 @@ class @Model extends @EventEmitter
     throw 'Object without id cannot perform get operation' unless @getUid()
     ledger.storage.local.get @getUid(), (results) =>
       results = results[@getUid()]
+      l results
       return callback(null) unless results?
       finalResults = {}
       relationships = []
@@ -29,7 +30,7 @@ class @Model extends @EventEmitter
           relationshipNames[ v.__uid] = k
         else
           finalResults[k] = v
-      return callback(finalResults) if relationships.length == 0
+      return callback?(finalResults) if relationships.length == 0
       ledger.storage.local.get relationships, (results) =>
         finalResults[relationshipNames[k]] = @relationship(relationshipNames[k], v) for k, v of results
         callback(finalResults)
@@ -39,8 +40,8 @@ class @Model extends @EventEmitter
       when @getUid()? then @getUid()
       when @_findOrCreate? then @_findOrCreate.__uid
       when @_find?  then @_find.__uid
-    ledger.storage.local.exists @_findOrCreate.__uid, (result) =>
-      if result[id]?
+    ledger.storage.local.exists id, (result) =>
+      if result[id] is yes
         @__uid = id
         @_find = null
         @_findOrCreate = null
@@ -90,13 +91,14 @@ class @Model extends @EventEmitter
 
   _performSave: (callback) ->
     inserted = @isInserted()
-    data = @_data
+    data = @_data or {}
     @_data = null
     data.__type = _(this).getClassName()
+    data._id ?= @getId()
     data.__uid = switch
       when inserted then @getUid()
       when not inserted and data.__uid? then data.__uid
-      else ledger.storage.local.createUniqueObjectIdentifier(data.__type, data._id)[1]
+    data.__uid ?= ledger.storage.local.createUniqueObjectIdentifier(data.__type, data._id)[1]
     data = _(data).omit(['_id']) if inserted and data._id?
     if not inserted
       @_data = data
@@ -108,7 +110,7 @@ class @Model extends @EventEmitter
       ledger.storage.local.set data, () => callback(yes)
 
   _performFind: (callback) ->
-    @exists (exists) ->
+    @exists (exists) =>
       if exists
         @_performSave(callback)
       else
@@ -195,7 +197,7 @@ class @Model extends @EventEmitter
       @::["get#{_.str.classify(relationName)}"] = (callback) ->
         ledger.storage.local.get @getUid(), (result) =>
           if result[@getUid()]?[relationName]?
-            obj = new ledger.collections[relationClass]()
+            obj = new ledger.collections[_.pluralize(relationClass)]()
             obj.__uid = result[@getUid()][relationName].__uid
             callback(obj)
           else
@@ -203,9 +205,10 @@ class @Model extends @EventEmitter
 
 _.mixin
   model: (object) ->
-    return null unless object.__type?
+    return null unless object?.__type?
     model = new window[object.__type]()
     model.__uid = object.__uid
+    model._id = object._id
     model
 
   modelReference: (object) ->

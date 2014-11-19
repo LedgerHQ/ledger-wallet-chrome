@@ -105,7 +105,10 @@ class ledger.wallet.HDWallet.Account
 openStores = (wallet, done) ->
   wallet.getBitIdAddress (bitIdAddress) =>
     wallet.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>
-      ledger.storage.openStores bitIdAddress, pubKey, done
+      if not pubKey?.bitcoinAddress?
+        ledger.app.emit 'wallet:initialization:fatal_error'
+        return
+      ledger.storage.openStores bitIdAddress, pubKey.bitcoinAddress.value, done
 
 openHdWallet = (wallet, done) ->
   ledger.wallet.HDWallet.instance = new ledger.wallet.HDWallet()

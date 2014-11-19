@@ -97,6 +97,11 @@
         'restclients/transactions_restclient'
         'restclients/balance_restclient'
 
+        ## Tasks
+        'tasks/task'
+        'tasks/balance_task'
+        'tasks/wallet_layout_recovery_task'
+
         ## Wallet
         'managers/wallets_manager'
         'wallet/hardware_wallet'

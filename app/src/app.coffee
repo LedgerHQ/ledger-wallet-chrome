@@ -15,13 +15,22 @@ require @ledger.imports, ->
       chrome.commands.onCommand.addListener (command) =>
         switch command
           when 'reload-page' then do @reloadUi
-          when 'reload-application' then chrome.runtime.reload()
+          when 'reload-application' then do @reload
+
+      @on 'wallet:balance:changed', (event, balance) =>
+        l balance
+        Wallet.instance.getBalance (b) =>
+          l b
 
       @_listenWalletEvents()
       @_listenClickEvents()
 
       @devicesManager.start()
       @router.go('/')
+
+    reload: () ->
+      @devicesManager.stop()
+      chrome.runtime.reload()
 
     navigate: (layoutName, viewController) ->
       @router.once 'routed', (event, data) =>
@@ -62,7 +71,6 @@ require @ledger.imports, ->
 
     handleAction: (actionName, params) ->
       handled = no
-      l actionName
       if ledger.dialogs.manager.displayedDialog()?
         handled = ledger.dialogs.manager.displayedDialog().handleAction actionName, params
       handled = @_navigationController.handleAction(actionName, params) unless handled
@@ -91,8 +99,7 @@ require @ledger.imports, ->
           ledger.wallet.initialize @wallet, =>
             Wallet.initializeWallet =>
               @emit 'wallet:initialized'
-              ledger.api.BalanceRestClient.instance.getAccountBalance 0, (balance) ->
-                l balance
+              Wallet.instance.retrieveAccountsBalances()
         @emit 'dongle:connected', @wallet
 
     _listenClickEvents: () ->

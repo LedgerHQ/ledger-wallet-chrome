@@ -24,7 +24,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
         data.lW.getOperationMode()
         data.lW.plugged()
         @emit 'connected', @
-      data.lW.recoverFirmwareVersion();
+      data.lW.recoverFirmwareVersion()
     @_lwCard = new LW(0, new BTChip(@lwCard), @_vents)
 
   disconnect: () ->

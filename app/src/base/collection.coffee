@@ -50,6 +50,7 @@ class ledger.collections.Collection extends EventEmitter
         object = new (@getModelClass())(object) unless object.getUid?
 
         object._data = {} unless object._data
+        object._data.__uid ?= object.getUid()
         object._data.__uid = ledger.storage.local.createUniqueObjectIdentifier(@getModelClass(), object._data._id)[1] unless object._data.__uid?
 
         collection = result[@getUid()]
@@ -94,7 +95,7 @@ class ledger.collections.Collection extends EventEmitter
   each: (callback) ->
     @iterator (it) =>
       onNext = (result) ->
-        callback(result)
+        callback(result, it.hasNext())
         it.next(onNext) if it.hasNext()
       it.next onNext
 
