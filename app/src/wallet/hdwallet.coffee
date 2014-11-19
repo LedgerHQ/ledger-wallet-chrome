@@ -88,17 +88,38 @@ class ledger.wallet.HDWallet.Account
     paths = _.difference(paths, @_account.excludedPublicPaths)
     paths
 
-  getCurrentPublicAddressPath: () ->
-    index = @_account.currentPublicIndex or 0
-    "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
+  getCurrentPublicAddressIndex: () -> @_account.currentPublicIndex or 0
+  getCurrentChangeAddressIndex: () -> @_account.currentChangeIndex or 0
+  getCurrentAddressIndex: (type) ->
+    switch type
+      when 'change' then @getChangeAddressPath(index)
+      when 'public' then @getPublicAddressPath(index)
 
-  getCurrentChangeAddressPath: () ->
-    index = @_account.currentChangeIndex or 0
-    "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index}"
+  getCurrentPublicAddressPath: () -> @getPublicAddressPath(@getCurrentPublicAddressIndex())
+  getCurrentChangeAddressPath: () -> @getChangeAddressPath(@getCurrentChangeAddressIndex())
+
+  getPublicAddressPath: (index) -> "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
+  getChangeAddressPath: (index) -> "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index}"
+  getAddressPath: (index, type) ->
+    switch type
+      when 'change' then @getChangeAddressPath(index)
+      when 'public' then @getPublicAddressPath(index)
 
   shiftCurrentPublicAddressPath: (callback) ->
+    index = @_account.currentPublicIndex
+    index = 0 unless index?
+    index = parseInt(index) if _.isString(index)
+    @_account.currentPublicIndex = index + 1
+    @save()
+    ledger.app.wallet?.getPublicAddress @getCurrentPublicAddressPath(), => callback
 
   shiftCurrentChangeAddressPath: (callback) ->
+    index = @_account.currentChangeIndex
+    index = 0 unless index?
+    index = parseInt(index) if _.isString(index)
+    @_account.currentChangeIndex = index + 1
+    @save()
+    ledger.app.wallet?.getPublicAddress @getCurrentChangeAddressPath(), => callback
 
   importPublicAddressPath: (addressPath) ->
     @_account.importedPublicPaths ?= []

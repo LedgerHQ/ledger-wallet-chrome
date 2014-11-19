@@ -32,4 +32,29 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
           @emit 'chronocoin:done'
 
   _restoreBip44Layout: () ->
-    @emit 'bip44:done'
+    #return @emit 'bip44:done'
+    accountIndex = 0
+    recoverAccount = =>
+      return @emit 'bip44:done' if accountIndex is 1 # App first version limitiation
+
+      account = ledger.HDWallet.instance.getOrCreateAccount(accountIndex)
+
+      done = =>
+        @emit 'bip44:account:done'
+        accountIndex += 1
+        do recoverAccount
+
+      done = _.after(done, 2)
+      @_restoreBip44AccountChangeLayout account, => do done
+      @_restoreBip44AccountPublicLayout account, => do done
+    do recoverAccount
+
+  _restoreBip44AccountPublicLayout: (account, done) ->
+    index = account.getCurrentPublicAddressIndex()
+
+  _restoreBip44AccountChangeLayout: (account, done) ->
+    index = account.getCurrentChangeAddressIndex()
+
+  _restoreBip44AccountChainLayout: (account, chain, done) ->
+
+

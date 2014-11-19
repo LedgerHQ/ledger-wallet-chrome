@@ -1,6 +1,6 @@
 name: "__MSG_application_name__"
 description: "__MSG_application_small_description__"
-version: "0.1"
+version: "0.1.1"
 manifest_version: 2
 minimum_chrome_version: "38"
 default_locale: "en"
@@ -11,6 +11,7 @@ app:
       - "src/background.js"
 
 permissions:
+  - "*://ledgerwallet.com/*"
   - "*://*.ledgerwallet.com/*"
   - "*://*.chain.com/v2/notifications/*"
   - "storage"
@@ -24,6 +25,10 @@ permissions:
       -
         vendorId: 9601
         productId: 11132
+
+externally_connectable:
+  matches:
+    - "*://*.ledgerwallet.com/*"
 
 commands:
   reload-page:
