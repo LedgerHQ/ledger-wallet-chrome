@@ -228,3 +228,8 @@ wallet:
       title: "Required validation code"
       grab_your_card: "Grab your <b>security card</b> (black card) and type on your keyboard the letter or digit in the black box for each highlighted value:"
       entered_code: "Entered code:"
+
+    processing:
+      sending: "Sending..."
+      preparing: "Preparing transaction..."
+      may_take_a_while: "Please wait, this operation may take a few moments."

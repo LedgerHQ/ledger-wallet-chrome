@@ -1,4 +1,4 @@
-<section id="receive_dialog">
+<section id="receive_index_dialog">
   <header>
     <h1><%= t 'wallet.receive.index.title' %></h1>
   </header>
