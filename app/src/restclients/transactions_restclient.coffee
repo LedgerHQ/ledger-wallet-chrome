@@ -27,8 +27,8 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
 
   postTransaction: (transaction, callback) ->
     @http().post
-      url: "blockchain/transactions/send"
-      params: {signed_hex: transaction.getSignedTransaction()}
+      url: "blockchain/pushtx"
+      params: {tx: transaction.getSignedTransaction()}
       onSuccess: (response) ->
         transaction.setHash(response.transaction_hash)
         callback?(transaction)
