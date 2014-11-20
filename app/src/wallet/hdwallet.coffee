@@ -107,6 +107,8 @@ class ledger.wallet.HDWallet.Account
     paths = _.difference(paths, @_account.excludedPublicPaths)
     paths
 
+  getAllAddressesPaths: () -> @getAllPublicAddressesPaths().concat(@getAllChangeAddressesPaths())
+
   getCurrentPublicAddressIndex: () -> @_account.currentPublicIndex or 0
   getCurrentChangeAddressIndex: () -> @_account.currentChangeIndex or 0
   getCurrentAddressIndex: (type) ->

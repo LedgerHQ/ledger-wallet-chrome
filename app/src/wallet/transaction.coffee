@@ -138,6 +138,7 @@ _.extend ledger.wallet.transaction,
         finalOutputs = []
         collectedAmount = new ledger.wallet.Value()
         requiredAmount = amount.add(fees)
+        l "Required amount", requiredAmount.toString()
         hadNetworkFailure = no
         # For each valid outputs we try to get its raw transaction.
         _.async.each validOutputs, (output, done, hasNext) ->
@@ -155,9 +156,9 @@ _.extend ledger.wallet.transaction,
             else if hasNext is false and collectedAmount.lt(requiredAmount)
               # Not enough available funds
               callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds})
-            else if collectedAmount.gte requiredAmount
+            else if collectedAmount.gt requiredAmount
               # We have reached our required amount. It's to prepare the transaction
-              _.defer -> transaction.prepare(outputs, changePath, callback)
+              _.defer -> transaction.prepare(finalOutputs, changePath, callback)
             else
               # Continue to collect funds
               do done

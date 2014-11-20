@@ -117,11 +117,7 @@ require @ledger.imports, ->
         , 500
 
       @on 'wallet:operations:sync:done', =>
-        l 'done'
-        account = Account.find(0).exists =>
-          account.getOperations (operations) =>
-            operations.toArray (a) =>
-              l a
+        
 
       @on 'wallet:transactions:new', => Wallet.instance?.retrieveAccountsBalances()
 

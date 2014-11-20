@@ -23,7 +23,7 @@ class ledger.tasks.BalanceTask extends ledger.tasks.Task
           ledger.app.emit "wallet:balance:changed",
             wallet:
               total: balance.total
-              unconfirmed: balance.unconfirmed
+              unconfirmed: if balance.unconfirmed > 0 then balance.unconfirmed else 0
             accounts: [
               {
                 total: balance.total
