@@ -50,5 +50,5 @@ class @WalletSendIndexDialogViewController extends DialogViewController
     undefined
 
   _updateTotalInput: ->
-    val = parseInt(ledger.wallet.Value.from(@_transactionAmount()).add(1000).toString()) #+ 0.00001 btc
+    val = parseInt(ledger.wallet.Value.from(@_transactionAmount()).add(10000).toString()) #+ 0.0001 btc
     @view.totalInput.text ledger.formatters.bitcoin.fromValue(val) + ' BTC ' + t 'wallet.send.index.transaction_fees_text'
