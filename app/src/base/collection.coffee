@@ -7,7 +7,7 @@
     ledger.collections[className]._name = className
     modelClassName = _.singularize(className)
     ledger.collections[className]::getModelClass = () -> window[modelClassName]
-    ledger.collections[className]::getModelClassName = () -> window[modelClassName]
+    ledger.collections[className]::getModelClassName = () -> modelClassName
   ledger.collections[collectionName] ?= ledger.collections[className].global()
 
 class Iterator

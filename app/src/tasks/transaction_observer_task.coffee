@@ -37,11 +37,12 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
             if account?
               account.shiftCurrentPublicAddressPath() if account.getCurrentPublicAddressPath() == derivation
               account.shiftCurrentChangeAddressPath() if account.getCurrentChangeAddressPath() == derivation
-              Account.fromHDWalletAccount(account)?.addRawTransaction(transaction)
+              Account.fromHDWalletAccount(account)?.addRawTransaction transaction, (success) =>
+                ledger.app.emit('wallet:transactions:new') if success
     found
 
   _listenTransactions: () ->
-
+    
 
 
   @instance: new @()

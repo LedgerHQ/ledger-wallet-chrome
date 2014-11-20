@@ -159,7 +159,7 @@ class @Model extends @EventEmitter
     else
       collectionName = _(@).getClass()._relations.many[relationName]
       throw "Unknown hasMany relation '#{relationName}'" unless collectionName?
-      collection = new ledger.collections[collectionName.className]()
+      collection = new ledger.collections[_.pluralize(collectionName.className)]()
       collection.__uid = item.__uid
       return collection
 
