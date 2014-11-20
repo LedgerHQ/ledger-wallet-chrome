@@ -22,8 +22,8 @@ class @Wallet extends Model
     @getAccounts (accounts) =>
       accounts.each (account) =>
         if account?
-          balance.wallet.total += account.total_balance
-          balance.wallet.unconfirmed += account.unconfirmed_balance
+          balance.wallet.total += account.total_balance if account.total_balance?
+          balance.wallet.unconfirmed += account.unconfirmed_balance if account.unconfirmed_balance?
           balance.accounts.push total: account.total_balance, unconfirmed: account.unconfirmed_balance
         else
           callback(balance)
