@@ -2,7 +2,7 @@ ledger.api ?= {}
 
 class ledger.api.RestClient
 
-  @singleton: () -> @.instance = new @()
+  @singleton: () -> @instance = new @()
 
   http: () ->
     new HttpClient('https://api.ledgerwallet.com/')

@@ -102,6 +102,7 @@
         'tasks/balance_task'
         'tasks/wallet_layout_recovery_task'
         'tasks/transaction_observer_task'
+        'tasks/operations_synchronization_task'
 
         ## Wallet
         'managers/wallets_manager'

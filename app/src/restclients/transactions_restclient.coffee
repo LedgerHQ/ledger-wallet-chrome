@@ -25,7 +25,6 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
           do done
         onError: @networkErrorCallback(callback)
 
-
   postTransaction: (transaction, callback) ->
     @http().post
       url: "blockchain/transactions/send"

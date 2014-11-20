@@ -19,7 +19,6 @@ class @Model extends @EventEmitter
     throw 'Object without id cannot perform get operation' unless @getUid()
     ledger.storage.local.get @getUid(), (results) =>
       results = results[@getUid()]
-      l results
       return callback(null) unless results?
       finalResults = {}
       relationships = []

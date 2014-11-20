@@ -22,11 +22,9 @@ class @Account extends Model
     @exists (exists) =>
       return unless exists
       @get (account) =>
-        l account
         hdAccount = ledger.wallet.HDWallet.instance?.getAccount(@getId())
         return unless hdAccount?
 
-        l rawTransaction
         @getOperations (operations) =>
           @_addRawTransaction account, operations, hdAccount.getAllPublicAddressesPaths(), rawTransaction, 'reception', (publicAdded) =>
             @_addRawTransaction account, operations, hdAccount.getAllChangeAddressesPaths(), rawTransaction, 'sending', (changeAdded) =>
@@ -87,4 +85,12 @@ class @Account extends Model
       return unless exists
       @get =>
         @getOperations (operations) =>
-          operations.insert operations, callback
+          operations.insert operation, callback
+
+  getAllSortedOperations: (callback) ->
+    @exists (exists) =>
+      return callback([]) unless exists
+      @getOperations (operations) =>
+        operations.toArray (operations) =>
+          out = _(operations).sortBy (operation) -> -(new Date(operation.time).getTime())
+          callback?(out)

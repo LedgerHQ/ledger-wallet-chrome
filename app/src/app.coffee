@@ -24,6 +24,7 @@ require @ledger.imports, ->
 
       @_listenWalletEvents()
       @_listenClickEvents()
+      @_listenAppEvents()
 
       @devicesManager.start()
       @router.go('/')
@@ -101,12 +102,26 @@ require @ledger.imports, ->
               @emit 'wallet:initialized'
               Wallet.instance.retrieveAccountsBalances()
               ledger.tasks.TransactionObserverTask.instance.start()
+              ledger.tasks.OperationsSynchronizationTask.instance.start()
         @emit 'dongle:connected', @wallet
 
     _listenAppEvents: () ->
       @on 'wallet:balance:changed', (ev, balance) =>
         if balance.wallet.unconfirmed > 0
           _.delay (=> Wallet.instance?.retrieveAccountsBalances()), 1000
+
+      @on 'wallet:operations:sync:failed', =>
+        l 'Failed'
+        _.delay =>
+          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() if @wallet?
+        , 500
+
+      @on 'wallet:operations:sync:done', =>
+        l 'done'
+        account = Account.find(0).exists =>
+          account.getOperations (operations) =>
+            operations.toArray (a) =>
+              l a
 
       @on 'wallet:transactions:new', => Wallet.instance?.retrieveAccountsBalances()
 
