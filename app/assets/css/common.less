@@ -75,32 +75,43 @@
   font-weight: @weight;
 
   b {
+    .bold-text;
     font-weight: @font-weight-semibold;
   }
 }
 .regular-text {
-  .text(@color-black);
+
+}
+.bold-text {
+  letter-spacing: -0.5px;
 }
 .regular-text-small {
   .text(@color-black, @font-size-very-small);
+  .regular-text;
 }
 .bold-regular-text {
   .text(@color-black, @font-size-medium, @font-weight-semibold);
+  .bold-text;
 }
 .regular-grey-text {
   .text(@color-dark-grey);
+  .regular-text;
 }
 .regular-grey-text-small {
   .text(@color-dark-grey, @font-size-very-small);
+  .regular-text;
 }
 .regular-valid-text {
   .text(@color-valid-green);
+  .regular-text;
 }
 .regular-invalid-text {
   .text(@color-invalid-red);
+  .regular-text;
 }
 .bold-invalid-text {
   .text(@color-invalid-red, @font-size-medium, @font-weight-semibold);
+  .bold-text;
 }
 
 // inputs

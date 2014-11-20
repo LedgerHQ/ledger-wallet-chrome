@@ -17,9 +17,11 @@ common:
     digits: "Digits"
 
   errors:
-    unsufficient_amount: "The balance of your wallet is too low."
+    unsufficient_balance: "The balance of your wallet is too low."
     wrong_keycode: "The validation code is incorrect."
     network_no_response: "The transactions server did not respond."
+    invalid_receiver_address: "Recipient bitcoin address is incorrect."
+    invalid_amount: "The amount to send is invalid."
 
 onboarding:
   device:

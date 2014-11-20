@@ -20,21 +20,28 @@
       cursor: pointer;
     }
   }
-}
 
-.dialog {
-  margin: auto;
-  position: relative;
-  background-color: @color-background-color;
-  border-radius: 5px;
-  padding: @metrics-medium-padding;
-  box-shadow: 0px 0px 50px rgba(0, 0, 0, 0.1);
-  &:hover {
-    cursor: auto;
+  .dialog {
+    margin: auto;
+    position: relative;
+    background-color: @color-background-color;
+    border-radius: 5px;
+    padding: @metrics-medium-padding;
+    box-shadow: 0px 0px 50px rgba(0, 0, 0, 0.1);
+    &:hover {
+      cursor: auto;
+    }
   }
-}
 
-.dialog-actions-bar {
-  .action-bar;
-  margin-top: @metrics-medium-padding;
+  .dialog-actions-bar {
+    .action-bar;
+    margin-top: @metrics-medium-padding;
+  }
+
+  div#error_container {
+    margin-top: @metrics-almost-small-padding;
+    .bold-invalid-text;
+    text-align: right;
+    line-height: 20px;
+  }
 }
