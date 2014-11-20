@@ -9,7 +9,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
     account = ledger.wallet.HDWallet.instance.getAccount(0)
 
     # fetch amount
-    ledger.wallet.transaction.createAndPrepareTransaction @params.amount, 1000, @params.address, account.getAllAddressesPaths(), account.getCurrentChangeAddressPath(), (transaction, error) =>
+    ledger.wallet.transaction.createAndPrepareTransaction @params.amount, 10000, @params.address, account.getAllAddressesPaths(), account.getCurrentChangeAddressPath(), (transaction, error) =>
       return if not @isShown()
       @once 'dismiss', =>
         if error?

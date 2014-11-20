@@ -112,7 +112,7 @@ class ledger.wallet.transaction.Transaction
 
 _.extend ledger.wallet.transaction,
 
-    MINIMUM_CONFIRMATIONS: 2
+    MINIMUM_CONFIRMATIONS: 1
 
     createAndPrepareTransaction: (amount, fees, recipientAddress, inputsPath, changePath, callback) ->
       amount = ledger.wallet.Value.from(amount)
@@ -139,6 +139,7 @@ _.extend ledger.wallet.transaction,
         collectedAmount = new ledger.wallet.Value()
         requiredAmount = amount.add(fees)
         l "Required amount", requiredAmount.toString()
+        l validOutputs
         hadNetworkFailure = no
         # For each valid outputs we try to get its raw transaction.
         _.async.each validOutputs, (output, done, hasNext) ->
@@ -157,6 +158,7 @@ _.extend ledger.wallet.transaction,
               # Not enough available funds
               callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds})
             else if collectedAmount.gt requiredAmount
+              l "Collected amount", collectedAmount.toString()
               # We have reached our required amount. It's to prepare the transaction
               _.defer -> transaction.prepare(finalOutputs, changePath, callback)
             else
