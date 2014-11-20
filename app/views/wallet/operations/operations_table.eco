@@ -12,7 +12,7 @@
   <tr class="<%= if @operations[@operations.length - 1] == operation then 'no-border' %>">
     <td class="fit-content regular-grey-text"><%= moment(new Date(operation.time)).format t 'common.date_format' %></td>
     <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= if operation.type == 'reception' then t 'wallet.accounts.show.operations.sender' else t 'wallet.accounts.show.operations.receiver' %></td>
-    <td><%= if operation.type == 'reception' then JSON.parse(operation.senders)[0] else JSON.parse(operation.recipients)[0] %></td>
+    <td class="selectable"><%= if operation.type == 'reception' then JSON.parse(operation.senders)[0] else JSON.parse(operation.recipients)[0] %></td>
     <% if operation.type == 'reception': %>
       <td class="fit-content align-right padding-right-medium regular-valid-text">+<%= ledger.formatters.bitcoin.fromValue(operation.value) %> BTC</td>
     <% else: %>
