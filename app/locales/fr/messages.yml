@@ -5,6 +5,8 @@ application:
 
 common:
   bitcoin_acronym: 'BTC'
+  default_account_name: "Mon compte"
+  date_format: 'DD/MM/YYYY à HH:mm'
 
   dialogs:
     yes: "Oui"
@@ -23,6 +25,8 @@ common:
     invalid_receiver_address: "L'adresse bitcoin à créditer n'est pas correcte."
     invalid_amount: "Le montant à envoyer n'est pas valide."
     unknown: "Une erreur inconnue est survenue."
+
+
 
 onboarding:
   device:
@@ -190,6 +194,7 @@ wallet:
       title_with_account_name: 'TOUTES LES OPÉRATIONS DE %s'
       filter_sort_desc: "TRI DÉCROISSANT"
       filter_sort_asc: "TRI CROISSANT"
+      no_operations: "Aucune opération."
 
   accounts:
     show:
@@ -205,6 +210,7 @@ wallet:
         <<: *default-operations-translation
         title: "DERNIÈRES OPÉRATIONS"
         action: "VOIR TOUTES LES OPÉRATIONS"
+        no_operations: "Aucune opération."
 
   receive:
     index:

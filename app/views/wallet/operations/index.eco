@@ -1,25 +1,9 @@
 <section id="operations">
   <header>
-    <h1><%= t 'wallet.operations.index.title_with_account_name' %></h1>
+    <h1 id="account_name"></h1>
   </header>
-  <table>
-    <thead>
-      <tr>
-        <td class="fit-content" ><%= t 'wallet.operations.index.time' %></td>
-        <td class="fit-content align-right padding-right-very-small"></td>
-        <td ><%= t 'wallet.operations.index.bitcoin_address' %></td>
-        <td class="fit-content align-right padding-right-medium price" ><%= t 'wallet.operations.index.amount' %></td>
-        <td class="fit-content align-right price" ><%= t 'wallet.operations.index.balance' %></td>
-      </tr>
-    </thead>
-      <tbody>
-        <tr data-href="#showOperation(operation=1)">
-          <td class="fit-content regular-grey-text">21/05/2014 à 15:30</td>
-          <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= t 'wallet.operations.index.sender' %></td>
-          <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
-          <td class="fit-content align-right padding-right-medium regular-valid-text">+1.0892 BTC</td>
-          <td class="fit-content align-right">1.0892 BTC</td>
-        </tr>
-      </tbody>
+  <div class="empty-container" id="empty_container"><%= t 'wallet.operation.index.no_operations' %></div>
+  <table id="operations_list">
+
   </table>
 </section>

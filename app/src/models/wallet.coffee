@@ -40,7 +40,7 @@ class @Wallet extends Model
         else
           @instance = Wallet.create({_id: 0, accounts: []})
           @instance.save =>
-            account = Account.create {_id: 0, name: 'Il faut changer ce nom'}
+            account = Account.create {_id: 0, name: t 'common.default_account_name'}
             account.save =>
               @instance.getAccounts (accounts) =>
                 accounts.insert account, =>

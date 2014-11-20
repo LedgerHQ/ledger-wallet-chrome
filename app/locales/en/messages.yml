@@ -5,6 +5,8 @@ application:
 
 common:
   bitcoin_acronym: 'BTC'
+  default_account_name: "My account"
+  date_format: 'MM/DD/YYYY at HH:mm'
 
   dialogs:
     yes: "Yes"
@@ -190,6 +192,7 @@ wallet:
       title_with_account_name: 'ALL %s OPERATIONS'
       filter_sort_desc: "DESCENDANT SORTING"
       filter_sort_asc: "ASCENDANT SORTING"
+      no_operations: "No operations."
 
   accounts:
     show:
@@ -205,6 +208,7 @@ wallet:
         <<: *default-operations-translation
         title: "LAST OPERATIONS"
         action: "SEE ALL OPERATIONS"
+        no_operations: "No operations."
 
   receive:
     index:
