@@ -53,6 +53,7 @@ onboarding:
 
     opening:
       is_opening: "Please wait while your wallet is opening..."
+      is_synchronizing: "Your wallet is synchronizing. This may take a few minutes..."
       not_opening: "Your Ledger Wallet won't open?"
 
   management:
