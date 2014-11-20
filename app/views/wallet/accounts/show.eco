@@ -12,8 +12,8 @@
     </thead>
     <tbody>
       <tr class="no-border">
-        <td class="fit-content"><span class="price">0.0</span><span class="btc-acronyme"> BTC</span></td>
-        <td class="unconfirmed-balance" ><span>0.0</span> <span>BTC</span></td>
+        <td class="fit-content"><span class="price" id="confirmed_balance">0.0</span><span class="btc-acronyme"> BTC</span></td>
+        <td class="unconfirmed-balance"><span id="unconfirmed_balance">0.0</span> <span>BTC</span></td>
         <td class="fit-content">
           <div class="action-bar">
             <a class="action-rounded-button" href="/wallet/send/index"><%= t 'wallet.accounts.show.detail.send' %></a>

@@ -22,6 +22,7 @@ common:
     network_no_response: "The transactions server did not respond."
     invalid_receiver_address: "Recipient bitcoin address is incorrect."
     invalid_amount: "The amount to send is invalid."
+    unknown: "An unknown error occured."
 
 onboarding:
   device:

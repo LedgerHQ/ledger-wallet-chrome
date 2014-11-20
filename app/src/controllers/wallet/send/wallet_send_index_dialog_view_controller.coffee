@@ -26,7 +26,7 @@ class @WalletSendIndexDialogViewController extends DialogViewController
     else
       @view.errorContainer.hide()
       @once 'dismiss', =>
-        dialog = new WalletSendPreparingDialogViewController()
+        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress()
         dialog.show()
       @dismiss()
 

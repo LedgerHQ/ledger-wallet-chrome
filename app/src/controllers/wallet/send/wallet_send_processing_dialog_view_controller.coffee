@@ -12,18 +12,29 @@ class @WalletSendProcessingDialogViewController extends @DialogViewController
   _startSignature: ->
     @view.title.text t 'wallet.send.processing.validating'
     # sign transaction
-    _.delay =>
+    @params.transaction.validate @params.keycode, (transaction, error) =>
       return if not @isShown()
-      @_startSending()
-    , 3000
+      if error?
+        @once 'dismiss', =>
+          reason = switch error.code
+            when ledger.errors.SignatureError then 'wrong_keycode'
+            when ledger.errors.UnknownError then 'unknown'
+          dialog = new WalletSendErrorDialogViewController reason: reason
+          dialog.show()
+        @dismiss()
+      else
+        @_startSending()
 
   _startSending: ->
     @view.title.text t 'wallet.send.processing.sending'
     # push transaction
-    _.delay =>
+    ledger.api.TransactionsRestClient.instance.postTransaction @params.transaction, (transaction, error) =>
       return if not @isShown()
       @once 'dismiss', =>
-        dialog = new WalletSendSuccessDialogViewController()
-        dialog.show()
+        if error?
+          dialog = new WalletSendErrorDialogViewController reason: 'network_no_response'
+          dialog.show()
+        else
+          dialog = new WalletSendSuccessDialogViewController
+          dialog.show()
       @dismiss()
-    , 3000
