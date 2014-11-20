@@ -12,15 +12,18 @@ class ledger.tasks.Task extends EventEmitter
     ledger.tasks.Task.RUNNING_TASKS[@taskId] = @
     @emit 'start', @
     do @onStart
+    @
 
   startIfNeccessary: () ->
     do @start unless @isRunning()
+    @
 
   stop: () ->
     throw "The task '#{@taskId}' is not running" unless @isRunning()
     ledger.tasks.Task.RUNNING_TASKS = _.omit(ledger.tasks.Task.RUNNING_TASKS, @taskId)
     do @onStop
     @emit 'stop', @
+    @
 
   stopIfNeccessary: () -> do @stop if @isRunning()
 

@@ -41,8 +41,5 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
                 ledger.app.emit('wallet:transactions:new') if success
     found
 
-  _listenTransactions: () ->
-    
-
 
   @instance: new @()

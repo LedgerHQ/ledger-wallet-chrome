@@ -103,6 +103,13 @@ require @ledger.imports, ->
               ledger.tasks.TransactionObserverTask.instance.start()
         @emit 'dongle:connected', @wallet
 
+    _listenAppEvents: () ->
+      @on 'wallet:balance:changed', (ev, balance) =>
+        if balance.wallet.unconfirmed > 0
+          _.delay (=> Wallet.instance?.retrieveAccountsBalances()), 1000
+
+      @on 'wallet:transactions:new', => Wallet.instance?.retrieveAccountsBalances()
+
     _listenClickEvents: () ->
       self = @
       # Redirect every in-app link with our router
