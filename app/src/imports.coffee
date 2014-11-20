@@ -151,6 +151,7 @@
         'controllers/wallet/send/wallet_send_index_dialog_view_controller'
         'controllers/wallet/send/wallet_send_validation_dialog_view_controller'
         'controllers/wallet/send/wallet_send_processing_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_preparing_dialog_view_controller'
         'controllers/wallet/send/wallet_send_error_dialog_view_controller'
         'controllers/wallet/send/wallet_send_success_dialog_view_controller'
 

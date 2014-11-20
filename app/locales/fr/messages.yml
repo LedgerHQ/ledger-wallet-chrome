@@ -239,7 +239,11 @@ wallet:
 
     processing:
       sending: "Envoi en cours..."
-      preparing: "Préparation de la transaction..."
+      validating: "Validation de la transaction..."
+      may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
+
+    preparing:
+      title: "Préparation de la transaction..."
       may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
 
     error:

@@ -25,7 +25,10 @@ class @WalletSendIndexDialogViewController extends DialogViewController
       @view.errorContainer.text nextError
     else
       @view.errorContainer.hide()
-
+      @once 'dismiss', =>
+        dialog = new WalletSendPreparingDialogViewController()
+        dialog.show()
+      @dismiss()
 
   _listenEvents: ->
     @view.amountInput.on 'keydown', =>
