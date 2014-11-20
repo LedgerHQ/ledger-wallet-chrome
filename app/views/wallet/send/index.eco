@@ -7,14 +7,14 @@
       <tr id="amount_row">
         <td class="row-title"><%= t 'wallet.send.index.amount' %></td>
         <td class="align-right">
-          <input id="amount_input" class="large-text-input" placeholder="<%= t 'wallet.send.index.amount_placeholder' %>" value="12"/>
+          <input id="amount_input" class="large-text-input" placeholder="<%= t 'wallet.send.index.amount_placeholder' %>" value=""/>
           <label class="large-text-input">BTC</label>
         </td>
       </tr>
       <tr>
         <td class="row-title"><%= t 'wallet.send.index.receiver_address' %></td>
         <td class="align-right">
-          <input class="text-input" placeholder="<%= t 'wallet.send.index.receiver_address_placeholder' %>" id="receiver_input" value="1DDGTMZUxwYwRdWcyVBmSrGEoVXkVTd6xS"/>
+          <input class="text-input" placeholder="<%= t 'wallet.send.index.receiver_address_placeholder' %>" id="receiver_input" value=""/>
         </td>
       </tr>
       <tr class="no-border">

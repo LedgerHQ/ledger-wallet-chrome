@@ -2,8 +2,14 @@
 @import (reference) "../application";
 @import "top-menu";
 
-#navigation_controller_content {
-  padding: @metrics-large-padding @metrics-medium-padding;
+.main-container {
+  display: flex;
+  flex-direction: column;
+
+  #navigation_controller_content {
+    padding: @metrics-large-padding @metrics-medium-padding;
+    overflow: scroll;
+  }
 }
 
 section {
@@ -30,15 +36,15 @@ section {
     }
   }
 
-  > table {
+  table {
     width: 100%;
     vertical-align: middle;
 
     thead tr td {
       .uppercase-section-column;
       border-bottom: 1px solid transparent;
-      padding-top: @metrics-medium-padding;
-      padding-bottom: @metrics-very-small-padding;
+      padding-top: @metrics-almost-medium-padding;
+      padding-bottom: 6px;
     }
 
     tbody tr td {
@@ -80,7 +86,7 @@ section {
     }
 
     &.no-table-head tr:first-child td {
-      padding-top: @metrics-medium-padding;
+      padding-top: @metrics-almost-medium-padding + 1px;
     }
 
     .align-right {
@@ -113,11 +119,17 @@ section {
     }
   }
 
+  > .empty-container {
+    .regular-grey-text;
+    text-align: center;
+    padding: 150px 0;
+  }
+
   &#receive_index_dialog, &#send_index_dialog {
     #amount_row {
       > td {
         padding-bottom: 5px;
-        padding-top: @metrics-small-padding;
+        padding-top: @metrics-almost-small-padding + 3px;
 
         > input {
           margin-right: 5px;

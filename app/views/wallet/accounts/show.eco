@@ -1,14 +1,3 @@
-<!--<a href="#badpin">Enter wrong pin</a>-->
-<!--<a href="#goodpin">Enter good pin</a>-->
-<!--<a href="#setup">Setup</a>-->
-<!--<a href="#bitid">Get bitId address</a>-->
-<!--<p>State: <span id="toto"></span></p>-->
-<!--<p>BitId: <span id="bitid">undefined</span></p>-->
-<!--<div>-->
-  <!--<input id="deriv" />-->
-  <!--<button data-href="#pub">Get</button>-->
-  <!--<p>Public Key: <span id="pk"></span></p>-->
-<!--</div>-->
 <section id="account">
   <header>
     <h1>COMPTE COURANT</h1>
@@ -40,6 +29,7 @@
     <h1><%= t 'wallet.accounts.show.operations.title' %></h1>
     <a href="/wallet/accounts/0/operations" class="uppercase-action"><%= t 'wallet.accounts.show.operations.action' %></a>
   </header>
+  <div class="empty-container" id="empty_container"></div>
   <table>
     <thead>
       <tr>
@@ -51,6 +41,76 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-href="#showOperation(operation=1)">
+        <td class="fit-content regular-grey-text">21/05/2014 à 15:30</td>
+        <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= t 'wallet.accounts.show.operations.sender' %></td>
+        <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+        <td class="fit-content align-right padding-right-medium regular-valid-text">+1.0892 BTC</td>
+        <td class="fit-content align-right">1.0892 BTC</td>
+      </tr>
+      <tr data-href="#showOperation(operation=1)">
+        <td class="fit-content regular-grey-text">21/05/2014 à 15:30</td>
+        <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= t 'wallet.accounts.show.operations.sender' %></td>
+        <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+        <td class="fit-content align-right padding-right-medium regular-valid-text">+1.0892 BTC</td>
+        <td class="fit-content align-right">1.0892 BTC</td>
+      </tr>
+      <tr data-href="#showOperation(operation=1)">
+        <td class="fit-content regular-grey-text">21/05/2014 à 15:30</td>
+        <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= t 'wallet.accounts.show.operations.sender' %></td>
+        <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+        <td class="fit-content align-right padding-right-medium regular-valid-text">+1.0892 BTC</td>
+        <td class="fit-content align-right">1.0892 BTC</td>
+      </tr>
+      <tr data-href="#showOperation(operation=1)">
+        <td class="fit-content regular-grey-text">21/05/2014 à 15:30</td>
+        <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= t 'wallet.accounts.show.operations.sender' %></td>
+        <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+        <td class="fit-content align-right padding-right-medium regular-valid-text">+1.0892 BTC</td>
+        <td class="fit-content align-right">1.0892 BTC</td>
+      </tr>
+      <tr data-href="#showOperation(operation=1)">
+        <td class="fit-content regular-grey-text">21/05/2014 à 15:30</td>
+        <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= t 'wallet.accounts.show.operations.sender' %></td>
+        <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+        <td class="fit-content align-right padding-right-medium regular-valid-text">+1.0892 BTC</td>
+        <td class="fit-content align-right">1.0892 BTC</td>
+      </tr>
+      <tr data-href="#showOperation(operation=1)">
+        <td class="fit-content regular-grey-text">21/05/2014 à 15:30</td>
+        <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= t 'wallet.accounts.show.operations.sender' %></td>
+        <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+        <td class="fit-content align-right padding-right-medium regular-valid-text">+1.0892 BTC</td>
+        <td class="fit-content align-right">1.0892 BTC</td>
+      </tr>
+      <tr data-href="#showOperation(operation=1)">
+        <td class="fit-content regular-grey-text">21/05/2014 à 15:30</td>
+        <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= t 'wallet.accounts.show.operations.sender' %></td>
+        <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+        <td class="fit-content align-right padding-right-medium regular-valid-text">+1.0892 BTC</td>
+        <td class="fit-content align-right">1.0892 BTC</td>
+      </tr>
+      <tr data-href="#showOperation(operation=1)">
+        <td class="fit-content regular-grey-text">21/05/2014 à 15:30</td>
+        <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= t 'wallet.accounts.show.operations.sender' %></td>
+        <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+        <td class="fit-content align-right padding-right-medium regular-valid-text">+1.0892 BTC</td>
+        <td class="fit-content align-right">1.0892 BTC</td>
+      </tr>
+      <tr data-href="#showOperation(operation=1)">
+        <td class="fit-content regular-grey-text">21/05/2014 à 15:30</td>
+        <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= t 'wallet.accounts.show.operations.sender' %></td>
+        <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+        <td class="fit-content align-right padding-right-medium regular-valid-text">+1.0892 BTC</td>
+        <td class="fit-content align-right">1.0892 BTC</td>
+      </tr>
+      <tr data-href="#showOperation(operation=1)">
+        <td class="fit-content regular-grey-text">21/05/2014 à 15:30</td>
+        <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= t 'wallet.accounts.show.operations.sender' %></td>
+        <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+        <td class="fit-content align-right padding-right-medium regular-valid-text">+1.0892 BTC</td>
+        <td class="fit-content align-right">1.0892 BTC</td>
+      </tr>
       <tr data-href="#showOperation(operation=1)">
         <td class="fit-content regular-grey-text">21/05/2014 à 15:30</td>
         <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= t 'wallet.accounts.show.operations.sender' %></td>
