@@ -51,6 +51,7 @@
         '../libs/sha256'
         '../libs/checkBitcoinAddress'
         '../libs/lru'
+        '../libs/moment.min'
 
         'routes'
 
