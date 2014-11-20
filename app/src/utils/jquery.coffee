@@ -26,8 +26,8 @@ $.fn.extend
     @on 'input', () ->
       @value = _.str.replace(@value, ',', '.') if @value.indexOf(',') != -1
       decimalPointIndex = @value.indexOf('.')
-      if decimalPointIndex != -1 and @value.length - decimalPointIndex > 8
-        @value = @value.substring(0, @value.indexOf('.') + 8)
+      if decimalPointIndex != -1 and @value.length - decimalPointIndex > 9
+        @value = @value.substring(0, @value.indexOf('.') + 9)
       if (/[^\.0-9]/).test(@value)
         @value = @value.replace(/[^\.0-9]/g, '')
       if @value.indexOf('.') != @value.lastIndexOf('.')

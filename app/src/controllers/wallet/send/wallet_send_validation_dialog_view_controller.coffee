@@ -19,7 +19,13 @@ class @WalletSendValidationDialogViewController extends @DialogViewController
 
   _listenEvents: ->
     @view.keycard.once 'completed', =>
-      @view.keycard.off 'character'
+      @once 'dismiss', =>
+        dialog = new WalletSendProcessingDialogViewController()
+        dialog.show()
+      @dismiss()
     @view.keycard.on 'character', (event, value) =>
       @view.keycardCode.text _.str.pad('', value.length, '•')
       @view.enteredCode.show()
+    @once 'dismiss', =>
+      @view.keycard.off 'completed'
+      @view.keycard.off 'character'

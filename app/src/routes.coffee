@@ -1,6 +1,6 @@
 # routes that do not need a plugged ledger wallet
 ledger.router ?= {}
-ledger.router.ignorePluggedWalletForRouting = yes
+ledger.router.ignorePluggedWalletForRouting = no
 ledger.router.pluggedWalletRoutesExceptions = [
   '/',
   '/onboarding/device/plug'
@@ -67,14 +67,6 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new WalletSendIndexDialogViewController()
     dialog.show()
 
-  route '/wallet/send/validation', (params) ->
-    dialog = new WalletSendValidationDialogViewController()
-    dialog.show()
-
-  route '/wallet/send/processing', (params) ->
-    dialog = new WalletSendProcessingDialogViewController()
-    dialog.show()
-
   # Receive
   route '/wallet/receive/index', (params) ->
     dialog = new WalletReceiveIndexDialogViewController()
@@ -85,5 +77,5 @@ ledger.router.pluggedWalletRoutesExceptions = [
     window.open t 'application.support_url'
 
   # Operations
-  route '/wallet/accounts/operations/index', (params) ->
+  route '/wallet/accounts/{id}/operations', (params) ->
     app.navigate WALLET_LAYOUT, WalletOperationsIndexViewController

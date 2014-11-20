@@ -1,0 +1,1 @@
+class @WalletSendErrorDialogViewController extends @DialogViewController 

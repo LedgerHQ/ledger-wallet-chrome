@@ -2,6 +2,7 @@ class @WalletReceiveIndexDialogViewController extends DialogViewController
 
   view:
     amountInput: '#amount_input'
+    receiverAddress: "#receiver_address"
 
   initialize: ->
     super
@@ -17,11 +18,15 @@ class @WalletReceiveIndexDialogViewController extends DialogViewController
         colorLight : "#ffffff"
         correctLevel : QRCode.CorrectLevel.H
     @view.amountInput.amountInput()
+    @view.receiverAddress.text @params.address
     do @_listenEvents
 
   onShow: ->
     super
     @view.amountInput.focus()
+
+  mail: ->
+    window.open 'mailto:?body=' + @params.address
 
   _listenEvents: ->
     @view.amountInput.on 'keydown', (e) =>

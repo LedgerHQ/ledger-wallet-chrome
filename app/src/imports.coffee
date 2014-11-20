@@ -71,6 +71,7 @@
         'utils/spinners'
         'utils/pin_codes'
         'utils/lru'
+        'utils/formatters'
 
         'utils/crypto/aes'
         'utils/crypto/sha256'
@@ -151,6 +152,9 @@
         'controllers/wallet/send/wallet_send_index_dialog_view_controller'
         'controllers/wallet/send/wallet_send_validation_dialog_view_controller'
         'controllers/wallet/send/wallet_send_processing_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_preparing_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_error_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_success_dialog_view_controller'
 
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'
