@@ -232,7 +232,7 @@ wallet:
       receiver_address: "RECIPIENT BITCOIN ADDRESS"
       receiver_address_placeholder: "bitcoin address"
       total_spent: "TOTAL SPENT"
-      transaction_fees_text: "(+0.00001 BTC transaction fees)"
+      transaction_fees_text: "(+0.0001 BTC transaction fees)"
       send: "SEND"
       close: "CLOSE"
       confirm: "CONFIRM"
