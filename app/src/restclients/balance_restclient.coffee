@@ -14,7 +14,7 @@ class ledger.api.BalanceRestClient extends ledger.api.RestClient
           onSuccess: (addressesBalances) ->
             for addressBalance in addressesBalances
               accountBalance.total += addressBalance.total.balance
-              accountBalance.confirmed += addressBalance.confirmed.balance
+              accountBalance.confirmed += addressBalance.confirmed.balance if addressBalance.confirmed.balance < addressBalance.total.balance
             unless hasNext
               accountBalance.unconfirmed = accountBalance.total - accountBalance.confirmed
               callback?(accountBalance)

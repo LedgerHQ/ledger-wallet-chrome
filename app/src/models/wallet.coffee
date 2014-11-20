@@ -23,7 +23,7 @@ class @Wallet extends Model
       accounts.each (account) =>
         if account?
           balance.wallet.total += parseInt(account.total_balance) if account.total_balance?
-          balance.wallet.unconfirmed += Math.abs(parseInt(account.unconfirmed_balance)) if account.unconfirmed_balance?
+          balance.wallet.unconfirmed += parseInt(account.unconfirmed_balance) if account.unconfirmed_balance?
           balance.accounts.push total: account.total_balance, unconfirmed: account.unconfirmed_balance
         else
           callback(balance)
