@@ -19,6 +19,7 @@ class ledger.tasks.BalanceTask extends ledger.tasks.Task
         account.set('unconfirmed_balance', balance.unconfirmed)
         account.save =>
           @emit "success", @
+          @stopIfNeccessary()
           ledger.app.emit "wallet:balance:changed",
             wallet:
               total: balance.total

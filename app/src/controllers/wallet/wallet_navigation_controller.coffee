@@ -8,17 +8,26 @@ class @WalletNavigationController extends @NavigationController
 #    '/wallet/signout/': '#signout-item'
     '/wallet/accounts/': '#account-item'
   }
+  view:
+    balanceValue: '#balance-value'
 
   constructor: () ->
     ledger.application.router.on 'routed', (event, data) =>
       {url} = data
       @updateMenu url
-      @updateBreadcrumbs url
+      ##@updateBreadcrumbs url
 
   onAfterRender: () ->
+    super
     url = ledger.application.router.currentUrl
     @updateMenu url
-    @updateBreadcrumbs url
+    ##@updateBreadcrumbs url
+    # fetch balances
+    Wallet.instance.getBalance (balance) =>
+      @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+    # listen events
+    ledger.app.on 'wallet:balance:changed', (event, balance) =>
+      @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
 
   updateMenu: (url) ->
     for baseUrl, itemSelector of @_menuItemBaseUrl
