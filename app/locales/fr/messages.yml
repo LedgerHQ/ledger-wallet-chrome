@@ -186,7 +186,6 @@ wallet:
 
     index:
       <<: *default-operations-translation
-      title: "TOUTES LES OPÉRATIONS"
       title_with_account_name: 'TOUTES LES OPÉRATIONS DE %s'
       filter_sort_desc: "TRI DÉCROISSANT"
       filter_sort_asc: "TRI CROISSANT"

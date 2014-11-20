@@ -77,5 +77,5 @@ ledger.router.pluggedWalletRoutesExceptions = [
     window.open t 'application.support_url'
 
   # Operations
-  route '/wallet/accounts/operations/index', (params) ->
+  route '/wallet/accounts/{id}/operations', (params) ->
     app.navigate WALLET_LAYOUT, WalletOperationsIndexViewController

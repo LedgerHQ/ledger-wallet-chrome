@@ -138,7 +138,7 @@ onboarding:
 wallet:
   defaults:
     operations: &default-operations-translation
-      time: "TIME"
+      time: "DATE AND TIME"
       sender: "from"
       receiver: "to"
       account_name: "ACCOUNT NAME"
@@ -147,7 +147,7 @@ wallet:
       balance: "BALANCE"
 
   top_menu:
-    balance: 'SOLDE'
+    balance: 'BALANCE'
     items:
       dashboard: 'DASHBOARD'
       send: 'SEND'
@@ -186,9 +186,8 @@ wallet:
 
     index:
       <<: *default-operations-translation
-      title: "ALL OPERATIONS"
       title_with_account_name: 'ALL %s OPERATIONS'
-      filter_sort_desc: "DESCENDANT SORTNG"
+      filter_sort_desc: "DESCENDANT SORTING"
       filter_sort_asc: "ASCENDANT SORTING"
 
   accounts:
