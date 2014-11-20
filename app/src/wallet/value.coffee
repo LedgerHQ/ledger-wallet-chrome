@@ -19,7 +19,7 @@ class ledger.wallet.Value
     if _(value).isKindOf(Bitcoin.BigInteger)
       @_number = value
       return this
-    @_number = new Bitcoin.BigInteger(value)
+    @_number = new Bitcoin.BigInteger(value.toString())
 
   add: (value) ->
     value = Value.from(value) unless _(value).isKindOf(ledger.wallet.Value)

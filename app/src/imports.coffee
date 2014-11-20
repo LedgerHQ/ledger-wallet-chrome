@@ -71,6 +71,7 @@
         'utils/spinners'
         'utils/pin_codes'
         'utils/lru'
+        'utils/formatters'
 
         'utils/crypto/aes'
         'utils/crypto/sha256'
