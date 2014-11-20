@@ -8,7 +8,7 @@ class @WalletSendValidationDialogViewController extends @DialogViewController
   onAfterRender: ->
     super
     @view.keycard = new ledger.pin_codes.KeyCard()
-    @view.keycard.setValidableValues ['c', 'A', '2']
+    @view.keycard.setValidableValues @params.transaction.getKeycardIndexes()
     @view.keycard.insertIn @view.cardContainer[0]
     @view.enteredCode.hide()
     @_listenEvents()
@@ -18,9 +18,9 @@ class @WalletSendValidationDialogViewController extends @DialogViewController
     @view.keycard.stealFocus()
 
   _listenEvents: ->
-    @view.keycard.once 'completed', =>
+    @view.keycard.once 'completed', (event, value) =>
       @once 'dismiss', =>
-        dialog = new WalletSendProcessingDialogViewController()
+        dialog = new WalletSendProcessingDialogViewController transaction: @params.transaction, keycode: value
         dialog.show()
       @dismiss()
     @view.keycard.on 'character', (event, value) =>

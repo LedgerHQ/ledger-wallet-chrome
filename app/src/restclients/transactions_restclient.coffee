@@ -26,7 +26,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
         onError: @networkErrorCallback(callback)
 
   postTransaction: (transaction, callback) ->
-    @http().post
+    @http().postForm
       url: "blockchain/pushtx"
       params: {tx: transaction.getSignedTransaction()}
       onSuccess: (response) ->
