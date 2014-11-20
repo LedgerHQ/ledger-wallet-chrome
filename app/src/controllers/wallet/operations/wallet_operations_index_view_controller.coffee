@@ -12,7 +12,7 @@ class @WalletOperationsIndexViewController extends ViewController
         @view.accountName.text(_.str.sprintf(t('wallet.operations.index.title_with_account_name'), data.name))
 
     do @_updateOperations
-    ledger.app.on 'wallet:transactions:new', =>
+    ledger.app.on 'wallet:transactions:new wallet:operations:sync:done', =>
       do @_updateOperations
 
   _updateOperations: ->
