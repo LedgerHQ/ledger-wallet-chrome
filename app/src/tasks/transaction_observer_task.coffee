@@ -4,7 +4,6 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
 
   onStart: () ->
     @_listenNewTransactions()
-    @_listenTransactions()
 
   onStop: () ->
     @newTransactionStream.close()

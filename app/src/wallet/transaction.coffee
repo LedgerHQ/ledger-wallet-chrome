@@ -17,6 +17,7 @@ class ledger.wallet.transaction.Transaction
     try
       @_btInputs = []
       @_btcAssociatedKeyPath = []
+      l inputs
       for input in inputs
         splitTransaction = ledger.app.wallet._lwCard.dongle.splitTransaction(new ByteString(input.raw, HEX))
         @_btInputs.push [splitTransaction, input.output_index]
@@ -39,6 +40,7 @@ class ledger.wallet.transaction.Transaction
       .fail (error) =>
         callback?(null, {title: 'Signature Error', code: ledger.errors.SignatureError})
     catch error
+      e error
       callback?(null, {title: 'An error occured', code: ledger.errors.UnknownError})
 
   validate: (validationKey, callback) ->
@@ -83,12 +85,25 @@ class ledger.wallet.transaction.Transaction
 
   getKeycardIndexes: () ->
     indexes = []
+    keycardIndexes = []
+
+    if ledger.app.wallet.getIntFirmwareVersion() < ledger.wallet.Firmware.V1_4_13
+      stringifiedAmount = @amount.toString()
+      stringifiedAmount = _.str.lpad(stringifiedAmount, 9, '0')
+      decimalPart = stringifiedAmount.substr(stringifiedAmount.length - 8)
+      integerPart = stringifiedAmount.substr(0, stringifiedAmount.length - 8)
+      keycardIndexes.push integerPart.charAt(integerPart.length - 1)
+      if decimalPart isnt "00000000"
+        keycardIndexes.push decimalPart.charAt(0)
+        keycardIndexes.push decimalPart.charAt(1)
+        keycardIndexes.push decimalPart.charAt(2)
+
     indexesKeyCard = @_out.indexesKeyCard
     while indexesKeyCard.length >= 2
       index = indexesKeyCard.substring(0, 2)
       indexesKeyCard = indexesKeyCard.substring(2)
       indexes.push parseInt(index, 16)
-    keycardIndexes = []
+
     keycardIndexes.push @recipientAddress[index] for index in indexes
     keycardIndexes
 
@@ -107,6 +122,7 @@ _.extend ledger.wallet.transaction,
       ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
         return callback?(null, {title: 'Network Error', error, code: ledger.errors.NetworkError}) if error?
 
+
         validOutputs = []
         # Collect each valid outputs
         for output in outputs
@@ -117,13 +133,14 @@ _.extend ledger.wallet.transaction,
         # Sort outputs by desired priority
         validOutputs = _(validOutputs).sortBy (output) -> output.priority
 
+        return callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds}) if validOutputs.length == 0
+
         finalOutputs = []
         collectedAmount = new ledger.wallet.Value()
         requiredAmount = amount.add(fees)
         hadNetworkFailure = no
         # For each valid outputs we try to get its raw transaction.
         _.async.each validOutputs, (output, done, hasNext) ->
-          l output
           ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
             if error?
               hadNetworkFailure = yes
@@ -138,7 +155,7 @@ _.extend ledger.wallet.transaction,
             else if hasNext is false and collectedAmount.lt(requiredAmount)
               # Not enough available funds
               callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds})
-            else if collectedAmount.gte requiredAmount
+            else if hasNext is false and collectedAmount.gte requiredAmount
               # We have reached our required amount. It's to prepare the transaction
               _.defer -> transaction.prepare(outputs, changePath, callback)
             else

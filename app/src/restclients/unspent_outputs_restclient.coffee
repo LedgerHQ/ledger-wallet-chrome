@@ -5,7 +5,7 @@ class ledger.api.UnspentOutputsRestClient extends ledger.api.RestClient
     query = addresses.join(',')
     @http().get "blockchain/addresses/#{query}/unspents", null,
       (response, request) =>
-        l arguments
+        l response
         callback?(response)
       ,
       (xhr, status, message) =>

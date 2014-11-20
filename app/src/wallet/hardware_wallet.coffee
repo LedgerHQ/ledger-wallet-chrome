@@ -10,6 +10,11 @@
   UNPLUGGED: 'unplugged'
   DISCONNECTED: 'disconnected'
 
+@ledger.wallet.Firmware =
+  V1_4_11: 0x0001040b0146
+  V1_4_12: 0x0001040c0146
+  V1_4_13: 0x0001040d0146
+
 class @ledger.wallet.HardwareWallet extends EventEmitter
 
   _state: ledger.wallet.States.UNDEFINED
@@ -35,6 +40,10 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       @manager.removeRestorableState(state) for state in @manager.findRestorableStates({label: 'numberOfRetry'})
       @manager.addRestorableState({label: 'numberOfRetry', numberOfRetry: @_numberOfRetry}, 45000)
 
+  getFirmwareVersion: () -> @_lwCard.getFirmwareVersion()
+
+  getIntFirmwareVersion: () -> parseInt(@_lwCard.firmwareVersion.toString(), 16)
+
   getState: (callback) ->
     if @_state is ledger.wallet.States.UNDEFINED
       @once 'state:changed', (e, state) => callback?(state)
@@ -47,6 +56,14 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       onSuccess:
         events: ['LW.PINVerified']
         do:  =>
+          ## This needs a BIG refactoring
+          l @getFirmwareVersion()
+          if @getIntFirmwareVersion() >= ledger.wallet.Firmware.V1_4_13
+            l 'GOT 13'
+          #.sendApdu_async(0xe0, 0x26, 0x00, 0x00, new ByteString(Convert.toHexByte(operationMode), HEX), [0x9000])
+            @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
+              .then => l 'DONE'
+              .fail => l 'FAIL', arguments
           @_setState(ledger.wallet.States.UNLOCKED)
           do unbind
           callback?(yes)

@@ -64,7 +64,6 @@ LW.prototype = {
     getFirmwareVersion: function(){
         LWTools.console("LW.getFirmwareVersion", 3);
         var lW = this;
-
         return lW.firmwareVersion.byteAt(1) + "." + lW.firmwareVersion.byteAt(2) + "." + lW.firmwareVersion.byteAt(3);
     },
 

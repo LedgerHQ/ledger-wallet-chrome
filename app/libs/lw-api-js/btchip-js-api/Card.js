@@ -222,6 +222,7 @@ var Card = Class.create({
 			}
 			else
 			if (typeof opt1 == "number") {
+                l(opt2, opt3);
 				if ((typeof opt2 == "undefined") && (typeof opt3 == "undefined")) {
 					// Simple Case 2 scenario already handled in the APDU itself
 				}
