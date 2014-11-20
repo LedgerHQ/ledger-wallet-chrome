@@ -155,7 +155,7 @@ _.extend ledger.wallet.transaction,
             else if hasNext is false and collectedAmount.lt(requiredAmount)
               # Not enough available funds
               callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds})
-            else if hasNext is false and collectedAmount.gte requiredAmount
+            else if collectedAmount.gte requiredAmount
               # We have reached our required amount. It's to prepare the transaction
               _.defer -> transaction.prepare(outputs, changePath, callback)
             else
