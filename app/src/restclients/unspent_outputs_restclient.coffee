@@ -2,7 +2,8 @@
 class ledger.api.UnspentOutputsRestClient extends ledger.api.RestClient
 
   getUnspentOutputsFromAddresses: (addresses, callback) ->
-    query = addresses.join(',')
+    addresses = (address for address in addresses when Bitcoin.Address.validate(address) is true)
+    query = _(addresses).join(',')
     @http().get "blockchain/addresses/#{query}/unspents", null,
       (response, request) =>
         l response
