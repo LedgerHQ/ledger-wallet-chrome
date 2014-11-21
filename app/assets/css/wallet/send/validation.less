@@ -1,0 +1,32 @@
+@import (reference) "../../constants";
+@import (reference) "../../common";
+
+section#send_validation_dialog {
+  width: 1px;
+
+  > div.regular-text {
+    line-height: 20px;
+    margin-top: @metrics-almost-medium-padding - 3px;
+  }
+
+  div.keycard {
+    margin-top: @metrics-small-padding;
+  }
+}
+
+#dialogs_container {
+  div.dialog-actions-bar {
+    align-items: center;
+  }
+  #entered_code {
+    .regular-text;
+    display: flex;
+    align-items: center;
+
+    > div.code {
+      margin-left: @metrics-very-small-padding;
+      font-size: @font-size-extra-large;
+      letter-spacing: 2px;
+    }
+  }
+}

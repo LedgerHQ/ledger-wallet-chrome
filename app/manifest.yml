@@ -1,0 +1,51 @@
+name: "__MSG_application_name__"
+description: "__MSG_application_small_description__"
+version: "1.0.0"
+manifest_version: 2
+minimum_chrome_version: "38"
+default_locale: "en"
+
+app:
+  background:
+    scripts:
+      - "src/background.js"
+
+permissions:
+  - "*://ledgerwallet.com/*"
+  - "*://*.ledgerwallet.com/*"
+  - "*://*.chain.com/v2/notifications/*"
+  - "storage"
+  - "usb"
+  - "hid"
+  -
+    usbDevices:
+      -
+        vendorId: 9601
+        productId: 7036
+      -
+        vendorId: 9601
+        productId: 11132
+
+externally_connectable:
+  matches:
+    - "*://*.ledgerwallet.com/*"
+
+#commands:
+#  reload-page:
+#    suggested_key:
+#      default: "Ctrl+R"
+#      mac: "Command+R"
+#    description: "Reload the current page"
+#
+#  reload-application:
+#    suggested_key:
+#      default: "Ctrl+Shift+R"
+#      mac: "Command+Shift+R"
+#    description: "Reload the application"
+
+icons:
+  16: "assets/images/icon-16.png"
+  48: "assets/images/icon-32.png"
+  48: "assets/images/icon-48.png"
+  48: "assets/images/icon-64.png"
+  128: "assets/images/icon-128.png"

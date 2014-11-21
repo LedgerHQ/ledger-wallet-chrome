@@ -1,0 +1,225 @@
+@import (reference) "../constants";
+@import (reference) "../application";
+@import "top-menu";
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+
+  #navigation_controller_content {
+    padding: @metrics-large-padding @metrics-medium-padding;
+    overflow: scroll;
+  }
+}
+
+section {
+  width: 100%;
+  display: table;
+  margin-top: @metrics-large-padding - 5px;
+
+  &:first-child {
+    margin-top: 0px;
+  }
+
+  > header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0px;
+
+    > h1 {
+      .uppercase-section-title;
+      margin-right: @metrics-very-small-padding;
+    }
+
+    a.uppercase-action {
+      margin-left: auto;
+    }
+  }
+
+  table {
+    width: 100%;
+    vertical-align: middle;
+
+    thead tr td {
+      .uppercase-section-column;
+      border-bottom: 1px solid transparent;
+      padding-top: @metrics-almost-medium-padding;
+      padding-bottom: 6px;
+    }
+
+    tbody tr td {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      vertical-align: middle;
+      padding-right: @metrics-very-large-padding;
+      border-bottom: 1px solid @color-very-light-grey;
+      font-size: @font-size-medium;
+
+      &.row-title {
+        .uppercase-section-column;
+        &.top-aligned {
+          vertical-align: top;
+        }
+        &.optional {
+          color: @color-soft-grey;
+        }
+      }
+    }
+
+    tbody tr[data-href] {
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+
+    tr.no-border td {
+      border-bottom: 0px solid transparent;
+    }
+
+    tr td.fit-content {
+      width: 1%;
+      white-space:nowrap;
+    }
+
+    tr td:last-child {
+      padding-right: 0px;
+    }
+
+    &.no-table-head tr:first-child td {
+      padding-top: @metrics-almost-medium-padding + 1px;
+    }
+
+    .align-right {
+      text-align: right;
+      padding-right: 0px;
+    }
+
+    .padding-right-very-small {
+      padding-right: @metrics-very-small-padding;
+    }
+
+    .padding-right-small {
+      padding-right: @metrics-small-padding;
+    }
+
+    .padding-right-medium {
+      padding-right: @metrics-medium-padding;
+    }
+
+    .padding-right-very-large {
+      padding-right: @metrics-very-large-padding;
+    }
+
+    .padding-right-extra-large {
+      padding-right: @metrics-extra-large-padding;
+    }
+
+    .padding-right-ultra-large {
+      padding-right: @metrics-ultra-large-padding;
+    }
+  }
+
+  > .empty-container {
+    .regular-grey-text;
+    text-align: center;
+    padding: 130px 0;
+  }
+
+  &#receive_index_dialog, &#send_index_dialog {
+    #amount_row {
+      > td {
+        padding-bottom: 5px;
+        padding-top: @metrics-almost-small-padding + 3px;
+
+        > input {
+          margin-right: 5px;
+          width: 200px;
+        }
+      }
+    }
+  }
+
+  &#send_processing_dialog, &#send_preparing_dialog {
+    text-align: center;
+
+    > #spinner_container {
+      > .spinner {
+        margin-top: @metrics-small-padding;
+      }
+    }
+
+    > #title {
+      margin-top: @metrics-extra-large-padding;
+    }
+
+    > .regular-grey-text-small {
+      margin: 0 @metrics-small-padding;
+      margin-top: @metrics-almost-small-padding;
+    }
+  }
+
+  .keycard {
+    width: 370px;
+    height: 190px;
+    background-color: @color-white;
+    border-radius: 10px;
+    border: 1px solid @color-light-grey;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+
+    > input {
+      width: 1;
+      height: 1;
+      opacity: 0;
+      position: absolute;
+      outline: none;
+    }
+
+    > .section-title {
+      .regular-grey-text-small;
+      text-transform: uppercase;
+      margin: @metrics-very-small-padding 0;
+
+      &:first-child {
+        margin-top: 0;
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    > .section-values {
+      background: transparent;
+      border: 1px solid @color-light-grey;
+      border-radius: 5px;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+
+      > .value {
+        .regular-text;
+        font-size: @font-size-small;
+        margin-right: 2px;
+        padding: 10px 0px;
+        width: 12px;
+        text-align: center;
+        background-position: center 32px;
+        background-image: url("@{images-url}/wallet/cursor_arrow.png");
+        background-size: 6px 6px;
+        background-repeat: no-repeat;
+        transition: background-position @animation-short-duration @animation-default-timing-function;
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        &.selected {
+          color: @color-invalid-red;
+          font-weight: @font-weight-bold;
+          background-position: center bottom;
+        }
+      }
+    }
+  }
+}

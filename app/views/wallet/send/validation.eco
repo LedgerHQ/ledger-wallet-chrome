@@ -1,0 +1,14 @@
+<section id="send_validation_dialog">
+  <header>
+    <h1><%= t 'wallet.send.validation.title' %></h1>
+  </header>
+  <div class="regular-text"><%- t 'wallet.send.validation.grab_your_card' %></div>
+  <div id="card_container"></div>
+</section>
+<div class="dialog-actions-bar">
+  <div id="entered_code">
+    <%= t 'wallet.send.validation.entered_code' %>
+    <div class="code"></div>
+  </div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'wallet.send.index.close' %></a>
+</div>

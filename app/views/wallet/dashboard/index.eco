@@ -1,0 +1,84 @@
+<section id="accounts">
+
+  <header>
+    <h1><%= t 'wallet.dashboard.index.accounts.title' %></h1><span class="account-type-orange transparent">courant</span>
+    <a href="/wallet/accounts/index"><%= t 'wallet.dashboard.index.accounts.action' %></a>
+  </header>
+
+  <table>
+    <thead>
+      <tr>
+        <td class="fit-content" ><%= t 'wallet.dashboard.index.accounts.account_name' %></td>
+        <td ><%= t 'wallet.dashboard.index.accounts.account_type' %></td>
+        <td class="fit-content align-right price" ><%= t 'wallet.dashboard.index.accounts.account_balance' %></td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-href="/wallet/accounts/operations/index?account_name=Compte courant">
+        <td class="fit-content">Compte courant</td>
+        <td><span class="account-type-orange">courant</span></td>
+        <td class="fit-content align-right price">2.0000 BTC</td>
+      </tr>
+      <tr data-href="/wallet/accounts/operations/index?account_name=Compte pas courant">
+        <td class="fit-content">Compte pas courant</td>
+        <td><span class="account-type-blue">épargne</span></td>
+        <td class="fit-content align-right price">945.9406 BTC</td>
+      </tr>
+      <tr data-href="/wallet/accounts/operations/index?account_name=Compte peu courant">
+        <td class="fit-content">Compte peu courant</td>
+        <td><span class="account-type-green">travail</span></td>
+        <td class="fit-content align-right price">289.0000 BTC</td>
+      </tr>
+      <tr data-href="/wallet/accounts/operations/index?account_name=Compte très courant">
+        <td class="fit-content">Compte très courant</td>
+        <td><span class="account-type-orange">courant</span></td>
+        <td class="fit-content align-right price">24.0000 BTC</td>
+      </tr>
+    </tbody>
+  </table>
+
+</section>
+
+<section id="operations">
+
+  <header>
+    <h1><%= t 'wallet.dashboard.index.operations.title' %></h1>
+    <a href="/wallet/accounts/operations/index"><%= t 'wallet.dashboard.index.operations.action' %></a>
+  </header>
+
+  <table>
+    <thead>
+      <tr>
+        <td class="fit-content" ><%= t 'wallet.dashboard.index.operations.time' %></td>
+        <td class="fit-content padding-right-ultra-large" ><%= t 'wallet.dashboard.index.operations.account_name' %></td>
+        <td class="fit-content align-right padding-right-very-small"></td>
+        <td ><%= t 'wallet.dashboard.index.operations.bitcoin_address' %></td>
+        <td class="fit-content align-right price" ><%= t 'wallet.dashboard.index.operations.amount' %></td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-href="#showOperation(operation=1)">
+        <td class="fit-content weak-text">21/05/2014 à 15:30</td>
+        <td class="fit-content padding-right-ultra-large">Épargne de Lucie</td>
+        <td class="fit-content align-right padding-right-very-small weak-text very-small-text"><%= t 'wallet.dashboard.index.operations.sender' %></td>
+        <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+        <td class="fit-content positive-price">+1.0892 BTC</td>
+      </tr>
+      <tr data-href="#showOperation(operation=2)">
+        <td class="fit-content weak-text">18/05/2014 à 21:30</td>
+        <td class="fit-content padding-right-ultra-large">Compte courant de Maxime</td>
+        <td class="fit-content align-right padding-right-very-small weak-text very-small-text"><%= t 'wallet.dashboard.index.operations.receiver' %></td>
+        <td>1KZVDwiebwwuAPbzUtJ3Zdu5G9ab5FvBi5q</td>
+        <td class="fit-content negative-price">-0.0892 BTC</td>
+      </tr>
+      <tr data-href="#showOperation(operation=3)">
+        <td class="fit-content weak-text">17/05/2014 à 02:36</td>
+        <td class="fit-content padding-right-ultra-large">Épargne de Lucie</td>
+        <td class="fit-content align-right padding-right-very-small weak-text very-small-text"><%= t 'wallet.dashboard.index.operations.sender' %></td>
+        <td>19zo4GYRJKRHRrzr9LuyECqUWszJ1gD5S1</td>
+        <td class="fit-content positive-price">+1.0892 BTC</td>
+      </tr>
+    </tbody>
+  </table>
+
+</section>

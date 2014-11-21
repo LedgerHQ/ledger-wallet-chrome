@@ -1,0 +1,1 @@
+class @OnboardingDeviceFrozenViewController extends @OnboardingViewController

@@ -1,0 +1,18 @@
+@import (reference) "../../constants";
+
+#content-container {
+  > .greyed-container {
+    &.detailed {
+      > .index {
+        letter-spacing: -10px;
+      }
+    }
+  }
+
+  > .page-content-container {
+    padding-right: @metrics-ultra-large-padding * 2;
+    > .paragraph {
+      margin-top: @metrics-very-small-padding + 5px;
+    }
+  }
+}

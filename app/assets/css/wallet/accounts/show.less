@@ -1,0 +1,48 @@
+@import (reference) "../../constants";
+
+section#account {
+
+  > table {
+
+    > thead tr:first-child td {
+      padding-bottom: 0px;
+
+      &.unconfirmed-balance {
+        color: @color-dark-grey;
+      }
+    }
+
+    > thead {
+      > tr {
+        > td {
+          .tinySpinner {
+          }
+        }
+      }
+    }
+
+    > tbody tr:first-child td {
+      .price {
+        font-size: @font-size-giga-large;
+        font-weight: @font-weight-semibold;
+        letter-spacing: -2px;
+      }
+
+      .btc-acronyme {
+        font-size: @font-size-giga-large;
+        font-weight: @font-weight-light;
+        letter-spacing: -2px;
+      }
+
+      &.unconfirmed-balance {
+        color: @color-soft-grey;
+        font-size: @font-size-giga-large;
+        font-weight: @font-weight-light;
+        letter-spacing: -2.5px;
+      }
+
+    }
+
+  }
+
+}

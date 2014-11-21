@@ -1,0 +1,52 @@
+@import (reference) "../../constants";
+
+#content-container {
+  > .page-content-container {
+    flex-direction: row;
+    padding-top: @metrics-large-padding - 3px;
+
+    > .choice {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+
+      &:first-child {
+        flex-shrink: 0;
+      }
+
+      > .pincode {
+        margin-top: @metrics-small-padding - 3px;
+      }
+
+      > .uppercase-action, > .grey-indication {
+        margin-top: @metrics-medium-padding;
+      }
+    }
+
+    > .separator {
+      width: 120px;
+      height: 105px;
+      margin-top: @metrics-medium-padding;
+      flex-shrink: 0;
+      opacity: 0.75;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      color: @color-light-grey;
+
+      > div.line {
+        flex-grow: 1;
+        width: 50%;
+        border-right: 1px solid @color-light-grey;
+
+        &:first-child {
+          margin-bottom: @metrics-small-padding;
+        }
+
+        &:last-child {
+          margin-top: @metrics-small-padding;
+        }
+      }
+    }
+  }
+}

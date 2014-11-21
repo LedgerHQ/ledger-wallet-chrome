@@ -1,0 +1,5 @@
+<section id="send_preparing_dialog">
+  <div id="spinner_container"></div>
+  <div class="uppercase-section-title" id="title"><%= t 'wallet.send.preparing.title' %></div>
+  <div class="regular-grey-text-small"><%= t 'wallet.send.preparing.may_take_a_while' %></div>
+</section>

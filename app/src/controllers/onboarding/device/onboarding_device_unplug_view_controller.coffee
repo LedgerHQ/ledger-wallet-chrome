@@ -1,0 +1,1 @@
+class @OnboardingDeviceUnplugViewController extends @OnboardingViewController

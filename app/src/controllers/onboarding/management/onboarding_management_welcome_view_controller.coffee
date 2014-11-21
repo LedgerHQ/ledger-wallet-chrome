@@ -1,0 +1,1 @@
+class @OnboardingManagementWelcomeViewController extends @OnboardingViewController
