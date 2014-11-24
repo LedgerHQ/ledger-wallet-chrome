@@ -6,33 +6,43 @@
     <tbody>
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.amount' %></td>
-        <td class="align-right regular-valid-text" id="operation_amount">+2.0892 BTC</td>
+        <% if @operation.type == 'reception': %>
+          <td class="align-right regular-valid-text">+<%= ledger.formatters.bitcoin.fromValue(@operation.value) %> BTC</td>
+          <% else: %>
+          <td class="align-right regular-invalid-text">-<%= ledger.formatters.bitcoin.fromValue(@operation.value) %> BTC</td>
+        <% end %>
       </tr>
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.time' %></td>
-        <td class="align-right" id="operation_time">21/05/2014 à 15:30</td>
+        <td class="align-right" id="operation_time"><%= moment(new Date(@operation.time)).format t 'common.date_format' %></td>
       </tr>
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.status' %></td>
-        <td class="align-right regular-valid-text" id="operation_status">Confirmée</td>
+        <% if @operation.confirmations < 2: %>
+          <td class="align-right regular-grey-text" id="operation_status">Non confirmée</td>
+        <% else: %>
+          <td class="align-right regular-valid-text" id="operation_status">Confirmée</td>
+        <% end %>
       </tr>
       <tr>
         <td class="row-title top-aligned"><%= t 'wallet.operations.detail.sender' %></td>
         <td class="align-right regular-text" id="operation_inputs">
-          1DDGTMZUxwYwRdWcyVBmSrGEoVXkVTd6xS<br />
-          1DDGTMZUxwYwRdWcyVBmSrGEoVXkVTd6xS
+          <% for input in @operation.senders: %>
+          <%= input %><br />
+          <% end %>
         </td>
       </tr>
       <tr>
         <td class="row-title top-aligned"><%= t 'wallet.operations.detail.receiver' %></td>
         <td class="align-right" id="operation_outputs">
-          1DDGTMZUxwYwRdWcyVBmSrGEoVXkVTd6xS<br />
-          1DDGTMZUxwYwRdWcyVBmSrGEoVXkVTd6xS
+          <% for output in @operation.recipients: %>
+          <%= output %><br />
+          <% end %>
         </td>
       </tr>
       <tr class="no-border">
         <td class="row-title"><%= t 'wallet.operations.detail.identifier' %></td>
-        <td class="align-right regular-text-small" id="operation_identifier">94b293fa7d9463e6a37c9c29826f145a22a83b0f295fe8935d5a9831018919db</td>
+        <td class="align-right regular-text-small" id="operation_identifier"><%= @operation.hash %></td>
       </tr>
     </tbody>
   </table>

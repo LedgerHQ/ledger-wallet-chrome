@@ -29,6 +29,10 @@ class @WalletAccountsShowViewController extends @ViewController
     ledger.app.on 'wallet:transactions:new wallet:operations:sync:done', =>
       do @_updateOperations
 
+  showOperation: (params) ->
+    dialog = new WalletOperationsDetailDialogViewController(params)
+    dialog.show()
+
   _updateOperations: ->
     Account.find(0).getAllSortedOperations (operations) =>
       @view.emptyContainer.hide() if operations.length > 0
