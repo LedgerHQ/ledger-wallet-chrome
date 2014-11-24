@@ -46,7 +46,7 @@ class ledger.wallet.transaction.Transaction
   validate: (validationKey, callback) ->
     throw 'Transaction must me prepared before validation' if not @_out? or not @_validationMode?
 
-    validationKey = ("0#{char}" for char in validationKey).join('')
+    validationKey = ("0#{char}" for char in validationKey).join('') if @getValidationMode() == ledger.wallet.transaction.Transaction.ValidationModes.KEYCARD
     l validationKey
     @_out.scriptData = new ByteString @_out.scriptData, HEX
     @_out.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in @_out.trustedInputs)
@@ -148,6 +148,7 @@ _.extend ledger.wallet.transaction,
               hadNetworkFailure = yes
               return do done
 
+            l 'raw', hasNext, requiredAmount.toString(), collectedAmount.toString()
             output.raw = rawTransaction
             finalOutputs.push output
             collectedAmount = collectedAmount.add output.value
@@ -157,7 +158,7 @@ _.extend ledger.wallet.transaction,
             else if hasNext is false and collectedAmount.lt(requiredAmount)
               # Not enough available funds
               callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds})
-            else if collectedAmount.gt requiredAmount
+            else if collectedAmount.gte requiredAmount
               l "Collected amount", collectedAmount.toString()
               # We have reached our required amount. It's to prepare the transaction
               _.defer -> transaction.prepare(finalOutputs, changePath, callback)

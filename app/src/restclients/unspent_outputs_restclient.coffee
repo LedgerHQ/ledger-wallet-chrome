@@ -14,7 +14,8 @@ class ledger.api.UnspentOutputsRestClient extends ledger.api.RestClient
 
   getUnspentOutputsFromPaths: (addressesPaths, callback) ->
     ledger.wallet.pathsToAddresses addressesPaths, (addresses, notFound) =>
-      if notFound.length > 0
+      l addressesPaths, addresses
+      if notFound.length == addressesPaths.length
         callback? null, {title: 'Missing addresses', missings: notFound}
       else
         @getUnspentOutputsFromAddresses _.values(addresses), (outputs, error) =>

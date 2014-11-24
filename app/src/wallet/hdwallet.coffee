@@ -97,6 +97,7 @@ class ledger.wallet.HDWallet.Account
         paths.push "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index}"
     paths = _.difference(paths, @_account.excludedChangePaths)
     paths
+    _(paths).without(undefined)
 
   getAllPublicAddressesPaths: () ->
     paths = []
@@ -105,7 +106,7 @@ class ledger.wallet.HDWallet.Account
       for index in [0..@_account.currentPublicIndex]
         paths.push "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
     paths = _.difference(paths, @_account.excludedPublicPaths)
-    paths
+    _(paths).without(undefined)
 
   getAllAddressesPaths: () -> @getAllPublicAddressesPaths().concat(@getAllChangeAddressesPaths())
 
