@@ -4,8 +4,7 @@
   </div>
   <div class="greyed-container">
     <span class="black-indication"><%= t 'onboarding.device.pin.enter_your_pin_code' %></span>
-  </div>
-  <div class="actions-container">
-    <a href="#openSupport" class="greyed-action"><%= t 'onboarding.device.pin.i_lost_my_pin_code' %></a>
+    <div id="pin_container"></div>
+    <a href="#openSupport" class="medium-indication"><%= t 'onboarding.device.pin.i_lost_my_pin_code' %></a>
   </div>
 </div>

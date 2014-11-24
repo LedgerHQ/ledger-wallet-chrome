@@ -4,8 +4,6 @@
   </div>
   <div class="greyed-container">
     <span class="black-indication" id="current_action"></span>
-  </div>
-  <div class="actions-container">
-    <a href="#openSupport" class="greyed-action"><%= t 'onboarding.device.opening.not_opening' %></a>
+    <a href="#openSupport" class="medium-indication"><%= t 'onboarding.device.opening.not_opening' %></a>
   </div>
 </div>

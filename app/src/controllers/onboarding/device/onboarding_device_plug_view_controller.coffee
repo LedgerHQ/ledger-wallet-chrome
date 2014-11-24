@@ -10,7 +10,6 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
 
   onAfterRender: ->
     super
-    @view.spinner = ledger.spinners.createLargeSpinner(@select('div.greyed-container')[0])
     if @params.animateIntro
       do @_animateIntro
     else

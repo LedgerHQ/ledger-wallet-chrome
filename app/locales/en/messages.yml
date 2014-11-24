@@ -30,7 +30,7 @@ onboarding:
   device:
     plug:
       to_start: "To begin, plug your Ledger Wallet into the USB port of the computer."
-      is_not_recognized: "Your Ledger Wallet is not recognized?"
+      is_not_recognized: "If your Ledger Wallet is not recognized, visit our help center."
 
     unplug:
       unlock_my_wallet: "Unlock my wallet"
@@ -38,7 +38,7 @@ onboarding:
 
     pin:
       enter_your_pin_code: "Enter you PIN code to unlock your wallet:"
-      i_lost_my_pin_code: "I lost my PIN code"
+      i_lost_my_pin_code: "If you forgot your PIN code, visit our help center."
 
     frozen:
       wallet_is_frozen: "Your wallet is frozen"
@@ -54,7 +54,7 @@ onboarding:
     opening:
       is_opening: "Please wait while your wallet is opening..."
       is_synchronizing: "Your wallet is synchronizing. This may take a few minutes..."
-      not_opening: "Your Ledger Wallet won't open?"
+      not_opening: "If your Ledger Wallet won't open, visit our help center."
 
   management:
     back: "BACK"
@@ -149,6 +149,7 @@ wallet:
       bitcoin_address: "BITCOIN ADDRESS"
       amount: "AMOUNT"
       balance: "BALANCE"
+      no_operations: "No operations"
 
   top_menu:
     balance: 'BALANCE'
@@ -193,7 +194,6 @@ wallet:
       title_with_account_name: 'ALL %s OPERATIONS'
       filter_sort_desc: "DESCENDANT SORTING"
       filter_sort_asc: "ASCENDANT SORTING"
-      no_operations: "No operations."
 
   accounts:
     show:
