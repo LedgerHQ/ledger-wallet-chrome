@@ -3,9 +3,11 @@
       <img src="../assets/images/onboarding/large_logo.png" width="244" height="181">
     </div>
     <div class="greyed-container">
-      <span class="black-indication"><%= t 'onboarding.device.plug.to_start' %></span>
+      <img src="../assets/images/onboarding/device/plug_wallet.png" height="44" width="187" />
+      <div class="black-indication"><%= t 'onboarding.device.plug.to_start' %></div>
+      <a href="#openSupport" class="medium-indication"><%= t 'onboarding.device.plug.is_not_recognized' %></a>
     </div>
     <div class="actions-container">
-      <a href="#openSupport" class="greyed-action"><%= t 'onboarding.device.plug.is_not_recognized' %></a>
+      <span class="greyed-action"><%= t('application.name') + ' Chrome ' + chrome.runtime.getManifest().version %></span>
     </div>
   </div>

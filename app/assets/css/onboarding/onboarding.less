@@ -22,14 +22,20 @@
       font-size: @font-size-very-large;
       font-weight: @font-weight-light;
       letter-spacing: -0.5px;
-      line-height: 25px;
     }
 
     .medium-indication {
-      font-size: @font-size-large;
+      font-size: @font-size-medium;
       font-weight: @font-weight-light;
-      letter-spacing: -0.3px;
-      line-height: 25px;
+      letter-spacing: -0.2px;
+    }
+    a.medium-indication {
+      color: @color-dark-grey;
+      text-decoration: none;
+
+      &:hover {
+        color: darken(@color-dark-grey, @color-very-strong-darken-value)
+      }
     }
 
     .black-title {
@@ -63,6 +69,7 @@
 
       .black-indication {
         margin-top: 10px;
+        line-height: 25px;
       }
 
       > .index {

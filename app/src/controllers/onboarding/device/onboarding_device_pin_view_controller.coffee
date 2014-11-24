@@ -6,7 +6,7 @@ class @OnboardingDevicePinViewController extends @OnboardingViewController
 
   _insertPinCode: ->
     @view.pinCode = new ledger.pin_codes.PinCode()
-    @view.pinCode.insertIn(@select('div.greyed-container')[0])
+    @view.pinCode.insertIn(@select('div#pin_container')[0])
     @view.pinCode.setStealsFocus(yes)
     @view.pinCode.once 'complete', (event, value) =>
       ledger.app.wallet.unlockWithPinCode value, (success, retryCount) =>

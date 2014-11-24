@@ -3,12 +3,11 @@
     <img src="../../assets/images/onboarding/large_logo.png" width="244" height="181">
   </div>
   <div class="greyed-container">
-    <img src="../../assets/images/common/large_check.png" width="50" height="50" />
+    <img src="../../assets/images/onboarding/device/unplug_wallet.png" width="187" height="44" />
     <div>
       <span class="black-indication"><%= t 'onboarding.device.unplug.you_can_unplug' %></span>
     </div>
   </div>
   <div class="actions-container">
-    <a href="#" class="greyed-action"><%= t 'onboarding.device.unplug.unlock_my_wallet' %></a>
   </div>
 </div>

@@ -1,9 +1,16 @@
+@import (reference) "../../constants";
+
 div.greyed-container {
   text-align: center;
 
   .pincode {
-    margin-top: 20px;
+    margin-top: @metrics-almost-medium-padding;
     justify-content: center;
     align-items: center;
+    margin-bottom: @metrics-almost-medium-padding;
+  }
+
+  > a {
+    display: block;
   }
 }
