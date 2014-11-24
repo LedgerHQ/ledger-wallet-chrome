@@ -26,13 +26,11 @@ common:
     invalid_amount: "Le montant à envoyer n'est pas valide."
     unknown: "Une erreur inconnue est survenue."
 
-
-
 onboarding:
   device:
     plug:
       to_start: "Pour commencer, branchez votre Ledger Wallet au port USB de l'ordinateur."
-      is_not_recognized: "Votre Ledger Wallet n'est pas reconnu ?"
+      is_not_recognized: "Si votre Ledger Wallet n'est pas reconnu, consultez notre centre d'aide."
 
     unplug:
       unlock_my_wallet: "Dévérouiller mon portefeuille"
@@ -40,7 +38,7 @@ onboarding:
 
     pin:
       enter_your_pin_code: "Entez votre code PIN pour dévérouiller votre portefeuille :"
-      i_lost_my_pin_code: "J'ai perdu mon code PIN"
+      i_lost_my_pin_code: "Si vous avez oublié votre code PIN, consultez notre centre d'aide."
 
     frozen:
       wallet_is_frozen: "Portefeuille bloqué"
@@ -56,7 +54,7 @@ onboarding:
     opening:
       is_opening: "Veuillez patienter pendant l'ouverture de votre portefeuille..."
       is_synchronizing: "Synchronisation de votre portefeuille. Ceci peut prendre plusieurs minutes..."
-      not_opening: "Votre Ledger Wallet ne s'ouvre pas ?"
+      not_opening: "Si votre Ledger Wallet ne s'ouvre pas, consultez notre centre d'aide."
 
   management:
     back: "RETOUR"
