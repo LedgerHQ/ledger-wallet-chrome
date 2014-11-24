@@ -28,6 +28,9 @@ class @WalletReceiveIndexDialogViewController extends DialogViewController
   mail: ->
     window.open 'mailto:?body=' + @params.address
 
+  print: ->
+    window.print()
+
   _listenEvents: ->
     @view.amountInput.on 'keydown', (e) =>
       _.defer =>
