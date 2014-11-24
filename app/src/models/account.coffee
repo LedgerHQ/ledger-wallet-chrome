@@ -79,6 +79,9 @@ class @Account extends Model
       for input in rawTransaction.inputs
         senders = senders.concat((address for address in input.addresses))
 
+      if rawTransaction.outputs.length == 1 and not _.contains(addresses, rawTransaction.outputs[0].addresses[0])
+        type = if type is 'reception' then 'sending' else 'reception'
+
       outputsToCompute = if type is 'reception' then ownOutputs else foreignOutputs
       recipients = do (outputsToCompute) ->
           recipients = []
