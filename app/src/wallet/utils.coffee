@@ -11,7 +11,7 @@ _.extend ledger.wallet,
     _.async.each paths, (path, done, hasNext) ->
       # Hit the cache first
       address = ledger.wallet.HDWallet.instance?.cache?.get(path)
-
+      l path, address, hasNext, callback
       if address?
         addresses[path] = address
         callback?(addresses, notFound) unless hasNext is true

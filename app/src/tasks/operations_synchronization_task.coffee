@@ -4,12 +4,19 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
   @instance: new @()
 
   onStart: () ->
+    l 'operations'
     account = ledger.wallet.HDWallet.instance?.getAccount(0)
+    l account, account.getAllChangeAddressesPaths()
     ledger.wallet.pathsToAddresses account.getAllChangeAddressesPaths(), (changeAddresses) =>
+      l 'CHANGE', changeAddresses
       ledger.wallet.pathsToAddresses account.getAllPublicAddressesPaths(), (publicAddresses) =>
+        l 'PUBLIC', publicAddresses
         publicAddresses = _.values(publicAddresses)
         changeAddresses = _.values(changeAddresses)
-        ledger.api.TransactionsRestClient.instance.getTransactions changeAddresses.concat(publicAddresses), (transactions, error) =>
+        addresses = changeAddresses.concat(publicAddresses)
+        l addresses
+        ledger.api.TransactionsRestClient.instance.getTransactions addresses, (transactions, error) =>
+          l transactions
           return unless @isRunning()
           return ledger.app.emit 'wallet:operations:sync:failed' if error?
           account = Account.find(0).exists (exists) =>

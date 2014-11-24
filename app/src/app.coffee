@@ -115,7 +115,9 @@ require @ledger.imports, ->
       @on 'wallet:operations:sync:done', =>
         
 
-      @on 'wallet:transactions:new', => Wallet.instance?.retrieveAccountsBalances()
+      @on 'wallet:transactions:new', =>
+        l 'BALANCE'
+        Wallet.instance?.retrieveAccountsBalances()
 
     _listenClickEvents: () ->
       self = @

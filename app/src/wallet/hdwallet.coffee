@@ -81,6 +81,8 @@ class ledger.wallet.HDWallet.Account
       accountJsonString = result[@_storeId]
       @_account = JSON.parse(accountJsonString) if accountJsonString?
       @_account = {} unless @_account
+      @_account.currentChangeIndex ?= 0
+      @_account.currentPublicIndex ?= 0
       callback?()
 
   release: () ->
