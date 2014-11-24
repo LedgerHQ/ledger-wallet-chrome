@@ -12,12 +12,10 @@ require @ledger.imports, ->
       ledger.dialogs.manager.initialize($('#dialogs_container'))
 
     start: ->
-      window.l = _.noop
-      LWTools.console = _.noop
-#      chrome.commands.onCommand.addListener (command) =>
-#        switch command
-#          when 'reload-page' then do @reloadUi
-#          when 'reload-application' then do @reload
+      chrome.commands.onCommand.addListener (command) =>
+        switch command
+          when 'reload-page' then do @reloadUi
+          when 'reload-application' then do @reload
 
 
       @_listenWalletEvents()
