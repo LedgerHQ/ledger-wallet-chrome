@@ -105,6 +105,8 @@ require @ledger.imports, ->
       @on 'wallet:balance:changed', (ev, balance) =>
         if balance.wallet.unconfirmed > 0
           _.delay (=> Wallet.instance?.retrieveAccountsBalances()), 1000
+        else
+          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary()
 
       @on 'wallet:operations:sync:failed', =>
         l 'Failed'

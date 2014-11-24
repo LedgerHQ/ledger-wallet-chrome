@@ -101,7 +101,6 @@ class ledger.wallet.HDWallet.Account
       paths.push "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index}"
     paths = _.difference(paths, @_account.excludedChangePaths)
     paths
-    l paths, @_account.currentChangeIndex
     _(paths).without(undefined)
 
   getAllPublicAddressesPaths: () ->

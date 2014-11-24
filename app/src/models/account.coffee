@@ -46,14 +46,32 @@ class @Account extends Model
             foreignOutputs.push output
           break
 
-      return done(no) if ownOutputs.length == 0
+      foreignInputs = []
+      ownInputs = []
+
+      for input in rawTransaction.inputs
+        continue unless input.addresses?
+        for address in input.addresses
+          if _(addresses).contains(address)
+            ownInputs.push output
+          else
+            foreignInputs.push output
+          break
+
+      return done(no) if ownOutputs.length == 0 and ownInputs.length == 0
 
       outputsToCompute = if type is 'reception' then ownOutputs else foreignOutputs
-      value = do (outputsToCompute) ->
-        out = 0
-        for output in outputsToCompute
-          out += output.value
-        out
+
+      value = 0
+
+      if rawTransaction.outputs.length == 1
+        value = rawTransaction.outputs[0].value
+      else
+        value = do (outputsToCompute) ->
+          out = 0
+          for output in outputsToCompute
+            out += output.value
+          out
 
       senders = []
       recipients = []
