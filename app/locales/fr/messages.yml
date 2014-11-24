@@ -151,6 +151,7 @@ wallet:
       sender: "depuis"
       receiver: "vers"
       balance: "SOLDE"
+      no_operations: "Aucune opération."
 
   top_menu:
     balance: 'SOLDE'
@@ -195,7 +196,6 @@ wallet:
       title_with_account_name: 'TOUTES LES OPÉRATIONS DE %s'
       filter_sort_desc: "TRI DÉCROISSANT"
       filter_sort_asc: "TRI CROISSANT"
-      no_operations: "Aucune opération."
 
   accounts:
     show:

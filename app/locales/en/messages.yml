@@ -149,6 +149,7 @@ wallet:
       bitcoin_address: "BITCOIN ADDRESS"
       amount: "AMOUNT"
       balance: "BALANCE"
+      no_operations: "No operations"
 
   top_menu:
     balance: 'BALANCE'
@@ -193,7 +194,6 @@ wallet:
       title_with_account_name: 'ALL %s OPERATIONS'
       filter_sort_desc: "DESCENDANT SORTING"
       filter_sort_asc: "ASCENDANT SORTING"
-      no_operations: "No operations."
 
   accounts:
     show:

@@ -29,6 +29,7 @@ permissions:
 externally_connectable:
   matches:
     - "*://*.ledgerwallet.com/*"
+    - "*://ledgerwallet.com/*"
 
 commands:
   reload-page:
