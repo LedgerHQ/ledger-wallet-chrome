@@ -145,6 +145,11 @@ class @Model extends @EventEmitter
     object._find = {_id: id, __uid: ledger.storage.local.createUniqueObjectIdentifier(@name, id)[1]}
     object
 
+  @findByUid: (uid) ->
+    object = new @()
+    object.__uid = uid
+    object
+
   @getCollectionName: () -> _.pluralize(_.str.underscored(@name))
 
   # Creates a relationship object from a store object or array reference. This fucntion is private to this file
