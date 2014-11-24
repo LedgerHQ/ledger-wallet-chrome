@@ -19,8 +19,6 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
         transaction = data.payload.transaction
         @_handleTransactionIO(transaction, transaction.inputs)
         @_handleTransactionIO(transaction, transaction.outputs)
-
-
     @newTransactionStream.onclose = => @_listenNewTransactions() if @isRunning()
 
   _handleTransactionIO: (transaction, io) ->
@@ -37,9 +35,7 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
               account.shiftCurrentPublicAddressPath() if account.getCurrentPublicAddressPath() == derivation
               account.shiftCurrentChangeAddressPath() if account.getCurrentChangeAddressPath() == derivation
               Account.fromHDWalletAccount(account)?.addRawTransaction transaction, () =>
-                l 'TRANSACTION'
                 ledger.app.emit('wallet:transactions:new')
     found
-
 
   @instance: new @()

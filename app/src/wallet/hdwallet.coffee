@@ -26,7 +26,6 @@ class ledger.wallet.HDWallet
   createAccount: () ->
     account = new ledger.wallet.HDWallet.Account(@, @getAccountsCount(), @_store)
     @_accounts.push account
-    account._account = {}
     do @save
     account
 
@@ -75,14 +74,18 @@ class ledger.wallet.HDWallet.Account
     @index = index
     @_store = store
     @_storeId = "account_#{@index}"
+    @_initialize()
+
+  _initialize: () ->
+    @_account ?= {}
+    @_account.currentChangeIndex ?= 0
+    @_account.currentPublicIndex ?= 0
 
   initialize: (callback) ->
     @_store.get [@_storeId], (result) =>
       accountJsonString = result[@_storeId]
       @_account = JSON.parse(accountJsonString) if accountJsonString?
-      @_account = {} unless @_account
-      @_account.currentChangeIndex ?= 0
-      @_account.currentPublicIndex ?= 0
+      @_initialize()
       callback?()
 
   release: () ->
@@ -94,19 +97,18 @@ class ledger.wallet.HDWallet.Account
   getAllChangeAddressesPaths: () ->
     paths = []
     paths = paths.concat(@_account.importedChangePaths)
-    if @_account.currentChangeIndex?
-      for index in [0..@_account.currentChangeIndex]
-        paths.push "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index}"
+    for index in [0..@_account.currentChangeIndex]
+      paths.push "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index}"
     paths = _.difference(paths, @_account.excludedChangePaths)
     paths
+    l paths, @_account.currentChangeIndex
     _(paths).without(undefined)
 
   getAllPublicAddressesPaths: () ->
     paths = []
     paths = paths.concat(@_account.importedPublicPaths)
-    if @_account.currentPublicIndex?
-      for index in [0..@_account.currentPublicIndex]
-        paths.push "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
+    for index in [0..@_account.currentPublicIndex]
+      paths.push "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
     paths = _.difference(paths, @_account.excludedPublicPaths)
     _(paths).without(undefined)
 

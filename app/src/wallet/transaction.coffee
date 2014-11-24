@@ -112,7 +112,7 @@ class ledger.wallet.transaction.Transaction
 
 _.extend ledger.wallet.transaction,
 
-    MINIMUM_CONFIRMATIONS: 1
+    MINIMUM_CONFIRMATIONS: 2
 
     createAndPrepareTransaction: (amount, fees, recipientAddress, inputsPath, changePath, callback) ->
       amount = ledger.wallet.Value.from(amount)
