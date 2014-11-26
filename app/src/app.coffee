@@ -17,8 +17,8 @@ require @ledger.imports, ->
 #          when 'reload-page' then do @reloadUi
 #          when 'reload-application' then do @reload
 
-      window.l = _.noop
-      LWTools.console = _.noop
+     # window.l = _.noop
+     # LWTools.console = _.noop
 
       @_listenWalletEvents()
       @_listenClickEvents()

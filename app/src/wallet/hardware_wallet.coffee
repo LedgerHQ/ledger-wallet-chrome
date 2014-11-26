@@ -123,6 +123,26 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       @_vents.on 'LW.ErrorOccured', onFailure
       @_lwCard.getBitIDAddress()
 
+  signMessageWithBitId: (message, callback) ->
+    throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
+
+    onSuccess = (e, data) =>
+      _.defer =>
+        callback?(data, null)
+        do unbind
+
+    onFailure = (ev, error) =>
+      _.defer =>
+        callback?(null, error)
+        do unbind
+
+    unbind = =>
+      @_vents.off 'LW.getMessageSignature', onSuccess
+      @_vents.off 'LW.getMessageSignature:error', onFailure
+    @_vents.on 'LW.getMessageSignature', onSuccess
+    @_vents.on 'LW.getMessageSignature:error', onFailure
+    @_lwCard.getMessageSignature(message)
+
   getPublicAddress: (derivationPath, callback) ->
     throw 'Cannot get a public while the key is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
     try
