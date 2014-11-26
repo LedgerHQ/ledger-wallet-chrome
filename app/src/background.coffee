@@ -6,6 +6,8 @@ chrome.app.runtime.onLaunched.addListener =>
       minHeight: 640
 
 chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse)=>
+  console.log request
+  console.log sender
   switch request.request
     when 'ping' then sendResponse yes
     when 'launch'
@@ -15,4 +17,8 @@ chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse)=>
           minWidth: 1000,
           minHeight: 640
       sendResponse yes
-
+    when 'bitid'
+      console.log request.url
+      console.log request.nonce
+      console.log request.unsecure
+      sendResponse yes
