@@ -188,6 +188,8 @@ wallet:
       send_by_email: "SEND BY EMAIL"
       print: "PRINT"
       close: "CLOSE"
+      confirmed: "Confirmed"
+      unconfirmed: "Unconfirmed"
 
     index:
       <<: *default-operations-translation

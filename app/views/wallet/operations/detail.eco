@@ -19,9 +19,9 @@
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.status' %></td>
         <% if @operation.confirmations < 2: %>
-          <td class="align-right regular-grey-text" id="operation_status">Non confirmée</td>
+          <td class="align-right regular-grey-text" id="operation_status"><%= t 'wallet.operations.detail.unconfirmed' %></td>
         <% else: %>
-          <td class="align-right regular-valid-text" id="operation_status">Confirmée</td>
+          <td class="align-right regular-valid-text" id="operation_status"><%= t 'wallet.operations.detail.confirmed' %></td>
         <% end %>
       </tr>
       <tr>
