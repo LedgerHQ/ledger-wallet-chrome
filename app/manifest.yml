@@ -31,18 +31,18 @@ externally_connectable:
     - "*://*.ledgerwallet.com/*"
     - "*://ledgerwallet.com/*"
 
-#commands:
-#  reload-page:
-#    suggested_key:
-#      default: "Ctrl+R"
-#      mac: "Command+R"
-#    description: "Reload the current page"
-#
-#  reload-application:
-#    suggested_key:
-#      default: "Ctrl+Shift+R"
-#      mac: "Command+Shift+R"
-#    description: "Reload the application"
+commands:
+  reload-page:
+    suggested_key:
+      default: "Ctrl+R"
+      mac: "Command+R"
+    description: "Reload the current page"
+
+  reload-application:
+    suggested_key:
+      default: "Ctrl+Shift+R"
+      mac: "Command+Shift+R"
+    description: "Reload the application"
 
 icons:
   16: "assets/images/icon-16.png"

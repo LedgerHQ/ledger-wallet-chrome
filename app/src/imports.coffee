@@ -52,6 +52,7 @@
         '../libs/checkBitcoinAddress'
         '../libs/lru'
         '../libs/moment.min'
+        '../libs/lokijs.min'
 
         'routes'
 
