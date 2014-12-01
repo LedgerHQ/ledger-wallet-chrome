@@ -234,7 +234,7 @@ wallet:
       receiver_address: "ADRESSE BITCOIN À CRÉDITER"
       receiver_address_placeholder: "adresse bitcoin"
       total_spent: "TOTAL DÉPENSÉ"
-      transaction_fees_text: "(+0.0001 BTC frais de transaction)"
+      transaction_fees_text: "(dont 0.0001 BTC frais de transaction)"
       send: "ENVOYER"
       close: "ANNULER"
       confirm: "CONFIRMER"
