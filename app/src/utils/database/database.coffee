@@ -20,8 +20,12 @@ class Database extends EventEmitter
     else
       @once 'loaded', callback
 
-  flush: () ->
-    clearTimeout @_scheduledFlush if @_scheduledFlush?
+  flush: (callback) ->
+    @perform =>
+      clearTimeout @_scheduledFlush if @_scheduledFlush?
+      serializedData = {}
+      serializedData[@_name] = @_db.toJSON()
+      ledger.storage.databases.set serializedData, callback
 
   scheduleFlush: () ->
     clearTimeout @_scheduledFlush if @_scheduledFlush?
