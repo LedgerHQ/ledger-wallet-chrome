@@ -51,7 +51,7 @@ section {
       padding-top: 12px;
       padding-bottom: 12px;
       vertical-align: middle;
-      padding-right: @metrics-very-large-padding;
+      padding-right: @metrics-extra-large-padding;
       border-bottom: 1px solid @color-very-light-grey;
       font-size: @font-size-medium;
 
@@ -63,6 +63,14 @@ section {
         &.optional {
           color: @color-soft-grey;
         }
+      }
+
+      .light-indicator {
+        border: 1px solid @color-soft-grey;
+        margin-left: 3px;
+        border-radius: @border-radius-default-value;
+        .regular-grey-text-small;
+        padding: 0 3px;
       }
     }
 

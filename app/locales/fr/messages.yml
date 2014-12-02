@@ -150,6 +150,8 @@ wallet:
       receiver: "vers"
       balance: "SOLDE"
       no_operations: "Aucune opération."
+      confirmed: "Confirmée"
+      unconfirmed: "Non confirmée"
 
   top_menu:
     balance: 'SOLDE'
@@ -178,18 +180,17 @@ wallet:
 
   operations:
     detail:
+      <<: *default-operations-translation
       title: "DÉTAIL DE L'OPÉRATION"
       amount: "Montant"
       time: "Date et heure"
       status: "État"
       sender: "Depuis"
       receiver: "Vers"
-      identifier: "Identifiant de transaction"
+      identifier: "ID Transaction"
       send_by_email: "ENVOYER PAR EMAIL"
       print: "IMPRIMER"
       close: "FERMER"
-      confirmed: "Confirmée"
-      unconfirmed: "Non confirmée"
 
     index:
       <<: *default-operations-translation
