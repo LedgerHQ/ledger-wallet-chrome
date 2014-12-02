@@ -51,6 +51,8 @@ class @Model extends @EventEmitter
 
   @has: (relationship) ->
 
+  @index: (field) ->
+
   @getCollectionName: () -> _.pluralize @name
 
   getCollectionName: () -> @constructor.getCollectionName()
