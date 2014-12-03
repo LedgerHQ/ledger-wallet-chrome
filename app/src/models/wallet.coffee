@@ -34,12 +34,11 @@ class @Wallet extends Model
 
   @initializeWallet: (callback) ->
     @instance = @findOrCreate(0, {id: 0})
-    l @instance
-    @instance.get("accounts")
     if @instance.isInserted()
       l 'Inserted'
     else
-      l 'Init'
+      l 'Not inserted'
+
 #    @instance = @find(0)
 #    _.defer =>
 #      @instance.exists (exists) =>

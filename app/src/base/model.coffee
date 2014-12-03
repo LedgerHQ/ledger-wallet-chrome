@@ -42,6 +42,10 @@ class @Model extends @EventEmitter
       @_object[key] = value
     @_needsUpdate = yes
 
+  remove: (key, value) ->
+
+  add: (key, value) ->
+
   save: () ->
     if @isInserted() and @hasChange()
       @_collection.update @_object
@@ -96,7 +100,8 @@ class @Model extends @EventEmitter
     if relationshipDeclaration['sortBy']?
       sort = relationshipDeclaration['sortBy']
       sort = [sort, false] unless _.isArray(sort)
-    relationship = name: r[0], type: "#{myType}_#{i[1]}", inverse: i[0], Class: r[1], inverseType: "#{i[1]}_#{myType}", sort: sort
+    onDelete = 'nullify' unless relationshipDeclaration['onDelete']?
+    relationship = name: r[0], type: "#{myType}_#{i[1]}", inverse: i[0], Class: r[1], inverseType: "#{i[1]}_#{myType}", sort: sort, onDelete: onDelete
     @_relationships ?= {}
     @_relationships[relationship.name] = relationship
 
