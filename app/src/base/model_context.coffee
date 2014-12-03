@@ -69,19 +69,20 @@ class ledger.db.contexts.Context
   constructor: (db) ->
     @_db = db
     @_collections = {}
-    @_collections[collection.name] = new Collection(@_db.getCollection(collection.name), @) for collection in @_db.getDb().listCollections()
+    @_collections[collection.name] = new Collection(@_db.getDb().getCollection(collection.name), @) for collection in @_db.getDb().listCollections()
     @initialize()
 
   initialize: () ->
     modelClasses = Model.AllModelClasses()
     for className, modelClass of modelClasses
       collection = @getCollection(className)
-      collection.getCollection().ensureIndex(index) for index in modelClass._indexes
+      collection.getCollection().ensureIndex(index) for index in modelClass._indexes if modelClass.__indexes?
 
   getCollection: (name) ->
     collection = @_collections[name]
     unless collection?
       collection = new Collection(@_db.getDb().addCollection(name), @)
+      @_collections[name] = collection
     collection
 
   notifyDatabaseChange: () ->

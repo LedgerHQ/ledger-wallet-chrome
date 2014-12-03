@@ -1,5 +1,5 @@
 
-resolveRelationship: (object, relationship) ->
+resolveRelationship = (object, relationship) ->
   Class = window[relationship.Class]
   switch relationship.type
     when 'many_one'
@@ -24,6 +24,7 @@ class @Model extends @EventEmitter
 
   get: (key) ->
     if @getRelationships()?[key]?
+      return e "Not inserted object should not be able to get relationship, please fix this" unless @isInserted()
       relationship = @getRelationships()[key]
       resolveRelationship(@, relationship)
     else
@@ -34,6 +35,7 @@ class @Model extends @EventEmitter
   set: (key, value) ->
     @_object ?= {}
     if @getRelationships()?[key]?
+      return e "Not inserted object should not be able to set up relationship, please fix this" unless @isInserted()
       relationship = @getRelationships()[key]
 
     else
@@ -66,7 +68,7 @@ class @Model extends @EventEmitter
   @findById: (id, context = ledger.db.contexts.main) -> context.getCollection(@getCollectionName()).get(id)
 
   @findOrCreate: (id, base, context = ledger.db.contexts.main) ->
-    object = @findById id
+    object = @findById id, context
     object = @create base, context unless object?
     object
 
