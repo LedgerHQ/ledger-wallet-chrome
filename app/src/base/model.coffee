@@ -14,13 +14,15 @@ class @Model extends @EventEmitter
   set: (key, value) ->
     @_object ?= {}
     @_object[key] = value
+    @_needsUpdate = yes
 
   save: () ->
     if @isInserted() and @hasChange()
       @_collection.update @_object
     else
-      @_object = {}
+      @_object ?= {}
       @_collection.insert()
+      @_needsUpdate = no
 
   delete: () ->
     unless @_deleted
@@ -36,8 +38,7 @@ class @Model extends @EventEmitter
   @create: (base, context = ledger.db.contexts.main) ->
     new @ context, base
 
-  @findById: (id, context = ledger.db.contexts.main) ->
-    context.get id
+  @findById: (id, context = ledger.db.contexts.main) -> context.get id
 
   @findOrCreate: (id, base, context = ledger.db.contexts.main) ->
     object = @findById id
@@ -45,7 +46,7 @@ class @Model extends @EventEmitter
     object
 
   @find: (query, context = ledger.db.contexts.main) ->
-    chain = ledger.db.contexts.main.getCollection(@getCollectionName()).chain()
+    chain = ledger.db.contexts.main.getCollection(@getCollectionName()).query()
     chain.find(query) if query?
     chain
 
@@ -53,6 +54,12 @@ class @Model extends @EventEmitter
 
   @index: (field) ->
 
-  @getCollectionName: () -> _.pluralize @name
+  @init: () ->
+    Model._allModelClasses ?= {}
+    Model._allModelClasses[@name] = @
+
+  @getCollectionName: () -> @name
 
   getCollectionName: () -> @constructor.getCollectionName()
+
+  @AllModelClasses: () -> @_AllModelClasses
