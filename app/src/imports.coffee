@@ -116,6 +116,8 @@
         'wallet/hdwallet'
         'wallet/cache'
 
+        'utils/database/database'
+        'base/model_context'
         'base/model'
         'base/collection'
         'base/view_controller'

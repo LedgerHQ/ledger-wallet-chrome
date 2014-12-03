@@ -9,11 +9,19 @@ class @Model extends @EventEmitter
     @_deleted = no
 
   get: (key) ->
-    @_object?[key]
+    if @getRelationships()?[key]?
+      relationship = @getRelationships()[key]
+
+    else
+      @_object?[key]
 
   set: (key, value) ->
     @_object ?= {}
-    @_object[key] = value
+    if @getRelationships()?[key]?
+      relationship = @getRelationships()[key]
+
+    else
+      @_object[key] = value
     @_needsUpdate = yes
 
   save: () ->
@@ -35,10 +43,12 @@ class @Model extends @EventEmitter
 
   hasChange: () -> @_needsUpdate
 
+  getRelationships: () -> @constructor._relationships
+
   @create: (base, context = ledger.db.contexts.main) ->
     new @ context, base
 
-  @findById: (id, context = ledger.db.contexts.main) -> context.get id
+  @findById: (id, context = ledger.db.contexts.main) -> context.getCollection(@getCollectionName()).get(id)
 
   @findOrCreate: (id, base, context = ledger.db.contexts.main) ->
     object = @findById id
@@ -50,16 +60,50 @@ class @Model extends @EventEmitter
     chain.find(query) if query?
     chain
 
-  @has: (relationship) ->
+  # Relationship creator
+  @has: (relationshipDeclaration) ->
+    if relationshipDeclaration['many']?
+      @_createRelationship(relationshipDeclaration, 'many')
+    else if relationshipDeclaration['one']
+      @_createRelationship(relationshipDeclaration, 'one')
+
+  @_createRelationship: (relationshipDeclaration, myType) ->
+    r = if _.isArray(relationshipDeclaration['many']) then relationshipDeclaration['many'] else [relationshipDeclaration['many'], _.str.capitalize(_.singularize(relationshipDeclaration['many']))]
+    if relationshipDeclaration['forOne']?
+      i = [relationshipDeclaration['forOne'], 'one']
+    else if relationshipDeclaration['forMany']?
+      i =  [relationshipDeclaration['forMany'], 'many']
+    else
+      i = [@name.toLocaleLowerCase(), 'one']
+    relationship = name: r[0], type: "#{myType}_#{i[1]}", inverse: i[0], Class: r[1], inverseType: "#{i[1]}_#{myType}"
+    @_relationships ?= {}
+    @_relationships[relationship.name] = relationship
+
+  @commitRelationship: () ->
+    throw 'This methods should only be called once by Model' unless @ is Model
+    # Ensure all relationships are bound and consistent between models (each relationship are sets in both directions)
+    for ClassName, Class of @AllModelClasses()
+      for relationshipName, relationship of Class._relationships
+        InverseClass = window[relationship.Class]
+        if InverseClass._relationships? and InverseClass._relationships[relationship.inverse]?.inverse is relationship.name and InverseClass._relationships[relationship.inverse]?.type is relationship.inverseType and InverseClass._relationships[relationship.inverse]?.Class is ClassName
+          continue
+        else if not InverseClass._relationships?[relationship.inverse]
+          InverseClass._relationships ?= {}
+          InverseClass._relationships[relationship.inverse] = name: relationship.inverse, type: relationship.inverseType, inverse:relationship.name, Class: ClassName, inverseType: relationship.type
+        else
+          e "Bad relationship #{relationship.name} <-> #{relationship.inverse}. You must absolutely check for errors for classes #{ClassName} and #{relationship.Class}"
 
   @index: (field) ->
+    @_indexes ?= []
+    @_indexes.push field
 
   @init: () ->
     Model._allModelClasses ?= {}
     Model._allModelClasses[@name] = @
 
+
   @getCollectionName: () -> @name
 
   getCollectionName: () -> @constructor.getCollectionName()
 
-  @AllModelClasses: () -> @_AllModelClasses
+  @AllModelClasses: () -> @_allModelClasses

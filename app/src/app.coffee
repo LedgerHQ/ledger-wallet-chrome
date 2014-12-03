@@ -94,12 +94,14 @@ require @ledger.imports, ->
           @emit 'dongle:unlocked', @wallet
           @emit 'wallet:initializing'
           ledger.wallet.initialize @wallet, =>
-            Wallet.initializeWallet =>
-              @emit 'wallet:initialized'
-              Wallet.instance.retrieveAccountsBalances()
-              ledger.tasks.TransactionObserverTask.instance.start()
-              ledger.tasks.OperationsSynchronizationTask.instance.start()
-        @emit 'dongle:connected', @wallet
+            ledger.db.init =>
+              ledger.db.contexts.open()
+              Wallet.initializeWallet =>
+                @emit 'wallet:initialized'
+                Wallet.instance.retrieveAccountsBalances()
+                ledger.tasks.TransactionObserverTask.instance.start()
+                ledger.tasks.OperationsSynchronizationTask.instance.start()
+          @emit 'dongle:connected', @wallet
 
     _listenAppEvents: () ->
       @on 'wallet:balance:changed', (ev, balance) =>
@@ -150,6 +152,8 @@ require @ledger.imports, ->
 
   @WALLET_LAYOUT = 'WalletNavigationController'
   @ONBOARDING_LAYOUT = 'OnboardingNavigationController'
+
+  Model.commitRelationship()
 
   @ledger.application = new Application()
   @ledger.app = @ledger.application

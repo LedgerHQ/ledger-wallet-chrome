@@ -1,7 +1,8 @@
 class @Wallet extends Model
   do @init
 
-  @hasMany accounts: 'Account'
+  #@hasMany accounts: 'Account'
+  @has many: 'accounts'
 
   instance: undefined
 
@@ -32,19 +33,26 @@ class @Wallet extends Model
   ## Lifecyle
 
   @initializeWallet: (callback) ->
-    @instance = @find(0)
-    _.defer =>
-      @instance.exists (exists) =>
-        if exists is true
-          callback?()
-        else
-          @instance = Wallet.create({_id: 0, accounts: []})
-          @instance.save =>
-            account = Account.create {_id: 0, name: t 'common.default_account_name'}
-            account.save =>
-              @instance.getAccounts (accounts) =>
-                accounts.insert account, =>
-                  accounts.toArray (a) => l a
-                  callback?()
+    @instance = @findOrCreate(0, {id: 0})
+    l @instance
+    @instance.get("accounts")
+    if @instance.isInserted()
+      l 'Inserted'
+    else
+      l 'Init'
+#    @instance = @find(0)
+#    _.defer =>
+#      @instance.exists (exists) =>
+#        if exists is true
+#          callback?()
+#        else
+#          @instance = Wallet.create({_id: 0, accounts: []})
+#          @instance.save =>
+#            account = Account.create {_id: 0, name: t 'common.default_account_name'}
+#            account.save =>
+#              @instance.getAccounts (accounts) =>
+#                accounts.insert account, =>
+#                  accounts.toArray (a) => l a
+#                  callback?()
 
   @releaseWallet: () ->

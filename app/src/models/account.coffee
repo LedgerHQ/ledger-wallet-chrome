@@ -1,7 +1,7 @@
 class @Account extends Model
   do @init
 
-  @hasMany operations: 'Operation'
+  #@hasMany operations: 'Operation'
 
   @fromHDWalletAccount: (hdAccount) ->
     return null unless hdAccount?

@@ -2,7 +2,6 @@
 ledger.db ?= {}
 ledger.db.contexts ?= {}
 
-
 class Collection
 
   constructor: (collection, context) ->
@@ -30,9 +29,12 @@ class Collection
     query.data = () =>
       @_modelize(data.call(@_collection))
 
+  getCollection: () -> @_collection
+
   _modelize: (data) ->
+    return null unless data?
     modelizeSingleItem = (item) ->
-      Class = Model.allModelClasses()[item.objType]
+      Class = Model.AllModelClasses()[item.objType]
       new Class(@_context, item)
     if _.isArray(data)
       (modelizeSingleItem(item) for item in data)
@@ -41,15 +43,24 @@ class Collection
 
 class ledger.db.contexts.Context
 
-  contructor: (db) ->
+  constructor: (db) ->
     @_db = db
     @_collections = {}
-    @_collections[collection.name] = new Collection(@_db.getCollection(collection.name), @) for collection in @_db.listCollections()
+    @_collections[collection.name] = new Collection(@_db.getCollection(collection.name), @) for collection in @_db.getDb().listCollections()
+    @initialize()
+
+  initialize: () ->
+    modelClasses = Model.AllModelClasses()
+    for className, modelClass of modelClasses
+      collection = @getCollection(className)
+      collection.getCollection().ensureIndex(index) for index in modelClass._indexes
+
+
 
   getCollection: (name) ->
     collection = @_collections[name]
     unless collection?
-      collection = new Collection(@_db.addCollection(), @)
+      collection = new Collection(@_db.getDb().addCollection(), @)
     collection
 
   notifyDatabaseChange: () ->
@@ -58,4 +69,7 @@ class ledger.db.contexts.Context
 
 _.extend ledger.db.contexts,
 
-  open: (callback) ->
+  open: () ->
+    ledger.db.contexts.main = new ledger.db.contexts.Context(ledger.db.main)
+
+  close: () ->

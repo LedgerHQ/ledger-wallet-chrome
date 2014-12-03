@@ -9,7 +9,7 @@ class Database extends EventEmitter
   load: (callback) ->
     ledger.storage.databases.get @_name, (json) =>
       @_db = new loki()
-      @_db.loadJSON json
+      @_db.loadJSON json[@_name] if json[@_name]?
       @_db.save = @scheduleFlush.bind(this)
       callback?()
       @emit 'loaded'
