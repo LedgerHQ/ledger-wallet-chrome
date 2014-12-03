@@ -1,3 +1,17 @@
+
+resolveRelationship: (object, relationship) ->
+  Class = window[relationship.Class]
+  switch relationship.type
+    when 'many_one'
+      object._collection.getRelationshipView(object, relationship).data()
+    when 'one_many'
+      Class.get "#{relationship.name}_id"
+    when 'one_one'
+      Class.get "#{relationship.name}_id"
+    when 'many_many'
+      object._collection.getRelationshipView(object, relationship).data()
+
+
 class @Model extends @EventEmitter
 
   constructor: (context, base) ->
@@ -11,9 +25,11 @@ class @Model extends @EventEmitter
   get: (key) ->
     if @getRelationships()?[key]?
       relationship = @getRelationships()[key]
-
+      resolveRelationship(@, relationship)
     else
       @_object?[key]
+
+  getId: () -> @_object?['id']
 
   set: (key, value) ->
     @_object ?= {}
@@ -45,8 +61,7 @@ class @Model extends @EventEmitter
 
   getRelationships: () -> @constructor._relationships
 
-  @create: (base, context = ledger.db.contexts.main) ->
-    new @ context, base
+  @create: (base, context = ledger.db.contexts.main) -> new @ context, base
 
   @findById: (id, context = ledger.db.contexts.main) -> context.getCollection(@getCollectionName()).get(id)
 
@@ -75,7 +90,11 @@ class @Model extends @EventEmitter
       i =  [relationshipDeclaration['forMany'], 'many']
     else
       i = [@name.toLocaleLowerCase(), 'one']
-    relationship = name: r[0], type: "#{myType}_#{i[1]}", inverse: i[0], Class: r[1], inverseType: "#{i[1]}_#{myType}"
+    sort = null
+    if relationshipDeclaration['sortBy']?
+      sort = relationshipDeclaration['sortBy']
+      sort = [sort, false] unless _.isArray(sort)
+    relationship = name: r[0], type: "#{myType}_#{i[1]}", inverse: i[0], Class: r[1], inverseType: "#{i[1]}_#{myType}", sort: sort
     @_relationships ?= {}
     @_relationships[relationship.name] = relationship
 

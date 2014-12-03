@@ -2,6 +2,13 @@
 ledger.db ?= {}
 ledger.db.contexts ?= {}
 
+collectionNameForRelationship = (object, relationship) ->
+  switch relationship.type
+    when 'many_one' then relationship.Class
+    when 'many_many' then _.sortBy([relationship.Class, object.constructor.name], ((s) -> s)).join('_')
+    when 'one_many' then relationship.Class
+    when 'one_one' then relationship.Class
+
 class Collection
 
   constructor: (collection, context) ->
@@ -22,6 +29,22 @@ class Collection
     @_context.notifyDatabaseChange()
 
   get: (id) -> @_modelize(@_collection.get(id))
+
+  getRelationshipView: (object, relationship) ->
+    viewName = "#{relationship.type}_#{relationship.name}_#{relationship.inverse}:#{object.getId()}"
+    collectionName = collectionNameForRelationship(object, relationship)
+    view = @_context.getCollection(collectionName).getCollection().getDynamicView(viewName)
+    unless view?
+      view = @_context.getCollection(collectionName).getCollection().addDynamicView(viewName, no)
+      switch relationship.type
+        when 'many_one'
+          query = {}
+          query["#{relationship.name}_id"] = object.getId()
+          view.applyFind({})
+        when 'many_many' then throw 'Not implemented yet'
+      if relationship.sort?
+        view.applySimpleSort(relationship.sort)
+    view
 
   query: () ->
     query = @_collection.chain()
@@ -55,12 +78,10 @@ class ledger.db.contexts.Context
       collection = @getCollection(className)
       collection.getCollection().ensureIndex(index) for index in modelClass._indexes
 
-
-
   getCollection: (name) ->
     collection = @_collections[name]
     unless collection?
-      collection = new Collection(@_db.getDb().addCollection(), @)
+      collection = new Collection(@_db.getDb().addCollection(name), @)
     collection
 
   notifyDatabaseChange: () ->
