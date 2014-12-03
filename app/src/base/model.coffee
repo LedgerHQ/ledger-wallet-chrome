@@ -52,11 +52,11 @@ class @Model extends @EventEmitter
 
   @findOrCreate: (id, base, context = ledger.db.contexts.main) ->
     object = @findById id
-    object = @create base unless object?
+    object = @create base, context unless object?
     object
 
   @find: (query, context = ledger.db.contexts.main) ->
-    chain = ledger.db.contexts.main.getCollection(@getCollectionName()).query()
+    chain = context.getCollection(@getCollectionName()).query()
     chain.find(query) if query?
     chain
 
@@ -100,7 +100,6 @@ class @Model extends @EventEmitter
   @init: () ->
     Model._allModelClasses ?= {}
     Model._allModelClasses[@name] = @
-
 
   @getCollectionName: () -> @name
 
