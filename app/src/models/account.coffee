@@ -1,11 +1,11 @@
 class @Account extends Model
   do @init
-
-  #@hasMany operations: 'Operation'
+  @has many: 'operations', sortBy: 'time', onDelete: 'destroy'
+  @index 'index'
 
   @fromHDWalletAccount: (hdAccount) ->
     return null unless hdAccount?
-    @find(hdAccount.index)
+    @find({index: hdAccount.index})
 
   createTransaction: (amount, fees, recipientAddress, callback) ->
     transaction = new ledger.wallet.Transaction()
