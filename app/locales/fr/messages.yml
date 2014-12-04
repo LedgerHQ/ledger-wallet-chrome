@@ -150,6 +150,8 @@ wallet:
       receiver: "vers"
       balance: "SOLDE"
       no_operations: "Aucune opération."
+      confirmed: "Confirmée"
+      unconfirmed: "Non confirmée"
 
   top_menu:
     balance: 'SOLDE'
@@ -178,13 +180,14 @@ wallet:
 
   operations:
     detail:
+      <<: *default-operations-translation
       title: "DÉTAIL DE L'OPÉRATION"
       amount: "Montant"
       time: "Date et heure"
       status: "État"
       sender: "Depuis"
       receiver: "Vers"
-      identifier: "Identifiant de transaction"
+      identifier: "ID Transaction"
       send_by_email: "ENVOYER PAR EMAIL"
       print: "IMPRIMER"
       close: "FERMER"
@@ -232,7 +235,7 @@ wallet:
       receiver_address: "ADRESSE BITCOIN À CRÉDITER"
       receiver_address_placeholder: "adresse bitcoin"
       total_spent: "TOTAL DÉPENSÉ"
-      transaction_fees_text: "(+0.0001 BTC frais de transaction)"
+      transaction_fees_text: "(dont 0.0001 BTC frais de transaction)"
       send: "ENVOYER"
       close: "ANNULER"
       confirm: "CONFIRMER"

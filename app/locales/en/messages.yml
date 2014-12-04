@@ -150,6 +150,8 @@ wallet:
       amount: "AMOUNT"
       balance: "BALANCE"
       no_operations: "No operations"
+      confirmed: "Confirmed"
+      unconfirmed: "Unconfirmed"
 
   top_menu:
     balance: 'BALANCE'
@@ -178,13 +180,14 @@ wallet:
 
   operations:
     detail:
+      <<: *default-operations-translation
       title: "OPERATION DETAIL"
       amount: "Amount"
       time: "Date and time"
       status: "Status"
       sender: "From"
       receiver: "To"
-      identifier: "Transaction identifier"
+      identifier: "Transaction ID"
       send_by_email: "SEND BY EMAIL"
       print: "PRINT"
       close: "CLOSE"
@@ -232,7 +235,7 @@ wallet:
       receiver_address: "RECIPIENT BITCOIN ADDRESS"
       receiver_address_placeholder: "bitcoin address"
       total_spent: "TOTAL SPENT"
-      transaction_fees_text: "(+0.0001 BTC transaction fees)"
+      transaction_fees_text: "(incl. 0.0001 BTC transaction fees)"
       send: "SEND"
       close: "CLOSE"
       confirm: "CONFIRM"
