@@ -25,7 +25,7 @@ class Collection
     @_context.notifyDatabaseChange()
 
   update: (model) ->
-    model._object = @_collection.update(model._object)
+    @_collection.update(model._object)
     @_context.notifyDatabaseChange()
 
   get: (id) -> @_modelize(@_collection.get(id))
@@ -39,11 +39,13 @@ class Collection
       switch relationship.type
         when 'many_one'
           query = {}
-          query["#{relationship.name}_id"] = object.getId()
-          view.applyFind({})
+          query["#{relationship.inverse}_id"] = object.getId()
+          view.applyFind(query)
         when 'many_many' then throw 'Not implemented yet'
       if relationship.sort?
         view.applySimpleSort(relationship.sort)
+    view.modelize = =>
+      @_modelize(view.data())
     view
 
   query: () ->
@@ -61,7 +63,7 @@ class Collection
       Class = Model.AllModelClasses()[item.objType]
       new Class(@_context, item)
     if _.isArray(data)
-      (modelizeSingleItem(item) for item in data)
+      (modelizeSingleItem(item) for item in data when item?)
     else
       modelizeSingleItem(data)
 

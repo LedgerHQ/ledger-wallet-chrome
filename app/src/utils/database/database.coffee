@@ -10,7 +10,6 @@ class Database extends EventEmitter
     ledger.storage.databases.get @_name, (json) =>
       try
         @_db = new loki(@_name)
-        l json[@_name]
         @_db.loadJSON json[@_name] if json[@_name]?
         @_db.save = @scheduleFlush.bind(this)
       catch er

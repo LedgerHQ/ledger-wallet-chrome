@@ -65,9 +65,9 @@ class @ledger.storage.ChromeStore extends ledger.storage.Store
       decryptedItems[@_decryptKey(key)] = @_decryptData(data) for key, data of items
       cb(decryptedItems) if cb?
 
-  clear: (keys, cb) ->
+  clear: (cb) ->
     keys = []
     chrome.storage.local.get null, (result) ->
-      for k, v in result
+      for k, v of result
         keys.push k if _.str.startsWith(k, @_name)
-      chrome.storage.local.remove keys, callback
+      chrome.storage.local.remove keys, cb

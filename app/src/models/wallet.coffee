@@ -2,7 +2,7 @@ class @Wallet extends Model
   do @init
 
   #@hasMany accounts: 'Account'
-  @has many: 'accounts'
+  @has many: 'accounts', onDelete: 'destroy'
 
   instance: undefined
 
