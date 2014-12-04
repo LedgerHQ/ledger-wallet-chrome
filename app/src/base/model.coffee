@@ -24,9 +24,10 @@ class @Model extends @EventEmitter
 
   get: (key) ->
     if @getRelationships()?[key]?
-      return e "Not inserted object should not be able to get relationship, please fix this" unless @isInserted()
       relationship = @getRelationships()[key]
-      resolveRelationship(@, relationship)
+      result = resolveRelationship(@, relationship)
+      result = @_pendingRelationships?[key] unless result?
+      result
     else
       @_object?[key]
 
@@ -35,29 +36,74 @@ class @Model extends @EventEmitter
   set: (key, value) ->
     @_object ?= {}
     if @getRelationships()?[key]?
-      return e "Not inserted object should not be able to set up relationship, please fix this" unless @isInserted()
-      relationship = @getRelationships()[key]
-
+      throw "Attempt to set a value to a '#{@getRelationships()[key].type.replace('_', ':')}'" if _.contains(['many_one', 'many_many'], @getRelationships()[key].type)
+      @_pendingRelationships ?= {}
+      @_pendingRelationships[key] = {value: value, add: if value? then yes else no}
     else
       @_object[key] = value
     @_needsUpdate = yes
 
   remove: (key, value) ->
+    unless value?
+      return @set(key, null)
+    if @getRelationships()?[key]?
+      throw "Attempt to remove a value to a '#{@getRelationships()[key].type.replace('_', ':')}'" if _.contains(['one_one', 'one_many'], @getRelationships()[key].type)
+      @_pendingRelationships ?= {}
+      @_pendingRelationships[key] ?= []
+      @_pendingRelationships[key].push {value: value, add: yes}
+    else if _.isArray(@_object[key])
+      if _.contains(@_object[key], value)
+        @_object[key] = _.without(@_object[key], value)
+        return true
+      else
+        return false
 
   add: (key, value) ->
+    if @getRelationships()?[key]?
+      throw "Attempt to add a value to a '#{@getRelationships()[key].type.replace('_', ':')}'" if _.contains(['one_one', 'one_many'], @getRelationships()[key].type)
+      @_pendingRelationships ?= {}
+      @_pendingRelationships[key] ?= []
+      @_pendingRelationships[key].push {value: value, add: yes}
+    else if not @_object[key]? or _.isArray(@_object[key])
+      @_object[key] ?= []
+      if _.contains(@_object[key], value)
+        return false
+      else
+        @_object[key].push value
+        return true
 
   save: () ->
-    if @isInserted() and @hasChange()
-      @_collection.update @_object
-    else
-      @_object ?= {}
-      @_collection.insert()
+    if @isInserted() and @hasChange() and @onUpdate() isnt false
+      @_commitPendingRelationship()
+      @_collection.update this
+    else if @onInsert() isnt false
+      @_collection.insert this
+      @_commitPendingRelationship()
       @_needsUpdate = no
 
   delete: () ->
-    unless @_deleted
+    if not @_deleted and @onDelete() isnt false
       @_deleted = true
       @_collection.remove @_object
+
+  # Called before insertion
+  # @return Return false if you want to cancel the insertion
+  onInsert: () ->
+
+  # Called before delete
+  # @return Return false if you want to cancel the deletion
+  onDelete: () ->
+
+  # Called before update
+  # @return Return false if you want to cancel the update
+  onUpdate: () ->
+
+  # Called before a model is added to another model as a many_* relationship
+  onAdd: () ->
+
+  # Called before a model is removed from another model as a many_* relationship
+  onRemove: () ->
+
 
   isInserted: () -> if @_object?.meta? then yes else no
 
@@ -66,6 +112,24 @@ class @Model extends @EventEmitter
   hasChange: () -> @_needsUpdate
 
   getRelationships: () -> @constructor._relationships
+
+  _getModelValue: (relationship, value) ->
+
+
+  _commitPendingRelationship: () ->
+    for relationshipName, pending of @_pendingRelationships
+      relationship = @getRelationships()[relationshipName]
+      continue unless relationship?
+      switch relationship.type
+        when 'many_one'
+          for v in pending.value
+            value = @_getModelValue(relationship, v)
+        when 'one_many'
+          value = @_getModelValue(relationship, pending.value)
+        when 'one_one'
+          value = @_getModelValue(relationship, pending.value)
+        when 'many_many' then throw 'many:many relationships are not implemented yet'
+    @_pendingRelationships = null
 
   @create: (base, context = ledger.db.contexts.main) -> new @ context, base
 
@@ -99,8 +163,11 @@ class @Model extends @EventEmitter
     sort = null
     if relationshipDeclaration['sortBy']?
       sort = relationshipDeclaration['sortBy']
-      sort = [sort, false] unless _.isArray(sort)
-    onDelete = 'nullify' unless relationshipDeclaration['onDelete']?
+      sort = [sort, 'asc'] unless _.isArray(sort)
+    onDelete = if relationshipDeclaration['onDelete']? then relationshipDeclaration['onDelete']? else 'nullify'
+    unless _.contains(['nullify', 'destroy', 'none'], onDelete)
+      e "Relationship #{@name}::#{r[0]} delete rule '#{onDelete}' is not valid. Please review this. Should be either 'nullify', 'none' or 'destroy'"
+      onDelete = 'nullify'
     relationship = name: r[0], type: "#{myType}_#{i[1]}", inverse: i[0], Class: r[1], inverseType: "#{i[1]}_#{myType}", sort: sort, onDelete: onDelete
     @_relationships ?= {}
     @_relationships[relationship.name] = relationship
@@ -115,7 +182,7 @@ class @Model extends @EventEmitter
           continue
         else if not InverseClass._relationships?[relationship.inverse]
           InverseClass._relationships ?= {}
-          InverseClass._relationships[relationship.inverse] = name: relationship.inverse, type: relationship.inverseType, inverse:relationship.name, Class: ClassName, inverseType: relationship.type
+          InverseClass._relationships[relationship.inverse] = name: relationship.inverse, type: relationship.inverseType, inverse:relationship.name, Class: ClassName, inverseType: relationship.type, onDelete: 'nullify'
         else
           e "Bad relationship #{relationship.name} <-> #{relationship.inverse}. You must absolutely check for errors for classes #{ClassName} and #{relationship.Class}"
 
