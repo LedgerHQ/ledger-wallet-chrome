@@ -74,15 +74,33 @@ class @Model extends @EventEmitter
 
   save: () ->
     if @isInserted() and @hasChange() and @onUpdate() isnt false
-      @_commitPendingRelationship()
+      @_commitPendingRelationships()
       @_collection.update this
     else if @onInsert() isnt false
       @_collection.insert this
-      @_commitPendingRelationship()
+      @_commitPendingRelationships()
       @_needsUpdate = no
 
   delete: () ->
     if not @_deleted and @onDelete() isnt false
+      for relationship in @getRelationships()
+        switch relationship.onDelete
+          when 'destroy'
+            switch relationship.type
+              when 'many_one'
+                item.delete() for item in @get(relationship.name)
+              when 'one_one'
+                @get(relationship.name).delete()
+              when 'one_many'
+                @get(relationship.name).delete()
+              when 'many_many' then throw 'many:many relastionships are not implemented yet'
+          when 'nullify'
+            switch relationship.type
+              when 'many_one'
+                item.set(relationship.inverse, null) for item in @get(relationship.name)
+              when 'one_one'
+                @get(relationship.name).set(relationship.inverse, null)
+              when 'many_many' then throw 'many:many relastionships are not implemented yet'
       @_deleted = true
       @_collection.remove @_object
 
@@ -114,21 +132,57 @@ class @Model extends @EventEmitter
   getRelationships: () -> @constructor._relationships
 
   _getModelValue: (relationship, value) ->
+    ValueClass = window[relationship.Class]
+    unless _(value).isKindOf ValueClass
+      value = new ValueClass(@_context, value)
+      value.save()
+    value
 
+  _commitAddPendingRelationship: (pending, relationship) ->
+    switch relationship.type
+      when 'many_one'
+        for v in pending.value
+          value = @_getModelValue(relationship, v)
+          value.set("#{relationship.inverse}_id", @getId())
+          value.save()
+      when 'one_many'
+        value = @_getModelValue(relationship, pending.value)
+        @_object["#{relationship.name}_id"] = value.getId()
+        @_context.update this
+      when 'one_one'
+        value = @_getModelValue(relationship, pending.value)
+        @_object["#{relationship.name}_id"] = value.getId()
+        value.set("#{relationship.inverse}_id", @getId())
+        value.save()
+        @_context.update this
+      when 'many_many' then throw 'many:many relationships are not implemented yet'
 
-  _commitPendingRelationship: () ->
+  _commitRemovePendingRelationship: (pending, relationship) ->
+    switch relationship.type
+      when 'many_one'
+        for v in pending.value
+          value = @_getModelValue(relationship, v)
+          value.set("#{relationship.inverse}_id", null)
+          value.save()
+      when 'one_many'
+        @_object["#{relationship.name}_id"] = null
+        @_context.update this
+      when 'one_one'
+        value = @_getModelValue(relationship, pending.value)
+        @_object["#{relationship.name}_id"] = value.getId()
+        value.set("#{relationship.inverse}_id", null)
+        value.save()
+        @_context.update this
+      when 'many_many' then throw 'many:many relationships are not implemented yet'
+
+  _commitPendingRelationships: () ->
     for relationshipName, pending of @_pendingRelationships
       relationship = @getRelationships()[relationshipName]
       continue unless relationship?
-      switch relationship.type
-        when 'many_one'
-          for v in pending.value
-            value = @_getModelValue(relationship, v)
-        when 'one_many'
-          value = @_getModelValue(relationship, pending.value)
-        when 'one_one'
-          value = @_getModelValue(relationship, pending.value)
-        when 'many_many' then throw 'many:many relationships are not implemented yet'
+      if pending.add is true
+        @_commitAddPendingRelationship(pending, relationship)
+      else
+        @_commitRemovePendingRelationship(pending, relationship)
     @_pendingRelationships = null
 
   @create: (base, context = ledger.db.contexts.main) -> new @ context, base
