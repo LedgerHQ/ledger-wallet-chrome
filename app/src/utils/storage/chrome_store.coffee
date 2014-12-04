@@ -51,12 +51,12 @@ class @ledger.storage.ChromeStore extends ledger.storage.Store
       obj = {}
       for key, value of item when key? and value?
         continue if _.isFunction(value)
-        obj[@_encryptKey(key)] = @_encryptData(JSON.stringify(value))
+        obj[@_encryptKey(key)] = @_encryptData(if value.toJson? then value.toJson() else JSON.stringify(value))
       chrome.storage.local.set obj, cb
     catch er
       e er
 
-  remove: (keys, cb) ->
+  remove: (key, cb) ->
     keys = []
     keys.push @_encryptKey(k) for k in key  if _.isArray(key)
     keys.push @_encryptKey(key) if _.isString(key)

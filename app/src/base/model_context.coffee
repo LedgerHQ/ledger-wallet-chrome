@@ -50,13 +50,14 @@ class Collection
     query = @_collection.chain()
     data = query.data
     query.data = () =>
-      @_modelize(data.call(@_collection))
+      @_modelize(data.call(query))
+    query
 
   getCollection: () -> @_collection
 
   _modelize: (data) ->
     return null unless data?
-    modelizeSingleItem = (item) ->
+    modelizeSingleItem = (item) =>
       Class = Model.AllModelClasses()[item.objType]
       new Class(@_context, item)
     if _.isArray(data)

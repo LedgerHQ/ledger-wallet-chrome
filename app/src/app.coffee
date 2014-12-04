@@ -94,9 +94,13 @@ require @ledger.imports, ->
           @emit 'dongle:unlocked', @wallet
           @emit 'wallet:initializing'
           ledger.wallet.initialize @wallet, =>
+            l '0'
             ledger.db.init =>
+              l '1'
               ledger.db.contexts.open()
+              l 2
               Wallet.initializeWallet =>
+                l 3
                 @emit 'wallet:initialized'
                 Wallet.instance.retrieveAccountsBalances()
                 ledger.tasks.TransactionObserverTask.instance.start()

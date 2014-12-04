@@ -8,9 +8,13 @@ class Database extends EventEmitter
 
   load: (callback) ->
     ledger.storage.databases.get @_name, (json) =>
-      @_db = new loki()
-      @_db.loadJSON json[@_name] if json[@_name]?
-      @_db.save = @scheduleFlush.bind(this)
+      try
+        @_db = new loki(@_name)
+        l json[@_name]
+        @_db.loadJSON json[@_name] if json[@_name]?
+        @_db.save = @scheduleFlush.bind(this)
+      catch er
+        e er
       callback?()
       @emit 'loaded'
 
@@ -24,7 +28,7 @@ class Database extends EventEmitter
     @perform =>
       clearTimeout @_scheduledFlush if @_scheduledFlush?
       serializedData = {}
-      serializedData[@_name] = @_db.toJSON()
+      serializedData[@_name] = @_db
       ledger.storage.databases.set serializedData, callback
 
   scheduleFlush: () ->

@@ -76,10 +76,13 @@ class @Model extends @EventEmitter
     if @isInserted() and @hasChange() and @onUpdate() isnt false
       @_commitPendingRelationships()
       @_collection.update this
+      return yes
     else if @onInsert() isnt false
       @_collection.insert this
       @_commitPendingRelationships()
       @_needsUpdate = no
+      return yes
+    no
 
   delete: () ->
     if not @_deleted and @onDelete() isnt false
