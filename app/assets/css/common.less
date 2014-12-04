@@ -47,6 +47,7 @@
   font-size: @font-size-small;
   color: @color-action-purple;
   letter-spacing: -0.1px;
+  text-transform: uppercase;
 
   a& {
     text-decoration: none;
@@ -69,6 +70,7 @@
   letter-spacing: -0.3px;
   text-transform: uppercase;
 }
+
 .text(@color, @size: @font-size-medium, @weight: @font-weight-regular) {
   font-size: @size;
   color: @color;
@@ -146,6 +148,7 @@
 // action bar
 .action-bar {
   display: flex;
+  align-items: center;
 
   > a {
     margin-right: 8px;

@@ -26,6 +26,10 @@ common:
     invalid_amount: "The amount to send is invalid."
     unknown: "An unknown error occured."
 
+  qrcode:
+    present: "Present the QR code in front of the webcam."
+    nowebcam: "No webcam is detected on your computer."
+
 onboarding:
   device:
     plug:
@@ -221,7 +225,7 @@ wallet:
       amount_placeholder: "amount"
       receiver_account: "CREDIT ACCOUNT"
       receiver_address: "BITCOIN ADDRESS TO RECEIVE"
-      qr_code_explanation: "This QR code can be scanned<br/>by the person who wants to send you bitcoins"
+      qr_code_explanation: "This QR code can be scanned<br/>by the person who wants to send you bitcoins."
       send_by_email: "SEND BY EMAIL"
       print: "PRINT"
       close: "CLOSE"
@@ -239,6 +243,8 @@ wallet:
       send: "SEND"
       close: "CLOSE"
       confirm: "CONFIRM"
+      close_scanner: "Close scanner"
+      qr_scanner: "Scan QR code"
 
     validation:
       title: "Required validation code"

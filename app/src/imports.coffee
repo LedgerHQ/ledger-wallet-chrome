@@ -53,6 +53,24 @@
         '../libs/lru'
         '../libs/moment.min'
 
+        '../libs/jsqrcode/grid'
+        '../libs/jsqrcode/version'
+        '../libs/jsqrcode/detector'
+        '../libs/jsqrcode/formatinf'
+        '../libs/jsqrcode/errorlevel'
+        '../libs/jsqrcode/bitmat'
+        '../libs/jsqrcode/datablock'
+        '../libs/jsqrcode/bmparser'
+        '../libs/jsqrcode/datamask'
+        '../libs/jsqrcode/rsdecoder'
+        '../libs/jsqrcode/gf256poly'
+        '../libs/jsqrcode/gf256'
+        '../libs/jsqrcode/decoder'
+        '../libs/jsqrcode/qrcode'
+        '../libs/jsqrcode/findpat'
+        '../libs/jsqrcode/alignpat'
+        '../libs/jsqrcode/databr'
+
         'routes'
 
         'utils/log'
@@ -71,6 +89,7 @@
         'utils/jquery'
         'utils/spinners'
         'utils/pin_codes'
+        'utils/qr_codes'
         'utils/lru'
         'utils/formatters'
 

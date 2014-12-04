@@ -17,6 +17,7 @@ permissions:
   - "storage"
   - "usb"
   - "hid"
+  - "videoCapture"
   -
     usbDevices:
       -
