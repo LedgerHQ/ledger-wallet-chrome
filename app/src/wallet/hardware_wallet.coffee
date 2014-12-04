@@ -99,7 +99,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     @_vents.on 'LW.ErrorOccured', onFailure
     @_lwCard.performSetup(pincode, seed, 'qwerty')
 
-  getBitIdAddress: (callback) ->
+  getBitIdAddress: (message, callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
 
     onSuccess = (e, data) =>
@@ -121,7 +121,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     else
       @_vents.on 'LW.getBitIDAddress', onSuccess
       @_vents.on 'LW.ErrorOccured', onFailure
-      @_lwCard.getBitIDAddress()
+      @_lwCard.getBitIDAddress(message)
 
   signMessageWithBitId: (message, callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED

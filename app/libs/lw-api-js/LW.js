@@ -355,15 +355,26 @@ LW.prototype = {
         });
     },
 
-    getBitIDAddress: function (){
+    getBitIDAddress: function (uri){
         LWTools.console("LW.getBitIDAddress", 3);
         var lW = this;
 
+        if (typeof uri == "undefined" || uri.indexOf("bitid") == -1) {
+            derivation = "0'/0/0xb11e";
+        } else {
+            uri = uri.replace("bitid://", "").replace("bitid:", "");
+            uri = uri.substring(0, uri.indexOf("?"));
+            derivation = "0'/0xb11e'/" + sha256_digest(uri).substring(0,8);
+        }
+        LWTools.console("BitID derivation: " + derivation, 3);
+
         try {
-            return lW.dongle.getWalletPublicKey_async("0'/0/0xb11e").then(function(result) {
+
+            return lW.dongle.getWalletPublicKey_async(derivation).then(function(result) {
                 LWTools.console("BitID public key :", 3);
                 LWTools.console(result, 3);
                 lW.bitIdPubKey = result.publicKey;
+                lW.bitIdDerivation = derivation
                 lW.event('LW.getBitIDAddress', {lW: lW, result: result});
                 return result;
             }).fail(function(error) {
@@ -414,12 +425,12 @@ LW.prototype = {
         LWTools.console("LW.getMessageSignature", 3);
         var lW = this;
 
-        if (lW.bitIdPubKey) {
+        return lW.getBitIDAddress(message).then(function(result) {
             LWTools.console('signMessage ( ' + message + ')', 3);
             message = new ByteString(message,ASCII);
             pin = new ByteString(lW.PIN,ASCII);
 
-            return lW.dongle.signMessagePrepare_async("0'/0/0xb11e", message).then(function(result) {
+            return lW.dongle.signMessagePrepare_async(lW.bitIdDerivation, message).then(function(result) {
                 return lW.dongle.signMessageSign_async(pin).then(function(result) {
 
                     function convertBase64(data) {
@@ -483,14 +494,7 @@ LW.prototype = {
                     };
                 });
             })
-        } else {
-            return lW.getBitIDAddress().then(function(result) {
-                return lW.getMessageSignature(message);
-            });
-
-        };
-
-
-    },
+        });
+    }
 }
 
