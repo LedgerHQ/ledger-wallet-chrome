@@ -111,6 +111,7 @@
         'base/errors'
 
         'managers/devices_manager'
+        'managers/schemes_manager'
 
         ## Rest clients
         'restclients/restclient'

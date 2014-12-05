@@ -40,6 +40,7 @@ class @WalletSendIndexDialogViewController extends DialogViewController
       @dismiss()
 
   openScanner: ->
+    @view.errorContainer.hide()
     @view.videoCaptureContainer.one 'webkitTransitionEnd', =>
       @startScanner()
     @view.videoCaptureContainer.addClass 'opened'
@@ -58,7 +59,11 @@ class @WalletSendIndexDialogViewController extends DialogViewController
     @view.qrcodeScanner = new ledger.qr_codes.Scanner()
     @view.qrcodeScanner.on 'qrcode', (event, data) =>
       # handle data
-      @closeScanner()
+      params = ledger.managers.schemes.bitcoin.parseURI data
+      if params?
+        @view.amountInput.val params.amount if params.amount?
+        @view.receiverInput.val params.address if params.address?
+        @closeScanner()
     @view.qrcodeScanner.startInNode @view.qrcodeVideo.get(0)
 
   stopScanner: ->
