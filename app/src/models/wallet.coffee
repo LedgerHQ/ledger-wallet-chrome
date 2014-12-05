@@ -10,7 +10,7 @@ class @Wallet extends Model
 
   retrieveAccountsBalances: () ->
     for account in @get('accounts')
-      account.retrieveAccountsBalances()
+      account.retrieveBalance()
 
   getBalance: () ->
     balance =

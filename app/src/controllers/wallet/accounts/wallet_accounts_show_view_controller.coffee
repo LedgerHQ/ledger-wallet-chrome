@@ -12,9 +12,9 @@ class @WalletAccountsShowViewController extends @ViewController
   onAfterRender: ->
     super
     # fetch balances
-    Wallet.instance.getBalance (balance) =>
-      @view.confirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
-      @view.unconfirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.unconfirmed)
+    balance = Wallet.instance.getBalance()
+    @view.confirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+    @view.unconfirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.unconfirmed)
 
     # listen events
     ledger.app.on 'wallet:balance:changed', (event, balance) =>
@@ -35,8 +35,8 @@ class @WalletAccountsShowViewController extends @ViewController
   _updateOperations: ->
     operations = @getAccount().get 'operations'
     @view.emptyContainer.hide() if operations.length > 0
-      render 'wallet/operations/operations_table', {operations: operations.slice(0, 6)}, (html) =>
-        @view.operationsList.html html
+    render 'wallet/operations/operations_table', {operations: operations.slice(0, 6)}, (html) =>
+      @view.operationsList.html html
 
   getAccount: () ->
     @_account ?= Account.find(index: 0).first()
