@@ -5,7 +5,7 @@ class @Account extends Model
 
   @fromHDWalletAccount: (hdAccount) ->
     return null unless hdAccount?
-    @find({index: hdAccount.index})
+    @find index: hdAccount.index
 
   createTransaction: (amount, fees, recipientAddress, callback) ->
     transaction = new ledger.wallet.Transaction()
@@ -14,7 +14,7 @@ class @Account extends Model
   ## Balance management
 
   retrieveBalance: () ->
-    ledger.tasks.BalanceTask.get(@getId()).startIfNeccessary()
+    ledger.tasks.BalanceTask.get(@get('index')).startIfNeccessary()
 
   ## Operations
 

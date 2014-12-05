@@ -67,6 +67,10 @@ class Collection
     else
       modelizeSingleItem(data)
 
+  refresh: (model) ->
+    model._object = @_collection.get model.getId()
+    model
+
 class ledger.db.contexts.Context
 
   constructor: (db) ->

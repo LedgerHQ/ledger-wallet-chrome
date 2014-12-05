@@ -113,6 +113,8 @@ class @Model extends @EventEmitter
       @_collection.remove this
       return
 
+  refresh: () -> @_collection.refresh this
+
   # Called before insertion
   # @return Return false if you want to cancel the insertion
   onInsert: () ->
