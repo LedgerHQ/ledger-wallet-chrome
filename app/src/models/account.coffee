@@ -1,11 +1,11 @@
 class @Account extends Model
   do @init
-  @has many: 'operations', sortBy: 'time', onDelete: 'destroy'
+  @has many: 'operations', sortBy: ['time', 'desc'], onDelete: 'destroy'
   @index 'index'
 
   @fromHDWalletAccount: (hdAccount) ->
     return null unless hdAccount?
-    @find index: hdAccount.index
+    @find(index: hdAccount.index).first()
 
   createTransaction: (amount, fees, recipientAddress, callback) ->
     transaction = new ledger.wallet.Transaction()
@@ -22,17 +22,20 @@ class @Account extends Model
     hdAccount = ledger.wallet.HDWallet.instance?.getAccount(@get('index'))
     ledger.wallet.pathsToAddresses hdAccount.getAllPublicAddressesPaths(), (publicAddresses) =>
       ledger.wallet.pathsToAddresses hdAccount.getAllChangeAddressesPaths(), (changeAddresses) =>
-        @_addRawTransaction rawTransaction, _.values publicAddresses, _.values changeAddresses
+        @_addRawTransaction rawTransaction, _.values(publicAddresses), _.values(changeAddresses)
         @save()
         callback()
 
   _addRawTransaction: (rawTransaction, publicAddresses, changeAddresses) ->
-    rawTransaction.outputAddresses = (address for address in output.addresses for output in rawTransaction.outputs)
-    rawTransaction.inputAddresses = (address for address in input.addresses for input in rawTransaction.outputs)
+    rawTransaction.outputAddresses = []
+    rawTransaction.inputAddresses = []
+    rawTransaction.outputAddresses = rawTransaction.outputAddresses.concat(output.addresses) for output in rawTransaction.outputs
+    rawTransaction.inputAddresses = rawTransaction.inputAddresses.concat(input.addresses) for input in rawTransaction.inputs
 
     hasAddressesInInput = _.some(rawTransaction.inputAddresses, ((address) -> _.contains(publicAddresses, address) or _.contains(changeAddresses, address)))
-    hasAddressesInOutput = _.select(rawTransaction.outputAddresses, ((address) -> _.contains(publicAddresses, address))).length > 1
+    hasAddressesInOutput = _.some(rawTransaction.outputAddresses, ((address) -> _.contains(publicAddresses, address)))
 
+    l hasAddressesInInput, hasAddressesInOutput
     if hasAddressesInInput
       @_addRawSendTransaction rawTransaction, changeAddresses
 
@@ -54,7 +57,7 @@ class @Account extends Model
 
     operation.set 'hash', rawTransaction['hash']
     operation.set 'fees', rawTransaction['fees']
-    operation.set 'time', rawTransaction['chain_received_at']
+    operation.set 'time', (new Date(rawTransaction['chain_received_at'])).getTime()
     operation.set 'type', 'reception'
     operation.set 'value', value
     operation.set 'confirmations', rawTransaction['confirmations']
@@ -62,6 +65,7 @@ class @Account extends Model
     operation.set 'recipients', recipients
 
     operation.save()
+    @add('operations', operation)
 
   _addRawSendTransaction: (rawTransaction, changeAddresses) ->
     value = 0
@@ -78,7 +82,7 @@ class @Account extends Model
 
     operation.set 'hash', rawTransaction['hash']
     operation.set 'fees', rawTransaction['fees']
-    operation.set 'time', rawTransaction['chain_received_at']
+    operation.set 'time', (new Date(rawTransaction['chain_received_at'])).getTime()
     operation.set 'type', 'sending'
     operation.set 'value', value
     operation.set 'confirmations', rawTransaction['confirmations']
@@ -86,3 +90,4 @@ class @Account extends Model
     operation.set 'recipients', recipients
 
     operation.save()
+    @add('operations', operation)

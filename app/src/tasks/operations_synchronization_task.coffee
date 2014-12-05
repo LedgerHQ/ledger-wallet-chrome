@@ -5,16 +5,15 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
 
   onStart: () ->
     accountIndex = 0
-    iterate = () ->
+    iterate = () =>
       if accountIndex >= ledger.wallet.HDWallet.instance.getAccountsCount()
         ledger.app.emit 'wallet:operations:sync:done'
         @stopIfNeccessary()
         return
       hdaccount = ledger.wallet.HDWallet.instance?.getAccount(accountIndex)
-      retrieveAccountOperations(hdaccount, iterate)
+      @retrieveAccountOperations(hdaccount, iterate)
       accountIndex += 1
     iterate()
-
 
   retrieveAccountOperations: (hdaccount, callback) ->
     l 'operations'
@@ -23,6 +22,7 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
       ledger.api.TransactionsRestClient.instance.getTransactions addresses, (transactions, error) =>
         return unless @isRunning()
         return ledger.app.emit 'wallet:operations:sync:failed' if error?
+        l transactions
         account = Account.fromHDWalletAccount hdaccount
         for transaction in transactions
           account.addRawTransactionAndSave transaction

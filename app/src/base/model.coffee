@@ -204,6 +204,8 @@ class @Model extends @EventEmitter
   @findOrCreate: (query, base, context = ledger.db.contexts.main) ->
     if _.isObject query
       object = @find(query, context).data()[0]
+      base ?= {}
+      _.extend(base, query)
     else
       object = @findById(query, context)
     object = @create base, context unless object?

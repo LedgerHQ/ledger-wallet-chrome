@@ -43,7 +43,7 @@ class Collection
           view.applyFind(query)
         when 'many_many' then throw 'Not implemented yet'
       if relationship.sort?
-        view.applySimpleSort(relationship.sort)
+        view.applySimpleSort(relationship.sort[0], relationship.sort[1] is 'desc')
     view.modelize = =>
       @_modelize(view.data())
     view
@@ -87,6 +87,7 @@ class ledger.db.contexts.Context
     modelClasses = Model.AllModelClasses()
     for className, modelClass of modelClasses
       collection = @getCollection(className)
+      collection.getCollection().DynamicViews = []
       collection.getCollection().ensureIndex(index) for index in modelClass._indexes if modelClass.__indexes?
 
   getCollection: (name) ->
