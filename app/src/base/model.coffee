@@ -5,9 +5,9 @@ resolveRelationship = (object, relationship) ->
     when 'many_one'
       object._collection.getRelationshipView(object, relationship).modelize()
     when 'one_many'
-      Class.get "#{relationship.name}_id"
+      Class.findById object.get("#{relationship.name}_id")
     when 'one_one'
-      Class.get "#{relationship.name}_id"
+      Class.findById object.get("#{relationship.name}_id")
     when 'many_many'
       object._collection.getRelationshipView(object, relationship).modelize()
 
@@ -201,8 +201,11 @@ class @Model extends @EventEmitter
 
   @findById: (id, context = ledger.db.contexts.main) -> context.getCollection(@getCollectionName()).get(id)
 
-  @findOrCreate: (id, base, context = ledger.db.contexts.main) ->
-    object = @findById id, context
+  @findOrCreate: (query, base, context = ledger.db.contexts.main) ->
+    if _.isObject query
+      object = @find(query, context).data()[0]
+    else
+      object = @findById(query, context)
     object = @create base, context unless object?
     object
 

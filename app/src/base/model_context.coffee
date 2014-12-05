@@ -53,6 +53,10 @@ class Collection
     data = query.data
     query.data = () =>
       @_modelize(data.call(query))
+    query.first = () => @_modelize(data.call(query)[0])
+    query.first = () =>
+      d = data.call(query)
+      @_modelize(d[d.length - 1])
     query
 
   getCollection: () -> @_collection

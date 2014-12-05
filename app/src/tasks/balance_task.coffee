@@ -8,17 +8,18 @@ class ledger.tasks.BalanceTask extends ledger.tasks.Task
     @_accountIndex = accountIndex
 
   onStart: () ->
-    account = Account.find index: @_accountIndex
+    account = Account.find(index: @_accountIndex).first()
     totalBalance = account.get 'total_balance'
     unconfirmedBalance = account.get 'unconfirmed_balance'
     account = undefined
     ledger.api.BalanceRestClient.instance.getAccountBalance @_accountIndex, (balance, error) =>
       return unless @isRunning()
+      l balance
       if error?
         @emit "failure", @
         ledger.app.emit "wallet:balance:failed"
       else
-        account = Account.find index: @_accountIndex
+        account = Account.find(index: @_accountIndex).first()
         account.set('total_balance', balance.total)
         account.set('unconfirmed_balance', balance.unconfirmed)
         account.save()

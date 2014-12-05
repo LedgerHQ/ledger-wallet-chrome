@@ -18,100 +18,71 @@ class @Account extends Model
 
   ## Operations
 
-  addRawTransaction: (rawTransaction, callback) ->
-    @exists (exists) =>
-      return unless exists
-      @get (account) =>
-        hdAccount = ledger.wallet.HDWallet.instance?.getAccount(@getId())
-        return unless hdAccount?
+  addRawTransactionAndSave: (rawTransaction, callback = _.noop) ->
+    hdAccount = ledger.wallet.HDWallet.instance?.getAccount(@get('index'))
+    ledger.wallet.pathsToAddresses hdAccount.getAllPublicAddressesPaths(), (publicAddresses) =>
+      ledger.wallet.pathsToAddresses hdAccount.getAllChangeAddressesPaths(), (changeAddresses) =>
+        @_addRawTransaction rawTransaction, _.values publicAddresses, _.values changeAddresses
+        @save()
+        callback()
 
-        @getOperations (operations) =>
-          @_addRawTransaction account, operations, hdAccount.getAllPublicAddressesPaths(), rawTransaction, 'reception', (publicAdded) =>
-            @_addRawTransaction account, operations, hdAccount.getAllChangeAddressesPaths(), rawTransaction, 'sending', (changeAdded) =>
-              callback?(publicAdded or changeAdded)
+  _addRawTransaction: (rawTransaction, publicAddresses, changeAddresses) ->
+    rawTransaction.outputAddresses = (address for address in output.addresses for output in rawTransaction.outputs)
+    rawTransaction.inputAddresses = (address for address in input.addresses for input in rawTransaction.outputs)
 
-  _addRawTransaction: (account, operations, paths, rawTransaction, type, done) ->
-    ledger.wallet.pathsToAddresses paths, (addresses) =>
-      value = 0
+    hasAddressesInInput = _.some(rawTransaction.inputAddresses, ((address) -> _.contains(publicAddresses, address) or _.contains(changeAddresses, address)))
+    hasAddressesInOutput = _.select(rawTransaction.outputAddresses, ((address) -> _.contains(publicAddresses, address))).length > 1
 
-      foreignOutputs = []
-      ownOutputs = []
+    if hasAddressesInInput
+      @_addRawSendTransaction rawTransaction, changeAddresses
 
-      for output in rawTransaction.outputs
-        continue unless output.addresses?
-        for address in output.addresses
-          if _(addresses).contains(address)
-            ownOutputs.push output
-          else
-            foreignOutputs.push output
-          break
+    if hasAddressesInOutput
+      @_addRawReceptionTransaction rawTransaction, publicAddresses.concat(changeAddresses)
 
-      foreignInputs = []
-      ownInputs = []
+  _addRawReceptionTransaction: (rawTransaction, ownAddresses) ->
+    value = 0
+    for output in rawTransaction.outputs
+      if _.select(output.addresses, ((address) -> _.contains(ownAddresses, address))).length > 0
+        value += parseInt(output.value) if output.value?
 
-      for input in rawTransaction.inputs
-        continue unless input.addresses?
-        for address in input.addresses
-          if _(addresses).contains(address)
-            ownInputs.push output
-          else
-            foreignInputs.push output
-          break
+    recipients = (address for address in rawTransaction.outputAddresses when _.contains(ownAddresses, address))
+    senders = (address for address in rawTransaction.inputAddresses)
 
-      return done(no) if ownOutputs.length == 0 and ownInputs.length == 0
+    uid = "reception_#{rawTransaction.hash}_#{@get('index')}"
 
-      outputsToCompute = if type is 'reception' then ownOutputs else foreignOutputs
+    operation = Operation.findOrCreate uid: uid
 
-      value = 0
+    operation.set 'hash', rawTransaction['hash']
+    operation.set 'fees', rawTransaction['fees']
+    operation.set 'time', rawTransaction['chain_received_at']
+    operation.set 'type', 'reception'
+    operation.set 'value', value
+    operation.set 'confirmations', rawTransaction['confirmations']
+    operation.set 'senders', senders
+    operation.set 'recipients', recipients
 
-      if rawTransaction.outputs.length == 1
-        value = rawTransaction.outputs[0].value
-      else
-        value = do (outputsToCompute) ->
-          out = 0
-          for output in outputsToCompute
-            out += output.value
-          out
+    operation.save()
 
-      senders = []
-      recipients = []
+  _addRawSendTransaction: (rawTransaction, changeAddresses) ->
+    value = 0
+    for output in rawTransaction.outputs
+      if _.select(output.addresses, ((address) -> _.contains(changeAddresses, address) is false)).length > 0
+        value += parseInt(output.value) if output.value?
 
-      for input in rawTransaction.inputs
-        senders = senders.concat((address for address in input.addresses))
+    recipients = (address for address in rawTransaction.outputAddresses when _.contains(changeAddresses, address) is false)
+    senders = (address for address in rawTransaction.inputAddresses)
 
-      if rawTransaction.outputs.length == 1 and not _.contains(addresses, rawTransaction.outputs[0].addresses[0])
-        type = if type is 'reception' then 'sending' else 'reception'
+    uid = "sending#{rawTransaction.hash}_#{@get('index')}"
 
-      outputsToCompute = if type is 'reception' then ownOutputs else foreignOutputs
-      recipients = do (outputsToCompute) ->
-          recipients = []
-          for output in outputsToCompute
-            recipients = recipients.concat((address for address in output.addresses))
-          recipients
+    operation = Operation.findOrCreate uid: uid
 
-      transaction =
-        _id: type + rawTransaction['hash']
-        hash: rawTransaction['hash']
-        fees: rawTransaction['fees']
-        time: rawTransaction['chain_received_at']
-        type: type
-        value: value
-        senders: JSON.stringify(senders)
-        recipients: JSON.stringify(recipients)
-        confirmations: rawTransaction['confirmations']
-      @insertOperation transaction, => done(yes)
+    operation.set 'hash', rawTransaction['hash']
+    operation.set 'fees', rawTransaction['fees']
+    operation.set 'time', rawTransaction['chain_received_at']
+    operation.set 'type', 'sending'
+    operation.set 'value', value
+    operation.set 'confirmations', rawTransaction['confirmations']
+    operation.set 'senders', senders
+    operation.set 'recipients', recipients
 
-  insertOperation: (operation, callback) ->
-    @exists (exists) =>
-      return unless exists
-      @get =>
-        @getOperations (operations) =>
-          operations.insert operation, callback
-
-  getAllSortedOperations: (callback) ->
-    @exists (exists) =>
-      return callback([]) unless exists
-      @getOperations (operations) =>
-        operations.toArray (operations) =>
-          out = _(operations).sortBy (operation) -> -(new Date(operation.time).getTime())
-          callback?(out)
+    operation.save()
