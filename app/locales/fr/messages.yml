@@ -27,7 +27,7 @@ common:
     unknown: "Une erreur inconnue est survenue."
 
   qrcode:
-    present: "Présentez le code QR devant la webcam."
+    present: "Présentez le code QR de réception devant la webcam."
     nowebcam: "Aucune webcam n'est détectée sur votre ordinateur."
 
 onboarding:
