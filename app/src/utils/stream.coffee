@@ -15,11 +15,21 @@ class @Stream extends EventEmitter
 
   open: () ->
     @_open = yes
+    @onOpen()
     @emit 'open'
+    @
+
+  onOpen: () ->
+
+  onClose: () ->
 
   close: () ->
+    @onClose()
     @_open = no
-    @emit 'close'
+    _.defer =>
+      @emit 'close'
+      _.defer =>
+        @off 'data close open'
 
   write: (data) ->
     if @_type is Stream.Type.OBJECT
@@ -27,7 +37,9 @@ class @Stream extends EventEmitter
     else
       @_buffer += data
     @_output?.write @read()
-    @emit 'data'
+    clearTimeout @_timeout if @_timeout?
+    @_timeout = _.defer => @emit 'data'
+    @
 
   read: (n = -1) ->
     n = @_buffer.length if n < 0
@@ -40,6 +52,19 @@ class @Stream extends EventEmitter
       @_buffer = _.str.splice(@_buffer, 0, n)
       out.join ''
 
+  readAndResetError: () ->
+    error = @_error
+    @_hasError = no
+    @_error = null
+    error
+
+  readError: () -> @_error
+
+  error: (msg) ->
+    @_hasError = yes
+    @_error = msg
+    _.defer => @emit 'error', msg
+
   pipe: (stream) ->
     @_output = stream
     stream
@@ -49,3 +74,5 @@ class @Stream extends EventEmitter
   isClosed: () -> not @isOpen()
 
   hasData: () -> @_buffer.length > 0
+
+  hasError: () -> if @_hasError? then @_hasError else no

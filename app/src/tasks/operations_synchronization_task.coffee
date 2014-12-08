@@ -7,7 +7,6 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
     accountIndex = 0
     ledger.db.contexts.main.on 'update:operation insert:operation', (ev, operations) =>
       @synchronizeConfirmationNumbers(operations)
-    @synchronizeConfirmationNumbers()
     iterate = () =>
       if accountIndex >= ledger.wallet.HDWallet.instance.getAccountsCount()
         ledger.app.emit 'wallet:operations:sync:done'
@@ -18,16 +17,30 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
       accountIndex += 1
     iterate()
 
+    Operation.pendingRawTransactionStream().on 'data', => @flushPendingOperationsStream()
+    @flushPendingOperationsStream()
+    @synchronizeConfirmationNumbers()
+
   retrieveAccountOperations: (hdaccount, callback) ->
     ledger.wallet.pathsToAddresses hdaccount.getAllAddressesPaths(), (addresses) =>
       addresses = _.values addresses
-      ledger.api.TransactionsRestClient.instance.getTransactions addresses, (transactions, error) =>
+      stream = ledger.api.TransactionsRestClient.instance.createTransactionStream(addresses)
+      stream.on 'data', =>
         return unless @isRunning()
-        return ledger.app.emit 'wallet:operations:sync:failed' if error?
         account = Account.fromHDWalletAccount hdaccount
-        for transaction in transactions
+        for transaction in stream.read()
           account.addRawTransactionAndSave transaction
-        callback?()
+        ledger.app.emit 'wallet:transactions:new'
+
+      stream.on 'close', =>
+        return unless @isRunning()
+        if stream.hasError()
+          ledger.app.emit 'wallet:operations:sync:failed'
+          @retrieveAccountOperations(hdaccount, callback)
+        else
+          callback?()
+
+      stream.open()
 
   synchronizeConfirmationNumbers: (operations = null, callback = _.noop) ->
     operations = Operation.find(confirmations: $lt: 2).data() unless operations?
@@ -36,4 +49,13 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
       l refreshedOperations
       # TODO continue
 
+  flushPendingOperationsStream: () ->
+    for transaction in Operation.pendingRawTransactionStream().read()
+      for account in Account.all()
+        do (transaction, account) ->
+          account.addRawTransactionAndSave(transaction)
+    ledger.app.emit 'wallet:transactions:new'
+
   onStop: () ->
+    Operation.pendingRawTransactionStream().read()
+    Operation.pendingRawTransactionStream().off 'data'

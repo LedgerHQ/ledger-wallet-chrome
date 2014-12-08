@@ -101,9 +101,10 @@ require @ledger.imports, ->
               ledger.db.contexts.open()
               Wallet.initializeWallet =>
                 @emit 'wallet:initialized'
-                Wallet.instance.retrieveAccountsBalances()
-                ledger.tasks.TransactionObserverTask.instance.start()
-                ledger.tasks.OperationsSynchronizationTask.instance.start()
+                _.defer =>
+                  Wallet.instance.retrieveAccountsBalances()
+                  ledger.tasks.TransactionObserverTask.instance.start()
+                  ledger.tasks.OperationsSynchronizationTask.instance.start()
         @emit 'dongle:connected', @wallet
 
     _listenAppEvents: () ->

@@ -216,6 +216,9 @@ class @Model extends @EventEmitter
     chain.find(query) if query?
     chain
 
+  @all: (context = ledger.db.contexts.main) -> context.getCollection(@getCollectionName()).query().data()
+
+
   # Relationship creator
   @has: (relationshipDeclaration) ->
     if relationshipDeclaration['many']?
