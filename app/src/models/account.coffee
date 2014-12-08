@@ -35,7 +35,6 @@ class @Account extends Model
     hasAddressesInInput = _.some(rawTransaction.inputAddresses, ((address) -> _.contains(publicAddresses, address) or _.contains(changeAddresses, address)))
     hasAddressesInOutput = _.some(rawTransaction.outputAddresses, ((address) -> _.contains(publicAddresses, address)))
 
-    l hasAddressesInInput, hasAddressesInOutput
     if hasAddressesInInput
       @_addRawSendTransaction rawTransaction, changeAddresses
 

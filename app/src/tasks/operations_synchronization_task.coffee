@@ -5,6 +5,9 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
 
   onStart: () ->
     accountIndex = 0
+    ledger.db.contexts.main.on 'update:operation insert:operation', (ev, operations) =>
+      @synchronizeConfirmationNumbers(operations)
+    @synchronizeConfirmationNumbers()
     iterate = () =>
       if accountIndex >= ledger.wallet.HDWallet.instance.getAccountsCount()
         ledger.app.emit 'wallet:operations:sync:done'
@@ -16,16 +19,21 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
     iterate()
 
   retrieveAccountOperations: (hdaccount, callback) ->
-    l 'operations'
     ledger.wallet.pathsToAddresses hdaccount.getAllAddressesPaths(), (addresses) =>
       addresses = _.values addresses
       ledger.api.TransactionsRestClient.instance.getTransactions addresses, (transactions, error) =>
         return unless @isRunning()
         return ledger.app.emit 'wallet:operations:sync:failed' if error?
-        l transactions
         account = Account.fromHDWalletAccount hdaccount
         for transaction in transactions
           account.addRawTransactionAndSave transaction
         callback?()
+
+  synchronizeConfirmationNumbers: (operations = null, callback = _.noop) ->
+    operations = Operation.find(confirmations: $lt: 2).data() unless operations?
+    ledger.api.TransactionsRestClient.refreshTransaction operations, (refreshedOperations, error) ->
+      return @synchronizeConfirmationNumbers(operations, callback) if error?
+      l refreshedOperations
+      
 
   onStop: () ->

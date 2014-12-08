@@ -34,3 +34,13 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
         callback?(transaction)
       onError: @networkErrorCallback(callback)
 
+  refreshTransaction: (transactions, callback) ->
+    outTransactions = []
+    _.async.each transactions, (transaction, done, hasNext) =>
+      @http().get
+        url: '/blockchain/transactions/#{transaction.hash}'
+        onSuccess: (response) =>
+          outTransactions.push  response
+          callback? response unless hasNext
+          do done
+        onError: @networkErrorCallback(callback)

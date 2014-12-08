@@ -81,13 +81,16 @@ require @ledger.imports, ->
         @wallet = wallet
         wallet.once 'disconnected', =>
           _.defer =>
-            @emit 'dongle:disconnected'
-            Wallet.releaseWallet()
-            ledger.wallet.release(wallet)
-            ledger.tasks.Task.stopAllRunningTasks()
-            @wallet = null
-            ledger.dialogs.manager.dismissAll(no)
-            @router.go '/onboarding/device/plug'
+            try
+              @emit 'dongle:disconnected'
+              Wallet.releaseWallet()
+              ledger.wallet.release(wallet)
+              ledger.tasks.Task.stopAllRunningTasks()
+              @wallet = null
+              ledger.dialogs.manager.dismissAll(no)
+              @router.go '/onboarding/device/plug'
+            catch er
+              e er
         wallet.once 'unplugged', =>
           @emit 'dongle:unplugged', @wallet
         wallet.once 'state:unlocked', =>
@@ -101,7 +104,7 @@ require @ledger.imports, ->
                 Wallet.instance.retrieveAccountsBalances()
                 ledger.tasks.TransactionObserverTask.instance.start()
                 ledger.tasks.OperationsSynchronizationTask.instance.start()
-          @emit 'dongle:connected', @wallet
+        @emit 'dongle:connected', @wallet
 
     _listenAppEvents: () ->
       @on 'wallet:balance:changed', (ev, balance) =>

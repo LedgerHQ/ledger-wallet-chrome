@@ -32,7 +32,7 @@ class @Wallet extends Model
   @initializeWallet: (callback) ->
     @instance = @findOrCreate(1, {id: 1})
     if @instance.isInserted()
-     callback?()
+      callback?()
     else
       @instance.add('accounts', {index: 0, name: t 'common.default_account_name'}).save()
       callback?()

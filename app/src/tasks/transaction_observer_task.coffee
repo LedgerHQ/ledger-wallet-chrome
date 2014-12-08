@@ -10,7 +10,7 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
 
   _listenNewTransactions: () ->
     @newTransactionStream = new WebSocket "wss://ws.chain.com/v2/notifications"
-    @newTransactionStream.onopen = (event) =>
+    @newTransactionStream.onopen = () =>
       @newTransactionStream.send JSON.stringify type: "new-transaction", block_chain: "bitcoin"
 
     @newTransactionStream.onmessage = (event) =>
