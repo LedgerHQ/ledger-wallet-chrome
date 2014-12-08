@@ -31,7 +31,7 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
 
   synchronizeConfirmationNumbers: (operations = null, callback = _.noop) ->
     operations = Operation.find(confirmations: $lt: 2).data() unless operations?
-    ledger.api.TransactionsRestClient.refreshTransaction operations, (refreshedOperations, error) ->
+    ledger.api.TransactionsRestClient.instance.refreshTransaction operations, (refreshedOperations, error) ->
       return @synchronizeConfirmationNumbers(operations, callback) if error?
       l refreshedOperations
       # TODO continue

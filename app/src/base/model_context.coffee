@@ -75,12 +75,14 @@ class Collection
     model._object = @_collection.get model.getId()
     model
 
-class ledger.db.contexts.Context
+class ledger.db.contexts.Context extends EventEmitter
 
   constructor: (db) ->
     @_db = db
     @_collections = {}
-    @_collections[collection.name] = new Collection(@_db.getDb().getCollection(collection.name), @) for collection in @_db.getDb().listCollections()
+    for collection in @_db.getDb().listCollections()
+      @_collections[collection.name] = new Collection(@_db.getDb().getCollection(collection.name), @)
+      @_listenCollectionEvent(@_collections[collection.name])
     @initialize()
 
   initialize: () ->
@@ -95,11 +97,20 @@ class ledger.db.contexts.Context
     unless collection?
       collection = new Collection(@_db.getDb().addCollection(name), @)
       @_collections[name] = collection
+      @_listenCollectionEvent(collection)
     collection
 
   notifyDatabaseChange: () ->
     @_db.scheduleFlush()
 
+  close: () ->
+    for n, collection of @_collections
+      collection.getCollection().off 'insert update delete'
+
+  _listenCollectionEvent: (collection) ->
+    collection.getCollection().on 'insert update delete', (event, data) =>
+      l event
+      l data
 
 _.extend ledger.db.contexts,
 
@@ -107,3 +118,4 @@ _.extend ledger.db.contexts,
     ledger.db.contexts.main = new ledger.db.contexts.Context(ledger.db.main)
 
   close: () ->
+    ledger.db.contexts.main?.close()

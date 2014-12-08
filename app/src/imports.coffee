@@ -119,11 +119,8 @@
         'utils/database/database'
         'base/model_context'
         'base/model'
-        'base/collection'
         'base/view_controller'
         'base/navigation_controller'
-
-        ## Collections (must absolutely be imported here before models)
 
         ## Models
         'models/wallet'
