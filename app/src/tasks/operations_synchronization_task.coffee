@@ -34,6 +34,6 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
     ledger.api.TransactionsRestClient.refreshTransaction operations, (refreshedOperations, error) ->
       return @synchronizeConfirmationNumbers(operations, callback) if error?
       l refreshedOperations
-      
+      # TODO continue
 
   onStop: () ->
