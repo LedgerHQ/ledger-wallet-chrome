@@ -49,6 +49,8 @@ class @Account extends Model
 
     recipients = (address for address in rawTransaction.outputAddresses when _.contains(ownAddresses, address))
     senders = (address for address in rawTransaction.inputAddresses)
+    senders = _.unique(senders)
+    recipients = _.unique(recipients)
 
     uid = "reception_#{rawTransaction.hash}_#{@get('index')}"
 
@@ -74,6 +76,8 @@ class @Account extends Model
 
     recipients = (address for address in rawTransaction.outputAddresses when _.contains(changeAddresses, address) is false)
     senders = (address for address in rawTransaction.inputAddresses)
+    senders = _.unique(senders)
+    recipients = _.unique(recipients)
 
     uid = "sending#{rawTransaction.hash}_#{@get('index')}"
 
@@ -87,6 +91,5 @@ class @Account extends Model
     operation.set 'confirmations', rawTransaction['confirmations']
     operation.set 'senders', senders
     operation.set 'recipients', recipients
-
     operation.save()
     @add('operations', operation)
