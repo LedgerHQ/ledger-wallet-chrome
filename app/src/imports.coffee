@@ -74,6 +74,7 @@
         'utils/pin_codes'
         'utils/lru'
         'utils/formatters'
+        'utils/stream'
 
         'utils/crypto/aes'
         'utils/crypto/sha256'

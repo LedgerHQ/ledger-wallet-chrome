@@ -31,7 +31,8 @@ class @Stream extends EventEmitter
 
   read: (n = -1) ->
     n = @_buffer.length if n < 0
-    out = (c for c in @_buffer)
+    l = n
+    out = (c for c in @_buffer when l-- > 0)
     if @_type is Stream.Type.OBJECT
       @_buffer.splice 0, n
       out
@@ -44,5 +45,7 @@ class @Stream extends EventEmitter
     stream
 
   isOpen: () -> @_open
+
+  isClosed: () -> not @isOpen()
 
   hasData: () -> @_buffer.length > 0
