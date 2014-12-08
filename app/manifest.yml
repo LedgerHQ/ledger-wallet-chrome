@@ -17,7 +17,6 @@ permissions:
   - "storage"
   - "usb"
   - "hid"
-  - "videoCapture"
   -
     usbDevices:
       -
@@ -26,6 +25,9 @@ permissions:
       -
         vendorId: 9601
         productId: 11132
+
+optional_permissions:
+  - "videoCapture"
 
 externally_connectable:
   matches:

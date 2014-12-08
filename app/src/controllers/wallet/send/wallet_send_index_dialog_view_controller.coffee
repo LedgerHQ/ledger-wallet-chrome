@@ -8,6 +8,7 @@ class @WalletSendIndexDialogViewController extends DialogViewController
     receiverInput: '#receiver_input'
     videoCaptureContainer: '#video_capture_container'
     qrcodeVideo: '#qrcode_video'
+    qrcodeIndication: '#qrcode_indication'
     openScannerButton: '#open_scanner_button'
     closeScannerButton: '#close_scanner_button'
 
@@ -40,12 +41,17 @@ class @WalletSendIndexDialogViewController extends DialogViewController
       @dismiss()
 
   openScanner: ->
-    @view.errorContainer.hide()
-    @view.videoCaptureContainer.one 'webkitTransitionEnd', =>
-      @startScanner()
-    @view.videoCaptureContainer.addClass 'opened'
-    @view.openScannerButton.hide()
-    @view.closeScannerButton.show()
+    successBlock = =>
+      @view.errorContainer.hide()
+      @view.videoCaptureContainer.one 'webkitTransitionEnd', =>
+        @startScanner()
+      @view.videoCaptureContainer.addClass 'opened'
+      @view.openScannerButton.hide()
+      @view.closeScannerButton.show()
+
+    ledger.managers.permissions.request 'videoCapture', (granted) =>
+      if granted
+        _.defer => successBlock()
 
   closeScanner: ->
     @view.videoCaptureContainer.one 'webkitTransitionEnd', =>
@@ -57,12 +63,17 @@ class @WalletSendIndexDialogViewController extends DialogViewController
   startScanner: ->
     return if @view.qrcodeScanner?
     @view.qrcodeScanner = new ledger.qr_codes.Scanner()
+    @view.qrcodeScanner.once 'error', (event, data) =>
+      @view.qrcodeIndication.hide()
+    @view.qrcodeScanner.once 'success', (event, data) =>
+      @view.qrcodeIndication.show()
     @view.qrcodeScanner.on 'qrcode', (event, data) =>
       # handle data
       params = ledger.managers.schemes.bitcoin.parseURI data
       if params?
         @view.amountInput.val params.amount if params.amount?
         @view.receiverInput.val params.address if params.address?
+        @_updateTotalInput()
         @closeScanner()
     @view.qrcodeScanner.startInNode @view.qrcodeVideo.get(0)
 
@@ -76,6 +87,8 @@ class @WalletSendIndexDialogViewController extends DialogViewController
     @view.amountInput.on 'keydown', =>
       _.defer =>
         @_updateTotalInput yes
+    @view.openScannerButton.on 'click', =>
+      @openScanner()
 
   _receiverBitcoinAddress: ->
     _.str.trim(@view.receiverInput.val())

@@ -30,6 +30,12 @@
 
   a&:hover {
     background-color: darken(@color, @color-default-darken-value);
+    cursor: pointer;
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
   }
 }
 .action-rounded-button {

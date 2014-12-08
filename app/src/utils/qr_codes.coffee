@@ -26,17 +26,19 @@ class ledger.qr_codes.Scanner extends EventEmitter
       @videoEl.src = (window.URL && window.URL.createObjectURL(stream)) || stream
       @videoEl.play()
       _.delay @_decodeCallback.bind(@), 1000
+      @emit 'success', stream
     ,
     (videoError) =>
       $(@overlayEl).addClass 'errored'
       $(@overlayEl).text t 'common.qrcode.nowebcam'
+      @emit 'error', videoError
 
     qrcode.callback = (data) =>
       @emit 'qrcode', data
 
   stop: ->
     return if not @renderedNode?
-    @localStream.stop()
+    @localStream.stop() if @localStream?
     @videoEl.pause()
     $(@videoEl).remove()
     $(@canvasEl).remove()
