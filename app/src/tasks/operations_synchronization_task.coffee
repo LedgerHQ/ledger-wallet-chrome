@@ -30,7 +30,6 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
         account = Account.fromHDWalletAccount hdaccount
         for transaction in stream.read()
           account.addRawTransactionAndSave transaction
-        ledger.app.emit 'wallet:transactions:new'
 
       stream.on 'close', =>
         return unless @isRunning()
@@ -43,8 +42,11 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
       stream.open()
 
   synchronizeConfirmationNumbers: (operations = null, callback = _.noop) ->
+    return
     operations = Operation.find(confirmations: $lt: 2).data() unless operations?
-    ledger.api.TransactionsRestClient.instance.refreshTransaction operations, (refreshedOperations, error) ->
+    return if operations.length is 0
+    l operations
+    ledger.api.TransactionsRestClient.instance.refreshTransaction operations, (refreshedOperations, error) =>
       return @synchronizeConfirmationNumbers(operations, callback) if error?
       l refreshedOperations
       # TODO continue

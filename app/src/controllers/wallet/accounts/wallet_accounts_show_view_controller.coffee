@@ -25,7 +25,7 @@ class @WalletAccountsShowViewController extends @ViewController
     @view.accountName.text account.get 'name'
 
     do @_updateOperations
-    ledger.app.on 'wallet:transactions:new wallet:operations:sync:done', =>
+    ledger.app.on 'wallet:transactions:new wallet:operations:sync:done wallet:operations:new wallet:operations:update', =>
       do @_updateOperations
 
   showOperation: (params) ->

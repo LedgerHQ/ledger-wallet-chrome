@@ -121,8 +121,6 @@ _.extend ledger.wallet.transaction,
       transaction.init(amount, fees, recipientAddress)
       ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
         return callback?(null, {title: 'Network Error', error, code: ledger.errors.NetworkError}) if error?
-
-
         validOutputs = []
         # Collect each valid outputs
         for output in outputs

@@ -22,8 +22,10 @@ class @Account extends Model
     hdAccount = ledger.wallet.HDWallet.instance?.getAccount(@get('index'))
     ledger.wallet.pathsToAddresses hdAccount.getAllPublicAddressesPaths(), (publicAddresses) =>
       ledger.wallet.pathsToAddresses hdAccount.getAllChangeAddressesPaths(), (changeAddresses) =>
-        @_addRawTransaction rawTransaction, _.values(publicAddresses), _.values(changeAddresses)
+        {inserts, updates} = @_addRawTransaction rawTransaction, _.values(publicAddresses), _.values(changeAddresses)
         @save()
+        ledger.app.emit 'wallet:operations:new', inserts if inserts.length > 0
+        ledger.app.emit 'wallet:operations:update', updates if updates.length > 0
         callback()
 
   _addRawTransaction: (rawTransaction, publicAddresses, changeAddresses) ->
@@ -35,11 +37,19 @@ class @Account extends Model
     hasAddressesInInput = _.some(rawTransaction.inputAddresses, ((address) -> _.contains(publicAddresses, address) or _.contains(changeAddresses, address)))
     hasAddressesInOutput = _.some(rawTransaction.outputAddresses, ((address) -> _.contains(publicAddresses, address)))
 
+    result = inserts: [], updates: []
+
     if hasAddressesInInput
-      @_addRawSendTransaction rawTransaction, changeAddresses
+      [insert, update] = @_addRawSendTransaction rawTransaction, changeAddresses
+      result.inserts.push insert if insert?
+      result.updates.push update if update?
 
     if hasAddressesInOutput
-      @_addRawReceptionTransaction rawTransaction, publicAddresses.concat(changeAddresses)
+      [insert, update] = @_addRawReceptionTransaction rawTransaction, publicAddresses.concat(changeAddresses)
+      result.inserts.push insert if insert?
+      result.updates.push update if update?
+    l result
+    result
 
   _addRawReceptionTransaction: (rawTransaction, ownAddresses) ->
     value = 0
@@ -65,8 +75,16 @@ class @Account extends Model
     operation.set 'senders', senders
     operation.set 'recipients', recipients
 
+    isInserted = not operation.isInserted()
+
     operation.save()
     @add('operations', operation)
+
+    if isInserted
+      [operation, null]
+    else
+      [null, operation]
+
 
   _addRawSendTransaction: (rawTransaction, changeAddresses) ->
     value = 0
@@ -91,5 +109,13 @@ class @Account extends Model
     operation.set 'confirmations', rawTransaction['confirmations']
     operation.set 'senders', senders
     operation.set 'recipients', recipients
+
+    isInserted = not operation.isInserted()
+
     operation.save()
     @add('operations', operation)
+
+    if isInserted
+      [operation, null]
+    else
+      [null, operation]

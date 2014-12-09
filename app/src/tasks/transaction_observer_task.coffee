@@ -32,10 +32,11 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
             l derivation
             account = ledger.wallet.HDWallet.instance?.getAccountFromDerivationPath(derivation)
             if account?
+              Account.fromHDWalletAccount(account)?.addRawTransactionAndSave transaction
+              Wallet.instance?.retrieveAccountsBalances()
               account.shiftCurrentPublicAddressPath() if account.getCurrentPublicAddressPath() == derivation
               account.shiftCurrentChangeAddressPath() if account.getCurrentChangeAddressPath() == derivation
-              Account.fromHDWalletAccount(account)?.addRawTransaction transaction, () =>
-                ledger.app.emit('wallet:transactions:new')
+              ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
     found
 
   @instance: new @()
