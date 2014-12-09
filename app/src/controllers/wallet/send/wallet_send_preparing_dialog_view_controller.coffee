@@ -6,10 +6,10 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
   onAfterRender: ->
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@view.spinnerContainer[0])
-    account = ledger.wallet.HDWallet.instance.getAccount(0)
+    account = Account.find(index: 0).first()
 
     # fetch amount
-    ledger.wallet.transaction.createAndPrepareTransaction @params.amount, 10000, @params.address, account.getAllAddressesPaths(), account.getCurrentChangeAddressPath(), (transaction, error) =>
+    ledger.wallet.transaction.createAndPrepareTransaction @params.amount, 10000, @params.address, account, account, (transaction, error) =>
       return if not @isShown()
       @once 'dismiss', =>
         if error?

@@ -7,8 +7,9 @@ class @WalletSendValidationDialogViewController extends @DialogViewController
 
   onAfterRender: ->
     super
+    l @params.transaction.getValidationDetails()
     @view.keycard = new ledger.pin_codes.KeyCard()
-    @view.keycard.setValidableValues @params.transaction.getKeycardIndexes()
+    @view.keycard.setValidableValues @params.transaction.getKeycardValidationCharacters()
     @view.keycard.insertIn @view.cardContainer[0]
     @view.enteredCode.hide()
     @_listenEvents()

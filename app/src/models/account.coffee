@@ -7,9 +7,7 @@ class @Account extends Model
     return null unless hdAccount?
     @find(index: hdAccount.index).first()
 
-  createTransaction: (amount, fees, recipientAddress, callback) ->
-    transaction = new ledger.wallet.Transaction()
-    transaction.init amount, fees, recipientAddress
+  getHDWalletAccount: () -> ledger.wallet.HDWallet.instance.getAccount(@get('index'))
 
   ## Balance management
 
@@ -118,3 +116,4 @@ class @Account extends Model
       [operation, null]
     else
       [null, operation]
+
