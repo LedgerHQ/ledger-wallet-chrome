@@ -78,7 +78,6 @@ qrcode.decode = function(src){
             }
             catch(e)
             {
-                console.log(e);
                 qrcode.result = "error decoding QR Code";
             }
             if(qrcode.callback!=null)
@@ -102,7 +101,6 @@ qrcode.decode_url = function (s)
   }
   catch(e)
   {
-    console.log(e);
     escaped = s;
   }
   var ret = "";
@@ -111,7 +109,6 @@ qrcode.decode_url = function (s)
   }
   catch(e)
   {
-    console.log(e);
     ret = escaped;
   }
   return ret;
@@ -177,8 +174,7 @@ qrcode.process = function(ctx){
     
     var end = new Date().getTime();
     var time = end - start;
-    console.log(time);
-    
+
     return qrcode.decode_utf8(str);
     //alert("Time:" + time + " Code: "+str);
 }
