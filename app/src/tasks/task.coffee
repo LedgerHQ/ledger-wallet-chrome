@@ -8,10 +8,11 @@ class ledger.tasks.Task extends EventEmitter
     @taskId = taskId
 
   start: () ->
-    throw "A task with id '#{@taskId}' is already started" if @isRunning()
-    ledger.tasks.Task.RUNNING_TASKS[@taskId] = @
-    @emit 'start', @
-    do @onStart
+    _.defer =>
+      throw "A task with id '#{@taskId}' is already started" if @isRunning()
+      ledger.tasks.Task.RUNNING_TASKS[@taskId] = @
+      @emit 'start', @
+      do @onStart
     @
 
   startIfNeccessary: () ->
@@ -19,10 +20,11 @@ class ledger.tasks.Task extends EventEmitter
     @
 
   stop: () ->
-    throw "The task '#{@taskId}' is not running" unless @isRunning()
-    ledger.tasks.Task.RUNNING_TASKS = _.omit(ledger.tasks.Task.RUNNING_TASKS, @taskId)
-    do @onStop
-    @emit 'stop', @
+    _.defer =>
+      throw "The task '#{@taskId}' is not running" unless @isRunning()
+      ledger.tasks.Task.RUNNING_TASKS = _.omit(ledger.tasks.Task.RUNNING_TASKS, @taskId)
+      do @onStop
+      @emit 'stop', @
     @
 
   stopIfNeccessary: () -> do @stop if @isRunning()

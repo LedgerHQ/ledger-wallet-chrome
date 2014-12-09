@@ -1,50 +1,40 @@
 class @Wallet extends Model
   do @init
 
-  @hasMany accounts: 'Account'
+  #@hasMany accounts: 'Account'
+  @has many: 'accounts', sortBy: 'index', onDelete: 'destroy'
 
-  instance: undefined
+  @instance: undefined
 
   ## Global Balance management
 
   retrieveAccountsBalances: () ->
-    @getAccounts (accounts) =>
-      accounts.each (account) =>
-        _.model(account).retrieveBalance() if account?
+    for account in @get('accounts')
+      account.retrieveBalance()
 
-  getBalance: (callback = _.noop) ->
+  getBalance: () ->
     balance =
       wallet:
         total: 0
         unconfirmed: 0
       accounts: []
 
-    @getAccounts (accounts) =>
-      accounts.each (account) =>
-        if account?
-          balance.wallet.total += parseInt(account.total_balance) if account.total_balance?
-          balance.wallet.unconfirmed += parseInt(account.unconfirmed_balance) if account.unconfirmed_balance?
-          balance.accounts.push total: account.total_balance, unconfirmed: account.unconfirmed_balance
-        else
-          callback(balance)
+    for account in @get('accounts')
+      continue if not account.get('total_balance')? or not account.get('unconfirmed_balance')?
+      balance.wallet.total += account.get('total_balance')
+      balance.wallet.unconfirmed += account.get('unconfirmed_balance')
+      balance.accounts.push total: account.get('total_balance'), unconfirmed: account.get('unconfirmed_balance')
 
+    balance
 
   ## Lifecyle
 
   @initializeWallet: (callback) ->
-    @instance = @find(0)
-    _.defer =>
-      @instance.exists (exists) =>
-        if exists is true
-          callback?()
-        else
-          @instance = Wallet.create({_id: 0, accounts: []})
-          @instance.save =>
-            account = Account.create {_id: 0, name: t 'common.default_account_name'}
-            account.save =>
-              @instance.getAccounts (accounts) =>
-                accounts.insert account, =>
-                  accounts.toArray (a) => l a
-                  callback?()
+    @instance = @findOrCreate(1, {id: 1})
+    if @instance.isInserted()
+      callback?()
+    else
+      @instance.add('accounts', {index: 0, name: t 'common.default_account_name'}).save()
+      callback?()
 
   @releaseWallet: () ->

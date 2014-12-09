@@ -52,6 +52,7 @@
         '../libs/checkBitcoinAddress'
         '../libs/lru'
         '../libs/moment.min'
+        '../libs/lokijs.min'
 
 
         ## QR Code
@@ -96,6 +97,7 @@
         'utils/qr_codes'
         'utils/lru'
         'utils/formatters'
+        'utils/stream'
 
         ## Crypto
         'utils/crypto/aes'
@@ -145,12 +147,11 @@
         'wallet/hdwallet'
         'wallet/cache'
 
+        'utils/database/database'
+        'base/model_context'
         'base/model'
-        'base/collection'
         'base/view_controller'
         'base/navigation_controller'
-
-        ## Collections (must absolutely be imported here before models)
 
         ## Models
         'models/wallet'

@@ -67,6 +67,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
           shiftPublic = no
 
           for transaction in transactions
+            Operation.pendingRawTransactionStream().write(transaction)
             for input in transaction.inputs
               shiftPublic = yes if _.contains(input.addresses, account.getCurrentPublicAddress())
               shiftChange = yes if _.contains(input.addresses, account.getCurrentChangeAddress())
