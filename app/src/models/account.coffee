@@ -48,7 +48,6 @@ class @Account extends Model
       [insert, update] = @_addRawReceptionTransaction rawTransaction, publicAddresses.concat(changeAddresses)
       result.inserts.push insert if insert?
       result.updates.push update if update?
-    l result
     result
 
   _addRawReceptionTransaction: (rawTransaction, ownAddresses) ->
