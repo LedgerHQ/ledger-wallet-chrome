@@ -205,28 +205,26 @@ section {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    padding: 6px 0;
 
     > .value {
       .regular-text;
       font-size: @font-size-small;
       margin-right: 2px;
-      padding: 10px 0px;
+      padding: 4px 0px;
       width: 12px;
       text-align: center;
-      background-position: center 32px;
-      background-image: url("@{images-url}/wallet/cursor_arrow.png");
-      background-size: 6px 6px;
-      background-repeat: no-repeat;
-      transition: background-position @animation-short-duration @animation-default-timing-function;
+      border-radius: @border-radius-small-value;
+      transition: background-color @animation-short-duration @animation-default-timing-function;
 
       &:last-child {
         margin-right: 0;
       }
 
       &.selected {
-        color: @color-invalid-red;
+        color: @color-white;
         font-weight: @font-weight-bold;
-        background-position: center bottom;
+        background-color: @color-invalid-red;
       }
     }
   }
@@ -253,6 +251,32 @@ div#video_capture_container {
         background-image: none;
         opacity: 1;
       }
+    }
+  }
+}
+
+.tiny-pincode {
+  display: flex;
+
+  > div.input {
+    display: flex;
+    margin-left: 3px;
+    background-color: @color-white;
+    height: 28px;
+    width: 17px;
+    border-radius: @border-radius-default-value;
+    border: 1px solid @color-light-grey;
+    color: @color-dark-grey-blue;
+    align-items: center;
+    justify-content: center;
+    font-size: @font-size-extra-extra-large;
+
+    &.selected {
+      border-color: @color-dark-grey-blue;
+    }
+
+    &:first-child {
+      margin-left: 0;
     }
   }
 }
