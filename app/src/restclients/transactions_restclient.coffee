@@ -53,9 +53,9 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     outTransactions = []
     _.async.each transactions, (transaction, done, hasNext) =>
       @http().get
-        url: '/blockchain/transactions/#{transaction.hash}'
+        url: "blockchain/transactions/#{transaction.get('hash')}"
         onSuccess: (response) =>
-          outTransactions.push  response
-          callback? response unless hasNext
+          outTransactions.push response
+          callback? outTransactions unless hasNext
           do done
         onError: @networkErrorCallback(callback)

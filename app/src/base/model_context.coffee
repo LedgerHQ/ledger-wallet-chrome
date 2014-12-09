@@ -105,12 +105,19 @@ class ledger.db.contexts.Context extends EventEmitter
 
   close: () ->
     for n, collection of @_collections
-      collection.getCollection().off 'insert update delete'
+      collection.getCollection().off 'insert'
+      collection.getCollection().off 'update'
+      collection.getCollection().off 'delete'
 
   _listenCollectionEvent: (collection) ->
-    collection.getCollection().on 'insert update delete', (event, data) =>
-      l event
-      l data
+    collection.getCollection().on 'insert', (data) =>
+      @emit "insert:#{data['objType'].toLowerCase()}", @_modelize(data)
+    collection.getCollection().on 'update', (data) =>
+      @emit "update:#{data['objType'].toLowerCase()}", @_modelize(data)
+    collection.getCollection().on 'delete', (data) =>
+      @emit "delete:#{data['objType'].toLowerCase()}", @_modelize(data)
+
+  _modelize: (data) -> @getCollection(data['objType'])?._modelize(data)
 
 _.extend ledger.db.contexts,
 
