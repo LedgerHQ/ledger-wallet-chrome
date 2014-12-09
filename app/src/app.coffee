@@ -17,7 +17,6 @@ require @ledger.imports, ->
           when 'reload-page' then do @reloadUi
           when 'reload-application' then do @reload
 
-
       @_listenWalletEvents()
       @_listenClickEvents()
       @_listenAppEvents()
@@ -108,8 +107,6 @@ require @ledger.imports, ->
         @emit 'dongle:connected', @wallet
 
     _listenAppEvents: () ->
-      @on 'wallet:balance:changed', (ev, balance) =>
-
 
       @on 'wallet:operations:sync:failed', =>
         l 'Failed'
