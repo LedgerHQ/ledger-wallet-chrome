@@ -26,10 +26,16 @@
 
   a& {
     text-decoration: none;
+
+    &:hover {
+      background-color: darken(@color, @color-default-darken-value);
+      cursor: pointer;
+    }
   }
 
-  a&:hover {
-    background-color: darken(@color, @color-default-darken-value);
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
   }
 }
 .action-rounded-button {
@@ -44,15 +50,17 @@
 
 // texts
 .uppercase-action {
-  font-size: @font-size-small;
+  font-size: 11.5px;
   color: @color-action-purple;
   letter-spacing: -0.1px;
+  text-transform: uppercase;
 
   a& {
     text-decoration: none;
 
     &:hover {
-      color: darken(@color-action-purple, 15%)
+      color: darken(@color-action-purple, 15%);
+      cursor: pointer;
     }
   }
 }
@@ -69,49 +77,41 @@
   letter-spacing: -0.3px;
   text-transform: uppercase;
 }
+
 .text(@color, @size: @font-size-medium, @weight: @font-weight-regular) {
   font-size: @size;
   color: @color;
   font-weight: @weight;
 
   b {
-    .bold-text;
     font-weight: @font-weight-semibold;
   }
 }
 .regular-text {
-
-}
-.bold-text {
-  letter-spacing: -0.5px;
+  .text(@color-black);
 }
 .regular-text-small {
   .text(@color-black, @font-size-very-small);
-  .regular-text;
 }
 .bold-regular-text {
   .text(@color-black, @font-size-medium, @font-weight-semibold);
-  .bold-text;
+  letter-spacing: -0.5px;
 }
 .regular-grey-text {
   .text(@color-dark-grey);
-  .regular-text;
 }
 .regular-grey-text-small {
   .text(@color-dark-grey, @font-size-very-small);
-  .regular-text;
 }
 .regular-valid-text {
   .text(@color-valid-green);
-  .regular-text;
 }
 .regular-invalid-text {
   .text(@color-invalid-red);
-  .regular-text;
 }
 .bold-invalid-text {
   .text(@color-invalid-red, @font-size-medium, @font-weight-semibold);
-  .bold-text;
+  letter-spacing: -0.5px;
 }
 
 // inputs
@@ -147,6 +147,7 @@
 // action bar
 .action-bar {
   display: flex;
+  align-items: center;
 
   > a {
     margin-right: 8px;

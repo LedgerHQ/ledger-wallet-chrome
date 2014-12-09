@@ -6,11 +6,29 @@ section#send_validation_dialog {
 
   > div.regular-text {
     line-height: 20px;
-    margin-top: @metrics-almost-medium-padding - 3px;
+    margin-top: @metrics-small-padding;
+  }
+
+  > div#validation_indication {
+    margin-top: @metrics-almost-medium-padding;
+    .bold-regular-text;
+    letter-spacing: 0px;
+    text-align: center;
+
+    > mark {
+      color: @color-invalid-red;
+      font-weight: @font-weight-bold;
+      background-color: transparent;
+    }
+  }
+
+  > div.regular-grey-text-small {
+    margin-top: @metrics-almost-small-padding;
+    text-align: center;
   }
 
   div.keycard {
-    margin-top: @metrics-small-padding;
+    margin-top: @metrics-medium-padding;
   }
 }
 
@@ -23,10 +41,8 @@ section#send_validation_dialog {
     display: flex;
     align-items: center;
 
-    > div.code {
-      margin-left: @metrics-very-small-padding;
-      font-size: @font-size-extra-large;
-      letter-spacing: 2px;
+    > .tiny-pincode {
+      margin-left: 10px;
     }
   }
 }

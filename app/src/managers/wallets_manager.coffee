@@ -1,4 +1,3 @@
-
 class @WalletsManager extends EventEmitter
 
   _wallets: {}
