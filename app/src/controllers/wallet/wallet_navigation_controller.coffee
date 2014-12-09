@@ -23,8 +23,8 @@ class @WalletNavigationController extends @NavigationController
     @updateMenu url
     ##@updateBreadcrumbs url
     # fetch balances
-    Wallet.instance.getBalance (balance) =>
-      @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+    balance = Wallet.instance.getBalance()
+    @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
     # listen events
     ledger.app.on 'wallet:balance:changed', (event, balance) =>
       @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
