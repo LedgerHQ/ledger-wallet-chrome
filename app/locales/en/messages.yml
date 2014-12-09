@@ -248,8 +248,10 @@ wallet:
 
     validation:
       title: "Required validation code"
-      grab_your_card: "Grab your <b>security card</b> (black card) and type on your keyboard the letter or digit in the black box for each highlighted value:"
+      grab_your_card: "Grab your <b>security card</b> and type on your keyboard the letter or digit in the black box for each highlighted value:"
       entered_code: "Entered code:"
+      address_to_validate: "Recipient's Bitcoin address to validate."
+      amount_and_address_to_validate: "Amount and recipient's Bitcoin address to validate."
 
     processing:
       sending: "Sending..."
