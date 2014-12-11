@@ -191,7 +191,7 @@ wallet:
       status: "Status"
       sender: "From"
       receiver: "To"
-      identifier: "Transaction ID"
+      identifier: "Identifiant"
       send_by_email: "SEND BY EMAIL"
       print: "PRINT"
       close: "CLOSE"
