@@ -11,7 +11,7 @@
 - Add operation detail dialog
 - Update onboarding flow
 
-1.0.3/1.0.3
+1.0.2/1.0.3
 =====
 - Add spanish translation
 - Fix spanish encoding
