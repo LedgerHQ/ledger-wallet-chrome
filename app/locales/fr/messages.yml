@@ -26,6 +26,10 @@ common:
     invalid_amount: "Le montant à envoyer n'est pas valide."
     unknown: "Une erreur inconnue est survenue."
 
+  qrcode:
+    present: "Présentez le code QR de réception devant la webcam."
+    nowebcam: "Aucune webcam n'est détectée sur votre ordinateur."
+
 onboarding:
   device:
     plug:
@@ -150,6 +154,8 @@ wallet:
       receiver: "vers"
       balance: "SOLDE"
       no_operations: "Aucune opération."
+      confirmed: "Confirmée"
+      unconfirmed: "Non confirmée"
 
   top_menu:
     balance: 'SOLDE'
@@ -178,16 +184,19 @@ wallet:
 
   operations:
     detail:
+      <<: *default-operations-translation
       title: "DÉTAIL DE L'OPÉRATION"
       amount: "Montant"
       time: "Date et heure"
       status: "État"
       sender: "Depuis"
       receiver: "Vers"
-      identifier: "Identifiant de transaction"
+      identifier: "Identifiant"
       send_by_email: "ENVOYER PAR EMAIL"
       print: "IMPRIMER"
       close: "FERMER"
+      blockchain_link: "Plus d'informations"
+      transaction_fees_text: "(dont %s BTC de frais de transaction)"
 
     index:
       <<: *default-operations-translation
@@ -218,7 +227,7 @@ wallet:
       amount_placeholder: "montant"
       receiver_account: "COMPTE À CRÉDITER"
       receiver_address: "ADRESSE BITCOIN DE RÉCEPTION"
-      qr_code_explanation: "Code QR à scanner par la personne<br />qui souhaite vous envoyer des bitcoins"
+      qr_code_explanation: "Code QR à scanner par la personne<br />qui souhaite vous envoyer des bitcoins."
       send_by_email: "ENVOYER PAR EMAIL"
       print: "IMPRIMER"
       close: "ANNULER"
@@ -232,15 +241,20 @@ wallet:
       receiver_address: "ADRESSE BITCOIN À CRÉDITER"
       receiver_address_placeholder: "adresse bitcoin"
       total_spent: "TOTAL DÉPENSÉ"
-      transaction_fees_text: "(+0.0001 BTC frais de transaction)"
+      transaction_fees_text: "(dont 0.0001 BTC de frais de transaction)"
       send: "ENVOYER"
       close: "ANNULER"
       confirm: "CONFIRMER"
+      close_scanner: "Fermer scanner"
+      qr_scanner: "Scanner code QR"
 
     validation:
       title: "Code de validation nécessaire"
-      grab_your_card: "Munissez-vous de votre <b>carte de sécurité</b> (carte noire) et tapez sur votre clavier la lettre ou chiffre indiqué dans la case noire pour chaque valeur en surbrillance :"
+      grab_your_card: "Munissez-vous de votre <b>carte de sécurité</b> et tapez sur votre clavier la lettre ou chiffre indiqué dans la case noire pour chaque valeur en surbrillance :"
       entered_code: "Code entré :"
+      address_to_validate: "Adresse Bitcoin du destinataire à vérifier."
+      amount_and_address_to_validate: "Montant et adresse Bitcoin du destinataire à vérifier."
+      to: "à"
 
     processing:
       sending: "Envoi en cours..."

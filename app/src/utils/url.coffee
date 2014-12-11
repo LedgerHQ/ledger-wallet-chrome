@@ -5,6 +5,15 @@
   # to retrieve the parsed search part of the URL.
   # @param [String] str The url string to parse (i.e. 'www.ledger.co')
   # @return [Node] The URL parser with a special method `params`
+
+  # protocol: parser.protocol,
+  # host: parser.host,
+  # hostname: parser.hostname,
+  # port: parser.port,
+  # pathname: parser.pathname,
+  # search: parser.search,
+  # searchObject: searchObject,
+  # hash: parser.hash
   parseAsUrl: (str) ->
     parser = document.createElement('a')
     parser.href = str

@@ -3,38 +3,44 @@ singletons = {}
 
 class ledger.tasks.BalanceTask extends ledger.tasks.Task
 
-  constructor: (accountId) ->
-    super 'balance:' + accountId
-    @_accountId = accountId
+  constructor: (accountIndex) ->
+    super 'balance:' + accountIndex
+    @_accountIndex = accountIndex
 
   onStart: () ->
-    ledger.api.BalanceRestClient.instance.getAccountBalance @_accountId, (balance, error) =>
+    @getAccountBalance()
+
+  getAccountBalance: () ->
+    account = Account.find(index: @_accountIndex).first()
+    totalBalance = account.get 'total_balance'
+    unconfirmedBalance = account.get 'unconfirmed_balance'
+    account = undefined
+    ledger.api.BalanceRestClient.instance.getAccountBalance @_accountIndex, (balance, error) =>
       return unless @isRunning()
+      l balance
       if error?
         @emit "failure", @
         ledger.app.emit "wallet:balance:failed"
       else
-        account = Account.find(@_accountId)
+        account = Account.find(index: @_accountIndex).first()
         account.set('total_balance', balance.total)
         account.set('unconfirmed_balance', balance.unconfirmed)
-        account.save =>
-          @emit "success", @
+        account.save()
+        @emit "success", @
+        if balance.unconfirmed > 0
+          _.delay (=> @getAccountBalance()), 1000
+        else
           @stopIfNeccessary()
-          ledger.app.emit "wallet:balance:changed",
-            wallet:
-              total: balance.total
-              unconfirmed: balance.unconfirmed
-            accounts: [
-              {
-                total: balance.total
-                unconfirmed: balance.unconfirmed
-              }
-            ]
+        if totalBalance != balance.total or unconfirmedBalance != balance.unconfirmed
+          ledger.app.emit "wallet:balance:changed", account.get('wallet').getBalance()
 
 
-  @get: (accountId) ->
-    unless singletons[accountId]?
-      singletons[accountId] = new @(accountId)
-    singletons[accountId]
+  @get: (accountIndex) ->
+    unless singletons[accountIndex]?
+      singletons[accountIndex] = new @(accountIndex)
+    singletons[accountIndex]
 
   @releaseAllBalanceTasks: -> singletons = {}
+
+  @reset: () ->
+    singletons = []

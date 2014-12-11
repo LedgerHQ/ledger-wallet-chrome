@@ -62,7 +62,8 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
             l 'GOT 13'
           #.sendApdu_async(0xe0, 0x26, 0x00, 0x00, new ByteString(Convert.toHexByte(operationMode), HEX), [0x9000])
             @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
-              .then => l 'DONE'
+              .then =>
+                l 'DONE'
               .fail => l 'FAIL', arguments
           @_setState(ledger.wallet.States.UNLOCKED)
           do unbind
@@ -123,6 +124,26 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       @_vents.on 'LW.ErrorOccured', onFailure
       @_lwCard.getBitIDAddress()
 
+  signMessageWithBitId: (message, callback) ->
+    throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
+
+    onSuccess = (e, data) =>
+      _.defer =>
+        callback?(data, null)
+        do unbind
+
+    onFailure = (ev, error) =>
+      _.defer =>
+        callback?(null, error)
+        do unbind
+
+    unbind = =>
+      @_vents.off 'LW.getMessageSignature', onSuccess
+      @_vents.off 'LW.getMessageSignature:error', onFailure
+    @_vents.on 'LW.getMessageSignature', onSuccess
+    @_vents.on 'LW.getMessageSignature:error', onFailure
+    @_lwCard.getMessageSignature(message)
+
   getPublicAddress: (derivationPath, callback) ->
     throw 'Cannot get a public while the key is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
     try
@@ -140,6 +161,106 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     catch error
       @_updateStateFromError(error)
       callback?(null, error)
+
+  getExtendedPublicKey: (derivationPath, callback) ->
+    throw 'Cannot get a public while the key is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
+    path = derivationPath.split '/'
+    bitcoin = new BitcoinExternal()
+    l path
+    finalize = (fingerprint) =>
+      @getPublicAddress derivationPath, (nodeData, error) =>
+        return callback?(null, error) if error?
+        publicKey = bitcoin.compressPublicKey nodeData.publicKey
+        depth = path.length
+        lastChild = path[path.length - 1].split('\'')
+        childnum = parseInt(lastChild[0]) if lastChild.length is 1
+        childnum = (0x80000000 | parseInt(lastChild)) >>> 0
+        xpub = @_createXPUB depth, fingerprint, childnum, nodeData.chainCode, publicKey
+        callback?(@_encodeBase58Check(xpub))
+        l 'depth', depth
+        l 'xpub', xpub
+        l 'pubKey', publicKey
+        l 'xpub final ', @_encodeBase58Check(xpub)
+
+    if path.length > 1
+      prevPath = path.slice(0, -1).join '/'
+      @getPublicAddress prevPath, (nodeData, error) =>
+        return callback?(null, error) if error?
+        publicKey = bitcoin.compressPublicKey nodeData.publicKey
+        ripemd160 = new JSUCrypt.hash.RIPEMD160()
+        sha256 = new JSUCrypt.hash.SHA256();
+        result = sha256.finalize(publicKey.toString(HEX));
+        result = new ByteString(JSUCrypt.utils.byteArrayToHexStr(result), HEX)
+        result = ripemd160.finalize(result.toString(HEX))
+        fingerprint = (result[0] << 24)  | (result[1] << 16) | (result[2] << 8) | result[3]
+        finalize fingerprint
+    else
+      finalize 0
+
+  _createXPUB: (depth, fingerprint, childnum, chainCode, publicKey, testnet = no) ->
+    magic = if testnet then  "043587CF" else "0488B21E"
+    xpub = new ByteString magic, HEX
+    xpub = xpub.concat new ByteString(_.str.lpad(depth.toString(16), 2), HEX)
+    xpub = xpub.concat new ByteString(_.str.lpad(fingerprint.toString(16), 8, '0'), HEX)
+    xpub = xpub.concat new ByteString(_.str.lpad(childnum.toString(16), 8, '0'), HEX)
+    xpub = xpub.concat new ByteString(chainCode.toString(HEX), HEX)
+    xpub = xpub.concat new ByteString(publicKey.toString(HEX), HEX)
+    xpub
+
+  _encodeBase58Check: (vchIn) ->
+    l 'vchIn ', vchIn
+    sha256 = new JSUCrypt.hash.SHA256();
+    hash = sha256.finalize(vchIn.toString(HEX));
+    return JSUCrypt.utils.byteArrayToHexStr(hash)
+    hash = new ByteString(JSUCrypt.utils.byteArrayToHexStr(hash), HEX)
+    hash.toString()
+
+
+  ###
+      def EncodeBase58Check(vchIn):
+      hash = Hash(vchIn)
+      return b58encode(vchIn + hash[0:4])
+
+    def Hash(x):
+    if type(x) is unicode: x=x.encode('utf-8')
+    return sha256(sha256(x))
+
+    def sha256(x):
+    return hashlib.sha256(x).digest()
+  ###
+  ###
+    def getXPUB(app, bip32_path, pubKey):
+    splitPath = bip32_path.split('/')
+    fingerprint = 0
+
+    # Grab previous node first if it exists
+    if len(splitPath) > 1:
+    prevPath = "/".join(splitPath[0:len(splitPath) - 1])
+      nodeData = app.getWalletPublicKey(prevPath)
+      publicKey = compress_public_key(nodeData['publicKey'])
+      h = hashlib.new('ripemd160')
+      h.update(hashlib.sha256(publicKey).digest())
+      fingerprint = unpack(">I", h.digest()[0:4])[0]
+
+    nodeData = pubKey
+    publicKey = compress_public_key(nodeData['publicKey'])
+    depth = len(splitPath)
+    lastChild = splitPath[len(splitPath) - 1].split('\'')
+    if len(lastChild) == 1:
+    childnum = int(lastChild[0])
+    else:
+    childnum = 0x80000000 | int(lastChild[0])
+
+    xpub = createXPUB(depth, fingerprint, childnum, nodeData['chainCode'], publicKey)
+    tpub = createXPUB(depth, fingerprint, childnum, nodeData['chainCode'], publicKey, testnet=True)
+
+  return EncodeBase58Check(xpub), EncodeBase58Check(tpub)
+
+    def createXPUB(depth, fingerprint, childnum, chainCode, publicKey, testnet=False):
+      magic = "043587CF" if testnet else "0488B21E"
+      return magic.decode('hex') + chr(depth) + i4b(fingerprint) + i4b(childnum) +
+      str(chainCode) + str(publicKey)
+  ###
 
   _setState: (newState) ->
     @_state = newState

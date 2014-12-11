@@ -10,6 +10,8 @@ class @HttpClient
 
   constructor: (baseUrl = '') ->
     @baseUrl = baseUrl
+    @_headerJson = _.clone @_headerJson
+    @_headerUrlEncode = _.clone @_headerUrlEncode
 
   do: (r) ->
     request =
@@ -59,3 +61,8 @@ class @HttpClient
 
   delete: (url, parameters, success, error, complete) ->
     @performHttpRequest 'DELETE', url, @_headerJson, parameters, success, error, complete
+
+  setHttpHeader: (key, value) ->
+    @_headerJson[key] = value
+    @_headerUrlEncode[key] = value
+    @

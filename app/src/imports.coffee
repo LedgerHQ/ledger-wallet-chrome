@@ -41,6 +41,7 @@
         '../libs/lw-api-js/ucrypt/hash'
         '../libs/lw-api-js/ucrypt/sha256'
         '../libs/lw-api-js/ucrypt/sha512'
+        '../libs/lw-api-js/ucrypt/ripemd160'
         '../libs/lw-api-js/ucrypt/hmac'
         '../libs/lw-api-js/LWTools'
         '../libs/lw-api-js/LW'
@@ -52,9 +53,32 @@
         '../libs/checkBitcoinAddress'
         '../libs/lru'
         '../libs/moment.min'
+        '../libs/lokijs.min'
 
+
+        ## QR Code
+        '../libs/jsqrcode/grid'
+        '../libs/jsqrcode/version'
+        '../libs/jsqrcode/detector'
+        '../libs/jsqrcode/formatinf'
+        '../libs/jsqrcode/errorlevel'
+        '../libs/jsqrcode/bitmat'
+        '../libs/jsqrcode/datablock'
+        '../libs/jsqrcode/bmparser'
+        '../libs/jsqrcode/datamask'
+        '../libs/jsqrcode/rsdecoder'
+        '../libs/jsqrcode/gf256poly'
+        '../libs/jsqrcode/gf256'
+        '../libs/jsqrcode/decoder'
+        '../libs/jsqrcode/qrcode'
+        '../libs/jsqrcode/findpat'
+        '../libs/jsqrcode/alignpat'
+        '../libs/jsqrcode/databr'
+
+        ## Routes
         'routes'
 
+        ## Utils
         'utils/log'
         'utils/string'
         'utils/number'
@@ -71,17 +95,22 @@
         'utils/jquery'
         'utils/spinners'
         'utils/pin_codes'
+        'utils/qr_codes'
         'utils/lru'
         'utils/formatters'
+        'utils/stream'
 
+        ## Crypto
         'utils/crypto/aes'
         'utils/crypto/sha256'
         'utils/crypto/base58'
 
+        ## Bitcoin
         'utils/bitcoin/bitcoin'
         'utils/bitcoin/bip39_wordlist'
         'utils/bitcoin/bip39'
 
+        ## Storage
         'utils/storage/store'
         'utils/storage/chrome_store'
         'utils/storage/secure_store'
@@ -89,9 +118,16 @@
         'utils/storage/object_store'
         'utils/storage/storage'
 
+        ## Data synchronization
+
+        ## Errors
         'base/errors'
 
+        ## Managers
         'managers/devices_manager'
+        'managers/schemes_manager'
+        'managers/permissions_manager'
+        'managers/wallets_manager'
 
         ## Rest clients
         'restclients/restclient'
@@ -107,7 +143,6 @@
         'tasks/operations_synchronization_task'
 
         ## Wallet
-        'managers/wallets_manager'
         'wallet/hardware_wallet'
         'wallet/utils'
         'wallet/transaction'
@@ -115,12 +150,11 @@
         'wallet/hdwallet'
         'wallet/cache'
 
+        'utils/database/database'
+        'base/model_context'
         'base/model'
-        'base/collection'
         'base/view_controller'
         'base/navigation_controller'
-
-        ## Collections (must absolutely be imported here before models)
 
         ## Models
         'models/wallet'

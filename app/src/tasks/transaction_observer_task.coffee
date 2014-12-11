@@ -10,7 +10,7 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
 
   _listenNewTransactions: () ->
     @newTransactionStream = new WebSocket "wss://ws.chain.com/v2/notifications"
-    @newTransactionStream.onopen = (event) =>
+    @newTransactionStream.onopen = () =>
       @newTransactionStream.send JSON.stringify type: "new-transaction", block_chain: "bitcoin"
 
     @newTransactionStream.onmessage = (event) =>
@@ -32,10 +32,14 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
             l derivation
             account = ledger.wallet.HDWallet.instance?.getAccountFromDerivationPath(derivation)
             if account?
+              Account.fromHDWalletAccount(account)?.addRawTransactionAndSave transaction
+              Wallet.instance?.retrieveAccountsBalances()
               account.shiftCurrentPublicAddressPath() if account.getCurrentPublicAddressPath() == derivation
               account.shiftCurrentChangeAddressPath() if account.getCurrentChangeAddressPath() == derivation
-              Account.fromHDWalletAccount(account)?.addRawTransaction transaction, () =>
-                ledger.app.emit('wallet:transactions:new')
+              ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
     found
 
   @instance: new @()
+
+  @reset: () ->
+    @instance = new @

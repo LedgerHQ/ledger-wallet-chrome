@@ -474,8 +474,11 @@ LW.prototype = {
                     var signature = result.signature;
 
                     try {
-                        return convertMessageSignature(lW.bitIdPubKey, new ByteString(message, ASCII), signature);
+                        var signedMessage = convertMessageSignature(lW.bitIdPubKey, new ByteString(message, ASCII), signature);
+                        lW.event("LW.getMessageSignature", signedMessage);
+                        return signedMessage;
                     } catch (e) {
+                        lW.event("LW.getMessageSignature:error", e);
                         LWTools.console(e, 1);
                     };
                 });
