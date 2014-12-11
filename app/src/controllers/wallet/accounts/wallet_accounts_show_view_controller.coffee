@@ -35,7 +35,7 @@ class @WalletAccountsShowViewController extends @ViewController
   _updateOperations: ->
     operations = @getAccount().get 'operations'
     @view.emptyContainer.hide() if operations.length > 0
-    render 'wallet/operations/operations_table', {operations: operations.slice(0, 7)}, (html) =>
+    render 'wallet/operations/operations_table', {operations: operations.slice(0, 6)}, (html) =>
       @view.operationsList.html html
 
   getAccount: () ->
