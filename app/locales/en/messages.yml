@@ -195,6 +195,7 @@ wallet:
       send_by_email: "SEND BY EMAIL"
       print: "PRINT"
       close: "CLOSE"
+      blockchain_link: "Blockchain link"
 
     index:
       <<: *default-operations-translation

@@ -48,5 +48,6 @@
   </table>
 </section>
 <div class="dialog-actions-bar">
+  <a class="uppercase-action" href="#openBlockchain"><%= t 'wallet.operations.detail.blockchain_link' %></a>
   <a class="cancel-rounded-button" href="#dismiss"><%= t 'wallet.operations.detail.close' %></a>
 </div>
