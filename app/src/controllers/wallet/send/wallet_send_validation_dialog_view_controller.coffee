@@ -53,15 +53,7 @@ class @WalletSendValidationDialogViewController extends @DialogViewController
     decal = 0
     # add amount
     if validationDetails.needsAmountValidation
-      value = ledger.formatters.bitcoin.fromValue(validationDetails.amount.text)
-      l value
-      # normalize value
-      dotIndex = value.indexOf '.'
-      if dotIndex == -1
-        value += '.000'
-      else
-        numDecimalDigits = value.length - 1 - dotIndex
-        value += _.str.repeat '0', 3 - numDecimalDigits
+      value = ledger.formatters.bitcoin.fromValue(validationDetails.amount.text, 3)
       string += value + ' BTC'
       indexes = indexes.concat validationDetails.amount.indexes[0]
       indexes = indexes.concat _.map(validationDetails.amount.indexes.slice(1), (num) => num + 1) # decalage virgule
