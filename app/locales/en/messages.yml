@@ -195,7 +195,8 @@ wallet:
       send_by_email: "SEND BY EMAIL"
       print: "PRINT"
       close: "CLOSE"
-      blockchain_link: "Blockchain link"
+      blockchain_link: "Plus d'informations"
+      transaction_fees_text: "(incl. %s BTC of transaction fees)"
 
     index:
       <<: *default-operations-translation
@@ -240,7 +241,7 @@ wallet:
       receiver_address: "RECIPIENT BITCOIN ADDRESS"
       receiver_address_placeholder: "bitcoin address"
       total_spent: "TOTAL SPENT"
-      transaction_fees_text: "(incl. 0.0001 BTC transaction fees)"
+      transaction_fees_text: "(incl. 0.0001 BTC of transaction fees)"
       send: "SEND"
       close: "CLOSE"
       confirm: "CONFIRM"
