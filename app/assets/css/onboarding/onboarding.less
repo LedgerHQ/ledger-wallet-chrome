@@ -1,7 +1,5 @@
 @import (reference) "../constants";
 
-@onboarding-images-url: '@{images-url}/onboarding';
-
 .main-container {
   display: flex;
   flex-direction: column;
@@ -91,57 +89,6 @@
   }
   a.greyed-container.detailed:hover {
     background-color: darken(@color-extra-light-grey, 2%);
-  }
-
-  // widgets
-  .pincode {
-    font-size: 0;
-    display: flex;
-
-    > div {
-      background-color: @color-white;
-      height: 85px;
-      width: 53px;
-      margin-right: 6px;
-      border: solid 1px @color-light-grey;
-      border-radius: 10px;
-      font-weight: @font-weight-light;
-      text-align: center;
-      font-size: 40px;
-      line-height: 82px;
-      transition: opacity @animation-short-duration @animation-default-timing-function;
-
-      &:last-of-type {
-        margin-right: 0;
-      }
-
-      &.focused {
-        border-color: @color-soft-grey;
-      }
-
-      &.selected {
-        border-color: @color-dark-grey-blue;
-      }
-
-      &.filled {
-        background-size: 17px 19px;
-        background-image: url("@{onboarding-images-url}/pin_value.png");
-        background-position: center center;
-        background-repeat: no-repeat;
-      }
-
-      &.disabled {
-        opacity: 0.5;
-        pointer-events: none;
-      }
-    }
-
-    > input {
-      width: 1;
-      height: 1;
-      opacity: 0;
-      position: absolute;
-    }
   }
 
   @import "device";
