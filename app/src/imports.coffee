@@ -41,6 +41,7 @@
         '../libs/lw-api-js/ucrypt/hash'
         '../libs/lw-api-js/ucrypt/sha256'
         '../libs/lw-api-js/ucrypt/sha512'
+        '../libs/lw-api-js/ucrypt/ripemd160'
         '../libs/lw-api-js/ucrypt/hmac'
         '../libs/lw-api-js/LWTools'
         '../libs/lw-api-js/LW'
@@ -116,6 +117,8 @@
         'utils/storage/synced_store'
         'utils/storage/object_store'
         'utils/storage/storage'
+
+        ## Data synchronization
 
         ## Errors
         'base/errors'
