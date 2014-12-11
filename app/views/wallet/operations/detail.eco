@@ -46,8 +46,8 @@
         </td>
       </tr>
       <tr class="no-border">
-        <td class="row-title"><%= t 'wallet.operations.detail.identifier' %></td>
-        <td class="align-right regular-text-small" id="operation_identifier"><%= @operation.get('hash') %></td>
+        <td class="row-title optional"><%= t 'wallet.operations.detail.identifier' %></td>
+        <td class="align-right regular-grey-text-small" id="operation_identifier"><%= @operation.get('hash') %></td>
       </tr>
     </tbody>
   </table>
