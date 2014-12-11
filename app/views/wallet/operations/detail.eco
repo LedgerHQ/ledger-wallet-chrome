@@ -7,9 +7,9 @@
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.amount' %></td>
         <% if @operation.get('type') == 'reception': %>
-          <td class="align-right regular-valid-text">+<%= ledger.formatters.bitcoin.fromValue(@operation.get('value')) %> BTC</td>
+          <td class="align-right regular-valid-text">+<%= ledger.formatters.bitcoin.fromValue(@operation.get('total_value')) %> BTC</td>
           <% else: %>
-          <td class="align-right regular-invalid-text">-<%= ledger.formatters.bitcoin.fromValue(@operation.get('value')) %> BTC</td>
+          <td class="align-right regular-invalid-text">-<%= ledger.formatters.bitcoin.fromValue(@operation.get('total_value')) %> BTC</td>
         <% end %>
       </tr>
       <tr>
