@@ -195,7 +195,7 @@ wallet:
       send_by_email: "SEND BY EMAIL"
       print: "PRINT"
       close: "CLOSE"
-      blockchain_link: "Plus d'informations"
+      blockchain_link: "More information"
       transaction_fees_text: "(incl. %s BTC of transaction fees)"
 
     index:
