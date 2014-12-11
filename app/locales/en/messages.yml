@@ -252,6 +252,7 @@ wallet:
       entered_code: "Entered code:"
       address_to_validate: "Recipient's Bitcoin address to validate."
       amount_and_address_to_validate: "Amount and recipient's Bitcoin address to validate."
+      to: "to"
 
     processing:
       sending: "Sending..."

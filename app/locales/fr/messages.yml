@@ -252,6 +252,7 @@ wallet:
       entered_code: "Code entré :"
       address_to_validate: "Adresse Bitcoin du destinataire à vérifier."
       amount_and_address_to_validate: "Montant et adresse Bitcoin du destinataire à vérifier."
+      to: "à"
 
     processing:
       sending: "Envoi en cours..."
