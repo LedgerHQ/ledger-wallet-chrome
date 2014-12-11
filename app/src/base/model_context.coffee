@@ -104,10 +104,6 @@ class ledger.db.contexts.Context extends EventEmitter
     @_db.scheduleFlush()
 
   close: () ->
-    for n, collection of @_collections
-      collection.getCollection().off 'insert'
-      collection.getCollection().off 'update'
-      collection.getCollection().off 'delete'
 
   _listenCollectionEvent: (collection) ->
     collection.getCollection().on 'insert', (data) =>

@@ -40,3 +40,6 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
     found
 
   @instance: new @()
+
+  @reset: () ->
+    @instance = new @

@@ -41,3 +41,6 @@ class ledger.tasks.BalanceTask extends ledger.tasks.Task
     singletons[accountIndex]
 
   @releaseAllBalanceTasks: -> singletons = {}
+
+  @reset: () ->
+    singletons = []

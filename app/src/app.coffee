@@ -85,6 +85,9 @@ require @ledger.imports, ->
               Wallet.releaseWallet()
               ledger.wallet.release(wallet)
               ledger.tasks.Task.stopAllRunningTasks()
+              ledger.tasks.Task.resetAllSingletonTasks()
+              ledger.db.contexts.close()
+              ledger.db.close()
               @wallet = null
               ledger.dialogs.manager.dismissAll(no)
               @router.go '/onboarding/device/plug'
@@ -115,6 +118,9 @@ require @ledger.imports, ->
         , 500
 
       @on 'wallet:operations:sync:done', =>
+
+      @on 'wallet:operations:update wallet:operations:new', =>
+        Wallet.instance.retrieveAccountsBalances()
 
     _listenClickEvents: () ->
       self = @

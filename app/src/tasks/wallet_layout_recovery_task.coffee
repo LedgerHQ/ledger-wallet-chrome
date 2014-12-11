@@ -92,4 +92,5 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     testIndex(0)
 
 
-
+  @reset: () ->
+    @instance = new @

@@ -69,3 +69,6 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
   onStop: () ->
     Operation.pendingRawTransactionStream().read()
     Operation.pendingRawTransactionStream().off 'data'
+
+  @reset: () ->
+    @instance = new @

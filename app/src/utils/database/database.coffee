@@ -59,5 +59,7 @@ _.extend ledger.db,
     db
 
   close: () ->
+    ledger.db.main?.close()
+    ledger.db.main = null
 
 
