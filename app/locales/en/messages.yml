@@ -191,10 +191,12 @@ wallet:
       status: "Status"
       sender: "From"
       receiver: "To"
-      identifier: "Transaction ID"
+      identifier: "Identifiant"
       send_by_email: "SEND BY EMAIL"
       print: "PRINT"
       close: "CLOSE"
+      blockchain_link: "More information"
+      transaction_fees_text: "(incl. %s BTC of transaction fees)"
 
     index:
       <<: *default-operations-translation
@@ -239,7 +241,7 @@ wallet:
       receiver_address: "RECIPIENT BITCOIN ADDRESS"
       receiver_address_placeholder: "bitcoin address"
       total_spent: "TOTAL SPENT"
-      transaction_fees_text: "(incl. 0.0001 BTC transaction fees)"
+      transaction_fees_text: "(incl. 0.0001 BTC of transaction fees)"
       send: "SEND"
       close: "CLOSE"
       confirm: "CONFIRM"
@@ -252,6 +254,7 @@ wallet:
       entered_code: "Entered code:"
       address_to_validate: "Recipient's Bitcoin address to validate."
       amount_and_address_to_validate: "Amount and recipient's Bitcoin address to validate."
+      to: "to"
 
     processing:
       sending: "Sending..."

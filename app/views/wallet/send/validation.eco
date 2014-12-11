@@ -3,8 +3,8 @@
     <h1><%= t 'wallet.send.validation.title' %></h1>
   </header>
   <div class="regular-text"><%- t 'wallet.send.validation.grab_your_card' %></div>
-  <div id="validation_indication">1J98t1<mark>A</mark>pEZ73CNmQviecrnyiWrnqRhWNLy</div>
-  <div class="regular-grey-text-small"><%= t 'wallet.send.validation.address_to_validate' %></div>
+  <div id="validation_indication"></div>
+  <div class="regular-grey-text-small" id="validation_subtitle"></div>
   <div id="card_container"></div>
 </section>
 <div class="dialog-actions-bar">

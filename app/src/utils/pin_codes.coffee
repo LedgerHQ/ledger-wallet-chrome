@@ -72,7 +72,7 @@ class ledger.pin_codes.KeyCard extends EventEmitter
     return @_input.value
 
   setValidableValues: (values) ->
-    @_validableValues = if values? then values else []
+    @_validableValues = if values? then values.slice() else []
     @_currentValidableValueNode = undefined
     @_updateCurrentValidableValue()
 
