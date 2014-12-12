@@ -177,9 +177,6 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
         childnum = (0x80000000 | parseInt(lastChild)) >>> 0
         xpub = @_createXPUB depth, fingerprint, childnum, nodeData.chainCode, publicKey
         callback?(@_encodeBase58Check(xpub))
-        l 'depth', depth
-        l 'xpub', xpub
-        l 'pubKey', publicKey
         l 'xpub final ', @_encodeBase58Check(xpub)
 
     if path.length > 1
@@ -200,7 +197,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
   _createXPUB: (depth, fingerprint, childnum, chainCode, publicKey, testnet = no) ->
     magic = if testnet then  "043587CF" else "0488B21E"
     xpub = new ByteString magic, HEX
-    xpub = xpub.concat new ByteString(_.str.lpad(depth.toString(16), 2), HEX)
+    xpub = xpub.concat new ByteString(_.str.lpad(depth.toString(16), 2, '0'), HEX)
     xpub = xpub.concat new ByteString(_.str.lpad(fingerprint.toString(16), 8, '0'), HEX)
     xpub = xpub.concat new ByteString(_.str.lpad(childnum.toString(16), 8, '0'), HEX)
     xpub = xpub.concat new ByteString(chainCode.toString(HEX), HEX)
@@ -208,13 +205,59 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     xpub
 
   _encodeBase58Check: (vchIn) ->
-    l 'vchIn ', vchIn
     sha256 = new JSUCrypt.hash.SHA256();
-    hash = sha256.finalize(vchIn.toString(HEX));
-    return JSUCrypt.utils.byteArrayToHexStr(hash)
-    hash = new ByteString(JSUCrypt.utils.byteArrayToHexStr(hash), HEX)
-    hash.toString()
+    hash = sha256.finalize(vchIn.toString(HEX))
+    hash = sha256.finalize(JSUCrypt.utils.byteArrayToHexStr(hash))
+    l 'Got ', JSUCrypt.utils.byteArrayToHexStr(hash)
+    hash = new ByteString(JSUCrypt.utils.byteArrayToHexStr(hash), HEX).bytes(0, 4)
+    hash = vchIn.concat(hash)
+    @_b58Encode hash
 
+  __b58chars: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+
+  _b58Encode: (v) ->
+    long_value = ledger.wallet.Value.from 0
+    value256 = ledger.wallet.Value.from 256
+    for i in [(v.length - 1)..0]
+      long_value = long_value.add value256.pow(v.length - i - 1).multiply(v.byteAt(i))
+
+    result = ''
+    while long_value.gte @__b58chars.length
+      div = long_value.divide(@__b58chars.length)
+      mod = long_value.mod(@__b58chars.length)
+      result = @__b58chars[mod.toNumber()] + result
+      long_value = div
+    result = @__b58chars[long_value.toNumber()] + result
+    result
+
+  ###
+  __b58chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+__b58base = len(__b58chars)
+
+def b58encode(v):
+  print 'Before encode ' + v
+  print 'Before encode length ' + str(len(v))
+  """ encode v, which is a string of bytes, to base58."""
+  long_value = 0L
+  for (i, c) in enumerate(v[::-1]):
+    long_value += (256**i) * ord(c)
+
+  result = ''
+  while long_value >= __b58base:
+    div, mod = divmod(long_value, __b58base)
+    result = __b58chars[mod] + result
+    long_value = div
+  result = __b58chars[long_value] + result
+
+  # Bitcoin does a little leading-zero-compression:
+  # leading 0-bytes in the input become leading-1s
+  nPad = 0
+  for c in v:
+    if c == '\0': nPad += 1
+    else: break
+
+  return (__b58chars[0]*nPad) + result
+  ###
 
   ###
       def EncodeBase58Check(vchIn):
