@@ -54,7 +54,7 @@
         '../libs/lru'
         '../libs/moment.min'
         '../libs/lokijs.min'
-
+        '../libs/bitcoinjs-min'
 
         ## QR Code
         '../libs/jsqrcode/grid'
@@ -149,6 +149,7 @@
         'wallet/value'
         'wallet/hdwallet'
         'wallet/cache'
+        'wallet/extended_public_key'
 
         'utils/database/database'
         'base/model_context'
