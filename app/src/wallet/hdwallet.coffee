@@ -86,7 +86,9 @@ class ledger.wallet.HDWallet.Account
       accountJsonString = result[@_storeId]
       @_account = JSON.parse(accountJsonString) if accountJsonString?
       @_initialize()
-      callback?()
+      ledger.app.wallet.getExtendedPublicKey "#{@wallet.getRootDerivationPath()}/#{@index}'", (xpub) =>
+        @_xpub = xpub
+        callback?()
 
   release: () ->
     @wallet = null
@@ -172,6 +174,7 @@ class ledger.wallet.HDWallet.Account
 openStores = (wallet, done) ->
   wallet.getBitIdAddress (bitIdAddress) =>
     wallet.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>
+      l pubKey
       if not pubKey?.bitcoinAddress? or not bitIdAddress?
         ledger.app.emit 'wallet:initialization:fatal_error'
         return

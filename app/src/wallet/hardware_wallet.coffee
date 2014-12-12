@@ -20,6 +20,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
   _state: ledger.wallet.States.UNDEFINED
 
   constructor: (@manager, @id, @lwCard) ->
+    @_xpubs = {}
     @_vents = new EventEmitter()
     do @_listenStateChanges
 
@@ -164,8 +165,12 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   getExtendedPublicKey: (derivationPath, callback) ->
     throw 'Cannot get a public while the key is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
+    return callback(@_xpubs[derivationPath]) if @_xpubs[derivationPath]?
+    l derivationPath
     xpub = new ledger.wallet.ExtendedPublicKey(@, derivationPath)
-    xpub.initialize callback
+    xpub.initialize () =>
+      @_xpubs[derivationPath] = xpub
+      callback xpub
 
   _setState: (newState) ->
     @_state = newState

@@ -17,6 +17,8 @@ _.extend ledger.wallet,
         do done
         return
 
+      # Try to use a xpub
+
       # No result from cache perform the derivation on the chip
       ledger.app.wallet.getPublicAddress path, (publicKey) ->
         if publicKey?
