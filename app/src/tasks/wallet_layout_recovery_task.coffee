@@ -54,42 +54,54 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   _restoreBip44AccountChainsLayout: (account, done) ->
     isRestoringChangeChain = yes
     isRestoringPublicChain = yes
-
-    testIndex = (index) =>
+    testIndex = (publicIndex, changeIndex) =>
       paths = []
-      paths.push account.getCurrentPublicAddressPath() if isRestoringPublicChain
-      paths.push account.getCurrentChangeAddressPath() if isRestoringChangeChain
+      l 'Before path'
+      if isRestoringPublicChain
+        for i in [publicIndex...publicIndex + 20]
+          paths.push account.getPublicAddressPath(i)
+      if isRestoringChangeChain
+        for i in [changeIndex...changeIndex + 20]
+          paths.push account.getChangeAddressPath(i)
+      l 'Before address', paths
       ledger.wallet.pathsToAddresses paths, (addresses) =>
-        ledger.api.TransactionsRestClient.instance.getTransactions _.values(addresses), 1, (transactions, error) =>
+        addressesPaths = _.invert addresses
+        l 'After address'
+        ledger.api.TransactionsRestClient.instance.getTransactions _.values(addresses), (transactions, error) =>
           return @emit 'bip44:fatal' if error?
 
-          shiftChange = no
-          shiftPublic = no
+          usedAddresses = []
+          select = (array) -> _.select array, (i) -> addressesPaths[i]?
 
           for transaction in transactions
             Operation.pendingRawTransactionStream().write(transaction)
             for input in transaction.inputs
-              shiftPublic = yes if _.contains(input.addresses, account.getCurrentPublicAddress())
-              shiftChange = yes if _.contains(input.addresses, account.getCurrentChangeAddress())
-              break if shiftChange and shiftChange
-            if not shiftChange or not shiftPublic
-              for output in transaction.outputs
-                shiftPublic = yes if _.contains(output.addresses, account.getCurrentPublicAddress())
-                shiftChange = yes if _.contains(output.addresses, account.getCurrentChangeAddress())
-                break if shiftChange and shiftChange
+              usedAddresses = usedAddresses.concat(select(input.addresses))
+            for output in transaction.outputs
+              usedAddresses = usedAddresses.concat(select(output.addresses))
+
+          shiftChange = account.getCurrentChangeAddressIndex()
+          shiftPublic = account.getCurrentPublicAddressIndex()
+
+          usedPaths = (addressesPaths[usedAddress] for usedAddress in usedAddresses)
+          l 'used', usedPaths
+          account.notifyPathsAsUsed _.values(usedPaths)
+
+          shiftChange = shiftChange isnt account.getCurrentChangeAddressIndex()
+          shiftPublic = shiftPublic isnt account.getCurrentPublicAddressIndex()
+
           if shiftChange and shiftPublic
-            account.shiftCurrentChangeAddressPath =>
-              account.shiftCurrentPublicAddressPath => testIndex(index + 1)
+            testIndex account.getCurrentPublicAddressIndex(), account.getCurrentChangeAddressIndex()
           else if shiftChange
             isRestoringPublicChain = no
-            account.shiftCurrentChangeAddressPath => testIndex(index + 1)
+            testIndex account.getCurrentPublicAddressIndex(), account.getCurrentChangeAddressIndex()
           else if shiftPublic
             isRestoringChangeChain = no
-            account.shiftCurrentPublicAddressPath => testIndex(index + 1)
+            testIndex account.getCurrentPublicAddressIndex(), account.getCurrentChangeAddressIndex()
           else
             do done
 
-    testIndex(0)
+    testIndex account.getCurrentPublicAddressIndex(), account.getCurrentChangeAddressIndex()
 
 
   @reset: () ->

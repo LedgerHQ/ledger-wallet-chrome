@@ -98,7 +98,6 @@ class ledger.wallet.ExtendedPublicKey
 
   _insertPublicAddressInCache: (partialPath, publicAddress) ->
     completePath = @_derivationPath + partialPath
-    l 'Put this in cache ', completePath, publicAddress
     ledger.wallet.HDWallet.instance?.cache?.set [[completePath, publicAddress]]
 
   _getPublicAddressFromCache: (partialPath) ->
