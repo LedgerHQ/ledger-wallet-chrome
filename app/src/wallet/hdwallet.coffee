@@ -81,14 +81,17 @@ class ledger.wallet.HDWallet.Account
     @_account.currentChangeIndex ?= 0
     @_account.currentPublicIndex ?= 0
 
+  initializeXpub: (callback) ->
+    ledger.app.wallet.getExtendedPublicKey "#{@wallet.getRootDerivationPath()}/#{@index}'", (xpub) =>
+      @_xpub = xpub
+      callback?()
+
   initialize: (callback) ->
     @_store.get [@_storeId], (result) =>
       accountJsonString = result[@_storeId]
       @_account = JSON.parse(accountJsonString) if accountJsonString?
       @_initialize()
-      ledger.app.wallet.getExtendedPublicKey "#{@wallet.getRootDerivationPath()}/#{@index}'", (xpub) =>
-        @_xpub = xpub
-        callback?()
+      @initializeXpub callback
 
   release: () ->
     @wallet = null

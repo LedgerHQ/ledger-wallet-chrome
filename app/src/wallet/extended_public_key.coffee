@@ -10,7 +10,7 @@ class ledger.wallet.ExtendedPublicKey
     @_wallet = wallet
 
   initialize: (callback) ->
-    derivationPath = @_derivationPath
+    derivationPath = @_derivationPath.substring(0, @_derivationPath.length - 1)
     path = derivationPath.split '/'
     bitcoin = new BitcoinExternal()
     finalize = (fingerprint) =>
@@ -98,7 +98,8 @@ class ledger.wallet.ExtendedPublicKey
 
   _insertPublicAddressInCache: (partialPath, publicAddress) ->
     completePath = @_derivationPath + partialPath
-    ledger.wallet.HDWallet.instance?.cache?.set completePath, publicAddress
+    l 'Put this in cache ', completePath, publicAddress
+    ledger.wallet.HDWallet.instance?.cache?.set [[completePath, publicAddress]]
 
   _getPublicAddressFromCache: (partialPath) ->
     completePath = @_derivationPath + partialPath

@@ -166,11 +166,12 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
   getExtendedPublicKey: (derivationPath, callback) ->
     throw 'Cannot get a public while the key is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
     return callback(@_xpubs[derivationPath]) if @_xpubs[derivationPath]?
-    l derivationPath
     xpub = new ledger.wallet.ExtendedPublicKey(@, derivationPath)
     xpub.initialize () =>
       @_xpubs[derivationPath] = xpub
       callback xpub
+
+  getExtendedPublicKeys: () -> @_xpubs
 
   _setState: (newState) ->
     @_state = newState

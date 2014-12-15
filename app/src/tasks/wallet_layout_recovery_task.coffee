@@ -47,7 +47,8 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
         @emit 'bip44:account:done'
         accountIndex += 1
         do recoverAccount
-      @_restoreBip44AccountChainsLayout account, => do done
+      account.initializeXpub =>
+        @_restoreBip44AccountChainsLayout account, => do done
     do recoverAccount
 
   _restoreBip44AccountChainsLayout: (account, done) ->
@@ -58,7 +59,6 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       paths = []
       paths.push account.getCurrentPublicAddressPath() if isRestoringPublicChain
       paths.push account.getCurrentChangeAddressPath() if isRestoringChangeChain
-      l paths
       ledger.wallet.pathsToAddresses paths, (addresses) =>
         ledger.api.TransactionsRestClient.instance.getTransactions _.values(addresses), 1, (transactions, error) =>
           return @emit 'bip44:fatal' if error?
