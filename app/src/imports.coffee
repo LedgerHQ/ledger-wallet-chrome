@@ -141,6 +141,7 @@
         'tasks/wallet_layout_recovery_task'
         'tasks/transaction_observer_task'
         'tasks/operations_synchronization_task'
+        'tasks/address_derivation_task'
 
         ## Wallet
         'wallet/hardware_wallet'

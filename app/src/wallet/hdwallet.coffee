@@ -219,7 +219,12 @@ openStores = (wallet, done) ->
 
 openHdWallet = (wallet, done) ->
   ledger.wallet.HDWallet.instance = new ledger.wallet.HDWallet()
-  ledger.wallet.HDWallet.instance.initialize(ledger.storage.wallet, done)
+  ledger.wallet.HDWallet.instance.initialize ledger.storage.wallet, () ->
+    ledger.tasks.AddressDerivationTask.instance.start()
+    _.defer =>
+      for accountIndex in [0...ledger.wallet.HDWallet.instance.getAccountsCount()]
+        ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.HDWallet.instance.getRootDerivationPath()}/#{accountIndex}'"
+      do done
 
 openAddressCache = (wallet, done) ->
   try

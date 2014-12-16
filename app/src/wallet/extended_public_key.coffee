@@ -1,4 +1,5 @@
 
+@ledger ?= {}
 @ledger.wallet ?= {}
 
 class ledger.wallet.ExtendedPublicKey

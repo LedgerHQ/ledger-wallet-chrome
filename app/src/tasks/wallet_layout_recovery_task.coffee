@@ -52,6 +52,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     do recoverAccount
 
   _restoreBip44AccountChainsLayout: (account, done) ->
+    return do done
     isRestoringChangeChain = yes
     isRestoringPublicChain = yes
     testIndex = (publicIndex, changeIndex) =>
