@@ -33,6 +33,8 @@ class ledger.tasks.BalanceTask extends ledger.tasks.Task
           @stopIfNeccessary()
         if totalBalance != balance.total or unconfirmedBalance != balance.unconfirmed
           ledger.app.emit "wallet:balance:changed", account.get('wallet').getBalance()
+        else
+          ledger.app.emit "wallet:balance:unchanged", account.get('wallet').getBalance()
 
 
   @get: (accountIndex) ->

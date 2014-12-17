@@ -1,5 +1,4 @@
 <div class="main-container">
-
   <div id="wallet_top_menu" class="top-main-menu">
     <ul class="left">
       <li id="account-item" class="menu-item selected">
@@ -8,9 +7,9 @@
             <img src="../assets/images/wallet/dashboard_icon.png" />
             <span><%= t('wallet.top_menu.items.account') %></span>
           </a>
-        <div class="spacer" />
-        <div class="selector" />
-      </div>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
       </li>
       <li id="send-item" class="menu-item">
         <div>
@@ -51,15 +50,12 @@
           <sup><%= t 'common.bitcoin_acronym' %></sup>
         </p>
       </div>
-      <a class="ledger-icon" href="#openLedger">
-        <img src="../assets/images/wallet/ledger_icon.png" />
+      <a class="reload-icon" href="#" id="reload_icon">
+        <img src="../assets/images/wallet/reload_icon.png" />
       </a>
     </div>
-
   </div>
-  <!-- Uncomment for displaying breadcrumbs <div id="breadcrumbs">/div>-->
   <div id="navigation_controller_content" >
 
   </div>
-
 </div>
