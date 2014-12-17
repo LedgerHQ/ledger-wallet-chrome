@@ -1,12 +1,20 @@
 class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
 
+  _retrieveAccountsOperationIsRunning: no
+  _synchronizeConfirmationNumbersIsRunning: no
+
   constructor: () -> super 'global_operations_synchronizer'
   @instance: new @()
 
   onStart: () ->
+    @_retrieveAccountsOperationIsRunning = yes
+    @_synchronizeConfirmationNumbersIsRunning = yes
     accountIndex = 0
     ledger.db.contexts.main.on 'insert:operation', () =>
-      _.defer => @synchronizeConfirmationNumbers()
+      if @isRunning()
+        _.defer => @synchronizeConfirmationNumbers()
+      else
+        @startIfNeccessary()
     iterate = () =>
       if accountIndex >= ledger.wallet.HDWallet.instance.getAccountsCount()
         ledger.app.emit 'wallet:operations:sync:done'
@@ -34,16 +42,21 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
         return unless @isRunning()
         if stream.hasError()
           ledger.app.emit 'wallet:operations:sync:failed'
-          @retrieveAccountOperations(hdaccount, callback)
+          _.delay @retrieveAccountOperations(hdaccount, callback), 1000
         else
           callback?()
+          @_retrieveAccountsOperationIsRunning = no
+          @stopIfPossible()
 
       stream.open()
 
   synchronizeConfirmationNumbers: (operations = null, callback = _.noop) ->
     ops = operations
     operations = Operation.find(confirmations: $lt: 1).data() unless operations?
-    return if operations.length is 0
+    if operations.length is 0
+      @_synchronizeConfirmationNumbersIsRunning = no
+      @stopIfPossible()
+      return
     ledger.api.TransactionsRestClient.instance.refreshTransaction operations, (refreshedOperations, error) =>
       return unless @isRunning()
       unless error?
@@ -58,7 +71,9 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
       _.delay (=> @synchronizeConfirmationNumbers(ops, callback)), 1000
       return if error?
 
-
+  stopIfPossible: ->
+    if not @_retrieveAccountsOperationIsRunning and not @_synchronizeConfirmationNumbersIsRunning
+      @stopIfNeccessary()
 
   flushPendingOperationsStream: () ->
     for transaction in Operation.pendingRawTransactionStream().read()

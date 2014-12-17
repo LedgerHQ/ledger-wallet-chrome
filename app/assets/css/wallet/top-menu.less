@@ -136,9 +136,27 @@
       }
     }
 
-    .ledger-icon {
-      .settings-icon;
-      pointer-events: none;
+    .reload-icon {
+      margin-left: @metrics-medium-padding;
+      transition: opacity @animation-short-duration ease-in-out;
+      font-size: 0;
+      opacity: 0.3;
+
+      img {
+        width: 24px;
+        height: 24px;
+      }
+
+      &:hover {
+        opacity: 0.7;
+      }
+
+      &.spinning {
+        pointer-events: none;
+        -webkit-animation:spin 1s linear infinite;
+      }
+
+      @-webkit-keyframes spin { 100% { -webkit-transform: rotate(-360deg); } }
     }
   }
 
