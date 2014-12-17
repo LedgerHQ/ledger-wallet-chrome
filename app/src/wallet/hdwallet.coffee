@@ -161,7 +161,7 @@ class ledger.wallet.HDWallet.Account
       for i in [0...difference]
         derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index - i - 1}"
         @_account.excludedPublicPaths.push derivationPath unless _.contains(@_account.excludedPublicPaths, derivationPath)
-      @_account.currentPublicIndex = index
+      @_account.currentPublicIndex = parseInt(index) + 1
     @save()
 
   _notifyChangeAddressIndexAsUsed: (index) ->
@@ -174,7 +174,7 @@ class ledger.wallet.HDWallet.Account
       for i in [0...difference]
         derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index - i - 1}"
         @_account.excludedChangePaths.push derivationPath unless _.contains(@_account.excludedChangePaths, derivationPath)
-      @_account.currentChangeIndex = index
+      @_account.currentChangeIndex = parseInt(index) + 1
     @save()
 
   shiftCurrentPublicAddressPath: (callback) ->

@@ -6,7 +6,10 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
   onStart: () ->
     accountIndex = 0
     ledger.db.contexts.main.on 'insert:operation', () =>
-      _.defer => @synchronizeConfirmationNumbers()
+      if not @isRunning()
+        @startIfNeccessary()
+      else
+        _.defer => @synchronizeConfirmationNumbers()
     iterate = () =>
       if accountIndex >= ledger.wallet.HDWallet.instance.getAccountsCount()
         ledger.app.emit 'wallet:operations:sync:done'

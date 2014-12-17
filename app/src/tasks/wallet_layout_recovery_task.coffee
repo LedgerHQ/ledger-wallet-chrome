@@ -47,18 +47,21 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
         @emit 'bip44:account:done'
         accountIndex += 1
         do recoverAccount
-      account.initializeXpub =>
-        @_restoreBip44AccountChainsLayout account, => do done
+      ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.HDWallet.instance.getRootDerivationPath()}/#{accountIndex}'", _.noop
+      @_restoreBip44AccountChainsLayout account, => do done
     do recoverAccount
 
   _restoreBip44AccountChainsLayout: (account, done) ->
-    return do done
     isRestoringChangeChain = yes
     isRestoringPublicChain = yes
     testIndex = (publicIndex, changeIndex) =>
+      publicIndex = parseInt publicIndex
+      changeIndex = parseInt changeIndex
       paths = []
       l 'Before path'
       if isRestoringPublicChain
+        l publicIndex, publicIndex + 10
+        l 'Range', publicIndex, (publicIndex + 20)
         for i in [publicIndex...publicIndex + 20]
           paths.push account.getPublicAddressPath(i)
       if isRestoringChangeChain
@@ -68,11 +71,12 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       ledger.wallet.pathsToAddresses paths, (addresses) =>
         addressesPaths = _.invert addresses
         l 'After address'
+        l addressesPaths
         ledger.api.TransactionsRestClient.instance.getTransactions _.values(addresses), (transactions, error) =>
           return @emit 'bip44:fatal' if error?
 
           usedAddresses = []
-          select = (array) -> _.select array, (i) -> addressesPaths[i]?
+          select = (array) -> _.select array, ((i) -> if addressesPaths[i]? then yes else no)
 
           for transaction in transactions
             Operation.pendingRawTransactionStream().write(transaction)
@@ -84,7 +88,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
           shiftChange = account.getCurrentChangeAddressIndex()
           shiftPublic = account.getCurrentPublicAddressIndex()
 
-          usedPaths = (addressesPaths[usedAddress] for usedAddress in usedAddresses)
+          usedPaths = _.unique((addressesPaths[usedAddress] for usedAddress in usedAddresses))
           l 'used', usedPaths
           account.notifyPathsAsUsed _.values(usedPaths)
 

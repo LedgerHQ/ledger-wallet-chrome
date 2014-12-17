@@ -77,7 +77,9 @@ class WorkerCache
       callback?(result, error)
 
 registerExtendedPublicKeyForPath = (path) ->
-  return if ExtendedPublicKeys[path]?
+  if ExtendedPublicKeys[path]?
+    postResult 'Already registered'
+    return
   ExtendedPublicKeys[path] = new ledger.wallet.ExtendedPublicKey(ledger.app.wallet, path)
   ExtendedPublicKeys[path].initialize (xpub) =>
     if xpub?
