@@ -223,7 +223,7 @@ openHdWallet = (wallet, done) ->
     ledger.tasks.AddressDerivationTask.instance.start()
     _.defer =>
       for accountIndex in [0...ledger.wallet.HDWallet.instance.getAccountsCount()]
-        ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.HDWallet.instance.getRootDerivationPath()}/#{accountIndex}'"
+        ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.HDWallet.instance.getRootDerivationPath()}/#{accountIndex}'", _.noop
       do done
 
 openAddressCache = (wallet, done) ->

@@ -17,27 +17,14 @@ _.extend ledger.wallet,
         do done
         return
 
-      # Try to use a xpub
-      for parentDerivationPath, xpub of ledger.app.wallet.getExtendedPublicKeys()
-        derivationPath = path
-        if _.str.startsWith(derivationPath, "#{parentDerivationPath}/")
-          derivationPath = derivationPath.replace("#{parentDerivationPath}/", '')
-          address =  xpub.getPublicAddress(derivationPath)
-          addresses[path] = address
-          callback?(addresses, notFound) unless hasNext is true
-          do done
-          return
-
-      # No result from cache perform the derivation on the chip
-      ledger.app.wallet.getPublicAddress path, (publicKey) ->
-        @_derivationPath
-        if publicKey?
-          addresses[path] = publicKey?.bitcoinAddress?.value
-        else
+      ledger.tasks.AddressDerivationTask.instance.getPublicAddress path, (result, error) ->
+        if error?
           notFound.push path
-        unless hasNext
-          callback?(addresses, notFound)
+        else
+          addresses[path] = result
+        callback?(addresses, notFound) unless hasNext
         do done
+
     return
 
 

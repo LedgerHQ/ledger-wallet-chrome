@@ -2,6 +2,8 @@
 @ledger ?= {}
 @ledger.wallet ?= {}
 
+GlobalContext = @
+
 class ledger.wallet.ExtendedPublicKey
 
   constructor: (wallet, derivationPath) ->
@@ -24,7 +26,7 @@ class ledger.wallet.ExtendedPublicKey
         childnum = (0x80000000 | parseInt(lastChild)) >>> 0
         @_xpub = @_createXPUB depth, fingerprint, childnum, nodeData.chainCode, publicKey
         @_xpub58 = @_encodeBase58Check @_xpub
-        @_hdnode = window.bitcoin.HDNode.fromBase58 @_xpub58
+        @_hdnode = GlobalContext.bitcoin.HDNode.fromBase58 @_xpub58
         callback?(@)
 
     if path.length > 1
@@ -99,8 +101,8 @@ class ledger.wallet.ExtendedPublicKey
 
   _insertPublicAddressInCache: (partialPath, publicAddress) ->
     completePath = @_derivationPath + partialPath
-    ledger.wallet.HDWallet.instance?.cache?.set [[completePath, publicAddress]]
+    ledger.wallet?.HDWallet?.instance?.cache?.set [[completePath, publicAddress]]
 
   _getPublicAddressFromCache: (partialPath) ->
     completePath = @_derivationPath + partialPath
-    ledger.wallet.HDWallet.instance?.cache?.get completePath
+    ledger.wallet?.HDWallet?.instance?.cache?.get completePath
