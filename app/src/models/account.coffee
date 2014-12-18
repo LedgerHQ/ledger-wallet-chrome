@@ -76,7 +76,6 @@ class @Account extends Model
 
     operation.save()
     @add('operations', operation)
-
     if isInserted
       [operation, null]
     else

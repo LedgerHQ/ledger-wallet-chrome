@@ -9,12 +9,12 @@ class ledger.tasks.OperationsConsumptionTask extends ledger.tasks.Task
         ledger.app.emit 'wallet:operations:sync:done'
         return
       hdaccount = ledger.wallet.HDWallet.instance?.getAccount(accountIndex)
-      @retrieveAccountOperations(hdaccount, iterate)
-      accountIndex += 1
-      if accountIndex < Wallet.instance.get('accounts').length
-        iterate()
-      else
-        @stopIfNeccessary()
+      @retrieveAccountOperations hdaccount, =>
+        accountIndex += 1
+        if accountIndex < Wallet.instance.get('accounts').length
+          iterate()
+        else
+          @stopIfNeccessary()
     iterate(0)
 
   retrieveAccountOperations: (hdaccount, callback) ->
