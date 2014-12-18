@@ -17,15 +17,14 @@ _.extend ledger.wallet,
         do done
         return
 
-      # No result from cache perform the derivation on the chip
-      ledger.app.wallet.getPublicAddress path, (publicKey) ->
-        if publicKey?
-          addresses[path] = publicKey?.bitcoinAddress?.value
-        else
+      ledger.tasks.AddressDerivationTask.instance.getPublicAddress path, (result, error) ->
+        if error?
           notFound.push path
-        unless hasNext
-          callback?(addresses, notFound)
+        else
+          addresses[path] = result
+        callback?(addresses, notFound) unless hasNext
         do done
+
     return
 
 

@@ -1,6 +1,46 @@
 @ledger.pin_codes ?= {}
 
-class @ledger.pin_codes.KeyCard extends EventEmitter
+class ledger.pin_codes.TinyPinCode
+
+  _el: undefined
+  inputsCount: 0
+  valuesCount: 0
+
+  insertIn: (parent) ->
+    parent.appendChild @el()
+
+  remove: ->
+    $(@_el).remove()
+    @_el = undefined
+
+  el: ->
+    @_buildEl() if not @_el?
+    return @_el
+
+  setInputsCount: (count) ->
+    return if count == @inputsCount
+    @inputsCount = count
+    @_updateInputs()
+
+  setValuesCount: (count) ->
+    return if count == @valuesCount
+    @valuesCount = count
+    @_updateInputs()
+
+  _buildEl: ->
+    @_el = document.createElement('div')
+    @_el.className = 'tiny-pincode'
+
+  _updateInputs: ->
+    $(@el()).empty()
+    return if @inputsCount == 0
+    for i in [0 .. @inputsCount - 1]
+      input = document.createElement('div')
+      input.className = if i == @valuesCount then 'input selected' else 'input'
+      input.innerText = '•' if i < @valuesCount
+      @el().appendChild input
+
+class ledger.pin_codes.KeyCard extends EventEmitter
 
   _el: undefined
   _input: undefined
@@ -27,8 +67,12 @@ class @ledger.pin_codes.KeyCard extends EventEmitter
     @_validableValues = undefined
     @_currentValidableValueNode = undefined
 
+  value: ->
+    return undefined if not @_el?
+    return @_input.value
+
   setValidableValues: (values) ->
-    @_validableValues = if values? then values else []
+    @_validableValues = if values? then values.slice() else []
     @_currentValidableValueNode = undefined
     @_updateCurrentValidableValue()
 
@@ -69,13 +113,18 @@ class @ledger.pin_codes.KeyCard extends EventEmitter
   _listenEvents: (listen = yes) ->
     if listen
       $(@_input).on 'input', (e) =>
-        reg = /[0-9a-zA-Z]/g
+        reg = /^[0-9a-zA-Z]+$/
         if reg.test @_input.value
           @_processNextValidableValue()
         else
           @_input.value = @_input.value.replace(/[^0-9a-zA-Z]/g, '')
+      $(@_input).on 'keydown', (e) =>
+        if not ((e.which >= 48 and e.which <= 90) or (e.which >= 96 and e.which <= 105))
+          e.preventDefault()
+          return false
     else
       $(@_input).off 'input'
+      $(@_input).off 'keydown'
 
   _updateCurrentValidableValue: ->
     if @_currentValidableValueNode?
@@ -88,11 +137,12 @@ class @ledger.pin_codes.KeyCard extends EventEmitter
     return if not valueNode?
     @_currentValidableValueNode = valueNode
     $(valueNode).addClass 'selected'
+    @emit 'character:waiting', @_validableValues[0]
 
   _processNextValidableValue: ->
     return if not @_validableValues? or @_validableValues.length == 0
     @_validableValues.splice 0, 1
-    @emit 'character', @_input.value
+    @emit 'character:input', @_input.value[@_input.value.length - 1]
     @_updateCurrentValidableValue()
     if @_validableValues.length == 0
       @emit 'completed', @_input.value
@@ -117,7 +167,7 @@ class @ledger.pin_codes.KeyCard extends EventEmitter
     return [undefined , undefined]
 
 # This class represents a visual pin code input composed of 4 digits.
-class @ledger.pin_codes.PinCode extends EventEmitter
+class ledger.pin_codes.PinCode extends EventEmitter
 
   _el: null
   _isProtected: yes

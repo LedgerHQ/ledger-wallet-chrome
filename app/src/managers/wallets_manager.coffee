@@ -1,4 +1,3 @@
-
 class @WalletsManager extends EventEmitter
 
   _wallets: {}
@@ -10,16 +9,19 @@ class @WalletsManager extends EventEmitter
     app.devicesManager.on 'unplug', (e, card) => @disconnectCard(card)
 
   connectCard: (card) ->
-    @emit 'connecting', card
-    @cardFactory.list_async().then (result) =>
-      setTimeout =>
-        if result.length > 0
-          @cardFactory.getCardTerminal(result[0]).getCard_async().then (lwCard) =>
-            setTimeout () =>
-              @_wallets[card.id] = new ledger.wallet.HardwareWallet(this, card.id, lwCard)
-              @_wallets[card.id].once 'connected', (event, wallet) => @emit 'connected', wallet
-              @_wallets[card.id].connect()
-      , 0
+    try
+      @emit 'connecting', card
+      @cardFactory.list_async().then (result) =>
+        setTimeout =>
+          if result.length > 0
+            @cardFactory.getCardTerminal(result[0]).getCard_async().then (lwCard) =>
+              setTimeout () =>
+                @_wallets[card.id] = new ledger.wallet.HardwareWallet(this, card.id, lwCard)
+                @_wallets[card.id].once 'connected', (event, wallet) => @emit 'connected', wallet
+                @_wallets[card.id].connect()
+        , 0
+    catch er
+      e er
 
   addRestorableState: (state, expiry) ->
     @_restoreStates.push state

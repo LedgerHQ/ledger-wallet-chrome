@@ -7,9 +7,7 @@ class @WalletOperationsIndexViewController extends ViewController
 
   onAfterRender: ->
     super
-    account = Account.find(0).exists =>
-      account.get (data) =>
-        @view.accountName.text(_.str.sprintf(t('wallet.operations.index.title_with_account_name'), data.name))
+    @view.accountName.text(_.str.sprintf(t('wallet.operations.index.title_with_account_name'), @getAccount().get('name')))
 
     do @_updateOperations
     ledger.app.on 'wallet:transactions:new wallet:operations:sync:done', =>
@@ -20,7 +18,11 @@ class @WalletOperationsIndexViewController extends ViewController
     dialog.show()
 
   _updateOperations: ->
-    Account.find(0).getAllSortedOperations (operations) =>
-      @view.emptyContainer.hide() if operations.length > 0
-      render 'wallet/operations/operations_table', {operations: operations}, (html) =>
-        @view.operationsList.html html
+    operations = @getAccount().get 'operations'
+    @view.emptyContainer.hide() if operations.length > 0
+    render 'wallet/operations/operations_table', {operations: operations}, (html) =>
+      @view.operationsList.html html
+
+  getAccount: () ->
+    @_account ?= Account.find(index: 0).first()
+    @_account

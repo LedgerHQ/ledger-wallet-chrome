@@ -12,13 +12,7 @@ require @ledger.imports, ->
       ledger.dialogs.manager.initialize($('#dialogs_container'))
 
     start: ->
-#      chrome.commands.onCommand.addListener (command) =>
-#        switch command
-#          when 'reload-page' then do @reloadUi
-#          when 'reload-application' then do @reload
-
-      window.l = _.noop
-      LWTools.console = _.noop
+      configureApplication @
 
       @_listenWalletEvents()
       @_listenClickEvents()
@@ -83,45 +77,49 @@ require @ledger.imports, ->
         @wallet = wallet
         wallet.once 'disconnected', =>
           _.defer =>
-            @emit 'dongle:disconnected'
-            Wallet.releaseWallet()
-            ledger.wallet.release(wallet)
-            ledger.tasks.Task.stopAllRunningTasks()
-            @wallet = null
-            ledger.dialogs.manager.dismissAll(no)
-            @router.go '/onboarding/device/plug'
+            try
+              @emit 'dongle:disconnected'
+              Wallet.releaseWallet()
+              ledger.wallet.release(wallet)
+              ledger.tasks.Task.stopAllRunningTasks()
+              ledger.tasks.Task.resetAllSingletonTasks()
+              ledger.db.contexts.close()
+              ledger.db.close()
+              @wallet = null
+              ledger.dialogs.manager.dismissAll(no)
+              @router.go '/onboarding/device/plug'
+            catch er
+              e er
         wallet.once 'unplugged', =>
           @emit 'dongle:unplugged', @wallet
         wallet.once 'state:unlocked', =>
           @emit 'dongle:unlocked', @wallet
           @emit 'wallet:initializing'
           ledger.wallet.initialize @wallet, =>
-            Wallet.initializeWallet =>
-              @emit 'wallet:initialized'
-              Wallet.instance.retrieveAccountsBalances()
-              ledger.tasks.TransactionObserverTask.instance.start()
-              ledger.tasks.OperationsSynchronizationTask.instance.start()
+            ledger.db.init =>
+              ledger.db.contexts.open()
+              Wallet.initializeWallet =>
+                @emit 'wallet:initialized'
+                _.defer =>
+                  Wallet.instance.retrieveAccountsBalances()
+                  ledger.tasks.TransactionObserverTask.instance.start()
+                  ledger.tasks.OperationsSynchronizationTask.instance.start()
+                  ledger.tasks.OperationsConsumptionTask.instance.start()
         @emit 'dongle:connected', @wallet
 
     _listenAppEvents: () ->
-      @on 'wallet:balance:changed', (ev, balance) =>
-        if balance.wallet.unconfirmed > 0
-          _.delay (=> Wallet.instance?.retrieveAccountsBalances()), 1000
-        else
-          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary()
 
       @on 'wallet:operations:sync:failed', =>
         l 'Failed'
         _.delay =>
+          ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary() if @wallet?
           ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() if @wallet?
         , 500
 
       @on 'wallet:operations:sync:done', =>
-        
 
-      @on 'wallet:transactions:new', =>
-        l 'BALANCE'
-        Wallet.instance?.retrieveAccountsBalances()
+      @on 'wallet:operations:update wallet:operations:new', =>
+        Wallet.instance.retrieveAccountsBalances()
 
     _listenClickEvents: () ->
       self = @
@@ -152,6 +150,8 @@ require @ledger.imports, ->
 
   @WALLET_LAYOUT = 'WalletNavigationController'
   @ONBOARDING_LAYOUT = 'OnboardingNavigationController'
+
+  Model.commitRelationship()
 
   @ledger.application = new Application()
   @ledger.app = @ledger.application

@@ -75,6 +75,7 @@ class @ViewController extends @EventEmitter
     view = @view
     @view = {}
     for key, value of view
+      continue if not value?
       @view[key] = if value.selector? then $(value.selector) else @select(value)
 
   # Called when the view controller is attached to a parent view controller

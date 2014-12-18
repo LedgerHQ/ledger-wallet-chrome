@@ -1,0 +1,1 @@
+@configureApplication = (app) ->

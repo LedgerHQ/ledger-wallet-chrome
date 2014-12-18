@@ -25,6 +25,21 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
           do done
         onError: @networkErrorCallback(callback)
 
+  createTransactionStream: (addresses) ->
+    stream = new Stream()
+    stream.onOpen = =>
+      _.async.eachBatch addresses, 20, (batch, done, hasNext) =>
+        @http().get
+          url: "blockchain/addresses/#{batch.join(',')}/transactions"
+          onSuccess: (transactions) ->
+            stream.write(transaction) for transaction in transactions
+            stream.close() unless hasNext
+            do done
+          onError: =>
+            stream.error 'Network Error'
+            stream.close()
+    stream
+
   postTransaction: (transaction, callback) ->
     @http().postForm
       url: "blockchain/pushtx"
@@ -34,3 +49,13 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
         callback?(transaction)
       onError: @networkErrorCallback(callback)
 
+  refreshTransaction: (transactions, callback) ->
+    outTransactions = []
+    _.async.each transactions, (transaction, done, hasNext) =>
+      @http().get
+        url: "blockchain/transactions/#{transaction.get('hash')}"
+        onSuccess: (response) =>
+          outTransactions.push response
+          callback? outTransactions unless hasNext
+          do done
+        onError: @networkErrorCallback(callback)

@@ -109,7 +109,7 @@
     .balance-value {
       font-size: 25px;
       font-weight: @font-weight-light;
-      letter-spacing: -1px;
+      letter-spacing: -1.5px;
       margin-top: 2px;
 
       sup {
@@ -117,7 +117,6 @@
         font-weight: @font-weight-light;
         font-size: @font-size-small;
         letter-spacing: -0px;
-        padding-left: 5px;
       }
 
     }
@@ -137,9 +136,29 @@
       }
     }
 
-    .ledger-icon {
-      .settings-icon;
-      pointer-events: none;
+    .reload-icon {
+      cursor: pointer;
+      margin-left: @metrics-medium-padding;
+      transition: opacity @animation-short-duration ease-in-out;
+      font-size: 0;
+      opacity: 0.3;
+
+      img {
+        width: 24px;
+        height: 24px;
+      }
+
+      &:hover {
+        opacity: 0.7;
+      }
+
+      &.spinning {
+        cursor: default;
+        pointer-events: none;
+        -webkit-animation:spin 1s linear infinite;
+      }
+
+      @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
     }
   }
 

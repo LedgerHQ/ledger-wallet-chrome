@@ -81,12 +81,17 @@ class ledger.wallet.HDWallet.Account
     @_account.currentChangeIndex ?= 0
     @_account.currentPublicIndex ?= 0
 
+  initializeXpub: (callback) ->
+    ledger.app.wallet.getExtendedPublicKey "#{@wallet.getRootDerivationPath()}/#{@index}'", (xpub) =>
+      @_xpub = xpub
+      callback?()
+
   initialize: (callback) ->
     @_store.get [@_storeId], (result) =>
       accountJsonString = result[@_storeId]
       @_account = JSON.parse(accountJsonString) if accountJsonString?
       @_initialize()
-      callback?()
+      @initializeXpub callback
 
   release: () ->
     @wallet = null
@@ -138,6 +143,40 @@ class ledger.wallet.HDWallet.Account
   getCurrentChangeAddress: () -> ledger.wallet.HDWallet.instance.cache?.get(@getCurrentChangeAddressPath())
   getCurrentPublicAddress: () -> ledger.wallet.HDWallet.instance.cache?.get(@getCurrentPublicAddressPath())
 
+  notifyPathsAsUsed: (paths) ->
+    for path in paths
+      path = path.replace("#{@wallet.getRootDerivationPath()}/0'/", '').split('/')
+      switch path[0]
+        when '0' then @_notifyPublicAddressIndexAsUsed path[1]
+        when '1' then @_notifyChangeAddressIndexAsUsed path[1]
+    return
+
+  _notifyPublicAddressIndexAsUsed: (index) ->
+    if index < @_account.currentPublicIndex
+      derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
+      @_account.excludedPublicPaths = _.without @_account.excludedPublicPaths, derivationPath
+    else if index > @_account.currentPublicIndex
+      difference =  index - (@_account.currentPublicIndex + 1)
+      @_account.excludedPublicPaths ?= []
+      for i in [0...difference]
+        derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index - i - 1}"
+        @_account.excludedPublicPaths.push derivationPath unless _.contains(@_account.excludedPublicPaths, derivationPath)
+      @_account.currentPublicIndex = parseInt(index) + 1
+    @save()
+
+  _notifyChangeAddressIndexAsUsed: (index) ->
+    if index < @_account.currentChangeIndex
+      derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index}"
+      @_account.excludedChangePaths = _.without @_account.excludedChangePaths, derivationPath
+    else if index > @_account.currentChangeIndex
+      difference =  index - (@_account.currentChangeIndex + 1)
+      @_account.excludedChangePaths ?= []
+      for i in [0...difference]
+        derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index - i - 1}"
+        @_account.excludedChangePaths.push derivationPath unless _.contains(@_account.excludedChangePaths, derivationPath)
+      @_account.currentChangeIndex = parseInt(index) + 1
+    @save()
+
   shiftCurrentPublicAddressPath: (callback) ->
     l 'shift public'
     index = @_account.currentPublicIndex
@@ -172,6 +211,7 @@ class ledger.wallet.HDWallet.Account
 openStores = (wallet, done) ->
   wallet.getBitIdAddress (bitIdAddress) =>
     wallet.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>
+      l pubKey
       if not pubKey?.bitcoinAddress? or not bitIdAddress?
         ledger.app.emit 'wallet:initialization:fatal_error'
         return
@@ -179,7 +219,12 @@ openStores = (wallet, done) ->
 
 openHdWallet = (wallet, done) ->
   ledger.wallet.HDWallet.instance = new ledger.wallet.HDWallet()
-  ledger.wallet.HDWallet.instance.initialize(ledger.storage.wallet, done)
+  ledger.wallet.HDWallet.instance.initialize ledger.storage.wallet, () ->
+    ledger.tasks.AddressDerivationTask.instance.start()
+    _.defer =>
+      for accountIndex in [0...ledger.wallet.HDWallet.instance.getAccountsCount()]
+        ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.HDWallet.instance.getRootDerivationPath()}/#{accountIndex}'", _.noop
+      do done
 
 openAddressCache = (wallet, done) ->
   try

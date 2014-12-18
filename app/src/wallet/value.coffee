@@ -1,6 +1,10 @@
 ledger.wallet ?= {}
 
+Value = null
+
 class ledger.wallet.Value
+
+  Value = @
 
   @from: (value) ->
     return value if _.isKindOf(value, ledger.wallet.Value)
@@ -14,6 +18,7 @@ class ledger.wallet.Value
         .add(new Bitcoin.BigInteger(fractionalPart))
         new ledger.wallet.Value(v)
       when _.isNumber value then new Value(value)
+    out
 
   constructor: (value = Bitcoin.BigInteger.ZERO) ->
     if _(value).isKindOf(Bitcoin.BigInteger)
@@ -37,6 +42,14 @@ class ledger.wallet.Value
     value = Value.from(value) unless _(value).isKindOf(ledger.wallet.Value)
     new Value(@_number.divide(value._number))
 
+  pow: (e) ->
+    e = Value.from(e) unless _(e).isKindOf(ledger.wallet.Value)
+    new Value(@_number.pow(e._number))
+
+  mod: (value) ->
+    value = Value.from(value) unless _(value).isKindOf(ledger.wallet.Value)
+    new Value(@_number.mod(value._number))
+
   compare: (value) ->
     value = Value.from(value) unless _(value).isKindOf(ledger.wallet.Value)
     @_number.compareTo(value._number)
@@ -51,3 +64,5 @@ class ledger.wallet.Value
   toByteString: () -> new ByteString(_.str.lpad(@toString(16), 16, '0'), HEX)
 
   toString: (base) -> @_number.toString(base)
+
+  toNumber: () -> @_number.intValue()
