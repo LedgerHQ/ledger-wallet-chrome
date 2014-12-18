@@ -63,22 +63,16 @@ class @WalletNavigationController extends @NavigationController
     fragmentedUrl.splice(0, 2)
     fragmentedUrl.splice(fragmentedUrl.length - 1, 1) if fragmentedUrl[fragmentedUrl.length - 1] == 'index'
 
-  _listenSynchronizationEvents: (listen = yes) ->
-    if listen
-      @_listenSynchronizationEvents no
-      @view.reloadIcon.on 'click', =>
-        Wallet.instance.retrieveAccountsBalances()
-        ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary()
-        _.defer => @_updateReloadIconState()
-      ledger.app.on 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done', (e) =>
-        _.defer => @_updateReloadIconState()
-      ledger.tasks.OperationsSynchronizationTask.instance.on 'start stop', =>
-        _.defer => @_updateReloadIconState()
-      @_updateReloadIconState()
-    else
-      @view.reloadIcon.off 'click'
-      ledger.app.off 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done'
-      ledger.tasks.OperationsSynchronizationTask.instance.off 'start stop'
+  _listenSynchronizationEvents: ->
+    @view.reloadIcon.on 'click', =>
+      Wallet.instance.retrieveAccountsBalances()
+      ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary()
+      _.defer => @_updateReloadIconState()
+    ledger.app.on 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done', (e) =>
+      _.defer => @_updateReloadIconState()
+    ledger.tasks.OperationsSynchronizationTask.instance.on 'start stop', =>
+      _.defer => @_updateReloadIconState()
+    @_updateReloadIconState()
 
   _updateReloadIconState: =>
     if @_isSynchronizationRunning()
