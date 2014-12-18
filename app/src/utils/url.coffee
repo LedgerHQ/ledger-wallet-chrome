@@ -22,7 +22,7 @@
       params = parser.search.substring(1)
       _.chain(params.split('&')).map (params) ->
         p = params.split '='
-        [p[0], decodeURIComponent(p[1])]
+        [decodeURIComponent(p[0]), decodeURIComponent(p[1])]
       .object().value()
     parser
 
@@ -52,7 +52,10 @@
   # @return [String] The newly created URL
   createUrlWithParams: (url, params) ->
     return url if not params? or _.isEmpty(params)
-    url + '?' + jQuery.param(params)
+    url = url + '?'
+    for name, value of params
+      url += encodeURIComponent(name) + '=' + encodeURIComponent(value) + "&"
+    url.slice(0, -1)
 
 String::parseAsUrl = () ->
   ledger.url.parseAsUrl(@)

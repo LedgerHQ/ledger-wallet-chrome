@@ -40,21 +40,26 @@ onboarding:
       enter_your_pin_code: "Ingrese su PIN para desbloquear su billetera :"
       i_lost_my_pin_code: "Si ha olvidado su PIN, por favor visite nuestro Centro de asistencia."
 
-    frozen:
-      wallet_is_frozen: "Monedero bloqueado"
-      wrong_pin_codes: "Su monedero está bloqueado después de 3 entradas incorrectas de su PIN."
-      blank_next_time: "La configuración de su monedero Ledger fue borrada pero tu cuenta bitcoins esta segura."
-      unplug_plug: "Desconecte y vuelva a conectar su monedero Ledger Monedero para restaurar sus cuentas y bitcoins."
-
-    wrongpin:
-      wrong_pin: "PIN incorrecto"
-      tries_left: "Usted tiene %s prueba(s) antes de bloquear su monedero."
-      unplug_plug: "Desconecte y vuelva a conectar el Monedero Ledger para acceder a sus cuentas y bitcoins."
-
     opening:
       is_opening: "Por favor, espere mientras abre su monedero..."
       is_synchronizing: "Sincronizando su cartera. Esto puede tardar varios minutos..."
       not_opening: "Si su cartera Ledger no se abre, consulte el centro de asistencia."
+
+    errors:
+      frozen:
+        wallet_is_frozen: "Monedero bloqueado"
+        blank_next_time: "La configuración de su monedero Ledger fue borrada pero tu cuenta bitcoins esta segura."
+        unplug_plug: "Desconecte y vuelva a conectar su monedero Ledger Monedero para restaurar sus cuentas y bitcoins."
+
+      wrongpin:
+        wrong_pin: "PIN incorrecto"
+        tries_left: "Usted tiene %s prueba(s) antes de bloquear su monedero."
+        unplug_plug: "Desconecte y vuelva a conectar el Monedero Ledger para acceder a sus cuentas y bitcoins."
+
+      unsupported:
+        device_unsupported: "Su monedero no esta aceptado"
+        unsuported_kind: "Este tipo de monedero no esta aceptado por la aplicación Ledger Wallet."
+        get_help: "Pongase en contacto con el centro de ayuda en support.ledgerwallet.com"
 
   management:
     back: "RETORNO"

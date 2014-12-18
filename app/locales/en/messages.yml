@@ -44,21 +44,26 @@ onboarding:
       enter_your_pin_code: "Enter you PIN code to unlock your wallet:"
       i_lost_my_pin_code: "If you forgot your PIN code, visit our help center."
 
-    frozen:
-      wallet_is_frozen: "Your wallet is frozen"
-      wrong_pin_codes: "Your wallet has frozen due to 3 incorrect PIN entries."
-      blank_next_time: "Your Ledger Wallet configuration has been deleted but your accounts and bitcoins remain safe."
-      unplug_plug: "Unplug then plug back your Ledger Wallet to recover your accounts and bitcoins."
-
-    wrongpin:
-      wrong_pin: "Wrong PIN code"
-      tries_left: "%s attempt(s) left before freezing your wallet."
-      unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and bitcoins."
-
     opening:
       is_opening: "Please wait while your wallet is opening..."
       is_synchronizing: "Your wallet is synchronizing. This may take a few minutes..."
       not_opening: "If your Ledger Wallet won't open, visit our help center."
+
+    errors:
+      frozen:
+        wallet_is_frozen: "Your wallet is frozen"
+        blank_next_time: "Your Ledger Wallet configuration has been deleted but your accounts and bitcoins remain safe."
+        unplug_plug: "Unplug then plug back your Ledger Wallet to recover your accounts and bitcoins."
+
+      wrongpin:
+        wrong_pin: "Wrong PIN code"
+        tries_left: "%s attempt(s) left before freezing your wallet."
+        unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and bitcoins."
+
+      unsupported:
+        device_unsupported: "Unsupported wallet"
+        unsuported_kind: "This type of wallet is not supported by the Ledger Wallet application."
+        get_help: "Please visit our help center at support.ledgerwallet.com for more information."
 
   management:
     back: "BACK"

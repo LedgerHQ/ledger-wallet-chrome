@@ -44,21 +44,26 @@ onboarding:
       enter_your_pin_code: "Entez votre code PIN pour dévérouiller votre portefeuille :"
       i_lost_my_pin_code: "Si vous avez oublié votre code PIN, consultez notre centre d'aide."
 
-    frozen:
-      wallet_is_frozen: "Portefeuille bloqué"
-      wrong_pin_codes: "Votre portefeuille s'est bloqué suite à 3 saisies incorrectes de votre code PIN."
-      blank_next_time: "La configuration de votre Ledger Wallet a été effacée mais vos comptes et bitcoins restent en sécurité."
-      unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour restaurer vos comptes et bitcoins."
-
-    wrongpin:
-      wrong_pin: "Code PIN erroné"
-      tries_left: "Il vous reste %s essai(s) avant de bloquer votre portefeuille."
-      unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder vos comptes et bitcoins."
-
     opening:
       is_opening: "Veuillez patienter pendant l'ouverture de votre portefeuille..."
       is_synchronizing: "Synchronisation de votre portefeuille. Ceci peut prendre plusieurs minutes..."
       not_opening: "Si votre Ledger Wallet ne s'ouvre pas, consultez notre centre d'aide."
+
+    errors:
+      frozen:
+        wallet_is_frozen: "Portefeuille bloqué"
+        blank_next_time: "La configuration de votre Ledger Wallet a été effacée mais vos comptes et bitcoins restent en sécurité."
+        unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour restaurer vos comptes et bitcoins."
+
+      wrongpin:
+        wrong_pin: "Code PIN erroné"
+        tries_left: "Il vous reste %s essai(s) avant de bloquer votre portefeuille."
+        unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder vos comptes et bitcoins."
+
+      unsupported:
+        device_unsupported: "Portefeuille non pris en charge"
+        unsuported_kind: "Ce type de portefeuille n’est pas pris en charge par l’application Ledger Wallet."
+        get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
 
   management:
     back: "RETOUR"

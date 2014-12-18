@@ -1,0 +1,1 @@
+class @OnboardingDeviceErrorViewController extends @ViewController 
