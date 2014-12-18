@@ -8,4 +8,6 @@ _.extend ledger.errors,
   NotEnoughFunds: 2
   UnknownError: 3
   SignatureError: 4
+  WrongPinCode: 5
+  NotSupportedDongle: 6
 
