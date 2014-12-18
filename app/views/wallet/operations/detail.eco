@@ -24,9 +24,15 @@
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.status' %></td>
         <% if @operation.get('confirmations') < ledger.wallet.transaction.MINIMUM_CONFIRMATIONS: %>
-          <td class="align-right regular-grey-text" id="operation_status"><%= t 'wallet.operations.detail.unconfirmed' %></td>
+          <td class="align-right regular-grey-text" id="operation_status">
+            <%= t 'wallet.operations.detail.unconfirmed' %>
+            <span class="regular-grey-text-small">(<%= @operation.get('confirmations') %>)</span>
+          </td>
         <% else: %>
-          <td class="align-right regular-valid-text" id="operation_status"><%= t 'wallet.operations.detail.confirmed' %></td>
+          <td class="align-right regular-valid-text" id="operation_status">
+            <%= t 'wallet.operations.detail.confirmed' %>
+            <span class="regular-grey-text-small">(<%= @operation.get('confirmations') %>)</span>
+          </td>
         <% end %>
       </tr>
       <tr>

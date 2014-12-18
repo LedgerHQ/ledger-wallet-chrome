@@ -50,6 +50,9 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
 
       stream.open()
 
+  getRetrieveAccountsOperationIsRunning: ->
+    @_retrieveAccountsOperationIsRunning
+
   synchronizeConfirmationNumbers: (operations = null, callback = _.noop) ->
     ops = operations
     operations = Operation.find(confirmations: $lt: 1).data() unless operations?
