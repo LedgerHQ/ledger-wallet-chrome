@@ -1,222 +1,277 @@
+
+resolveRelationship = (object, relationship) ->
+  Class = window[relationship.Class]
+  switch relationship.type
+    when 'many_one'
+      object._collection.getRelationshipView(object, relationship).modelize()
+    when 'one_many'
+      Class.findById object.get("#{relationship.name}_id")
+    when 'one_one'
+      Class.findById object.get("#{relationship.name}_id")
+    when 'many_many'
+      object._collection.getRelationshipView(object, relationship).modelize()
+
+
 class @Model extends @EventEmitter
 
-  constructor: (base) ->
-    @_data = base
-    @_id = @_data?._id
-    @__uid = @_data?.__uid
-    @_initializeRelationships()
-    @initilialize?()
+  constructor: (context, base) ->
+    throw 'Model can not be build without a context' unless context?
+    @_context = context
+    @_collection = context.getCollection(@getCollectionName())
+    @_object = base
+    @_needsUpdate = if @isInserted() then no else yes
+    @_deleted = no
 
-  getUid: () -> @__uid
+  get: (key) ->
+    if @getRelationships()?[key]?
+      relationship = @getRelationships()[key]
+      result = resolveRelationship(@, relationship)
+      result = @_pendingRelationships?[key] unless result?
+      result
+    else
+      @_object?[key]
 
-  getId: () -> @_id
-
-  get: (callback) ->
-    return @_performFindOrCreate(callback) if @_findOrCreate?
-    @_performGet(callback)
-
-  _performGet: (callback) ->
-    throw 'Object without id cannot perform get operation' unless @getUid()
-    ledger.storage.local.get @getUid(), (results) =>
-      results = results[@getUid()]
-      return callback(null) unless results?
-      finalResults = {}
-      relationships = []
-      relationshipNames = {}
-      for k, v of results
-        if _(v).isStoreReference()
-          relationships.push v.__uid
-          relationshipNames[ v.__uid] = k
-        else
-          finalResults[k] = v
-      return callback?(finalResults) if relationships.length == 0
-      ledger.storage.local.get relationships, (results) =>
-        finalResults[relationshipNames[k]] = @relationship(relationshipNames[k], v) for k, v of results
-        callback(finalResults)
-
-  exists: (callback) ->
-    id = switch
-      when @getUid()? then @getUid()
-      when @_findOrCreate? then @_findOrCreate.__uid
-      when @_find?  then @_find.__uid
-    ledger.storage.local.exists id, (result) =>
-      if result[id] is yes
-        @__uid = id
-        @_find = null
-        @_findOrCreate = null
-        callback(yes)
-      else
-        callback(no)
-    @
+  getId: () -> @_object?['id']
 
   set: (key, value) ->
-    @_data ?= {}
-    if _(value).isKindOf Model
-      if value.isInserted()
-        @_data[key] = _(value).modelReference()
-      else
-        value._data ?= {}
-        value._data.__uid ?= value.__uid
-        value._data._id ?= value._id
-        value._data.__type = _(value).getClassName()
-        value._data.__uid ?= ledger.storage.local.createUniqueObjectIdentifier(value._data.__type, value._data._id)[1]
-        @_data[key] = value._data
+    @_object ?= {}
+    if @getRelationships()?[key]?
+      throw "Attempt to set a value to a '#{@getRelationships()[key].type.replace('_', ':')}'" if _.contains(['many_one', 'many_many'], @getRelationships()[key].type)
+      @_pendingRelationships ?= {}
+      @_pendingRelationships[key] = {}
+      @_pendingRelationships[key].add = value if value?
+      @_pendingRelationships[key].remove = {} unless value?
     else
-      @_data[key] = value
+      @_object[key] = value
+    @_needsUpdate = yes
     @
 
-  isInserted: () -> if @__uid? then yes else no
-
-  isUpdated: () -> if @_data? then yes else no
-
-  isSaving: () -> if @_saving? then yes else no
-
-  save: (callback = _.noop) ->
-    @_saving = yes
-
-    onDone = () ->
-      @_saving = null
-      callback arguments
-
-    return @_performFind(onDone) if @_find?
-    @_performSave(onDone)
+  remove: (key, value) ->
+    unless value?
+      return @set(key, null)
+    if @getRelationships()?[key]?
+      throw "Attempt to remove a value to a '#{@getRelationships()[key].type.replace('_', ':')}'" if _.contains(['one_one', 'one_many'], @getRelationships()[key].type)
+      @_pendingRelationships ?= {}
+      @_pendingRelationships[key] ?= {}
+      @_pendingRelationships[key].remove ?= []
+      @_pendingRelationships[key].remove.push value
+    else if _.isArray(@_object[key])
+      if _.contains(@_object[key], value)
+        @_object[key] = _.without(@_object[key], value)
+    @_needsUpdate = yes
     @
 
-  remove: (callback = _.noop) ->
-    throw 'Cannot remove a model never inserted' unless @isInserted()
-    @getCollection().removeItemByUid @getUid(), () =>
-      ledger.storage.local.remove [@getUid()], callback
+  add: (key, value) ->
+    if @getRelationships()?[key]?
+      throw "Attempt to add a value to a '#{@getRelationships()[key].type.replace('_', ':')}'" if _.contains(['one_one', 'one_many'], @getRelationships()[key].type)
+      @_pendingRelationships ?= {}
+      @_pendingRelationships[key] ?= {}
+      @_pendingRelationships[key].add ?= []
+      @_pendingRelationships[key].add.push value
+    else if not @_object[key]? or _.isArray(@_object[key])
+      @_object[key] ?= []
+      unless _.contains(@_object[key], value)
+        @_object[key].push value
+    @_needsUpdate = yes
     @
 
-  _performSave: (callback) ->
-    inserted = @isInserted()
-    data = @_data or {}
-    @_data = null
-    data.__type = _(this).getClassName()
-    data._id ?= @getId()
-    data.__uid = switch
-      when inserted then @getUid()
-      when not inserted and data.__uid? then data.__uid
-    data.__uid ?= ledger.storage.local.createUniqueObjectIdentifier(data.__type, data._id)[1]
-    data = _(data).omit(['_id']) if inserted and data._id?
-    if not inserted
-      @_data = data
-      @getCollection().insert this, () =>
-        @_data = null
-        @__uid = data.__uid
-        callback(yes)
+  save: () ->
+    return unless @hasChange()
+    if @isInserted() and @onUpdate() isnt false
+      @_commitPendingRelationships()
+      @_collection.update this
+    else if @onInsert() isnt false
+      @_collection.insert this
+      @_commitPendingRelationships()
+      @_needsUpdate = no
+    @
+
+  delete: () ->
+    if not @_deleted and @onDelete() isnt false
+      if @getRelationships()?
+        l 'Check relations ', @getRelationships()
+        for relationshipName, relationship of @getRelationships()
+          l relationship
+          switch relationship.onDelete
+            when 'destroy'
+              switch relationship.type
+                when 'many_one'
+                  item.delete() for item in @get(relationshipName)
+                when 'one_one'
+                  @get(relationshipName).delete()
+                when 'one_many'
+                  @get(relationshipName).delete()
+                when 'many_many' then throw 'many:many relastionships are not implemented yet'
+            when 'nullify'
+              switch relationship.type
+                when 'many_one'
+                  item.set(relationship.inverse, null).save() for item in @get(relationshipName)
+                when 'one_one'
+                  @get(relationshipName).set(relationship.inverse, null)
+                when 'many_many' then throw 'many:many relastionships are not implemented yet'
+      @_deleted = true
+      @_collection.remove this
+      return
+
+  refresh: () ->
+    @_collection.refresh this
+    @
+
+  # Called before insertion
+  # @return Return false if you want to cancel the insertion
+  onInsert: () ->
+
+  # Called before delete
+  # @return Return false if you want to cancel the deletion
+  onDelete: () ->
+
+  # Called before update
+  # @return Return false if you want to cancel the update
+  onUpdate: () ->
+
+  # Called before a model is added to another model as a many_* relationship
+  onAdd: () ->
+
+  # Called before a model is removed from another model as a many_* relationship
+  onRemove: () ->
+
+
+  isInserted: () -> if @_object?.meta? then yes else no
+
+  isDeleted: () -> @_deleted
+
+  hasChange: () -> @_needsUpdate
+
+  getRelationships: () -> @constructor._relationships
+
+  _getModelValue: (relationship, value) ->
+    ValueClass = window[relationship.Class]
+    unless _(value).isKindOf ValueClass
+      value = new ValueClass(@_context, value)
+      value.save()
+    value
+
+  _commitAddPendingRelationship: (pending, relationship) ->
+    switch relationship.type
+      when 'many_one'
+        for v in pending.add
+          value = @_getModelValue(relationship, v)
+          value.set("#{relationship.inverse}_id", @getId())
+          value.save()
+      when 'one_many'
+        value = @_getModelValue(relationship, pending.add)
+        @_object["#{relationship.name}_id"] = value.getId()
+        @_collection.update this
+      when 'one_one'
+        value = @_getModelValue(relationship, pending.add)
+        @_object["#{relationship.name}_id"] = value.getId()
+        value.set("#{relationship.inverse}_id", @getId())
+        value.save()
+        @_collection.update this
+      when 'many_many' then throw 'many:many relationships are not implemented yet'
+
+  _commitRemovePendingRelationship: (pending, relationship) ->
+    switch relationship.type
+      when 'many_one'
+        for v in pending.remove
+          value = @_getModelValue(relationship, v)
+          value.set("#{relationship.inverse}_id", null)
+          value.save()
+      when 'one_many'
+        @_object["#{relationship.name}_id"] = null
+        @_collection.update this
+      when 'one_one'
+        value = @get(relationship.name)
+        @_object["#{relationship.name}_id"] = value.getId()
+        value.set("#{relationship.inverse}_id", null)
+        value.save()
+        @_collection.update this
+      when 'many_many' then throw 'many:many relationships are not implemented yet'
+
+  _commitPendingRelationships: () ->
+    return unless @_pendingRelationships?
+    for relationshipName, pending of @_pendingRelationships
+      relationship = @getRelationships()[relationshipName]
+      continue unless relationship?
+      if pending.add?
+        @_commitAddPendingRelationship(pending, relationship)
+      if pending.remove?
+        @_commitRemovePendingRelationship(pending, relationship)
+    @_pendingRelationships = null
+
+  @create: (base, context = ledger.db.contexts.main) -> new @ context, base
+
+  @findById: (id, context = ledger.db.contexts.main) -> context.getCollection(@getCollectionName()).get(id)
+
+  @findOrCreate: (query, base, context = ledger.db.contexts.main) ->
+    if _.isObject query
+      object = @find(query, context).data()[0]
+      base ?= {}
+      _.extend(base, query)
     else
-      ledger.storage.local.set data, () => callback(yes)
-
-  _performFind: (callback) ->
-    @exists (exists) =>
-      if exists
-        @_performSave(callback)
-      else
-        callback(no)
-
-  _performFindOrCreate: (callback) ->
-    ledger.storage.local.exists @_findOrCreate.__uid, (result) =>
-      _findOrCreate = @_findOrCreate
-      @_findOrCreate = undefined
-      if result[_findOrCreate.__uid]
-        @__uid = _findOrCreate.__uid
-        return @_performGet(callback)
-      @_data = _findOrCreate.base
-      @_data._id = _findOrCreate._id
-      @_data.__uid = _findOrCreate.__uid
-      @save () =>
-        @_performGet callback
-
-  _initializeRelationships: () ->
-
-
-  @create: (base = {}) -> new @(base)
-
-  @findOrCreate: (id, base = {}) ->
-    object = new @()
-    object._id = id
-    object._findOrCreate = {_id: id, __uid: ledger.storage.local.createUniqueObjectIdentifier(@name, id)[1], base: base}
+      object = @findById(query, context)
+    object = @create base, context unless object?
     object
 
-  @find: (id) ->
-    object = new @()
-    object._id = id
-    object._find = {_id: id, __uid: ledger.storage.local.createUniqueObjectIdentifier(@name, id)[1]}
-    object
+  @find: (query, context = ledger.db.contexts.main) ->
+    chain = context.getCollection(@getCollectionName()).query()
+    chain.find(query) if query?
+    chain
 
-  @findByUid: (uid) ->
-    object = new @()
-    object.__uid = uid
-    object
+  @all: (context = ledger.db.contexts.main) -> context.getCollection(@getCollectionName()).query().data()
 
-  @getCollectionName: () -> _.pluralize(_.str.underscored(@name))
 
-  # Creates a relationship object from a store object or array reference. This fucntion is private to this file
-  # @return [Model|Collection]
-  # @private
-  relationship: (relationName, item) ->
-    unless _(item).isArray()
-      obj = new window[item.__type]()
-      obj.__uid = item.__uid
-      return obj
+  # Relationship creator
+  @has: (relationshipDeclaration) ->
+    if relationshipDeclaration['many']?
+      @_createRelationship(relationshipDeclaration, 'many')
+    else if relationshipDeclaration['one']
+      @_createRelationship(relationshipDeclaration, 'one')
+
+  @_createRelationship: (relationshipDeclaration, myType) ->
+    r = if _.isArray(relationshipDeclaration['many']) then relationshipDeclaration['many'] else [relationshipDeclaration['many'], _.str.capitalize(_.singularize(relationshipDeclaration['many']))]
+    if relationshipDeclaration['forOne']?
+      i = [relationshipDeclaration['forOne'], 'one']
+    else if relationshipDeclaration['forMany']?
+      i =  [relationshipDeclaration['forMany'], 'many']
     else
-      collectionName = _(@).getClass()._relations.many[relationName]
-      throw "Unknown hasMany relation '#{relationName}'" unless collectionName?
-      collection = new ledger.collections[_.pluralize(collectionName.className)]()
-      collection.__uid = item.__uid
-      return collection
+      i = [@name.toLocaleLowerCase(), 'one']
+    sort = null
+    if relationshipDeclaration['sortBy']?
+      sort = relationshipDeclaration['sortBy']
+      sort = [sort, 'asc'] unless _.isArray(sort)
+    onDelete = if relationshipDeclaration['onDelete']? then relationshipDeclaration['onDelete'] else 'nullify'
+    unless _.contains(['nullify', 'destroy', 'none'], onDelete)
+      e "Relationship #{@name}::#{r[0]} delete rule '#{onDelete}' is not valid. Please review this. Should be either 'nullify', 'none' or 'destroy'"
+      onDelete = 'nullify'
+    relationship = name: r[0], type: "#{myType}_#{i[1]}", inverse: i[0], Class: r[1], inverseType: "#{i[1]}_#{myType}", sort: sort, onDelete: onDelete
+    @_relationships ?= {}
+    @_relationships[relationship.name] = relationship
 
-  getCollectionName: () -> _(@).getClass().getCollectionName()
+  @commitRelationship: () ->
+    throw 'This methods should only be called once by Model' unless @ is Model
+    # Ensure all relationships are bound and consistent between models (each relationship are sets in both directions)
+    for ClassName, Class of @AllModelClasses()
+      for relationshipName, relationship of Class._relationships
+        InverseClass = window[relationship.Class]
+        if InverseClass._relationships? and InverseClass._relationships[relationship.inverse]?.inverse is relationship.name and InverseClass._relationships[relationship.inverse]?.type is relationship.inverseType and InverseClass._relationships[relationship.inverse]?.Class is ClassName
+          continue
+        else if not InverseClass._relationships?[relationship.inverse]
+          InverseClass._relationships ?= {}
+          InverseClass._relationships[relationship.inverse] = name: relationship.inverse, type: relationship.inverseType, inverse:relationship.name, Class: ClassName, inverseType: relationship.type, onDelete: 'nullify'
+        else
+          e "Bad relationship #{relationship.name} <-> #{relationship.inverse}. You must absolutely check for errors for classes #{ClassName} and #{relationship.Class}"
 
-  getCollection: () -> ledger.collections[@getCollectionName()]
+  @index: (field) ->
+    @_indexes ?= []
+    @_indexes.push field
 
-  @getCollection: () -> ledger.collections[@getCollectionName()]
+  @init: () ->
+    Model._allModelClasses ?= {}
+    Model._allModelClasses[@name] = @
 
-  @init: ->
-    unless @getCollection()
-      ledger.collections.createCollection(@getCollectionName())
+  @getCollectionName: () -> @name
 
-  ## Relations
+  getCollectionName: () -> @constructor.getCollectionName()
 
-  @hasOne: (relations) ->
-    @._relations ?= {}
-    @._relations.one ?= {}
-    for relationName, relationClass of relations
-      @_relations.one[relationName] = {className: relationClass}
-      @::["get#{_.str.classify(relationName)}"] = (callback) ->
-        ledger.storage.local.get @getUid(), (result) =>
-          if result[@getUid()]?[relationName]?
-            obj = new window[relationClass]()
-            obj.__uid = result[@getUid()][relationName].__uid
-            callback(obj)
-          else
-            callback()
-
-  @hasMany: (relations) ->
-    @._relations ?= {}
-    @._relations.many ?= {}
-    for relationName, relationClass of relations
-      @_relations.many[relationName] = {className: relationClass}
-      @::["get#{_.str.classify(relationName)}"] = (callback) ->
-        ledger.storage.local.get @getUid(), (result) =>
-          if result[@getUid()]?[relationName]?
-            obj = new ledger.collections[_.pluralize(relationClass)]()
-            obj.__uid = result[@getUid()][relationName].__uid
-            callback(obj)
-          else
-            @set relationName, []
-            @save =>
-              @["get#{_.str.classify(relationName)}"](callback)
-
-_.mixin
-  model: (object) ->
-    return null unless object?.__type?
-    model = new window[object.__type]()
-    model.__uid = object.__uid
-    model._id = object._id
-    model
-
-  modelReference: (object) ->
-    return null unless object?.__uid?
-    {__type: 'ref', __uid: object.__uid}
+  @AllModelClasses: () -> @_allModelClasses

@@ -1,2 +1,0 @@
-class @OnboardingDeviceWrongpinViewController extends @OnboardingViewController
-

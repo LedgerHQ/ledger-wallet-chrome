@@ -6,28 +6,39 @@
     <tbody>
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.amount' %></td>
-        <% if @operation.type == 'reception': %>
-          <td class="align-right regular-valid-text">+<%= ledger.formatters.bitcoin.fromValue(@operation.value) %> BTC</td>
+        <% if @operation.get('type') == 'reception': %>
+          <td class="align-right" id="operation_amount">
+            <span class="regular-valid-text">+<%= ledger.formatters.bitcoin.fromValue(@operation.get('total_value')) %> BTC</span>
+          </td>
           <% else: %>
-          <td class="align-right regular-invalid-text">-<%= ledger.formatters.bitcoin.fromValue(@operation.value) %> BTC</td>
+          <td class="align-right" id="operation_amount">
+            <span class="regular-invalid-text">-<%= ledger.formatters.bitcoin.fromValue(@operation.get('total_value')) %> BTC</span>
+            <span class="regular-grey-text-small"><%= _.str.sprintf t('wallet.operations.detail.transaction_fees_text'), ledger.formatters.bitcoin.fromValue(@operation.get('fees')) %></span>
+          </td>
         <% end %>
       </tr>
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.time' %></td>
-        <td class="align-right" id="operation_time"><%= moment(new Date(@operation.time)).format t 'common.date_format' %></td>
+        <td class="align-right" id="operation_time"><%= moment(new Date(@operation.get('time'))).format t 'common.date_format' %></td>
       </tr>
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.status' %></td>
-        <% if @operation.confirmations < 2: %>
-          <td class="align-right regular-grey-text" id="operation_status"><%= t 'wallet.operations.detail.unconfirmed' %></td>
+        <% if @operation.get('confirmations') < ledger.wallet.transaction.MINIMUM_CONFIRMATIONS: %>
+          <td class="align-right regular-grey-text" id="operation_status">
+            <%= t 'wallet.operations.detail.unconfirmed' %>
+            <span class="regular-grey-text-small">(<%= @operation.get('confirmations') %>)</span>
+          </td>
         <% else: %>
-          <td class="align-right regular-valid-text" id="operation_status"><%= t 'wallet.operations.detail.confirmed' %></td>
+          <td class="align-right regular-valid-text" id="operation_status">
+            <%= t 'wallet.operations.detail.confirmed' %>
+            <span class="regular-grey-text-small">(<%= @operation.get('confirmations') %>)</span>
+          </td>
         <% end %>
       </tr>
       <tr>
         <td class="row-title top-aligned"><%= t 'wallet.operations.detail.sender' %></td>
         <td class="align-right regular-text" id="operation_inputs">
-          <% for input in @operation.senders: %>
+          <% for input in @operation.get('senders'): %>
           <%= input %><br />
           <% end %>
         </td>
@@ -35,18 +46,19 @@
       <tr>
         <td class="row-title top-aligned"><%= t 'wallet.operations.detail.receiver' %></td>
         <td class="align-right" id="operation_outputs">
-          <% for output in @operation.recipients: %>
+          <% for output in @operation.get('recipients'): %>
           <%= output %><br />
           <% end %>
         </td>
       </tr>
       <tr class="no-border">
-        <td class="row-title"><%= t 'wallet.operations.detail.identifier' %></td>
-        <td class="align-right regular-text-small" id="operation_identifier"><%= @operation.hash %></td>
+        <td class="row-title optional"><%= t 'wallet.operations.detail.identifier' %></td>
+        <td class="align-right regular-grey-text-small" id="operation_identifier"><%= @operation.get('hash') %></td>
       </tr>
     </tbody>
   </table>
 </section>
 <div class="dialog-actions-bar">
+  <a class="uppercase-action" href="#openBlockchain"><%= t 'wallet.operations.detail.blockchain_link' %></a>
   <a class="cancel-rounded-button" href="#dismiss"><%= t 'wallet.operations.detail.close' %></a>
 </div>

@@ -20,6 +20,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
   _state: ledger.wallet.States.UNDEFINED
 
   constructor: (@manager, @id, @lwCard) ->
+    @_xpubs = {}
     @_vents = new EventEmitter()
     do @_listenStateChanges
 
@@ -56,17 +57,23 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       onSuccess:
         events: ['LW.PINVerified']
         do:  =>
-          ## This needs a BIG refactoring
-          l @getFirmwareVersion()
-          if @getIntFirmwareVersion() >= ledger.wallet.Firmware.V1_4_13
-            l 'GOT 13'
-          #.sendApdu_async(0xe0, 0x26, 0x00, 0x00, new ByteString(Convert.toHexByte(operationMode), HEX), [0x9000])
-            @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
-              .then => l 'DONE'
+          @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).then =>
+            ## This needs a BIG refactoring
+            l @getFirmwareVersion()
+            if @getIntFirmwareVersion() >= ledger.wallet.Firmware.V1_4_13
+              l 'GOT 13'
+              # ledger.app.wallet._lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).then(function (){l('done');}).fail(e)
+              #.sendApdu_async(0xe0, 0x26, 0x00, 0x00, new ByteString(Convert.toHexByte(operationMode), HEX), [0x9000])
+              @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
+              .then =>
+                  l 'DONE'
               .fail => l 'FAIL', arguments
-          @_setState(ledger.wallet.States.UNLOCKED)
-          do unbind
-          callback?(yes)
+            @_setState(ledger.wallet.States.UNLOCKED)
+            do unbind
+            callback?(yes)
+          .fail =>
+              do unbind
+              callback? no, title: 'Not supported dongle', code: ledger.errors.NotSupportedDongle
       onFailure:
         events: ['LW.ErrorOccured']
         do: (error) =>
@@ -74,7 +81,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
             retryNumber = parseInt(error.message.substr(-1))
             @_numberOfRetry = retryNumber
             do unbind
-            callback?(no, retryNumber)
+            callback?(no, {title: 'Wrong PIN', code: ledger.errors.WrongPinCode, error, retryCount: retryNumber})
     @_lwCard.verifyPIN pin
 
   setup: (pincode, seed, callback) ->
@@ -160,6 +167,16 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     catch error
       @_updateStateFromError(error)
       callback?(null, error)
+
+  getExtendedPublicKey: (derivationPath, callback) ->
+    throw 'Cannot get a public while the key is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
+    return callback(@_xpubs[derivationPath]) if @_xpubs[derivationPath]?
+    xpub = new ledger.wallet.ExtendedPublicKey(@, derivationPath)
+    xpub.initialize () =>
+      @_xpubs[derivationPath] = xpub
+      callback xpub
+
+  getExtendedPublicKeys: () -> @_xpubs
 
   _setState: (newState) ->
     @_state = newState

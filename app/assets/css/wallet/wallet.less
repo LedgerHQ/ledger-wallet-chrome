@@ -165,68 +165,28 @@ section {
       margin-top: @metrics-almost-small-padding;
     }
   }
+}
 
-  .keycard {
-    width: 370px;
-    height: 190px;
-    background-color: @color-white;
-    border-radius: 10px;
-    border: 1px solid @color-light-grey;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-
-    > input {
-      width: 1;
-      height: 1;
-      opacity: 0;
-      position: absolute;
-      outline: none;
-    }
-
-    > .section-title {
-      .regular-grey-text-small;
-      text-transform: uppercase;
-      margin: @metrics-very-small-padding 0;
-
-      &:first-child {
-        margin-top: 0;
-      }
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-
-    > .section-values {
-      background: transparent;
-      border: 1px solid @color-light-grey;
-      border-radius: 5px;
+div#video_capture_container {
+  > #qrcode_video {
+    > #qrcode_overlay {
       display: flex;
-      flex-direction: row;
       justify-content: center;
+      align-items: center;
+      background-image: url("@{images-url}/wallet/qrcode_borders.png");
+      background-position: center center;
+      background-size: 170px 170px;
+      background-repeat: no-repeat;
+      opacity: 0.5;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      .regular-grey-text-small;
+      color: @color-soft-grey;
 
-      > .value {
-        .regular-text;
-        font-size: @font-size-small;
-        margin-right: 2px;
-        padding: 10px 0px;
-        width: 12px;
-        text-align: center;
-        background-position: center 32px;
-        background-image: url("@{images-url}/wallet/cursor_arrow.png");
-        background-size: 6px 6px;
-        background-repeat: no-repeat;
-        transition: background-position @animation-short-duration @animation-default-timing-function;
-
-        &:last-child {
-          margin-right: 0;
-        }
-
-        &.selected {
-          color: @color-invalid-red;
-          font-weight: @font-weight-bold;
-          background-position: center bottom;
-        }
+      &.errored {
+        background-image: none;
+        opacity: 1;
       }
     }
   }

@@ -4,8 +4,8 @@ class ledger.api.BalanceRestClient extends ledger.api.RestClient
   @instance: new @
 
   getAccountBalance: (account, callback) ->
-    account = ledger.wallet.HDWallet.instance.getAccount(account) unless _.isKindOf(account, ledger.wallet.HDWallet.instance)
-    addressesPaths = [].concat(account.getAllChangeAddressesPaths()).concat(account.getAllPublicAddressesPaths())
+    account = ledger.wallet.HDWallet.instance.getAccount(account) unless _.isKindOf(account, ledger.wallet.HDWallet.Account)
+    addressesPaths = account.getAllAddressesPaths()
     accountBalance = {total: 0, confirmed: 0, unconfirmed: 0}
     ledger.wallet.pathsToAddresses addressesPaths, (addresses) =>
       _.async.eachBatch _.values(addresses), 20, (addresses, done, hasNext) =>

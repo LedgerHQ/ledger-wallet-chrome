@@ -12,21 +12,20 @@ class @WalletAccountsShowViewController extends @ViewController
   onAfterRender: ->
     super
     # fetch balances
-    Wallet.instance.getBalance (balance) =>
-      @view.confirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
-      @view.unconfirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.unconfirmed)
+    balance = Wallet.instance.getBalance()
+    @view.confirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+    @view.unconfirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.unconfirmed)
 
     # listen events
     ledger.app.on 'wallet:balance:changed', (event, balance) =>
       @view.confirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
       @view.unconfirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.unconfirmed)
 
-    account = Account.find(0).exists =>
-      account.get (data) =>
-        @view.accountName.text data.name
+    account = @getAccount()
+    @view.accountName.text account.get 'name'
 
     do @_updateOperations
-    ledger.app.on 'wallet:transactions:new wallet:operations:sync:done', =>
+    ledger.app.on 'wallet:transactions:new wallet:operations:sync:done wallet:operations:new wallet:operations:update', =>
       do @_updateOperations
 
   showOperation: (params) ->
@@ -34,7 +33,11 @@ class @WalletAccountsShowViewController extends @ViewController
     dialog.show()
 
   _updateOperations: ->
-    Account.find(0).getAllSortedOperations (operations) =>
-      @view.emptyContainer.hide() if operations.length > 0
-      render 'wallet/operations/operations_table', {operations: operations.slice(0, 6)}, (html) =>
-        @view.operationsList.html html
+    operations = @getAccount().get 'operations'
+    @view.emptyContainer.hide() if operations.length > 0
+    render 'wallet/operations/operations_table', {operations: operations.slice(0, 6)}, (html) =>
+      @view.operationsList.html html
+
+  getAccount: () ->
+    @_account ?= Account.find(index: 0).first()
+    @_account

@@ -4,28 +4,38 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
   @instance: new @()
 
   onStart: () ->
-    l 'operations'
-    account = ledger.wallet.HDWallet.instance?.getAccount(0)
-    l account, account.getAllChangeAddressesPaths()
-    ledger.wallet.pathsToAddresses account.getAllChangeAddressesPaths(), (changeAddresses) =>
-      l 'CHANGE', changeAddresses
-      ledger.wallet.pathsToAddresses account.getAllPublicAddressesPaths(), (publicAddresses) =>
-        l 'PUBLIC', publicAddresses
-        publicAddresses = _.values(publicAddresses)
-        changeAddresses = _.values(changeAddresses)
-        addresses = changeAddresses.concat(publicAddresses)
-        l addresses
-        ledger.api.TransactionsRestClient.instance.getTransactions addresses, (transactions, error) =>
-          l transactions
-          return unless @isRunning()
-          return ledger.app.emit 'wallet:operations:sync:failed' if error?
-          account = Account.find(0).exists (exists) =>
-            return ledger.app.emit 'wallet:operations:sync:failed' unless exists
-            _.async.each transactions, (transaction, done, hasNext) =>
-              account.addRawTransaction transaction, =>
-                unless hasNext
-                  ledger.app.emit 'wallet:operations:sync:done'
-                  @stopIfNeccessary()
-                do done
+    Operation.pendingRawTransactionStream().on 'data', => @flushPendingOperationsStream()
+    @flushPendingOperationsStream()
+    @synchronizeConfirmationNumbers()
+
+  synchronizeConfirmationNumbers: (operations = null, callback = _.noop) ->
+    ops = operations
+    operations = Operation.find(confirmations: $lt: 1).data() unless operations?
+    return @stopIfNeccessary() if operations.length is 0
+
+    ledger.api.TransactionsRestClient.instance.refreshTransaction operations, (refreshedOperations, error) =>
+      return unless @isRunning()
+      unless error?
+        updatesCount = 0
+        for refreshedOperation in refreshedOperations
+          operationsToUpdate = _.select(operations, ((op) -> op.get('hash') is refreshedOperation.hash))
+          for operationToUpdate in operationsToUpdate
+            if operationToUpdate.refresh().get('confirmations') isnt refreshedOperation['confirmations']
+              operationToUpdate.set('confirmations', refreshedOperation['confirmations']).save()
+              updatesCount += 1
+        ledger.app.emit 'wallet:operations:update', operationsToUpdate if updatesCount > 0
+      _.delay (=> @synchronizeConfirmationNumbers(ops, callback)), 1000
+      return if error?
+
+  flushPendingOperationsStream: () ->
+    for transaction in Operation.pendingRawTransactionStream().read()
+      for account in Account.all()
+        do (transaction, account) ->
+          account.addRawTransactionAndSave(transaction)
 
   onStop: () ->
+    Operation.pendingRawTransactionStream().read()
+    Operation.pendingRawTransactionStream().off 'data'
+
+  @reset: () ->
+    @instance = new @

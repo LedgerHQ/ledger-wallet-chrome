@@ -10,6 +10,7 @@ class @WalletNavigationController extends @NavigationController
   }
   view:
     balanceValue: '#balance-value'
+    reloadIcon: '#reload_icon'
 
   constructor: () ->
     ledger.application.router.on 'routed', (event, data) =>
@@ -22,12 +23,8 @@ class @WalletNavigationController extends @NavigationController
     url = ledger.application.router.currentUrl
     @updateMenu url
     ##@updateBreadcrumbs url
-    # fetch balances
-    Wallet.instance.getBalance (balance) =>
-      @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
-    # listen events
-    ledger.app.on 'wallet:balance:changed', (event, balance) =>
-      @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+    @_listenBalanceEvents()
+    @_listenSynchronizationEvents()
 
   updateMenu: (url) ->
     for baseUrl, itemSelector of @_menuItemBaseUrl
@@ -61,3 +58,30 @@ class @WalletNavigationController extends @NavigationController
     fragmentedUrl.splice(0, 2)
     fragmentedUrl.splice(fragmentedUrl.length - 1, 1) if fragmentedUrl[fragmentedUrl.length - 1] == 'index'
 
+  _listenBalanceEvents: ->
+    # fetch balances
+    balance = Wallet.instance.getBalance()
+    @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+    # listen events
+    ledger.app.on 'wallet:balance:changed', (event, balance) =>
+      @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+
+  _listenSynchronizationEvents: ->
+    @view.reloadIcon.on 'click', =>
+      Wallet.instance.retrieveAccountsBalances()
+      ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary()
+      _.defer => @_updateReloadIconState()
+    ledger.app.on 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done', (e) =>
+      _.defer => @_updateReloadIconState()
+    ledger.tasks.OperationsSynchronizationTask.instance.on 'start stop', =>
+      _.defer => @_updateReloadIconState()
+    @_updateReloadIconState()
+
+  _updateReloadIconState: =>
+    if @_isSynchronizationRunning()
+      @view.reloadIcon.addClass 'spinning'
+    else
+      @view.reloadIcon.removeClass 'spinning'
+
+  _isSynchronizationRunning: ->
+    return ledger.tasks.OperationsConsumptionTask.instance.isRunning()

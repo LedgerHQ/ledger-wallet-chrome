@@ -1,0 +1,268 @@
+﻿application:
+  name: 'Ledger Wallet'
+  small_description: "Ledger Wallet gestiona sus cuentas Bitcoin de manera eficiente y segura."
+  support_url: 'http://support.ledgerwallet.com/'
+
+common:
+  bitcoin_acronym: 'BTC'
+  default_account_name: "Mi cuenta"
+  date_format: 'DD/MM/YYYY à HH:mm'
+
+  dialogs:
+    yes: "Si"
+    no: "No"
+    confirmation: "Confirmación"
+
+  keycard:
+    uppercase_letters: "Mayúsculas"
+    lowercase_letters: "Minúsculas"
+    digits: "Cifras"
+
+  errors:
+    unsufficient_balance: "El saldo de su monedero es insuficiente."
+    wrong_keycode: "El código de validación no es correcta."
+    network_no_response: "El servidor des transacciónes no ha respondido."
+    invalid_receiver_address: "La dirección Bitcoin de destino no es correcto."
+    invalid_amount: "La cantidad enviada no es válida."
+    unknown: "Se produjo un error desconocido."
+
+onboarding:
+  device:
+    plug:
+      to_start: "En primer lugar, conecte su monedero Ledger al puerto USB de la computadora."
+      is_not_recognized: "Si no se reconoce su Monedero Ledger, por favor consulte nuestro Centro de asistencia."
+
+    unplug:
+      unlock_my_wallet: "Desbloquear mi monedero"
+      you_can_unplug: "Ya puede desenchufar su monedero Ledger con seguridad."
+
+    pin:
+      enter_your_pin_code: "Ingrese su PIN para desbloquear su billetera :"
+      i_lost_my_pin_code: "Si ha olvidado su PIN, por favor visite nuestro Centro de asistencia."
+
+    opening:
+      is_opening: "Por favor, espere mientras abre su monedero..."
+      is_synchronizing: "Sincronizando su cartera. Esto puede tardar varios minutos..."
+      not_opening: "Si su cartera Ledger no se abre, consulte el centro de asistencia."
+
+    errors:
+      frozen:
+        wallet_is_frozen: "Monedero bloqueado"
+        blank_next_time: "La configuración de su monedero Ledger fue borrada pero tu cuenta bitcoins esta segura."
+        unplug_plug: "Desconecte y vuelva a conectar su monedero Ledger Monedero para restaurar sus cuentas y bitcoins."
+
+      wrongpin:
+        wrong_pin: "PIN incorrecto"
+        tries_left: "Usted tiene %s prueba(s) antes de bloquear su monedero."
+        unplug_plug: "Desconecte y vuelva a conectar el Monedero Ledger para acceder a sus cuentas y bitcoins."
+
+      unsupported:
+        device_unsupported: "Su monedero no esta aceptado"
+        unsuported_kind: "Este tipo de monedero no esta aceptado por la aplicación Ledger Wallet."
+        get_help: "Pongase en contacto con el centro de ayuda en support.ledgerwallet.com"
+
+  management:
+    back: "RETORNO"
+    cancel: "CANCELAR"
+    continue: "CONTINUAR"
+    finish: "ACABAR"
+    or: "O"
+    create_my_wallet: "Crear mi cartera"
+    recover_my_wallet: "Restaurar mi cartera"
+    cancel_wallet_configuration: "¿Quieres cancelar la configuración de su cartera Ledger?"
+    wallet_not_affected: "No se harán cambios a su monedero."
+
+    security:
+      security_informations: "Información de <b>seguridad</b>"
+      trusted_computer_required: "Se requiere un equipo de confianza para configurar el monedero Ledger"
+      line1: "Este asistente de configuración maneja datos confidenciales acerca de su monedero."
+      line2_create: "Es muy importante que continúe el proceso de creación desde un equipo privado (o de confianza) para evitar que alguien accede a esta información ilícitamente."
+      line2_other: "Es muy importante que continúe el proceso de recuperación de un equipo privado (o de confianza) para evitar que alguien accede a esta información ilícitamente."
+      line3: "En caso de duda, se recomienda retirar de su cartera Ledger puerto USB del ordenador y vuelva a abrir este asistente desde otro equipo más seguro."
+      by_clicking_continue: "Al hacer clic en Continuar, confirme que esta usando un equipo de confianza para configurar su monedero Ledger."
+
+    welcome:
+      new_wallet: "Nuevo monedero"
+      welcome_to_your_new_wallet: "Bienvenido a tu nuevo monedero Ledger !"
+      create_or_recover: "¿Quieres crear una nueva cartera o restaurar una ya existente?"
+      use_as_new: "Crear un nuevo monedero"
+      if_its_your_first_wallet: "Configure su nuevo monedero Ledger"
+      recover_wallet: "Restaurar un monedero existente"
+      if_you_lost_your_wallet: "Encuentra el acceso a sus cuentas y bitcoins si ha bloqueado o perdido su monedero Ledger"
+
+    pin:
+      choose_your: "Eligir su"
+      choose_your_new: "ligir su nuevo"
+      pin_code: "codigo PIN"
+      to_protect_your_wallet: "Este código de 4 dígitos le permite proteger el acceso a su monedero"
+      new_pin_code: "GENERAR OTRO CÓDIGO PIN"
+      auto: "PIN CODE AUTOMÁTICO"
+      manual: "PIN CODE MANUAL"
+      please_note: "Advertencia :"
+      warning_weak_pin_codes: "Su año de nacimiento y código de la tarjeta de crédito no son seguras PIN."
+
+    pin_confirmation:
+      confirm_your: "Confirmar"
+      pin_code: "Código PIN"
+      your_pin_code: "Su código PIN :"
+      enter_again: "Vuelva a introducir el código PIN seleccionado en el paso anterior"
+      pin_codes_do_not_match: "El PIN introducido no coincide con el elegido en el paso anterior."
+
+    seed:
+      usecase_word_group: "Este conjunto de 24 palabras, le permite restaurar su monedero en caso de pérdida o PIN olvidado"
+      given_word_group: "Usted recibió este conjunto de 24 palabras al crear su cartera"
+      write_down_your: "Revise su <b>frase de restauración</b> en el folleto proporcionado"
+      enter_your: "Entre su <b>frase de restauración</b>"
+      recovery_sheet: "Folleto de restauración"
+      your_recovery_phrase: "Su frase de restauración :"
+      invalid_recovery_phrase: "La frase de restauración no es válida."
+      it_wont_be_displayed_again: "Su frase de restauración no se mostrará de nuevo."
+      without_it: "Sin ella, no tendrá acceso a su monedero en caso de pérdida."
+
+    summary:
+      your_wallet_is: "Su monedero esta"
+      almost_ready: "listo en un momento"
+      use_your_bitcoins_create: "En un momento, usted podra utilizar sus bitcoins de la manera más segura posible"
+      use_your_bitcoins_other: "En algunos momentos se podra utilizar de nuevo sus bitcoins de la manera más segura posible"
+      by_clicking_finish_create: "Al hacer clic en Finalizar, confirmas que has elegido un PIN seguro y tenga en cuenta su frase de restauración."
+      by_clicking_finish_other: "Al hacer clic en Finalizar, usted confirma que ha elegido un nuevo PIN seguro."
+      your_wallet_mode_create: "Su monedero se creará."
+      your_wallet_mode_recover: "Su monedero será restaurado."
+      during_the_operation: "Durante la operación, no desconecte su monedero Ledger del USB de su ordenador."
+
+    provisioning:
+      dont_unplug: "No desconecte su monedero Ledger del USB Ledger de su ordenador."
+      provisioning: "Configurando..."
+
+    done:
+      you_can_access_your_wallet: "Ahora puede acceder a su monedero en toda seguridad."
+      configuration_is_complete_create: "Creación completa"
+      configuration_is_complete_recover: "Restauración acabada"
+      unplug_plug: "Desconecte y vuelva a conectar el monedero Ledger para acceder a sus cuentas y bitcoins."
+      configuration_failed_create: "Creación anulada"
+      configuration_failed_recover: "Restauración anulada"
+      error_occured: "Se ha producido un error grave. Contactar con el soporte de ayuda."
+      contact_support: "CONTACTAR EL SOPORTE"
+
+wallet:
+  defaults:
+    operations: &default-operations-translation
+      time: "FECHA Y HORA"
+      account_name: "NOMBRE DE LA CUENTA"
+      bitcoin_address: "DIRECCIÓN BITCOIN"
+      amount: "CANTIDAD"
+      sender: "desde"
+      receiver: "a"
+      balance: "SALDO"
+      no_operations: "Ninguna operación."
+
+  top_menu:
+    balance: 'SALDO'
+    items:
+      dashboard: 'SYNTHESIS'
+      send: 'ENVIAR'
+      receive: 'RECIBIR'
+      accounts: 'CUENTAS'
+      signout: 'LOCK'
+      help: 'AYUDA'
+      account: 'CUENTA'
+
+  dashboard:
+    index:
+      accounts:
+        title: "PANORAMA GENERAL DE CUENTAS"
+        action: "ADMINISTRAR CUENTAS"
+        account_name: "NOMBRE DE CUENTA"
+        account_type: "TYPO"
+        account_balance: "SALDO"
+
+      operations:
+        <<: *default-operations-translation
+        title: "TRANSACCIONES RECIENTES"
+        action: "VER TODAS LAS TRANSACCIONES"
+
+  operations:
+    detail:
+      title: "DETALLE DE OPERACIÓN"
+      amount: "Cantidad"
+      time: "Fecha y hora"
+      status: "Estado"
+      sender: "Desde"
+      receiver: "a"
+      identifier: "Identificación de la transacción"
+      send_by_email: "ENVIAR POR MAIL"
+      print: "IMPRIMIR"
+      close: "CERRAR"
+
+    index:
+      <<: *default-operations-translation
+      title_with_account_name: 'TODAS LAS OPERACIÓNES DE %s'
+      filter_sort_desc: "ORDEN DESCENDENTE"
+      filter_sort_asc: "ORDEN CRECIENTE"
+
+  accounts:
+    show:
+      detail:
+        action: "Configuraciones de la cuenta"
+        balance: "SALDO"
+        balance_in_progress: "CUYAS SIN CONFIRMAR"
+        actions: "ACCIÓNES"
+        receive: "RECIBIR"
+        send: "ENVIAR"
+
+      operations:
+        <<: *default-operations-translation
+        title: "ULTIMAS OPERACIÓNES"
+        action: "VER TODAS LAS OPERACIÓNES"
+        no_operations: "Ninguna operación."
+
+  receive:
+    index:
+      title: "RECIBIR BITCOINS"
+      amount: "CANTIDAD (OPCIONAL)"
+      amount_placeholder: "cantidad"
+      receiver_account: "CUENTA DE CREDITO"
+      receiver_address: "DIRECCIÓN DE RECEPCIÓN BITCOIN"
+      qr_code_explanation: "Escáner de códigos QR por la persona que desea <br /> usted enviar bitcoins"
+      send_by_email: "ENVIAR POR MAIL"
+      print: "IMPRIMIR"
+      close: "CANCELAR"
+
+  send:
+    index:
+      title: "ENVIAR BITCOINS"
+      amount: "CANTIDAD"
+      amount_placeholder: "cantidad"
+      sender_account: "CUENTA DEBITADA"
+      receiver_address: "DIRECCIÓN DE RECEPCIÓN BITCOIN"
+      receiver_address_placeholder: "DIRECCIÓN BITCOIN"
+      total_spent: "TOTAL DEBITADO"
+      transaction_fees_text: "(+0.0001 BTC gastos de transacción)"
+      send: "ENVOYER"
+      close: "ANNULER"
+      confirm: "CONFIRMER"
+
+    validation:
+      title: "Code de validation nécessaire"
+      grab_your_card: "Munissez-vous de votre <b>carte de sécurité</b> (carte noire) et tapez sur votre clavier la lettre ou chiffre indiqué dans la case noire pour chaque valeur en surbrillance :"
+      entered_code: "Code entré :"
+
+    processing:
+      sending: "Envoi en cours..."
+      validating: "Validation de la transaction..."
+      may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
+
+    preparing:
+      title: "Préparation de la transaction..."
+      may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
+
+    error:
+      title: "Envoi échoué"
+      unable_to_send_bitcoins: "La transaction n’a pas pu être effectuée."
+      close: "Fermer"
+
+    success:
+      title: "Envoi terminé"
+      able_to_send_bitcoins: "La transaction a bien été effectuée."
+      close: "Fermer"
+      confirmed_in_a_few_minutes: "L'opération apparaîtra comme confirmée dans quelques minutes."

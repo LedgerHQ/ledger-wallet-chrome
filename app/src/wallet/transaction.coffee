@@ -48,14 +48,16 @@ class ledger.wallet.transaction.Transaction
 
     validationKey = ("0#{char}" for char in validationKey).join('') if @getValidationMode() == ledger.wallet.transaction.Transaction.ValidationModes.KEYCARD
     l validationKey
-    @_out.scriptData = new ByteString @_out.scriptData, HEX
-    @_out.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in @_out.trustedInputs)
-    @_out.publicKeys = (new ByteString(publicKey, HEX) for publicKey in @_out.publicKeys)
+
+    out = _.clone(@_out)
+
+    out.scriptData = new ByteString @_out.scriptData, HEX
+    out.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in @_out.trustedInputs)
+    out.publicKeys = (new ByteString(publicKey, HEX) for publicKey in @_out.publicKeys)
 
     validationKey = switch @_validationMode
       when ledger.wallet.transaction.Transaction.ValidationModes.KEYCARD then new ByteString(validationKey, HEX)
       when ledger.wallet.transaction.Transaction.ValidationModes.PIN then new ByteString(validationKey, ASCII)
-    l validationKey
     try
       ledger.app.wallet._lwCard.dongle.createPaymentTransaction_async(
         @_btInputs,
@@ -67,7 +69,7 @@ class ledger.wallet.transaction.Transaction
         undefined, # Default lockTime
         undefined, # Default sigHash
         validationKey,
-        @_out
+        out
       )
         .then (rawTransaction) =>
           @_transaction = rawTransaction
@@ -83,7 +85,43 @@ class ledger.wallet.transaction.Transaction
 
   getValidationMode: () -> @_validationMode
 
-  getKeycardIndexes: () ->
+  getAmout: () -> @amount
+
+  getRecipientAddress: () -> @receiverAddress
+
+  getValidationDetails: () ->
+    indexes = []
+    indexesKeyCard = @_out.indexesKeyCard
+    amount = ''
+    if ledger.app.wallet.getIntFirmwareVersion() < ledger.wallet.Firmware.V1_4_13
+      stringifiedAmount = @amount.toString()
+      stringifiedAmount = _.str.lpad(stringifiedAmount, 9, '0')
+      decimalPart = stringifiedAmount.substr(stringifiedAmount.length - 8)
+      integerPart = stringifiedAmount.substr(0, stringifiedAmount.length - 8)
+      firstAmountValidationIndex = integerPart.length - 1
+      lastAmountValidationIndex = firstAmountValidationIndex
+      if decimalPart isnt "00000000"
+        lastAmountValidationIndex += 3
+
+    while indexesKeyCard.length >= 2
+      index = indexesKeyCard.substring(0, 2)
+      indexesKeyCard = indexesKeyCard.substring(2)
+      indexes.push parseInt(index, 16)
+
+    details =
+      validationMode: @_validationMode
+      amount:
+        text: stringifiedAmount
+        indexes: [firstAmountValidationIndex..lastAmountValidationIndex]
+      recipientsAddress:
+        text: @recipientAddress
+        indexes: indexes
+      validationCharacters: @getKeycardValidationCharacters()
+
+    details.needsAmountValidation = details.amount.indexes.length > 0
+    details
+
+  getKeycardValidationCharacters: () ->
     indexes = []
     keycardIndexes = []
 
@@ -109,60 +147,67 @@ class ledger.wallet.transaction.Transaction
 
   setHash: (hash) -> @hash = hash
 
+createAndPrepareTransaction = (amount, fees, recipientAddress, inputsPath, changePath, callback) ->
+  amount = ledger.wallet.Value.from(amount)
+  fees = ledger.wallet.Value.from(fees)
+  transaction = new ledger.wallet.transaction.Transaction()
+  transaction.init(amount, fees, recipientAddress)
+  ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
+    return callback?(null, {title: 'Network Error', error, code: ledger.errors.NetworkError}) if error?
+    validOutputs = []
+    # Collect each valid outputs
+    for output in outputs
+      continue if output.paths.length is 0
+      validOutputs.push output
+
+    # Sort outputs by desired priority
+    validOutputs = _(validOutputs).sortBy (output) -> -output['confirmatons']
+
+    return callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds}) if validOutputs.length == 0
+
+    finalOutputs = []
+    collectedAmount = new ledger.wallet.Value()
+    requiredAmount = amount.add(fees)
+    l "Required amount", requiredAmount.toString()
+    l validOutputs
+    hadNetworkFailure = no
+    # For each valid outputs we try to get its raw transaction.
+    _.async.each validOutputs, (output, done, hasNext) ->
+      ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
+        if error?
+          hadNetworkFailure = yes
+          return do done
+
+        l 'raw', hasNext, requiredAmount.toString(), collectedAmount.toString()
+        output.raw = rawTransaction
+        finalOutputs.push output
+        collectedAmount = collectedAmount.add output.value
+        if hasNext is false and collectedAmount.lt(requiredAmount) and hadNetworkFailure
+          # Not enough funds but error is probably caused by a previous network issue
+          callback?(null, {title: 'Network Error', code: ledger.errors.NetworkError})
+        else if hasNext is false and collectedAmount.lt(requiredAmount)
+          # Not enough available funds
+          callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds})
+        else if collectedAmount.gte requiredAmount
+          l "Collected amount", collectedAmount.toString()
+          # We have reached our required amount. It's time to prepare the transaction
+          _.defer -> transaction.prepare(finalOutputs, changePath, callback)
+        else
+          # Continue to collect funds
+          do done
 
 _.extend ledger.wallet.transaction,
 
-    MINIMUM_CONFIRMATIONS: 2
+    MINIMUM_CONFIRMATIONS: 1
 
-    createAndPrepareTransaction: (amount, fees, recipientAddress, inputsPath, changePath, callback) ->
-      amount = ledger.wallet.Value.from(amount)
-      fees = ledger.wallet.Value.from(fees)
-      transaction = new ledger.wallet.transaction.Transaction()
-      transaction.init(amount, fees, recipientAddress)
-      ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
-        return callback?(null, {title: 'Network Error', error, code: ledger.errors.NetworkError}) if error?
+    createAndPrepareTransaction: (amount, fees, recipientAddress, inputsAccounts, changeAccount, callback) ->
+      inputsAccounts = [inputsAccounts] unless _.isArray inputsAccounts
 
+      inputsPaths = []
+      changePath = changeAccount.getHDWalletAccount().getCurrentChangeAddressPath()
 
-        validOutputs = []
-        # Collect each valid outputs
-        for output in outputs
-          continue if output.confirmations < ledger.wallet.transaction.MINIMUM_CONFIRMATIONS or output.paths.length is 0
-          output.priority = inputsPath.indexOf(output.paths[0])
-          validOutputs.push output
+      for inputsAccount in inputsAccounts
+        inputsPaths = inputsPaths.concat(inputsAccount.getHDWalletAccount().getAllAddressesPaths())
 
-        # Sort outputs by desired priority
-        validOutputs = _(validOutputs).sortBy (output) -> output.priority
-
-        return callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds}) if validOutputs.length == 0
-
-        finalOutputs = []
-        collectedAmount = new ledger.wallet.Value()
-        requiredAmount = amount.add(fees)
-        l "Required amount", requiredAmount.toString()
-        l validOutputs
-        hadNetworkFailure = no
-        # For each valid outputs we try to get its raw transaction.
-        _.async.each validOutputs, (output, done, hasNext) ->
-          ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
-            if error?
-              hadNetworkFailure = yes
-              return do done
-
-            l 'raw', hasNext, requiredAmount.toString(), collectedAmount.toString()
-            output.raw = rawTransaction
-            finalOutputs.push output
-            collectedAmount = collectedAmount.add output.value
-            if hasNext is false and collectedAmount.lt(requiredAmount) and hadNetworkFailure
-              # Not enough funds but error is probably caused by a previous network issue
-              callback?(null, {title: 'Network Error', code: ledger.errors.NetworkError})
-            else if hasNext is false and collectedAmount.lt(requiredAmount)
-              # Not enough available funds
-              callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds})
-            else if collectedAmount.gte requiredAmount
-              l "Collected amount", collectedAmount.toString()
-              # We have reached our required amount. It's to prepare the transaction
-              _.defer -> transaction.prepare(finalOutputs, changePath, callback)
-            else
-              # Continue to collect funds
-              do done
+      createAndPrepareTransaction amount, fees, recipientAddress, inputsPaths, changePath, callback
 
