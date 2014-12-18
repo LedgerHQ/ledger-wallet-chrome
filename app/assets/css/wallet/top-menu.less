@@ -137,6 +137,7 @@
     }
 
     .reload-icon {
+      cursor: pointer;
       margin-left: @metrics-medium-padding;
       transition: opacity @animation-short-duration ease-in-out;
       font-size: 0;
@@ -152,6 +153,7 @@
       }
 
       &.spinning {
+        cursor: default;
         pointer-events: none;
         -webkit-animation:spin 1s linear infinite;
       }

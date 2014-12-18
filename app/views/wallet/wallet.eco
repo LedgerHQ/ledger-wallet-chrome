@@ -50,7 +50,7 @@
           <sup><%= t 'common.bitcoin_acronym' %></sup>
         </p>
       </div>
-      <a class="reload-icon" href="#" id="reload_icon">
+      <a class="reload-icon" id="reload_icon">
         <img src="../assets/images/wallet/reload_icon.png" />
       </a>
     </div>
