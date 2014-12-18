@@ -36,12 +36,14 @@ externally_connectable:
 
 commands:
   reload-page:
+    debug: true
     suggested_key:
       default: "Ctrl+R"
       mac: "Command+R"
     description: "Reload the current page"
 
   reload-application:
+    debug: true
     suggested_key:
       default: "Ctrl+Shift+R"
       mac: "Command+Shift+R"

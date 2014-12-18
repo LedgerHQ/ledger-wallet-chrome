@@ -75,6 +75,9 @@
         '../libs/jsqrcode/alignpat'
         '../libs/jsqrcode/databr'
 
+        ## Application configuration
+        'configuration'
+
         ## Routes
         'routes'
 
