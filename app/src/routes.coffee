@@ -1,6 +1,6 @@
 # routes that do not need a plugged ledger wallet
 ledger.router ?= {}
-ledger.router.ignorePluggedWalletForRouting = no
+ledger.router.ignorePluggedWalletForRouting = yes
 ledger.router.pluggedWalletRoutesExceptions = [
   '/',
   '/onboarding/device/plug'
@@ -23,14 +23,29 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/device/pin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDevicePinViewController
 
-  route '/onboarding/device/frozen', (params) ->
-    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceFrozenViewController
-
-  route '/onboarding/device/wrongpin', (params) ->
-    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceWrongpinViewController
-
   route '/onboarding/device/opening', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceOpeningViewController
+
+  route '/onboarding/device/error', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceErrorViewController
+
+  route '/onboarding/device/wrongpin', (params) ->
+    app.router.go '/onboarding/device/error',
+      error: t 'onboarding.device.errors.wrongpin.wrong_pin'
+      message: _.str.sprintf t('onboarding.device.errors.wrongpin.tries_left'), params['?params'].tries_left
+      indication: t 'onboarding.device.errors.wrongpin.unplug_plug'
+
+  route '/onboarding/device/frozen', (params) ->
+    app.router.go '/onboarding/device/error',
+      error: t 'onboarding.device.errors.frozen.wallet_is_frozen'
+      message: t 'onboarding.device.errors.frozen.blank_next_time'
+      indication: t 'onboarding.device.errors.frozen.unplug_plug'
+
+  route '/onboarding/device/unsupported', (params) ->
+    app.router.go '/onboarding/device/error',
+      error: t 'onboarding.device.errors.unsupported.device_unsupported'
+      message: t 'onboarding.device.errors.unsupported.unsuported_kind'
+      indication: t 'onboarding.device.errors.unsupported.get_help'
 
   # Management
   route '/onboarding/management/security', (params) ->

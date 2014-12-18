@@ -81,7 +81,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
             retryNumber = parseInt(error.message.substr(-1))
             @_numberOfRetry = retryNumber
             do unbind
-            callback?(no, {title: 'Wrong PIN', code: ledger.errors.WrongPinCode, error, retryNumber: retryNumber})
+            callback?(no, {title: 'Wrong PIN', code: ledger.errors.WrongPinCode, error, retryCount: retryNumber})
     @_lwCard.verifyPIN pin
 
   setup: (pincode, seed, callback) ->
