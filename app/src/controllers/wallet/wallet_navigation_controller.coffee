@@ -23,12 +23,7 @@ class @WalletNavigationController extends @NavigationController
     url = ledger.application.router.currentUrl
     @updateMenu url
     ##@updateBreadcrumbs url
-    # fetch balances
-    balance = Wallet.instance.getBalance()
-    @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
-    # listen events
-    ledger.app.on 'wallet:balance:changed', (event, balance) =>
-      @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+    @_listenBalanceEvents()
     @_listenSynchronizationEvents()
 
   updateMenu: (url) ->
@@ -63,6 +58,14 @@ class @WalletNavigationController extends @NavigationController
     fragmentedUrl.splice(0, 2)
     fragmentedUrl.splice(fragmentedUrl.length - 1, 1) if fragmentedUrl[fragmentedUrl.length - 1] == 'index'
 
+  _listenBalanceEvents: ->
+    # fetch balances
+    balance = Wallet.instance.getBalance()
+    @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+    # listen events
+    ledger.app.on 'wallet:balance:changed', (event, balance) =>
+      @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+
   _listenSynchronizationEvents: ->
     @view.reloadIcon.on 'click', =>
       Wallet.instance.retrieveAccountsBalances()
@@ -81,6 +84,4 @@ class @WalletNavigationController extends @NavigationController
       @view.reloadIcon.removeClass 'spinning'
 
   _isSynchronizationRunning: ->
-    for i in [0...ledger.wallet.HDWallet.instance.getAccountsCount()]
-      return yes if (ledger.tasks.BalanceTask.get i).isRunning()
-    return ledger.tasks.OperationsSynchronizationTask.instance.isRunning()
+    return ledger.tasks.OperationsSynchronizationTask.instance.getRetrieveAccountsOperationIsRunning()
