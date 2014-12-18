@@ -69,7 +69,7 @@ class @WalletNavigationController extends @NavigationController
   _listenSynchronizationEvents: ->
     @view.reloadIcon.on 'click', =>
       Wallet.instance.retrieveAccountsBalances()
-      ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary()
+      ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary()
       _.defer => @_updateReloadIconState()
     ledger.app.on 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done', (e) =>
       _.defer => @_updateReloadIconState()
@@ -84,4 +84,4 @@ class @WalletNavigationController extends @NavigationController
       @view.reloadIcon.removeClass 'spinning'
 
   _isSynchronizationRunning: ->
-    return ledger.tasks.OperationsSynchronizationTask.instance.getRetrieveAccountsOperationIsRunning()
+    return ledger.tasks.OperationsConsumptionTask.instance.isRunning()

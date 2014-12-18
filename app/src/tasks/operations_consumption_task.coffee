@@ -17,8 +17,6 @@ class ledger.tasks.OperationsConsumptionTask extends ledger.tasks.Task
         @stopIfNeccessary()
     iterate(0)
 
-    Operation.pendingRawTransactionStream().on 'data', => @flushPendingOperationsStream()
-
   retrieveAccountOperations: (hdaccount, callback) ->
     ledger.wallet.pathsToAddresses hdaccount.getAllAddressesPaths(), (addresses) =>
       addresses = _.values addresses
