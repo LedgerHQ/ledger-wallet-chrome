@@ -110,6 +110,7 @@ require @ledger.imports, ->
                   Wallet.instance.retrieveAccountsBalances()
                   ledger.tasks.TransactionObserverTask.instance.start()
                   ledger.tasks.OperationsSynchronizationTask.instance.start()
+                  ledger.tasks.OperationsConsumptionTask.instance.start()
         @emit 'dongle:connected', @wallet
 
     _listenAppEvents: () ->
@@ -117,6 +118,7 @@ require @ledger.imports, ->
       @on 'wallet:operations:sync:failed', =>
         l 'Failed'
         _.delay =>
+          ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary() if @wallet?
           ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() if @wallet?
         , 500
 
