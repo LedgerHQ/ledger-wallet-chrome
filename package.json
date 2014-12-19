@@ -26,6 +26,7 @@
         "through2": "1.1.1",
         "codo": "2.0.9",
         "glob": "4.3.1",
+        "q": "1.1.2",
         "archiver": "latest"
     }
 }

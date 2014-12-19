@@ -1,4 +1,5 @@
 # Load all required libraries.
+Q           = require 'q'
 gulp        = require 'gulp'
 less        = require 'gulp-less'
 coffee      = require 'gulp-coffee'
@@ -45,96 +46,119 @@ releaseManifest = () ->
     @push file
     callback()
 
-completeBuildTask = (dir, mode) ->
+completeBuildTask = (mode) ->
   anti_mode = if mode is DEBUG_MODE then RELEASE_MODE else DEBUG_MODE
-  glob "#{dir}/**/*.#{anti_mode}.js", (er, files) ->
+  glob "#{mode.BuildDir}/**/*.#{anti_mode.Name}.js", (er, files) ->
     for file in files
       del file
-  glob "#{dir}/**/*.#{mode}.js", (er, files) ->
+  glob "#{mode.BuildDir}/**/*.#{mode.Name}.js", (er, files) ->
     for file in files
       path = file.split '/'
       [newFilename] = path.splice -1, 1
-      newFilename = path.join('/') + "/" + newFilename.slice(0, newFilename.lastIndexOf(".#{mode}.js")) + ".js"
+      newFilename = path.join('/') + "/" + newFilename.slice(0, newFilename.lastIndexOf(".#{mode.Name}.js")) + ".js"
       fs.renameSync file, newFilename
 
-DEBUG_MODE = 'debug'
-RELEASE_MODE = 'release'
+class BuildMode
+  constructor: (@Name, @BuildDir) ->
+
+DEBUG_MODE = new BuildMode('debug', 'build')
+RELEASE_MODE = new BuildMode('release', 'release')
 
 COMPILATION_MODE = DEBUG_MODE
 
-gulp.task 'less', ['compile:clean'], ->
-  gulp.src 'app/assets/css/**/*.less'
+tasks =
+
+  less: () ->
+    gulp.src 'app/assets/css/**/*.less'
+      .pipe plumber()
+      .pipe changed "#{COMPILATION_MODE.BuildDir}/assets/css"
+      .pipe less()
+      .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/assets/css"
+
+  css: () ->
+    gulp.src 'app/assets/css/**/*.css'
     .pipe plumber()
     .pipe changed 'build/assets/css'
-    .pipe less()
     .pipe gulp.dest 'build/assets/css'
 
-gulp.task 'css', ['compile:clean'], ->
-  gulp.src 'app/assets/css/**/*.css'
-    .pipe plumber()
-    .pipe changed 'build/assets/css'
-    .pipe gulp.dest 'build/assets/css'
-
-gulp.task 'images', ['compile:clean'], ->
-  gulp.src 'app/assets/images/**/*'
+  images: () ->
+    gulp.src 'app/assets/images/**/*'
     .pipe plumber()
     .pipe changed 'build/assets/images/'
     .pipe gulp.dest 'build/assets/images/'
 
-gulp.task 'fonts', ['compile:clean'], ->
-  gulp.src 'app/assets/fonts/**/*'
-  .pipe plumber()
-  .pipe changed 'build/assets/fonts/'
-  .pipe gulp.dest 'build/assets/fonts/'
+  fonts: () ->
+    gulp.src 'app/assets/fonts/**/*'
+    .pipe plumber()
+    .pipe changed 'build/assets/fonts/'
+    .pipe gulp.dest 'build/assets/fonts/'
 
-gulp.task 'html', ['compile:clean'], ->
-  gulp.src 'app/views/**/*.html'
+  html: () ->
+    gulp.src 'app/views/**/*.html'
     .pipe plumber()
     .pipe changed 'build/views'
     .pipe gulp.dest 'build/views'
 
-gulp.task 'eco', ['compile:clean'], ->
-  gulp.src 'app/views/**/*.eco'
+  eco: () ->
+    gulp.src 'app/views/**/*.eco'
     .pipe plumber()
     .pipe changed 'build/views'
     .pipe eco({basePath: 'app/views/'})
     .pipe gulp.dest 'build/views'
 
-gulp.task 'yml', ['compile:clean'], ->
-  gulp.src 'app/manifest.yml'
+  yml: () ->
+    gulp.src 'app/manifest.yml'
     .pipe plumber()
     .pipe changed 'build/'
     .pipe yaml()
     .pipe gulp.dest 'build/'
 
-gulp.task 'translate', ['compile:clean'], ->
-  gulp.src 'app/locales/**/*.yml'
+  translate: () ->
+    gulp.src 'app/locales/**/*.yml'
     .pipe plumber()
     .pipe changed 'build/_locales/'
     .pipe yaml()
     .pipe i18n()
     .pipe gulp.dest 'build/_locales/'
 
-gulp.task 'js', ['compile:clean'], ->
-  gulp.src 'app/**/*.js'
+  js: () ->
+    gulp.src 'app/**/*.js'
     .pipe plumber()
     .pipe changed 'build/'
     .pipe gulp.dest 'build/'
 
-gulp.task 'public', ['compile:clean'], ->
-  gulp.src 'app/public/**/*'
-  .pipe plumber()
+  public: () ->
+    gulp.src 'app/public/**/*'
+    .pipe plumber()
     .pipe changed 'build/'
-      .pipe gulp.dest 'build/public'
+    .pipe gulp.dest 'build/public'
 
-gulp.task 'coffee-script', ['compile:clean'], ->
-  gulp.src 'app/**/*.coffee'
+  coffee: () ->
+    gulp.src 'app/**/*.coffee'
     .pipe plumber()
     .pipe changed 'build/'
     .pipe sourcemaps.init()
     .pipe coffee()
     .pipe sourcemaps.write '/'
     .pipe gulp.dest 'build/'
+
+  compile: () ->
+    promise = Q.defer()
+    run = [
+      tasks.js()
+      tasks.coffee()
+      tasks.public()
+      tasks.translate()
+      tasks.yml()
+      tasks.eco()
+      tasks.images()
+      tasks.fonts()
+      tasks.html()
+      tasks.less()
+    ]
+    Q.all.apply(Q, run).then promise.resolve
+    promise.promise
+
 
 gulp.task 'doc', (cb) ->
   {exec} = require 'child_process'
@@ -144,73 +168,29 @@ gulp.task 'doc', (cb) ->
   child.stdout.pipe process.stdout
   child.stderr.pipe process.stderr
 
-gulp.task 'compile:clean', (cb) ->
-  del ['build/'], cb
-
-gulp.task 'release:clean', (cb) ->
-  del ['release/'], cb
-
-gulp.task 'release:uglify', ['compile:sources', 'release:clean'],  ->
-  gulp.src 'build/src/**/*.js'
-    .pipe gulp.dest 'release/src/'
-
-gulp.task 'release:minify', ['compile:assets', 'release:clean'],  ->
-  gulp.src 'build/**/*.css'
-    .pipe minifyCss()
-    .pipe gulp.dest 'release/'
-
-gulp.task 'release:images', ['compile:assets', 'release:clean'], ->
-  gulp.src 'build/assets/images/**/*'
-    .pipe gulp.dest 'release/assets/images'
-
-gulp.task 'release:fonts', ['compile:assets', 'release:clean'], ->
-  gulp.src 'build/assets/fonts/**/*'
-  .pipe gulp.dest 'release/assets/fonts'
-
-gulp.task 'release:json', ['compile:assets', 'release:clean'], ->
-  gulp.src 'build/**/*.json'
-    .pipe gulp.dest 'release/'
-
-gulp.task 'release:libs', ['compile:sources', 'release:clean'], ->
-  gulp.src 'build/libs/**/*.js'
-    .pipe gulp.dest 'release/libs/'
-
-gulp.task 'release:views', ['compile:assets', 'release:clean'], ->
-  gulp.src 'build/views/**/*'
-    .pipe gulp.dest 'release/views/'
-
-gulp.task 'release:public', ['public', 'release:clean'], ->
-  gulp.src 'build/public/**/*'
-  .pipe plumber()
-    .pipe changed 'release/'
-      .pipe gulp.dest 'release/public'
-
-gulp.task 'release:manifest', ['compile:assets', 'release:clean', 'release:json'], ->
-  gulp.src 'app/manifest.yml'
-  .pipe yaml()
-  .pipe releaseManifest()
-  .pipe gulp.dest 'release/'
+gulp.task 'clean', (cb) ->
+  del ['build/', 'release/'], cb
 
 gulp.task 'watch', ['compile'], ->
   gulp.watch('app/**/*', ['watch-debug'])
 
 
 # Default task call every tasks created so far.
-gulp.task 'compile:assets', ['less', 'css', 'eco', 'html', 'yml', 'images', 'fonts', 'translate', 'public']
-gulp.task 'compile:sources', ['js', 'coffee-script']
-gulp.task 'compile', ['compile:clean', 'compile:assets', 'compile:sources']
-gulp.task 'default', ['debug']
+
+gulp.task 'compile', ->
+  tasks.compile()
+
+gulp.task 'default', ['compile']
 
 gulp.task 'clean', ['compile:clean', 'release:clean']
 
-gulp.task 'debug', ['compile'], ->
-  completeBuildTask 'build', DEBUG_MODE
+gulp.task 'debug', ['clean'], ->
+  COMPILATION_MODE = DEBUG_MODE
+  tasks.compile()
 
-gulp.task 'debug', ['compile:assets', 'compile:sources'], ->
-  completeBuildTask 'build', DEBUG_MODE
-
-gulp.task 'release', ['release:clean', 'release:uglify', 'release:minify', 'release:json', 'release:libs', 'release:images', 'release:views', 'release:public', 'release:manifest', 'release:fonts', 'compile'],  ->
-  completeBuildTask 'release', RELEASE_MODE
+gulp.task 'release',  ->
+  COMPILATION_MODE = RELEASE_MODE
+  tasks.compile()
 
 gulp.task 'package', ['release'], ->
   setTimeout ->
