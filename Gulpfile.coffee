@@ -36,7 +36,7 @@ i18n = () ->
 releaseManifest = () ->
   through2.obj (file, encoding, callback) ->
     manifest = JSON.parse(file.contents.toString(encoding))
-    if manifest.commands?
+    if manifest.commands? and COMPILATION_MODE is RELEASE_MODE
       commands = {}
       for name, command of manifest.commands
         unless command.debug? is true
@@ -111,6 +111,7 @@ tasks =
     .pipe plumber()
     .pipe changed 'build/'
     .pipe yaml()
+    .pipe releaseManifest()
     .pipe gulp.dest 'build/'
 
   translate: () ->
