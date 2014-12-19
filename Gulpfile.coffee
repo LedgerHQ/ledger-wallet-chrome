@@ -152,7 +152,6 @@ gulp.task 'release:clean', (cb) ->
 
 gulp.task 'release:uglify', ['compile:sources', 'release:clean'],  ->
   gulp.src 'build/src/**/*.js'
-    .pipe uglify(mangle: off)
     .pipe gulp.dest 'release/src/'
 
 gulp.task 'release:minify', ['compile:assets', 'release:clean'],  ->
@@ -163,6 +162,10 @@ gulp.task 'release:minify', ['compile:assets', 'release:clean'],  ->
 gulp.task 'release:images', ['compile:assets', 'release:clean'], ->
   gulp.src 'build/assets/images/**/*'
     .pipe gulp.dest 'release/assets/images'
+
+gulp.task 'release:fonts', ['compile:assets', 'release:clean'], ->
+  gulp.src 'build/assets/fonts/**/*'
+  .pipe gulp.dest 'release/assets/fonts'
 
 gulp.task 'release:json', ['compile:assets', 'release:clean'], ->
   gulp.src 'build/**/*.json'
@@ -206,7 +209,7 @@ gulp.task 'debug', ['compile'], ->
 gulp.task 'debug', ['compile:assets', 'compile:sources'], ->
   completeBuildTask 'build', DEBUG_MODE
 
-gulp.task 'release', ['release:clean', 'release:uglify', 'release:minify', 'release:json', 'release:libs', 'release:images', 'release:views', 'release:public', 'release:manifest', 'compile'],  ->
+gulp.task 'release', ['release:clean', 'release:uglify', 'release:minify', 'release:json', 'release:libs', 'release:images', 'release:views', 'release:public', 'release:manifest', 'release:fonts', 'compile'],  ->
   completeBuildTask 'release', RELEASE_MODE
 
 gulp.task 'package', ['release'], ->
