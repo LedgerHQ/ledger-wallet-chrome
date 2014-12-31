@@ -16,7 +16,6 @@ class AuthenticatedClient
     onComplete = request.onComplete
 
     request.onFailure = () ->
-      
 
     request.onComplete = () ->
 
