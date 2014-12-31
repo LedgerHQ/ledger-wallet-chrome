@@ -41,7 +41,6 @@ class @WalletSendIndexDialogViewController extends DialogViewController
       @dismiss()
 
   openScanner: ->
-    (new WalletSendIndexDialogViewController()).show()
     successBlock = =>
       @view.errorContainer.hide()
       @view.videoCaptureContainer.one 'webkitTransitionEnd', =>

@@ -7,6 +7,7 @@ class @ledger.dialogs.DialogController extends EventEmitter
   constructor: (controller, @options) ->
     @_controller = controller
     @_shown = no
+    @_backStack = []
 
   # Show the dialog
   show: ->
@@ -27,15 +28,30 @@ class @ledger.dialogs.DialogController extends EventEmitter
   # Called by the dialogs controller when its time to render the view controller
   # in the given selector
   render: (selector, done) ->
+    @_selector = selector
     @_viewController.once 'afterRender', done
     @_viewController.render selector
 
   handleAction: (actionName, params) -> @_viewController.handleAction(actionName, params)
 
   push: (viewController) ->
+    if @_viewController?
+     @_pushViewController(viewController)
+    else
+      @_viewController = viewController
+      viewController.parentViewController = @
+      viewController.onAttach()
+      @emit 'push', {sender: @, viewController: viewController}
+
+  _pushViewController: (viewController) ->
+    @_viewController?.onDetach()
+    @_selector.empty()
+    @_backStack.push @_viewController if @_viewController?
     @_viewController = viewController
-    viewController.parentViewController = @
-    viewController.onAttach()
+    @_viewController.parentViewController = @
+    @_viewController._dialog = @
+    @_viewController.onAttach()
+    @_viewController.render @_selector
     @emit 'push', {sender: @, viewController: viewController}
 
   pop: ->
@@ -45,6 +61,8 @@ class @ledger.dialogs.DialogController extends EventEmitter
     viewController.onDetach()
     viewController.parentViewController = undefined
     @emit 'pop', {sender: @, viewController: viewController}
+    if @_backStack.length > 0
+      @_pushViewController(@_backStack.splice(@_backStack.length - 1, 1)[0])
     viewController
 
   # Ask to its DialogsController to dismiss its UI
