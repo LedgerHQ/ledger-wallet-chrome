@@ -2,9 +2,6 @@
     "name": "ledger-wallet",
     "version": "0.0.1",
     "private": true,
-    "scripts": {
-       "preinstall": "npm install -g gulp"
-    },
     "dependencies": {
         "node-watch": "0.3.4",
         "eco": "1.1.0-rc-3",
@@ -26,6 +23,10 @@
         "through2": "1.1.1",
         "codo": "2.0.9",
         "glob": "4.3.1",
-        "archiver": "latest"
+        "q": "1.1.2",
+        "archiver": "latest",
+        "gulp-rename": "1.2.0",
+        "crx": "2.0.0",
+        "node-rsa": "0.2.13"
     }
 }
