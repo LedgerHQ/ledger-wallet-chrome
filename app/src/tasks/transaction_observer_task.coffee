@@ -49,9 +49,14 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
     found
 
   _handleNewBlock: (block) ->
+    l 'Receive block', block
     for transactionHash in block['transaction_hashes']
       if Operation.find(hash: transactionHash).count() > 0
-        ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary()
+        l 'Found transaction in block'
+        if ledger.tasks.OperationsSynchronizationTask.instance.isRunning()
+          ledger.tasks.OperationsSynchronizationTask.instance.synchronizeConfirmationNumbers()
+        else
+          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary()
         Wallet.instance?.retrieveAccountsBalances()
         return
 

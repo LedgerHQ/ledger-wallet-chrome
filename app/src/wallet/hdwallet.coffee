@@ -144,24 +144,31 @@ class ledger.wallet.HDWallet.Account
   getCurrentPublicAddress: () -> ledger.wallet.HDWallet.instance.cache?.get(@getCurrentPublicAddressPath())
 
   notifyPathsAsUsed: (paths) ->
+    paths = [paths] unless _.isArray(paths)
     for path in paths
       path = path.replace("#{@wallet.getRootDerivationPath()}/0'/", '').split('/')
       switch path[0]
-        when '0' then @_notifyPublicAddressIndexAsUsed path[1]
-        when '1' then @_notifyChangeAddressIndexAsUsed path[1]
+        when '0' then @_notifyPublicAddressIndexAsUsed parseInt(path[1])
+        when '1' then @_notifyChangeAddressIndexAsUsed parseInt(path[1])
     return
 
   _notifyPublicAddressIndexAsUsed: (index) ->
+    l 'Notify public change', index, 'current is', @_account.currentPublicIndex
     if index < @_account.currentPublicIndex
+      l 'Index is less than current'
       derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
       @_account.excludedPublicPaths = _.without @_account.excludedPublicPaths, derivationPath
     else if index > @_account.currentPublicIndex
+      l 'Index is more than current'
       difference =  index - (@_account.currentPublicIndex + 1)
       @_account.excludedPublicPaths ?= []
       for i in [0...difference]
         derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index - i - 1}"
         @_account.excludedPublicPaths.push derivationPath unless _.contains(@_account.excludedPublicPaths, derivationPath)
       @_account.currentPublicIndex = parseInt(index) + 1
+    else if index == @_account.currentPublicIndex
+        l 'Index is equal to current'
+        @shiftCurrentPublicAddressPath()
     @save()
 
   _notifyChangeAddressIndexAsUsed: (index) ->
@@ -175,6 +182,8 @@ class ledger.wallet.HDWallet.Account
         derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index - i - 1}"
         @_account.excludedChangePaths.push derivationPath unless _.contains(@_account.excludedChangePaths, derivationPath)
       @_account.currentChangeIndex = parseInt(index) + 1
+    else if index == @_account.currentChangeIndex
+      @shiftCurrentChangeAddressPath()
     @save()
 
   shiftCurrentPublicAddressPath: (callback) ->
