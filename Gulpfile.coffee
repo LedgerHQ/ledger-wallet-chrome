@@ -211,7 +211,7 @@ gulp.task 'doc', (cb) ->
 gulp.task 'clean', (cb) ->
   del ['build/', 'release/'], cb
 
-gulp.task 'watch', ['compile'], ->
+gulp.task 'watch', ['debug'], ->
   COMPILATION_MODE = DEBUG_MODE
   gulp.watch('app/**/*', ['compile'])
 

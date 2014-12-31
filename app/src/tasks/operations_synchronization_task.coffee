@@ -24,7 +24,6 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
               operationToUpdate.set('confirmations', refreshedOperation['confirmations']).save()
               updatesCount += 1
         ledger.app.emit 'wallet:operations:update', operationsToUpdate if updatesCount > 0
-      _.delay (=> @synchronizeConfirmationNumbers(ops, callback)), 1000
       return if error?
 
   flushPendingOperationsStream: () ->

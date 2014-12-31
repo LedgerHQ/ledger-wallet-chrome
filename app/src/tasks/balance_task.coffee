@@ -27,10 +27,7 @@ class ledger.tasks.BalanceTask extends ledger.tasks.Task
         account.set('unconfirmed_balance', balance.unconfirmed)
         account.save()
         @emit "success", @
-        if balance.unconfirmed > 0
-          _.delay (=> @getAccountBalance()), 1000
-        else
-          @stopIfNeccessary()
+        @stopIfNeccessary()
         if totalBalance != balance.total or unconfirmedBalance != balance.unconfirmed
           ledger.app.emit "wallet:balance:changed", account.get('wallet').getBalance()
         else

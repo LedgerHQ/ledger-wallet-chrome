@@ -57,6 +57,8 @@ class Collection
     query.first = () =>
       d = data.call(query)
       @_modelize(d[d.length - 1])
+    query.all = query.data
+    query.count = () -> data.call(query).length
     query
 
   getCollection: () -> @_collection
