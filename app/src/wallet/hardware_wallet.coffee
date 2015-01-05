@@ -178,6 +178,31 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   getExtendedPublicKeys: () -> @_xpubs
 
+  isDongleCertified: (callback) ->
+    randomValues = new Uint32Array(2)
+    crypto.getRandomValues(randomValues)
+    random = _.str.lpad(randomValues[0].toString(16), 8, '0') + _.str.lpad(randomValues[1].toString(16), 8, '0')
+    adpu = 'E0C2000008' + random
+    p = @sendAdpu new ByteString(adpu, HEX), [0x9000]
+    p.then (result) =>
+      attestation = result.toString(HEX)
+      @attestation =
+        raw: attestation
+        keyBatchId: attestation.substring(0, 8)
+        keyDerivationId: attestation.substring(8, 16)
+        supportedOperationBitFlag: attestation.substring(16, 18)
+        firmwareMajor: attestation.substring(18, 22)
+        firmwareMinor: attestation.substring(22, 24)
+        firmarePatch: attestation.substring(24, 26)
+        loaderIdMajor: attestation.substring(26, 28)
+        loaderIdMinor: attestation.substring(28, 30)
+        signature: attestation.substring(30)
+      l @attestation, random
+    p.fail (result) =>
+      e result
+
+  sendAdpu: (cla, ins, p1, p2, opt1, opt2, opt3, wrapScript) -> @_lwCard.dongle.card.sendApdu_async(cla, ins, p1, p2, opt1, opt2, opt3, wrapScript)
+
   _setState: (newState) ->
     @_state = newState
     switch newState
