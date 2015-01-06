@@ -15,6 +15,13 @@
   V1_4_12: 0x0001040c0146
   V1_4_13: 0x0001040d0146
 
+@ledger.wallet.Attestation =
+  String: "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
+  Bytes: []
+
+for i in [0...(ledger.wallet.Attestation.String.length / 2)]
+  ledger.wallet.Attestation.Bytes.push parseInt(ledger.wallet.Attestation.String.substring(i, i + 2), 16)
+
 class @ledger.wallet.HardwareWallet extends EventEmitter
 
   _state: ledger.wallet.States.UNDEFINED
@@ -198,6 +205,21 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
         loaderIdMinor: attestation.substring(28, 30)
         signature: attestation.substring(30)
       l @attestation, random
+      try
+        SHA256  = new  JSUCrypt.hash.SHA256()
+        domain =  JSUCrypt.ECFp.getEcDomainByName("secp256k1")
+        pubKey = new JSUCrypt.key.EcFpPublicKey(256, domain)
+        pubKey.W =
+          getUncompressedForm: -> ledger.wallet.Attestation.Bytes
+        ecsig = new JSUCrypt.signature.ECDSA(SHA256)
+        ecsig.init(pubKey,  JSUCrypt.signature.MODE_VERIFY)
+        sigBytes = (parseInt(@attestation.signature.substring(i, i + 2), 16) for i in [0...(@attestation.signature.length / 2)])
+        ver = ecsig.verify(random, sigBytes)
+        l sigBytes
+        l 'Verif', ver
+        return
+      catch er
+        e er
     p.fail (result) =>
       e result
 
@@ -254,4 +276,3 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
             _.defer () ->
               params.do(data, ev)
     unbind
-
