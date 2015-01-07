@@ -204,7 +204,9 @@ class @Model extends @EventEmitter
   @findById: (id, context = ledger.db.contexts.main) -> context.getCollection(@getCollectionName()).get(id)
 
   @findOrCreate: (query, base, context = ledger.db.contexts.main) ->
-    context = base if _.isKindOf(base, ledger.db.contexts.Context)
+    if _.isKindOf(base, ledger.db.contexts.Context)
+      context = base
+      base = undefined
     if _.isObject query
       object = @find(query, context).data()[0]
       base ?= {}

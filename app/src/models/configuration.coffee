@@ -1,4 +1,5 @@
 class @Configuration extends @Model
+  do @init
 
   @_instance: undefined
 
