@@ -73,8 +73,8 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
         l 'After address'
         l addressesPaths
         ledger.api.TransactionsRestClient.instance.getTransactions _.values(addresses), (transactions, error) =>
+          l 'Received', transactions
           return @emit 'bip44:fatal' if error?
-
           usedAddresses = []
           select = (array) -> _.select array, ((i) -> if addressesPaths[i]? then yes else no)
 

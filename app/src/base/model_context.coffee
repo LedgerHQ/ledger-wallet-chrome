@@ -57,6 +57,8 @@ class Collection
     query.first = () =>
       d = data.call(query)
       @_modelize(d[d.length - 1])
+    query.all = query.data
+    query.count = () -> data.call(query).length
     query
 
   getCollection: () -> @_collection
@@ -91,6 +93,10 @@ class ledger.db.contexts.Context extends EventEmitter
       collection = @getCollection(className)
       collection.getCollection().DynamicViews = []
       collection.getCollection().ensureIndex(index) for index in modelClass._indexes if modelClass.__indexes?
+    try
+      new MigrationHandler(@).applyMigrations()
+    catch er
+      e er
 
   getCollection: (name) ->
     collection = @_collections[name]

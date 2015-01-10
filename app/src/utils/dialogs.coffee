@@ -6,34 +6,52 @@ class @ledger.dialogs.DialogController extends EventEmitter
 
   constructor: (controller, @options) ->
     @_controller = controller
+    @_shown = no
+    @_backStack = []
 
   # Show the dialog
   show: ->
     @_controller.show this
 
   onShow: ->
+    @_shown = yes
     @_viewController.onShow()
     @emit 'show'
 
-  isShown: ->
-    @ == ledger.dialogs.manager.displayedDialog()
+  isShown: -> @_shown
 
   onDismiss: ->
     @_viewController.onDismiss()
     @emit 'dismiss'
+    @_shown = no
 
   # Called by the dialogs controller when its time to render the view controller
   # in the given selector
   render: (selector, done) ->
+    @_selector = selector
     @_viewController.once 'afterRender', done
     @_viewController.render selector
 
   handleAction: (actionName, params) -> @_viewController.handleAction(actionName, params)
 
   push: (viewController) ->
+    if @_viewController?
+     @_pushViewController(viewController)
+    else
+      @_viewController = viewController
+      viewController.parentViewController = @
+      viewController.onAttach()
+      @emit 'push', {sender: @, viewController: viewController}
+
+  _pushViewController: (viewController) ->
+    @_viewController?.onDetach()
+    @_selector.empty()
+    @_backStack.push @_viewController if @_viewController?
     @_viewController = viewController
-    viewController.parentViewController = @
-    viewController.onAttach()
+    @_viewController.parentViewController = @
+    @_viewController._dialog = @
+    @_viewController.onAttach()
+    @_viewController.render @_selector
     @emit 'push', {sender: @, viewController: viewController}
 
   pop: ->
@@ -43,6 +61,8 @@ class @ledger.dialogs.DialogController extends EventEmitter
     viewController.onDetach()
     viewController.parentViewController = undefined
     @emit 'pop', {sender: @, viewController: viewController}
+    if @_backStack.length > 0
+      @_pushViewController(@_backStack.splice(@_backStack.length - 1, 1)[0])
     viewController
 
   # Ask to its DialogsController to dismiss its UI
@@ -72,16 +92,17 @@ class @ledger.dialogs.DialogsController
   # Shpw a dialog
   # @param dialog [ledger.dialogs.DialogController] the dialog to show
   show: (dialog) ->
-    return if @_dialogs.length > 0
 
+    dialog._level = @_dialogs.length
     dialog._id = _.uniqueId()
-    @_selector.show(0, =>  @_selector.addClass('display'))
+    @_selector.show(0, =>  @_selector.addClass('display')) if @_dialogs.length is 0
 
     @_selector.append(JST['base/dialog']({dialog_id: dialog._id}))
     @_selector.find("#dialog_#{dialog._id}").on 'click', ((e) -> e.preventDefault())
     if @_dialogs.length == 0
       @_selector.show()
-      @_selector.addClass('display')
+
+    @_selector.find("#dialog_container_#{dialog._id}").addClass('display')
 
     @_dialogs.push dialog
     dialog.render @_selector.find("#dialog_#{dialog._id}"), =>
@@ -96,20 +117,19 @@ class @ledger.dialogs.DialogsController
   # @param dialog [ledger.dialogs.DialogController] the dialog to dismiss
   dismiss: (dialog, animated = yes) ->
     return if not dialog.isShown()
-    @_dialogs.splice(0, 1)
-    @_selector.removeClass('display')
+    @_dialogs = _.without @_dialogs, dialog
+    @_selector.find("#dialog_container_#{dialog._id}").removeClass('display')
     dialogSelector = @_selector.find("#dialog_#{dialog._id}")
     dialogSelector.animate {top:(window.innerHeight) / 2 + dialogSelector.height() * 0.8, opacity: 0.6}, (if animated then 400 else 0),  =>
-      @_selector.find("#dialog_#{dialog._id}").remove()
-      @_selector.hide()
+      @_selector.find("#dialog_container_#{dialog._id}").remove()
       dialog.onDismiss()
+      @_selector.hide() if @_dialogs.length is 0
 
   dismissAll: (animated = yes) ->
     return if @_dialogs.length == 0
     dialog = @_dialogs[0]
     dialog.dismiss(animated)
 
-  displayedDialog: () ->
-    @_dialogs[0]
+  displayedDialog: () -> @_dialogs[@_dialogs.length - 1]
 
 @ledger.dialogs.manager = new ledger.dialogs.DialogsController()

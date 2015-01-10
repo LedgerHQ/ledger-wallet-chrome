@@ -159,6 +159,7 @@
         'utils/database/database'
         'base/model_context'
         'base/model'
+        'base/migrations'
         'base/view_controller'
         'base/navigation_controller'
 
@@ -166,6 +167,7 @@
         'models/wallet'
         'models/account'
         'models/operation'
+        'models/configuration'
 
         ## Dialog Management
         'utils/dialogs'

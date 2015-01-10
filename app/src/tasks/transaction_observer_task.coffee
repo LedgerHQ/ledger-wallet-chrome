@@ -12,13 +12,18 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
     @newTransactionStream = new WebSocket "wss://ws.chain.com/v2/notifications"
     @newTransactionStream.onopen = () =>
       @newTransactionStream.send JSON.stringify type: "new-transaction", block_chain: "bitcoin"
+      @newTransactionStream.send JSON.stringify type: "new-block", block_chain: "bitcoin"
 
     @newTransactionStream.onmessage = (event) =>
       data = JSON.parse(event.data)
-      if data?.payload.transaction?
-        transaction = data.payload.transaction
-        @_handleTransactionIO(transaction, transaction.inputs)
-        @_handleTransactionIO(transaction, transaction.outputs)
+      return unless data?.payload?.type?
+      switch data.payload.type
+        when 'new-transaction'
+          transaction = data.payload.transaction
+          @_handleTransactionIO(transaction, transaction.inputs)
+          @_handleTransactionIO(transaction, transaction.outputs)
+        when 'new-block'
+          @_handleNewBlock data.payload.block
     @newTransactionStream.onclose = => @_listenNewTransactions() if @isRunning()
 
   _handleTransactionIO: (transaction, io) ->
@@ -29,15 +34,31 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
         for address in input.addresses
           derivation = ledger.wallet.HDWallet.instance?.cache?.getDerivationPath(address)
           if derivation?
-            l derivation
+            l "New transaction on #{derivation}"
             account = ledger.wallet.HDWallet.instance?.getAccountFromDerivationPath(derivation)
             if account?
+              l 'Add transaction'
+              account.notifyPathsAsUsed(derivation)
               Account.fromHDWalletAccount(account)?.addRawTransactionAndSave transaction
               Wallet.instance?.retrieveAccountsBalances()
-              account.shiftCurrentPublicAddressPath() if account.getCurrentPublicAddressPath() == derivation
-              account.shiftCurrentChangeAddressPath() if account.getCurrentChangeAddressPath() == derivation
               ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
+              ledger.app.emit 'wallet:operations:new'
+              ledger.app.emit 'wallet:operations:new'
+            else
+              l 'Failed to add transaction'
     found
+
+  _handleNewBlock: (block) ->
+    l 'Receive block', block
+    for transactionHash in block['transaction_hashes']
+      if Operation.find(hash: transactionHash).count() > 0
+        l 'Found transaction in block'
+        if ledger.tasks.OperationsSynchronizationTask.instance.isRunning()
+          ledger.tasks.OperationsSynchronizationTask.instance.synchronizeConfirmationNumbers()
+        else
+          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary()
+        Wallet.instance?.retrieveAccountsBalances()
+        return
 
   @instance: new @()
 

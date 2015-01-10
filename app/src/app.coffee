@@ -17,7 +17,6 @@ require @ledger.imports, ->
       @_listenWalletEvents()
       @_listenClickEvents()
       @_listenAppEvents()
-
       @devicesManager.start()
       @router.go('/')
 

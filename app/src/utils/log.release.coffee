@@ -1,5 +1,7 @@
-@l = _.noop
+noop = ->
 
-@e = _.noop
+@l = noop
 
-LWTools.console = _.noop
+@e = noop
+
+LWTools?.console = noop
