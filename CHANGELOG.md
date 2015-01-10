@@ -1,5 +1,11 @@
 # Changelog
 
+1.0.7
+=====
+- Improve transactions synchronization
+- Fix a bug in transaction preparation
+- Fix a bug in transaction interpretation
+
 1.0.5/1.0.6
 =====
 - Add manual synchronization button
