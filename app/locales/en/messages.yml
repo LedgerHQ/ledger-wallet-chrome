@@ -77,11 +77,11 @@ onboarding:
     wallet_not_affected: "No changes will be made to your wallet."
 
     security:
-      security_informations: "<b>Security</b> informations"
+      security_informations: "<b>Security</b> information"
       trusted_computer_required: "A trusted computer is required to configure your Ledger Wallet"
       line1: "This configuration wizard handles highly sensitive data about your wallet."
-      line2_create: "It is very important to continue the creation process from a private (or trusted) computer to prevent someone from accessing these informations illicitly."
-      line2_other: "It is very important to continue the recovery process from a private (or trusted) computer to prevent someone from accessing these informations illicitly."
+      line2_create: "It is very important to continue the creation process from a private (or trusted) computer to prevent someone from accessing these information illicitly."
+      line2_other: "It is very important to continue the recovery process from a private (or trusted) computer to prevent someone from accessing these information illicitly."
       line3: "In case of doubt, we recommend that you remove your Ledger Wallet from the USB port of the computer and reopen this wizard from another more secure computer."
       by_clicking_continue: "By clicking CONTINUE, you confirm to use a trusted computer to configure your Ledger Wallet."
 
