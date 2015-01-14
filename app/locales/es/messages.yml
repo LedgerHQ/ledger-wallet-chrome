@@ -238,31 +238,31 @@ wallet:
       receiver_address_placeholder: "DIRECCIÓN BITCOIN"
       total_spent: "TOTAL DEBITADO"
       transaction_fees_text: "(+0.0001 BTC gastos de transacción)"
-      send: "ENVOYER"
-      close: "ANNULER"
-      confirm: "CONFIRMER"
+      send: "ENVIAR"
+      close: "ANULAR"
+      confirm: "CONFIRMAR"
 
     validation:
-      title: "Code de validation nécessaire"
-      grab_your_card: "Munissez-vous de votre <b>carte de sécurité</b> (carte noire) et tapez sur votre clavier la lettre ou chiffre indiqué dans la case noire pour chaque valeur en surbrillance :"
-      entered_code: "Code entré :"
+      title: "Requiere código de validación"
+      grab_your_card: "Coge tu <b>carta de seguridad</b> y tipea en tu teclado la letra o el número en la caja negra por cada valor indicado:"
+      entered_code: "Código ingresado:"
 
     processing:
-      sending: "Envoi en cours..."
-      validating: "Validation de la transaction..."
-      may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
+      sending: "Enviando..."
+      validating: "Validando la transacción..."
+      may_take_a_while: "Por favor esperá, la transacción puede demorar unos momentos."
 
     preparing:
-      title: "Préparation de la transaction..."
-      may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
+      title: "Preparando la transacción..."
+      may_take_a_while: "Por favor esperá, la transacción puede demorar unos momentos."
 
     error:
-      title: "Envoi échoué"
-      unable_to_send_bitcoins: "La transaction n’a pas pu être effectuée."
-      close: "Fermer"
+      title: "Error en envío"
+      unable_to_send_bitcoins: "La transacción no pudo ser completada."
+      close: "Cerrar"
 
     success:
-      title: "Envoi terminé"
-      able_to_send_bitcoins: "La transaction a bien été effectuée."
-      close: "Fermer"
-      confirmed_in_a_few_minutes: "L'opération apparaîtra comme confirmée dans quelques minutes."
+      title: "Transacción exitosa"
+      able_to_send_bitcoins: "La transacción fue completada."
+      close: "Cerrar"
+      confirmed_in_a_few_minutes: "Esta operación va a figurar confirmada en unos minutos."
