@@ -244,7 +244,7 @@ wallet:
 
     validation:
       title: "Requiere código de validación"
-      grab_your_card: "Coge tu <b>carta de seguridad</b> y tipea en tu teclado la letra o el número en la caja negra cada valor indicado:"
+      grab_your_card: "Coge tu <b>carta de seguridad</b> y tipea en tu teclado la letra o el número en la caja negra por cada valor indicado:"
       entered_code: "Código ingresado:"
 
     processing:
