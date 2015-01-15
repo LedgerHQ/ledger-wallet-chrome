@@ -10,4 +10,7 @@ _.extend ledger.errors,
   SignatureError: 4
   WrongPinCode: 5
   NotSupportedDongle: 6
+  AuthenticationFailed: 7
+
+  create: (code, title, error) -> code: code, title: title, error: error
 
