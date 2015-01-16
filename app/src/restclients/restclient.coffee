@@ -31,9 +31,11 @@ class AuthenticatedClient extends HttpClient
     postAuthenticationError = (error) ->
       request.onError?(error)
       request.onComplete?(null, 'error')
+    headers =  {dataType: 'json', contentType: 'application/json'}
     ledger.app.wallet.getBitIdAddress (bitidAddress) =>
       @_httpDo
         method: 'GET'
+        # headers: headers
         url: "bitid/authenticate?address=#{bitidAddress}"
         onSuccess: (authentication) =>
           ledger.app.wallet.signMessageWithBitId authentication, (signature, error) =>
@@ -41,15 +43,15 @@ class AuthenticatedClient extends HttpClient
             @_httpDo
               method: 'POST'
               url: 'bitid/authenticate'
-              parameters: {address: bitidAddress, signature: signature}
+              headers: headers
+              params: JSON.stringify {address: bitidAddress, signature: signature}
               onSuccess: (AuthToken) =>
-                ledger.api.RestClient.AuthToken = AuthToken
-                l AuthToken
+                ledger.api.RestClient.AuthToken = AuthToken.token
                 @_http.setHttpHeader 'X-LedgerWallet-AuthToken', ledger.api.RestClient.AuthToken
                 @_httpDo request
-              onError: () =>
+              onError: (r, t, error) =>
                 postAuthenticationError(ledger.errors.create(ledger.errors.AuthenticationFailed, 'Second step error', error))
-        onError: (error) =>
+        onError: (r, t, error) =>
           postAuthenticationError(ledger.errors.create(ledger.errors.AuthenticationFailed, 'First step error', error))
 
 class ledger.api.RestClient
@@ -57,7 +59,7 @@ class ledger.api.RestClient
   @singleton: () -> @instance = new @()
 
   http: () ->
-    client = new HttpClient('https://api.ledgerwallet.com/')
+    client = new HttpClient('https://api02.ledgerwallet.com/')
     client.authenticated = -> new AuthenticatedClient(client)
     client.setHttpHeader 'X-Ledger-Locale', chrome.i18n.getUILanguage()
     client.setHttpHeader 'X-LedgerWallet-AuthToken', ledger.api.RestClient.AuthToken if ledger.api.RestClient.AuthToken?

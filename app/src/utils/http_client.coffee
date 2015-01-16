@@ -14,6 +14,9 @@ class @HttpClient
     @_headerUrlEncode = _.clone @_headerUrlEncode
 
   do: (r) ->
+    data = r.params
+    if @headers?.contentType? is 'application/json' and _.contains(['POST', 'PUT'], r.method)
+      data = JSON.stringify data
     request =
       url: @baseUrl + r.url
       type: r.method
