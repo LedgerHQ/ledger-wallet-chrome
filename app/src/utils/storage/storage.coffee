@@ -1,11 +1,5 @@
 @ledger.storage ?= {}
 
-@ledger.storage.closeStores = ->
-  ledger.storage.local.emit 'close'
-  delete ledger.storage.local.store
-  delete ledger.storage.local
-  delete  ledger.storage.sync
-
 @ledger.storage.openStores = (userId, passphrase, callback) ->
   localStorage = new ledger.storage.SecureStore 'ledger.local.' + userId, passphrase
   ledger.storage.local =  new ledger.storage.ObjectStore localStorage

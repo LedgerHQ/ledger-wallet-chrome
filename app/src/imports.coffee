@@ -222,4 +222,15 @@
         'controllers/onboarding/management/onboarding_management_summary_view_controller'
         'controllers/onboarding/management/onboarding_management_provisioning_view_controller'
         'controllers/onboarding/management/onboarding_management_done_view_controller'
+
+        # Specs
+        '../spec/jasmine/jasmine'
+        '../spec/jasmine/jasmine-html'
+        '../spec/jasmine/boot'
+
+        '../spec/utils/storage/store_spec'
+        '../spec/utils/storage/chrome_store_spec'
+        '../spec/utils/storage/secure_store_spec'
+
+        '../spec/spec_helper'
       ]
