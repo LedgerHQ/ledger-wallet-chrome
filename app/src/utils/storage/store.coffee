@@ -9,6 +9,7 @@ class @ledger.storage.Store extends EventEmitter
   # @param [String] name The store name (for key mangling)
   constructor: (name) ->
     @_name = name
+    @_nameRegex = new RegExp("^#{@_name}\\.")
 
   # Gets one or more items from storage.
   # If keys is empty, retrieve all values in this namespace.
@@ -82,7 +83,7 @@ class @ledger.storage.Store extends EventEmitter
   ## Deprocessing ##
 
   _deprocessKey: (raw_key) -> @_from_ns_key(raw_key)
-  _deprocessKeys: (raw_keys) -> (@_deprocessKey(raw_key) for raw_key in raw_keys)
+  _deprocessKeys: (raw_keys) -> @_from_ns_keys(raw_keys)
   _deprocessValue: (raw_value) -> JSON.parse(raw_value)
   _deprocessItems: (raw_items) ->
     hash = {}
@@ -94,5 +95,5 @@ class @ledger.storage.Store extends EventEmitter
 
   _to_ns_key: (key) -> @_name + "." + key
   _to_ns_keys: (keys) -> (@_to_ns_key(key) for key in keys)
-  _from_ns_key: (ns_key) -> ns_key.replace(@_name+'.', '')
-  _from_ns_keys: (ns_keys) -> (@_from_ns_key(ns_key) for ns_key in ns_keys)
+  _from_ns_key: (ns_key) -> ns_key.replace(@_nameRegex, '')
+  _from_ns_keys: (ns_keys) -> (@_from_ns_key(ns_key) for ns_key in ns_keys when ns_key.match(@_nameRegex))

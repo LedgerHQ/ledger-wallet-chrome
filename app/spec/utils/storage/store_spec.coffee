@@ -17,6 +17,9 @@ describe "Store", ->
   
   it "transform namespaced keys to keys", ->
     expect(store._from_ns_keys(["a.pretty.ns.key1", "a.pretty.ns.key2"])).toEqual(["key1", "key2"])
+
+  it "filter namespaced keys", ->
+    expect(store._from_ns_keys(["a.pretty.ns.key1", "an.other.ns.key2"])).toEqual(["key1"])
   
   it "preprocess key should namespace key", ->
     expect(store._preprocessKey("key")).toBe("a.pretty.ns.key")
