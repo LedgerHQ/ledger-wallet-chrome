@@ -55,11 +55,12 @@ class AuthenticatedClient extends HttpClient
           postAuthenticationError(ledger.errors.create(ledger.errors.AuthenticationFailed, 'First step error', error))
 
 class ledger.api.RestClient
+  API_BASE_URL: ledger.config.restClient.baseUrl
 
   @singleton: () -> @instance = new @()
 
   http: () ->
-    client = new HttpClient('https://api02.ledgerwallet.com/')
+    client = new HttpClient(@API_BASE_URL)
     client.authenticated = -> new AuthenticatedClient(client)
     client.setHttpHeader 'X-Ledger-Locale', chrome.i18n.getUILanguage()
     client.setHttpHeader 'X-LedgerWallet-AuthToken', ledger.api.RestClient.AuthToken if ledger.api.RestClient.AuthToken?
