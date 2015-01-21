@@ -4,7 +4,7 @@ class @ledger.storage.ChromeStore extends ledger.storage.Store
   # @see ledger.storage.Store#_raw_get
   _raw_get: (keys, cb) ->
     try
-      keys = null if keys.length < 1
+      keys = null if keys? && keys.length < 1
       chrome.storage.local.get(keys, cb)
      catch e
        console.error("chrome.storage.local.get :", e)
