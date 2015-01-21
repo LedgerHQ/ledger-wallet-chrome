@@ -233,6 +233,7 @@
         '../spec/utils/storage/chrome_store_spec'
         '../spec/utils/storage/secure_store_spec'
         '../spec/restclients/synced_rest_client_spec'
+        '../spec/utils/storage/synced_store_spec'
 
         '../spec/spec_helper'
       ]

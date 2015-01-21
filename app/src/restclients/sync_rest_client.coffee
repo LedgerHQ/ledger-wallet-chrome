@@ -19,5 +19,4 @@ class ledger.api.SyncRestClient extends ledger.api.RestClient
   # @param [Function] cb cb(meta:Object, md5:String) a callback function.
   # @param [Function] ecb cb(err:String) an error callback function.
   put_meta: (meta, cb, ecb) ->
-    @authHttp.put(url: 'sync/meta', params: meta, onSuccess: cb, onError: ecbr)
-    , ecb
+    @authHttp.put(url: 'sync/meta', params: meta, onSuccess: cb, onError: ecb)
