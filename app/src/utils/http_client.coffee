@@ -15,6 +15,7 @@ class @HttpClient
 
   do: (r) ->
     data = r.params
+    headers = _.extend({}, @headers || {}, r.headers || {})
     if @headers?.contentType? is 'application/json' and _.contains(['POST', 'PUT'], r.method)
       data = JSON.stringify data
     request =
@@ -24,10 +25,8 @@ class @HttpClient
       error: r.onError
       crossDomain: true
       complete: r.onComplete
-      headers: @headers
-      data: r.params
-    for key, value of r.headers
-      request[key] = value
+      headers: headers
+      data: data
     $.ajax request
 
   performHttpRequest: (method, url, headers, parameters, success, error, complete) ->
@@ -47,8 +46,6 @@ class @HttpClient
         onSuccess: success
         onError: error
         onComplete: complete
-
-
 
   get: (url, parameters, success, error, complete) ->
     @performHttpRequest 'GET', url, @_headerJson, parameters, success, error, complete
