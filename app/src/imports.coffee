@@ -137,6 +137,7 @@
         'restclients/unspent_outputs_restclient'
         'restclients/transactions_restclient'
         'restclients/balance_restclient'
+        'restclients/sync_rest_client'
 
         ## Tasks
         'tasks/task'
@@ -231,6 +232,7 @@
         '../spec/utils/storage/store_spec'
         '../spec/utils/storage/chrome_store_spec'
         '../spec/utils/storage/secure_store_spec'
+        '../spec/restclients/synced_rest_client_spec'
 
         '../spec/spec_helper'
       ]
