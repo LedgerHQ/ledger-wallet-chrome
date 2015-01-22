@@ -8,6 +8,7 @@ describe "SyncedStore", ->
     spyOn(window, 'setInterval').and.callFake (cb) -> cb()
     spyOn(ledger.storage.SyncedStore.prototype, '_pull')
     store = new ledger.storage.SyncedStore("synced_store", "private_key")
+    store.client = jasmine.createSpyObj('restClient', ['get_settings_md5','get_settings','post_settings','put_settings','delete_settings']);
 
   it "call debounced push when a value is set", ->
     spyOn(ledger.storage.SecureStore.prototype, 'set').and.callFake (items, cb) -> cb()
@@ -30,3 +31,7 @@ describe "SyncedStore", ->
     expect(window.setInterval).toHaveBeenCalled()
     expect(window.setInterval.calls.argsFor(0)[1]).toBe(store.PULL_INTERVAL_DELAY)
     expect(ledger.storage.SyncedStore.prototype._pull).toHaveBeenCalled()
+
+  it "call client.delete_settings on clear", ->
+    store.clear()
+    expect(store.client.delete_settings).toHaveBeenCalled()
