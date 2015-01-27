@@ -5,30 +5,44 @@ class ledger.api.SyncRestClient extends ledger.api.RestClient
 
   constructor: (addr) ->
     @authHttp = @http().authenticated()
-    @basePath = 'accountsettings/#{addr}'
+    @basePath = "accountsettings/#{addr}"
 
   # @param [Function] cb A callback function with object.md5 as argument.
-  get_settings_md5: (cb, ecb) ->
-    @authHttp.get(url: @basePath+'/md5', onSuccess: cb, onError: ecb)
+  # @return A jQuery promise
+  get_settings_md5: ->
+    @_promisify(url: @basePath+'/md5', (p) =>
+      @authHttp.get(p)
+    ).then (r) => r.md5
 
-  # @param [Function] cb cb(settings:Object) a callback function.
-  # @param [Function] ecb An ajax error callback function.
-  get_settings: (cb, ecb) ->
-    @authHttp.get(url: @basePath, onSuccess: cb, onError: ecb)
+  # @return A jQuery promise
+  get_settings: ->
+    @_promisify(url: @basePath, (p) =>
+      @authHttp.get(p)
+    ).then (r) => JSON.parse(r.settings)
 
   # @param [Object] settings data to put on sync server.
-  # @param [Function] cb A callback function with object.md5 as argument.
-  # @param [Function] ecb An ajax error callback function.
-  post_settings: (settings, cb, ecb) ->
-    @authHttp.post(url: @basePath, params: settings, onSuccess: cb, onError: ecb)
+  # @return A jQuery promise
+  post_settings: (settings) ->
+    @_promisify(url: @basePath, params: {settings: JSON.stringify(settings)}, (p) =>
+      @authHttp.post(p)
+    ).then (r) => r.md5
 
   # @param [Object] settings data to put on sync server.
-  # @param [Function] cb A callback function with object.md5 as argument.
-  # @param [Function] ecb An ajax error callback function.
-  put_settings: (settings, cb, ecb) ->
-    @authHttp.put(url: @basePath, params: settings, onSuccess: cb, onError: ecb)
+  # @return A jQuery promise
+  put_settings: (settings) ->
+    @_promisify(url: @basePath, params: {settings: JSON.stringify(settings)}, (p) =>
+      @authHttp.put(p)
+    ).then (r) => r.md5
 
-  # @param [Function] cb A callback function.
-  # @param [Function] ecb An ajax error callback function.
-  delete_settings: (cb, ecb) ->
-    @authHttp.delete(url: @basePath, onSuccess: cb, onError: ecb)
+  # @return A jQuery promise
+  delete_settings: ->
+    @_promisify(url: @basePath, (p) =>
+      @authHttp.delete(p)
+    )
+
+  # @param [Object] params An object given as argument to fct.
+  # @return A jQuery Deferred
+  _promisify: (params, fct) ->
+    d = $.Deferred()
+    fct(_.extend(params, {onSuccess: _.bind(d.resolve,d), onError: _.bind(d.reject,d)}))
+    d.promise()
