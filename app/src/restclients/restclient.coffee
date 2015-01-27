@@ -31,24 +31,22 @@ class AuthenticatedClient extends HttpClient
     postAuthenticationError = (error) ->
       request.onError?(error)
       request.onComplete?(null, 'error')
-    headers =  {dataType: 'json', contentType: 'application/json'}
+    headers =  {"Data-Type": 'json', "Content-Type": 'application/json'}
     ledger.app.wallet.getBitIdAddress (bitidAddress) =>
       @_httpDo
         method: 'GET'
-        # headers: headers
-        url: "bitid/authenticate?address=#{bitidAddress}"
+        url: "bitid/authenticate/#{bitidAddress}"
         onSuccess: (authentication) =>
-          ledger.app.wallet.signMessageWithBitId authentication, (signature, error) =>
-            l signature
+          ledger.app.wallet.signMessageWithBitId authentication.message, (signature, error) =>
             @_httpDo
               method: 'POST'
               url: 'bitid/authenticate'
               headers: headers
-              params: JSON.stringify {address: bitidAddress, signature: signature}
+              params: {address: bitidAddress, signature: signature}
               onSuccess: (AuthToken) =>
                 ledger.api.RestClient.AuthToken = AuthToken.token
                 @_http.setHttpHeader 'X-LedgerWallet-AuthToken', ledger.api.RestClient.AuthToken
-                @_httpDo request
+                @_httpDo(request) if request?
               onError: (r, t, error) =>
                 postAuthenticationError(ledger.errors.create(ledger.errors.AuthenticationFailed, 'Second step error', error))
         onError: (r, t, error) =>
@@ -71,22 +69,6 @@ class ledger.api.RestClient
     errorCallback = (xhr, status, message) ->
         callback(null, {xhr, status, message, code: ledger.errors.NetworkError})
     errorCallback
-
-  authenticate: (callback) ->
-    @http().setHttpHeader 'X-LedgerWallet-AuthToken', ledger.api.RestClient.AuthToken
-    if ledger.api.RestClient.AuthToken?
-      do callback
-    else
-      @_performAuthenticationFirstStep () =>
-
-  _performAuthenticationFirstStep: (callback) ->
-    ledger.app.wallet.getBitIdAddress (bitidAddress) =>
-      @http().get
-        url: "bitid/authenticate?address=#{bitidAddress}"
-        onSuccess: (authentication) ->
-          l authentication
-        onError: () ->
-          l arguments
 
 @testRestClientAuthenticate = ->
   f = ->
