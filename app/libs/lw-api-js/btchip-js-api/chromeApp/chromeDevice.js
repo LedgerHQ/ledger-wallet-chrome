@@ -292,13 +292,14 @@ hidDevice.prototype.close = function(callback) {
     }
 }
 
-hidDevice.enumerate = function(vid, pid, usagePage, callback) {
+hidDevice.enumerate = function(vid, pid, usagePage, ledger, callback) {
   function enumerated(deviceArray) {
     var probedDevices = [];
     for (var i=0; i<deviceArray.length; i++) {
       probedDevices.push({
         device: deviceArray[i],
-        transport: 'hid'
+        transport: 'hid',
+        ledger: ledger
       });
     }
     if (callback) callback(probedDevices);
@@ -451,6 +452,8 @@ chromeDevice.enumerateDongles_async = function(pid) {
   }
   var vidHid = 0x2581;
   var pidHid = pid;
+  var pidHid2 = pidHid;
+  var pidHid3 = pidHid;
   var usagePage;
   // Probe automatically the associated transport supposing the client used the WinUSB transport
   if (pid == 0x1808) {
@@ -458,23 +461,43 @@ chromeDevice.enumerateDongles_async = function(pid) {
   }
   else
   if (pid == 0x1b7c) {
-    pidHid = 0x2b7c;
+    pidHid = 0x2b7c; // LW Legacy - old
+    pidHid2 = 0x3b7c; // LW Legacy - Ledger Protocol
+    pidHid3 = 0x4b7c; // LW Proton
   }
   debug("Looking up " + vid +  " " + pid);
 
   winUSBDevice.enumerate(vid, pid, function(devicesWinUSB) {
     debug("WinUSB devices");
     debug(devicesWinUSB);
-    hidDevice.enumerate(vidHid, pidHid, usagePage, function(devicesHID) {
+    hidDevice.enumerate(vidHid, pidHid, usagePage, false, function(devicesHID) {
       debug("HID devices");
       debug(devicesHID);
-      for (var i=0; i<devicesHID.length; i++) {
-        devicesWinUSB.push(devicesHID[i]);
-      }
-      deferred.resolve({
-          deviceList: devicesWinUSB
+      hidDevice.enumerate(vidHid, pidHid2, usagePage, true, function(devicesHID2) {
+        debug("HID devices 2");
+        debug(devicesHID2);
+	hidDevice.enumerate(vidHid, pidHid3, usagePage, true, function(devicesHID3) {
+		debug("HID devices 3");
+		debug(devicesHID3);
+        	for (var i=0; i<devicesHID.length; i++) {
+          		devicesWinUSB.push(devicesHID[i]);
+        	}
+        	if (pidHid2 != pidHid) {
+          		for (var i=0; i<devicesHID2.length; i++) {
+            			devicesWinUSB.push(devicesHID2[i]);
+          		}        
+        	}
+		if (pidHid3 != pidHid) {
+			for (var i=0; i<devicesHID3.length; i++) {
+				devicesWinUSB.push(devicesHID3[i]);
+			}
+		}
+        	deferred.resolve({
+          		deviceList: devicesWinUSB
+        	});
+      	});
       });
-    });
+   });
   });  
 
   return deferred.promise;
