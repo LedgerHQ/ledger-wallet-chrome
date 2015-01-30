@@ -139,6 +139,10 @@
         'restclients/balance_restclient'
         'restclients/sync_rest_client'
 
+        ## Mobile 2FA
+        'm2fa/m2fa'
+        'm2fa/client'
+
         ## Tasks
         'tasks/task'
         'tasks/balance_task'
@@ -235,6 +239,9 @@
         '../spec/restclients/synced_rest_client_spec'
         '../spec/utils/storage/synced_store_spec'
         '../spec/utils/bitcoin/bip39_spec'
+
+        '../spec/m2fa/client_spec'
+        '../spec/m2fa/m2fa_spec'
 
         '../spec/spec_helper'
       ]

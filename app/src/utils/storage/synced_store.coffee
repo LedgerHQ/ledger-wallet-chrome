@@ -11,7 +11,6 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   # @param [Function] syncPushHandler A function used to perform push synchronization operations
   # @param [Function] syncPullHandler A function used to perform pull synchronization operations
   constructor: (name, addr, key) ->
-    console.log(name, addr, key)
     super(name, key)
     @mergeStrategy = @_overwriteStrategy
     @client = new ledger.api.SyncRestClient(addr)
@@ -106,9 +105,9 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   # @param [Function] fct A function invoked with ecbr, a retry on error callback.
   # @param [Function] ecb A callback invoked when retry all fail.
   __retryer: (fct, ecb, wait=1000) ->
-    fct (err) ->
+    fct (err) =>
       if wait <= 64*1000
-        console.warning(err)
+        console.warn(err)
         setTimeout => @__retryer(fct, ecb, wait*2)
       else
         console.error(err)
@@ -126,7 +125,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         else if jqXHR.status == 400
           console.error("BadRequest during SyncedStore initialization:", jqXHR)
         else
-          ecbr()
+          ecbr(jqXHR)
 
   # @param [Function] cb A callback invoked once init is done. cb()
   # @param [Function] ecb A callback invoked when init fail. Take $.ajax.fail args.

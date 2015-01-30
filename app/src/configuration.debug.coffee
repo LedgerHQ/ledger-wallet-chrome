@@ -3,14 +3,15 @@
 @ledger.isDev = ledger.env == "dev"
 
 @ledger.config ?= {}
-
-@ledger.config.restClient ?=
-  baseUrl = 'https://api02.ledgerwallet.com/'
-
-@ledger.config.syncRestClient ?=
-  pullIntervalDelay: 10000
-  pullThrottleDelay: 1000
-  pushDebounceDelay: 1000
+_.extend @ledger.config,
+  m2fa:
+    baseUrl: 'wss://ws.api.ledgerwallet.com/2fa/channels'
+  restClient:
+    baseUrl: 'https://api02.ledgerwallet.com/'
+  syncRestClient:
+    pullIntervalDelay: 10000
+    pullThrottleDelay: 1000
+    pushDebounceDelay: 1000
 
 @configureApplication = (app) ->
   chrome.commands.onCommand.addListener (command) =>

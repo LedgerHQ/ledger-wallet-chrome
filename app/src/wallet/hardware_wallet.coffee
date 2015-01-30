@@ -223,6 +223,26 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     p.fail (result) =>
       e result
 
+  randomBitIdAddress: () ->
+    i = sjcl.random.randomWords(1) & 0xffff
+    ledger.wallet.pathsToAddresses("0'/0/0xb11e/#{i}")
+
+  # @param [String] pubKey public key, hex encoded.
+  # @return A promise which resolve with a 32 bytes length pairing blob hex encoded.
+  initiateSecureScreen: (pubKey) ->
+    throw 'Wallet is not connected and unlocked' if @_state != ledger.wallet.States.UNLOCKED
+    binPubKey = new ByteString(Convert.toHexByte(pubKey), HEX)
+    throw "Invalid pubKey length : #{binPubKey.length}" if binPubKey.length != 65
+    @sendAdpu(0xE0, 0x12, 1, 0, binPubKey, 0).then (d) -> d.toString()
+
+  # @param [String] data challenge response, hex encoded.
+  # @return A promise which resolve if pairing is successful.
+  confirmSecureScreen: (data) ->
+    throw 'Wallet is not connected and unlocked' if @_state != ledger.wallet.States.UNLOCKED
+    binDate = new ByteString(Convert.toHexByte(data), HEX)
+    throw "Invalid pubKey length : #{binData.length}" if binData.length != 16
+    @sendAdpu(0xE0, 0x12, 1, 0, binData, 0)
+
   sendAdpu: (cla, ins, p1, p2, opt1, opt2, opt3, wrapScript) -> @_lwCard.dongle.card.sendApdu_async(cla, ins, p1, p2, opt1, opt2, opt3, wrapScript)
 
   _setState: (newState) ->

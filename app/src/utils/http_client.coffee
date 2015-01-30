@@ -26,7 +26,6 @@ class @HttpClient
       complete: r.onComplete
       headers: headers
       data: data
-    console.log(request)
     $.ajax request
 
   performHttpRequest: (method, url, headers, parameters, success, error, complete) ->
