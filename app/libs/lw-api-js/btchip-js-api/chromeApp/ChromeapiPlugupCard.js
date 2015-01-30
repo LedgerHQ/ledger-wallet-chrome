@@ -16,10 +16,6 @@ limitations under the License.
 *************************************************************************
 */
 
-require('Sandbox');
-require('ByteString');
-require('Card');
-
 var ChromeapiPlugupCard = Class.extend(Card, {
 	/** @lends ChromeapiPlugupCard.prototype */
 	
