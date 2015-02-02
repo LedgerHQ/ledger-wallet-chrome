@@ -3,11 +3,12 @@ ledger.db ?= {}
 
 class Database extends EventEmitter
 
-  constructor: (name) ->
+  constructor: (name, store) ->
     @_name = name
+    @_store = store
 
   load: (callback) ->
-    ledger.storage.databases.get @_name, (json) =>
+    @_store.get @_name, (json) =>
       try
         @_db = new loki(@_name)
         @_db.loadJSON JSON.stringify(json[@_name]) if json[@_name]?
@@ -28,7 +29,7 @@ class Database extends EventEmitter
       clearTimeout @_scheduledFlush if @_scheduledFlush?
       serializedData = {}
       serializedData[@_name] = @_db
-      ledger.storage.databases.set serializedData, callback
+      @_store.set serializedData, callback
 
   scheduleFlush: () ->
     clearTimeout @_scheduledFlush if @_scheduledFlush?
@@ -54,7 +55,7 @@ _.extend ledger.db,
       callback?()
 
   open: (databaseName, callback) ->
-    db = new Database databaseName
+    db = new Database(databaseName, ledger.storage.databases)
     db.load callback
     db
 
