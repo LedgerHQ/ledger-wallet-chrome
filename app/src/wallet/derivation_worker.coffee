@@ -64,9 +64,10 @@ class WorkerWallet
 
   getPublicAddress: (path, callback) ->
     sendCommand 'private:getPublicAddress', [path], (result, error) =>
-      result.publicKey = new ByteString(result.publicKey, HEX)
-      result.bitcoinAddress = new ByteString(result.bitcoinAddress, HEX)
-      result.chainCode = new ByteString(result.chainCode, HEX)
+      if result?
+        result.publicKey = new ByteString(result.publicKey, HEX)
+        result.bitcoinAddress = new ByteString(result.bitcoinAddress, HEX)
+        result.chainCode = new ByteString(result.chainCode, HEX)
       callback?(result, error)
 
 
