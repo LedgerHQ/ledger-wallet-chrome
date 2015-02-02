@@ -1,65 +1,45 @@
 class @HttpClient
 
-  _headerJson:
-    "Data-Type": 'json'
-    "Content-Type": 'application/json'
-
-  _headerUrlEncode:
-    "Data-Type": 'text'
-    "Content-Type": 'application/x-www-form-urlencoded'
-
   constructor: (baseUrl = '') ->
     @baseUrl = baseUrl
     @headers = {}
 
-  do: (r) ->
-    data = r.params
-    headers = _.extend({}, @headers, r.headers || {})
-    if headers["Content-Type"] == 'application/json' && _.contains(['POST', 'PUT'], r.method)
-      data = JSON.stringify data
-    request =
-      url: @baseUrl + r.url
-      type: r.method
-      success: r.onSuccess
-      error: r.onError
-      crossDomain: true
-      complete: r.onComplete
-      headers: headers
-      data: data
-    $.ajax request
+  # @params {Object} See jQuery.ajax() params.
+  # @return A jQuery.jqXHR
+  jqAjax: (r) ->
+    r.headers = _.extend({}, @headers, r.headers)
+    r.data = JSON.stringify(r.data) if r.contentType == 'application/json'
+    r.url = @baseUrl + r.url
+    r.crossDomain = true
+    $.ajax(r)
 
-  performHttpRequest: (method, url, headers, parameters, success, error, complete) ->
-    if _.isObject method
-      method.header = _.extend(method.header || {}, headers)
-      this.do method
-    else if _.isObject url
-      url.method = method
-      url.headers = headers
-      this.do url
-    else
-      this.do
-        method: method
-        url: url
-        headers: headers
-        params: parameters
-        onSuccess: success
-        onError: error
-        onComplete: complete
+  # Alias for jqAjax
+  do: (r) -> @jqAjax(r)
 
-  get: (url, parameters, success, error, complete) ->
-    @performHttpRequest 'GET', url, {"Data-Type": 'json'}, parameters, success, error, complete
+  # @params {Object} See jQuery.ajax() params.
+  # @return A jQuery.jqXHR
+  get: (r) ->
+    @jqAjax _.extend(r, {type: 'GET', dataType: 'json'})
 
-  post: (url, parameters, success, error, complete) ->
-    @performHttpRequest 'POST', url, {"Data-Type": 'json', "Content-Type": 'application/json'}, parameters, success, error, complete
+  # @params {Object} See jQuery.ajax() params.
+  # @return A jQuery.jqXHR
+  post: (r) ->
+    @jqAjax _.extend(r, {type: 'POST', dataType: 'json', contentType: 'application/json'})
 
-  postForm: (url, parameters, success, error, complete) ->
-    @performHttpRequest 'POST', url, {"Data-Type": 'text', "Content-Type": 'application/x-www-form-urlencoded'}, parameters, success, error, complete
+  # @params {Object} See jQuery.ajax() params.
+  # @return A jQuery.jqXHR
+  postForm: (r) ->
+    @jqAjax _.extend(r, {type: 'POST', dataType: 'text', contentType: 'application/x-www-form-urlencoded'})
 
-  put: (url, parameters, success, error, complete) ->
-    @performHttpRequest 'PUT', url, {"Data-Type": 'json', "Content-Type": 'application/json'}, parameters, success, error, complete
+  # @params {Object} See jQuery.ajax() params.
+  # @return A jQuery.jqXHR
+  put: (r) ->
+    @jqAjax _.extend(r, {type: 'PUT', dataType: 'json', contentType: 'application/json'})
 
-  delete: (url, parameters, success, error, complete) ->
-    @performHttpRequest 'DELETE', url, {"Data-Type": 'json'}, parameters, success, error, complete
+  # @params {Object} See jQuery.ajax() params.
+  # @return A jQuery.jqXHR
+  delete: (r) ->
+    @jqAjax _.extend(r, {type: 'DELETE', dataType: 'json'})
 
   setHttpHeader: (key, value) ->
     @headers[key] = value

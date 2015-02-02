@@ -7,7 +7,7 @@ describe "SyncedStore", ->
     spyOn(_, 'defer').and.callFake (cb) -> cb()
     spyOn(ledger.storage.SyncedStore.prototype, '_initConnection')
     store = new ledger.storage.SyncedStore("synced_store", "private_key")
-    store.client = jasmine.createSpyObj('restClient', ['get_settings_md5','get_settings','post_settings','put_settings','delete_settings']);
+    store.client = jasmine.createSpyObj('restClient', ['get_settings_md5','get_settings','post_settings','put_settings','delete_settings'])
 
   it "call debounced push when a value is set", ->
     spyOn(ledger.storage.SecureStore.prototype, 'set').and.callFake (items, cb) -> cb()
