@@ -16,7 +16,10 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     @client = new ledger.api.SyncRestClient(addr)
     @throttled_pull = _.throttle _.bind(@._pull,@), @PULL_THROTTLE_DELAY
     @debounced_push = _.debounce _.bind(@._push,@), @PUSH_DEBOUNCE_DELAY
-    _.defer => @_initConnection()
+    _.defer =>
+      ledger.storage.wallet.get ['__last_sync_md5'], (item) =>
+        @lastMd5 = item.__last_sync_md5
+        @_initConnection()
 
   # Stores one or many item
   #
@@ -42,40 +45,16 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
 
   # @return A jQuery promise
   _pull: ->
-    d = jQuery.Deferred()
     @client.get_settings_md5().then( (md5) =>
-      if md5 != @lastMd5
-        @client.get_settings().catch(_.bind(d.reject,d)).then (items) =>
-          @mergeStrategy(items).then =>
-            @lastMd5 = md5
-            d.resolve(items)
-      else
-        d.resolve()
+      return undefined if md5 == @lastMd5
+      @client.get_settings().then (items) =>
+        @mergeStrategy(items).then =>
+          @_setLastMd5(md5)
+          items
     ).catch( (jqXHR) =>
       # Data not synced already
-      if jqXHR.status == 404
-        this.init(cb, ecb)
-      else
-        d.reject(jqXHR)
-    )
-    d.promise()
-
-  # @return A jQuery promise
-  _pull2: ->
-    @client.get_settings_md5().then( (md5) =>
-      if md5 != @lastMd5
-        return @client.get_settings().then (items) =>
-          return @mergeStrategy(items).then =>
-            @lastMd5 = md5
-            return items
-      else
-        return undefined
-    ).catch( (jqXHR) =>
-      # Data not synced already
-      if jqXHR.status == 404
-        return this.init()
-      else
-        return jqXHR
+      return this.init() if jqXHR.status == 404
+      jqXHR
     )
 
   # @return A jQuery promise
@@ -87,7 +66,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         settings[raw_key] = raw_value if raw_key.match(@_nameRegex)
       @__retryer (ecbr) =>
         @client.put_settings(settings).catch(ecbr).then (md5) =>
-          @lastMd5 = md5
+          @_setLastMd5(md5)
           d.resolve(md5)
       , _.bind(d.reject,d)
     , _.bind(d.reject,d)
@@ -116,7 +95,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   _initConnection: ->
     @__retryer (ecbr) =>
       @client.get_settings_md5().then( =>
-        setInterval(@throttled_pull, @PULL_INTERVAL_DELAY)
+        @pullTimer = setInterval(@throttled_pull, @PULL_INTERVAL_DELAY)
       ).catch (jqXHR) =>
         # Data not synced already
         if jqXHR.status == 404
@@ -126,6 +105,8 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
           console.error("BadRequest during SyncedStore initialization:", jqXHR)
         else
           ecbr(jqXHR)
+    ledger.app.wallet.once 'state:changed', =>
+      clearInterval(@pullTimer) if ledger.app.wallet._state != ledger.wallet.States.UNLOCKED
 
   # @param [Function] cb A callback invoked once init is done. cb()
   # @param [Function] ecb A callback invoked when init fail. Take $.ajax.fail args.
@@ -138,8 +119,13 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         settings[raw_key] = raw_value if raw_key.match(@_nameRegex)
       @__retryer (ecbr) =>
         @client.post_settings(settings).catch(ecbr).then (md5) =>
-          @lastMd5 = md5
+          @_setLastMd5(md5)
           d.resolve(md5)
       , _.bind(d.reject,d)
     , _.bind(d.reject,d)
     d.promise()
+
+  # Save lastMd5 in settings
+  _setLastMd5: (md5) ->
+    @lastMd5 = md5
+    ledger.storage.wallet.set("__last_sync_md5": md5)
