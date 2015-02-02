@@ -11,7 +11,7 @@ class ledger.api.BalanceRestClient extends ledger.api.RestClient
       _.async.eachBatch _.values(addresses), 20, (addresses, done, hasNext) =>
         @http().get(
           url: "blockchain/addresses/#{addresses.join(',')}"
-        ).done (addressesBalances) ->
+        ).done( (addressesBalances) ->
           for addressBalance in addressesBalances
             accountBalance.total += parseInt(addressBalance.total.balance)
             accountBalance.confirmed += parseInt(addressBalance.confirmed.balance) if parseInt(addressBalance.confirmed.balance) <= parseInt(addressBalance.total.balance)
