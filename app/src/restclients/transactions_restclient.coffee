@@ -3,7 +3,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
   @singleton()
 
   getRawTransaction: (transactionHash, callback) ->
-    @http().get(
+    @http.get(
       url: "blockchain/transactions/#{transactionHash}/hex"
     ).done( (response) ->
       l response
@@ -17,7 +17,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     batchSize ?= 20
     transactions = []
     _.async.eachBatch addresses, batchSize, (batch, done, hasNext, batchIndex, batchCount) =>
-      @http().get(
+      @http.get(
         url: "blockchain/addresses/#{batch.join(',')}/transactions"
       ).done( (response) ->
         transactions = transactions.concat(response)
@@ -29,7 +29,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     stream = new Stream()
     stream.onOpen = =>
       _.async.eachBatch addresses, 20, (batch, done, hasNext) =>
-        @http().get(
+        @http.get(
           url: "blockchain/addresses/#{batch.join(',')}/transactions"
         ).done( (transactions) ->
           stream.write(transaction) for transaction in transactions
@@ -41,7 +41,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     stream
 
   postTransaction: (transaction, callback) ->
-    @http().postForm(
+    @http.postForm(
       url: "blockchain/pushtx",
       data: {tx: transaction.getSignedTransaction()}
     ).done( (response) ->
@@ -52,7 +52,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
   refreshTransaction: (transactions, callback) ->
     outTransactions = []
     _.async.each transactions, (transaction, done, hasNext) =>
-      @http().get(
+      @http.get(
         url: "blockchain/transactions/#{transaction.get('hash')}"
       ).done( (response) =>
         outTransactions.push response

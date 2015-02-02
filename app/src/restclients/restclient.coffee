@@ -46,9 +46,6 @@ class ledger.api.RestClient
     @http.setHttpHeader 'X-Ledger-Locale', chrome.i18n.getUILanguage()
     @http.setHttpHeader 'X-Ledger-Platform', 'chrome'
 
-  http: () ->
-    @http
-
   networkErrorCallback: (callback) ->
     errorCallback = (xhr, status, message) ->
         callback(null, {xhr, status, message, code: ledger.errors.NetworkError})
@@ -64,7 +61,7 @@ class ledger.api.AuthRestClient extends ledger.api.RestClient
 @testRestClientAuthenticate = ->
   f = ->
     r = new ledger.api.RestClient()
-    r.http().get(
+    r.http.get(
       url: 'blockchain'
     ).done( -> console.log(arguments)
     ).fail( -> console.log(arguments) )
