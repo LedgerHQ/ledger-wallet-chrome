@@ -4,31 +4,37 @@ class AuthenticatedClient extends HttpClient
 
   # Redefine do to ensure Connection is Authentified.
   do: (request) ->
-    # ledger.app.wallet.getState (state) =>
-    #   throw "Unable to authenticate a locked or blank dongle" unless state is ledger.wallet.States.UNLOCKED
     throw "Unable to authenticate a locked or blank dongle" unless ledger.wallet.isPluggedAndUnlocked()
-    if @headers['X-LedgerWallet-AuthToken']?
+    if @isAuthenticated()
       super(request)
     else
-      @_performAuthenticationAndRequest(request)
+      @authenticate(request)
 
-  _performAuthenticationAndRequest: (request) ->
+  authenticate: (request) ->
     postAuthenticationError = (error) -> request.error?(error)
     ledger.app.wallet.getBitIdAddress (bitidAddress) =>
-      @get(
+      @jqAjax(
+        type: 'GET'
         url: "bitid/authenticate/#{bitidAddress}"
+        dataType: 'json'
       ).done( (authentication) =>
         ledger.app.wallet.signMessageWithBitId authentication.message, (signature, error) =>
-          @post(
+          @jqAjax(
+            type: 'POST'
             url: 'bitid/authenticate'
             data: {address: bitidAddress, signature: signature}
-          ).done( (AuthToken) =>
-            @headers['X-LedgerWallet-AuthToken'] = ledger.api.RestClient.AuthToken
-            @do(request)
+            contentType: 'application/json'
+            dataType: 'json'
+          ).done( (authToken) =>
+            @headers['X-LedgerWallet-AuthToken'] = authToken.token
+            @jqAjax(request) if request?
           ).fail (r, t, error) =>
             postAuthenticationError(ledger.errors.create(ledger.errors.AuthenticationFailed, 'Second step error', error))
       ).fail (r, t, error) =>
         postAuthenticationError(ledger.errors.create(ledger.errors.AuthenticationFailed, 'First step error', error))
+
+  isAuthenticated: ->
+    @headers['X-LedgerWallet-AuthToken']?
 
 class ledger.api.RestClient
   API_BASE_URL: ledger.config.restClient.baseUrl
@@ -36,7 +42,7 @@ class ledger.api.RestClient
   @singleton: () -> @instance = new @()
 
   constructor: () ->
-    @http = new AuthenticatedClient(@API_BASE_URL)
+    @http = @_httpClientFactory()
     @http.setHttpHeader 'X-Ledger-Locale', chrome.i18n.getUILanguage()
     @http.setHttpHeader 'X-Ledger-Platform', 'chrome'
 
@@ -47,6 +53,13 @@ class ledger.api.RestClient
     errorCallback = (xhr, status, message) ->
         callback(null, {xhr, status, message, code: ledger.errors.NetworkError})
     errorCallback
+
+  _httpClientFactory: ->
+    new HttpClient(@API_BASE_URL)
+
+class ledger.api.AuthRestClient extends ledger.api.RestClient
+  _httpClientFactory: ->
+    new AuthenticatedClient(@API_BASE_URL)
 
 @testRestClientAuthenticate = ->
   f = ->

@@ -1,5 +1,5 @@
 
-class ledger.api.SyncRestClient extends ledger.api.RestClient
+class ledger.api.SyncRestClient extends ledger.api.AuthRestClient
 
   @instance: new @
 
