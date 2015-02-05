@@ -26,8 +26,8 @@ _.extend @ledger.m2fa,
     pairingId = @_nextPairingId()
     client = new ledger.m2fa.Client(pairingId)
     @clients[pairingId] = client    
-    client.on 'm2fa.identify', (pubKey) => @_onIdentify(client, pubKey, d)
-    client.on 'm2fa.challenge', (data) => @_onChallenge(client, data, d)
+    client.on 'm2fa.identify', (e,pubKey) => @_onIdentify(client, pubKey, d)
+    client.on 'm2fa.challenge', (e,data) => @_onChallenge(client, data, d)
     return [pairingId, d.promise]
 
   # Allow you to assign a label to a pairingId (ex: "mobile Pierre").
@@ -62,7 +62,7 @@ _.extend @ledger.m2fa,
     client.off 'm2fa.response'
     client.on 'm2fa.accept', ->
       d.notify('accepted')
-    client.on 'm2fa.response', (blob) ->
+    client.on 'm2fa.response', (e,blob) ->
       client.off 'm2fa.accept'
       client.off 'm2fa.response'
       d.resolve(blob)
@@ -98,22 +98,33 @@ _.extend @ledger.m2fa,
     @clients[pairingId] ||= new ledger.m2fa.Client(pairingId)
 
   _onIdentify: (client, pubKey, d) ->
-    d.notify("pubKeyReceived")
+    d.notify("pubKeyReceived", pubKey)
+    l("%c[_onIdentify] pubKeyReceived", "color: #4444cc", pubKey)
     try
-      ledger.wallet.safe().initiateSecureScreen(pubKey).catch(_.bind(d.reject,d)).then (challenge) ->
+      ledger.wallet.safe().initiateSecureScreen(pubKey).then((challenge) ->
+        l("%c[_onIdentify] challenge received:", "color: #4444cc", challenge)
         client.sendChallenge(challenge)
-    catch e
-      d.reject(e)
+      ).fail( (err) =>
+        e(err)
+        d.reject()
+      ).done()
+    catch err
+      e(err)
+      d.reject(err)
 
   _onChallenge: (client, data, d) ->
     d.notify("challengeReceived")
+    l("%c[_onChallenge] challengeReceived", "color: #4444cc", data)
     try
-      ledger.wallet.safe().confirmSecureScreen(data).catch( ->
-        client.rejectPairing()
-        d.reject()
-      ).then ->
+      ledger.wallet.safe().confirmSecureScreen(data).then( ->
+        l("%c[_onChallenge] SUCCESS !!!", "color: #00ff00" )
         client.confirmPairing()
         d.resolve()
-    catch e
-      d.reject(e)
-
+      ).fail( (e) ->
+        l("%c[_onChallenge] >>>  FAILURE  <<<", "color: #ff0000", e)
+        client.rejectPairing()
+        d.reject()
+      ).done()
+    catch err
+      e(err)
+      d.reject(err)

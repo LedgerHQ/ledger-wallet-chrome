@@ -86,7 +86,6 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   __retryer: (fct, ecb, wait=1000) ->
     fct (err) =>
       if wait <= 64*1000
-        console.warn(err)
         setTimeout (=> @__retryer(fct, ecb, wait*2)), wait
       else
         console.error(err)

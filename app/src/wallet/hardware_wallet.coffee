@@ -68,7 +68,6 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
             ## This needs a BIG refactoring
             l @getFirmwareVersion()
             if @getIntFirmwareVersion() >= ledger.wallet.Firmware.V1_4_13
-              l 'GOT 13'
               # ledger.app.wallet._lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).then(function (){l('done');}).fail(e)
               #.sendApdu_async(0xe0, 0x26, 0x00, 0x00, new ByteString(Convert.toHexByte(operationMode), HEX), [0x9000])
               @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
@@ -234,17 +233,19 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
   # @return A promise which resolve with a 32 bytes length pairing blob hex encoded.
   initiateSecureScreen: (pubKey) ->
     throw 'Wallet is not connected and unlocked' if @_state != ledger.wallet.States.UNLOCKED
-    binPubKey = new ByteString(pubKey, HEX)
-    throw "Invalid pubKey length : #{binPubKey.length}" if binPubKey.length != 65
-    @sendAdpu(0xE0, 0x12, 1, 0, binPubKey, 0).then (d) -> d.toString()
+    throw "Invalid pubKey" unless pubKey.match(/^[0-9A-Fa-f]{130}$/)
+    adpu = new ByteString("E0"+"12"+"01"+"00"+"41"+pubKey, HEX)
+    console.log("[initiateSecureScreen] adpu:", adpu.toString(HEX))
+    @sendAdpu(adpu, [0x9000]).then (d) -> d.toString()
 
   # @param [String] data challenge response, hex encoded.
   # @return A promise which resolve if pairing is successful.
   confirmSecureScreen: (data) ->
     throw 'Wallet is not connected and unlocked' if @_state != ledger.wallet.States.UNLOCKED
-    binDate = new ByteString(data, HEX)
-    throw "Invalid pubKey length : #{binData.length}" if binData.length != 16
-    @sendAdpu(0xE0, 0x12, 1, 0, binData, 0)
+    throw "Invalid challenge resp" unless data.match(/^[0-9A-Fa-f]{32}$/)
+    adpu = new ByteString("E0"+"12"+"02"+"00"+"10"+data, HEX)
+    console.log("[confirmSecureScreen] adpu:", adpu.toString(HEX))
+    @sendAdpu(adpu, [0x9000])
 
   sendAdpu: (cla, ins, p1, p2, opt1, opt2, opt3, wrapScript) -> @_lwCard.dongle.card.sendApdu_async(cla, ins, p1, p2, opt1, opt2, opt3, wrapScript)
 

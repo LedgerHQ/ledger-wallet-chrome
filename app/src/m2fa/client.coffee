@@ -7,7 +7,7 @@
 # client.requestValidation(tx)
 class @ledger.m2fa.Client extends EventEmitter
 
-  BASE_URL = ledger.config.m2fa.baseUrl
+  BASE_URL: ledger.config.m2fa.baseUrl
 
   # @param [String] pairingId The id must be a valid btc address. Used to be a bitId address.
   constructor: (pairingId) ->
@@ -18,19 +18,23 @@ class @ledger.m2fa.Client extends EventEmitter
   # @params [String] challenge is encoded in hex "8 nonce bytes"+"4 challenge bytes"
   sendChallenge: (challenge) ->
     @ws.send JSON.stringify(type: 'challenge', data: challenge)
+    @emit 'm2fa.challenge.sended', challenge
 
   # End a pairing process whether its successful or not.
   confirmPairing: (success=true) ->
     @ws.send JSON.stringify(type: 'pairing', is_successful: success)
+    @emit 'm2fa.pairing.confirmed', success
   rejectPairing: () ->
     @ws.send JSON.stringify(type: 'pairing', is_successful: false)
+    @emit 'm2fa.pairing.rejected'
 
   requestValidation: (data) ->
     @_lastRequest = JSON.stringify(type: 'request', second_factor_data: data)
     @ws.send @_lastRequest
+    @emit 'm2fa.request.sended', data
 
   _joinRoom: (pairingId) ->
-    @ws = new WebSocket(BASE_URL)
+    @ws = new WebSocket(@BASE_URL)
     @ws.onopen = _.bind(@_onOpen,@)
     @ws.onmessage = _.bind(@_onMessage,@)
     @ws.onclose = _.bind(@_onClose,@)
@@ -39,9 +43,12 @@ class @ledger.m2fa.Client extends EventEmitter
     @ws.send JSON.stringify(type: 'leave')
     @ws.close()
     @ws = null
+    @emit 'm2fa.room.left'
 
   _onOpen: (e) ->
     @ws.send JSON.stringify(type: 'join', room: @pairingId)
+    @ws.send JSON.stringify(type: 'repeat')
+    @emit 'm2fa.room.joined'
 
   _onMessage: (e) ->
     data = JSON.parse(e.data)

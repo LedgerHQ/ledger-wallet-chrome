@@ -10,7 +10,7 @@ class @OnboardingDevicePinViewController extends @OnboardingViewController
     @view.pinCode.setStealsFocus(yes)
     @view.pinCode.once 'complete', (event, value) =>
       ledger.app.wallet.unlockWithPinCode value, (success, error) =>
-        l error
+        l error if error?
         if success == yes
           ledger.app.router.go '/onboarding/device/opening'
         else if error.code == ledger.errors.WrongPinCode and error['retryCount'] > 0

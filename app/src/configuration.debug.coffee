@@ -5,7 +5,7 @@
 @ledger.config ?= {}
 _.extend @ledger.config,
   m2fa:
-    baseUrl: 'wss://ws.api.ledgerwallet.com/2fa/channels'
+    baseUrl: 'ws://ws02.api.ledgerwallet.com/2fa/channels'
   restClient:
     baseUrl: 'https://api02.ledgerwallet.com/'
   syncRestClient:

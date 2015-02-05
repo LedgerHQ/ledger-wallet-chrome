@@ -56,6 +56,13 @@
         '../libs/lokijs.min'
         '../libs/bitcoinjs-min'
 
+        # Used be m2fa.DebugClient
+        '../libs/lw-api-js/ucrypt/ka'
+        '../libs/lw-api-js/ucrypt/pad'
+        '../libs/lw-api-js/ucrypt/cipher'
+        '../libs/lw-api-js/ucrypt/des'
+        '../libs/lw-api-js/ucrypt/ecdh'
+
         ## QR Code
         '../libs/jsqrcode/grid'
         '../libs/jsqrcode/version'
@@ -142,6 +149,7 @@
         ## Mobile 2FA
         'm2fa/m2fa'
         'm2fa/client'
+        'm2fa/debug_client'
 
         ## Tasks
         'tasks/task'
