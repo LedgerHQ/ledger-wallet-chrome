@@ -2,8 +2,8 @@
 # Listen and log each event + add conveniant methods to simulate mobile/server.
 class @ledger.m2fa.DebugClient extends ledger.m2fa.Client
   constructor: (pairingId, baseUrl) ->
+    @constructor.BASE_URL = baseUrl || "ws://192.168.2.107:8080/2fa/channels"
     super(pairingId || "holymacaroni2")
-    @BASE_URL = baseUrl || "ws://192.168.2.107:8080/2fa/channels"
     @pubKey = "04"+"78c0837ded209265ea8131283585f71c5bddf7ffafe04ccddb8fe10b3edc7833"+"d6dee70c3b9040e1a1a01c5cc04fcbf9b4de612e688d09245ef5f9135413cc1d"
     @privKey = "80"+"dbd39adafe3a007706e61a17e0c56849146cfe95849afef7ede15a43a1984491"+"7e960af3"
     @attestationKey = "04"+"e69fd3c044865200e66f124b5ea237c918503931bee070edfcab79a00a25d6b5"+"a09afbee902b4b763ecf1f9c25f82d6b0cf72bce3faf98523a1066948f1a395f"

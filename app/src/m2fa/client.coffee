@@ -7,7 +7,7 @@
 # client.requestValidation(tx)
 class @ledger.m2fa.Client extends EventEmitter
 
-  BASE_URL: ledger.config.m2fa.baseUrl
+  @BASE_URL: ledger.config.m2fa.baseUrl
 
   # @param [String] pairingId The id must be a valid btc address. Used to be a bitId address.
   constructor: (pairingId) ->
@@ -34,7 +34,7 @@ class @ledger.m2fa.Client extends EventEmitter
     @emit 'm2fa.request.sended', data
 
   _joinRoom: (pairingId) ->
-    @ws = new WebSocket(@BASE_URL)
+    @ws = new WebSocket(@constructor.BASE_URL)
     @ws.onopen = _.bind(@_onOpen,@)
     @ws.onmessage = _.bind(@_onMessage,@)
     @ws.onclose = _.bind(@_onClose,@)
