@@ -13,7 +13,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   constructor: (name, addr, key) ->
     super(name, key)
     @mergeStrategy = @_overwriteStrategy
-    @client = new ledger.api.SyncRestClient(addr)
+    @client = ledger.api.SyncRestClient.instance(addr)
     @throttled_pull = _.throttle _.bind(@._pull,@), @PULL_THROTTLE_DELAY
     @debounced_push = _.debounce _.bind(@._push,@), @PUSH_DEBOUNCE_DELAY
     _.defer =>
@@ -59,7 +59,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
 
   # @return A jQuery promise
   _push: ->
-    d = jQuery.Deferred()
+    d = Q.defer()
     this._raw_get null, (raw_items) =>
       settings = {}
       for raw_key, raw_value of raw_items
@@ -70,13 +70,13 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
           d.resolve(md5)
       , _.bind(d.reject,d)
     , _.bind(d.reject,d)
-    d.promise()
+    d.promise
 
   # @return A jQuery promise
   _overwriteStrategy: (items) ->
-    d = jQuery.Deferred()
+    d = Q.defer()
     this._raw_set items, _.bind(d.resolve,d)
-    d.promise()
+    d.promise
 
   # Call fct with ecbr as arg and retry it on fail.
   # Wait 1 second before retry first time, double until 64 s then.
@@ -93,8 +93,10 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
 
   _initConnection: ->
     @__retryer (ecbr) =>
-      @client.get_settings_md5().then( =>
-        @pullTimer = setInterval(@throttled_pull, @PULL_INTERVAL_DELAY)
+      @_pull().then( =>
+        setTimeout =>
+          @pullTimer = setInterval(@throttled_pull, @PULL_INTERVAL_DELAY)
+        , @PULL_INTERVAL_DELAY
       ).catch (jqXHR) =>
         # Data not synced already
         if jqXHR.status == 404
@@ -111,7 +113,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   # @param [Function] ecb A callback invoked when init fail. Take $.ajax.fail args.
   # @return A jQuery promise
   _init: ->
-    d = jQuery.Deferred()
+    d = Q.defer()
     this._raw_get null, (raw_items) =>
       settings = {}
       for raw_key, raw_value of raw_items
@@ -122,7 +124,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
           d.resolve(md5)
       , _.bind(d.reject,d)
     , _.bind(d.reject,d)
-    d.promise()
+    d.promise
 
   # Save lastMd5 in settings
   _setLastMd5: (md5) ->

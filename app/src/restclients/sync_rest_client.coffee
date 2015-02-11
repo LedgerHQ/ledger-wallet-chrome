@@ -1,7 +1,10 @@
 
 class ledger.api.SyncRestClient extends ledger.api.AuthRestClient
 
-  @instance: new @
+  # Create a single instance of a SyncRestClient for a same addr
+  @_instances: {}
+  @instance: (addr) ->
+    @_instances[addr] ||= new @(addr)
 
   constructor: (addr) ->
     super

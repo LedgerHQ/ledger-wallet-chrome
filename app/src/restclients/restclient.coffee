@@ -8,10 +8,16 @@ class AuthenticatedClient extends HttpClient
     if @isAuthenticated()
       super(request)
     else
-      @authenticate(request)
+      @authenticate()
+      .then => Q(@jqAjax(request))
+      .catch (error) =>
+        request.error?(error)
+        return
 
-  authenticate: (request) ->
-    postAuthenticationError = (error) -> request.error?(error)
+  authenticate: () ->
+    return @_authPromise if @_authPromise?
+    d = Q.defer()
+    @_authPromise = d.promise
     ledger.app.wallet.getBitIdAddress (bitidAddress) =>
       @jqAjax(
         type: 'GET'
@@ -19,6 +25,7 @@ class AuthenticatedClient extends HttpClient
         dataType: 'json'
       ).done( (authentication) =>
         ledger.app.wallet.signMessageWithBitId authentication.message, (signature, error) =>
+          d.reject(ledger.errors.create(ledger.errors.AuthenticationFailed, 'Signing challenge step error', error)) if error?
           @jqAjax(
             type: 'POST'
             url: 'bitid/authenticate'
@@ -27,19 +34,20 @@ class AuthenticatedClient extends HttpClient
             dataType: 'json'
           ).done( (authToken) =>
             @headers['X-LedgerWallet-AuthToken'] = authToken.token
-            @jqAjax(request) if request?
+            d.resolve()
           ).fail (r, t, error) =>
-            postAuthenticationError(ledger.errors.create(ledger.errors.AuthenticationFailed, 'Second step error', error))
+            d.reject(ledger.errors.create(ledger.errors.AuthenticationFailed, 'Post signed challenge step error', error))
       ).fail (r, t, error) =>
-        postAuthenticationError(ledger.errors.create(ledger.errors.AuthenticationFailed, 'First step error', error))
+        d.reject(ledger.errors.create(ledger.errors.AuthenticationFailed, 'Getting challenge step error', error))
+    @_authPromise
 
   isAuthenticated: ->
     @headers['X-LedgerWallet-AuthToken']?
 
 class ledger.api.RestClient
-  API_BASE_URL: ledger.config.restClient.baseUrl
+  @API_BASE_URL: ledger.config.restClient.baseUrl
 
-  @singleton: () -> @instance = new @()
+  @singleton: () -> @instance ||= new @()
 
   constructor: () ->
     @http = @_httpClientFactory()
@@ -52,11 +60,11 @@ class ledger.api.RestClient
     errorCallback
 
   _httpClientFactory: ->
-    new HttpClient(@API_BASE_URL)
+    new HttpClient(@constructor.API_BASE_URL)
 
 class ledger.api.AuthRestClient extends ledger.api.RestClient
   _httpClientFactory: ->
-    new AuthenticatedClient(@API_BASE_URL)
+    new AuthenticatedClient(@constructor.API_BASE_URL)
 
 @testRestClientAuthenticate = ->
   f = ->
