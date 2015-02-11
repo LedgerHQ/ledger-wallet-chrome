@@ -4,8 +4,7 @@ describe "SyncedStore", ->
     cb: ->
 
   beforeEach ->
-    spyOn(_, 'defer').and.callFake (cb) -> cb()
-    spyOn(ledger.storage.SyncedStore.prototype, '_initConnection')
+    spyOn(_, 'defer')
     store = new ledger.storage.SyncedStore("synced_store", "private_key")
     store.client = jasmine.createSpyObj('restClient', ['get_settings_md5','get_settings','post_settings','put_settings','delete_settings'])
 
@@ -24,10 +23,6 @@ describe "SyncedStore", ->
 
     expect(ledger.storage.SecureStore.prototype.remove).toHaveBeenCalled()
     expect(store.debounced_push).toHaveBeenCalled()
-
-  it "call throttle pull", ->
-    expect(_.defer).toHaveBeenCalled()
-    expect(ledger.storage.SyncedStore.prototype._initConnection).toHaveBeenCalled()
 
   it "call client.delete_settings on clear", ->
     store.clear()

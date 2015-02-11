@@ -42,6 +42,9 @@ describe "Store", ->
   it "deprocess keys should deprocess each key", ->
     expect(store._deprocessKeys(["a.pretty.ns.key1", "a.pretty.ns.key2"])).toEqual(["key1", "key2"])
   
+  it "deprocess keys should skip bad keys", ->
+    expect(store._deprocessKeys(["a.pretty.ns.key1", "a.pretty.ns.key2"])).toEqual(["key1", "key2"])
+
   it "deprocess value should parse JSON", ->
     expect(store._deprocessValue("[1,2,3]")).toEqual([1,2,3])
   
@@ -79,6 +82,14 @@ describe "Store", ->
     store.keys(obj.cb)
     expect(store._raw_keys).toHaveBeenCalled()
     expect(obj.cb).toHaveBeenCalledWith(["key1", "key2"])
+
+  it "#keys filter bad keys", ->
+    spyOn(store, '_raw_keys').and.callFake (cb)-> cb(["a.pretty.ns.key1", "a.other.ns.key2"])
+    spyOn(obj, 'cb')
+
+    store.keys(obj.cb)
+    expect(store._raw_keys).toHaveBeenCalled()
+    expect(obj.cb).toHaveBeenCalledWith(["key1"])
 
   it "#remove calls _raw_remove with preprocessed keys", ->
     spy = spyOn(store, '_raw_remove').and.callFake (raw_keys, cb)-> cb("a.pretty.ns.key":"42")

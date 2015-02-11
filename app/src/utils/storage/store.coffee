@@ -83,12 +83,17 @@ class @ledger.storage.Store extends EventEmitter
   ## Deprocessing ##
 
   _deprocessKey: (raw_key) -> @_from_ns_key(raw_key)
-  _deprocessKeys: (raw_keys) -> @_from_ns_keys(raw_keys)
+  _deprocessKeys: (raw_keys) ->
+    _.chain([raw_keys]).flatten().map((raw_key) =>
+      try @_deprocessKey(raw_key) catch e
+        undefined
+    ).compact().value()
   _deprocessValue: (raw_value) -> JSON.parse(raw_value)
   _deprocessItems: (raw_items) ->
     hash = {}
     for raw_key, raw_value of raw_items
-      hash[@_deprocessKey(raw_key)] = @_deprocessValue(raw_value)
+      key = @_deprocessKey(raw_key)
+      hash[key] = @_deprocessValue(raw_value) if key?
     hash
 
   ## Namespaces methods ##

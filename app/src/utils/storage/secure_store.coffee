@@ -7,6 +7,11 @@ class @ledger.storage.SecureStore extends ledger.storage.ChromeStore
     super(name)
     @_aes = new ledger.crypto.AES(key)
 
+  # @see Store.keys
+  keys: (cb) ->
+    super (encrypted_keys) =>
+      cb(@_aes.decrypt(encrypted_key) for encrypted_key in encrypted_keys)
+
   _preprocessKey: (key) -> super(@_aes.encrypt(key))
   _deprocessKey: (raw_key) -> @_aes.decrypt(super(raw_key))
   _preprocessValue: (value) -> @_aes.encrypt(super(value))
