@@ -554,7 +554,6 @@ var BTChip = Class.create({
                     result['authorizationReference'] = outData.bytes(offset, referenceLength);
                     offset += referenceLength;
                     result['authorizationPaired'] = outData.bytes(offset);
-                    l("%c[hashOutputInternal_async] result=", "#888888", result)
                   }
                   /* FIN MODIF VINCENT */
                   return result;

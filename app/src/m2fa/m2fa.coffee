@@ -24,7 +24,7 @@ _.extend @ledger.m2fa,
   pairDevice: () ->
     d = Q.defer()
     pairingId = @_nextPairingId()
-    client = new ledger.m2fa.Client(pairingId)
+    client = @_clientFactory(pairingId)
     @clients[pairingId] = client    
     client.on 'm2fa.identify', (e,pubKey) => @_onIdentify(client, pubKey, d)
     client.on 'm2fa.challenge', (e,data) => @_onChallenge(client, data, d)
@@ -42,45 +42,56 @@ _.extend @ledger.m2fa,
   getPairingIds: () ->
     d = Q.defer()
     ledger.storage.sync.keys (keys) ->
-      keys = _.filter(keys, (key) -> key.match(/^__m2fa_/))
-      ledger.storage.sync.get keys, (items) ->
-        pairingCuple = {}
-        for key, value of items
-          pairingCuple[key.replace(/^__m2fa_/,'')] = value
-        d.resolve(pairingCuple)
+      try
+        keys = _.filter(keys, (key) -> key.match(/^__m2fa_/))
+        ledger.storage.sync.get keys, (items) ->
+          try
+            pairingCuple = {}
+            for key, value of items
+              pairingCuple[key.replace(/^__m2fa_/,'')] = value
+            d.resolve(pairingCuple)
+          catch err
+            d.reject(err)
+      catch err
+        d.reject(err)
     d.promise
 
   # Validate with M2FA that tx is correct.
-  # @param [String] tx
-  # @param [String] challenge
+  # @param [Object] tx A ledger.wallet.Transaction
   # @param [String] pairingId The paired mobile to send validation.
   # @return A Q promise.
-  validateTx: (tx, challenge, pairingId) ->
+  validateTx: (tx, pairingId) ->
     d = Q.defer()
     client = @_getClientFor(pairingId)
     client.off 'm2fa.accept'
     client.off 'm2fa.response'
     client.on 'm2fa.accept', ->
       d.notify('accepted')
-    client.on 'm2fa.response', (e,blob) ->
+    client.on 'm2fa.response', (e,pin) ->
       client.off 'm2fa.accept'
       client.off 'm2fa.response'
-      d.resolve(blob)
-    client.requestValidation(tx: tx, challenge: challenge)
+      l "%c[M2FA][#{pairingId}] request's pin received :", "#888888", pin
+      tx.validate pin, (transaction, error) =>
+        if error?
+          l "%c[M2FA][#{pairingId}] tx validation FAILED :", "#CC0000", error
+          d.reject(error)
+        else
+          l "%c[M2FA][#{pairingId}] tx validation SUCCEEDED", "#00CC00"
+          d.resolve(transaction)
+    client.requestValidation(tx._out.authorizationPaired)
     d.promise
 
   # Validate with M2FA that tx is correct on every paired mobile.
-  # @param [String] tx
-  # @param [String] challenge
+  # @param [Object] tx A ledger.wallet.Transaction
   # @param [String] pairingId The paired mobile to send validation.
   # @return A Q promise.
-  validateTxOnAll: (tx, challenge) ->
+  validateTxOnAll: (tx) ->
     d = Q.defer()
     @getPairingIds().then (pairingIds) =>
       for pairingId, label of pairingIds
-        @validateTx(tx, challenge, pairingId)
+        @validateTx(tx, pairingId)
         .progress (p) -> d.notify(p)
-        .then (blob) -> d.resolve(blob)
+        .then (transaction) -> d.resolve(transaction)
     d.promise
 
   _nextPairingId: () -> 
@@ -95,7 +106,7 @@ _.extend @ledger.m2fa,
     pairingId = hexaWords + Convert.toHexByte(hash[0] >>> 24)
 
   _getClientFor: (pairingId) ->
-    @clients[pairingId] ||= new ledger.m2fa.Client(pairingId)
+    @clients[pairingId] ||= @_clientFactory(pairingId)
 
   _onIdentify: (client, pubKey, d) ->
     d.notify("pubKeyReceived", pubKey)
@@ -116,11 +127,12 @@ _.extend @ledger.m2fa,
     d.notify("challengeReceived")
     l("%c[_onChallenge] challengeReceived", "color: #4444cc", data)
     try
-      ledger.wallet.safe().confirmSecureScreen(data).then( ->
+      ledger.wallet.safe().confirmSecureScreen(data).then( =>
         l("%c[_onChallenge] SUCCESS !!!", "color: #00ff00" )
         client.confirmPairing()
+        @setPairingLabel(client.pairingId, "")
         d.resolve()
-      ).fail( (e) ->
+      ).fail( (e) =>
         l("%c[_onChallenge] >>>  FAILURE  <<<", "color: #ff0000", e)
         client.rejectPairing()
         d.reject()
@@ -128,3 +140,7 @@ _.extend @ledger.m2fa,
     catch err
       e(err)
       d.reject(err)
+
+  _clientFactory: (pairingId) ->
+    new ledger.m2fa.Client(pairingId)
+    # new ledger.m2fa.DebugClient(pairingId)

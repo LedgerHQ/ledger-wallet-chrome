@@ -1,7 +1,6 @@
 describe "m2fa", ->
   beforeAll ->
-    spyOn(_, 'defer').and.callFake (cb) -> cb()
-    spyOn(ledger.storage.SyncedStore.prototype, '_initConnection')
+    spyOn(_, 'defer')
     ledger.storage.sync = new ledger.storage.SyncedStore("synced_store", "private_key")
     ledger.storage.sync.client = jasmine.createSpyObj('restClient', ['get_settings_md5','get_settings','post_settings','put_settings','delete_settings'])
 
@@ -47,13 +46,13 @@ describe "m2fa", ->
     expect(result.valueOf()).toEqual("a_random_pairing_id": "label")
 
   it "get client corresponding to pairingId, clear previous listners, set new listeners and call requestValidation on validateTx", ->
-    tx = "XxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx"
-    challenge = "0f1f2f3f"
+    tx =
+      _out: {authorizationPaired: "XxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx"}
     pairingId = "a_random_pairing_id"
     client = jasmine.createSpyObj('client',['on','off','sendChallenge','rejectPairing','confirmPairing','requestValidation'])
     spyOn(@$, '_getClientFor').and.returnValue(client)
     
-    r = @$.validateTx(tx, challenge, pairingId)
+    r = @$.validateTx(tx, pairingId)
 
     expect(r.constructor.name).toBe('Promise')
 
@@ -66,16 +65,16 @@ describe "m2fa", ->
     expect(client.on.calls.argsFor(0)[1]).toEqual(jasmine.any(Function))
     expect(client.on.calls.argsFor(1)[0]).toBe('m2fa.response')
     expect(client.on.calls.argsFor(1)[1]).toEqual(jasmine.any(Function))
-    expect(client.requestValidation).toHaveBeenCalledWith(tx: tx, challenge: challenge)
+    expect(client.requestValidation).toHaveBeenCalledWith(tx._out.authorizationPaired)
 
   it "get call validateTx for each client on validateTxOnAll", ->
-    tx = "XxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx"
-    challenge = "0f1f2f3f"
+    tx =
+      _out: {authorizationPaired: "XxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx"}
     spyOn(@$, 'getPairingIds').and.returnValue(then: ((cb) -> cb("a_random_pairing_id":"label")))
     spyOn(@$, 'validateTx').and.returnValue(Q.defer().promise)
-    r = @$.validateTxOnAll(tx, challenge)
+    r = @$.validateTxOnAll(tx)
     expect(@$.validateTx.calls.count()).toBe(1)
-    expect(@$.validateTx.calls.argsFor(0)).toEqual([tx,challenge,"a_random_pairing_id"])
+    expect(@$.validateTx.calls.argsFor(0)).toEqual([tx,"a_random_pairing_id"])
 
   it "_nextPairingId call _randomPairingId", ->
     spyOn(@$, '_randomPairingId')

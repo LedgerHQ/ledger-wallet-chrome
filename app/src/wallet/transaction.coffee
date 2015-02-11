@@ -50,7 +50,6 @@ class ledger.wallet.transaction.Transaction
     throw 'Transaction must me prepared before validation' if not @_out? or not @_validationMode?
 
     validationKey = ("0#{char}" for char in validationKey).join('') if @getValidationMode() == ledger.wallet.transaction.Transaction.ValidationModes.KEYCARD
-    l validationKey
 
     out = _.clone(@_out)
 

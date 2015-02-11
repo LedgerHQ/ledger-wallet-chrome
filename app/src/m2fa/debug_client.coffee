@@ -22,16 +22,15 @@ class @ledger.m2fa.DebugClient extends ledger.m2fa.Client
       @lastChallenge = challenge
     @on 'm2fa.pairing.confirmed', (e,success) => console.log("%c[M2FA][#{@pairingId}] pairing.confirmed", "color: #888888", success, e)
     @on 'm2fa.pairing.rejected', => console.log("%c[M2FA][#{@pairingId}] pairing.confirmed", "color: #888888")
+    @on 'm2fa.request.sended', (e,requestBlob) =>
+      console.log("%c[M2FA][#{@pairingId}] request :", "color: #888888", requestBlob, e)
+      @lastRequest = requestBlob
 
   identify: -> @_onIdentify({public_key: @pubKey})
   challenge: (data) -> @_onChallenge({data: data || @_computeChallenge()})
   accept: -> @_onAccept()
   repeat: -> @_onRepeat()
-  respond: (pin) -> @_onResponse({pin: pin || @_computeResponse()})
-
-  requestValidation: (data) ->
-    @lastRequest = data
-    super
+  respond: (pin) -> @_onResponse({pin: pin || @_computeResponse().pin})
 
   # @param {String} challenge hex encoded
   # @return {Array} The resp hex encoded + the pairingKey hex encoded
