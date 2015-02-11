@@ -70,8 +70,8 @@ describe "m2fa.Client", ->
     expect(@client.emit).toHaveBeenCalledWith('m2fa.accept')
     @client.emit.calls.reset()
 
-    @client._onResponse({blob: "blob"})
-    expect(@client.emit).toHaveBeenCalledWith('m2fa.response', "blob")
+    @client._onResponse({pin: "01020304"})
+    expect(@client.emit).toHaveBeenCalledWith('m2fa.response', "01020304")
     @client.emit.calls.reset()
     
     @client._onIdentify({public_key: "toto"})

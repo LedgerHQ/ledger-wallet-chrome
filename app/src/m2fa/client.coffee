@@ -79,10 +79,10 @@ class @ledger.m2fa.Client extends EventEmitter
     @emit 'm2fa.accept'
 
   # Sent by mobile clients to finalize the 'request' message.
-  # If the 'request' message is accepted, the message must contain the "blob" parameter in order to validate the transaction.
-  # @params [Object] data {"type": "response", "blob": "xxxxxxxxxxxx..."}
+  # If the 'request' message is accepted, the message must contain the "pin" parameter in order to validate the transaction.
+  # @params [Object] data {"type": "response", "pin": "xxxxxxxxxxxx..."}
   _onResponse: (data) ->
-    @emit 'm2fa.response', data.blob
+    @emit 'm2fa.response', data.pin
 
   # Sent by mobile clients to transmit their generated public key.
   # @params [Object] data {"type": "identity", "public_key": "xxxxxxxxxxxx..."}
