@@ -7,6 +7,7 @@ class ledger.wallet.transaction.Transaction
   @ValidationModes:
     PIN: 0x01
     KEYCARD: 0x02
+    SECURE_SCREEN: 0x03
 
   init: (@amount, @fees, @recipientAddress) ->
     @amount = ledger.wallet.Value.from(amount)
@@ -35,6 +36,8 @@ class ledger.wallet.transaction.Transaction
         @_out.scriptData = @_out.scriptData.toString(HEX)
         @_out.trustedInputs = (trustedInput.toString(HEX) for trustedInput in @_out.trustedInputs)
         @_out.publicKeys = (publicKey.toString(HEX) for publicKey in @_out.publicKeys)
+        @_out.authorizationPaired = @_out.authorizationPaired.toString(HEX) if @_out.authorizationPaired?
+        @_out.authorizationReference = @_out.authorizationReference.toString(HEX) if @_out.authorizationReference?
         @_validationMode = result.authorizationRequired
         callback?(@)
       .fail (error) =>
