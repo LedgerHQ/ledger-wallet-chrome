@@ -14,40 +14,48 @@ class @ledger.m2fa.Client extends EventEmitter
     @pairingId = pairingId
     @_joinRoom()
 
+  isConnected: ->
+    return @_connectionPromise && @_connectionPromise.isFullfilled()
+
   # Transmit 4 bytes challenge. 
   # @params [String] challenge is encoded in hex "8 nonce bytes"+"4 challenge bytes"
   sendChallenge: (challenge) ->
-    @ws.send JSON.stringify(type: 'challenge', data: challenge)
+    @_send JSON.stringify(type: 'challenge', data: challenge)
     @emit 'm2fa.challenge.sended', challenge
 
   # End a pairing process whether its successful or not.
   confirmPairing: (success=true) ->
-    @ws.send JSON.stringify(type: 'pairing', is_successful: success)
+    @_send JSON.stringify(type: 'pairing', is_successful: success)
     @emit 'm2fa.pairing.confirmed', success
   rejectPairing: () ->
-    @ws.send JSON.stringify(type: 'pairing', is_successful: false)
+    @_send JSON.stringify(type: 'pairing', is_successful: false)
     @emit 'm2fa.pairing.rejected'
 
   requestValidation: (data) ->
     @_lastRequest = JSON.stringify(type: 'request', second_factor_data: data)
-    @ws.send @_lastRequest
+    @_send @_lastRequest
     @emit 'm2fa.request.sended', data
 
   _joinRoom: (pairingId) ->
+    d = Q.defer()
+    @_connectionPromise = d.promise
     @ws = new WebSocket(@constructor.BASE_URL)
-    @ws.onopen = _.bind(@_onOpen,@)
+    @ws.onopen = (e) =>
+      @_onOpen(e)
+      d.resolve()
     @ws.onmessage = _.bind(@_onMessage,@)
     @ws.onclose = _.bind(@_onClose,@)
 
   _leaveRoom: () ->
-    @ws.send JSON.stringify(type: 'leave')
+    @_send JSON.stringify(type: 'leave')
     @ws.close()
     @ws = null
+    @_connectionPromise = null
     @emit 'm2fa.room.left'
 
   _onOpen: (e) ->
-    @ws.send JSON.stringify(type: 'join', room: @pairingId)
-    @ws.send JSON.stringify(type: 'repeat')
+    @_send JSON.stringify(type: 'join', room: @pairingId)
+    @_send JSON.stringify(type: 'repeat')
     @emit 'm2fa.room.joined'
 
   _onMessage: (e) ->
@@ -63,7 +71,14 @@ class @ledger.m2fa.Client extends EventEmitter
       when "challenge" then @_onChallenge(data)
 
   _onClose: (e) ->
+    @ws = null
+    @_connectionPromise = null
     @_joinRoom()
+
+  _send: (data) ->
+    throw "Not connected" unless @ws?
+    @_connectionPromise.then =>
+      @ws.send(data)
 
   _onConnect: (data) ->
     @emit 'm2fa.connect'
@@ -72,7 +87,7 @@ class @ledger.m2fa.Client extends EventEmitter
 
   # Sent by mobile clients to request chrome application to repeat their 'request' message.
   _onRepeat: (data) ->
-    @ws.send(@_lastRequest)
+    @_send(@_lastRequest)
 
   # Sent by mobile clients to indicate the chrome application that one client is able to handle the 'request' message.
   _onAccept: (data) ->
