@@ -87,6 +87,11 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new WalletReceiveIndexDialogViewController()
     dialog.show()
 
+  # Pairing
+  route '/wallet/pairing/index', (params) ->
+    dialog = new WalletPairingIndexDialogViewController()
+    dialog.show()
+
   # Help
   route '/wallet/help/index', (params) ->
     window.open t 'application.support_url'
