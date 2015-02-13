@@ -47,15 +47,15 @@ class @ledger.m2fa.Client extends EventEmitter
     @ws.onclose = _.bind(@_onClose,@)
 
   _leaveRoom: () ->
-    @_send JSON.stringify(type: 'leave')
+    @ws.send JSON.stringify(type: 'leave')
     @ws.close()
     @ws = null
     @_connectionPromise = null
     @emit 'm2fa.room.left'
 
   _onOpen: (e) ->
-    @_send JSON.stringify(type: 'join', room: @pairingId)
-    @_send JSON.stringify(type: 'repeat')
+    @ws.send JSON.stringify(type: 'join', room: @pairingId)
+    @ws.send JSON.stringify(type: 'repeat')
     @emit 'm2fa.room.joined'
 
   _onMessage: (e) ->
@@ -87,7 +87,7 @@ class @ledger.m2fa.Client extends EventEmitter
 
   # Sent by mobile clients to request chrome application to repeat their 'request' message.
   _onRepeat: (data) ->
-    @_send(@_lastRequest)
+    @ws.send(@_lastRequest)
 
   # Sent by mobile clients to indicate the chrome application that one client is able to handle the 'request' message.
   _onAccept: (data) ->
