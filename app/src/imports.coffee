@@ -236,6 +236,9 @@
         'controllers/onboarding/management/onboarding_management_provisioning_view_controller'
         'controllers/onboarding/management/onboarding_management_done_view_controller'
 
+        # Pairing
+        'controllers/wallet/pairing/wallet_pairing_index_dialog_view_controller'
+
         # Specs
         '../spec/jasmine/jasmine'
         '../spec/jasmine/jasmine-html'
