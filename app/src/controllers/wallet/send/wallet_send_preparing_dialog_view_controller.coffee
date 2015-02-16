@@ -42,7 +42,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
     ).then( () =>
       # return if not @isShown()
       @once 'dismiss', =>
-        dialog = new WalletSendSuccessDialogViewController()
+        dialog = new WalletSendProcessingDialogViewController transaction: tx
         dialog.show()
       @dismiss()
     ).done()

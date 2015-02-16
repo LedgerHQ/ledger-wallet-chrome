@@ -6,6 +6,7 @@ class @WalletPairingIndexDialogViewController extends DialogViewController
   onAfterRender: ->
     super
     [pairingId, promise] = ledger.m2fa.pairDevice()
+    l pairingId
     @view.qrcode = new QRCode "qrcode_frame",
         text: pairingId
         width: 196
@@ -19,4 +20,3 @@ class @WalletPairingIndexDialogViewController extends DialogViewController
 
   dismiss: ->
     super
-    pr

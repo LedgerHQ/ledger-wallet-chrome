@@ -142,5 +142,5 @@ _.extend @ledger.m2fa,
       d.reject(err)
 
   _clientFactory: (pairingId) ->
-    #new ledger.m2fa.Client(pairingId)
-    new ledger.m2fa.DebugClient(pairingId)
+    new ledger.m2fa.Client(pairingId)
+    #new ledger.m2fa.DebugClient(pairingId)

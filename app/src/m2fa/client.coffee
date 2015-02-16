@@ -59,6 +59,7 @@ class @ledger.m2fa.Client extends EventEmitter
     @emit 'm2fa.room.joined'
 
   _onMessage: (e) ->
+    l e
     data = JSON.parse(e.data)
     @emit 'm2fa.message', data
     switch data.type
