@@ -261,6 +261,10 @@ wallet:
       amount_and_address_to_validate: "Amount and recipient's Bitcoin address to validate."
       to: "to"
 
+    mobile_validation:
+      title: "[ALPHA]Waiting for mobile validation"
+      content: "[ALPHA]Please confirm the transaction on your mobile device"
+
     processing:
       sending: "Sending..."
       validating: "Validating transaction..."
