@@ -67,17 +67,11 @@ _.extend @ledger.m2fa,
     client.off 'm2fa.response'
     client.on 'm2fa.accept', ->
       d.notify('accepted')
-    client.on 'm2fa.response', (e,pin) ->
       client.off 'm2fa.accept'
-      client.off 'm2fa.response'
+    client.on 'm2fa.response', (e,pin) ->
       l "%c[M2FA][#{pairingId}] request's pin received :", "#888888", pin
-      tx.validate pin, (transaction, error) =>
-        if error?
-          l "%c[M2FA][#{pairingId}] tx validation FAILED :", "#CC0000", error
-          d.reject(error)
-        else
-          l "%c[M2FA][#{pairingId}] tx validation SUCCEEDED", "#00CC00"
-          d.resolve(transaction)
+      client._leaveRoom()
+      d.resolve(pin)
     client.requestValidation(tx._out.authorizationPaired)
     d.promise
 
@@ -89,9 +83,15 @@ _.extend @ledger.m2fa,
     d = Q.defer()
     @getPairingIds().then (pairingIds) =>
       for pairingId, label of pairingIds
-        @validateTx(tx, pairingId)
-        .progress (p) -> d.notify(p)
-        .then (transaction) -> d.resolve(transaction)
+        do (pairingId) =>
+          @validateTx(tx, pairingId)
+          .progress (msg) ->
+            if msg == 'accepted'
+              # Close all other client
+              @clients[pId]._leaveRoom() for pId, lbl of pairingIds when pId isnt pairingId
+            d.notify(msg)
+          .then (transaction) -> d.resolve(transaction)
+          .done()
     d.promise
 
   _nextPairingId: () -> 
@@ -118,10 +118,12 @@ _.extend @ledger.m2fa,
       ).fail( (err) =>
         e(err)
         d.reject()
+        client._leaveRoom()
       ).done()
     catch err
       e(err)
       d.reject(err)
+      client._leaveRoom()
 
   _onChallenge: (client, data, d) ->
     d.notify("challengeReceived")
@@ -136,10 +138,13 @@ _.extend @ledger.m2fa,
         l("%c[_onChallenge] >>>  FAILURE  <<<", "color: #ff0000", e)
         client.rejectPairing()
         d.reject()
+      ).finally(=>
+        client._leaveRoom()
       ).done()
     catch err
       e(err)
       d.reject(err)
+      client._leaveRoom()
 
   _clientFactory: (pairingId) ->
     new ledger.m2fa.Client(pairingId)

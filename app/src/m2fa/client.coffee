@@ -5,12 +5,13 @@
 # client.on 'm2fa.idendify', (data) ->
 #   console.log data.public_key, "identified"
 # client.requestValidation(tx)
-class @ledger.m2fa.Client extends EventEmitter
+class @ledger.m2fa.Client extends ledger.tasks.Task
 
   @BASE_URL: ledger.config.m2fa.baseUrl
 
   # @param [String] pairingId The id must be a valid btc address. Used to be a bitId address.
   constructor: (pairingId) ->
+    super(pairingId)
     @pairingId = pairingId
     @_joinRoom()
 
@@ -36,7 +37,12 @@ class @ledger.m2fa.Client extends EventEmitter
     @_send @_lastRequest
     @emit 'm2fa.request.sended', data
 
+  # Redefine from Task
+  onStop: () ->
+    @_leaveRoom()
+
   _joinRoom: (pairingId) ->
+    return @_connectionPromise if @ws?
     d = Q.defer()
     @_connectionPromise = d.promise
     @ws = new WebSocket(@constructor.BASE_URL)
@@ -45,6 +51,7 @@ class @ledger.m2fa.Client extends EventEmitter
       d.resolve()
     @ws.onmessage = _.bind(@_onMessage,@)
     @ws.onclose = _.bind(@_onClose,@)
+    @_connectionPromise
 
   _leaveRoom: () ->
     @ws.send JSON.stringify(type: 'leave')
@@ -59,7 +66,6 @@ class @ledger.m2fa.Client extends EventEmitter
     @emit 'm2fa.room.joined'
 
   _onMessage: (e) ->
-    l e
     data = JSON.parse(e.data)
     @emit 'm2fa.message', data
     switch data.type
@@ -77,7 +83,7 @@ class @ledger.m2fa.Client extends EventEmitter
     @_joinRoom()
 
   _send: (data) ->
-    throw "Not connected" unless @ws?
+    @_joinRoom().then(=> @_send(data)) if ! @ws?
     @_connectionPromise.then =>
       @ws.send(data)
 

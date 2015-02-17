@@ -146,11 +146,6 @@
         'restclients/balance_restclient'
         'restclients/sync_rest_client'
 
-        ## Mobile 2FA
-        'm2fa/m2fa'
-        'm2fa/client'
-        'm2fa/debug_client'
-
         ## Tasks
         'tasks/task'
         'tasks/balance_task'
@@ -175,6 +170,11 @@
         'base/migrations'
         'base/view_controller'
         'base/navigation_controller'
+
+        ## Mobile 2FA
+        'm2fa/m2fa'
+        'm2fa/client'
+        'm2fa/debug_client'
 
         ## Models
         'models/wallet'

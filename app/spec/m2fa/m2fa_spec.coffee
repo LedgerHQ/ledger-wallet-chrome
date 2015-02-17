@@ -7,6 +7,7 @@ describe "m2fa", ->
   beforeEach ->
     @$ = ledger.m2fa
     spyOn(@$, 'Client').and.returnValue jasmine.createSpyObj('client', ['on','off','sendChallenge','rejectPairing','confirmPairing','requestValidation'])
+    @$._clientFactory = (pairingId) -> new ledger.m2fa.Client(pairingId)
 
   it "init device pairing with a new random pairingId, a client, listen client event, and return the pairingId and a promise", ->
     pairingId = "a_random_pairing_id"
