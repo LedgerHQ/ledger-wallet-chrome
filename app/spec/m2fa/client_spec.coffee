@@ -4,6 +4,7 @@ describe "m2fa.Client", ->
     spyOn(window, 'WebSocket').and.returnValue jasmine.createSpyObj('ws', ['send', 'close'])
     @pairingId = "aPairingId"
     @client = new ledger.m2fa.Client(@pairingId)
+    spyOn(@client, "_send")
     @ws = @client.ws
   
   it "connect to 2fa on creation and set event callbacks", ->
@@ -15,20 +16,20 @@ describe "m2fa.Client", ->
   it "send challenge send good stringified message", ->
     challenge = "XxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx"
     @client.sendChallenge(challenge)
-    expect(@ws.send).toHaveBeenCalledWith(JSON.stringify(type:"challenge","data":challenge))
+    expect(@client._send).toHaveBeenCalledWith(JSON.stringify(type:"challenge","data":challenge))
 
   it "confirm pairing send good stringified message", ->
     @client.confirmPairing()
-    expect(@ws.send).toHaveBeenCalledWith(JSON.stringify(type:'pairing', is_successful:true))
+    expect(@client._send).toHaveBeenCalledWith(JSON.stringify(type:'pairing', is_successful:true))
 
   it "reject pairing send good stringified message", ->
     @client.rejectPairing()
-    expect(@ws.send).toHaveBeenCalledWith(JSON.stringify(type:'pairing', is_successful:false))
+    expect(@client._send).toHaveBeenCalledWith(JSON.stringify(type:'pairing', is_successful:false))
 
   it "request validation send good stringified message", ->
     data = "11XxXxXxXxXxXx88XxXxXxXxXxXxXxFF"
     @client.requestValidation(data)
-    expect(@ws.send).toHaveBeenCalledWith(JSON.stringify(type:'request', second_factor_data:data))
+    expect(@client._send).toHaveBeenCalledWith(JSON.stringify(type:'request', second_factor_data:data))
 
   it "leave room send message and close connection", ->
     @client._leaveRoom()
