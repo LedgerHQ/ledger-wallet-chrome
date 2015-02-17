@@ -210,6 +210,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
         pubKey = new JSUCrypt.key.EcFpPublicKey(256, domain)
         pubKey.W =
           getUncompressedForm: -> ledger.wallet.Attestation.Bytes
+        l ledger.wallet.Attestation.Bytes
         ecsig = new JSUCrypt.signature.ECDSA(SHA256)
         ecsig.init(pubKey,  JSUCrypt.signature.MODE_VERIFY)
         sigBytes = (parseInt(@attestation.signature.substring(i, i + 2), 16) for i in [0...(@attestation.signature.length / 2)])

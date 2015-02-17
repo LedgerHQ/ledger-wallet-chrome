@@ -41,7 +41,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     stream
 
   postTransaction: (transaction, callback) ->
-    @http.postForm(
+    @http.post(
       url: "blockchain/pushtx",
       data: {tx: transaction.getSignedTransaction()}
     ).done( (response) ->

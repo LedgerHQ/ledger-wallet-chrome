@@ -59,6 +59,7 @@ class ledger.wallet.transaction.Transaction
 
     validationKey = switch @_validationMode
       when ledger.wallet.transaction.Transaction.ValidationModes.KEYCARD then new ByteString(validationKey, HEX)
+      when ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN then new ByteString(validationKey, ASCII)
       when ledger.wallet.transaction.Transaction.ValidationModes.PIN then new ByteString(validationKey, ASCII)
     try
       ledger.app.wallet._lwCard.dongle.createPaymentTransaction_async(
@@ -74,6 +75,8 @@ class ledger.wallet.transaction.Transaction
         out
       )
         .then (rawTransaction) =>
+          l 'rawtx'
+          l rawTransaction
           @_transaction = rawTransaction
           callback?(this)
         .fail (error) ->
@@ -83,6 +86,7 @@ class ledger.wallet.transaction.Transaction
 
   getSignedTransaction: () ->
     throw 'Transaction should be validated before retrieving signed transaction' unless @_transaction?
+    l "Push ", @_transaction.toString(HEX)
     @_transaction.toString(HEX)
 
   getValidationMode: () -> @_validationMode
