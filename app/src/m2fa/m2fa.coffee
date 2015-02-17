@@ -71,13 +71,7 @@ _.extend @ledger.m2fa,
       client.off 'm2fa.accept'
       client.off 'm2fa.response'
       l "%c[M2FA][#{pairingId}] request's pin received :", "#888888", pin
-      tx.validate pin, (transaction, error) =>
-        if error?
-          l "%c[M2FA][#{pairingId}] tx validation FAILED :", "#CC0000", error
-          d.reject(error)
-        else
-          l "%c[M2FA][#{pairingId}] tx validation SUCCEEDED", "#00CC00"
-          d.resolve(transaction)
+      d.resolve(pin)
     client.requestValidation(tx._out.authorizationPaired)
     d.promise
 

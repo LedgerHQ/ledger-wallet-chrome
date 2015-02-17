@@ -12,6 +12,7 @@ class ledger.wallet.transaction.Transaction
   init: (@amount, @fees, @recipientAddress) ->
     @amount = ledger.wallet.Value.from(amount)
     @fees = ledger.wallet.Value.from(fees)
+    @_isValidated = no
 
   prepare: (@inputs, @changePath, callback) ->
     throw 'Transaction must me initialized before preparation' if not @amount? or not @fees? or not @recipientAddress?
@@ -75,14 +76,15 @@ class ledger.wallet.transaction.Transaction
         out
       )
         .then (rawTransaction) =>
-          l 'rawtx'
-          l rawTransaction
+          @_isValidated = yes
           @_transaction = rawTransaction
           callback?(this)
         .fail (error) ->
           callback?(null, {title: 'Signature Error', code: ledger.errors.SignatureError, error})
     catch error
       callback?(null, {title: 'Unknown Error', code: ledger.errors.UnknownError, error})
+
+  isValidated: () -> @_isValidated
 
   getSignedTransaction: () ->
     throw 'Transaction should be validated before retrieving signed transaction' unless @_transaction?
