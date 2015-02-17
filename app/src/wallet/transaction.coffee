@@ -18,11 +18,11 @@ class ledger.wallet.transaction.Transaction
     try
       @_btInputs = []
       @_btcAssociatedKeyPath = []
-      l inputs
       for input in inputs
         splitTransaction = ledger.app.wallet._lwCard.dongle.splitTransaction(new ByteString(input.raw, HEX))
         @_btInputs.push [splitTransaction, input.output_index]
         @_btcAssociatedKeyPath.push input.paths[0]
+
       ledger.app.wallet._lwCard.dongle.createPaymentTransaction_async(
         @_btInputs,
         @_btcAssociatedKeyPath,
