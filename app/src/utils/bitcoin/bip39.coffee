@@ -63,10 +63,12 @@ _.extend ledger.bitcoin.bip39,
 
   entropyToMnemonic: (entropy, entropyBitLength = @ENTROPY_BIT_LENGTH) ->
     # convert it to integers array
-    if entropy instanceof Array
-      entropyIntegersArray = entropy
-    else
+    if typeof entropy == "string"
       entropyIntegersArray = entropy.match(/\w{8}/g).map (h) -> parseInt(h,16)
+    else if entropy instanceof Uint8Array
+      entropyIntegersArray = @_bytesArrayToIntegersArray(entropy)
+    else
+      entropyIntegersArray = entropy
     # apply sha256 to hash
     hashedEntropyIntegersArray = sjcl.hash.sha256.hash entropyIntegersArray
     # get first x bits of hash

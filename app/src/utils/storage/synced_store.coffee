@@ -53,7 +53,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
           items
     ).catch( (jqXHR) =>
       # Data not synced already
-      return this.init() if jqXHR.status == 404
+      return this._init() if jqXHR.status == 404
       jqXHR
     )
 
