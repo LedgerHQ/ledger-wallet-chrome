@@ -109,6 +109,7 @@
         'utils/lru'
         'utils/formatters'
         'utils/stream'
+        'utils/completion_closure'
 
         ## Crypto
         'utils/crypto/aes'
@@ -145,6 +146,7 @@
         'restclients/transactions_restclient'
         'restclients/balance_restclient'
         'restclients/sync_rest_client'
+        'restclients/m2fa_restclient'
 
         ## Tasks
         'tasks/task'
@@ -175,6 +177,8 @@
         'm2fa/m2fa'
         'm2fa/client'
         'm2fa/debug_client'
+        'm2fa/pairing_request'
+        'm2fa/transaction_validation_request'
 
         ## Models
         'models/wallet'

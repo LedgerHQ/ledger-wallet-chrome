@@ -6,17 +6,19 @@ class @WalletSendMobileValidationDialogViewController extends @DialogViewControl
   onAfterRender: ->
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@view.spinnerContainer[0])
-    ledger.m2fa.validateTxOnAll(@params.transaction).fail( (error) =>
-      # return if not @isShown()
-      @once 'dismiss', =>
-        dialog = new WalletSendErrorDialogViewController(reason: error)
-        dialog.show()
+    ledger.m2fa.validateTxOnAll(@params.transaction)
+    @_request =  ledger.m2fa.requestValidationOnAll(@params.transaction)
+    @_request.onComplete (keycode, error) ->
+      if error?
+        @once 'dismiss', =>
+          dialog = new WalletSendErrorDialogViewController(reason: error)
+          dialog.show()
+      else
+        @once 'dismiss', =>
+          dialog = new WalletSendProcessingDialogViewController transaction: @params.transaction, keycode: keycode
+          dialog.show()
       @dismiss()
-    ).then( (keycode) =>
-      # return if not @isShown()
-      @once 'dismiss', =>
-        dialog = new WalletSendProcessingDialogViewController transaction: @params.transaction, keycode: keycode
-        dialog.show()
-      @dismiss()
-    ).done()
 
+  onDismiss: () ->
+    super
+    @_request.cancel()

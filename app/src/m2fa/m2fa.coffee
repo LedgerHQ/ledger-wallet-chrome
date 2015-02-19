@@ -12,7 +12,7 @@ _.extend @ledger.m2fa,
   # - send challenge to mobile ;
   # - wait for challenge response ;
   # - verify response ;
-  # - notity mobile of the pairing success/failure.
+  # - notify mobile of the pairing success/failure.
   #
   # The return promise :
   # - notify when "pubKeyReceived" ;
@@ -28,7 +28,14 @@ _.extend @ledger.m2fa,
     @clients[pairingId] = client    
     client.on 'm2fa.identify', (e,pubKey) => @_onIdentify(client, pubKey, d)
     client.on 'm2fa.challenge', (e,data) => @_onChallenge(client, data, d)
-    return [pairingId, d.promise]
+    [pairingId, d.promise, client]
+
+  # Creates a new pairing request and starts the m2fa pairing process.
+  # @see ledger.m2fa.PairingRequest
+  # @return [ledger.m2fa.PairingRequest] The request interface
+  requestPairing: () ->
+    [pairingId, promise, client] = @pairDevice()
+    new ledger.m2fa.PairingRequest(pairingId, promise, client)
 
   # Allow you to assign a label to a pairingId (ex: "mobile Pierre").
   # @params [String] pairingId
@@ -45,13 +52,10 @@ _.extend @ledger.m2fa,
       try
         keys = _.filter(keys, (key) -> key.match(/^__m2fa_/))
         ledger.storage.sync.get keys, (items) ->
-          try
-            pairingCuple = {}
-            for key, value of items
-              pairingCuple[key.replace(/^__m2fa_/,'')] = value
-            d.resolve(pairingCuple)
-          catch err
-            d.reject(err)
+          pairingCuple = {}
+          for key, value of items
+            pairingCuple[key.replace(/^__m2fa_/,'')] = value
+          d.resolve(pairingCuple)
       catch err
         d.reject(err)
     d.promise
@@ -61,6 +65,10 @@ _.extend @ledger.m2fa,
   # @param [String] pairingId The paired mobile to send validation.
   # @return A Q promise.
   validateTx: (tx, pairingId) ->
+    ledger.api.M2faRestClient.instance.wakeUpSecureScreens([pairingId])
+    @_validateTx(tx, pairingId)
+
+  _validateTx: (tx, pairingId) ->
     d = Q.defer()
     client = @_getClientFor(pairingId)
     client.off 'm2fa.accept'
@@ -73,7 +81,7 @@ _.extend @ledger.m2fa,
       client._leaveRoom()
       d.resolve(pin)
     client.requestValidation(tx._out.authorizationPaired)
-    d.promise
+    [client , d.promise]
 
   # Validate with M2FA that tx is correct on every paired mobile.
   # @param [Object] tx A ledger.wallet.Transaction
@@ -81,18 +89,35 @@ _.extend @ledger.m2fa,
   # @return A Q promise.
   validateTxOnAll: (tx) ->
     d = Q.defer()
+    clients = []
     @getPairingIds().then (pairingIds) =>
+      ledger.api.M2faRestClient.instance.wakeUpSecureScreens(_.keys(pairingIds))
       for pairingId, label of pairingIds
         do (pairingId) =>
-          @validateTx(tx, pairingId)
-          .progress (msg) ->
+          [client, promise] = @_validateTx(tx, pairingId)
+          clients.push client
+          promise.progress (msg) ->
             if msg == 'accepted'
               # Close all other client
               @clients[pId]._leaveRoom() for pId, lbl of pairingIds when pId isnt pairingId
             d.notify(msg)
           .then (transaction) -> d.resolve(transaction)
           .done()
-    d.promise
+    .fail (er) ->
+      e er
+      throw er
+    [clients, d.promise]
+
+  # Creates a transaction validation request and starts the validation process.
+  # @see ledger.m2fa.TransactionValidationRequest
+  # @return [ledger.m2fa.TransactionValidationRequest] The request interface
+  requestValidationOnAll: (tx) ->
+    [clients, promise] = @validateTxOnAll(tx, request)
+    new ledger.m2fa.TransactionValidationRequest(clients, promise)
+
+  requestValidation: (tx, pairingId) ->
+    [client, promise] = @validateTx(tx, pairingId)
+    new ledger.m2fa.TransactionValidationRequest([client], promise)
 
   _nextPairingId: () -> 
     # ledger.wallet.safe.randomBitIdAddress()

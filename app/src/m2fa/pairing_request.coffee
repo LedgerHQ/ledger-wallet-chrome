@@ -6,7 +6,7 @@
 #   - 'cancel'
 #   - 'joined'
 #   - 'leave'
-class PairingRequest extends @EventEmitter
+class @ledger.m2fa.PairingRequest extends @EventEmitter
 
   constructor: (pairingTuple) ->
     [@_pairingId, promise, @_client] = pairingTuple
@@ -15,15 +15,18 @@ class PairingRequest extends @EventEmitter
         l result
       ,
       (err) ->
-        l err
+
       ,
       (progress) ->
-        l progress
+        @emit progress
     ).done()
+    @_client.on 'm2fa.disconnect'
     @_promise = promise
+
+  onComplete: (cb) -> @_onComplete = cb
 
   cancel: () ->
     @_promise = null
     @_client.stopIfNeccessary()
     @_onComplete = null
-    @_onCancel?()
+    @emit 'cancel'

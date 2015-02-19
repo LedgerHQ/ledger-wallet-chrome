@@ -27,7 +27,7 @@ describe "m2fa", ->
     expect(client.on.calls.argsFor(1)[1]).toEqual(jasmine.any(Function))
 
     expect(result).toEqual(jasmine.any(Array))
-    expect(result.length).toBe(2)
+    expect(result.length).toBe(3)
     expect(result[0]).toBe(pairingId)
     expect(result[1].constructor.name).toBe('Promise')
 
@@ -53,7 +53,7 @@ describe "m2fa", ->
     client = jasmine.createSpyObj('client',['on','off','sendChallenge','rejectPairing','confirmPairing','requestValidation'])
     spyOn(@$, '_getClientFor').and.returnValue(client)
     
-    r = @$.validateTx(tx, pairingId)
+    [c, r] = @$.validateTx(tx, pairingId)
 
     expect(r.constructor.name).toBe('Promise')
 
@@ -73,7 +73,7 @@ describe "m2fa", ->
       _out: {authorizationPaired: "XxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx"}
     spyOn(@$, 'getPairingIds').and.returnValue(then: ((cb) -> cb("a_random_pairing_id":"label")))
     spyOn(@$, 'validateTx').and.returnValue(Q.defer().promise)
-    r = @$.validateTxOnAll(tx)
+    [c, r] = @$.validateTxOnAll(tx)
     expect(@$.validateTx.calls.count()).toBe(1)
     expect(@$.validateTx.calls.argsFor(0)).toEqual([tx,"a_random_pairing_id"])
 
