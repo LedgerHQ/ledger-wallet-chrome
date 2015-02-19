@@ -42,7 +42,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
     @_leaveRoom()
 
   _joinRoom: (pairingId) ->
-    return @_connectionPromise if @ws?
+    return @_connectionPromise if @_connectionPromise?
     d = Q.defer()
     @_connectionPromise = d.promise
     @ws = new WebSocket(@constructor.BASE_URL)
@@ -54,10 +54,10 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
     @_connectionPromise
 
   _leaveRoom: () ->
-    @ws.send JSON.stringify(type: 'leave')
-    @ws.close()
-    @ws = null
-    @_connectionPromise = null
+    [ws, @ws, @_connectionPromise] = [@ws, undefined, undefined]
+    ws.onclose = undefined
+    ws.send JSON.stringify(type: 'leave')
+    ws.close()
     @emit 'm2fa.room.left'
 
   _onOpen: (e) ->
@@ -78,12 +78,12 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
       when "challenge" then @_onChallenge(data)
 
   _onClose: (e) ->
-    @ws = null
-    @_connectionPromise = null
+    [@ws.onclose, @ws.onmessage] = [undefined, undefined]
+    [@ws, @_connectionPromise] = [undefined, undefined]
     @_joinRoom()
 
   _send: (data) ->
-    @_joinRoom().then(=> @_send(data)) if ! @ws?
+    @_joinRoom().then(=> @_send(data)) if ! @_connectionPromise?
     @_connectionPromise.then =>
       l 'Actual send ', data
       @ws.send(data)
@@ -95,7 +95,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
 
   # Sent by mobile clients to request chrome application to repeat their 'request' message.
   _onRepeat: (data) ->
-    @ws.send(@_lastRequest)
+    @ws.send(@_lastRequest) if @_lastRequest?
 
   # Sent by mobile clients to indicate the chrome application that one client is able to handle the 'request' message.
   _onAccept: (data) ->
