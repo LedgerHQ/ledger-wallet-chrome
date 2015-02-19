@@ -37,7 +37,7 @@ class @CompletionClosure
     Completes the closure with an error. This method will call the onComplete function if possible or keep the error until
     a callback is submitted.
 
-    @param [Any] error A error to failed the closure
+    @param [Any] error An error to failed the closure
     @return [CompletionClosure] self
     @throw If the closure is already completed
   ###
@@ -46,6 +46,22 @@ class @CompletionClosure
     @_isFailed = yes
     @_complete = [null, error]
     @_tryNotify()
+    @
+
+  ###
+    Completes the closure either by a success or an error. If both error and result are null, the closure will be failed
+    with an 'Unknown Error'.
+
+    @param [Any] value A value to complete the closure (may be null)
+    @param [Any] error An error to failed the closure (may be null)
+    @return [CompletionClosure] self
+    @throw If the closure is already completed
+  ###
+  complete: (value, error) ->
+    if value?
+      @success(value)
+    else
+      @fail(if error? then error else "Unknown Error")
     @
 
   ###
