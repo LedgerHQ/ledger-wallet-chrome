@@ -6,7 +6,6 @@ class @WalletSendMobileValidationDialogViewController extends @DialogViewControl
   onAfterRender: ->
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@view.spinnerContainer[0])
-    ledger.m2fa.validateTxOnAll(@params.transaction)
     @_request =  ledger.m2fa.requestValidationOnAll(@params.transaction)
     @_request.onComplete (keycode, error) ->
       if error?

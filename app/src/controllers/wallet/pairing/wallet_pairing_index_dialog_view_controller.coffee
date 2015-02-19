@@ -7,7 +7,7 @@ class @WalletPairingIndexDialogViewController extends DialogViewController
     super
     @_request = ledger.m2fa.requestPairing()
     @view.qrcode = new QRCode "qrcode_frame",
-        text: pairingId
+        text: @_request.pairingId
         width: 196
         height: 196
         colorDark : "#000000"

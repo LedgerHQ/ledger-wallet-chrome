@@ -85,6 +85,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
   _send: (data) ->
     @_joinRoom().then(=> @_send(data)) if ! @ws?
     @_connectionPromise.then =>
+      l 'Actual send ', data
       @ws.send(data)
 
   _onConnect: (data) ->

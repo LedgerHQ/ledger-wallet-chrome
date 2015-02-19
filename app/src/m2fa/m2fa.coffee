@@ -102,6 +102,7 @@ _.extend @ledger.m2fa,
               @clients[pId]._leaveRoom() for pId, lbl of pairingIds when pId isnt pairingId
             d.notify(msg)
           .then (transaction) -> d.resolve(transaction)
+          .fail (er) -> throw er
           .done()
     .fail (er) ->
       e er
@@ -112,7 +113,7 @@ _.extend @ledger.m2fa,
   # @see ledger.m2fa.TransactionValidationRequest
   # @return [ledger.m2fa.TransactionValidationRequest] The request interface
   requestValidationOnAll: (tx) ->
-    [clients, promise] = @validateTxOnAll(tx, request)
+    [clients, promise] = @validateTxOnAll(tx)
     new ledger.m2fa.TransactionValidationRequest(clients, promise)
 
   requestValidation: (tx, pairingId) ->

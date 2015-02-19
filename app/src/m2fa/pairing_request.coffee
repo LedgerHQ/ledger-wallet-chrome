@@ -8,14 +8,15 @@
 #   - 'leave'
 class @ledger.m2fa.PairingRequest extends @EventEmitter
 
-  constructor: (pairingTuple) ->
-    [@_pairingId, promise, @_client] = pairingTuple
+  constructor: (pairindId, promise, client) ->
+    @pairingId = pairindId
+    @_client = client
     promise.then(
       (result) ->
         l result
       ,
       (err) ->
-
+        e err
       ,
       (progress) ->
         @emit progress
