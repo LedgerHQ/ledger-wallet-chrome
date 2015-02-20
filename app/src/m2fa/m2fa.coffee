@@ -28,6 +28,7 @@ _.extend @ledger.m2fa,
     @clients[pairingId] = client    
     client.on 'm2fa.identify', (e,pubKey) => @_onIdentify(client, pubKey, d)
     client.on 'm2fa.challenge', (e,data) => @_onChallenge(client, data, d)
+    client.on 'm2fa.disconnect', (e, data) => @_onDisconnect(client, data, d)
     [pairingId, d.promise, client]
 
   # Creates a new pairing request and starts the m2fa pairing process.
@@ -78,7 +79,7 @@ _.extend @ledger.m2fa,
       client.off 'm2fa.accept'
     client.on 'm2fa.response', (e,pin) ->
       l "%c[M2FA][#{pairingId}] request's pin received :", "#888888", pin
-      client._leaveRoom()
+      client.stopIfNeccessary()
       d.resolve(pin)
     client.requestValidation(tx._out.authorizationPaired)
     [client , d.promise]
@@ -99,7 +100,7 @@ _.extend @ledger.m2fa,
           promise.progress (msg) ->
             if msg == 'accepted'
               # Close all other client
-              @clients[pId]._leaveRoom() for pId, lbl of pairingIds when pId isnt pairingId
+              @clients[pId].stopIfNeccessary() for pId, lbl of pairingIds when pId isnt pairingId
             d.notify(msg)
           .then (transaction) -> d.resolve(transaction)
           .fail (er) -> throw er
@@ -140,16 +141,17 @@ _.extend @ledger.m2fa,
     try
       ledger.wallet.safe().initiateSecureScreen(pubKey).then((challenge) ->
         l("%c[_onIdentify] challenge received:", "color: #4444cc", challenge)
+        d.notify("sendChallenge", challenge)
         client.sendChallenge(challenge)
       ).fail( (err) =>
         e(err)
         d.reject()
-        client._leaveRoom()
+        client.stopIfNeccessary()
       ).done()
     catch err
       e(err)
       d.reject(err)
-      client._leaveRoom()
+      client.stopIfNeccessary()
 
   _onChallenge: (client, data, d) ->
     d.notify("challengeReceived")
@@ -165,12 +167,15 @@ _.extend @ledger.m2fa,
         client.rejectPairing()
         d.reject()
       ).finally(=>
-        client._leaveRoom()
+        client.stopIfNeccessary()
       ).done()
     catch err
       e(err)
       d.reject(err)
-      client._leaveRoom()
+      client.stopIfNeccessary()
+
+  _onDisconnect: (client, data, d) ->
+    d.notify "secureScreenDisconnect"
 
   _clientFactory: (pairingId) ->
     new ledger.m2fa.Client(pairingId)

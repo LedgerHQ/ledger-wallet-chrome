@@ -1,5 +1,8 @@
 @ledger.m2fa ?= {}
 
+DebugWebsocket = (message) -> l message
+
+
 # The mobile 2FA ChromeClient.
 # client = new ledger.api.m2fa.Client(aPairingId)
 # client.on 'm2fa.idendify', (data) ->
@@ -12,6 +15,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
   # @param [String] pairingId The id must be a valid btc address. Used to be a bitId address.
   constructor: (pairingId) ->
     super(pairingId)
+    @start()
     @pairingId = pairingId
     @_joinRoom()
 
@@ -46,6 +50,12 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
     d = Q.defer()
     @_connectionPromise = d.promise
     @ws = new WebSocket(@constructor.BASE_URL)
+    if DebugWebsocket?
+      do (@ws) ->
+        ws._send = ws.send
+        ws.send = (data) ->
+          DebugWebsocket?("[WS] ==> " + data)
+          ws._send(data)
     @ws.onopen = (e) =>
       @_onOpen(e)
       d.resolve()
@@ -61,11 +71,13 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
     @emit 'm2fa.room.left'
 
   _onOpen: (e) ->
+    DebugWebsocket?("[WS] Open")
     @ws.send JSON.stringify(type: 'join', room: @pairingId)
     @ws.send JSON.stringify(type: 'repeat')
     @emit 'm2fa.room.joined'
 
   _onMessage: (e) ->
+    DebugWebsocket?("[WS] <== #{e.data}")
     data = JSON.parse(e.data)
     @emit 'm2fa.message', data
     switch data.type
@@ -78,6 +90,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
       when "challenge" then @_onChallenge(data)
 
   _onClose: (e) ->
+    DebugWebsocket?("[WS] Close")
     [@ws.onclose, @ws.onmessage] = [undefined, undefined]
     [@ws, @_connectionPromise] = [undefined, undefined]
     @_joinRoom()
@@ -85,7 +98,6 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
   _send: (data) ->
     @_joinRoom().then(=> @_send(data)) if ! @_connectionPromise?
     @_connectionPromise.then =>
-      l 'Actual send ', data
       @ws.send(data)
 
   _onConnect: (data) ->
