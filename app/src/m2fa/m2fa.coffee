@@ -45,6 +45,7 @@ _.extend @ledger.m2fa,
     h = {}
     h["__m2fa_#{pairingId}"] = label
     ledger.storage.sync.set(h)
+    [label, pairingId]
 
   # @return Promise an object where each key is pairingId and the value the associated label.
   getPairingIds: () ->
@@ -145,7 +146,7 @@ _.extend @ledger.m2fa,
         client.sendChallenge(challenge)
       ).fail( (err) =>
         e(err)
-        d.reject('initiationFailure')
+        d.reject('initiateFailure')
         client.stopIfNeccessary()
       ).done()
     catch err
@@ -162,8 +163,7 @@ _.extend @ledger.m2fa,
         client.confirmPairing()
         client.pairedDongleName.onComplete (name, err) ->
           return d.reject('cancel')
-          @setPairingLabel(client.pairingId, name)
-          d.resolve()
+          d.resolve @setPairingLabel(client.pairingId, name)
       ).fail( (e) =>
         l("%c[_onChallenge] >>>  FAILURE  <<<", "color: #ff0000", e)
         client.rejectPairing()
