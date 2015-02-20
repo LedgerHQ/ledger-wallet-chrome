@@ -145,7 +145,7 @@ _.extend @ledger.m2fa,
         client.sendChallenge(challenge)
       ).fail( (err) =>
         e(err)
-        d.reject()
+        d.reject('initiationFailure')
         client.stopIfNeccessary()
       ).done()
     catch err
@@ -160,12 +160,14 @@ _.extend @ledger.m2fa,
       ledger.wallet.safe().confirmSecureScreen(data).then( =>
         l("%c[_onChallenge] SUCCESS !!!", "color: #00ff00" )
         client.confirmPairing()
-        @setPairingLabel(client.pairingId, "")
-        d.resolve()
+        client.pairedDongleName.onComplete (name, err) ->
+          return d.reject('cancel')
+          @setPairingLabel(client.pairingId, name)
+          d.resolve()
       ).fail( (e) =>
         l("%c[_onChallenge] >>>  FAILURE  <<<", "color: #ff0000", e)
         client.rejectPairing()
-        d.reject()
+        d.reject('invalidChallenge')
       ).finally(=>
         client.stopIfNeccessary()
       ).done()
