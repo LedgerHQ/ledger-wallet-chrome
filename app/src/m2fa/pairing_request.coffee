@@ -12,6 +12,7 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
     WAITING: 0
     CHALLENGING: 1
     FINISHING: 2
+    DEAD: 3
 
   @Errors:
     InconsistentState: "Inconsistent state"
@@ -55,5 +56,9 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
     @emit 'cancel'
 
   _failure: (reason) ->
+    @_currentState = ledger.m2fa.PairingRequest.States.DEAD
+    @_onComplete.fail(reason)
 
   _success: () ->
+    @_currentState = ledger.m2fa.PairingRequest.States.DEAD
+    @_onComplete.success()
