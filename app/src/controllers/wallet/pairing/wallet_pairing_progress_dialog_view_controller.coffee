@@ -11,7 +11,7 @@ class @WalletPairingProgressDialogViewController extends DialogViewController
     @_request = @params.request
     @view.progress.text("Answer the challenge!")
     @_request.onComplete (screen, error) =>
-      @getDialog().push new WalletPairingErrorDialogViewController()
+      @getDialog().push new WalletPairingErrorDialogViewController(reason: error) if error?
 
     #request.on ''
 

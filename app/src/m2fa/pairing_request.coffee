@@ -66,7 +66,7 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
               @emit 'answerChallenge'
             when 'secureScreenDisconnect'
               @_failure(ledger.m2fa.PairingRequest.Errors.ClientCancelled) if @_currentState isnt ledger.m2fa.PairingRequest.States.WAITING
-            when 'sendChallenge' then @emit 'challenge'
+            when 'sendChallenge' then @emit 'sendChallenge'
         catch er
           e er
     ).done()
@@ -98,5 +98,5 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
   _success: (screen) ->
     @_currentState = ledger.m2fa.PairingRequest.States.DEAD
     unless @_onComplete.isCompleted()
-      @_onComplete.success(dongle)
+      @_onComplete.success(screen)
       @emit 'success'
