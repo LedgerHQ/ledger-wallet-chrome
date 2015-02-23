@@ -33,8 +33,8 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
   constructor: (pairindId, promise, client) ->
     @pairingId = pairindId
     @_client = client
-    @_pairedDongleName = new CompletionClosure()
-    @_client.pairedDongleName = @_pairedDongleName
+    @_secureScreenName = new CompletionClosure()
+    @_client.pairedDongleName = @_secureScreenName
     @_currentState = ledger.m2fa.PairingRequest.States.WAITING
     @_onComplete = new CompletionClosure()
 
@@ -79,14 +79,14 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
   # @param [Function] A callback to call once the pairing process is completed
   onComplete: (cb) -> @_onComplete.onComplete(cb)
 
-  # Sets the dongle name. This is a mandatory step for saving the paired secure screen
-  setDongleName: (name) -> @_pairedDongleName.success(name)
+  # Sets the secure screen name. This is a mandatory step for saving the paired secure screen
+  setSecureScreenName: (name) -> @_secureScreenName.success(name)
 
   getCurrentState: () -> @_currentState
 
   cancel: () ->
     @_promise = null
-    @_pairedDongleName.fail('cancel')
+    @_secureScreenName.fail('cancel')
     @_client.stopIfNeccessary()
     @_onComplete = null
     @emit 'cancel'

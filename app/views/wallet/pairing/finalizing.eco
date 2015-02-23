@@ -1,0 +1,15 @@
+<section id="receive_index_dialog">
+  <header>
+    <h1>Pairing</h1>
+  </header>
+  <div id="container">
+    <div>
+      <input id="screenNameInput" type="text"/>
+    </div>
+
+  </div>
+</section>
+<div class="dialog-actions-bar">
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'wallet.receive.index.close' %></a>
+  <a class="action-rounded-button" href="#submitScreenName">[ALPHA]Submit</a>
+</div>

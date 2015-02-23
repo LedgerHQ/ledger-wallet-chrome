@@ -13,7 +13,8 @@ class @WalletPairingIndexDialogViewController extends DialogViewController
         colorDark : "#000000"
         colorLight : "#ffffff"
         correctLevel : QRCode.CorrectLevel.H
-    @_request.on 'sendChallenge', @_onSendChallenge.bind(this)
+    @_onSendChallenge = @_onSendChallenge.bind(this)
+    @_request.on 'sendChallenge', @_onSendChallenge
     @_request.onComplete (screen, error) =>
       if error is ledger.m2fa.PairingRequest.Errors.NeedPowerCycle
         @getDialog().push new WalletPairingErrorDialogViewController(reason: error)

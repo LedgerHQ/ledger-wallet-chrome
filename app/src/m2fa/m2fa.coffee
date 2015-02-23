@@ -162,8 +162,8 @@ _.extend @ledger.m2fa,
         l("%c[_onChallenge] SUCCESS !!!", "color: #00ff00" )
         client.confirmPairing()
         d.notify("secureScreenConfirmed")
-        client.pairedDongleName.onComplete (name, err) ->
-          return d.reject('cancel')
+        client.pairedDongleName.onComplete (name, err) =>
+          return d.reject('cancel') if err?
           d.resolve @setPairingLabel(client.pairingId, name)
       ).fail( (e) =>
         l("%c[_onChallenge] >>>  FAILURE  <<<", "color: #ff0000", e)

@@ -1,0 +1,1 @@
+class @WalletPairingSuccessDialogViewController extends DialogViewController
