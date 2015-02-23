@@ -9,6 +9,7 @@
   @event 'join' Notifies that a client joined the room and attempts to create a secure channel
   @event 'sendChallenge' Notifies that the dongle is challenging the client
   @event 'answerChallenge' Notifies that a client answered to the dongle challenge
+  @event 'finalizing' Notifies that the pairing is successful and the application is about to store the secure screen in the user preferences
   @event 'error' Notifies pairing error. Use 'reason' key in data to retrieve the error reason.
   @event 'success' Notifies pairing success
 
@@ -67,6 +68,7 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
             when 'secureScreenDisconnect'
               @_failure(ledger.m2fa.PairingRequest.Errors.ClientCancelled) if @_currentState isnt ledger.m2fa.PairingRequest.States.WAITING
             when 'sendChallenge' then @emit 'sendChallenge'
+            when 'secureScreenConfirmed' then @emit 'finalizing'
         catch er
           e er
     ).done()

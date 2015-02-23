@@ -161,6 +161,7 @@ _.extend @ledger.m2fa,
       ledger.wallet.safe().confirmSecureScreen(data).then( =>
         l("%c[_onChallenge] SUCCESS !!!", "color: #00ff00" )
         client.confirmPairing()
+        d.notify("secureScreenConfirmed")
         client.pairedDongleName.onComplete (name, err) ->
           return d.reject('cancel')
           d.resolve @setPairingLabel(client.pairingId, name)
