@@ -13,10 +13,21 @@ class @WalletPairingIndexDialogViewController extends DialogViewController
         colorDark : "#000000"
         colorLight : "#ffffff"
         correctLevel : QRCode.CorrectLevel.H
+    @_onSendChallenge =  =>
+      request = @_request
+      @_request = null
+      @getDialog().push new WalletPairingProgressDialogViewController(request: request)
+    @_request.on 'sendChallenge', onSendChallenge
 
   onShow: ->
     super
 
   onDismiss: ->
     super
-    @_request.cancel()
+    @_request?.off 'sendChallenge', @_onSendChallenge
+    @_request?.cancel()
+
+  _onSendChallenge: ->
+    request = @_request
+    @_request = null
+    @getDialog().push new WalletPairingProgressDialogViewController(request: request)

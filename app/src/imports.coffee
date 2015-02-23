@@ -243,6 +243,8 @@
 
         # Pairing
         'controllers/wallet/pairing/wallet_pairing_index_dialog_view_controller'
+        'controllers/wallet/pairing/wallet_pairing_progress_dialog_view_controller'
+        'controllers/wallet/pairing/wallet_pairing_error_dialog_view_controller'
 
         # Specs
         '../spec/jasmine/jasmine'

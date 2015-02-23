@@ -69,7 +69,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
   _leaveRoom: () ->
     [ws, @ws, @_connectionPromise] = [@ws, undefined, undefined]
     ws.onclose = undefined
-    ws.send JSON.stringify(type: 'leave')
+    ws.send JSON.stringify(type: 'leave') if ws.readyState == WebSocket.OPEN
     ws.close()
     @emit 'm2fa.room.left'
 

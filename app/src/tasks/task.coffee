@@ -23,15 +23,17 @@ class ledger.tasks.Task extends EventEmitter
   stop: (safe = no) ->
     _.defer =>
       throw "The task '#{@taskId}' is not running" if not @isRunning() and not safe
-      return if not @isRunning() and safe
+      l "Trying to stop  #{@taskId}", @, ledger.tasks.Task.RUNNING_TASKS
+      return if not @isRunning()
       ledger.tasks.Task.RUNNING_TASKS = _.omit(ledger.tasks.Task.RUNNING_TASKS, @taskId)
+      l "Stopping #{@taskId}"
       do @onStop
       @emit 'stop', @
     @
 
   stopIfNeccessary: () -> @stop(yes) if @isRunning()
 
-  isRunning: () -> ledger.tasks.Task.RUNNING_TASKS[@taskId]?
+  isRunning: () -> if ledger.tasks.Task.RUNNING_TASKS[@taskId]? then yes else no
 
   onStart: () ->
 
@@ -40,9 +42,10 @@ class ledger.tasks.Task extends EventEmitter
   @getTask: (taskId) -> ledger.tasks.Task.RUNNING_TASKS[taskId]
 
   @stopAllRunningTasks: () ->
-    for id, task of ledger.tasks.Task.RUNNING_TASKS
+    tasks = _.values(ledger.tasks.Task.RUNNING_TASKS)
+    l "Stopping all", ledger.tasks.Task.RUNNING_TASKS
+    for task in tasks
       task.stopIfNeccessary()
-    ledger.tasks.Task.RUNNING_TASKS = {}
 
   @resetAllSingletonTasks: () ->
     for name, task of ledger.tasks when task?.reset? and _.isFunction(task.reset)

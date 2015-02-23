@@ -14,6 +14,8 @@ class @DialogViewController extends ViewController
   identifier: () ->
     @className().replace 'DialogViewController', ''
 
+  getDialog: () -> @_dialog
+
   # Dismiss the current view controller
   dismiss: () ->
     @_dialog.dismiss()

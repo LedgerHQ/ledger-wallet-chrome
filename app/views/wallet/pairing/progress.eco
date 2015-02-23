@@ -2,9 +2,9 @@
   <header>
     <h1>Pairing</h1>
   </header>
-  <div id="qrcode_container">
+  <div id="container">
     <div>
-      <div id="qrcode_frame"></div>
+      <p id="progress"></p>
     </div>
 
   </div>
