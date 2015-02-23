@@ -21,6 +21,7 @@ class @ledger.dialogs.DialogController extends EventEmitter
   isShown: -> @_shown
 
   onDismiss: ->
+    @_viewController.onDetach()
     @_viewController.onDismiss()
     @emit 'dismiss'
     @_shown = no
