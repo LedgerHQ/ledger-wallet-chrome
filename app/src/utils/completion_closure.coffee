@@ -90,5 +90,25 @@ class @CompletionClosure
     return unless @isCompleted()
     [result, error] = @_complete
     if @_func? and (result? or error?)
+      @_qDefferedObject?.fulfill(result) if @isSuccessful()
+      @_jqDefferedObject?.resolve(result) if @isSuccessful()
+      @_qDefferedObject?.reject(error) if @isFailed()
+      @_jqDefferedObject?.reject(error) if @isFailed()
       @_complete = []
       @_func(result, error)
+
+  _qDeffered: () -> @_qDeferredObject ?= Q.defer()
+  _jqDeffered: () -> @_jqDefferedObject ?= jQuery.Deferred()
+
+  ###
+    Returns a Q promise
+
+    @return [Q.Promise] A Q promise
+  ###
+  q: () -> @_qDeffered().promise
+
+  ###
+    Returns jQuery promise
+    @return [jQuery.Promise] A jQuery promise
+  ###
+  jq: () -> @_jqDeffered().promise()
