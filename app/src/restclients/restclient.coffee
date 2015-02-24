@@ -1,5 +1,6 @@
 ledger.api ?= {}
 
+###
 class AuthenticatedClient extends HttpClient
 
   # Redefine do to ensure Connection is Authentified.
@@ -49,9 +50,12 @@ class AuthenticatedClient extends HttpClient
     @headers['X-LedgerWallet-AuthToken']?
 
   @AuthToken: null
+###
 
 class ledger.api.HttpClient extends @HttpClient
-  authenticated: -> ledger.api.authenticated()
+  constructor: () -> super
+
+  authenticated: -> ledger.api.authenticated(@_baseUrl)
 
 class ledger.api.RestClient
   @API_BASE_URL: ledger.config.restClient.baseUrl
@@ -59,9 +63,9 @@ class ledger.api.RestClient
   @singleton: () -> @instance ||= new @()
 
   http: () ->
-    @_client ?= @_httpClientFactory()
-    @http.setHttpHeader 'X-Ledger-Locale', chrome.i18n.getUILanguage()
-    @http.setHttpHeader 'X-Ledger-Platform', 'chrome'
+    @_client ||= @_httpClientFactory()
+    @_client.setHttpHeader 'X-Ledger-Locale', chrome.i18n.getUILanguage()
+    @_client.setHttpHeader 'X-Ledger-Platform', 'chrome'
     @_client
 
   networkErrorCallback: (callback) ->
@@ -69,18 +73,20 @@ class ledger.api.RestClient
         callback(null, {xhr, status, message, code: ledger.errors.NetworkError})
     errorCallback
 
-  _httpClientFactory: -> new ledger.api.HttpClient(@constructor.API_BASE_URL)
+  _httpClientFactory: -> new ledger.api.HttpClient(ledger.config.restClient.baseUrl)
 
 class ledger.api.AuthRestClient extends ledger.api.RestClient
-  _httpClientFactory: -> super().authenticated()
+  _httpClientFactory: -> super().authenticated(@baseUrl)
 
 @testRestClientAuthenticate = ->
   f = ->
-    r = new ledger.api.AuthRestClient()
-    r.http.get
-      url: 'blockchain'
-      onSuccess: l
-      onError: e
+    ledger.app.wallet.getBitIdAddress (address) ->
+      r = new ledger.api.AuthRestClient()
+      r.http().get
+        url: "accountsettings/#{address}"
+        onSuccess: () -> l arguments
+        onError: () ->
+          e arguments
   ledger.app.wallet.getState (state) ->
     if state is ledger.wallet.States.LOCKED
       ledger.app.wallet.unlockWithPinCode '0000', f

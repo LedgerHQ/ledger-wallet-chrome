@@ -11,6 +11,7 @@ _.extend ledger.errors,
   WrongPinCode: 5
   NotSupportedDongle: 6
   AuthenticationFailed: 7
+  UnableToGetBitIdAddress: 8
 
   create: (code, title, error) -> code: code, title: title, error: error
 

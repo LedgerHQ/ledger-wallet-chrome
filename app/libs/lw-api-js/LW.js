@@ -356,6 +356,7 @@ LW.prototype = {
     },
 
     getBitIDAddress: function (){
+        var deferred = Q.defer()
         LWTools.console("LW.getBitIDAddress", 3);
         var lW = this;
 
@@ -365,6 +366,7 @@ LW.prototype = {
                 LWTools.console(result, 3);
                 lW.bitIdPubKey = result.publicKey;
                 lW.event('LW.getBitIDAddress', {lW: lW, result: result});
+                deferred.resolve(result)
                 return result;
             }).fail(function(error) {
                 LWTools.console("BitID public key fail", 2);
@@ -376,6 +378,7 @@ LW.prototype = {
 
                     /* Event : LW.PINRequired */
                     lW.event('LW.PINRequired',  {lW: lW});
+                    deferred.reject({lW: lW})
 
                 } else if (error.indexOf("6985") >= 0) {
 
@@ -389,7 +392,7 @@ LW.prototype = {
 
                     /* Event : LW.ErrorOccured */
                     lW.event('LW.ErrorOccured', {lW: lW, title: 'dongleLocked', message: error});
-
+                    deferred.reject({lW: lW, title: 'dongleLocked', message: error})
                 } else {
 
                     LWTools.console("public key fail", 1);
@@ -397,7 +400,7 @@ LW.prototype = {
 
                     /* Event : LW.ErrorOccured */
                     lW.event('LW.ErrorOccured', {lW: lW, title: 'error', message: error});
-
+                    deferred.reject({lW: lW, title: 'error', message: error})
                 }
 
 
@@ -408,6 +411,7 @@ LW.prototype = {
             LWTools.console("Get public key failed", 1);
             LWTools.console(e, 1);
         }
+        return d.promise
     },
 
     getMessageSignature: function(message) {

@@ -114,27 +114,12 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   getBitIdAddress: (callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
-
-    onSuccess = (e, data) =>
-      _.defer =>
-        @_bitIdData = data.result
-        callback?(@_bitIdData.bitcoinAddress.value)
-        do unbind
-
-    onFailure = (ev, error) =>
-      _.defer =>
-        callback?(null, error)
-        do unbind
-
-    unbind = =>
-      @_vents.off 'LW.getBitIDAddress', onSuccess
-      @_vents.off 'LW.ErrorOccured', onFailure
-    if @_bitIdData?
+    @_lwCard.getBitIDAddress()
+    .then (data) =>
+      @_bitIdData = data
       callback?(@_bitIdData.bitcoinAddress.value)
-    else
-      @_vents.on 'LW.getBitIDAddress', onSuccess
-      @_vents.on 'LW.ErrorOccured', onFailure
-      @_lwCard.getBitIDAddress()
+    .fail (error) => callback?(null, error)
+    return
 
   signMessageWithBitId: (message, callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
