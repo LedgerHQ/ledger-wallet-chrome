@@ -27,7 +27,7 @@ class AuthenticatedClient extends HttpClient
         url: "bitid/authenticate/#{bitidAddress}"
         dataType: 'json'
       ).done( (authentication) =>
-        ledger.app.wallet.authentication.message, (signature, error) =>
+        ledger.app.wallet.signMessageWithBitId authentication.message, (signature, error) =>
           d.reject(ledger.errors.create(ledger.errors.AuthenticationFailed, 'Signing challenge step error', error)) if error?
           @jqAjax(
             type: 'POST'

@@ -13,9 +13,43 @@
 ###
 class @CompletionClosure
 
+  ###
+    Wraps a node-like asynchronous method in a {CompletionClosure}. This method is useful if you need promise chaining.
+
+    @example Case without {CompletionClosure.call}
+      asyncFunc = (arg1, callback) ->
+        ... do something ...
+
+      asyncFunc 'oiseau', (result, error) ->
+        ... do something ...
+
+    @example Case with {CompletionClosure.call}
+      asyncFunc = (arg1, callback) ->
+        ... do something ...
+
+      CompletionClosure.call(asyncFunc, null, 'oiseau').promise()
+        .then (result) ->
+          ... do something ...
+        .fail () ->
+          ... do something ...
+
+    @param [Function] func The function to call
+    @param [Object] self The calling this object
+    @param [Object*] args Method args
+    @return [CompletionClosure] The closure
+  ###
+  @defer: (func, self, args...) ->
+    closure = new @
+    onComplete = (result, error) -> closure.complete(result, error)
+    args.push onComplete
+    func.apply(self, args)
+    closure
+
   constructor: () ->
     @_isSuccessful = no
     @_isFailed = no
+    @_isJqFulfilled = no
+    @_isQFulfilled = no
     @_complete = [null, null]
 
   ###
@@ -31,6 +65,7 @@ class @CompletionClosure
     @_isSuccessful = yes
     @_complete = [value, null]
     @_tryNotify()
+    @_tryFulfill()
     @
 
   ###
@@ -46,6 +81,7 @@ class @CompletionClosure
     @_isFailed = yes
     @_complete = [null, error]
     @_tryNotify()
+    @_tryFulfill()
     @
 
   ###
@@ -58,10 +94,10 @@ class @CompletionClosure
     @throw If the closure is already completed
   ###
   complete: (value, error) ->
-    if value?
+    unless error?
       @success(value)
     else
-      @fail(if error? then error else "Unknown Error")
+      @fail(error)
     @
 
   ###
@@ -77,6 +113,7 @@ class @CompletionClosure
   onComplete: (func) ->
     @_func = func
     @_tryNotify()
+    @_tryFulfill()
 
   ###
     Returns 'yes' if completed else 'no'
@@ -90,15 +127,32 @@ class @CompletionClosure
     return unless @isCompleted()
     [result, error] = @_complete
     if @_func? and (result? or error?)
-      @_qDefferedObject?.fulfill(result) if @isSuccessful()
-      @_jqDefferedObject?.resolve(result) if @isSuccessful()
-      @_qDefferedObject?.reject(error) if @isFailed()
-      @_jqDefferedObject?.reject(error) if @isFailed()
       @_complete = []
       @_func(result, error)
 
-  _qDeffered: () -> @_qDeferredObject ?= Q.defer()
-  _jqDeffered: () -> @_jqDefferedObject ?= jQuery.Deferred()
+  _tryFulfill: () ->
+    return unless @isCompleted()
+    [result, error] = @_complete
+    if not @_isQFulfilled and @_qDefferedObject?
+      @_qDefferedObject.fulfill(result) if @isSuccessful()
+      @_qDefferedObject?.reject(error) if @isFailed()
+      @_isQFulfilled = yes
+    if not @_isJqFulfilled and @_jqDefferedObject?
+      @_jqDefferedObject.resolve(result) if @isSuccessful()
+      @_jqDefferedObject.reject(error) if @isFailed()
+      @_isJqFulfilled = yes
+
+  _qDeffered: () ->
+    unless @_qDeferredObject?
+      @_qDeferredObject = Q.defer()
+      @_tryFulfill()
+    @_qDeferredObject
+
+  _jqDeffered: () ->
+    unless @_jqDefferedObject?
+      @_jqDefferedObject = jQuery.Deferred()
+      @_tryFulfill()
+    @_jqDefferedObject
 
   ###
     Returns a Q promise
@@ -108,7 +162,21 @@ class @CompletionClosure
   q: () -> @_qDeffered().promise
 
   ###
+    Alias for q method
+
+    @see CompletionClosure#q
+  ###
+  promise: () -> @q()
+
+  ###
     Returns jQuery promise
     @return [jQuery.Promise] A jQuery promise
   ###
   jq: () -> @_jqDeffered().promise()
+
+  ###
+    Alias for jq method
+
+    @see CompletionClosure#jq
+  ###
+  jpromise: () -> @jq()

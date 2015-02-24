@@ -68,6 +68,8 @@ class AuthenticatedHttpClient extends @HttpClient
     return @_deferredAuthentication if @_deferredAuthentication?
     @_deferredAuthentication = jQuery.Deferred()
 
+    @_client.get url: "bitid/authenticate/#{bitidAddress}"
+      .then (data) => CompletionClosure.defer ledger.app.wallet.signMessageWithBitId, ledger.app.wallet, data['message'].jq()
 
     @_deferredAuthentication
 
