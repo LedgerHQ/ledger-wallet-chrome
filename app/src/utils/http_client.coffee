@@ -8,6 +8,10 @@ class @HttpClient
   # @return A jQuery.jqXHR
   jqAjax: (r) ->
     r.headers = _.extend({}, @headers, r.headers)
+    r.success ?= r.onSuccess
+    r.error ?= r.onError
+    r.data ?= r.body
+    r.complete ?= r.onComplete
     r.data = JSON.stringify(r.data) if r.contentType == 'application/json'
     r.url = @baseUrl + r.url
     r.crossDomain = true

@@ -7,6 +7,9 @@ class AuthenticatedClient extends HttpClient
     throw "Unable to authenticate a locked or blank dongle" unless ledger.wallet.isPluggedAndUnlocked()
     if @isAuthenticated()
       super(request)
+    else if not @isAuthenticated() and AuthenticatedClient.AuthToken?
+      @headers['X-LedgerWallet-AuthToken'] = AuthenticatedClient.AuthToken
+      super request
     else
       @authenticate()
       .then => Q(@jqAjax(request))
@@ -24,7 +27,7 @@ class AuthenticatedClient extends HttpClient
         url: "bitid/authenticate/#{bitidAddress}"
         dataType: 'json'
       ).done( (authentication) =>
-        ledger.app.wallet.signMessageWithBitId authentication.message, (signature, error) =>
+        ledger.app.wallet.authentication.message, (signature, error) =>
           d.reject(ledger.errors.create(ledger.errors.AuthenticationFailed, 'Signing challenge step error', error)) if error?
           @jqAjax(
             type: 'POST'
@@ -33,6 +36,7 @@ class AuthenticatedClient extends HttpClient
             contentType: 'application/json'
             dataType: 'json'
           ).done( (authToken) =>
+            AuthenticatedClient.AuthToken = authToken.token
             @headers['X-LedgerWallet-AuthToken'] = authToken.token
             d.resolve()
           ).fail (r, t, error) =>
@@ -43,6 +47,11 @@ class AuthenticatedClient extends HttpClient
 
   isAuthenticated: ->
     @headers['X-LedgerWallet-AuthToken']?
+
+  @AuthToken: null
+
+class ledger.api.HttpClient extends @HttpClient
+  authenticated: -> ledger.api.authenticated()
 
 class ledger.api.RestClient
   @API_BASE_URL: ledger.config.restClient.baseUrl
@@ -59,16 +68,14 @@ class ledger.api.RestClient
         callback(null, {xhr, status, message, code: ledger.errors.NetworkError})
     errorCallback
 
-  _httpClientFactory: ->
-    new HttpClient(@constructor.API_BASE_URL)
+  _httpClientFactory: -> new ledger.api.HttpClient(@constructor.API_BASE_URL)
 
 class ledger.api.AuthRestClient extends ledger.api.RestClient
-  _httpClientFactory: ->
-    new AuthenticatedClient(@constructor.API_BASE_URL)
+  _httpClientFactory: -> super().authenticated()
 
 @testRestClientAuthenticate = ->
   f = ->
-    r = new ledger.api.RestClient()
+    r = new ledger.api.AuthRestClient()
     r.http.get(
       url: 'blockchain'
     ).done( -> console.log(arguments)

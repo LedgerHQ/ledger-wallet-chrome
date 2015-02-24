@@ -9,6 +9,7 @@ class @ledger.m2fa.TransactionValidationRequest extends @EventEmitter
     l clients
     @_completion = new CompletionClosure
     @_clients = clients
+    ###
     promise.then (result) ->
       @_onComplete.success(result)
     , (error) ->
@@ -17,6 +18,7 @@ class @ledger.m2fa.TransactionValidationRequest extends @EventEmitter
     , (progress) ->
       @emit progress
     .done()
+    ###
 
   cancel: () ->
     @_completion.onComplete _.noop
