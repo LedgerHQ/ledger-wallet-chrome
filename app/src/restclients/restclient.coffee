@@ -58,10 +58,11 @@ class ledger.api.RestClient
 
   @singleton: () -> @instance ||= new @()
 
-  constructor: () ->
-    @http = @_httpClientFactory()
+  http: () ->
+    @_client ?= @_httpClientFactory()
     @http.setHttpHeader 'X-Ledger-Locale', chrome.i18n.getUILanguage()
     @http.setHttpHeader 'X-Ledger-Platform', 'chrome'
+    @_client
 
   networkErrorCallback: (callback) ->
     errorCallback = (xhr, status, message) ->
@@ -76,10 +77,10 @@ class ledger.api.AuthRestClient extends ledger.api.RestClient
 @testRestClientAuthenticate = ->
   f = ->
     r = new ledger.api.AuthRestClient()
-    r.http.get(
+    r.http.get
       url: 'blockchain'
-    ).done( -> console.log(arguments)
-    ).fail( -> console.log(arguments) )
+      onSuccess: l
+      onError: e
   ledger.app.wallet.getState (state) ->
     if state is ledger.wallet.States.LOCKED
       ledger.app.wallet.unlockWithPinCode '0000', f

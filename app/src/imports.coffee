@@ -141,6 +141,7 @@
         'managers/wallets_manager'
 
         ## Rest clients
+        'restclients/authentication'
         'restclients/restclient'
         'restclients/unspent_outputs_restclient'
         'restclients/transactions_restclient'

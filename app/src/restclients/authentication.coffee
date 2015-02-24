@@ -67,11 +67,21 @@ class AuthenticatedHttpClient extends @HttpClient
   _authenticate: () ->
     return @_deferredAuthentication if @_deferredAuthentication?
     @_deferredAuthentication = jQuery.Deferred()
-
-    @_client.get url: "bitid/authenticate/#{bitidAddress}"
-      .then (data) => CompletionClosure.defer ledger.app.wallet.signMessageWithBitId, ledger.app.wallet, data['message'].jq()
-
+    @_performAuthenticate(@_deferredAuthentication)
     @_deferredAuthentication
+
+  _performAuthenticate: (deferred) ->
+    deferred.retryNumber ?= 3
+    @_client.get url: "bitid/authenticate/#{bitidAddress}"
+    fail (jqXHR, textStatus, errorThrown) =>
+      if deferred.retryNumber > 0
+        @_performAuthenticate deferred
+      else
+        deferred.reject([jqXHR, textStatus, errorThrown])
+      return
+    .then (data) => CompletionClosure.defer ledger.app.wallet.signMessageWithBitId, ledger.app.wallet, data['message'].jq()
+    .fail (error) => deferred.reject([null, error, ledger.errors.create(ledger.errors.create(ledger.errors.AuthenticationFailed, 'Signing challenge step error', error))])
+    .then l, e
 
 
   @instance: -> @_instance ?= new @
