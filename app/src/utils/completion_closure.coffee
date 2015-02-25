@@ -45,12 +45,13 @@ class @CompletionClosure
     func.apply(self, args)
     closure
 
-  constructor: () ->
+  constructor: (callback = null) ->
     @_isSuccessful = no
     @_isFailed = no
     @_isJqFulfilled = no
     @_isQFulfilled = no
     @_complete = [null, null]
+    @onComplete callback if callback?
 
   ###
     Completes the closure with success. This method will call the onComplete function if possible or keep the result until
@@ -153,6 +154,20 @@ class @CompletionClosure
       @_jqDefferedObject = jQuery.Deferred()
       @_tryFulfill()
     @_jqDefferedObject
+
+  ###
+    Returns a readonly version of the closure
+
+    @return [Object] A readonly version of the closure
+  ###
+  readonly: () ->
+    c = new CompletionClosure()
+    delete c.success
+    delete c.fail
+    delete c.complete
+    for key, value of c when _(value).isFunction()
+      c[key] = @[key].bind(@)
+    c
 
   ###
     Returns a Q promise

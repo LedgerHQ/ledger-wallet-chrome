@@ -41,11 +41,8 @@ _.extend @ledger.m2fa,
   # Allow you to assign a label to a pairingId (ex: "mobile Pierre").
   # @params [String] pairingId
   # @params [String] label
-  setPairingLabel: (pairingId, label) ->
-    h = {}
-    h["__m2fa_#{pairingId}"] = label
-    ledger.storage.sync.set(h)
-    [label, pairingId]
+  saveSecureScreen: (pairingId, label) ->
+    ledger.m2fa.PairedSecureScreen.create(pairingId, label).toSyncedStore()
 
   # @return Promise an object where each key is pairingId and the value the associated label.
   getPairingIds: () ->
@@ -122,6 +119,9 @@ _.extend @ledger.m2fa,
     [client, promise] = @validateTx(tx, pairingId)
     new ledger.m2fa.TransactionValidationRequest([client], promise)
 
+  requestValidationForLastPairing: (tx) ->
+    [client, promise] = @validateTx(tx, null)
+
   _nextPairingId: () -> 
     # ledger.wallet.safe.randomBitIdAddress()
     @_randomPairingId()
@@ -164,7 +164,7 @@ _.extend @ledger.m2fa,
         d.notify("secureScreenConfirmed")
         client.pairedDongleName.onComplete (name, err) =>
           return d.reject('cancel') if err?
-          d.resolve @setPairingLabel(client.pairingId, name)
+          d.resolve @saveSecureScreen(client.pairingId, name)
       ).fail( (e) =>
         l("%c[_onChallenge] >>>  FAILURE  <<<", "color: #ff0000", e)
         client.rejectPairing()

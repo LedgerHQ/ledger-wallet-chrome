@@ -7,8 +7,11 @@ class AuthenticatedHttpClient extends @HttpClient
     super(baseUrl)
     @_client = new HttpClient(baseUrl)
 
-  jqAjax: (request) ->
+  setHttpHeader: (key, value) ->
+    @_client.setHttpHeader(key, value)
+    @
 
+  jqAjax: (request) ->
     # We must use a jQuery Deferred object else the promise hierarchy becomes messy
     deferred = $.Deferred()
 

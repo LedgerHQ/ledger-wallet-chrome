@@ -180,6 +180,7 @@
         'm2fa/debug_client'
         'm2fa/pairing_request'
         'm2fa/transaction_validation_request'
+        'm2fa/paired_secure_screen'
 
         ## Models
         'models/wallet'
