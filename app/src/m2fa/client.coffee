@@ -105,6 +105,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
 
   _onConnect: (data) ->
     @emit 'm2fa.connect'
+
   _onDisconnect: (data) ->
     @emit 'm2fa.disconnect'
 
@@ -120,7 +121,10 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
   # If the 'request' message is accepted, the message must contain the "pin" parameter in order to validate the transaction.
   # @params [Object] data {"type": "response", "pin": "xxxxxxxxxxxx..."}
   _onResponse: (data) ->
-    @emit 'm2fa.response', data.pin
+    if data['is_accepted']
+      @emit 'm2fa.response', data.pin
+    else
+      @emit 'm2fa.reject'
 
   # Sent by mobile clients to transmit their generated public key.
   # @params [Object] data {"type": "identity", "public_key": "xxxxxxxxxxxx..."}

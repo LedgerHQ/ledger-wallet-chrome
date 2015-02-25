@@ -2,7 +2,7 @@
 # and then securely ask for user validation of the transaction.
 @ledger.m2fa ?= {}
 _.extend @ledger.m2fa,
-  
+
   clients: {}
 
   # This method :
@@ -75,10 +75,15 @@ _.extend @ledger.m2fa,
     client.on 'm2fa.accept', ->
       d.notify('accepted')
       client.off 'm2fa.accept'
+    client.once 'm2fa.disconnect', ->
+      d.notify('disconnected')
     client.on 'm2fa.response', (e,pin) ->
       l "%c[M2FA][#{pairingId}] request's pin received :", "#888888", pin
       client.stopIfNeccessary()
       d.resolve(pin)
+    client.once 'm2fa.reject', ->
+      client.stopIfNeccessary()
+      d.reject('cancelled')
     client.requestValidation(tx._out.authorizationPaired)
     [client , d.promise]
 
@@ -115,12 +120,12 @@ _.extend @ledger.m2fa,
     [clients, promise] = @validateTxOnAll(tx)
     new ledger.m2fa.TransactionValidationRequest(clients, promise)
 
-  requestValidation: (tx, pairingId) ->
-    [client, promise] = @validateTx(tx, pairingId)
-    new ledger.m2fa.TransactionValidationRequest([client], promise)
+  requestValidation: (tx, screen) ->
+    [client, promise] = @validateTx(tx, screen.id)
+    new ledger.m2fa.TransactionValidationRequest([client], promise, tx, screen)
 
   requestValidationForLastPairing: (tx) ->
-    [client, promise] = @validateTx(tx, null)
+    [client, promise] = @validateTx(tx)
 
   _nextPairingId: () -> 
     # ledger.wallet.safe.randomBitIdAddress()
