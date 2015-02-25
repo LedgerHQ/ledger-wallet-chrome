@@ -195,3 +195,24 @@ class @CompletionClosure
     @see CompletionClosure#jq
   ###
   jpromise: () -> @jq()
+
+  ###
+    Shorthand for completionClosure.q().then()
+
+    @return [Q.Promise]
+  ###
+  then: (fulfilled, rejected = null, progressed = null) -> @q().then(onSuccess, onFailure, progressed)
+
+  ###
+    Shorthand for completionClosure.q().fail()
+
+    @return [Q.Promise]
+  ###
+  fail: (rejected) -> @q().fail(rejected)
+
+  ###
+    Shorthand for completionClosure.q().progress()
+
+    @return [Q.Promise]
+  ###
+  progress: (progressed) -> @q().progress(progressed)
