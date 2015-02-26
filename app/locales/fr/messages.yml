@@ -7,6 +7,8 @@ common:
   bitcoin_acronym: 'BTC'
   default_account_name: "Mon compte"
   date_format: 'DD/MM/YYYY à HH:mm'
+  close: "Fermer"
+  cancel: "Annuler"
 
   dialogs:
     yes: "Oui"
@@ -284,3 +286,14 @@ wallet:
       able_to_send_bitcoins: "La transaction a bien été effectuée."
       close: "Fermer"
       confirmed_in_a_few_minutes: "L'opération apparaîtra comme confirmée dans quelques minutes."
+
+  pairing:
+    common:
+      pair_a_new_mobile: "Associer un nouveau téléphone"
+
+    index:
+      download_the_app: "<b>Téléchargez</b> l'application mobile Ledger Wallet."
+      compatibility_details_available: "Détails de compatibilité et guides d'installation disponibles sur notre <b>centre d'aide</b>."
+      open_the_app: "<b>Scannez</b> le code QR d'association."
+      tap_pair: "Touchez “Associer un nouveau Ledger Wallet” pour démarrer le scanner."
+      scan_this_qrcode: "Scannez ce code QR d'association."

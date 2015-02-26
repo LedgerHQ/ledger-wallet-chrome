@@ -85,6 +85,15 @@
   b {
     font-weight: @font-weight-semibold;
   }
+
+  a {
+    text-decoration: none;
+    color: @color;
+  }
+
+  a:hover {
+    color: darken(@color, @color-extra-strong-darken-value);
+  }
 }
 .regular-text {
   .text(@color-black);
@@ -111,6 +120,10 @@
 .bold-invalid-text {
   .text(@color-invalid-red, @font-size-medium, @font-weight-semibold);
   letter-spacing: -0.5px;
+}
+.light-grey-text-huge {
+  .text(@color-dark-grey, @font-size-giga-giga-large, @font-weight-light);
+  letter-spacing: -2px;
 }
 
 // icons

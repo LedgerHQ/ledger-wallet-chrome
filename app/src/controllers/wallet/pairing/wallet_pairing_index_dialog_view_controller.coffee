@@ -1,8 +1,5 @@
 class @WalletPairingIndexDialogViewController extends DialogViewController
 
-  initialize: ->
-    super
-
   onAfterRender: ->
     super
     @_request = ledger.m2fa.requestPairing()
@@ -16,13 +13,7 @@ class @WalletPairingIndexDialogViewController extends DialogViewController
     @_onSendChallenge = @_onSendChallenge.bind(this)
     @_request.on 'sendChallenge', @_onSendChallenge
     @_request.onComplete (screen, error) =>
-      if error is ledger.m2fa.PairingRequest.Errors.NeedPowerCycle
         @getDialog().push new WalletPairingErrorDialogViewController(reason: error)
-      else
-        @getDialog().push new WalletPairingErrorDialogViewController(reason: error)
-
-  onShow: ->
-    super
 
   onDetached: ->
     super
@@ -31,6 +22,9 @@ class @WalletPairingIndexDialogViewController extends DialogViewController
   onDismiss: ->
     super
     @_request?.cancel()
+
+  openSupport: ->
+    window.open t 'application.support_url'
 
   _onSendChallenge: ->
     request = @_request
