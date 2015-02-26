@@ -14,6 +14,7 @@
   V1_4_11: 0x0001040b0146
   V1_4_12: 0x0001040c0146
   V1_4_13: 0x0001040d0146
+  V1_0_0B: 0x20010000010f
 
 @ledger.wallet.Attestation =
   String: "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
@@ -47,6 +48,10 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     if @_numberOfRetry?
       @manager.removeRestorableState(state) for state in @manager.findRestorableStates({label: 'numberOfRetry'})
       @manager.addRestorableState({label: 'numberOfRetry', numberOfRetry: @_numberOfRetry}, 45000)
+
+  getFirmwareUpdater: () -> @_fup ?= new ledger.fup.FirmwareUpdater(@)
+
+  isFirmwareUpdateAvailable: () -> @getFirmwareUpdater().isFirmwareUpdateAvailable()
 
   getFirmwareVersion: () -> @_lwCard.getFirmwareVersion()
 

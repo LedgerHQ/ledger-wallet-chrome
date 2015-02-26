@@ -8,7 +8,7 @@ class @WalletSendMobileValidationDialogViewController extends @DialogViewControl
     @view.spinner = ledger.spinners.createLargeSpinner(@view.spinnerContainer[0])
     ledger.m2fa.PairedSecureScreen.getMostRecentFromSyncedStore (screen) =>
       @_request =  ledger.m2fa.requestValidation(@params.transaction, screen)
-      @_request.onComplete (keycode, error) ->
+      @_request.onComplete (keycode, error) =>
         if error?
           @once 'dismiss', =>
             dialog = new WalletSendErrorDialogViewController(reason: error)

@@ -86,15 +86,16 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
 
   cancel: () ->
     @_promise = null
-    @_secureScreenName.fail('cancel')
+    @_secureScreenName.failure('cancel')
     @_client.stopIfNeccessary()
     @_onComplete = null
     @emit 'cancel'
+    do @off
 
   _failure: (reason) ->
     @_currentState = ledger.m2fa.PairingRequest.States.DEAD
     unless @_onComplete.isCompleted()
-      @_onComplete.fail(reason)
+      @_onComplete.failure(reason)
       @emit 'error', {reason: reason}
 
   _success: (screen) ->
