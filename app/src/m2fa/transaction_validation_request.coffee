@@ -21,12 +21,16 @@ class @ledger.m2fa.TransactionValidationRequest extends @EventEmitter
         @_completion.success(result)
         @emit "complete", result
       else
-        @_completion.fail(ledger.m2fa.TransactionValidationRequest.errors.InvalidResult)
+        @_completion.failure(ledger.m2fa.TransactionValidationRequest.errors.InvalidResult)
         @emit "error"
     .fail (error) =>
       switch error
         when 'cancelled'
-          @_completion.fail(ledger.m2fa.TransactionValidationRequest.errors.TransactionCancelled)
+          l @_completion
+          try
+            @_completion.failure(ledger.m2fa.TransactionValidationRequest.errors.TransactionCancelled)
+          catch er
+            e er
           @emit "error"
     .progress (progress) =>
       switch progress
@@ -35,8 +39,10 @@ class @ledger.m2fa.TransactionValidationRequest extends @EventEmitter
     .done()
 
   cancel: () ->
-    @_completion.onComplete _.noop
-    @_completion.fail 'Operation cancelled'
+    do @off
+    unless @_completion.isCompleted()
+      @_completion.onComplete _.noop
+      @_completion.failure 'Operation cancelled'
     for client in @_clients
       do client?.off
       do client?.stopIfNeccessary

@@ -77,7 +77,7 @@ class @CompletionClosure
     @return [CompletionClosure] self
     @throw If the closure is already completed
   ###
-  fail: (error) ->
+  failure: (error) ->
     throw 'CompletionClosure already completed' if @isCompleted()
     @_isFailed = yes
     @_complete = [null, error]
@@ -163,7 +163,7 @@ class @CompletionClosure
   readonly: () ->
     c = new CompletionClosure()
     delete c.success
-    delete c.fail
+    delete c.failure
     delete c.complete
     for key, value of c when _(value).isFunction()
       c[key] = @[key].bind(@)

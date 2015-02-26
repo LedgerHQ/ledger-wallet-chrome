@@ -61,7 +61,7 @@ class ledger.m2fa.PairedSecureScreen
   @getMostRecentFromStore: (store, callback = _.noop) ->
     closure = new CompletionClosure(callback)
     @getAllFromStore store, (screens) ->
-      return closure.fail(ledger.errors.NotFound) if screens.length is 0
+      return closure.failure(ledger.errors.NotFound) if screens.length is 0
       closure.success(_(screens).max (screen) -> screen.createdAt.getTime())
     closure.readonly()
 
