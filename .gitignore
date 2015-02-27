@@ -6,3 +6,6 @@ release/
 doc/
 *.html
 *~
+dist/
+*.log
+signature/
