@@ -110,6 +110,8 @@
         'utils/formatters'
         'utils/stream'
         'utils/completion_closure'
+        'utils/try'
+        'utils/application/base_application'
 
         ## Crypto
         'utils/crypto/aes'

@@ -1,4 +1,5 @@
 
+@ledger ?= {}
 ledger.base ?= {}
 ledger.base.application ?= {}
 
@@ -20,6 +21,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   start: ->
     configureApplication @
     @_listenClickEvents()
+    @_listenWalletEvents()
     @onStart()
     @devicesManager.start()
 
@@ -127,48 +129,25 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   _listenWalletEvents: () ->
     # Wallet management & wallet events re-dispatching
     @walletsManager.on 'connecting', (event, card) =>
-      Try()
+      (Try => @onConnectingDongle(card)).printError()
     @walletsManager.on 'connected', (event, wallet) =>
       @wallet = wallet
       wallet.once 'disconnected', =>
-        _.defer =>
-          try
-            @emit 'dongle:disconnected'
-            Wallet.releaseWallet()
-            ledger.wallet.release(wallet)
-            ledger.tasks.Task.stopAllRunningTasks()
-            ledger.tasks.Task.resetAllSingletonTasks()
-            ledger.db.contexts.close()
-            ledger.db.close()
-            @wallet = null
-            ledger.dialogs.manager.dismissAll(no)
-            @router.go '/onboarding/device/plug'
-          catch er
-            e er
+        _.defer => (Try => @onDongleIsDisconnected(wallet)).printError()
+        @wallet = null
       wallet.once 'unplugged', =>
-        @emit 'dongle:unplugged', @wallet
+        (Try => @onDongleNeedsUnplug(wallet)).printError()
       wallet.once 'state:unlocked', =>
-        @emit 'dongle:unlocked', @wallet
-        @emit 'wallet:initializing'
-        ledger.wallet.initialize @wallet, =>
-          ledger.db.init =>
-            ledger.db.contexts.open()
-            Wallet.initializeWallet =>
-              @emit 'wallet:initialized'
-              _.defer =>
-                Wallet.instance.retrieveAccountsBalances()
-                ledger.tasks.TransactionObserverTask.instance.start()
-                ledger.tasks.OperationsSynchronizationTask.instance.start()
-                ledger.tasks.OperationsConsumptionTask.instance.start()
-      @emit 'dongle:connected', @wallet
+        (Try => @onDongleIsUnlocked(wallet)).printError()
+      (Try => @onDongleConnected(wallet)).printError()
 
 
   onConnectingDongle: (card) ->
 
-  onDongleConnected: (dongle) ->
+  onDongleConnected: (wallet) ->
 
-  onDongleNeedsUnplug: () ->
+  onDongleNeedsUnplug: (wallet) ->
 
-  onDongleIsUnlocked: () ->
+  onDongleIsUnlocked: (wallet) ->
 
-  onDongleIsDisconnected: () ->
+  onDongleIsDisconnected: (wallet) ->
