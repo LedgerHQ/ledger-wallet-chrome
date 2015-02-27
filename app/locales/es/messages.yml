@@ -7,6 +7,8 @@ common:
   bitcoin_acronym: 'BTC'
   default_account_name: "Mi cuenta"
   date_format: 'DD/MM/YYYY à HH:mm'
+  close: "Close"
+  cancel: "Cancel"
 
   dialogs:
     yes: "Si"
@@ -261,6 +263,10 @@ wallet:
       amount_and_address_to_validate: "Amount and recipient's Bitcoin address to validate."
       to: "to"
 
+    mobile_validation:
+      title: "[ALPHA]Waiting for mobile validation"
+      content: "[ALPHA]Please confirm the transaction on your mobile device"
+
     processing:
       sending: "Envoi en cours..."
       validating: "Validation de la transaction..."
@@ -280,3 +286,14 @@ wallet:
       able_to_send_bitcoins: "La transaction a bien été effectuée."
       close: "Fermer"
       confirmed_in_a_few_minutes: "L'opération apparaîtra comme confirmée dans quelques minutes."
+
+  pairing:
+    common:
+      pair_a_new_mobile: "PAIR A NEW MOBILE PHONE"
+
+    index:
+      download_the_app: "<b>Download</b> the Ledger Wallet mobile app."
+      compatibility_details_available: "Compatibility details and installation guides are available from our <b>help center</b>."
+      open_the_app: "<b>Scan<b/> the pairing QR code."
+      tap_pair: "Tap “Pair a new Ledger Wallet” to start the scanner."
+      scan_this_qrcode: "Scan this pairing QR code."
