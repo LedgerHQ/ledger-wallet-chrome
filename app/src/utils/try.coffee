@@ -1,7 +1,6 @@
 
 ###
-  The Try type represents a computation that may either result in an exception, or return a successfully computed value.
-  This
+  The TryResult type represents a computation that may either result in an exception, or return a successfully computed value.
 ###
 class TryResult
 
@@ -23,8 +22,10 @@ class TryResult
   isSuccess: -> not @isSuccess()
 
   then: (func) -> @promise().then(func)
-  fail: (func) -> @promise().promise.fail(func)
+  fail: (func) -> @promise().fail(func)
   promise: () -> @_deffered.promise
+
+  printError: -> @fail (er) => e er
 
 ###
   Executes the function passed in parameter. Try returns a {TryResult} which represents the computation of the function that
