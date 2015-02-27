@@ -49,9 +49,9 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       @manager.removeRestorableState(state) for state in @manager.findRestorableStates({label: 'numberOfRetry'})
       @manager.addRestorableState({label: 'numberOfRetry', numberOfRetry: @_numberOfRetry}, 45000)
 
-  getFirmwareUpdater: () -> @_fup ?= new ledger.fup.FirmwareUpdater(@)
+  getFirmwareUpdater: () -> ledger.fup.FirmwareUpdater.instance
 
-  isFirmwareUpdateAvailable: () -> @getFirmwareUpdater().isFirmwareUpdateAvailable()
+  isFirmwareUpdateAvailable: () -> @getFirmwareUpdater().isFirmwareUpdateAvailable(this)
 
   getFirmwareVersion: () -> @_lwCard.getFirmwareVersion()
 

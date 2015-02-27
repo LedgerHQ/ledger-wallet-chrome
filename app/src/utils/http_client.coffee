@@ -4,8 +4,11 @@ class @HttpClient
     @baseUrl = baseUrl
     @headers = {}
 
-  # @params {Object} See jQuery.ajax() params.
-  # @return A jQuery.jqXHR
+  ###
+   @private This method should not be used outside this class and its descendants.
+   @params [Object] See jQuery.ajax() params.
+   @return [jqXHR] A jQuery.jqXHR
+  ###
   jqAjax: (r) ->
     r.headers = _.extend({}, @headers, r.headers)
     r.success ?= r.onSuccess
@@ -17,34 +20,90 @@ class @HttpClient
     r.crossDomain = true
     $.ajax(r)
 
-  # Alias for jqAjax. May be redefine.
-  do: (r) -> @jqAjax(r)
+  ###
+    Performs a HTTP request. Please prefer shorthand methods as {HttpClient#get} or {HttpClient#post}.
 
-  # @params {Object} See jQuery.ajax() params.
-  # @return A jQuery.jqXHR
+    @example Simple Usage with callbacks
+      http = new HttpClient("http://paristocrats.com")
+      http.do
+        type: 'GET'
+        data: {what: 'score'}
+        onSuccess: (data, statusText, jqXHR) ->
+          ... Handle success ...
+        onError: (jqXHR, status) ->
+          ... Handle error ...
+
+    @example Simple Usage with Q.Promise
+       http = new HttpClient("http://paristocrats.com")
+        http
+          .do type: 'GET', data: {what: 'score'}
+          .then (data, statusText, jqXHR) ->
+            ... Handle success ...
+          .fail (jqXHR, statusText) ->
+            ... Handle error ...
+          .done()
+
+    @params [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
+    @return [Q.Promise] A Q.Promise
+  ###
+  do: (r) -> Q(@jqAjax(r))
+
+  ###
+    Performs a HTTP GET request.
+
+    @params [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
+    @return [Q.Promise] A Q.Promise
+    @see {HttpClient#do}
+  ###
   get: (r) ->
     @do _.extend(r, {type: 'GET', dataType: 'json'})
 
-  # @params {Object} See jQuery.ajax() params.
-  # @return A jQuery.jqXHR
+  ###
+    Performs a HTTP POST request.
+
+    @params [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
+    @return [Q.Promise] A Q.Promise
+    @see HttpClient#do
+  ###
   post: (r) ->
     @do _.extend(r, {type: 'POST', dataType: 'json', contentType: 'application/json'})
 
-  # @params {Object} See jQuery.ajax() params.
-  # @return A jQuery.jqXHR
+  ###
+   Performs a HTTP POST request using a form url encoded body.
+
+   @params [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
+   @return [Q.Promise] A Q.Promise
+   @see HttpClient#do
+  ###
   postForm: (r) ->
     @do _.extend(r, {type: 'POST', dataType: 'text', contentType: 'application/x-www-form-urlencoded'})
 
-  # @params {Object} See jQuery.ajax() params.
-  # @return A jQuery.jqXHR
+  ###
+   Performs a HTTP PUT request.
+
+   @params [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
+   @return [Q.Promise] A Q.Promise
+   @see HttpClient#do
+  ###
   put: (r) ->
     @do _.extend(r, {type: 'PUT', dataType: 'json', contentType: 'application/json'})
 
-  # @params {Object} See jQuery.ajax() params.
-  # @return A jQuery.jqXHR
+  ###
+   Performs a HTTP DELETE request.
+
+   @params [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
+   @return [Q.Promise] A Q.Promise
+   @see HttpClient#do
+  ###
   delete: (r) ->
     @do _.extend(r, {type: 'DELETE', dataType: 'json'})
 
+  ###
+    Sets custom http header to the client. These headers will be automatically included in each HTTP request.
+
+    @param [String] key The name of the HTTP header field
+    @param [String] value The value for the HTTP header field
+  ###
   setHttpHeader: (key, value) ->
     @headers[key] = value
     @
