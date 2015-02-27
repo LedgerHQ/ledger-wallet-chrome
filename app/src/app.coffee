@@ -6,6 +6,7 @@ require @ledger.imports, ->
       @_listenAppEvents()
       @router.go('/')
 
+
     onConnectingDongle: (card) ->
       @emit 'dongle:connecting', card
 

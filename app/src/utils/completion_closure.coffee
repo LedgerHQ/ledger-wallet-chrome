@@ -1,14 +1,45 @@
 
 ###
-  A helper class for defining a node like callback. A completion closure is a callback holder that can be either successful
+  A helper class for defining a callback. A completion closure is a callback holder that can be either successful
   or failed. If a result is set and no function is defined, the CompletionClosure will keep the result until a callback function
-  is submitted. Callback function are defining as node callback
+  is submitted.
+
+  CompletionClosure can also create a copy of themselves (with {CompletionClosure#readonly}) which cannot complete the closure.
+  This is handy if you need to return the closure and still want to be the only to have control over the completion.
+
+  It can also be chained with Q.Promise or jQuery.Promise.
 
   @example Simple case
     completion = new CompletionClosure()
     completion.success("A value")
     completion.onComplete (result, err) ->
       console.log(result)
+
+  @example With Promises
+    completion = new CompletionClosure()
+    completion.success("A value")
+    completion.then (result) ->
+      console.log(result)
+
+  @example Create a function that is compatible with both promise and callback
+
+    asyncFunc = (param, callback = null) ->
+      completion = new CompletionClosure(callback)
+      doSomethingAsync ->
+        completion.success("A value")
+      completion.readonly()
+
+    # asyncFunc can be used either like this...
+    asyncFunc "a param", (result, error) ->
+      ... Do something ...
+
+    # or like this
+    asyncFunc "a param"
+      .then (result) ->
+        ... Do something ...
+      .fail (error) ->
+        ... Do something ...
+      .done()
 
 ###
 class @CompletionClosure
@@ -108,7 +139,7 @@ class @CompletionClosure
     @example Function prototype
       (result, err) ->
 
-    @param [Function] func A function declared as a NodeJS callback
+    @param [Function] func A function declared as follow '(result, err) ->'
     @return [CompletionClosure] self
   ###
   onComplete: (func) ->
