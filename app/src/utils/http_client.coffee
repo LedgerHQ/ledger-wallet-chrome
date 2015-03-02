@@ -6,7 +6,7 @@ class @HttpClient
 
   ###
    @private This method should not be used outside this class and its descendants.
-   @params [Object] See jQuery.ajax() params.
+   @param [Object] See jQuery.ajax() params.
    @return [jqXHR] A jQuery.jqXHR
   ###
   jqAjax: (r) ->
@@ -43,7 +43,7 @@ class @HttpClient
             ... Handle error ...
           .done()
 
-    @params [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
+    @param [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
     @return [Q.Promise] A Q.Promise
   ###
   do: (r) -> Q(@jqAjax(r))
@@ -51,7 +51,7 @@ class @HttpClient
   ###
     Performs a HTTP GET request.
 
-    @params [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
+    @param [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
     @return [Q.Promise] A Q.Promise
     @see {HttpClient#do}
   ###
@@ -61,7 +61,7 @@ class @HttpClient
   ###
     Performs a HTTP POST request.
 
-    @params [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
+    @param [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
     @return [Q.Promise] A Q.Promise
     @see HttpClient#do
   ###
@@ -71,7 +71,7 @@ class @HttpClient
   ###
    Performs a HTTP POST request using a form url encoded body.
 
-   @params [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
+   @param [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
    @return [Q.Promise] A Q.Promise
    @see HttpClient#do
   ###
@@ -81,7 +81,7 @@ class @HttpClient
   ###
    Performs a HTTP PUT request.
 
-   @params [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
+   @param [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
    @return [Q.Promise] A Q.Promise
    @see HttpClient#do
   ###
@@ -91,7 +91,7 @@ class @HttpClient
   ###
    Performs a HTTP DELETE request.
 
-   @params [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
+   @param [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
    @return [Q.Promise] A Q.Promise
    @see HttpClient#do
   ###
