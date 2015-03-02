@@ -1,0 +1,1 @@
+class @UpdateNavigationController extends @NavigationController
