@@ -111,7 +111,6 @@
         'utils/stream'
         'utils/completion_closure'
         'utils/try'
-        'utils/application/base_application'
 
         ## Crypto
         'utils/crypto/aes'
@@ -170,6 +169,7 @@
         'wallet/extended_public_key'
 
         'utils/database/database'
+        'base/base_application'
         'base/model_context'
         'base/model'
         'base/migrations'

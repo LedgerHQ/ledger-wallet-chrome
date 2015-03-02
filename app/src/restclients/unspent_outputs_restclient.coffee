@@ -24,5 +24,4 @@ class ledger.api.UnspentOutputsRestClient extends ledger.api.RestClient
             output.paths.push paths[address] for address in output.addresses when paths[address]?
           callback?(outputs)
 
-
 ledger.api.UnspentOutputsRestClient.instance = new ledger.api.UnspentOutputsRestClient()

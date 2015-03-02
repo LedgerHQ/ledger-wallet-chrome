@@ -39,3 +39,5 @@ class @WalletsManager extends EventEmitter
     @_wallets[card.id]?.disconnect()
     @emit 'disconnect', card
 
+  getAllWallets: -> _.values(@_wallets)
+

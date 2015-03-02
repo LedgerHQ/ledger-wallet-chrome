@@ -18,11 +18,11 @@ Errors =
   InconsistentState: "InconsistentState"
 
 ###
-  This class manages dongle firmware update. It ensures consistent state during the update process
-
-
+  FirmwareUpdateRequest performs dongle firmware updates. Once started it will listen the {WalletsManager} in order to catch
+  connected dongles and update them. Only one instance of FirmwareUpdateRequest should be alive at the same time. (This is
+  ensured by the {ledger.fup.FirmwareUpdater})
 ###
-class ledger.fup.FirmwareUpdateRequest
+class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   @States: States
 
@@ -34,8 +34,32 @@ class ledger.fup.FirmwareUpdateRequest
     @_fup = firmwareUpdater
     @_completion = new CompletionClosure()
     @_currentState = _(@).getClass().States.Undefined
+    @_waitForConnectedDongle()
+
+  ###
+    Stops all current tasks and listened events.
+  ###
+  cancel: () -> @_fup._cancelRequest(this)
 
   onComplete: (callback) -> @_completion.onComplete callback
+
+  _waitForConnectedDongle: (callback = _.noop) ->
+    completion = new CompletionClosure(callback)
+
+    registerWallet = (wallet) =>
+      @_wallet = wallet
+      wallet.once 'disconnected', => @_wallet = null
+      completion.success(wallet)
+
+    [wallet] = ledger.app.walletsManager.getAllWallets()
+    unless wallet?
+      ledger.app.walletsManager.once 'connected', (e, wallet) => registerWallet(wallet)
+    else
+      registerWallet(wallet)
+    completion.readonly()
+
+  _waitForDisconnectDongle: ->
+    ledger.app.walletsManager.once 'disconnect', =>
 
   _handleCurrentState: () ->
     if LastMode is Modes.Os
