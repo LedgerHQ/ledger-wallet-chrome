@@ -1,7 +1,29 @@
+###
+  View controllers are the bridge between models and view. They are responsible of fetching data and injecting them in views.
+  View controllers are automatically bound to an eco HTML template depending of the class name. For example an instance of
+  'NamespaceHereFoxyViewController' will render the template located at 'views/namespace/here/foxy.eco'.
+
+  @example How to use the view property of view controller
+    class MyFoxyViewController extends ViewController
+      view:
+        foxyButton: "#foxy_button"
+        foxyInput: "#foxy_input"
+
+      onAfterRender: ->
+        super
+        @view.foxyButton.on 'click', =>
+          foxyValue = foxyInput.val()
+          ... Do something with the value ...
+
+###
 class @ViewController extends @EventEmitter
 
   renderedSelector: undefined
   parentViewController: undefined
+
+  ###
+    A hash of view selectors that will be selected after the view render. (See the example in the class description)
+  ###
   view: {}
 
   constructor: (params = {}, routedUrl = "") ->
@@ -11,7 +33,11 @@ class @ViewController extends @EventEmitter
 
   initialize: ->
 
+  ###
+    Selects elements in the controller node with {http://api.jquery.com/category/selectors/ jQuery selector}
 
+    @return [jQuery.Element] The result of the selector
+  ###
   select: (selectorString) ->
     $(@renderedSelector).find(selectorString)
 

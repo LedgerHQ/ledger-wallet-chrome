@@ -58,10 +58,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   ###
   setKeyCardSeed: (keyCardSeed) ->
     throw Errors.InvalidSeedSize if not keyCardSeed? or keyCardSeed.length != 32
-    try
-      @_keyCardSeed = new ByteString(keyCardSeed, HEX)
-    catch er
-      throw Errors.InvalidSeedFormat
+    seed = Try => new ByteString(keyCardSeed, HEX)
+    throw Errors.InvalidSeedFormat if seed.isFailure() or seed.getValue()?.length != 16
+    @_keyCardSeed = seed.getValue()
     return
 
   _waitForConnectedDongle: (callback = _.noop) ->

@@ -275,9 +275,9 @@
         '../spec/spec_helper'
 
         ## Update controllers
-
         'controllers/update/update_navigation_controller'
+        'controllers/update/update_view_controller'
         'controllers/update/update_plug_view_controller'
-        'controller/update/update_seed_view_controller'
+        'controllers/update/update_seed_view_controller'
 
       ]
