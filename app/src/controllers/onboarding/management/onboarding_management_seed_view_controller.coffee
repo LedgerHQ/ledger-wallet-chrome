@@ -5,6 +5,8 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     invalidLabel: '#invalid_label'
     indicationLabel: '#indication_label'
     continueButton: '#continue_button'
+    copyButton: '#copy_button'
+    printButton: '#print_button'
   navigation:
     continueUrl: '/onboarding/management/summary'
 
@@ -25,6 +27,20 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     do @_generateInputs
     do @_listenEvents
     @_updateUI no
+
+  copy: ->
+    text = @params.mnemonic
+    input = document.createElement("textarea");
+    input.id = "toClipboard"
+    input.value = text
+    document.body.appendChild(input)
+    input.focus()
+    input.select()
+    document.execCommand('copy')
+    input.remove()
+
+  print: ->
+    window.print()
 
   _generateInputs: ->
     @view.inputs = []
@@ -47,6 +63,21 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       input.on 'keydown', =>
         return if @params.wallet_mode == 'create'
         setTimeout =>
+          @params.mnemonic = @_writtenMnemonic()
+          do @_updateUI
+        , 0
+      input.on 'paste', (e) =>
+        element = e.target
+        setTimeout =>
+          words = $(element).val().split(/[^A-Za-z]/)
+          words = words.filter(Boolean)
+          beginInput = 0
+          for input2 in @view.inputs
+            if input2[0] is $(element)[0]
+              beginInput = @view.inputs.indexOf(input2)
+          for i in [0..words.length - 1]
+            if @view.inputs[i + beginInput]
+              @view.inputs[i + beginInput].val(words[i])
           @params.mnemonic = @_writtenMnemonic()
           do @_updateUI
         , 0
@@ -84,6 +115,14 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       else
         @view.invalidLabel.fadeOut(if animated then 250 else 0)
       @view.continueButton.addClass 'disabled'
+
+    # hide copy button
+    if @params.wallet_mode == 'create'
+      @view.copyButton.show()
+      @view.printButton.show()
+    else
+      @view.copyButton.hide()
+      @view.printButton.hide()
 
   _writtenMnemonic: ->
     mnemonic = ''

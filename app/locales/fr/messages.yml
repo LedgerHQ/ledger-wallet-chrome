@@ -124,6 +124,8 @@ onboarding:
       invalid_recovery_phrase: "La phrase de restauration est invalide."
       it_wont_be_displayed_again: "Votre phrase de restauration ne sera pas affichée à nouveau."
       without_it: "Sans elle, vous n'aurez plus accès à votre portefeuille en cas de perte."
+      copy: "Copier la phrase de restauration dans le presse-papier"
+      print: "IMPRIMER"
 
     summary:
       your_wallet_is: "Votre portefeuille est"

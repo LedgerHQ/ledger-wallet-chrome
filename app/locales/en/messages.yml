@@ -124,6 +124,8 @@ onboarding:
       invalid_recovery_phrase: "The recovery phrase is invalid."
       it_wont_be_displayed_again: "Your recovery phrase won't be displayed again."
       without_it: "Without it, you will not be able to access your wallet in case of loss."
+      copy: "Copy recovery phrase to clipboard"
+      print: "PRINT"
 
     summary:
       your_wallet_is: "Your wallet is"
