@@ -184,6 +184,11 @@
         'm2fa/transaction_validation_request'
         'm2fa/paired_secure_screen'
 
+        ## Firmware Update
+        'fup/firmware_update_request'
+        'fup/firmware_updater'
+        'fup/firmwares_manifest'
+
         ## Models
         'models/wallet'
         'models/account'
@@ -268,4 +273,11 @@
         '../spec/m2fa/m2fa_spec'
 
         '../spec/spec_helper'
+
+        ## Update controllers
+
+        'controllers/update/update_navigation_controller'
+        'controllers/update/update_plug_view_controller'
+        'controller/update/update_seed_view_controller'
+
       ]

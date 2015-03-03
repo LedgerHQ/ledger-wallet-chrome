@@ -15,7 +15,7 @@ class @WalletPairingIndexDialogViewController extends DialogViewController
     @_request.onComplete (screen, error) =>
         @getDialog().push new WalletPairingErrorDialogViewController(reason: error)
 
-  onDetached: ->
+  onDetach: ->
     super
     @_request?.off 'sendChallenge', @_onSendChallenge
 

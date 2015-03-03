@@ -10,7 +10,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
 @declareRoutes = (route, app) ->
   ## Default
   route '/', ->
-    app.router.go '/onboarding/device/plug', {animateIntro: yes}
+    if app.isInWalletMode()
+      app.router.go '/onboarding/device/plug', {animateIntro: yes}
+    else
+      app.router.go '/update/seed'
 
   ## Onboarding
   # Device
@@ -99,3 +102,11 @@ ledger.router.pluggedWalletRoutesExceptions = [
   # Operations
   route '/wallet/accounts/{id}/operations', (params) ->
     app.navigate WALLET_LAYOUT, WalletOperationsIndexViewController
+
+  ## Firmware Update
+
+  route 'update/plug', (params) ->
+    app.navigate UPDATE_LAYOUT, UpdatePlugViewController
+
+  route 'update/seed', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateSeedViewController

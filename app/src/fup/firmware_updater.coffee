@@ -7,7 +7,7 @@ ledger.fup ?= {}
 ###
 class ledger.fup.FirmwareUpdater
 
-  instance: new @
+  @instance: new @
 
   ###
     Checks if a firmware update is available for the given wallet.

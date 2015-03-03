@@ -53,7 +53,9 @@ class ledger.base.application.BaseApplication extends @EventEmitter
         @handleAction(actionName, parameters) if newUrl.hash.length > 0
 
       if @_navigationController == null or @_navigationController.constructor.name != layoutName
+        @_navigationController?.onDetach()
         @_navigationController = new window[layoutName]()
+        @_navigationController.onAttach()
         controller = new viewController(newUrl.params(), data.url)
         controller.on 'afterRender', onControllerRendered.bind(@)
         @_navigationController.push controller
