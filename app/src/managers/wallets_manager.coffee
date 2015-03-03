@@ -39,5 +39,5 @@ class @WalletsManager extends EventEmitter
     @_wallets[card.id]?.disconnect()
     @emit 'disconnect', card
 
-  getAllWallets: -> _.values(@_wallets)
+  getConnectedWallets: -> _(_.values(@_wallets)).filter (w) -> w._state isnt ledger.wallet.States.DISCONNECTED
 

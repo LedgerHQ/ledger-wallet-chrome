@@ -1,0 +1,1 @@
+class @UpdateErasingViewController extends UpdateViewController

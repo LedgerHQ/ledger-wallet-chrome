@@ -26,6 +26,8 @@ Errors =
 
   @event plug Emitted when the user must plug its dongle in
   @event unplug Emitted when the user must unplug its dongle
+  @event stateChanged Emitted when the current state has changed. The event holds a data formatted like this: {oldState: ..., newState: ...}
+  @event setKeycardSeed Emitted once the key card seed is provided
 ###
 class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
@@ -40,7 +42,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_keyCardSeed = null
     @_completion = new CompletionClosure()
     @_currentState = States.Undefined
-    @_handleCurrentState()
 
   ###
     Stops all current tasks and listened events.
@@ -61,7 +62,15 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     seed = Try => new ByteString(keyCardSeed, HEX)
     throw Errors.InvalidSeedFormat if seed.isFailure() or seed.getValue()?.length != 16
     @_keyCardSeed = seed.getValue()
-    return
+    @emit "setKeyCardSeed"
+    @_handleCurrentState()
+
+  ###
+    Checks if the current request has a key card seed or not.
+
+    @return [Boolean] Yes if the key card seed has been setup
+  ###
+  hasKeyCardSeed: () -> if @_keyCardSeed? then yes else no
 
   _waitForConnectedDongle: (callback = _.noop) ->
     completion = new CompletionClosure(callback)
@@ -71,7 +80,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       wallet.once 'disconnected', => @_wallet = null
       completion.success(wallet)
 
-    [wallet] = ledger.app.walletsManager.getAllWallets()
+    [wallet] = ledger.app.walletsManager.getConnectedWallets()
     unless wallet?
       @emit 'plug'
       ledger.app.walletsManager.once 'connected', (e, wallet) => registerWallet(wallet)
@@ -86,7 +95,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _handleCurrentState: () ->
     # If there is no dongle wait for one
-    return @_waitForConnectedDongle => @_handleCurrentState() unless @_wallet
+    (return @_waitForConnectedDongle => @_handleCurrentState()) unless @_wallet
+
+    l 'Here I am'
 
     # Otherwise handle the current by calling the right method depending on the last mode and the state
     if LastMode is Modes.Os
@@ -101,6 +112,11 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         when States.LoadingBootloader then null
 
   _processInitStageOs: ->
+    @_wallet.getState (state) =>
+      if state isnt ledger.wallet.States.BLANK
+        @_setCurrentState(States.Erasing)
+      else
+        l 'BLANK'
 
   _processInitOs: ->
 
@@ -113,6 +129,11 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _compareVersion: (v1, v2) ->
 
   _failure: (reason) ->
+
+  _setCurrentState: (newState) ->
+    oldState = @_currentState
+    @_currentState = newState
+    @emit 'stateChanged', {oldState, newState}
 
 LastMode = ledger.fup.FirmwareUpdateRequest.Modes.Os
 

@@ -279,5 +279,6 @@
         'controllers/update/update_view_controller'
         'controllers/update/update_plug_view_controller'
         'controllers/update/update_seed_view_controller'
+        'controllers/update/update_erasing_view_controller'
 
       ]
