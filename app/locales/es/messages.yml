@@ -9,6 +9,9 @@ common:
   date_format: 'DD/MM/YYYY à HH:mm'
   close: "Close"
   cancel: "Cancel"
+  yes: "Si"
+  no: "No"
+  may_take_a_while: "Please wait, this operation may take a few moments."
 
   dialogs:
     yes: "Si"
@@ -297,3 +300,6 @@ wallet:
       open_the_app: "<b>Scan<b/> the pairing QR code."
       tap_pair: "Tap “Pair a new Ledger Wallet” to start the scanner."
       scan_this_qrcode: "Scan this pairing QR code."
+
+    progress:
+      pairing_with_mobile_device: "Pairing with mobile device..."
