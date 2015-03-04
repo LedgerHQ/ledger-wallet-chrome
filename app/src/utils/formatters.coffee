@@ -165,6 +165,7 @@ class ledger.formatters.bitcoin
 
 
 
+
 ###
   Tests
 ###
