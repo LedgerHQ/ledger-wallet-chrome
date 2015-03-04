@@ -91,7 +91,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _waitForConnectedDongle: (callback = undefined) ->
     completion = new CompletionClosure(callback)
-
     registerWallet = (wallet) =>
       @_wallet = wallet
       wallet.once 'disconnected', => @_wallet = null
@@ -115,7 +114,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       completion.success()
     completion.readonly()
 
-  _waitForPowerCycle: (callback = undefined ) -> @_waitForDisconnectDongle().then(@_waitForConnectedDongle(callback).promise())
+  _waitForPowerCycle: (callback = undefined ) -> @_waitForDisconnectDongle().then(=> @_waitForConnectedDongle(callback).promise())
 
   _handleCurrentState: () ->
     # If there is no dongle wait for one
@@ -136,7 +135,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processInitStageOs: ->
     @_wallet.getState (state) =>
-      if state isnt ledger.wallet.States.BLANK
+      if state isnt ledger.wallet.States.BLANK and state isnt ledger.wallet.States.FROZEN
         @_setCurrentState(States.Erasing)
         @_handleCurrentState()
       else
@@ -145,22 +144,20 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _processErasing: ->
     @_waitForUserApproval()
     .then =>
-      l 'USER APPROVAL'
       getRandomChar = -> "0123456789".charAt(_.random(10))
       deferred = Q.defer()
       pincode = getRandomChar() + getRandomChar()
       failUntilDongleIsBlank = =>
         @_attemptToFailDonglePinCode(pincode)
-        .then (isBlank) =>
-          l 'IS BLANK', isBlank
-          if isBlank then deffered.resolve() else failUntilDongleIsBlank()
+        .then (isBlank) => if isBlank then deferred.resolve() else failUntilDongleIsBlank()
         .fail =>
-          pincode += getRandomPin()
+          pincode += getRandomChar()
           failUntilDongleIsBlank()
         .done()
       failUntilDongleIsBlank()
       deferred.promise
     .then =>
+      l 'DONE ERASING'
       @_setCurrentState(States.Undefined)
       @_handleCurrentState()
     .fail ->
@@ -181,18 +178,16 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _attemptToFailDonglePinCode: (pincode) ->
     deferred = Q.defer()
-    l 'Enter ', pincode
     @_wallet.unlockWithPinCode pincode, (isUnlocked, error) =>
-      l isUnlocked, error
       if isUnlocked or error.code isnt ledger.errors.WrongPinCode
         @emit "erasureStep", 3
-        @_waitForPowerCycle().then -> deffered.reject()
+        @_waitForPowerCycle().then -> deferred.reject()
       else
         @emit "erasureStep", error.retryCount
-        @_waitForDisconnectDongle()
+        @_waitForPowerCycle()
         .then =>
           @_wallet.getState (state) =>
-            deferred.resolve(state is ledger.wallet.States.BLANK)
+            deferred.resolve(state is ledger.wallet.States.BLANK or state is ledger.wallet.States.FROZEN)
     deferred.promise
 
   _setCurrentState: (newState) ->
