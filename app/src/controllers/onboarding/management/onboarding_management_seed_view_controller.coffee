@@ -55,17 +55,25 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       div.appendChild(input)
       @view.inputs.push $(input)
       @view.seedContainer.append div
+      $(input).suggest(ledger.bitcoin.bip39.wordlist);
       if i == 0
         input.focus()
 
   _listenEvents: ->
     for input in @view.inputs
-      input.on 'keydown', =>
+      input.on 'keydown', (e) =>
         return if @params.wallet_mode == 'create'
+        element = e.target
+        $(element).removeClass 'seed-invalid'
         setTimeout =>
           @params.mnemonic = @_writtenMnemonic()
           do @_updateUI
         , 0
+      input.on 'blur', (e) =>
+        return if @params.wallet_mode == 'create'
+        element = e.target
+        @_inputIsValid $(element)
+          
       input.on 'paste', (e) =>
         element = e.target
         setTimeout =>
@@ -78,6 +86,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
           for i in [0..words.length - 1]
             if @view.inputs[i + beginInput]
               @view.inputs[i + beginInput].val(words[i])
+              @_inputIsValid @view.inputs[i + beginInput]
           @params.mnemonic = @_writtenMnemonic()
           do @_updateUI
         , 0
@@ -135,3 +144,9 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
 
   _mnemonicIsValid: ->
     ledger.bitcoin.bip39.mnemonicIsValid(@params.mnemonic)
+
+  _inputIsValid: (input) ->
+    if input.val() != "" and input.val() not in ledger.bitcoin.bip39.wordlist
+      input.addClass 'seed-invalid'
+    else
+      input.removeClass 'seed-invalid'

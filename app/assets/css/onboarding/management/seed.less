@@ -18,7 +18,17 @@
         margin-right: 8px;
         background-color: @color-white;
 
-        > input {
+        > div {
+          margin-left: -19px;
+          >div {
+            margin: 3px 0px 0px 0px;
+            font-size: 14px;
+            font-family: "Open Sans";
+            letter-spacing: -0.3px;
+          }
+        }
+
+        input {
           background: transparent;
           outline: none;
           border: 0;
@@ -26,10 +36,18 @@
           font-family: "Open Sans";
           letter-spacing: -0.3px;
           color: @color-grey-blue;
+          padding: 5px;
+          position: relative;
+          z-index: 10;
+          width: 78px;
 
           &[readonly] {
             -webkit-user-select: none;
           }
+        }
+
+        .seed-invalid {
+          color: @color-invalid-red;
         }
 
         > span {

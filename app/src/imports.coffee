@@ -12,6 +12,7 @@
         '../libs/sjcl/sha512'
         '../libs/jquery.selectric.min'
         '../libs/qrcode.min'
+        '../libs/jquery.suggest'
         '../public/tooltipster/js/jquery.tooltipster.min'
         '../libs/lw-api-js/lib/bitcoinjs-min'
         '../libs/lw-api-js/lib/util'
