@@ -27,7 +27,9 @@ Errors =
   @event plug Emitted when the user must plug its dongle in
   @event unplug Emitted when the user must unplug its dongle
   @event stateChanged Emitted when the current state has changed. The event holds a data formatted like this: {oldState: ..., newState: ...}
-  @event setKeycardSeed Emitted once the key card seed is provided
+  @event setKeyCardSeed Emitted once the key card seed is provided
+  @event needsUserApproval Emitted once the request needs a user input to continue
+  @event erasureStep Emitted each time the erasure step is trying to reset the dongle. The event holds the number of remaining steps before erasing is done.
 ###
 class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
@@ -42,6 +44,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_keyCardSeed = null
     @_completion = new CompletionClosure()
     @_currentState = States.Undefined
+    @_isNeedingUserApproval = no
 
   ###
     Stops all current tasks and listened events.
@@ -49,6 +52,13 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   cancel: () -> @_fup._cancelRequest(this)
 
   onComplete: (callback) -> @_completion.onComplete callback
+
+  ###
+    Approves the current request state and continue its execution.
+  ###
+  approveCurrentState: -> @_setIsNeedingUserApproval no
+
+  isNeedingUserApproval: -> @_isNeedingUserApproval
 
   ###
     Sets the key card seed used during the firmware update process. The seed must be a 32 characters string formatted as
@@ -66,13 +76,20 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_handleCurrentState()
 
   ###
+    Gets the current state.
+
+    @return [ledger.fup.FirmwareUpdateRequest.States] The current request state
+  ###
+  getCurrentState: -> @_currentState
+
+  ###
     Checks if the current request has a key card seed or not.
 
     @return [Boolean] Yes if the key card seed has been setup
   ###
   hasKeyCardSeed: () -> if @_keyCardSeed? then yes else no
 
-  _waitForConnectedDongle: (callback = _.noop) ->
+  _waitForConnectedDongle: (callback = undefined) ->
     completion = new CompletionClosure(callback)
 
     registerWallet = (wallet) =>
@@ -88,16 +105,21 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       registerWallet(wallet)
     completion.readonly()
 
-  _waitForDisconnectDongle: ->
-    return if @_wallet?
-    @emit 'unplug'
-    ledger.app.walletsManager.once 'disconnect', => @_handleCurrentState()
+  _waitForDisconnectDongle: (callback = undefined) ->
+    completion = new CompletionClosure(callback)
+    if @_wallet?
+      @emit 'unplug'
+      @_wallet.once 'disconnected', =>
+        completion.success()
+    else
+      completion.success()
+    completion.readonly()
+
+  _waitForPowerCycle: (callback = undefined ) -> @_waitForDisconnectDongle().then(@_waitForConnectedDongle(callback).promise())
 
   _handleCurrentState: () ->
     # If there is no dongle wait for one
     (return @_waitForConnectedDongle => @_handleCurrentState()) unless @_wallet
-
-    l 'Here I am'
 
     # Otherwise handle the current by calling the right method depending on the last mode and the state
     if LastMode is Modes.Os
@@ -105,6 +127,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         when States.Undefined then do @_processInitStageOs
         when States.ReloadingBootloaderFromOs then do @_processReloadBootloaderFromOs
         when States.InitializingOs then do @_processInitOs
+        when States.Erasing then do @_processErasing
         else @_failure(Errors.InconsistentState)
     else
       switch @_currentState
@@ -115,8 +138,34 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_wallet.getState (state) =>
       if state isnt ledger.wallet.States.BLANK
         @_setCurrentState(States.Erasing)
+        @_handleCurrentState()
       else
         l 'BLANK'
+
+  _processErasing: ->
+    @_waitForUserApproval()
+    .then =>
+      l 'USER APPROVAL'
+      getRandomChar = -> "0123456789".charAt(_.random(10))
+      deferred = Q.defer()
+      pincode = getRandomChar() + getRandomChar()
+      failUntilDongleIsBlank = =>
+        @_attemptToFailDonglePinCode(pincode)
+        .then (isBlank) =>
+          l 'IS BLANK', isBlank
+          if isBlank then deffered.resolve() else failUntilDongleIsBlank()
+        .fail =>
+          pincode += getRandomPin()
+          failUntilDongleIsBlank()
+        .done()
+      failUntilDongleIsBlank()
+      deferred.promise
+    .then =>
+      @_setCurrentState(States.Undefined)
+      @_handleCurrentState()
+    .fail ->
+      l 'FAIL', arguments
+    .done()
 
   _processInitOs: ->
 
@@ -130,10 +179,50 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _failure: (reason) ->
 
+  _attemptToFailDonglePinCode: (pincode) ->
+    deferred = Q.defer()
+    l 'Enter ', pincode
+    @_wallet.unlockWithPinCode pincode, (isUnlocked, error) =>
+      l isUnlocked, error
+      if isUnlocked or error.code isnt ledger.errors.WrongPinCode
+        @emit "erasureStep", 3
+        @_waitForPowerCycle().then -> deffered.reject()
+      else
+        @emit "erasureStep", error.retryCount
+        @_waitForDisconnectDongle()
+        .then =>
+          @_wallet.getState (state) =>
+            deferred.resolve(state is ledger.wallet.States.BLANK)
+    deferred.promise
+
   _setCurrentState: (newState) ->
     oldState = @_currentState
     @_currentState = newState
     @emit 'stateChanged', {oldState, newState}
+
+  _setIsNeedingUserApproval: (value) ->
+    if @_isNeedingUserApproval isnt value
+      @_isNeedingUserApproval = value
+      if @_isNeedingUserApproval is true
+        @emit 'needsUserApproval'
+        @_defferedApproval = Q.defer()
+      else
+        defferedApproval = @_defferedApproval
+        @_defferedApproval = null
+        defferedApproval.resolve()
+    return
+
+  _cancelApproval: ->
+    if @_isNeedingUserApproval
+      @_isNeedingUserApproval = no
+      defferedApproval = @_defferedApproval
+      @_defferedApproval = null
+      defferedApproval.reject("cancelled")
+
+  _waitForUserApproval: ->
+    @_setIsNeedingUserApproval  yes
+    @_defferedApproval.promise
+
 
 LastMode = ledger.fup.FirmwareUpdateRequest.Modes.Os
 

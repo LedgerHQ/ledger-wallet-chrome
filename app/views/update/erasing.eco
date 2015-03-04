@@ -2,4 +2,6 @@
 
   Erasing
 
+  <button id="eraseSeed" data-href="#approveSeedErasure">Erase me!</button>
+
 </div>
