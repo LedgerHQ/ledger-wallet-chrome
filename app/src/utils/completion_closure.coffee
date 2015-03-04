@@ -232,7 +232,7 @@ class @CompletionClosure
 
     @return [Q.Promise]
   ###
-  then: (fulfilled, rejected = null, progressed = null) -> @q().then(onSuccess, onFailure, progressed)
+  then: (fulfilled, rejected = null, progressed = null) -> @q().then(fulfilled, rejected, progressed)
 
   ###
     Shorthand for completionClosure.q().fail()
