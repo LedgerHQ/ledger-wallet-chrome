@@ -9,6 +9,7 @@ common:
   date_format: 'DD/MM/YYYY à HH:mm'
   close: "Close"
   cancel: "Cancel"
+  finish: "Finish"
   yes: "Si"
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
@@ -234,7 +235,7 @@ wallet:
     index:
       title: "RECIBIR BITCOINS"
       amount: "CANTIDAD (OPCIONAL)"
-      amount_placeholder: "cantidad"
+      amount_placeholder: "Cantidad"
       receiver_account: "CUENTA DE CREDITO"
       receiver_address: "DIRECCIÓN DE RECEPCIÓN BITCOIN"
       qr_code_explanation: "Escáner de códigos QR por la persona que desea <br /> usted enviar bitcoins"
@@ -246,10 +247,10 @@ wallet:
     index:
       title: "ENVIAR BITCOINS"
       amount: "CANTIDAD"
-      amount_placeholder: "cantidad"
+      amount_placeholder: "Cantidad"
       sender_account: "CUENTA DEBITADA"
       receiver_address: "DIRECCIÓN DE RECEPCIÓN BITCOIN"
-      receiver_address_placeholder: "DIRECCIÓN BITCOIN"
+      receiver_address_placeholder: "Dirección bitcoin"
       total_spent: "TOTAL DEBITADO"
       transaction_fees_text: "(+0.0001 BTC gastos de transacción)"
       send: "ENVOYER"
@@ -292,7 +293,7 @@ wallet:
 
   pairing:
     common:
-      pair_a_new_mobile: "PAIR A NEW MOBILE PHONE"
+      pair_a_new_mobile: "Pair a new mobile phone"
 
     index:
       download_the_app: "<b>Download</b> the Ledger Wallet mobile app."
@@ -302,4 +303,12 @@ wallet:
       scan_this_qrcode: "Scan this pairing QR code."
 
     progress:
-      pairing_with_mobile_device: "Pairing with mobile device..."
+      pairing_with_mobile_device: "Pairing in progress..."
+      follow_instructions: "Follow the instructions displayed on the mobile phone screen."
+
+    finalizing:
+      assign_a_name: "To finish, please give a name to this mobile phone."
+      placeholder_name: "Mobile phone name"
+      default_name: "Mobile phone name"
+      name_already_used_by_paired_device: "This name is already used by another mobile phone."
+      please_enter_a_name: "Please enter a mobile phone name."

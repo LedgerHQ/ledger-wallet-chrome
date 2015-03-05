@@ -22,5 +22,6 @@
   </div>
 </section>
 <div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
   <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
 </div>

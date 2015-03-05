@@ -1,22 +1,19 @@
 class @WalletPairingProgressDialogViewController extends DialogViewController
 
   view:
-    spinnerContainer: "#spinner_container"
-    contentContainer: "#content-container"
+    contentContainer: "#content_container"
 
   onAfterRender: ->
     super
     # launch request
     @_request = @params.request
-    @_request.onComplete (screen, error) =>
+    @_request?.onComplete (screen, error) =>
       @getDialog().push new WalletPairingErrorDialogViewController(reason: error) if error?
-    @_onFinalizing = @_onFinalizing.bind(@)
-    @_request.on 'finalizing', @_onFinalizing
-
+    @_request?.on 'finalizing', @_onFinalizing
     # show spinner
     @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
 
-    onDetach: ->
+  onDetach: ->
     super
     @_request?.off 'finalizing', @_onFinalizing
 
