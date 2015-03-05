@@ -45,6 +45,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_completion = new CompletionClosure()
     @_currentState = States.Undefined
     @_isNeedingUserApproval = no
+    @_lastMode = Modes.Os
+    @_lastVersion = undefined
 
   ###
     Stops all current tasks and listened events.
@@ -144,7 +146,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_setCurrentState(States.Erasing)
         @_handleCurrentState()
       else
-        l 'BLANK'
+        @_getVersion()
 
   _processErasing: ->
     @_waitForUserApproval()
@@ -176,7 +178,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processInitStageBootloader: ->
 
-  _getVersion: ->
+  _getVersion: (forceBl, callback) -> @_wallet.getRawFirmwareVersion(@_lastMode is Modes.Bootloader, forceBl, callback)
 
   _compareVersion: (v1, v2) ->
 
