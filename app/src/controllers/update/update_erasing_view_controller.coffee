@@ -2,10 +2,14 @@ class @UpdateErasingViewController extends UpdateViewController
 
   view:
     eraseSeedButton: "#eraseSeed"
+    defaultFrame: "#default"
+    powerCycleFrame: "#powerCycle"
+    remainingStepText: "#remainingStep"
 
   constructor: ->
     super
     @_onNeedsUserApproval = @_onNeedsUserApproval.bind(@)
+    @_onErasureStep = @_onErasureStep.bind(@)
 
   _updateUi: ->
     if @getRequest().isNeedingUserApproval()
@@ -15,15 +19,22 @@ class @UpdateErasingViewController extends UpdateViewController
 
   onAfterRender: ->
     super
+    @view.powerCycleFrame.hide()
     @_updateUi()
 
   onAttach: ->
     @getRequest().on 'needsUserApproval', @_onNeedsUserApproval
+    @getRequest().on 'erasureStep', @_onErasureStep
 
   onDetach: ->
     @getRequest().off 'needsUserApproval', @_onNeedsUserApproval
+    @getRequest().off 'erasureStep', @_onErasureStep
 
   approveSeedErasure: -> @getRequest().approveCurrentState()
 
   _onNeedsUserApproval: -> @_updateUi()
 
+  _onErasureStep: (ev, remainingStep) ->
+    @view.defaultFrame.hide()
+    @view.powerCycleFrame.show()
+    @view.remainingStepText.text("Remaining: #{remainingStep}")

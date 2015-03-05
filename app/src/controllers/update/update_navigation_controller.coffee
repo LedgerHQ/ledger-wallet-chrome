@@ -10,7 +10,8 @@ class @UpdateNavigationController extends @NavigationController
     @_request.cancel()
 
   _onPlugDongle: ->
-    ledger.app.router.go '/update/plug'
+    if @_request.getCurrentState() isnt ledger.fup.FirmwareUpdateRequest.States.Erasing
+      ledger.app.router.go '/update/plug'
 
   _onErasingDongle: ->
     ledger.app.router.go '/update/erasing'

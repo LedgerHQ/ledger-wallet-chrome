@@ -64,7 +64,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     Sets the key card seed used during the firmware update process. The seed must be a 32 characters string formatted as
     an hexadecimal value.
 
-    @param [String] keyCardSeed A 32 characters string formatted as an hexadecimal valeu (i.e. '01294b7431234b5323f5588ce7d02703'
+    @param [String] keyCardSeed A 32 characters string formatted as an hexadecimal value (i.e. '01294b7431234b5323f5588ce7d02703'
     @throw If the seed length is not 32 or if it is malformed
   ###
   setKeyCardSeed: (keyCardSeed) ->
@@ -97,11 +97,15 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       completion.success(wallet)
 
     [wallet] = ledger.app.walletsManager.getConnectedWallets()
-    unless wallet?
-      @emit 'plug'
-      ledger.app.walletsManager.once 'connected', (e, wallet) => registerWallet(wallet)
-    else
-      registerWallet(wallet)
+    try
+      unless wallet?
+        _.defer => @emit 'plug'
+        ledger.app.walletsManager.once 'connected', (e, wallet) =>
+          registerWallet(wallet)
+      else
+        registerWallet(wallet)
+    catch er
+      e er
     completion.readonly()
 
   _waitForDisconnectDongle: (callback = undefined) ->
@@ -109,6 +113,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     if @_wallet?
       @emit 'unplug'
       @_wallet.once 'disconnected', =>
+        @_wallet = null
         completion.success()
     else
       completion.success()
@@ -149,7 +154,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       pincode = getRandomChar() + getRandomChar()
       failUntilDongleIsBlank = =>
         @_attemptToFailDonglePinCode(pincode)
-        .then (isBlank) => if isBlank then deferred.resolve() else failUntilDongleIsBlank()
+        .then (isBlank) =>
+          l 'IS BLANK', isBlank
+          if isBlank then deferred.resolve() else failUntilDongleIsBlank()
         .fail =>
           pincode += getRandomChar()
           failUntilDongleIsBlank()
@@ -157,7 +164,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       failUntilDongleIsBlank()
       deferred.promise
     .then =>
-      l 'DONE ERASING'
       @_setCurrentState(States.Undefined)
       @_handleCurrentState()
     .fail ->
@@ -183,9 +189,12 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @emit "erasureStep", 3
         @_waitForPowerCycle().then -> deferred.reject()
       else
+        l 'Here I am', arguments
         @emit "erasureStep", error.retryCount
+        l 'Wait for'
         @_waitForPowerCycle()
         .then =>
+          l 'Power cycled'
           @_wallet.getState (state) =>
             deferred.resolve(state is ledger.wallet.States.BLANK or state is ledger.wallet.States.FROZEN)
     deferred.promise
@@ -217,6 +226,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _waitForUserApproval: ->
     @_setIsNeedingUserApproval  yes
     @_defferedApproval.promise
+
 
 
 LastMode = ledger.fup.FirmwareUpdateRequest.Modes.Os
