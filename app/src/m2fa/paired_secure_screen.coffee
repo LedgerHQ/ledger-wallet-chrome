@@ -67,3 +67,12 @@ class ledger.m2fa.PairedSecureScreen
 
   @getMostRecentFromSyncedStore: (callback = _.noop) -> @getMostRecentFromStore(ledger.storage.sync, callback)
 
+  @getByNameFromStore: (store, name, callback = _.noop) ->
+    closure = new CompletionClosure(callback)
+    @getAllFromStore store, (result, error) ->
+      return closure.failure(error) if error?
+      closure.success(_(result).where(name: name)[0])
+    closure.readonly()
+
+  @getByNameFromSyncedStore: (name, callback = _.noop) -> @getByNameFromStore(ledger.storage.sync, name, callback)
+
