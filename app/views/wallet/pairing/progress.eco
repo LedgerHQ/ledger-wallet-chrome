@@ -1,14 +1,12 @@
-<section id="receive_index_dialog">
+<section id="pairing_progress_dialog">
   <header>
-    <h1>Pairing</h1>
+    <h1><%= t 'wallet.pairing.common.pair_a_new_mobile' %></h1>
   </header>
-  <div id="container">
-    <div>
-      <p id="progress"></p>
-    </div>
-
+  <div id="content-container">
+    <div class="regular-text"><%= t 'wallet.pairing.progress.pairing_with_mobile_device' %></div>
+    <div class="regular-grey-text-small"><%= t 'common.may_take_a_while' %></div>
   </div>
 </section>
 <div class="dialog-actions-bar">
-  <a class="cancel-rounded-button" href="#dismiss"><%= t 'wallet.receive.index.close' %></a>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
 </div>

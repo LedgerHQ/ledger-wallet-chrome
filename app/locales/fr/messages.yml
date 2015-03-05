@@ -9,6 +9,9 @@ common:
   date_format: 'DD/MM/YYYY à HH:mm'
   close: "Fermer"
   cancel: "Annuler"
+  yes: "Oui"
+  no: "Non"
+  may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
 
   dialogs:
     yes: "Oui"
@@ -297,3 +300,6 @@ wallet:
       open_the_app: "<b>Scannez</b> le code QR d'association."
       tap_pair: "Touchez “Associer un nouveau Ledger Wallet” pour démarrer le scanner."
       scan_this_qrcode: "Scannez ce code QR d'association."
+
+    progress:
+      pairing_with_mobile_device: "Association avec le téléphone mobile..."
