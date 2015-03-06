@@ -9,6 +9,7 @@ common:
   date_format: 'DD/MM/YYYY à HH:mm'
   close: "Fermer"
   cancel: "Annuler"
+  finish: "Terminer"
   yes: "Oui"
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
@@ -234,7 +235,7 @@ wallet:
     index:
       title: "RECEVOIR DES BITCOINS"
       amount: "MONTANT (OPTIONNEL)"
-      amount_placeholder: "montant"
+      amount_placeholder: "Montant"
       receiver_account: "COMPTE À CRÉDITER"
       receiver_address: "ADRESSE BITCOIN DE RÉCEPTION"
       qr_code_explanation: "Code QR à scanner par la personne<br />qui souhaite vous envoyer des bitcoins."
@@ -246,10 +247,10 @@ wallet:
     index:
       title: "ENVOYER DES BITCOINS"
       amount: "MONTANT"
-      amount_placeholder: "montant"
+      amount_placeholder: "Montant"
       sender_account: "COMPTE À DÉBITER"
       receiver_address: "ADRESSE BITCOIN À CRÉDITER"
-      receiver_address_placeholder: "adresse bitcoin"
+      receiver_address_placeholder: "Adresse bitcoin"
       total_spent: "TOTAL DÉPENSÉ"
       transaction_fees_text: "(dont 0.0001 BTC de frais de transaction)"
       send: "ENVOYER"
@@ -302,4 +303,12 @@ wallet:
       scan_this_qrcode: "Scannez ce code QR d'association."
 
     progress:
-      pairing_with_mobile_device: "Association avec le téléphone mobile..."
+      pairing_with_mobile_device: "Association en cours..."
+      follow_instructions: "Suivez les instructions affichées à l'écran du téléphone mobile."
+
+    finalizing:
+      assign_a_name: "Pour terminer, donnez un nom à ce téléphone mobile."
+      placeholder_name: "Nom du téléphone mobile"
+      default_name: "Mon téléphone mobile"
+      name_already_used_by_paired_device: "Ce nom est déjà utilisé par un autre téléphone mobile."
+      please_enter_a_name: "Veuillez entrer un nom pour ce téléphone mobile."

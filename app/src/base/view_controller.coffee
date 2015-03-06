@@ -29,6 +29,10 @@ class @ViewController extends @EventEmitter
   constructor: (params = {}, routedUrl = "") ->
     @params = _.defaults(params, @defaultParams)
     @routedUrl = routedUrl
+    # bind all methods to self
+    for key, value of @
+      if _.isFunction(value) and value != @constructor
+        @[key] = value.bind(@)
     @initialize()
 
   initialize: ->

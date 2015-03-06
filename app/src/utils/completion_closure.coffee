@@ -158,7 +158,7 @@ class @CompletionClosure
   _tryNotify: () ->
     return unless @isCompleted()
     [result, error] = @_complete
-    if @_func? and @isCompleted()
+    if @_func?
       @_complete = []
       @_func(result, error)
 

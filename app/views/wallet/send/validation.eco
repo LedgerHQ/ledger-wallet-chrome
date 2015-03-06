@@ -11,5 +11,6 @@
   <div id="entered_code">
     <%= t 'wallet.send.validation.entered_code' %>
   </div>
+  <div class="left-spacer"></div>
   <a class="cancel-rounded-button" href="#dismiss"><%= t 'wallet.send.index.close' %></a>
 </div>
