@@ -295,6 +295,17 @@ wallet:
     common:
       pair_a_new_mobile: "Pair a new mobile phone"
 
+    errors:
+      pairing_failed: "Pairing failed"
+      pairing_succeeded: "Pairing succeeded"
+      dongle_is_now_paired: "Your Ledger Wallet is now paired<br />with your mobile device \"%s\"."
+      inconsistent_state: "Something wrong happened (inconsistent state)."
+      client_cancelled: "The mobile application cancelled the pairing process."
+      dongle_needs_power_cycle: "Your Ledger Wallet needs to be unplugged and plugged back<br/>to pair a new mobile phone."
+      invalid_challenge_response: "The security card validation code is incorrect."
+      dongle_cancelled: "Your Ledger Wallet cancelled the pairing process."
+      unknown: "An unknown error occurred."
+
     index:
       download_the_app: "<b>Download</b> the Ledger Wallet mobile app."
       compatibility_details_available: "Compatibility details and installation guides are available from our <b>help center</b>."

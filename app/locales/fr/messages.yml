@@ -295,6 +295,17 @@ wallet:
     common:
       pair_a_new_mobile: "Associer un nouveau téléphone"
 
+    errors:
+      pairing_failed: "Association échouée"
+      pairing_succeeded: "Association réussie"
+      dongle_is_now_paired: "Votre Ledger Wallet est maintenant associé<br />avec votre téléphone mobile \"%s\"."
+      inconsistent_state: "Quelque chose ne s'est pas bien déroulé (état inconsistant)."
+      client_cancelled: "L'application mobile a annulé la procédure d'association."
+      dongle_needs_power_cycle: "Votre Ledger Wallet nécessite d'être débranché puis rebranché<br />pour associer un nouveau téléphone mobile."
+      invalid_challenge_response: "Le code de validation de la carte de sécurité est incorrect."
+      dongle_cancelled: "Votre Ledger Wallet a annulé la procédure d'association."
+      unknown: "Une erreur inconnue est survenue."
+
     index:
       download_the_app: "<b>Téléchargez</b> l'application mobile Ledger Wallet."
       compatibility_details_available: "Détails de compatibilité et guides d'installation disponibles sur notre <b>centre d'aide</b>."
