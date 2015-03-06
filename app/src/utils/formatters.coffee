@@ -165,6 +165,61 @@ class ledger.formatters.bitcoin
 
 
 
+  ###
+    Currency formatter to BTC
+
+    @param [String] currency The currency that you want to convert
+    @param [Number] currencyValue The amount in the given currency
+    @return [String] The formatted amount in BTC
+  ###
+  @currencyToBTC: (currency, currencyValue) ->
+    return if not currency? || not currencyValue?
+
+    currencies = ledger.tasks.TickerTask.instance.getCache()
+    # btcValueCurrency is the amount in BTC for 1 in the given currency
+    btcValueCurrency = currencies[currency].values[1]['toBTC'].value
+    btcValue = btcValueCurrency * currencyValue
+
+    return btcValue.toFixed(8)
+
+
+  ###
+    Currency formatter to Satochi
+
+    @param [String] currency The currency that you want to convert
+    @param [Number] currencyValue The amount in the given currency
+    @return [String] The formatted amount in Satochi
+  ###
+  @currencyToSatochi: (currency, currencyValue) ->
+    return if not currency? || not currencyValue?
+
+    currencies = ledger.tasks.TickerTask.instance.getCache()
+    # satochiValueCurrency is the amount in Satochi for 1 in the given currency
+    satochiValueCurrency = currencies[currency].values[2]['toSatoshis'].value
+    satochiValue = satochiValueCurrency * currencyValue
+    l(satochiValue)
+    return satochiValue.toFixed()
+
+
+  ###
+    Formatter from Satochi to a given currency
+
+    @param [String] currency The currency to which you want your output
+    @param [Number] satochiValue The amount in Satochi
+    @return [String] The formatted amount in the given currency
+  ###
+  @satochiToCurrency: (currency, satochiValue) ->
+    return if not currency? || not satochiValue?
+
+    currencies = ledger.tasks.TickerTask.instance.getCache()
+    # currencyValueBTC is the amount in the given currency for 1 BTC
+    currencyValueBTC = currencies[currency].values[0]['fromBTC'].value
+    val = currencyValueBTC * Math.pow(10, -8)
+    currencyValueSatochi = val * satochiValue
+    return currencyValueSatochi.toFixed(4)
+
+
+
 
 ###
   Tests
@@ -179,3 +234,5 @@ class ledger.formatters.bitcoin
 #console.log(ledger.formatters.bitcoin.fromBtcToSatochi(1), 'fromBtcToSatochi');
 #console.log(ledger.formatters.bitcoin.fromMilliBtcToSatochi(1), 'fromMilliBtcToSatochi');
 #console.log(ledger.formatters.bitcoin.fromMicroBtcToSatochi(1), 'fromMicroBtcToSatochi');
+
+#console.log(ledger.formatters.bitcoin.currencyFormatterToBTC('USD', 1), 'currencyFormatterToBTC');

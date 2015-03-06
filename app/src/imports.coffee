@@ -150,6 +150,7 @@
         'restclients/balance_restclient'
         'restclients/sync_rest_client'
         'restclients/m2fa_restclient'
+        'restclients/currencies_restclient'
 
         ## Tasks
         'tasks/task'
@@ -159,6 +160,7 @@
         'tasks/operations_synchronization_task'
         'tasks/operations_consumption_task'
         'tasks/address_derivation_task'
+        'tasks/ticker_task'
 
         ## Wallet
         'wallet/hardware_wallet'

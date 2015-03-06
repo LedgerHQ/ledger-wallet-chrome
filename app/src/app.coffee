@@ -12,6 +12,7 @@ require @ledger.imports, ->
 
     onDongleConnected: (wallet) ->
       @emit 'dongle:connected', @wallet
+      ledger.tasks.TickerTask.instance.start()
 
     onDongleNeedsUnplug: (wallet) ->
       @emit 'dongle:unplugged', @wallet
