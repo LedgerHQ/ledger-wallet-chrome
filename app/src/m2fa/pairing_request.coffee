@@ -88,7 +88,7 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
     @_promise = null
     @_secureScreenName.failure('cancel')
     @_client.stopIfNeccessary()
-    @_onComplete = null
+    @_onComplete = new CompletionClosure()
     @emit 'cancel'
     do @off
 
