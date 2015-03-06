@@ -60,35 +60,33 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
         input.focus()
 
   _listenEvents: ->
+    self = @
     for input in @view.inputs
-      input.on 'keydown', (e) =>
-        return if @params.wallet_mode == 'create'
-        element = e.target
-        $(element).removeClass 'seed-invalid'
+      input.on 'keydown', ->
+        return if self.params.wallet_mode == 'create'
+        $(this).removeClass 'seed-invalid'
         setTimeout =>
-          @params.mnemonic = @_writtenMnemonic()
-          do @_updateUI
+          self.params.mnemonic = self._writtenMnemonic()
+          do self._updateUI
         , 0
-      input.on 'blur', (e) =>
-        return if @params.wallet_mode == 'create'
-        element = e.target
-        @_inputIsValid $(element)
+      input.on 'blur', ->
+        return if self.params.wallet_mode == 'create'
+        self._inputIsValid $(this)
           
-      input.on 'paste', (e) =>
-        element = e.target
+      input.on 'paste', ->
         setTimeout =>
-          words = $(element).val().split(/[^A-Za-z]/)
+          words = $(this).val().split(/[^A-Za-z]/)
           words = words.filter(Boolean)
           beginInput = 0
-          for input2 in @view.inputs
-            if input2[0] is $(element)[0]
-              beginInput = @view.inputs.indexOf(input2)
+          for tmp in self.view.inputs
+            if tmp[0] is $(this)[0]
+              beginInput = self.view.inputs.indexOf(tmp)
           for i in [0..words.length - 1]
-            if @view.inputs[i + beginInput]
-              @view.inputs[i + beginInput].val(words[i])
-              @_inputIsValid @view.inputs[i + beginInput]
-          @params.mnemonic = @_writtenMnemonic()
-          do @_updateUI
+            if self.view.inputs[i + beginInput]
+              self.view.inputs[i + beginInput].val(words[i])
+              self._inputIsValid self.view.inputs[i + beginInput]
+          self.params.mnemonic = self._writtenMnemonic()
+          do self._updateUI
         , 0
 
   _updateUI: (animated = yes) ->

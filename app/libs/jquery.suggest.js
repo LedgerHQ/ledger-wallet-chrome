@@ -7,64 +7,21 @@
  *
  * USAGE:
  *
- * $('#container').suggest(haystack, {
- *   suggestionColor   : '#cccccc',
- *   moreIndicatorClass: 'suggest-more',
- *   moreIndicatorText : '&hellip;'
- * });
+ * $('#container').suggest(haystack);
  *
  */
 
 (function($) {
 
-  $.fn.suggest = function(source, options) {
-
-    var settings = $.extend({
-      suggestionColor       : '#ccc',
-      moreIndicatorClass    : 'suggest-more',
-      moreIndicatorText     : '&hellip;'
-    }, options);
+  $.fn.suggest = function(source) {
 
     return this.each(function() {
 
       $this = $(this);
 
-      // this helper will show possible suggestions
-      // and needs to match the input field in style
       var $suggest = $('<div/>', {
-        'css' : {
-          'position'        : 'absolute',
-          'height'          : $this.height(),
-          'width'           : $this.width(),
-          'top'             : $this.css('borderTopWidth'),
-          'left'            : $this.css('borderLeftWidth'),
-          'padding'         : $this.cssShortForAllSides('padding'),
-          // 'margin'          : $this.cssShortForAllSides('margin'),
-          // 'fontFamily'      : $this.css('fontFamily'),
-          // 'fontSize'        : $this.css('fontSize'),
-          // 'fontStyle'       : $this.css('fontStyle'),
-          // 'lineHeight'      : $this.css('lineHeight'),
-          // 'fontWeight'      : $this.css('fontWeight'),
-          // 'letterSpacing'   : $this.css('letterSpacing'),
-          'backgroundColor' : $this.css('backgroundColor'),
-          'color'           : settings.suggestionColor
-        }
+        'class'             : 'suggest'
       });
-
-      var $more = $('<span/>', {
-        'css' : {
-          'position'        : 'absolute',
-          'top'             : $suggest.height() + parseInt($this.css('fontSize'), 10) / 2,
-          'left'            : $suggest.width(),
-          'display'         : 'block',
-          'fontSize'        : $this.css('fontSize'),
-          'fontFamily'      : $this.css('fontFamily'),
-          'color'           : settings.suggestionColor
-        },
-        'class'             : settings.moreIndicatorClass
-      })
-      .html(settings.moreIndicatorText)
-      .hide();
 
       $this
         .attr({
@@ -135,9 +92,6 @@
             return false;
           }
 
-          // be default we hide the "more suggestions" indicator
-          $more.hide();
-
           // what has been input?
           var needle = $(this).val();
 
@@ -191,11 +145,7 @@
               'suggest': $suggest
             });
 
-            // show the indicator that there's more suggestions available
-            // only for more than one suggestion
-            if (suggestions.length > 1) {
-              $more.show();
-            }
+
           }
         })
 
@@ -206,26 +156,9 @@
 
         // insert the suggestion helpers within the wrapper
         $suggest.insertAfter($this);
-        // $more.insertAfter($suggest);
 
     });
 
   };
 
-  /* A little helper to calculate the sum of different
-   * CSS properties around all four sides
-   *
-   * EXAMPLE:
-   * $('#my-div').cssSum('padding');
-   */
-  $.fn.cssShortForAllSides = function(property) {
-    var $self = $(this), sum = [];
-    var properties = $.map(['Top', 'Right', 'Bottom', 'Left'], function(side){
-      return property + side;
-    });
-    $.each(properties, function(i, e) {
-      sum.push($self.css(e) || "0");
-    });
-    return sum.join(' ');
-  };
 })(jQuery);
