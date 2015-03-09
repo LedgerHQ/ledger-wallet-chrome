@@ -14,6 +14,7 @@ class ledger.api.RestClient
     @_client ||= @_httpClientFactory()
     @_client.setHttpHeader 'X-Ledger-Locale', chrome.i18n.getUILanguage()
     @_client.setHttpHeader 'X-Ledger-Platform', 'chrome'
+    @_client.setHttpHeader 'X-Ledger-Environment', ledger.env
     @_client
 
   networkErrorCallback: (callback) ->
