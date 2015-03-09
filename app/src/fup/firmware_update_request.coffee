@@ -18,6 +18,7 @@ Errors =
   InconsistentState: "InconsistentState"
   InvalidSeedSize: "Invalid seed size. The seed must have 32 characters"
   InvalidSeedFormat: "Invalid seed format. The seed must represent a hexadecimal value"
+  GetVersionError: "GetVersionError"
 
 ###
   FirmwareUpdateRequest performs dongle firmware updates. Once started it will listen the {WalletsManager} in order to catch
@@ -47,6 +48,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_isNeedingUserApproval = no
     @_lastMode = Modes.Os
     @_lastVersion = undefined
+    @_isOsLoaded = no
 
   ###
     Stops all current tasks and listened events.
@@ -146,7 +148,18 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_setCurrentState(States.Erasing)
         @_handleCurrentState()
       else
-        @_getVersion()
+        @_getVersion (version, error) =>
+          @_failure(Errors.GetVersionError) if error?
+          @_lastVersion = version
+          if ledger.fup.compareVersions(@_lastVersion, ledger.fup.versions.Nano.CurrentVersion.Os).eq()
+            @_currentState = States.InitializingOs
+            @_handleCurrentState()
+          else if ledger.fup.versions.compareVersions(@_lastVersion, ledger.fup.versions.Nano.CurrentVersion.Os).gt()
+            # TODO: Report current version is higher
+          else
+
+
+
 
   _processErasing: ->
     @_waitForUserApproval()
