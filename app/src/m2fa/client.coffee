@@ -67,6 +67,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
     @_connectionPromise
 
   _leaveRoom: () ->
+    return unless @ws?
     [ws, @ws, @_connectionPromise] = [@ws, undefined, undefined]
     ws.onclose = undefined
     ws.send JSON.stringify(type: 'leave') if ws.readyState == WebSocket.OPEN
@@ -121,7 +122,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
   # If the 'request' message is accepted, the message must contain the "pin" parameter in order to validate the transaction.
   # @params [Object] data {"type": "response", "pin": "xxxxxxxxxxxx..."}
   _onResponse: (data) ->
-    if data['is_accepted']
+    if data.is_accepted
       @emit 'm2fa.response', data.pin
     else
       @emit 'm2fa.reject'
