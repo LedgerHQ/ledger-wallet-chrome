@@ -73,15 +73,12 @@ class AuthenticatedHttpClient extends @HttpClient
   isAuthenticated: -> if @_authToken? then yes else no
 
   _authenticate: () ->
-    l "_authenticate()"
     return @_deferredAuthentication if @_deferredAuthentication?
-    l "Create new defer"
     @_deferredAuthentication = jQuery.Deferred()
     @_performAuthenticate(@_deferredAuthentication)
     @_deferredAuthentication
 
   _performAuthenticate: (deferred) ->
-    l "_performAuthenticate"
     bitidAddress = null
     deferred.retryNumber ?= 3
     CompletionClosure.defer(ledger.app.wallet.getBitIdAddress, ledger.app.wallet).jq()
