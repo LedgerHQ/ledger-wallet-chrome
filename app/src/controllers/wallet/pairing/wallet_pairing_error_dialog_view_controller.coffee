@@ -1,1 +1,0 @@
-class @WalletPairingErrorDialogViewController extends DialogViewController

@@ -23,12 +23,12 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
     DEAD: 3
 
   @Errors:
-    InconsistentState: "Inconsistent state"
-    ClientCancelled: "Client cancelled: consider power cycling your dongle"
-    NeedPowerCycle: "Dongle needs to be power cycled"
-    InvalidChallengeResponse: "Invalid challenge response"
-    Cancelled: "Cancelled"
-    UnknownError: "Unknown error"
+    InconsistentState: "inconsistent_state"
+    ClientCancelled: "client_cancelled"
+    NeedPowerCycle: "dongle_needs_power_cycle"
+    InvalidChallengeResponse: "invalid_challenge_response"
+    Cancelled: "dongle_cancelled"
+    UnknownError: "unknown"
 
   constructor: (pairindId, promise, client) ->
     @pairingId = pairindId

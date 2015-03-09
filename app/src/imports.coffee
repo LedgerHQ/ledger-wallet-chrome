@@ -205,6 +205,7 @@
         ## Common controllers
         # Dialogs
         'controllers/common/dialogs/common_dialogs_confirmation_dialog_view_controller'
+        'controllers/common/dialogs/common_dialogs_message_dialog_view_controller'
 
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller'
@@ -255,8 +256,6 @@
         # Pairing
         'controllers/wallet/pairing/wallet_pairing_index_dialog_view_controller'
         'controllers/wallet/pairing/wallet_pairing_progress_dialog_view_controller'
-        'controllers/wallet/pairing/wallet_pairing_error_dialog_view_controller'
-        'controllers/wallet/pairing/wallet_pairing_success_dialog_view_controller'
         'controllers/wallet/pairing/wallet_pairing_finalizing_dialog_view_controller'
 
         # Specs
