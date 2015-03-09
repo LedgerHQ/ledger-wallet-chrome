@@ -46,6 +46,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
 
   # Redefine from Task
   onStop: () ->
+    ledger.m2fa.clients = _.omit(ledger.m2fa.clients, @pairingId)
     @_leaveRoom()
 
   _joinRoom: (pairingId) ->
