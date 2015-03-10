@@ -51,6 +51,10 @@ class @ledger.dialogs.DialogController extends EventEmitter
       viewController.onAttach()
       @emit 'push', {sender: @, viewController: viewController}
     @setCancellable(if viewController.cancellable? then viewController.cancellable else yes)
+    if @isCancellable()
+      @_containerSelector?.addClass("clickable")
+    else
+      @_containerSelector?.removeClass("clickable")
 
   _pushViewController: (viewController) ->
     @_viewController?.onDetach()
@@ -104,6 +108,7 @@ class @ledger.dialogs.DialogsController
 
     dialog._level = @_dialogs.length
     dialog._id = _.uniqueId()
+
     @_selector.show(0, =>  @_selector.addClass('display')) if @_dialogs.length is 0
 
     @_selector.append(JST['base/dialog']({dialog_id: dialog._id}))
@@ -111,7 +116,9 @@ class @ledger.dialogs.DialogsController
     if @_dialogs.length == 0
       @_selector.show()
 
-    container = @_selector.find("#dialog_container_#{dialog._id}")
+    dialog._containerSelector = @_selector.find("#dialog_container_#{dialog._id}")
+    dialog._containerSelector.addClass("clickable") if dialog.isCancellable()
+    container = dialog._containerSelector
     container.addClass('display')
     container.on 'click', (e) =>
       dialog.dismiss() if !e.isDefaultPrevented() and dialog.isCancellable()

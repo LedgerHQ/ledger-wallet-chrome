@@ -13,6 +13,7 @@ class @DialogViewController extends ViewController
     @_dialog = ledger.dialogs.manager.create()
     @_dialog.push this
     @parentViewController.show()
+    @
 
   identifier: () ->
     @className().replace 'DialogViewController', ''

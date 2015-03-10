@@ -1,5 +1,7 @@
 class @WalletPairingFinalizingDialogViewController extends DialogViewController
 
+  cancellable: no
+
   view:
     phoneNameInput: '#phone_name_input'
     errorLabel: "#error_label"
