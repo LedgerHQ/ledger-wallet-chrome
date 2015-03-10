@@ -37,6 +37,7 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
     @_client.pairedDongleName = @_secureScreenName
     @_currentState = ledger.m2fa.PairingRequest.States.WAITING
     @_onComplete = new CompletionClosure()
+    @_identifyData = {}
 
     promise.then(
       (result) =>
@@ -58,12 +59,12 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
         try
           switch progress
             when 'pubKeyReceived'
-              @_identifyData = _.clone(@client.lastIdentifyData)
-              return _failure(ledger.m2fa.PairingRequest.Errors.InconsistentState) if @_currentState isnt ledger.m2fa.PairingRequest.States.WAITING
+              @_identifyData = _.clone(@_client.lastIdentifyData)
+              return @_failure(ledger.m2fa.PairingRequest.Errors.InconsistentState) if @_currentState isnt ledger.m2fa.PairingRequest.States.WAITING
               @_currentState = ledger.m2fa.PairingRequest.States.CHALLENGING
               @emit 'join'
             when 'challengeReceived'
-              return _failure(ledger.m2fa.PairingRequest.Errors.InconsistentState) if @_currentState isnt ledger.m2fa.PairingRequest.States.CHALLENGING
+              return @_failure(ledger.m2fa.PairingRequest.Errors.InconsistentState) if @_currentState isnt ledger.m2fa.PairingRequest.States.CHALLENGING
               @_currentState = ledger.m2fa.PairingRequest.States.FINISHING
               @emit 'answerChallenge'
             when 'secureScreenDisconnect'
@@ -87,7 +88,7 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
 
   getSuggestedDeviceName: -> @_identifyData?['name']
 
-  getDeviceUuid: -> @_identifyData?['']
+  getDeviceUuid: -> @_identifyData?['uuid']
 
   cancel: () ->
     @_promise = null

@@ -17,7 +17,8 @@ class @DialogViewController extends ViewController
   getDialog: () -> @_dialog
 
   # Dismiss the current view controller
-  dismiss: () ->
+  dismiss: (callback = undefined) ->
+    @once 'dismiss', -> callback?()
     @_dialog.dismiss()
 
   # Called once the dialog has been shown

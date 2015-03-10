@@ -9,13 +9,12 @@ class @WalletPairingFinalizingDialogViewController extends DialogViewController
     @_request = @params.request
     @_request?.onComplete (screen, error) =>
       @_request = null
-      @once 'dismiss', =>
+      @dismiss =>
         if screen?
           dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.pairing.errors.pairing_succeeded"), subtitle: _.str.sprintf(t("wallet.pairing.errors.dongle_is_now_paired"), screen.name))
         else
           dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.pairing.errors.pairing_failed"), subtitle: t("wallet.pairing.errors." + error))
         dialog.show()
-      @dismiss()
     # setup ui
     @view.errorLabel.hide()
     suggestedName = if @_request.getSuggestedDeviceName()?.length == 0 then t 'wallet.pairing.finalizing.default_name' else @_request.getSuggestedDeviceName()
