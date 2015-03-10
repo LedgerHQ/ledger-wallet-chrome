@@ -18,7 +18,8 @@ class @WalletPairingFinalizingDialogViewController extends DialogViewController
       @dismiss()
     # setup ui
     @view.errorLabel.hide()
-    @view.phoneNameInput.val(t 'wallet.pairing.finalizing.default_name')
+    suggestedName = if @_request.getSuggestedDeviceName()?.length == 0 then t 'wallet.pairing.finalizing.default_name' else @_request.getSuggestedDeviceName()
+    @view.phoneNameInput.val(suggestedName)
     _.defer =>
       @view.phoneNameInput.focus()
       @view.phoneNameInput.on 'blur', =>

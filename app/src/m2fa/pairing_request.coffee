@@ -84,6 +84,8 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
 
   getCurrentState: () -> @_currentState
 
+  getSuggestedDeviceName: -> @_client.lastIdentifyData['name']
+
   cancel: () ->
     @_promise = null
     @_secureScreenName.failure('cancel')
