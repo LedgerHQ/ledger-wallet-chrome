@@ -108,6 +108,7 @@
         'utils/qr_codes'
         'utils/lru'
         'utils/formatters'
+        'utils/converters'
         'utils/stream'
         'utils/completion_closure'
         'utils/try'
@@ -265,6 +266,8 @@
         '../spec/restclients/synced_rest_client_spec'
         '../spec/utils/storage/synced_store_spec'
         '../spec/utils/bitcoin/bip39_spec'
+        '../spec/utils/formatters_spec'
+        '../spec/utils/converters_spec'
 
         '../spec/m2fa/client_spec'
         '../spec/m2fa/m2fa_spec'

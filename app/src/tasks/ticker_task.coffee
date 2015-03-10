@@ -22,7 +22,6 @@ class ledger.tasks.TickerTask extends ledger.tasks.Task
     @_currenciesRestClient = new ledger.api.CurrenciesRestClient
     @_cache = new CurrencyCache
 
-
   # Create a single instance of TickerTask
   @instance: new @()
 
