@@ -58,6 +58,7 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
         try
           switch progress
             when 'pubKeyReceived'
+              @_identifyData = _.clone(@client.lastIdentifyData)
               return _failure(ledger.m2fa.PairingRequest.Errors.InconsistentState) if @_currentState isnt ledger.m2fa.PairingRequest.States.WAITING
               @_currentState = ledger.m2fa.PairingRequest.States.CHALLENGING
               @emit 'join'
@@ -84,7 +85,9 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
 
   getCurrentState: () -> @_currentState
 
-  getSuggestedDeviceName: -> @_client.lastIdentifyData['name']
+  getSuggestedDeviceName: -> @_identifyData?['name']
+
+  getDeviceUuid: -> @_identifyData?['']
 
   cancel: () ->
     @_promise = null

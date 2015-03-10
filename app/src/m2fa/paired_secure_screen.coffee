@@ -85,3 +85,28 @@ class ledger.m2fa.PairedSecureScreen
     closure.readonly()
 
   @getByNameFromSyncedStore: (name, callback = _.noop) -> @getByNameFromStore(ledger.storage.sync, name, callback)
+
+  @getAllGroupedByPropertyFromStore: (store, property, callback = _.noop) ->
+    closure = new CompletionClosure(callback)
+    @getAllFromStore store, (screens, error) ->
+      return closure.failure(error) if error?
+      groups = _.groupBy screens, (s) -> s[property]
+      closure.success(groups)
+    closure.readonly()
+
+  @getAllGroupedByPropertyFromSyncedStore: (property, callback = _.noop) -> @getAllGroupedByPropertyFromStore(ledger.storage.sync, property, callback)
+
+  @getAllGroupedByUuidFromStore: (store, callback = _.noop) -> @getAllGroupedByPropertyFromStore(store, 'uuid', callback)
+
+  @getAllGroupedByUuidFromSyncedStore: (callback = _.noop) -> @getAllGroupedByUuidFromStore(ledger.storage.sync, callback)
+
+  @getScreensByUuidFromStore: (store, uuid, callback = _.noop) ->
+    closure = new CompletionClosure(callback)
+    @getAllFromStore store, (result, error) ->
+      return closure.failure(error) if error?
+      closure.success(_(result).where(uuid: uuid))
+    closure.readonly()
+
+  @getScreensByUuidFromSyncedStore: (uuid, callback = _.noop) -> @getScreensByUuidFromStore(ledger.storage.sync, uuid, callback)
+
+
