@@ -10,6 +10,8 @@ common:
   close: "Close"
   cancel: "Cancel"
   finish: "Finish"
+  confirm: "Confirm"
+  send: "Send"
   yes: "Si"
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
@@ -244,18 +246,17 @@ wallet:
       close: "CANCELAR"
 
   send:
+    common:
+      send_bitcoins: "ENVIAR BITCOINS"
+
     index:
-      title: "ENVIAR BITCOINS"
-      amount: "CANTIDAD"
+      amount: "Cantidad"
       amount_placeholder: "Cantidad"
-      sender_account: "CUENTA DEBITADA"
-      receiver_address: "DIRECCIÓN DE RECEPCIÓN BITCOIN"
-      receiver_address_placeholder: "Dirección bitcoin"
-      total_spent: "TOTAL DEBITADO"
+      sender_account: "Cuenta debitada"
+      receiver_address: "Dirección de recepción bitcoin"
+      receiver_address_placeholder: "Dirección Bitcoin"
+      total_spent: "Total debitado"
       transaction_fees_text: "(+0.0001 BTC gastos de transacción)"
-      send: "ENVOYER"
-      close: "ANNULER"
-      confirm: "CONFIRMER"
       close_scanner: "Close scanner"
       qr_scanner: "Scan QR code"
 

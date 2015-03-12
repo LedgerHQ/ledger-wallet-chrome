@@ -10,6 +10,8 @@ common:
   close: "Close"
   cancel: "Cancel"
   finish: "Finish"
+  confirm: "Confirm"
+  send: "Send"
   yes: "Yes"
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
@@ -244,18 +246,17 @@ wallet:
       close: "CLOSE"
 
   send:
+    common:
+      send_bitcoins: "Send Bitcoins"
+
     index:
-      title: "SEND BITCOINS"
-      amount: "AMOUNT"
+      amount: "Amount"
       amount_placeholder: "Amount"
-      sender_account: "DEBIT ACCOUNT"
-      receiver_address: "RECIPIENT BITCOIN ADDRESS"
+      sender_account: "Debit account"
+      receiver_address: "Recipient Bitcoin address"
       receiver_address_placeholder: "Bitcoin address"
-      total_spent: "TOTAL SPENT"
+      total_spent: "Total spent"
       transaction_fees_text: "(incl. 0.0001 BTC of transaction fees)"
-      send: "SEND"
-      close: "CLOSE"
-      confirm: "CONFIRM"
       close_scanner: "Close scanner"
       qr_scanner: "Scan QR code"
 

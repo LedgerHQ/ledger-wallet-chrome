@@ -10,6 +10,8 @@ common:
   close: "Fermer"
   cancel: "Annuler"
   finish: "Terminer"
+  confirm: "Confirmer"
+  send: "Envoyer"
   yes: "Oui"
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
@@ -244,18 +246,17 @@ wallet:
       close: "ANNULER"
 
   send:
+    common:
+      send_bitcoins: "Envoyer des Bitcoins"
+
     index:
-      title: "ENVOYER DES BITCOINS"
-      amount: "MONTANT"
+      amount: "Montant"
       amount_placeholder: "Montant"
-      sender_account: "COMPTE À DÉBITER"
-      receiver_address: "ADRESSE BITCOIN À CRÉDITER"
-      receiver_address_placeholder: "Adresse bitcoin"
-      total_spent: "TOTAL DÉPENSÉ"
+      sender_account: "Compte à débiter"
+      receiver_address: "Adresse Bitcoin du destinataire"
+      receiver_address_placeholder: "Adresse Bitcoin"
+      total_spent: "Total dépensé"
       transaction_fees_text: "(dont 0.0001 BTC de frais de transaction)"
-      send: "ENVOYER"
-      close: "ANNULER"
-      confirm: "CONFIRMER"
       close_scanner: "Fermer scanner"
       qr_scanner: "Scanner code QR"
 
