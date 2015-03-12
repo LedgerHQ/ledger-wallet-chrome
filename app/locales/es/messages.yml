@@ -202,7 +202,7 @@ wallet:
       status: "Estado"
       sender: "Desde"
       receiver: "a"
-      identifier: "Identificación de la transacción"
+      identifier: "Identificación"
       send_by_email: "ENVIAR POR MAIL"
       print: "IMPRIMIR"
       close: "CERRAR"

@@ -202,7 +202,7 @@ wallet:
       status: "Status"
       sender: "From"
       receiver: "To"
-      identifier: "Identifiant"
+      identifier: "Identifier"
       send_by_email: "SEND BY EMAIL"
       print: "PRINT"
       close: "CLOSE"
