@@ -89,6 +89,37 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @return [Integer] Firmware version, 0x20010000010f for example.
   getIntFirmwareVersion: -> @firmwareVersion
 
+  ###
+    Gets the raw version {ByteString} of the dongle.
+
+    @param [Boolean] isInBootLoaderMode Must be true if the current dongle is in bootloader mode.
+    @param [Boolean] forceBl Force the call in BootLoader mode
+    @param [Function] callback Called once the version is retrieved. The callback must be prototyped like size `(version, error) ->`
+    @return [CompletionClosure]
+  ###
+  getRawFirmwareVersion: (isInBootLoaderMode, forceBl=no, callback=undefined) ->
+    completion = new CompletionClosure(callback)
+    apdu = new ByteString((if !isInBootLoaderMode and !forceBl then "E0C4000000" else "F001000000"), HEX)
+    @_sendApdu(apdu).then (result) =>
+      sw = @_btchip.card.SW
+      if !isInBootLoaderMode and !forceBl
+        if sw is 0x9000
+          completion.success([result.byteAt(1), (result.byteAt(2) << 16) + (result.byteAt(3) << 8) + result.byteAt(4)])
+        else
+          # Not initialized now - Retry
+          @getRawFirmwareVersion(isInBootLoaderMode, yes).thenForward(completion)
+      else
+        if sw is 0x9000
+          completion.success([0, (result.byteAt(5) << 16) + (result.byteAt(6) << 8) + result.byteAt(7)])
+        else if !isInBootLoaderMode and (sw is 0x6d00 or sw is 0x6e00)
+          #  Unexpected - let's say it's 1.4.3
+          completion.success([0, (1 << 16) + (4 << 8) + (3)])
+        else
+          completion.failure(new ledger.StandardError(ledger.errors.UnknowError, "Failed to get version"))
+    .fail (error) ->
+      completion.failure(new ledger.StandardError(ledger.errors.UnknowError, error))
+    completion.readonly()
+
   # @return [ledger.fup.FirmwareUpdater]
   getFirmwareUpdater: () -> ledger.fup.FirmwareUpdater.instance
 
@@ -106,38 +137,21 @@ class @ledger.dongle.Dongle extends EventEmitter
     # 24.2. GET DEVICE ATTESTATION
     @_sendApdu(new ByteString("E0"+"C2"+"00"+"00"+"08"+random, HEX), [0x9000])
     .then (result) =>
-      result = result.toString(HEX)
-      fields = result.match(/^(\w{8})(\w{8})(\w{2})(\w{2})(\w{4})(\w{2})(\w{2})(\w{2})(\w{2})(\w+)$/)[1..-1]
-      fieldsSigned = attestation[2..8]
-      signature = attestation[-1]
-      @attestation =
-        raw: result
-        keyBatchId: attestation.substring(0, 8)
-        keyDerivationId: attestation.substring(8, 16)
-        supportedOperationBitFlag: attestation.substring(16, 18)
-        currentOperationMode: attestation.substring(18, 20)
-        firmwareMajor: attestation.substring(20, 24)
-        firmwareMinor: attestation.substring(24, 26)
-        firmarePatch: attestation.substring(26, 28)
-        loaderIdMajor: attestation.substring(28, 30)
-        loaderIdMinor: attestation.substring(30, 32)
-        signature: attestation.substring(32)
-      l "Device attestation :", fieldsSigned, random, signature
-      try
-        SHA256 = new JSUCrypt.hash.SHA256()
-        domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
-        aKey = ledger.wallet.Attestation.String.match(/^(\w{2})(\w{64})(\w{64})$/)
-        affinePoint = new JSUCrypt.ECFp.AffinePoint(aKey[2], aKey[3], ecdhdomain.curve)
-        pubKey = new JSUCrypt.key.EcFpPublicKey(256, domain, affinePoint)
-        ecsig = new JSUCrypt.signature.ECDSA(SHA256)
-        ecsig.init(pubKey, JSUCrypt.signature.MODE_VERIFY)
-        sigBytes = (parseInt(n, 16) for n in @attestation.signature.match(/\w\w/g))
-        verif = ecsig.verify(random, sigBytes)
-        l sigBytes
-        l 'Verif', verif
-      catch err
-        error = new Errors.StandardError(Errors.SignatureError, err)
-        completion.failure(error)
+      attestation = result.toString(HEX)
+      dataToSign = attestation.substring(16,32) + random
+      dataSig = attestation.substring(32)
+      dataSigBytes = (parseInt(n,16) for n in dataSig.match(/\w\w/g))
+
+      sha = new JSUCrypt.hash.SHA256()
+      domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
+      affinePoint = new JSUCrypt.ECFp.AffinePoint(Attestation.xPoint, Attestation.yPoint)
+      pubkey = new JSUCrypt.key.EcFpPublicKey(256, domain, affinePoint)
+      ecsig = new JSUCrypt.signature.ECDSA(sha)
+      ecsig.init(pubkey, JSUCrypt.signature.MODE_VERIFY)
+      if ecsig.verify(dataToSign, dataSigBytes)
+        completion.success()
+      else
+        completion.failure()
     .fail (err) =>
       error = new Errors.StandardError(Errors.SignatureError, err)
       completion.failure(error)
