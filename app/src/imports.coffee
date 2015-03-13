@@ -111,6 +111,7 @@
         'utils/stream'
         'utils/completion_closure'
         'utils/try'
+        'utils/comparison_result'
 
         ## Crypto
         'utils/crypto/aes'
@@ -188,6 +189,7 @@
         'fup/firmware_update_request'
         'fup/firmware_updater'
         'fup/firmwares_manifest'
+        'fup/utils'
 
         ## Models
         'models/wallet'

@@ -47,7 +47,7 @@ onboarding:
       you_can_unplug: "You can now safely unplug your Ledger Wallet."
 
     pin:
-      enter_your_pin_code: "Enter you PIN code to unlock your wallet:"
+      enter_your_pin_code: "Enter your PIN code to unlock your wallet:"
       i_lost_my_pin_code: "If you forgot your PIN code, visit our help center."
 
     opening:
@@ -202,7 +202,7 @@ wallet:
       status: "Status"
       sender: "From"
       receiver: "To"
-      identifier: "Identifiant"
+      identifier: "Identifier"
       send_by_email: "SEND BY EMAIL"
       print: "PRINT"
       close: "CLOSE"
@@ -309,7 +309,7 @@ wallet:
     index:
       download_the_app: "<b>Download</b> the Ledger Wallet mobile app."
       compatibility_details_available: "Compatibility details and installation guides are available from our <b>help center</b>."
-      open_the_app: "<b>Scan<b/> the pairing QR code."
+      open_the_app: "<b>Scan</b> the pairing QR code."
       tap_pair: "Tap “Pair a new Ledger Wallet” to start the scanner."
       scan_this_qrcode: "Scan this pairing QR code."
 

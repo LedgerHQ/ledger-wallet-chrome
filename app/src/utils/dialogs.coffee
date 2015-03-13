@@ -8,6 +8,7 @@ class @ledger.dialogs.DialogController extends EventEmitter
     @_controller = controller
     @_shown = no
     @_backStack = []
+    @_cancellable = true
 
   # Show the dialog
   show: ->
@@ -19,6 +20,12 @@ class @ledger.dialogs.DialogController extends EventEmitter
     @emit 'show'
 
   isShown: -> @_shown
+
+  setCancellable: (cancellable) -> @_cancellable = cancellable
+
+  isCancellable: -> @_cancellable
+
+  getId: () -> @_id
 
   onDismiss: ->
     @_viewController.onDetach()
@@ -43,6 +50,11 @@ class @ledger.dialogs.DialogController extends EventEmitter
       viewController.parentViewController = @
       viewController.onAttach()
       @emit 'push', {sender: @, viewController: viewController}
+    @setCancellable(if viewController.cancellable? then viewController.cancellable else yes)
+    if @isCancellable()
+      @_containerSelector?.addClass("clickable")
+    else
+      @_containerSelector?.removeClass("clickable")
 
   _pushViewController: (viewController) ->
     @_viewController?.onDetach()
@@ -81,8 +93,8 @@ class @ledger.dialogs.DialogsController
     @_selector = selector
     @_selector.css('visibility', 'visible') # To remove 'visibility: hidden' in layout.html (prevent clipping)
     @_selector.hide()
-    @_selector.on 'click', (e) =>
-      @dismissAll() unless e.isDefaultPrevented()
+    #@_selector.on 'click', (e) =>
+      #@dismissAll() unless e.isDefaultPrevented()
 
   # Create a new instance of a dialog controller
   # @param options [Hash] Set of options for creating the dialog controller
@@ -96,6 +108,7 @@ class @ledger.dialogs.DialogsController
 
     dialog._level = @_dialogs.length
     dialog._id = _.uniqueId()
+
     @_selector.show(0, =>  @_selector.addClass('display')) if @_dialogs.length is 0
 
     @_selector.append(JST['base/dialog']({dialog_id: dialog._id}))
@@ -103,7 +116,12 @@ class @ledger.dialogs.DialogsController
     if @_dialogs.length == 0
       @_selector.show()
 
-    @_selector.find("#dialog_container_#{dialog._id}").addClass('display')
+    dialog._containerSelector = @_selector.find("#dialog_container_#{dialog._id}")
+    dialog._containerSelector.addClass("clickable") if dialog.isCancellable()
+    container = dialog._containerSelector
+    container.addClass('display')
+    container.on 'click', (e) =>
+      dialog.dismiss() if !e.isDefaultPrevented() and dialog.isCancellable()
 
     @_dialogs.push dialog
     dialog.render @_selector.find("#dialog_#{dialog._id}"), =>
@@ -128,8 +146,8 @@ class @ledger.dialogs.DialogsController
 
   dismissAll: (animated = yes) ->
     return if @_dialogs.length == 0
-    dialog = @_dialogs[0]
-    dialog.dismiss(animated)
+    while @_dialogs.length > 0
+      @_dialogs[@_dialogs.length - 1].dismiss(animated)
 
   displayedDialog: () -> @_dialogs[@_dialogs.length - 1]
 

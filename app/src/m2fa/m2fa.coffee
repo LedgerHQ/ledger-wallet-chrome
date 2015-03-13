@@ -41,8 +41,12 @@ _.extend @ledger.m2fa,
   # Allow you to assign a label to a pairingId (ex: "mobile Pierre").
   # @params [String] pairingId
   # @params [String] label
-  saveSecureScreen: (pairingId, label) ->
-    ledger.m2fa.PairedSecureScreen.create(pairingId, label).toSyncedStore()
+  saveSecureScreen: (pairingId, screenData) ->
+    data =
+      name: screenData['name']
+      platform: screenData['platform']
+      uuid: screenData['uuid']
+    ledger.m2fa.PairedSecureScreen.create(pairingId, data).toSyncedStore()
 
   # @return Promise an object where each key is pairingId and the value the associated label.
   getPairingIds: () ->
@@ -160,16 +164,18 @@ _.extend @ledger.m2fa,
       client.stopIfNeccessary()
 
   _onChallenge: (client, data, d) ->
+    screenData = _.clone(client.lastIdentifyData)
     d.notify("challengeReceived")
     l("%c[_onChallenge] challengeReceived", "color: #4444cc", data)
     try
       ledger.wallet.safe().confirmSecureScreen(data).then( =>
-        l("%c[_onChallenge] SUCCESS !!!", "color: #00ff00" )
+        l("%c[_onChallenge] SUCCESS !!!", "color: #00ff00", data )
         client.confirmPairing()
         d.notify("secureScreenConfirmed")
         client.pairedDongleName.onComplete (name, err) =>
           return d.reject('cancel') if err?
-          d.resolve @saveSecureScreen(client.pairingId, name)
+          screenData['name'] = name
+          d.resolve @saveSecureScreen(client.pairingId, screenData)
       ).fail( (e) =>
         l("%c[_onChallenge] >>>  FAILURE  <<<", "color: #ff0000", e)
         client.rejectPairing()

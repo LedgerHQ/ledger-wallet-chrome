@@ -46,6 +46,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
 
   # Redefine from Task
   onStop: () ->
+    ledger.m2fa.clients = _.omit(ledger.m2fa.clients, @pairingId)
     @_leaveRoom()
 
   _joinRoom: (pairingId) ->
@@ -130,6 +131,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
   # Sent by mobile clients to transmit their generated public key.
   # @params [Object] data {"type": "identity", "public_key": "xxxxxxxxxxxx..."}
   _onIdentify: (data) ->
+    @lastIdentifyData = data
     @emit 'm2fa.identify', data.public_key
 
   # Sent by mobile apps to transmit their previously received challenge response.
