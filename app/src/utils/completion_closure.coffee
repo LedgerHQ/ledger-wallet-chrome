@@ -148,6 +148,24 @@ class @CompletionClosure
     @_tryFulfill()
 
   ###
+    @overload
+      @param [CompletionClosure] defer
+      @return [CompletionClosure] self
+
+    @overload
+      @param [Q.defer] defer
+      @return [CompletionClosure] self
+  ###
+  thenForward: (defer) ->
+    deferType = typeof defer
+    if deferType == 'object' && defer instanceof CompletionClosure
+      @then( (=> defer.success.apply(defer, arguments)), (=> defer.failure.apply(defer, arguments)) )
+    else if deferType == 'object' && defer instanceof Q.defer
+      @then( (=> defer.resolve.apply(defer, arguments)), (=> defer.reject.apply(defer, arguments)) )
+    else
+      throw new ArgumentError(if promiseType == 'object' then promise.constructor.name else promiseType)
+
+  ###
     Returns 'yes' if completed else 'no'
     @return [Boolean]
   ###
