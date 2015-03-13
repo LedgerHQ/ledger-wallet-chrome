@@ -108,6 +108,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route 'update/plug', (params) ->
     app.navigate UPDATE_LAYOUT, UpdatePlugViewController
 
+  route 'update/unplug', (params) ->
+    app.navigate UPDATE_LAYOUT, UpdateUnplugViewController
+
   route 'update/seed', (param) ->
     app.navigate UPDATE_LAYOUT, UpdateSeedViewController
 

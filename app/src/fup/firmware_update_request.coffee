@@ -49,6 +49,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_lastMode = Modes.Os
     @_lastVersion = undefined
     @_isOsLoaded = no
+    @_approvedStates = []
+    @_stateCache = {} # This holds the state related data
 
   ###
     Stops all current tasks and listened events.
@@ -72,9 +74,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @throw If the seed length is not 32 or if it is malformed
   ###
   setKeyCardSeed: (keyCardSeed) ->
-    throw Errors.InvalidSeedSize if not keyCardSeed? or keyCardSeed.length != 32
+    throw new Error(Errors.InvalidSeedSize) if not keyCardSeed? or keyCardSeed.length != 32
     seed = Try => new ByteString(keyCardSeed, HEX)
-    throw Errors.InvalidSeedFormat if seed.isFailure() or seed.getValue()?.length != 16
+    throw new Error(Errors.InvalidSeedFormat) if seed.isFailure() or seed.getValue()?.length != 16
     @_keyCardSeed = seed.getValue()
     @emit "setKeyCardSeed"
     @_handleCurrentState()
@@ -94,17 +96,24 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   hasKeyCardSeed: () -> if @_keyCardSeed? then yes else no
 
   _waitForConnectedDongle: (callback = undefined) ->
+    return @_connectionCompletion if @_connectionCompletion?
     completion = new CompletionClosure(callback)
     registerWallet = (wallet) =>
       @_wallet = wallet
-      wallet.once 'disconnected', => @_wallet = null
+      wallet.once 'disconnected', =>
+        @_setCurrentState(States.Undefined)
+        @_wallet = null
+        @_waitForConnectedDongle()
+      @_handleCurrentState()
       completion.success(wallet)
 
     [wallet] = ledger.app.walletsManager.getConnectedWallets()
     try
       unless wallet?
+        @_connectionCompletion = completion.readonly()
         _.defer => @emit 'plug'
         ledger.app.walletsManager.once 'connected', (e, wallet) =>
+          @_connectionCompletion = null
           registerWallet(wallet)
       else
         registerWallet(wallet)
@@ -112,11 +121,15 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       e er
     completion.readonly()
 
+
   _waitForDisconnectDongle: (callback = undefined) ->
+    return @_disconnectionCompletion if @_disconnectionCompletion?
     completion = new CompletionClosure(callback)
     if @_wallet?
       @emit 'unplug'
+      @_disconnectionCompletion = completion.readonly()
       @_wallet.once 'disconnected', =>
+        @_disconnectionCompletion = null
         @_wallet = null
         completion.success()
     else
@@ -158,31 +171,20 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
             # TODO: Report current version is higher
           else
 
-
-
-
   _processErasing: ->
-    @_waitForUserApproval()
+    @_waitForUserApproval('erasure')
     .then =>
-      getRandomChar = -> "0123456789".charAt(_.random(10))
-      deferred = Q.defer()
-      pincode = getRandomChar() + getRandomChar()
-      failUntilDongleIsBlank = =>
-        @_attemptToFailDonglePinCode(pincode)
-        .then (isBlank) =>
-          l 'IS BLANK', isBlank
-          if isBlank then deferred.resolve() else failUntilDongleIsBlank()
-        .fail =>
-          pincode += getRandomChar()
-          failUntilDongleIsBlank()
-        .done()
-      failUntilDongleIsBlank()
-      deferred.promise
-    .then =>
-      @_setCurrentState(States.Undefined)
-      @_handleCurrentState()
+      unless @_stateCache.pincode?
+        getRandomChar = -> "0123456789".charAt(_.random(10))
+        @_stateCache.pincode = getRandomChar() + getRandomChar()
+      pincode = @_stateCache.pincode
+      @_wallet.unlockWithPinCode pincode, (isUnlocked, error) =>
+        @emit "erasureStep", if error?.retryCount? then error.retryCount else 3
+        @_waitForPowerCycle()
+      return
     .fail ->
-      l 'FAIL', arguments
+      # TODO: PROPER ERROR
+      e "ERROR IN ERASURE"
     .done()
 
   _processInitOs: ->
@@ -224,23 +226,28 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_isNeedingUserApproval = value
       if @_isNeedingUserApproval is true
         @emit 'needsUserApproval'
-        @_defferedApproval = Q.defer()
+        @_deferredApproval = Q.defer()
       else
-        defferedApproval = @_defferedApproval
-        @_defferedApproval = null
+        defferedApproval = @_deferredApproval
+        @_deferredApproval = null
         defferedApproval.resolve()
     return
 
   _cancelApproval: ->
     if @_isNeedingUserApproval
       @_isNeedingUserApproval = no
-      defferedApproval = @_defferedApproval
-      @_defferedApproval = null
+      defferedApproval = @_deferredApproval
+      @_deferredApproval = null
       defferedApproval.reject("cancelled")
 
-  _waitForUserApproval: ->
-    @_setIsNeedingUserApproval  yes
-    @_defferedApproval.promise
+  _waitForUserApproval: (approvalName) ->
+    if _.contains(@_approvedStates, approvalName)
+      deferred = Q.defer()
+      deferred.resolve()
+      deferred.promise
+    else
+      @_setIsNeedingUserApproval  yes
+      @_deferredApproval.promise.then => @_approvedStates.push approvalName
 
 
 
