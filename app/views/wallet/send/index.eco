@@ -1,6 +1,6 @@
 <section id="send_index_dialog">
   <header>
-    <h1><%= t 'wallet.send.index.title' %></h1>
+    <h1><%= t 'wallet.send.common.send_bitcoins' %></h1>
   </header>
   <table class="no-table-head">
     <tbody>
@@ -33,6 +33,6 @@
   <a class="uppercase-action" id="open_scanner_button"><%= t 'wallet.send.index.qr_scanner' %></a>
   <a class="uppercase-action" href="#closeScanner" id="close_scanner_button"><%= t 'wallet.send.index.close_scanner' %></a>
   <div class="left-spacer"></div>
-  <a class="cancel-rounded-button" href="#dismiss"><%= t 'wallet.send.index.close' %></a>
-  <a class="action-rounded-button" href="#send" id="send_button"><%= t 'wallet.send.index.send' %></a>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
+  <a class="action-rounded-button" href="#send" id="send_button"><%= t 'common.send' %></a>
 </div>

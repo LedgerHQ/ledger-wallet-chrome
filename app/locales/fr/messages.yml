@@ -10,6 +10,8 @@ common:
   close: "Fermer"
   cancel: "Annuler"
   finish: "Terminer"
+  confirm: "Confirmer"
+  send: "Envoyer"
   yes: "Oui"
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
@@ -244,28 +246,35 @@ wallet:
       close: "ANNULER"
 
   send:
+    common:
+      send_bitcoins: "Envoyer des Bitcoins"
+      other_validation_methods: "Autres méthodes de validation"
+
     index:
-      title: "ENVOYER DES BITCOINS"
-      amount: "MONTANT"
+      amount: "Montant"
       amount_placeholder: "Montant"
-      sender_account: "COMPTE À DÉBITER"
-      receiver_address: "ADRESSE BITCOIN À CRÉDITER"
-      receiver_address_placeholder: "Adresse bitcoin"
-      total_spent: "TOTAL DÉPENSÉ"
+      sender_account: "Compte à débiter"
+      receiver_address: "Adresse Bitcoin du destinataire"
+      receiver_address_placeholder: "Adresse Bitcoin"
+      total_spent: "Total dépensé"
       transaction_fees_text: "(dont 0.0001 BTC de frais de transaction)"
-      send: "ENVOYER"
-      close: "ANNULER"
-      confirm: "CONFIRMER"
       close_scanner: "Fermer scanner"
       qr_scanner: "Scanner code QR"
 
-    validation:
-      title: "Code de validation nécessaire"
+    card:
       grab_your_card: "Munissez-vous de votre <b>carte de sécurité</b> et tapez sur votre clavier la lettre ou chiffre indiqué dans la case noire pour chaque valeur en surbrillance :"
       entered_code: "Code entré :"
       address_to_validate: "Adresse Bitcoin du destinataire à vérifier."
       amount_and_address_to_validate: "Montant et adresse Bitcoin du destinataire à vérifier."
       to: "à"
+
+    method:
+      select_method: "Sélectionnez une méthode de validation pour authentifier la transaction sortante depuis votre Ledger Wallet:"
+      pair_a_mobile_phone: "Associer un téléphone mobile"
+      mobile_phone: "Téléphone mobile"
+      security_card: "Carte de sécurité"
+      single_paired_device: "%s association"
+      multiple_paired_devices: "%s associations"
 
     mobile_validation:
       title: "[ALPHA]Waiting for mobile validation"
@@ -293,7 +302,7 @@ wallet:
 
   pairing:
     common:
-      pair_a_new_mobile: "Associer un nouveau téléphone"
+      pair_a_new_mobile: "Associer un téléphone mobile"
 
     errors:
       pairing_failed: "Association échouée"
