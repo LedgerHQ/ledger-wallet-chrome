@@ -177,6 +177,11 @@
         'base/view_controller'
         'base/navigation_controller'
 
+        ## Dongle
+        'dongle/dongle'
+        'dongle/transaction'
+        'dongle/manager'
+
         ## Mobile 2FA
         'm2fa/m2fa'
         'm2fa/client'
