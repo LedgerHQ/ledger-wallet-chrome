@@ -25,7 +25,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
         switch transaction.getValidationMode()
           when ledger.wallet.transaction.Transaction.ValidationModes.KEYCARD
             @once 'dismiss', =>
-              dialog = new WalletSendValidationDialogViewController transaction: transaction
+              dialog = new WalletSendCardDialogViewController transaction: transaction
               dialog.show()
             @dismiss()
           when ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN

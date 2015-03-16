@@ -248,6 +248,7 @@ wallet:
   send:
     common:
       send_bitcoins: "Envoyer des Bitcoins"
+      other_validation_methods: "Autres méthodes de validation"
 
     index:
       amount: "Montant"
@@ -260,13 +261,20 @@ wallet:
       close_scanner: "Fermer scanner"
       qr_scanner: "Scanner code QR"
 
-    validation:
-      title: "Code de validation nécessaire"
+    card:
       grab_your_card: "Munissez-vous de votre <b>carte de sécurité</b> et tapez sur votre clavier la lettre ou chiffre indiqué dans la case noire pour chaque valeur en surbrillance :"
       entered_code: "Code entré :"
       address_to_validate: "Adresse Bitcoin du destinataire à vérifier."
       amount_and_address_to_validate: "Montant et adresse Bitcoin du destinataire à vérifier."
       to: "à"
+
+    method:
+      select_method: "Sélectionnez une méthode de validation pour authentifier la transaction sortante depuis votre Ledger Wallet:"
+      pair_a_mobile_phone: "Associer un téléphone mobile"
+      mobile_phone: "Téléphone mobile"
+      security_card: "Carte de sécurité"
+      single_paired_device: "%s association"
+      multiple_paired_devices: "%s associations"
 
     mobile_validation:
       title: "[ALPHA]Waiting for mobile validation"
@@ -294,7 +302,7 @@ wallet:
 
   pairing:
     common:
-      pair_a_new_mobile: "Associer un nouveau téléphone"
+      pair_a_new_mobile: "Associer un téléphone mobile"
 
     errors:
       pairing_failed: "Association échouée"

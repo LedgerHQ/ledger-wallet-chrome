@@ -1,30 +1,36 @@
 @import (reference) "../../constants";
 @import (reference) "../../common";
 
-section#send_validation_dialog {
-  width: 1px;
+section#send_card_dialog {
+  width: @dialog-width-send;
 
   > div.regular-text {
     line-height: 20px;
     margin-top: @metrics-small-padding;
   }
 
-  > div#validation_indication {
+  > #validation_container {
+    display: flex;
     margin-top: @metrics-almost-medium-padding;
-    .bold-regular-text;
-    letter-spacing: 0px;
-    text-align: center;
 
-    > mark {
-      color: @color-invalid-red;
-      font-weight: @font-weight-bold;
-      background-color: transparent;
+    > #validation_texts {
+      flex-grow: 1;
+
+      > #validation_indication {
+        .bold-regular-text;
+        letter-spacing: 0px;
+
+        > mark {
+          color: @color-invalid-red;
+          font-weight: @font-weight-bold;
+          background-color: transparent;
+        }
+      }
+
+      #validation_subtitle {
+        margin-top: @metrics-almost-small-padding;
+      }
     }
-  }
-
-  > div#validation_subtitle {
-    margin-top: @metrics-almost-small-padding;
-    text-align: center;
   }
 
   div.keycard {
