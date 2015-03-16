@@ -5,12 +5,15 @@ ValidationModes =
 
 Errors = @ledger.errors
 
-Value = ledger.wallet.Value
+Amount = ledger.Amount
 
 @ledger.dongle ?= {}
 
 ###
 @example Usage
+  amount = ledger.Amount("1.234")
+  fee = ledger.Amount("0.0001")
+  recipientAddress = "1DR6p2UVfu1m6mCU8hyvh5r6ix3dJEPMX7"
   ledger.dongle.Transaction.createAndPrepareTransaction(amount, fees, recipientAddress, inputsAccounts, changeAccount).then (tx) =>
     console.log("Prepared tx :", tx)
 ###
@@ -18,13 +21,13 @@ class ledger.dongle.Transaction
   #
   @ValidationModes: ValidationModes
   #
-  @DEFAULT_FEES: Value.from(0.00005)
+  @DEFAULT_FEES: Amount.fromBtc(0.00005)
   #
   @MINIMUM_CONFIRMATIONS: 1
 
-  # @property [Value]
+  # @property [ledger.Amount]
   amount: undefined
-  # @property [Value]
+  # @property [ledger.Amount]
   fees: @DEFAULT_FEES
   # @property [String]
   recipientAddress: undefined
@@ -49,14 +52,11 @@ class ledger.dongle.Transaction
   # @property [Object]
   _transaction: undefined
 
-
-  # @param [String, Number, Value] amount
-  # @param [String, Number, Value] fees
+  # @param [ledger.dongle.Dongle] dongle
+  # @param [ledger.Amount] amount
+  # @param [ledger.Amount] fees
   # @param [String] recipientAddress
-  # @return [CompletionClosure]
-  init: (amount, fees, @recipientAddress) ->
-    @amount = Value.from(amount)
-    @fees = Value.from(fees)
+  constructor: (@dongle, @amount, @fees, @recipientAddress) ->
 
   # @return [Boolean]
   isValidated: () -> @_isValidated
@@ -67,8 +67,8 @@ class ledger.dongle.Transaction
   # @return [Integer]
   getValidationMode: () -> @_validationMode
 
-  # @return [Value]
-  getAmout: () -> @amount
+  # @return [ledger.Amount]
+  getAmount: () -> @amount
 
   # @return [String]
   getRecipientAddress: () -> @receiverAddress
@@ -88,13 +88,13 @@ class ledger.dongle.Transaction
       @_btInputs = []
       @_btcAssociatedKeyPath = []
       for input in inputs
-        splitTransaction = ledger.app.wallet._lwCard.dongle.splitTransaction(input)
+        splitTransaction = @dongle.splitTransaction(input)
         @_btInputs.push [splitTransaction, input.output_index]
         @_btcAssociatedKeyPath.push input.paths[0]
     catch err
       completion.failure(new ledger.StandardError(Errors.UnknowError, err))
 
-    ledger.app.dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
+    @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
     .then (@_resumeData) =>
       @_validationMode = @_resumeData.authorizationRequired
       completion.success()
@@ -116,7 +116,7 @@ class ledger.dongle.Transaction
       validationKey = ("0#{char}" for char in validationKey.split('')).join('') 
     else
       validationKey = (validationKey.charCodeAt(i).toString(16) for i in [0...validationKey.length]).join('')
-    ledger.app.dongle.createPaymentTransaction(
+    @dongle.createPaymentTransaction(
       @_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees,
       undefined, # Default lockTime
       undefined, # Default sigHash
@@ -131,63 +131,51 @@ class ledger.dongle.Transaction
     .done()
     completion.readonly()
 
-  getValidationDetails: () ->
-    indexes = []
-    indexesKeyCard = @_resumeData.indexesKeyCard
-    amount = ''
-    if ledger.app.dongle.getIntFirmwareVersion() < ledger.dongle.Firmware.V1_4_13
-      stringifiedAmount = @amount.toString()
-      stringifiedAmount = _.str.lpad(stringifiedAmount, 9, '0')
-      decimalPart = stringifiedAmount.substr(stringifiedAmount.length - 8)
-      integerPart = stringifiedAmount.substr(0, stringifiedAmount.length - 8)
-      firstAmountValidationIndex = integerPart.length - 1
-      lastAmountValidationIndex = firstAmountValidationIndex
-      if decimalPart isnt "00000000"
-        lastAmountValidationIndex += 3
-
-    while indexesKeyCard.length >= 2
-      index = indexesKeyCard.substring(0, 2)
-      indexesKeyCard = indexesKeyCard.substring(2)
-      indexes.push parseInt(index, 16)
-
+  # Retrieve information that need to be confirmed by the user.
+  # @return [Object]
+  #   @option [Integer] validationMode
+  #   @option [Object, undefined] amount
+  #     @option [String] text
+  #     @option [Array<Integer>] indexes
+  #   @option [Object] recipientsAddress
+  #     @option [String] text
+  #     @option [Array<Integer>] indexes
+  #   @option [String] validationCharacters
+  #   @option [Boolean] needsAmountValidation
+  getValidationDetails: ->
     details =
       validationMode: @_validationMode
-      amount:
-        text: stringifiedAmount
-        indexes: [firstAmountValidationIndex..lastAmountValidationIndex]
       recipientsAddress:
         text: @recipientAddress
-        indexes: indexes
-      validationCharacters: @getKeycardValidationCharacters()
-    details.needsAmountValidation = details.amount.indexes.length > 0
-    details
+        indexes: @_resumeData.indexesKeyCard.match(/../g)
+      validationCharacters: (@recipientAddress[index] for index in @_resumeData.indexesKeyCard.match(/../g))
+      needsAmountValidation: false
 
-  getKeycardValidationCharacters: () ->
-    indexes = []
-    keycardIndexes = []
-
-    if ledger.app.wallet.getIntFirmwareVersion() < ledger.wallet.Firmware.V1_4_13
+    # ~> 1.4.13 need validation on amount
+    if @dongle.getIntFirmwareVersion() < @dongle.Firmware.V1_4_13
       stringifiedAmount = @amount.toString()
       stringifiedAmount = _.str.lpad(stringifiedAmount, 9, '0')
-      decimalPart = stringifiedAmount.substr(stringifiedAmount.length - 8)
+      # Split amount in integer and decimal parts
       integerPart = stringifiedAmount.substr(0, stringifiedAmount.length - 8)
-      keycardIndexes.push integerPart.charAt(integerPart.length - 1)
+      decimalPart = stringifiedAmount.substr(stringifiedAmount.length - 8)
+      # Prepend to validationCharacters first digit of integer part,
+      # and 3 first digit of decimal part only if not empty.
+      amountChars = [integerPart.charAt(integerPart.length - 1)]
       if decimalPart isnt "00000000"
-        keycardIndexes.push decimalPart.charAt(0)
-        keycardIndexes.push decimalPart.charAt(1)
-        keycardIndexes.push decimalPart.charAt(2)
+        amountChars.concat decimalPart.substring(0,3).split('')
+      details.validationCharacters = amountChars.concat(details.validationCharacters)
+      # Compute amount indexes
+      firstIdx = integerPart.length - 1
+      lastIdx = if decimalPart is "00000000" then firstIdx else firstIdx+3
+      detail.amount =
+        text: stringifiedAmount
+        indexes: [firstIdx..lastIdx]
+      details.needsAmountValidation = true
 
-    indexesKeyCard = @_resumeData.indexesKeyCard
-    while indexesKeyCard.length >= 2
-      index = indexesKeyCard.substring(0, 2)
-      indexesKeyCard = indexesKeyCard.substring(2)
-      indexes.push parseInt(index, 16)
+    return details
 
-    keycardIndexes.push(@recipientAddress[index]) for index in indexes
-    keycardIndexes
-
-  # @param [Integer] amount
-  # @param [Integer] fees
+  # @param [ledger.Amount] amount
+  # @param [ledger.Amount] fees
   # @param [String] recipientAddress
   # @param [Array] inputsAccounts
   # @param [?] changeAccount
@@ -198,18 +186,15 @@ class ledger.dongle.Transaction
     inputsAccounts = [inputsAccounts] unless _.isArray inputsAccounts
     inputsPaths = _.flatten(inputsAccount.getHDWalletAccount().getAllAddressesPaths() for inputsAccount in inputsAccounts)
     changePath = changeAccount.getHDWalletAccount().getCurrentChangeAddressPath()
-    amount = ledger.wallet.Value.from(amount)
-    fees = ledger.wallet.Value.from(fees)
     requiredAmount = amount.add(fees)
     l "Required amount", requiredAmount.toString()
 
-    transaction = new ledger.dongle.Transaction()
-    transaction.init(amount, fees, recipientAddress)
+    transaction = new ledger.dongle.Transaction(ledger.app.dongle, amount, fees, recipientAddress)
     ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
       return completion.error(Errors.NetworkError, error) if error?
       
       # Collect each valid outputs and sort them by desired priority
-      validOutputs = _.chain(validOutputs)
+      validOutputs = _.chain(outputs)
         .filter((output) -> output.paths.length > 0)
         .sortBy((output) -> -output['confirmations'])
         .value()
@@ -218,7 +203,7 @@ class ledger.dongle.Transaction
       
       # For each valid outputs we try to get its raw transaction.
       finalOutputs = []
-      collectedAmount = new ledger.wallet.Value()
+      collectedAmount = new Amount()
       hadNetworkFailure = no
       _.async.each validOutputs, (output, done, hasNext) =>
         ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
