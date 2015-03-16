@@ -161,15 +161,28 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_setCurrentState(States.Erasing)
         @_handleCurrentState()
       else
-        @_getVersion (version, error) =>
-          @_failure(Errors.GetVersionError) if error?
-          @_lastVersion = version
-          if ledger.fup.compareVersions(@_lastVersion, ledger.fup.versions.Nano.CurrentVersion.Os).eq()
-            @_currentState = States.InitializingOs
-            @_handleCurrentState()
-          else if ledger.fup.versions.compareVersions(@_lastVersion, ledger.fup.versions.Nano.CurrentVersion.Os).gt()
-            # TODO: Report current version is higher
-          else
+        l 'Time to update'
+        @_fup.getFirmwareUpdateAvailability @_wallet, @_lastMode is Modes.Bootloader, no, (availability, error) =>
+          switch availability.result
+            when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Overwrite
+              @_setCurrentState(States.InitializingOs)
+              @_handleCurrentState()
+            when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update
+              index = 0
+
+            else return @_failure()
+      ###
+          if (index != OS_INIT.length) {
+            processLoadingScript(OS_INIT[index][1], "Initializing old application", true).then(function(result) {
+            stage = STAGE_RELOAD_BL_FROM_OS;
+            processStage();
+          });
+          }
+          else {
+            stage = STAGE_RELOAD_BL_FROM_OS;
+            processStage();
+          }
+      ###
 
   _processErasing: ->
     @_waitForUserApproval('erasure')
@@ -198,6 +211,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _compareVersion: (v1, v2) ->
 
   _failure: (reason) ->
+    @_waitForPowerCycle()
 
   _attemptToFailDonglePinCode: (pincode) ->
     deferred = Q.defer()
