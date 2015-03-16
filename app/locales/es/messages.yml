@@ -1,4 +1,7 @@
-﻿application:
+﻿language:
+  name: "espanol"
+
+application:
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet gestiona sus cuentas Bitcoin de manera eficiente y segura."
   support_url: 'http://support.ledgerwallet.com/'

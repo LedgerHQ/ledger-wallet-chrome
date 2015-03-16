@@ -101,7 +101,6 @@
         'utils/url'
         'utils/easing'
         'utils/router'
-        'utils/i18n'
         'utils/jquery'
         'utils/spinners'
         'utils/pin_codes'
@@ -254,6 +253,10 @@
         'controllers/wallet/pairing/wallet_pairing_error_dialog_view_controller'
         'controllers/wallet/pairing/wallet_pairing_success_dialog_view_controller'
         'controllers/wallet/pairing/wallet_pairing_finalizing_dialog_view_controller'
+
+        # i18n
+        'i18n/i18n'
+        'i18n_languages'
 
         # Specs
         '../spec/jasmine/jasmine'

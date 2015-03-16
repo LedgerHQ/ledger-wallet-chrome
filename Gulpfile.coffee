@@ -22,6 +22,8 @@ path            = require 'path'
 join            = path.join
 resolve         = path.resolve
 rsa             = require 'node-rsa'
+concat          = require 'gulp-concat'
+tap             = require 'gulp-tap'
 
 class BuildMode
   constructor: (Name, BuildDir, MangleVersion) ->
@@ -39,6 +41,8 @@ i18n = () ->
     i18nContent = {}
     json = JSON.parse(file.contents.toString(encoding))
     json.application.name = "#{json.application.name} (#{COMPILATION_MODE.Name})" if COMPILATION_MODE.MangleVersion is true and json.application?.name?
+
+    # Format the 'json' object to be suitable for chrome.i18n
     flatify = (json, path = '') ->
       for key, value of json
         if typeof value is "object"
@@ -47,9 +51,27 @@ i18n = () ->
           i18nContent[path + key] = {message: value, description: "Description for #{path + key} = #{value}"}
 
     flatify json
+    # Insert the newly created content
     file.contents = new Buffer(JSON.stringify(i18nContent), encoding)
+
     @push file
     callback()
+
+
+buildLangFilePlugin = () ->
+  through2.obj (chunk, encoding, callback) ->
+    languages = {}
+
+    tag = chunk.relative.substring(0, chunk.relative.indexOf("/"))
+    langFile = JSON.parse(chunk.contents.toString(encoding))
+
+    languages = "window.ledger.i18n.Languages['" + tag + "'] = " + "'" + langFile.language.name + "';"
+
+    chunk.contents = new Buffer(JSON.stringify(languages), encoding)
+
+    @push chunk
+    callback()
+
 
 releaseManifest = () ->
   through2.obj (file, encoding, callback) ->
@@ -129,6 +151,16 @@ tasks =
     .pipe yaml()
     .pipe i18n()
     .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/_locales"
+
+  buildLangFile: () ->
+    gulp.src 'app/locales/**/*.yml'
+    .pipe plumber()
+    .pipe yaml()
+    .pipe buildLangFilePlugin()
+    .pipe tap (file, t) ->
+      file.contents = new Buffer file.contents.toString().replace(/^"|"$/g, '')
+    .pipe concat 'i18n_languages.js'
+    .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/src/i18n"
 
   js: () ->
     gulp.src 'app/**/*.js'
@@ -272,3 +304,6 @@ gulp.task 'package', ['release'], ->
       manifest = require './release/manifest.json'
       fs.writeFileSync("dist/ledger-wallet-#{manifest.version}.crx", crxBuffer)
       crx.destroy()
+
+gulp.task 'buildLangFile', ->
+  tasks.buildLangFile()

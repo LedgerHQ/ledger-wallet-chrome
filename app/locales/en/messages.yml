@@ -1,3 +1,6 @@
+language:
+  name: "english"
+
 application:
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet manages your Bitcoin accounts efficiently and securely."
