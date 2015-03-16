@@ -12,11 +12,11 @@ class @ledger.Amount
   # @param [String, Number] value A satoshi amount.
   @fromSatoshi: (value) ->
     return value if _.isKindOf(value, Amount)
-    new Amount(Math.trunc(+value).toString())
+    new Amount(new Bitcoin.BigInteger(Math.trunc(+value).toString()))
 
   # @param [Bitcoin.BigInteger] value The amount value in satoshi.
-  constructor: (@_number) ->
-    @_number = value
+  constructor: (value) ->
+    @_number = value.clone()
 
   # @param [ledger.Amount] amount
   # @return [ledger.Amount]

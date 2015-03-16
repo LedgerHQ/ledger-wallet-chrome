@@ -112,6 +112,7 @@
         'utils/completion_closure'
         'utils/try'
         'utils/comparison_result'
+        'utils/amount'
 
         ## Crypto
         'utils/crypto/aes'

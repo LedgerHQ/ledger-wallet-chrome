@@ -11,8 +11,8 @@ Amount = ledger.Amount
 
 ###
 @example Usage
-  amount = ledger.Amount("1.234")
-  fee = ledger.Amount("0.0001")
+  amount = ledger.Amount.fromBtc("1.234")
+  fee = ledger.Amount.fromBtc("0.0001")
   recipientAddress = "1DR6p2UVfu1m6mCU8hyvh5r6ix3dJEPMX7"
   ledger.dongle.Transaction.createAndPrepareTransaction(amount, fees, recipientAddress, inputsAccounts, changeAccount).then (tx) =>
     console.log("Prepared tx :", tx)
