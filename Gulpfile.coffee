@@ -4,6 +4,7 @@ gulp            = require 'gulp'
 less            = require 'gulp-less'
 coffee          = require 'gulp-coffee'
 yaml            = require 'gulp-yaml'
+Yaml            = require 'js-yaml'
 Eco             = require 'eco'
 eco             = require 'gulp-eco'
 del             = require 'del'
@@ -202,11 +203,22 @@ tasks =
           Q.all([tasks.promisify(tasks.minify()), tasks.promisify(tasks.uglify())]).then(promise.resolve)
 
   createFupManifest: () ->
+    getVersionFromDotNotation =  (dotNotation) -> dotNotation.replace(/\./g, '')
     varify = (name, src) -> name + "_" + (/[a-z-]+-([0-9]+)/).exec(src)[1]
     getVersionFromVarName = (name) -> (/[A-Za-z_]+([0-9]+)/).exec(name)[1]
     normalizeVersion = (src) -> src.substring(0, 3) + _.str.lpad(src.substring(3), 3, '0')
     expressionFromNormalizedVersion = (src) ->
       parts = [src.substr(0, 1), src.substr(1, 1), src.substr(2, 1), parseInt(src.substring(3))]
+      first = if parts[0] is '1' then '0x20' else '0x00'
+      "[#{first}, (#{parts[1]} << 16) + (#{parts[2]} << 8) + (#{parts[3]})]"
+    expressionFromDotNotation = (src) ->
+      parts = []
+      loop
+        index = src.indexOf('.')
+        parts.push src.substring(0, index)
+        src = src.substring(index + 1)
+        break if src.indexOf('.') is -1
+      parts.push src
       first = if parts[0] is '1' then '0x20' else '0x00'
       "[#{first}, (#{parts[1]} << 16) + (#{parts[2]} << 8) + (#{parts[3]})]"
 
@@ -243,7 +255,14 @@ tasks =
         os_init.push [expressionFromNormalizedVersion(normalizeVersion(getVersionFromVarName(varName))), varName]
       os_init = _.sortBy os_init, (entry) -> normalizeVersion(getVersionFromVarName(entry[1]))
 
-      l(Eco.render template, imports: imports, reloader_from_bl: reloader_from_bl, bl_loader: bl_loader, os_loader: os_loader, bl_reloader: bl_reloader, os_init: os_init)
+      manifest = Yaml.safeLoad(fs.readFileSync('app/firmwares/manifest.yml', 'utf8'))
+
+      manifest['current_version']['bootloader'] = expressionFromDotNotation(manifest['current_version']['bootloader'])
+      manifest['current_version']['os'] = expressionFromDotNotation(manifest['current_version']['os'])
+      manifest['current_version']['reloader'] = expressionFromDotNotation(manifest['current_version']['reloader'])
+
+      file = Eco.render template, imports: imports, reloader_from_bl: reloader_from_bl, bl_loader: bl_loader, os_loader: os_loader, bl_reloader: bl_reloader, os_init: os_init, manifest: manifest
+      fs.writeFile 'app/src/fup/firmwares_manifest.coffee', file, -> deferred.resolve()
       return
     deferred.promise
 

@@ -30,6 +30,7 @@
     "node-rsa": "0.2.13"
   },
   "devDependencies": {
+    "js-yaml": "^3.2.2",
     "underscore": "^1.8.2",
     "underscore.string": "^3.0.3"
   }
