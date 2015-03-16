@@ -1,6 +1,6 @@
-ledger ?= {}
+@ledger ?= {}
 
-class ledger.Amount
+class @ledger.Amount
 
   Amount = @
 
