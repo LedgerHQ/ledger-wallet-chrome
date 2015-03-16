@@ -240,7 +240,7 @@ tasks =
       bl_loader = (varify('BL_LOADER', e) for e in names['loader-from-loader'])
       bl_loader = _.sortBy bl_loader, (varName) -> normalizeVersion(getVersionFromVarName(varName))
 
-      os_loader = (varify('OS_LOADER', e) for e in names['loader'])
+      os_loader = (varify('LOADER', e) for e in names['loader'])
       os_loader = _.sortBy os_loader, (varName) -> normalizeVersion(getVersionFromVarName(varName))
 
       bl_reloader = []
