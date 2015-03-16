@@ -112,6 +112,7 @@
         'utils/completion_closure'
         'utils/try'
         'utils/comparison_result'
+        'utils/amount'
 
         ## Crypto
         'utils/crypto/aes'
@@ -177,6 +178,11 @@
         'base/view_controller'
         'base/navigation_controller'
 
+        ## Dongle
+        'dongle/dongle'
+        'dongle/transaction'
+        'dongle/manager'
+
         ## Mobile 2FA
         'm2fa/m2fa'
         'm2fa/client'
@@ -223,11 +229,12 @@
         # Send
         'controllers/wallet/send/wallet_send_index_dialog_view_controller'
         'controllers/wallet/send/wallet_send_mobile_validation_dialog_view_controller'
-        'controllers/wallet/send/wallet_send_validation_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_card_dialog_view_controller'
         'controllers/wallet/send/wallet_send_processing_dialog_view_controller'
         'controllers/wallet/send/wallet_send_preparing_dialog_view_controller'
         'controllers/wallet/send/wallet_send_error_dialog_view_controller'
         'controllers/wallet/send/wallet_send_success_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_method_dialog_view_controller'
 
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'

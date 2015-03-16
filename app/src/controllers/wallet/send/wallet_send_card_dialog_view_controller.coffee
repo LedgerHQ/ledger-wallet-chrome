@@ -1,8 +1,8 @@
-class @WalletSendValidationDialogViewController extends @DialogViewController
+class @WalletSendCardDialogViewController extends @DialogViewController
 
   view:
     cardContainer: "#card_container"
-    enteredCode: "#entered_code"
+    enteredCode: "#validation_code"
     validationIndication: "#validation_indication"
     validationSubtitle: "#validation_subtitle"
     keycard: undefined
@@ -31,9 +31,9 @@ class @WalletSendValidationDialogViewController extends @DialogViewController
     @view.keycard.setValidableValues @_validationDetails.validationCharacters
     @view.tinyPincode.setInputsCount @_validationDetails.validationCharacters.length
     if @_validationDetails.needsAmountValidation
-      @view.validationSubtitle.text t 'wallet.send.validation.amount_and_address_to_validate'
+      @view.validationSubtitle.text t 'wallet.send.card.amount_and_address_to_validate'
     else
-      @view.validationSubtitle.text t 'wallet.send.validation.address_to_validate'
+      @view.validationSubtitle.text t 'wallet.send.card.address_to_validate'
 
   _updateValidableIndication: ->
     return if @_validationDetails.localizedIndexes.length == 0
@@ -64,7 +64,7 @@ class @WalletSendValidationDialogViewController extends @DialogViewController
       string += value + ' BTC'
       indexes = indexes.concat validationDetails.amount.indexes[0]
       indexes = indexes.concat _.map(validationDetails.amount.indexes.slice(1), (num) => num + 1) # decalage virgule
-      string += ' ' + t('wallet.send.validation.to') + ' '
+      string += ' ' + t('wallet.send.card.to') + ' '
     # add address
     decal += string.length
     string += validationDetails.recipientsAddress.text
