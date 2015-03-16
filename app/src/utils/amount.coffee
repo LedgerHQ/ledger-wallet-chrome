@@ -7,7 +7,12 @@ class @ledger.Amount
   # @param [String, Number] value A BTC amount.
   @fromBtc: (value) ->
     return value if _.isKindOf(value, Amount)
-    @fromSatoshi(+value * 10e7)
+    @fromSatoshi(+value * 1e8)
+
+  # @param [String, Number] value A bits (aka µBTC) amount.
+  @fromBits: (value) ->
+    return value if _.isKindOf(value, Amount)
+    @fromSatoshi(+value * 1e2)
 
   # @param [String, Number] value A satoshi amount.
   @fromSatoshi: (value) ->
@@ -56,12 +61,17 @@ class @ledger.Amount
   toByteString: () -> new ByteString(_.str.lpad(@toSatoshiString(16), 16, '0'), HEX)
   # @param [Number] base 10 or 16
   # @return [String]
-  toBtcString: (base=10) -> @_number.toString(base)
+  toBtcString: (base=10) -> @toBtcNumber().toString(base)
   # @return [Number]
-  toBtcNumber: () -> @_number.intValue()
+  toBtcNumber: () -> @toSatoshiNumber() / 1e8
   # @param [Number] base 10 or 16
   # @return [String]
-  toSatoshiString: (base=10) -> @_number.toString(base)
+  toBitsString: (base=10) -> @toBitsNumber().toString(base)
+  # @return [Number]
+  toBitsNumber: () -> @toSatoshiNumber() / 1e2
+  # @param [Number] base 10 or 16
+  # @return [String]
+  toSatoshiString: (base=10) -> @toSatoshiNumber().toString(base)
   # @return [Number]
   toSatoshiNumber: () -> @_number.intValue()
   # @return [Bitcoin.BigInteger]
