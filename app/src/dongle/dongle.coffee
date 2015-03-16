@@ -31,7 +31,7 @@ Errors = @ledger.errors
 
 # Populate dongle namespace.
 @ledger.dongle ?= {}
-_.extend @ledger.dongle
+_.extend @ledger.dongle,
   States: States
   Firmware: Firmware
   Attestation: Attestation
@@ -118,6 +118,7 @@ class @ledger.dongle.Dongle extends EventEmitter
           completion.failure(new ledger.StandardError(ledger.errors.UnknowError, "Failed to get version"))
     .fail (error) ->
       completion.failure(new ledger.StandardError(ledger.errors.UnknowError, error))
+    .done()
     completion.readonly()
 
   # @return [ledger.fup.FirmwareUpdater]
@@ -153,7 +154,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       else
         completion.failure()
     .fail (err) =>
-      error = new Errors.StandardError(Errors.SignatureError, err)
+      error = new ledger.StandardError(Errors.SignatureError, err)
       completion.failure(error)
     .done()
     completion.readonly()
@@ -288,10 +289,12 @@ class @ledger.dongle.Dongle extends EventEmitter
     @getPublicAddress(path)
     .then( (address) =>
       message = new ByteString(message, ASCII)
-      return @_btchip.signMessagePrepare_async(path, message).then =>
-        return @_btchip.signMessageSign_async(new ByteString(_pin, ASCII)).then (sig) =>
-          signedMessage = @_convertMessageSignature(address.publicKey, message, sig.signature)
-          completion.success(signedMessage)
+      return @_btchip.signMessagePrepare_async(path, message)
+    ).then( =>
+      return @_btchip.signMessageSign_async(new ByteString(_pin, ASCII))
+    ).then( (sig) =>
+      signedMessage = @_convertMessageSignature(address.publicKey, message, sig.signature)
+      completion.success(signedMessage)
     ).fail( (error) ->
       completion.failure(error)
     ).done()
@@ -393,6 +396,10 @@ class @ledger.dongle.Dongle extends EventEmitter
   @return [Q.Promise] Resolve with resumeData
   ###
   createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
+    resumeData = _.clone(resumeData)
+    resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)
+    resumeData.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in resumeData.trustedInputs)
+    resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
     @_btchip.createPaymentTransaction_async(
       inputs, associatedKeysets, changePath,
       new ByteString(recipientAddress, ASCII),

@@ -1,4 +1,6 @@
 
+@ledger.dongle ?= {}
+
 DevicesInfo = [
   {productId: 0x1b7c, vendorId: 0x2581, type: 'usb'}
   {productId: 0x2b7c, vendorId: 0x2581, type: 'hid'}
@@ -22,7 +24,7 @@ class @ledger.dongle.Manager extends EventEmitter
   start: () ->
     return if @_running
     _running = yes
-    @_interval = setInterval checkIfDongleIsPluggedIn.bind(@), 200
+    @_interval = setInterval @_checkIfDongleIsPluggedIn.bind(@), 200
 
   # Stop observing dongles state
   stop: () ->
@@ -33,16 +35,16 @@ class @ledger.dongle.Manager extends EventEmitter
   dongles: () ->
     _.values(@_dongles)
 
-  _checkIfDongleIsPluggedIn = () ->
-    _getDevices (devices) =>
+  _checkIfDongleIsPluggedIn: () ->
+    @_getDevices (devices) =>
       oldDongles = @_dongles
       newIds = device.device || device.deviceId for device in devices
       for id in newIds when ! @_dongles[id]?
-        _connectDongle(id)
+        @_connectDongle(id)
       for dongle in @_dongles when newIds.indexOf(dongle.device_id) == -1
         dongle.disconnect()
 
-  _getDevices = (cb) ->
+  _getDevices: (cb) ->
     devices = []
     _.async.each DevicesInfo, (device, next, hasNext) ->
       type = if device.type is "usb" then chrome.usb else chrome.hid

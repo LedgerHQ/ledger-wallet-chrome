@@ -2,6 +2,8 @@
 ledger.errors ?= {}
 
 _.extend ledger.errors,
+  StandardError: 0
+
   # Generic errors
   UnknownError: 100
   InvalidArgument: 101
@@ -22,6 +24,8 @@ _.extend ledger.errors,
   SignatureError: 301
 
   DefaultMessages:
+    0: "StandardError"
+
     100: "Unknow error"
     101: "Invalid argument"
     102: "Not found"
@@ -42,8 +46,11 @@ _.extend ledger.errors,
   throw: (code, message) -> throw new ledger.StandardError(code, message)
 
 class ledger.StandardError extends Error
-  #
-  constructor: (@code=100, message=undefined) ->
+  # @exemple Initializations
+  #   new ledger.StandardError("an error message")
+  #   new ledger.StandardError(NotFound, "an error message")
+  constructor: (@code, message=undefined) ->
+    [@code, @message] = [0, @code] if ledger.errors.DefaultMessages[@code] == undefined
     super(message || ledger.errors.DefaultMessages[@code])
 
   name: ->
