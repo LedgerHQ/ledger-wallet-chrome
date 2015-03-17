@@ -31,6 +31,6 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
           when ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN
             l "%c[M2FA] Secure screen dialog in preparation", "#888888"
             @once 'dismiss', =>
-              dialog = new WalletSendMobileValidationDialogViewController transaction: transaction
+              dialog = new WalletSendMobileDialogViewController transaction: transaction
               dialog.show()
             @dismiss()
