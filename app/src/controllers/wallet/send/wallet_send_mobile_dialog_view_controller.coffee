@@ -1,12 +1,7 @@
 class @WalletSendMobileDialogViewController extends @DialogViewController
 
-  view:
-    contentContainer: '#content_container'
-
   onAfterRender: ->
     super
-    ## setup ui
-    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
     ## request validation
     ledger.m2fa.PairedSecureScreen.getMostRecentFromSyncedStore (screen) =>
       @_request = ledger.m2fa.requestValidation(@params.transaction, screen)
