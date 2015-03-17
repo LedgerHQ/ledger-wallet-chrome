@@ -17,87 +17,152 @@ _.extend ledger.fup.versions,
 
 ledger.fup.updates ?= {}
 
-_.extend ledger.fup.updates,
+ledger.fup.setupUpdates = ->
 
-  RELOADER_FROM_BL: [
+  _.extend ledger.fup.updates,
 
-    BL_RELOADER_0143
-    BL_RELOADER_0144
-    BL_RELOADER_0146
-    BL_RELOADER_0147
-    BL_RELOADER_0148
-    BL_RELOADER_0149
-    BL_RELOADER_01410
-    BL_RELOADER_01411
-    BL_RELOADER_01412
-    BL_RELOADER_01413
-    BL_RELOADER_01414
-    BL_RELOADER_1100
-    
-  ]
+    RELOADER_FROM_BL: [
 
-  BL_LOADER: [
-
-    BL_LOADER_0143
-    BL_LOADER_0144
-    BL_LOADER_0146
-    BL_LOADER_0147
-    BL_LOADER_0148
-    BL_LOADER_0149
-    BL_LOADER_01410
-    BL_LOADER_01411
-    BL_LOADER_01412
-    BL_LOADER_01413
-    BL_LOADER_01414
-    BL_LOADER_1100
-    
-  ]
-
-  OS_LOADER: [
-
-    LOADER_0143
-    LOADER_0144
-    LOADER_0146
-    LOADER_0147
-    LOADER_0148
-    LOADER_0149
-    LOADER_01410
-    LOADER_01411
-    LOADER_01412
-    LOADER_01413
-    LOADER_01414
-    LOADER_1100
-    
-  ]
-
-  BL_RELOADER: [
-
-    [[0x00, (1 << 16) + (4 << 8) + (3)], RELOADER_0143]
-    [[0x00, (1 << 16) + (4 << 8) + (4)], RELOADER_0144]
-    [[0x00, (1 << 16) + (4 << 8) + (5)], RELOADER_0145]
-    [[0x00, (1 << 16) + (4 << 8) + (6)], RELOADER_0146]
-    [[0x00, (1 << 16) + (4 << 8) + (7)], RELOADER_0147]
-    [[0x00, (1 << 16) + (4 << 8) + (8)], RELOADER_0148]
-    [[0x00, (1 << 16) + (4 << 8) + (9)], RELOADER_0149]
-    [[0x00, (1 << 16) + (4 << 8) + (10)], RELOADER_01410]
-    [[0x00, (1 << 16) + (4 << 8) + (11)], RELOADER_01411]
-    [[0x00, (1 << 16) + (4 << 8) + (12)], RELOADER_01412]
-    [[0x00, (1 << 16) + (4 << 8) + (13)], RELOADER_01413]
-    [[0x00, (1 << 16) + (4 << 8) + (14)], RELOADER_01414]
-    [[0x20, (1 << 16) + (0 << 8) + (0)], RELOADER_1100]
-    
-  ]
-
-  OS_INIT: [
-
-      [[0x00, (1 << 16) + (4 << 8) + (10)], INIT_01410]
-      [[0x00, (1 << 16) + (4 << 8) + (11)], INIT_01411]
-      [[0x00, (1 << 16) + (4 << 8) + (12)], INIT_01412]
-      [[0x00, (1 << 16) + (4 << 8) + (13)], INIT_01413]
-      [[0x00, (1 << 16) + (4 << 8) + (14)], INIT_01414]
-      [[0x20, (1 << 16) + (0 << 8) + (0)], INIT_LW_1100]
+      BL_RELOADER_0143
+      BL_RELOADER_0144
+      BL_RELOADER_0146
+      BL_RELOADER_0147
+      BL_RELOADER_0148
+      BL_RELOADER_0149
+      BL_RELOADER_01410
+      BL_RELOADER_01411
+      BL_RELOADER_01412
+      BL_RELOADER_01413
+      BL_RELOADER_01414
+      BL_RELOADER_1100
       
-  ]
+    ]
+
+    BL_LOADER: [
+
+      BL_LOADER_0143
+      BL_LOADER_0144
+      BL_LOADER_0146
+      BL_LOADER_0147
+      BL_LOADER_0148
+      BL_LOADER_0149
+      BL_LOADER_01410
+      BL_LOADER_01411
+      BL_LOADER_01412
+      BL_LOADER_01413
+      BL_LOADER_01414
+      BL_LOADER_1100
+      
+    ]
+
+    OS_LOADER: [
+
+      LOADER_0143
+      LOADER_0144
+      LOADER_0146
+      LOADER_0147
+      LOADER_0148
+      LOADER_0149
+      LOADER_01410
+      LOADER_01411
+      LOADER_01412
+      LOADER_01413
+      LOADER_01414
+      LOADER_1100
+      
+    ]
+
+    BL_RELOADER: [
+
+      [[0x00, (1 << 16) + (4 << 8) + (3)], RELOADER_0143]
+      [[0x00, (1 << 16) + (4 << 8) + (4)], RELOADER_0144]
+      [[0x00, (1 << 16) + (4 << 8) + (5)], RELOADER_0145]
+      [[0x00, (1 << 16) + (4 << 8) + (6)], RELOADER_0146]
+      [[0x00, (1 << 16) + (4 << 8) + (7)], RELOADER_0147]
+      [[0x00, (1 << 16) + (4 << 8) + (8)], RELOADER_0148]
+      [[0x00, (1 << 16) + (4 << 8) + (9)], RELOADER_0149]
+      [[0x00, (1 << 16) + (4 << 8) + (10)], RELOADER_01410]
+      [[0x00, (1 << 16) + (4 << 8) + (11)], RELOADER_01411]
+      [[0x00, (1 << 16) + (4 << 8) + (12)], RELOADER_01412]
+      [[0x00, (1 << 16) + (4 << 8) + (13)], RELOADER_01413]
+      [[0x00, (1 << 16) + (4 << 8) + (14)], RELOADER_01414]
+      [[0x20, (1 << 16) + (0 << 8) + (0)], RELOADER_1100]
+      
+    ]
+
+    OS_INIT: [
+
+        [[0x00, (1 << 16) + (4 << 8) + (10)], INIT_01410]
+        [[0x00, (1 << 16) + (4 << 8) + (11)], INIT_01411]
+        [[0x00, (1 << 16) + (4 << 8) + (12)], INIT_01412]
+        [[0x00, (1 << 16) + (4 << 8) + (13)], INIT_01413]
+        [[0x00, (1 << 16) + (4 << 8) + (14)], INIT_01414]
+        [[0x20, (1 << 16) + (0 << 8) + (0)], INIT_LW_1100]
+        
+    ]
+
+ledger.fup.clearUpdates = ->
+  ledger.fup.updates = {}
+  window.BL_RELOADER_0143 = undefined
+  window.BL_RELOADER_0144 = undefined
+  window.BL_RELOADER_0146 = undefined
+  window.BL_RELOADER_0147 = undefined
+  window.BL_RELOADER_0148 = undefined
+  window.BL_RELOADER_0149 = undefined
+  window.BL_RELOADER_01410 = undefined
+  window.BL_RELOADER_01411 = undefined
+  window.BL_RELOADER_01412 = undefined
+  window.BL_RELOADER_01413 = undefined
+  window.BL_RELOADER_01414 = undefined
+  window.BL_RELOADER_1100 = undefined
+  
+  window.BL_LOADER_0143 = undefined
+  window.BL_LOADER_0144 = undefined
+  window.BL_LOADER_0146 = undefined
+  window.BL_LOADER_0147 = undefined
+  window.BL_LOADER_0148 = undefined
+  window.BL_LOADER_0149 = undefined
+  window.BL_LOADER_01410 = undefined
+  window.BL_LOADER_01411 = undefined
+  window.BL_LOADER_01412 = undefined
+  window.BL_LOADER_01413 = undefined
+  window.BL_LOADER_01414 = undefined
+  window.BL_LOADER_1100 = undefined
+  
+  window.LOADER_0143 = undefined
+  window.LOADER_0144 = undefined
+  window.LOADER_0146 = undefined
+  window.LOADER_0147 = undefined
+  window.LOADER_0148 = undefined
+  window.LOADER_0149 = undefined
+  window.LOADER_01410 = undefined
+  window.LOADER_01411 = undefined
+  window.LOADER_01412 = undefined
+  window.LOADER_01413 = undefined
+  window.LOADER_01414 = undefined
+  window.LOADER_1100 = undefined
+  
+  window.RELOADER_0143 = undefined
+  window.RELOADER_0144 = undefined
+  window.RELOADER_0145 = undefined
+  window.RELOADER_0146 = undefined
+  window.RELOADER_0147 = undefined
+  window.RELOADER_0148 = undefined
+  window.RELOADER_0149 = undefined
+  window.RELOADER_01410 = undefined
+  window.RELOADER_01411 = undefined
+  window.RELOADER_01412 = undefined
+  window.RELOADER_01413 = undefined
+  window.RELOADER_01414 = undefined
+  window.RELOADER_1100 = undefined
+  
+  window.INIT_01410 = undefined
+  window.INIT_01411 = undefined
+  window.INIT_01412 = undefined
+  window.INIT_01413 = undefined
+  window.INIT_01414 = undefined
+  window.INIT_LW_1100 = undefined
+  
 
 ledger.fup.imports = [
 

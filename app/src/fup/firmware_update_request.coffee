@@ -74,6 +74,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @throw If the seed length is not 32 or if it is malformed
   ###
   setKeyCardSeed: (keyCardSeed) ->
+    return if @_keyCardSeed?
     throw new Error(Errors.InvalidSeedSize) if not keyCardSeed? or keyCardSeed.length != 32
     seed = Try => new ByteString(keyCardSeed, HEX)
     throw new Error(Errors.InvalidSeedFormat) if seed.isFailure() or seed.getValue()?.length != 16
@@ -140,7 +141,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _handleCurrentState: () ->
     # If there is no dongle wait for one
-    (return @_waitForConnectedDongle => @_handleCurrentState()) unless @_wallet
+    (return @_waitForConnectedDongle =>) unless @_wallet?
 
     # Otherwise handle the current by calling the right method depending on the last mode and the state
     if LastMode is Modes.Os
@@ -165,11 +166,12 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_fup.getFirmwareUpdateAvailability @_wallet, @_lastMode is Modes.Bootloader, no, (availability, error) =>
           switch availability.result
             when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Overwrite
+              l 'GOT SAME VERSION'
               @_setCurrentState(States.InitializingOs)
               @_handleCurrentState()
             when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update
               index = 0
-
+              l 'GOT LOWER VERSION'
             else return @_failure()
       ###
           if (index != OS_INIT.length) {

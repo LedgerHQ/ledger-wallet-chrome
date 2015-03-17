@@ -6,6 +6,8 @@ class @UpdateNavigationController extends @NavigationController
     @_request.on 'unplug', =>  @_onDongleNeedPowerCycle()
     @_request.on 'stateChanged', (ev, data) => @_onStateChanged(data.newState, data.oldState)
 
+    ledger.fup.FirmwareUpdater.instance.load =>
+
     window.fup = @_request # TODO: REMOVE THIS
 
   onDetach: ->
