@@ -30,7 +30,7 @@ class @DialogViewController extends ViewController
     @emit 'show'
 
   isShown: ->
-    @_dialog.isShown()
+    @_dialog?.isShown()
 
   onDetach: ->
     super

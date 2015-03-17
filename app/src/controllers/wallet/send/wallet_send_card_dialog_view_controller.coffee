@@ -73,10 +73,9 @@ class @WalletSendCardDialogViewController extends @DialogViewController
 
   _listenEvents: ->
     @view.keycard.once 'completed', (event, value) =>
-      @once 'dismiss', =>
+      @dismiss =>
         dialog = new WalletSendProcessingDialogViewController transaction: @params.transaction, keycode: value
         dialog.show()
-      @dismiss()
     @view.keycard.on 'character:input', (event, value) =>
       @view.tinyPincode.setValuesCount @view.keycard.value().length
       @_validationDetails.localizedIndexes.splice(0, 1)

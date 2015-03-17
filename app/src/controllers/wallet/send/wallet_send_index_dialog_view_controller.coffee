@@ -24,9 +24,13 @@ class @WalletSendIndexDialogViewController extends DialogViewController
     super
     @view.amountInput.focus()
 
+  onDetach: ->
+    super
+    @_stopScanner()
+
   onDismiss: ->
     super
-    @stopScanner()
+    @_stopScanner()
 
   send: ->
     nextError = @_nextFormError()
@@ -35,10 +39,8 @@ class @WalletSendIndexDialogViewController extends DialogViewController
       @view.errorContainer.text nextError
     else
       @view.errorContainer.hide()
-      @once 'dismiss', =>
-        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress()
-        dialog.show()
-      @dismiss()
+      dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress()
+      @getDialog().push dialog
 
   openScanner: ->
     successBlock = =>
@@ -55,7 +57,7 @@ class @WalletSendIndexDialogViewController extends DialogViewController
 
   closeScanner: ->
     @view.videoCaptureContainer.one 'webkitTransitionEnd', =>
-      @stopScanner()
+      @_stopScanner()
     @view.videoCaptureContainer.removeClass 'opened'
     @view.openScannerButton.show()
     @view.closeScannerButton.hide()
@@ -77,9 +79,11 @@ class @WalletSendIndexDialogViewController extends DialogViewController
         @closeScanner()
     @view.qrcodeScanner.startInNode @view.qrcodeVideo.get(0)
 
-  stopScanner: ->
+  _stopScanner: ->
     return if not @view.qrcodeScanner?
     @view.qrcodeScanner.off 'qrcode'
+    @view.qrcodeScanner.off 'error'
+    @view.qrcodeScanner.off 'success'
     @view.qrcodeScanner.stop()
     @view.qrcodeScanner = undefined
 

@@ -17,9 +17,8 @@ class @WalletSendMobileDialogViewController extends @DialogViewController
             dialog = new WalletSendErrorDialogViewController reason: error
             dialog.show()
         else
-          @dismiss =>
-            dialog = new WalletSendProcessingDialogViewController transaction: @params.transaction, keycode: keycode
-            dialog.show()
+          dialog = new WalletSendProcessingDialogViewController transaction: @params.transaction, keycode: keycode
+          @getDialog().push dialog
 
   onDismiss: () ->
     super
