@@ -276,9 +276,9 @@ wallet:
       single_paired_device: "%s pairing"
       multiple_paired_devices: "%s pairings"
 
-    mobile_validation:
-      title: "[ALPHA]Waiting for mobile validation"
-      content: "[ALPHA]Please confirm the transaction on your mobile device"
+    mobile:
+      sending_transaction: "Sending transaction to \"%s\"..."
+      open_mobile_app: "Open the Ledger Wallet mobile app to validate the transaction."
 
     processing:
       sending: "Envoi en cours..."
@@ -307,7 +307,7 @@ wallet:
     errors:
       pairing_failed: "Pairing failed"
       pairing_succeeded: "Pairing succeeded"
-      dongle_is_now_paired: "Your Ledger Wallet is now paired<br />with your mobile device \"%s\"."
+      dongle_is_now_paired: "Your Ledger Wallet is now paired<br />with your mobile phone \"%s\"."
       inconsistent_state: "Something wrong happened (inconsistent state)."
       client_cancelled: "The mobile application cancelled the pairing process."
       dongle_needs_power_cycle: "Your Ledger Wallet needs to be unplugged and plugged back<br/>to pair a new mobile phone."

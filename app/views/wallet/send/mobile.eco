@@ -1,0 +1,14 @@
+<section id="send_mobile_dialog">
+  <header>
+    <h1><%= t 'wallet.send.common.send_bitcoins' %></h1>
+  </header>
+  <div id="content_container">
+    <div class="regular-text"><%= t 'wallet.send.mobile.sending_transaction' %></div>
+    <div class="regular-grey-text-small"><%= t 'wallet.send.mobile.open_mobile_app' %></div>
+  </div>
+</section>
+<div class="dialog-actions-bar">
+  <a class="uppercase-action" href="#test"><%= t 'wallet.send.common.other_validation_methods' %></a>
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
+</div>

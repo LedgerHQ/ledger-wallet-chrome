@@ -228,7 +228,7 @@
 
         # Send
         'controllers/wallet/send/wallet_send_index_dialog_view_controller'
-        'controllers/wallet/send/wallet_send_mobile_validation_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_mobile_dialog_view_controller'
         'controllers/wallet/send/wallet_send_card_dialog_view_controller'
         'controllers/wallet/send/wallet_send_processing_dialog_view_controller'
         'controllers/wallet/send/wallet_send_preparing_dialog_view_controller'

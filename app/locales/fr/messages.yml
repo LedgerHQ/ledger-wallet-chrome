@@ -264,8 +264,8 @@ wallet:
     card:
       grab_your_card: "Munissez-vous de votre <b>carte de sécurité</b> et tapez sur votre clavier la lettre ou chiffre indiqué dans la case noire pour chaque valeur en surbrillance :"
       entered_code: "Code entré :"
-      address_to_validate: "Adresse Bitcoin du destinataire à vérifier."
-      amount_and_address_to_validate: "Montant et adresse Bitcoin du destinataire à vérifier."
+      address_to_validate: "Adresse Bitcoin du destinataire à valider."
+      amount_and_address_to_validate: "Montant et adresse Bitcoin du destinataire à valider."
       to: "à"
 
     method:
@@ -276,9 +276,9 @@ wallet:
       single_paired_device: "%s association"
       multiple_paired_devices: "%s associations"
 
-    mobile_validation:
-      title: "[ALPHA]Waiting for mobile validation"
-      content: "[ALPHA]Please confirm the transaction on your mobile device"
+    mobile:
+      sending_transaction: "Envoi de la transaction à \"%s\"..."
+      open_mobile_app: "Ouvrez l'application mobile Ledger Wallet pour valider cette transaction."
 
     processing:
       sending: "Envoi en cours..."
