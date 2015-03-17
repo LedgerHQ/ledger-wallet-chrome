@@ -224,6 +224,7 @@ tasks =
       tasks.fonts
       tasks.html
       tasks.less
+      tasks.buildLangFile
     ]
     run = (tasks.promisify(task()) for task in run)
     Q.all(run).then ->
@@ -304,6 +305,3 @@ gulp.task 'package', ['release'], ->
       manifest = require './release/manifest.json'
       fs.writeFileSync("dist/ledger-wallet-#{manifest.version}.crx", crxBuffer)
       crx.destroy()
-
-gulp.task 'buildLangFile', ->
-  tasks.buildLangFile()

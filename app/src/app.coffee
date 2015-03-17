@@ -4,8 +4,8 @@ require @ledger.imports, ->
 
     onStart: ->
       @_listenAppEvents()
-      @router.go('/')
-
+      ledger.i18n.init =>
+        @router.go('/')
 
     onConnectingDongle: (card) ->
       @emit 'dongle:connecting', card

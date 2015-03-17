@@ -256,7 +256,7 @@
 
         # i18n
         'i18n/i18n'
-        'i18n_languages'
+        'i18n/i18n_languages'
 
         # Specs
         '../spec/jasmine/jasmine'
