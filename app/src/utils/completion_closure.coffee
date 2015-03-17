@@ -92,7 +92,7 @@ class @CompletionClosure
     @return [CompletionClosure] self
     @throw If the closure is already completed
   ###
-  success: (value) ->
+  success: (value=yes) ->
     throw 'CompletionClosure already completed' if @isCompleted()
     @_isSuccessful = yes
     @_complete = [value, null]

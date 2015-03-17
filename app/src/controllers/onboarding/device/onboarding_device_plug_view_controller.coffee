@@ -40,14 +40,14 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
     , 1500
 
   navigateContinue: ->
-    ledger.app.wallet.getState (state) =>
-      if state == ledger.wallet.States.LOCKED
+    ledger.app.dongle.getState (state) =>
+      if state == ledger.dongle.States.LOCKED
         ledger.app.router.go '/onboarding/device/pin'
       else
         ledger.app.router.go '/onboarding/management/welcome'
 
   _listenEvents: ->
-    if ledger.app.wallet?
+    if ledger.app.dongle?
       do @navigateContinue
     else
       ledger.app.once 'dongle:connected', =>

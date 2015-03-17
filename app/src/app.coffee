@@ -46,28 +46,32 @@ require @ledger.imports, ->
     onConnectingDongle: (card) ->
       @emit 'dongle:connecting', card if @isInWalletMode()
 
-    onDongleConnected: (wallet) ->
-      @emit 'dongle:connected', @wallet if @isInWalletMode()
+    onDongleConnected: (dongle) ->
+      @emit 'dongle:connected', @dongle if @isInWalletMode()
 
-    onDongleNeedsUnplug: (wallet) ->
-      @emit 'dongle:unplugged', @wallet if @isInWalletMode()
+    onDongleNeedsUnplug: (dongle) ->
+      @emit 'dongle:unplugged', @dongle if @isInWalletMode()
 
-    onDongleIsUnlocked: (wallet) ->
+    onDongleIsUnlocked: (dongle) ->
+      console.log("onDongleIsUnlocked")
       return unless @isInWalletMode()
-      @emit 'dongle:unlocked', @wallet
+      @emit 'dongle:unlocked', @dongle
       @emit 'wallet:initializing'
-      ledger.wallet.initialize @wallet, =>
+      ledger.wallet.initialize @dongle, =>
         ledger.db.init =>
+          console.log("db.inited")
           ledger.db.contexts.open()
           Wallet.initializeWallet =>
+            console.log("emit wallet:initialized")
             @emit 'wallet:initialized'
             _.defer =>
+              console.log("wallet:initialized defers")
               Wallet.instance.retrieveAccountsBalances()
               ledger.tasks.TransactionObserverTask.instance.start()
               ledger.tasks.OperationsSynchronizationTask.instance.start()
               ledger.tasks.OperationsConsumptionTask.instance.start()
 
-    onDongleIsDisconnected: (wallet) ->
+    onDongleIsDisconnected: (dongle) ->
       return unless @isInWalletMode()
       @_releaseWallet()
 
@@ -76,8 +80,8 @@ require @ledger.imports, ->
       @on 'wallet:operations:sync:failed', =>
         return unless @isInWalletMode()
         _.delay =>
-          ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary() if @wallet?
-          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() if @wallet?
+          ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary() if @dongle?
+          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() if @dongle?
         , 500
 
       @on 'wallet:operations:sync:done', =>
@@ -89,12 +93,12 @@ require @ledger.imports, ->
     _releaseWallet: ->
       @emit 'dongle:disconnected'
       Wallet.releaseWallet()
-      ledger.wallet.release(@wallet)
+      ledger.wallet.release(@dongle)
       ledger.tasks.Task.stopAllRunningTasks()
       ledger.tasks.Task.resetAllSingletonTasks()
       ledger.db.contexts.close()
       ledger.db.close()
-      @wallet = null
+      @dongle = null
       ledger.dialogs.manager.dismissAll(no)
       @router.go '/onboarding/device/plug' if @isInWalletMode()
 

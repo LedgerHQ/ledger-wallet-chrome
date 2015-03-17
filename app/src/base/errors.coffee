@@ -18,10 +18,14 @@ _.extend ledger.errors,
   WrongPinCode: 203
   DongleLocked: 204
   UnableToGetBitIdAddress: 205
+  BlankDongle: 205
 
   # Wallet errors
   NotEnoughFunds: 300
   SignatureError: 301
+
+  ledger.errors.SignatureError
+
 
   DefaultMessages:
     0: "StandardError"
@@ -45,13 +49,23 @@ _.extend ledger.errors,
   create: (code, title, error) -> code: code, title: title, error: error
   throw: (code, message) -> throw new ledger.StandardError(code, message)
 
-class ledger.StandardError extends Error
-  # @exemple Initializations
-  #   new ledger.StandardError("an error message")
-  #   new ledger.StandardError(NotFound, "an error message")
-  constructor: (@code, message=undefined) ->
-    [@code, @message] = [0, @code] if ledger.errors.DefaultMessages[@code] == undefined
-    super(message || ledger.errors.DefaultMessages[@code])
+# @exemple Initializations
+#   new ledger.StdError("an error message")
+#   new ledger.StdError(NotFound, "an error message")
+ledger.StdError = (code, msg)->
+  defaultMessage = ledger.errors.DefaultMessages[code]
+  [code, msg] = [0, code] if defaultMessage == undefined
+  self = new Error(msg || defaultMessage)
+  self.code = code
+  self.name = _.invert(ledger.errors)[code]
+  self.__proto__ = ledger.StdError.prototype
+  return self
+ledger.StdError.prototype.__proto__= Error.prototype
 
-  name: ->
-    _.invert(ledger.errors)[@code]
+ledger.StdError.prototype.localizedMessage = ->
+    t(@_i18nId())
+
+ledger.StdError.prototype._i18nId = ->
+    "common.errors.#{_.underscore(@name)}"
+
+ledger.throw = (code, message) => throw ledger.StdError(code, message)

@@ -60,7 +60,7 @@ sendCommand = (command, parameters, callback) ->
 
 class WorkerWallet
 
-  ledger.app.wallet = new @
+  ledger.app.dongle = new @
 
   getPublicAddress: (path, callback) ->
     sendCommand 'private:getPublicAddress', [path], (result, error) =>
@@ -85,7 +85,7 @@ registerExtendedPublicKeyForPath = (path) ->
   if ExtendedPublicKeys[path]?
     postResult 'Already registered'
     return
-  ExtendedPublicKeys[path] = new ledger.wallet.ExtendedPublicKey(ledger.app.wallet, path)
+  ExtendedPublicKeys[path] = new ledger.wallet.ExtendedPublicKey(ledger.app.dongle, path)
   ExtendedPublicKeys[path].initialize (xpub) =>
     if xpub?
       postResult 'registered'
@@ -104,7 +104,7 @@ getPublicAddress = (path) ->
 
   # No result from cache perform the derivation on the chip
   unless address?
-    ledger.app.wallet.getPublicAddress path, (publicKey) ->
+    ledger.app.dongle.getPublicAddress path, (publicKey) ->
       @_derivationPath
       if publicKey?
        address = publicKey?.bitcoinAddress?.value

@@ -37,6 +37,8 @@ class ledger.dongle.Transaction
   changePath: undefined
   # @property [String]
   hash: undefined
+  # @property [String]
+  authorizationPaired: undefined
 
 
   # @property [Boolean]
@@ -82,7 +84,7 @@ class ledger.dongle.Transaction
   # @return [CompletionClosure]
   prepare: (@inputs, @changePath, callback=undefined) ->
     if not @amount? or not @fees? or not @recipientAddress?
-      throw new ledger.StandardError('Transaction must me initialized before preparation')
+      ledger.throw('Transaction must me initialized before preparation')
     completion = new CompletionClosure(callback)
     try
       @_btInputs = []
@@ -92,14 +94,15 @@ class ledger.dongle.Transaction
         @_btInputs.push [splitTransaction, input.output_index]
         @_btcAssociatedKeyPath.push input.paths[0]
     catch err
-      completion.failure(new ledger.StandardError(Errors.UnknowError, err))
+      completion.failure(new ledger.StdError(Errors.UnknowError, err))
 
     @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
     .then (@_resumeData) =>
       @_validationMode = @_resumeData.authorizationRequired
+      @authorizationPaired = @_resumeData.authorizationPaired
       completion.success()
     .fail (error) =>
-      completion.failure(new ledger.StandardError(Errors.SignatureError))
+      completion.failure(new ledger.StdError(Errors.SignatureError))
     .done()
 
     completion.readonly()
@@ -109,7 +112,7 @@ class ledger.dongle.Transaction
   # @return [CompletionClosure]
   validate: (validationKey, callback=undefined) ->
     if not @_resumeData? or not @_validationMode?
-      throw new ledger.StandardError('Transaction must me prepared before validation')
+      ledger.throw('Transaction must me prepared before validation')
     completion = new CompletionClosure(callback)
     # Convert ASCII encoded validationKey to HEX encoded validationKey
     if @_validationMode == ValidationModes.KEYCARD
@@ -127,7 +130,7 @@ class ledger.dongle.Transaction
       @_isValidated = yes
       _.defer => completion.success()
     .fail (error) =>
-      _.defer => completion.failure(new ledger.StandardError(Errors.SignatureError, error))
+      _.defer => completion.failure(new ledger.StdError(Errors.SignatureError, error))
     .done()
     completion.readonly()
 

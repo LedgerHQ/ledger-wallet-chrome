@@ -180,6 +180,7 @@
 
         ## Dongle
         'dongle/dongle'
+        'dongle/utils'
         'dongle/transaction'
         'dongle/manager'
 

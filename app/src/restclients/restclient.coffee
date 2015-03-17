@@ -33,15 +33,15 @@ class ledger.api.AuthRestClient extends ledger.api.RestClient
 
 @testRestClientAuthenticate = ->
   f = ->
-    ledger.app.wallet.getBitIdAddress (address) ->
+    ledger.app.dongle.getBitIdAddress (address) ->
       r = new ledger.api.AuthRestClient()
       r.http().get
-        url: "accountsettings/#{address}"
+        url: "accountsettings/#{address.bitcoinAddress.value}"
         onSuccess: () -> l arguments
         onError: () ->
           e arguments
-  ledger.app.wallet.getState (state) ->
-    if state is ledger.wallet.States.LOCKED
-      ledger.app.wallet.unlockWithPinCode '0000', f
+  ledger.app.dongle.getState (state) ->
+    if state is ledger.dongle.States.LOCKED
+      ledger.app.dongle.unlockWithPinCode '0000', f
     else
       do f

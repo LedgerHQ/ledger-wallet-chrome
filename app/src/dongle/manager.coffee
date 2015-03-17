@@ -37,11 +37,10 @@ class @ledger.dongle.Manager extends EventEmitter
 
   _checkIfDongleIsPluggedIn: () ->
     @_getDevices (devices) =>
-      oldDongles = @_dongles
-      newIds = device.device || device.deviceId for device in devices
-      for id in newIds when ! @_dongles[id]?
+      pluggedIds = (device.device || device.deviceId for device in devices)
+      for id in pluggedIds when ! @_dongles[id]?
         @_connectDongle(id)
-      for dongle in @_dongles when newIds.indexOf(dongle.device_id) == -1
+      for id, dongle of @_dongles when pluggedIds.indexOf(+id) == -1
         dongle.disconnect()
 
   _getDevices: (cb) ->
@@ -57,19 +56,15 @@ class @ledger.dongle.Manager extends EventEmitter
   _connectDongle: (device_id) ->
     try
       @cardFactory.list_async().then (result) =>
-        setTimeout =>
-          if result.length > 0
-            @cardFactory.getCardTerminal(result[0]).getCard_async().then (card) =>
-              setTimeout () =>
-                @_dongles[device_id] = new ledger.wallet.Dongle(device_id, card)
-                @_dongles[device_id].once 'state:locked', (event, dongle) =>
-                  @emit 'connected', dongle
-                @_dongles[device_id].once 'state:disconnected', (event, dongle) =>
-                  delete @_dongle[dongle.device_id]
-                  @emit 'disconnected', dongle
-
-        , 0
+        return if result.length == 0
+        @cardFactory.getCardTerminal(result[0]).getCard_async().then (card) =>
+          @_dongles[device_id] = new ledger.dongle.Dongle(device_id, card)
+          @_dongles[device_id].once 'state:locked', (event) =>
+            @emit 'connected', @_dongles[device_id]
+          @_dongles[device_id].once 'state:disconnected', (event) =>
+            delete @_dongles[device_id]
+            @emit 'disconnected', @_dongles[device_id]
     catch er
       e er
 
-  getConnectedDongle: -> _(_.values(@_dongles)).filter (w) -> w._state isnt ledger.wallet.States.DISCONNECTED
+  getConnectedDongle: -> _(_.values(@_dongles)).filter (w) -> w.state isnt ledger.dongle.States.DISCONNECTED

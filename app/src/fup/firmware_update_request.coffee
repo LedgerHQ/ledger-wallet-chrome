@@ -21,7 +21,7 @@ Errors =
   GetVersionError: "GetVersionError"
 
 ###
-  FirmwareUpdateRequest performs dongle firmware updates. Once started it will listen the {WalletsManager} in order to catch
+  FirmwareUpdateRequest performs dongle firmware updates. Once started it will listen the {DonglesManager} in order to catch
   connected dongles and update them. Only one instance of FirmwareUpdateRequest should be alive at the same time. (This is
   ensured by the {ledger.fup.FirmwareUpdater})
 
@@ -107,7 +107,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_handleCurrentState()
       completion.success(wallet)
 
-    [wallet] = ledger.app.walletsManager.getConnectedWallets()
+    [dongle] = ledger.app.donglesManager.getConnectedDongles()
     try
       unless wallet?
         @_connectionCompletion = completion.readonly()
@@ -116,7 +116,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           @_connectionCompletion = null
           registerWallet(wallet)
       else
-        registerWallet(wallet)
+        registerDongle(dongle)
     catch er
       e er
     completion.readonly()
@@ -125,7 +125,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _waitForDisconnectDongle: (callback = undefined) ->
     return @_disconnectionCompletion if @_disconnectionCompletion?
     completion = new CompletionClosure(callback)
-    if @_wallet?
+    if @_dongle?
       @emit 'unplug'
       @_disconnectionCompletion = completion.readonly()
       @_wallet.once 'disconnected', =>
@@ -140,7 +140,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _handleCurrentState: () ->
     # If there is no dongle wait for one
-    (return @_waitForConnectedDongle => @_handleCurrentState()) unless @_wallet
+    (return @_waitForConnectedDongle => @_handleCurrentState()) unless @_dongle
 
     # Otherwise handle the current by calling the right method depending on the last mode and the state
     if LastMode is Modes.Os
@@ -156,8 +156,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         when States.LoadingBootloader then null
 
   _processInitStageOs: ->
-    @_wallet.getState (state) =>
-      if state isnt ledger.wallet.States.BLANK and state isnt ledger.wallet.States.FROZEN
+    @_dongle.getState (state) =>
+      if state isnt ledger.dongle.States.BLANK and state isnt ledger.dongle.States.FROZEN
         @_setCurrentState(States.Erasing)
         @_handleCurrentState()
       else
@@ -206,7 +206,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processInitStageBootloader: ->
 
-  _getVersion: (forceBl, callback) -> @_wallet.getRawFirmwareVersion(@_lastMode is Modes.Bootloader, forceBl, callback)
+  _getVersion: (forceBl, callback) -> @_dongle.getRawFirmwareVersion(@_lastMode is Modes.Bootloader, forceBl, callback)
 
   _compareVersion: (v1, v2) ->
 
@@ -215,7 +215,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _attemptToFailDonglePinCode: (pincode) ->
     deferred = Q.defer()
-    @_wallet.unlockWithPinCode pincode, (isUnlocked, error) =>
+    @_dongle.unlockWithPinCode pincode, (isUnlocked, error) =>
       if isUnlocked or error.code isnt ledger.errors.WrongPinCode
         @emit "erasureStep", 3
         @_waitForPowerCycle().then -> deferred.reject()
@@ -226,8 +226,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_waitForPowerCycle()
         .then =>
           l 'Power cycled'
-          @_wallet.getState (state) =>
-            deferred.resolve(state is ledger.wallet.States.BLANK or state is ledger.wallet.States.FROZEN)
+          @_dongle.getState (state) =>
+            deferred.resolve(state is ledger.dongle.States.BLANK or state is ledger.dongle.States.FROZEN)
     deferred.promise
 
   _setCurrentState: (newState) ->

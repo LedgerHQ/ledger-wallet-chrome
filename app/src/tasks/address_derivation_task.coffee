@@ -19,7 +19,7 @@ class ledger.tasks.AddressDerivationTask extends ledger.tasks.Task
       event.preventDefault()
 
     @_vents.on 'private:getPublicAddress', (ev, data) =>
-      ledger.app.wallet.getPublicAddress data['parameters'][0], (result, error) =>
+      ledger.app.dongle.getPublicAddress data['parameters'][0], (result, error) =>
         {command, queryId} = data
         if result?
           result.publicKey = result.publicKey.toString(HEX)
