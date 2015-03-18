@@ -29,6 +29,7 @@ class @ViewController extends @EventEmitter
   constructor: (params = {}, routedUrl = "") ->
     @params = _.defaults(params, @defaultParams)
     @routedUrl = routedUrl
+    @_isRendered = no
     # bind all methods to self
     for key, value of @
       if _.isFunction(value) and value != @constructor
@@ -52,6 +53,7 @@ class @ViewController extends @EventEmitter
     @emit 'beforeRender', {sender: @}
     render @viewPath(), @, (html) =>
       selector.html(html)
+      @_isRendered = yes
       do @onAfterRender
       @emit 'afterRender', {sender: @}
 
@@ -113,3 +115,5 @@ class @ViewController extends @EventEmitter
 
   # Called when the view controller is detached from a parent view controller
   onDetach: ->
+
+  isRendered: -> @_isRendered
