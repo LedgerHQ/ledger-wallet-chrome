@@ -117,6 +117,24 @@ _.extend @ledger.m2fa,
       throw er
     [clients, d.promise]
 
+  validateTxOnMultipleIds: (tx, pairingIds) ->
+    d = Q.defer()
+    clients = []
+    ledger.api.M2faRestClient.instance.wakeUpSecureScreens(_.keys(pairingIds))
+    for pairingId, label of pairingIds
+      do (pairingId) =>
+        [client, promise] = @_validateTx(tx, pairingId)
+        clients.push client
+        promise.progress (msg) ->
+          if msg == 'accepted'
+            # Close all other client
+            @clients[pId].stopIfNeccessary() for pId, lbl of pairingIds when pId isnt pairingId
+          d.notify(msg)
+        .then (transaction) -> d.resolve(transaction)
+        .fail (er) -> throw er
+        .done()
+    [clients, d.promise]
+
   # Creates a transaction validation request and starts the validation process.
   # @see ledger.m2fa.TransactionValidationRequest
   # @return [ledger.m2fa.TransactionValidationRequest] The request interface
@@ -125,8 +143,12 @@ _.extend @ledger.m2fa,
     new ledger.m2fa.TransactionValidationRequest(clients, promise)
 
   requestValidation: (tx, screen) ->
-    [client, promise] = @validateTx(tx, screen.id)
-    new ledger.m2fa.TransactionValidationRequest([client], promise, tx, screen)
+    if _(screen).isArray()
+      [client, promise] = @validateTx(tx, screen.id)
+      new ledger.m2fa.TransactionValidationRequest([client], promise, tx, screen)
+    else
+      [clients, promise] = @validateTxOnMultipleIds(tx, _(screen).map (e) -> e.id)
+      new ledger.m2fa.TransactionValidationRequest(clients, promise)
 
   requestValidationForLastPairing: (tx) ->
     [client, promise] = @validateTx(tx)
