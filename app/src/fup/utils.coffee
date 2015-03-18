@@ -12,3 +12,9 @@ _.extend ledger.fup.utils,
         -1
       else if v1[1] > v2[1]
         1
+
+  versionToString: (v) ->
+    return null unless v?
+    version = v[1]
+    info = if v[0] is 0 then "HW1" else "Ledger"
+    "#{info} #{(version >> 16) & 0xff}.#{(version >> 8) & 0xff}.#{version & 0xff}"
