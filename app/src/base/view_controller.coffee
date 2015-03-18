@@ -116,4 +116,6 @@ class @ViewController extends @EventEmitter
   # Called when the view controller is detached from a parent view controller
   onDetach: ->
 
+  # Checks if the UI of the current view controller is already rendered in its selector or not.
+  # @return [Boolean] True if the view controller is rendered, false otherwise
   isRendered: -> @_isRendered
