@@ -11,3 +11,7 @@ class @UpdateViewController extends @ViewController
   ###
   onNeedsUserApproval: ->
 
+  ###
+    Called once the controller is displayed and the Firmware update request is notifying a progress
+  ###
+  onProgress: (state, current, total) ->

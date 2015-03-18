@@ -1,37 +1,34 @@
-class @UpdateErasingViewController extends UpdateViewController
+class @UpdateReloadblfromosViewController extends UpdateViewController
 
   view:
-    eraseSeedButton: "#eraseSeed"
+    startButton: "#start"
     defaultFrame: "#default"
-    powerCycleFrame: "#powerCycle"
-    remainingStepText: "#remainingStep"
+    progressFrame: "#progress"
+    versionText: "#version"
 
   constructor: ->
     super
-    @_onErasureStep = @_onErasureStep.bind(@)
 
   _updateUi: ->
+    @view.versionText.text("from #{@getRequest().getDongleVersion()} to #{@getRequest().getTargetVersion()}")
     if @getRequest().isNeedingUserApproval()
-      @view.eraseSeedButton.show()
+      @view.defaultFrame.show()
+      @view.progressFrame.hide()
     else
-      @view.eraseSeedButton.hide()
+      @view.defaultFrame.hide()
+      @view.progressFrame.show()
 
   onAfterRender: ->
     super
-    @view.powerCycleFrame.hide()
+    @view.progressFrame.hide()
     @_updateUi()
 
-  onAttach: ->
-    @getRequest().on 'erasureStep', @_onErasureStep
-
-  onDetach: ->
-    @getRequest().off 'erasureStep', @_onErasureStep
-
-  approveSeedErasure: -> @getRequest().approveCurrentState()
+  approveUpdate: ->
+    @getRequest().approveCurrentState()
+    @_updateUi()
 
   onNeedsUserApproval: -> @_updateUi()
 
-  _onErasureStep: (ev, remainingStep) ->
-    @view.defaultFrame.hide()
-    @view.powerCycleFrame.show()
-    @view.remainingStepText.text("Remaining: #{remainingStep}")
+  onProgress: (state, current, total) ->
+    super
+    @view.progressFrame.text("#{Math.ceil(current * 100 / total)}%")

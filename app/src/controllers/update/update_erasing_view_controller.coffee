@@ -8,7 +8,6 @@ class @UpdateErasingViewController extends UpdateViewController
 
   constructor: ->
     super
-    @_onNeedsUserApproval = @_onNeedsUserApproval.bind(@)
     @_onErasureStep = @_onErasureStep.bind(@)
 
   _updateUi: ->

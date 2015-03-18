@@ -254,8 +254,24 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_waitForUserApproval('reloadbootloader')
     .then =>
       @_removeUserApproval('reloadbootloader')
+      l 'The party may begin'
       index = 0
       loop break if index >= ledger.fup.updates.BL_RELOADER.length or ledger.fup.utils.compareVersions(@_dongleVersion, ledger.fup.updates.BL_RELOADER[index][0])
+
+      if index is ledger.fup.updates.BL_RELOADER.length
+        e "This firmware is not supported"
+        # TODO: Handle This firmware is not supported
+        return
+      l 'Process loading'
+      @_processLoadingScript ledger.fup.updates.BL_RELOADER[index][1], States.ReloadingBootloaderFromOs
+      .then =>
+        @_waitForPowerCycle()
+      .fail (e) =>
+        # TODO: If e is 0x6985 -> Error loading
+        # TODO: If e is 0x6faa -> Error loading reloader. You might not have the right personalization on your card - make sure you're not using a pre-release or test card
+        # TODO: Else -> Error loading with code
+        @_waitForDisconnectDongle()
+
 
 
   _processInitStageBootloader: ->
@@ -327,29 +343,34 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     completion.readonly()
 
   _doProcessLoadingScript: (adpus, state, ignoreSW, offset) ->
-    @_onProgress?(state, offset, adpus.length)
+    l '_doProcessLoadingScript', offset
+    Try -> @_onProgress?(state, offset, adpus.length)
     if offset >= adpus.length
       @_exchangeNeedsExtraTimeout = no
       return
-    @_wallet.dongle._lwCard.dongle.card.exchange_async(new ByteString(apdus[offset], HEX))
-    .then =>
-      if ignoreSW or @_wallet.dongle._lwCard.dongle.card.SW == 0x9000
-        if @_exchangeNeedsExtraTimeout
-          deferred = Q.defer()
-          _.delay (=> deferred.resolve(@_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1))), ExchangeTimeout
-          deferred.promise()
+    try
+      @_wallet._lwCard.dongle.card.exchange_async(new ByteString(adpus[offset], HEX))
+      .then =>
+        l 'After exchange'
+        if ignoreSW or @_wallet.dongle._lwCard.dongle.card.SW == 0x9000
+          if @_exchangeNeedsExtraTimeout
+            deferred = Q.defer()
+            _.delay (=> deferred.resolve(@_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1))), ExchangeTimeout
+            deferred.promise()
+          else
+            @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
         else
-          @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
-      else
+          @_exchangeNeedsExtraTimeout = no
+          # TODO: Place Logger here
+          l 'Unexpected status', @_wallet._lwCard.dongle.card.SW
+          throw new Error('Unexpected status ' + @_wallet._lwCard.dongle.card.SW)
+      .fail (ex) =>
+        e ex
+        return @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1) if offset is adpus.length - 1
         @_exchangeNeedsExtraTimeout = no
-        # TODO: Place Logger here
-        l 'Unexpected status', @_wallet._lwCard.dongle.card.SW
-        throw new Error('Unexpected status ' + @_wallet._lwCard.dongle.card.SW)
-    .fail (ex) =>
+        throw new Error("ADPU sending failed " + ex)
+    catch ex
       e ex
-      return @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1) if offset is adpus.length - 1
-      @_exchangeNeedsExtraTimeout = no
-      throw new Error("ADPU sending failed " + ex)
 
 
 

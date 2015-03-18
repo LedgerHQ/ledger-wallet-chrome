@@ -1,13 +1,13 @@
-<div style="background-color: #880000;width: 100%;height: 100%">
+<div style="background-color: #445577;width: 100%;height: 100%">
+  Reloading bootloader from OS <p id="version"></p>
 
   <div id="default">
-    Erasing
-    <button id="eraseSeed" data-href="#approveSeedErasure">Erase me!</button>
+    Do you want to begin update ?
+    <button id="start" data-href="#approveUpdate">Update me!</button>
   </div>
 
-  <div id="powerCycle">
-    Power cycle your dongle now!
-    <p id="remainingStep"></p>
+  <div id="progress">
+    0%
   </div>
 
 </div>
