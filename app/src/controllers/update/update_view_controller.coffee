@@ -5,3 +5,9 @@
 class @UpdateViewController extends @ViewController
 
   getRequest: -> @parentViewController._request
+
+  ###
+    Called once the controller is displayed and the Firmware update request needs a user approval
+  ###
+  onNeedsUserApproval: ->
+

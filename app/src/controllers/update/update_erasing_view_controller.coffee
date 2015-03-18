@@ -23,16 +23,14 @@ class @UpdateErasingViewController extends UpdateViewController
     @_updateUi()
 
   onAttach: ->
-    @getRequest().on 'needsUserApproval', @_onNeedsUserApproval
     @getRequest().on 'erasureStep', @_onErasureStep
 
   onDetach: ->
-    @getRequest().off 'needsUserApproval', @_onNeedsUserApproval
     @getRequest().off 'erasureStep', @_onErasureStep
 
   approveSeedErasure: -> @getRequest().approveCurrentState()
 
-  _onNeedsUserApproval: -> @_updateUi()
+  onNeedsUserApproval: -> @_updateUi()
 
   _onErasureStep: (ev, remainingStep) ->
     @view.defaultFrame.hide()
