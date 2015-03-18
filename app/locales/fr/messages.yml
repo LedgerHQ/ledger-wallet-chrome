@@ -9,7 +9,9 @@ application:
 common:
   bitcoin_acronym: 'BTC'
   default_account_name: "Mon compte"
-  date_format: 'DD/MM/YYYY à HH:mm'
+  date_time_format: 'L [à] LT'
+  date_format: 'L'
+  time_format: 'LT'
   close: "Fermer"
   cancel: "Annuler"
 

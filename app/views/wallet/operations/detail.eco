@@ -19,7 +19,7 @@
       </tr>
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.time' %></td>
-        <td class="align-right" id="operation_time"><%= moment(new Date(@operation.get('time'))).format t 'common.date_format' %></td>
+        <td class="align-right" id="operation_time"><%= ledger.i18n.formatDateTime(new Date(@operation.get('time'))) %></td>
       </tr>
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.status' %></td>
@@ -37,7 +37,7 @@
       </tr>
       <tr>
         <td class="row-title top-aligned"><%= t 'wallet.operations.detail.sender' %></td>
-        <td class="align-right regular-text" id="operation_inputs">
+        <td class="align-right regular-text" id="operation_inputs
           <% for input in @operation.get('senders'): %>
           <%= input %><br />
           <% end %>
