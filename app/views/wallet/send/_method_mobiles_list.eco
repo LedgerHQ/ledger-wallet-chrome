@@ -1,5 +1,5 @@
 <div id="mobile_table" class="large-table">
-  <div class="header <%= "top" if @mobilesGroups.length > 1 %>">
+  <div class="header <%= "top" if @mobilesGroups.length > 0 %>">
     <div class="uppercase-section-column stretchable"><%= t 'wallet.send.method.mobile_phone' %></div>
     <a class="uppercase-action" href="#pairMobilePhone"><i class="fa fa-plus"></i><%= t 'wallet.send.method.pair_a_mobile_phone' %></a>
   </div>

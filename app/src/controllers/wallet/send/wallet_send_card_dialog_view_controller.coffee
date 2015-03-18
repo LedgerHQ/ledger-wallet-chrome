@@ -18,6 +18,10 @@ class @WalletSendCardDialogViewController extends @DialogViewController
     super
     @view.keycard.stealFocus()
 
+  otherValidationMethod: ->
+    dialog = new WalletSendMethodDialogViewController(transaction: @params.transaction)
+    @getDialog().push dialog
+
   _setupUI: ->
     @view.keycard = new ledger.pin_codes.KeyCard()
     @view.tinyPincode = new ledger.pin_codes.TinyPinCode()
@@ -81,7 +85,3 @@ class @WalletSendCardDialogViewController extends @DialogViewController
       @_validationDetails.localizedIndexes.splice(0, 1)
     @view.keycard.on 'character:waiting', (event, value) =>
       @_updateValidableIndication()
-    @once 'dismiss', =>
-      @view.keycard.off 'completed'
-      @view.keycard.off 'character:input'
-      @view.keycard.off 'character:waiting'

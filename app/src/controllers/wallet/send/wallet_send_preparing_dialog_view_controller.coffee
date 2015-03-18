@@ -19,11 +19,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
           dialog = new WalletSendErrorDialogViewController reason: reason
           dialog.show()
       else
-        dialog = switch transaction.getValidationMode()
-          when ledger.wallet.transaction.Transaction.ValidationModes.KEYCARD
-              new WalletSendCardDialogViewController transaction: transaction
-          when ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN
-              new WalletSendMobileDialogViewController transaction: transaction
+        dialog = new WalletSendMethodDialogViewController(transaction: transaction)
         @getDialog().push dialog
 
   onDismiss: ->

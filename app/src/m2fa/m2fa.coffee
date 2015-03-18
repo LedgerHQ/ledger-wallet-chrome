@@ -110,7 +110,7 @@ _.extend @ledger.m2fa,
               @clients[pId].stopIfNeccessary() for pId, lbl of pairingIds when pId isnt pairingId
             d.notify(msg)
           .then (transaction) -> d.resolve(transaction)
-          .fail (er) -> throw er
+          .fail (er) -> d.reject er
           .done()
     .fail (er) ->
       e er
@@ -120,18 +120,18 @@ _.extend @ledger.m2fa,
   validateTxOnMultipleIds: (tx, pairingIds) ->
     d = Q.defer()
     clients = []
-    ledger.api.M2faRestClient.instance.wakeUpSecureScreens(_.keys(pairingIds))
-    for pairingId, label of pairingIds
+    ledger.api.M2faRestClient.instance.wakeUpSecureScreens(pairingIds)
+    for pairingId in pairingIds
       do (pairingId) =>
         [client, promise] = @_validateTx(tx, pairingId)
         clients.push client
-        promise.progress (msg) ->
+        promise.progress (msg) =>
           if msg == 'accepted'
             # Close all other client
-            @clients[pId].stopIfNeccessary() for pId, lbl of pairingIds when pId isnt pairingId
+            @clients[pId].stopIfNeccessary() for pId in pairingIds when pId isnt pairingId
           d.notify(msg)
         .then (transaction) -> d.resolve(transaction)
-        .fail (er) -> throw er
+        .fail (er) -> d.reject er
         .done()
     [clients, d.promise]
 
@@ -143,7 +143,7 @@ _.extend @ledger.m2fa,
     new ledger.m2fa.TransactionValidationRequest(clients, promise)
 
   requestValidation: (tx, screen) ->
-    if _(screen).isArray()
+    unless _(screen).isArray()
       [client, promise] = @validateTx(tx, screen.id)
       new ledger.m2fa.TransactionValidationRequest([client], promise, tx, screen)
     else
