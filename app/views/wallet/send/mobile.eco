@@ -3,6 +3,7 @@
     <h1><%= t 'wallet.send.common.send_bitcoins' %></h1>
   </header>
   <div id="content_container">
+    <img src="../assets/images/wallet/pairing_icon.png" width="108" height="60" />
     <div class="regular-text"><%= t 'wallet.send.mobile.sending_transaction' %></div>
     <div class="regular-grey-text-small"><%= t 'wallet.send.mobile.open_mobile_app' %></div>
   </div>

@@ -281,13 +281,10 @@ wallet:
       open_mobile_app: "Open the Ledger Wallet mobile app to validate the transaction."
 
     processing:
-      sending: "Sending..."
-      validating: "Validating transaction..."
-      may_take_a_while: "Please wait, this operation may take a few moments."
+      finalizing_transaction: "Finalizing transaction..."
 
     preparing:
-      title: "Preparing transaction..."
-      may_take_a_while: "Please wait, this operation may take a few moments."
+      preparing_transaction: "Preparing transaction..."
 
     error:
       title: "Sending failed"
