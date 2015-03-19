@@ -205,7 +205,7 @@
 
         ## Dialog Management
         'utils/dialogs'
-        '../views/base/dialog'
+        '../views/common/dialogs/dialog'
         'base/dialog_view_controller'
 
         ## Common controllers
