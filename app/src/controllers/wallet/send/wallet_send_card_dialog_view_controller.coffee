@@ -5,6 +5,7 @@ class @WalletSendCardDialogViewController extends @DialogViewController
     enteredCode: "#validation_code"
     validationIndication: "#validation_indication"
     validationSubtitle: "#validation_subtitle"
+    otherValidationMethodsLabel: "#other_validation_methods"
     keycard: undefined
     tinyPincode: undefined
   _validationDetails: undefined
@@ -13,12 +14,11 @@ class @WalletSendCardDialogViewController extends @DialogViewController
     super
     @_setupUI()
     @_updateUI()
+    _.defer =>
+      @view.keycard.stealFocus()
 
-  onShow: ->
-    super
-    @view.keycard.stealFocus()
-
-  otherValidationMethod: ->
+  otherValidationMethods: ->
+    return if @params.options?.hideOtherValidationMethods? is true
     dialog = new WalletSendMethodDialogViewController(transaction: @params.transaction)
     @getDialog().push dialog
 
@@ -27,7 +27,19 @@ class @WalletSendCardDialogViewController extends @DialogViewController
     @view.tinyPincode = new ledger.pin_codes.TinyPinCode()
     @view.keycard.insertIn @view.cardContainer[0]
     @view.tinyPincode.insertIn @view.enteredCode[0]
+    @view.otherValidationMethodsLabel.hide() if @params.options?.hideOtherValidationMethods? is true
     @_listenEvents()
+
+  _listenEvents: ->
+    @view.keycard.once 'completed', (event, value) =>
+      @dismiss =>
+        dialog = new WalletSendProcessingDialogViewController transaction: @params.transaction, keycode: value
+        dialog.show()
+    @view.keycard.on 'character:input', (event, value) =>
+      @view.tinyPincode.setValuesCount @view.keycard.value().length
+      @_validationDetails.localizedIndexes.splice(0, 1)
+    @view.keycard.on 'character:waiting', (event, value) =>
+      @_updateValidableIndication()
 
   _updateUI: ->
     @_validationDetails = @params.transaction.getValidationDetails()
@@ -74,14 +86,3 @@ class @WalletSendCardDialogViewController extends @DialogViewController
     string += validationDetails.recipientsAddress.text
     indexes = indexes.concat _.map(validationDetails.recipientsAddress.indexes, (num) => num + decal)
     {localizedString: string, localizedIndexes: indexes}
-
-  _listenEvents: ->
-    @view.keycard.once 'completed', (event, value) =>
-      @dismiss =>
-        dialog = new WalletSendProcessingDialogViewController transaction: @params.transaction, keycode: value
-        dialog.show()
-    @view.keycard.on 'character:input', (event, value) =>
-      @view.tinyPincode.setValuesCount @view.keycard.value().length
-      @_validationDetails.localizedIndexes.splice(0, 1)
-    @view.keycard.on 'character:waiting', (event, value) =>
-      @_updateValidableIndication()

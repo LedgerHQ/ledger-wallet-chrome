@@ -27,6 +27,6 @@ class @WalletSendMobileDialogViewController extends @DialogViewController
     super
     @_request?.cancel()
 
-  otherValidationMethod: ->
+  otherValidationMethods: ->
     dialog = new WalletSendMethodDialogViewController(transaction: @params.transaction)
     @getDialog().push dialog
