@@ -11,15 +11,11 @@ common:
   cancel: "Cancel"
   finish: "Finish"
   confirm: "Confirm"
+  confirmation: "Confirmación"
   send: "Send"
   yes: "Si"
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
-
-  dialogs:
-    yes: "Si"
-    no: "No"
-    confirmation: "Confirmación"
 
   keycard:
     uppercase_letters: "Mayúsculas"

@@ -4,12 +4,12 @@
   </header>
   <div id="content_container">
     <img src="../assets/images/wallet/pairing_icon.png" width="108" height="60" />
-    <div class="regular-text"><%= t 'wallet.send.mobile.sending_transaction' %></div>
+    <div id="mobile_name" class="regular-text"></div>
     <div class="regular-grey-text-small"><%= t 'wallet.send.mobile.open_mobile_app' %></div>
   </div>
 </section>
 <div class="dialog-actions-bar">
-  <a class="uppercase-action" href="#test"><%= t 'wallet.send.common.other_validation_methods' %></a>
+  <a class="uppercase-action" href="#otherValidationMethods"><%= t 'wallet.send.common.other_validation_methods' %></a>
   <div class="left-spacer"></div>
   <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
 </div>

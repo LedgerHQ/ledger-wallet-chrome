@@ -15,7 +15,13 @@ class @WalletSendMethodDialogViewController extends @DialogViewController
       @_refreshMobilesList()
 
   selectMobileGroup: (params) ->
-    mobilesGroup = @mobilesGroups[params.index]
+    secureScreens = @mobilesGroups[params.index]
+    dialog = new WalletSendMobileDialogViewController(secureScreens: secureScreens, transaction: @params.transaction)
+    @getDialog().push dialog
+
+  selectSecurityCard: ->
+    dialog = new WalletSendCardDialogViewController(transaction: @params.transaction)
+    @getDialog().push dialog
 
   _refreshMobilesList: ->
     ledger.m2fa.PairedSecureScreen.getAllGroupedByUuidFromSyncedStore (mobilesGroups, error) =>

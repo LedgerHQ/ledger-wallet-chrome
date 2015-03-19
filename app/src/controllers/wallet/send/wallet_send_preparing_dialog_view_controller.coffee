@@ -19,15 +19,25 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
           dialog = new WalletSendErrorDialogViewController reason: reason
           dialog.show()
       else
-        dialog = switch transaction.getValidationMode()
-          when ledger.wallet.transaction.Transaction.ValidationModes.KEYCARD
-              new WalletSendCardDialogViewController transaction: transaction
-          when ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN
-              new WalletSendMobileDialogViewController transaction: transaction
-        @getDialog().push dialog
+        @_routeToNextDialog(transaction)
 
-  onDismiss: ->
-    super
+  _routeToNextDialog: (transaction) ->
+    cardBlock = (transaction) =>
+      @getDialog().push new WalletSendCardDialogViewController(transaction: transaction, options: {hideOtherValidationMethods: true})
+    mobileBlock = (transaction, secureScreens) =>
+      @getDialog().push new WalletSendMobileDialogViewController(transaction: transaction, secureScreens: secureScreens)
+    methodBlock = (transaction) =>
+      @getDialog().push new WalletSendMethodDialogViewController(transaction: transaction)
 
-  onDetach: ->
-    super
+    # if mobile validation is supported
+    if ledger.app.wallet.getIntFirmwareVersion() >= ledger.wallet.Firmware.V_LW_1_0_0
+      # fetch grouped paired screens
+      ledger.m2fa.PairedSecureScreen.getAllGroupedByUuidFromSyncedStore (groups, error) =>
+        groups = _.values(_.omit(groups, undefined)) if groups?
+        ## if paired and only one pairing id exists
+        if error? or not groups? or groups.length != 1 or transaction.getValidationMode() != ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN
+          methodBlock(transaction)
+        else
+          mobileBlock(transaction, groups[0])
+    else
+      cardBlock(transaction)
