@@ -29,6 +29,8 @@ common:
     invalid_receiver_address: "L'adresse bitcoin à créditer n'est pas correcte."
     invalid_amount: "Le montant à envoyer n'est pas valide."
     unknown: "Une erreur inconnue est survenue."
+    secure_screen_cancelled_transaction: "Le smartphone a annulé la transaction."
+    secure_screen_invalid_pin: "Le smartphone a retourné un mauvais code pin."
 
   qrcode:
     present: "Présentez le code QR de réception devant la webcam."
@@ -282,12 +284,8 @@ wallet:
     preparing:
       preparing_transaction: "Préparation de la transaction..."
 
-    error:
-      title: "Envoi échoué"
-      unable_to_send_bitcoins: "La transaction n’a pas pu être effectuée."
-      close: "Fermer"
-
     errors:
+      sending_failed: "Envoi échoué"
       sending_succeeded: "Envoi terminé"
       transaction_completed: "La transaction a bien été effectuée."
 

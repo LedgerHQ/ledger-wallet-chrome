@@ -9,8 +9,8 @@
 class @ledger.m2fa.TransactionValidationRequest extends @EventEmitter
 
   @errors:
-    TransactionCancelled: "The transaction has been cancelled by the secure screen"
-    InvalidResult: "The secure screen sent back an invalid pin"
+    TransactionCancelled: "secure_screen_cancelled_transaction"
+    InvalidResult: "secure_screen_invalid_pin"
 
   constructor: (clients, promise) ->
     @_completion = new CompletionClosure

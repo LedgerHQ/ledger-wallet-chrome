@@ -29,6 +29,8 @@ common:
     invalid_receiver_address: "Recipient bitcoin address is incorrect."
     invalid_amount: "The amount to send is invalid."
     unknown: "An unknown error occured."
+    secure_screen_cancelled_transaction: "The smartphone cancelled the transaction."
+    secure_screen_invalid_pin: "The smartphone returned a wrong pin code."
 
   qrcode:
     present: "Present the recipient QR code in front of the webcam."
@@ -282,12 +284,8 @@ wallet:
     preparing:
       preparing_transaction: "Preparing transaction..."
 
-    error:
-      title: "Sending failed"
-      unable_to_send_bitcoins: "The transaction could not be completed."
-      close: "Close"
-
     errors:
+      sending_failed: "Sending failed"
       sending_succeeded: "Sending succeeded"
       transaction_completed: "The transaction successfully completed."
 
