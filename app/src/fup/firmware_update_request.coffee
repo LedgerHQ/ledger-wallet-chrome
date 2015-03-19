@@ -195,7 +195,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
                 @_handleCurrentState()
             when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update
               index = 0
-              loop break if index >= ledger.fup.updates.OS_INIT.length or ledger.fup.utils.compareVersions(availability.dongleVersion, ledger.fup.updates.OS_INIT[index++][0]).eq()
+              while index < ledger.fup.updates.OS_INIT.length and !ledger.fup.utils.compareVersions(@_dongleVersion, ledger.fup.updates.OS_INIT[index][0]).eq()
+                index += 1
               if index isnt ledger.fup.updates.OS_INIT.length
                 @_processLoadingScript(ledger.fup.updates.OS_INIT[index][1], States.LoadingOldApplication, true)
                 .then =>
@@ -206,18 +207,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
                 @_setCurrentState(States.ReloadingBootloaderFromOs)
                 @_handleCurrentState()
             else return @_failure() # TODO: Handle error properly
-      ###
-          if (index != OS_INIT.length) {
-            processLoadingScript(OS_INIT[index][1], "Initializing old application", true).then(function(result) {
-            stage = STAGE_RELOAD_BL_FROM_OS;
-            processStage();
-          });
-          }
-          else {
-            stage = STAGE_RELOAD_BL_FROM_OS;
-            processStage();
-          }
-      ###
 
   _processErasing: ->
     @_waitForUserApproval('erasure')
@@ -256,8 +245,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_removeUserApproval('reloadbootloader')
       l 'The party may begin'
       index = 0
-      loop break if index >= ledger.fup.updates.BL_RELOADER.length or ledger.fup.utils.compareVersions(@_dongleVersion, ledger.fup.updates.BL_RELOADER[index][0])
-
+      while index < ledger.fup.updates.BL_RELOADER.length and !ledger.fup.utils.compareVersions(@_dongleVersion, ledger.fup.updates.BL_RELOADER[index][0]).eq()
+        index += 1
+      l 'load BL_RELOADER', index
       if index is ledger.fup.updates.BL_RELOADER.length
         e "This firmware is not supported"
         # TODO: Handle This firmware is not supported
@@ -267,7 +257,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       .then =>
         @_waitForPowerCycle()
       .fail (e) =>
-        # TODO: If e is 0x6985 -> Error loading
+        l 'Failure', e
+        # TODO: If e is 0x6985 -> Error loading reloader. If the dongle is set up, make sure to erase the seed before updating the firmware
         # TODO: If e is 0x6faa -> Error loading reloader. You might not have the right personalization on your card - make sure you're not using a pre-release or test card
         # TODO: Else -> Error loading with code
         @_waitForDisconnectDongle()
@@ -334,7 +325,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_deferredApproval.promise.then => @_approvedStates.push approvalName
 
   _removeUserApproval: (approvalName) ->
-    _(@_approvedStates).without(approvalName)
+    @_approvedStates = _(@_approvedStates).without(approvalName)
     return
 
   _processLoadingScript: (adpus, state, ignoreSW, offset = 0) ->
@@ -343,16 +334,18 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     completion.readonly()
 
   _doProcessLoadingScript: (adpus, state, ignoreSW, offset) ->
-    l '_doProcessLoadingScript', offset
-    Try -> @_onProgress?(state, offset, adpus.length)
+    l '_doProcessLoadingScript', offset, adpus.length
+    @_notifyProgress(state, offset, adpus.length)
     if offset >= adpus.length
       @_exchangeNeedsExtraTimeout = no
       return
     try
+      l 'Writing', adpus[offset]
       @_wallet._lwCard.dongle.card.exchange_async(new ByteString(adpus[offset], HEX))
       .then =>
         l 'After exchange'
-        if ignoreSW or @_wallet.dongle._lwCard.dongle.card.SW == 0x9000
+        if ignoreSW or @_wallet._lwCard.dongle.card.SW == 0x9000
+          l 'Exchange OK'
           if @_exchangeNeedsExtraTimeout
             deferred = Q.defer()
             _.delay (=> deferred.resolve(@_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1))), ExchangeTimeout
@@ -360,19 +353,20 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           else
             @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
         else
+          l 'Exchange Not OK'
           @_exchangeNeedsExtraTimeout = no
           # TODO: Place Logger here
           l 'Unexpected status', @_wallet._lwCard.dongle.card.SW
           throw new Error('Unexpected status ' + @_wallet._lwCard.dongle.card.SW)
       .fail (ex) =>
-        e ex
         return @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1) if offset is adpus.length - 1
         @_exchangeNeedsExtraTimeout = no
         throw new Error("ADPU sending failed " + ex)
     catch ex
       e ex
 
+  _notifyProgress: (state, offset, total) -> _.defer => @_onProgress?(state, offset, total)
+
 
 
 LastMode = ledger.fup.FirmwareUpdateRequest.Modes.Os
-

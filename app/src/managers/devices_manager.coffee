@@ -31,6 +31,8 @@ class @DevicesManager extends EventEmitter
         {productId: 0x1b7c, vendorId: 0x2581, type: 'usb'}
         {productId: 0x2b7c, vendorId: 0x2581, type: 'hid'}
         {productId: 0x3b7c, vendorId: 0x2581, type: 'hid'}
+        {productId: 0x1808, vendorId: 0x2581, type: 'usb'}
+        {productId: 0x1807, vendorId: 0x2581, type: 'hid'}
       ]
       getDevices devicesInfo, (devices) =>
         oldDevices = @_devices

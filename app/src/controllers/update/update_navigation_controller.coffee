@@ -6,7 +6,7 @@ class @UpdateNavigationController extends @NavigationController
     @_request.on 'unplug', =>  @_onDongleNeedPowerCycle()
     @_request.on 'stateChanged', (ev, data) => @_onStateChanged(data.newState, data.oldState)
     @_request.on 'needsUserApproval', @_onNeedsUserApproval
-
+    @_request.onProgress @_onProgress.bind(@)
     ledger.fup.FirmwareUpdater.instance.load =>
 
     window.fup = @_request # TODO: REMOVE THIS
@@ -38,6 +38,7 @@ class @UpdateNavigationController extends @NavigationController
       @topViewController().once 'afterRender', => @topViewController().onNeedsUserApproval()
 
   _onProgress: (state, current, total) ->
+    l 'on progress', arguments
     if @topViewController()?.isRendered()
       @topViewController().onProgress(state, current, total)
     else
