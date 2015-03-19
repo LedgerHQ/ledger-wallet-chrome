@@ -287,11 +287,9 @@ wallet:
       unable_to_send_bitcoins: "La transaction n’a pas pu être effectuée."
       close: "Fermer"
 
-    success:
-      title: "Envoi terminé"
-      able_to_send_bitcoins: "La transaction a bien été effectuée."
-      close: "Fermer"
-      confirmed_in_a_few_minutes: "L'opération apparaîtra comme confirmée dans quelques minutes."
+    errors:
+      sending_succeeded: "Envoi terminé"
+      transaction_completed: "La transaction a bien été effectuée."
 
   pairing:
     common:

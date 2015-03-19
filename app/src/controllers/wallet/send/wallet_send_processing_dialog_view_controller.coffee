@@ -31,5 +31,5 @@ class @WalletSendProcessingDialogViewController extends @DialogViewController
           dialog = new WalletSendErrorDialogViewController reason: 'network_no_response'
           dialog.show()
         else
-          dialog = new WalletSendSuccessDialogViewController
+          dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.send.errors.sending_succeeded"), subtitle: t("wallet.send.errors.transaction_completed"))
           dialog.show()
