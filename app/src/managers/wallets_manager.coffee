@@ -5,21 +5,32 @@ class @WalletsManager extends EventEmitter
 
   constructor: (app) ->
     @cardFactory = new ChromeapiPlugupCardTerminalFactory()
+    @factoryDongleBootloader = new ChromeapiPlugupCardTerminalFactory(0x1808);
+    @factoryDongleBootloaderHID = new ChromeapiPlugupCardTerminalFactory(0x1807);
     app.devicesManager.on 'plug', (e, card) => @connectCard(card)
     app.devicesManager.on 'unplug', (e, card) => @disconnectCard(card)
 
   connectCard: (card) ->
     try
+      l card
       @emit 'connecting', card
-      @cardFactory.list_async().then (result) =>
-        setTimeout =>
+      result = []
+      @cardFactory.list_async()
+      .then (cards) =>
+        result = result.concat(cards)
+        @factoryDongleBootloader.list_async()
+      .then (cards) =>
+        result = result.concat(cards)
+        @factoryDongleBootloaderHID.list_async()
+      .then (cards) =>
+        result = result.concat(cards)
+        _.defer =>
           if result.length > 0
             @cardFactory.getCardTerminal(result[0]).getCard_async().then (lwCard) =>
-              setTimeout () =>
-                @_wallets[card.id] = new ledger.wallet.HardwareWallet(this, card.id, lwCard)
+              _.defer =>
+                @_wallets[card.id] = new ledger.wallet.HardwareWallet(this, card, lwCard)
                 @_wallets[card.id].once 'connected', (event, wallet) => @emit 'connected', wallet
                 @_wallets[card.id].connect()
-        , 0
     catch er
       e er
 

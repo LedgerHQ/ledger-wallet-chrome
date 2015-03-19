@@ -27,19 +27,28 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   _state: ledger.wallet.States.UNDEFINED
 
-  constructor: (@manager, @id, @lwCard) ->
+  constructor: (@manager, card, @lwCard) ->
+    @id = card.id
+    @_productId = card.productId
     @_xpubs = {}
     @_vents = new EventEmitter()
     do @_listenStateChanges
 
   connect: () ->
-    @_vents.once 'LW.CardConnected', (event, data) =>
-      @_vents.once 'LW.FirmwareVersionRecovered', (event, data) =>
-        data.lW.getOperationMode()
-        data.lW.plugged()
-        @emit 'connected', @
-      data.lW.recoverFirmwareVersion()
-    @_lwCard = new LW(0, new BTChip(@lwCard), @_vents)
+    unless @isInBootloaderMode()
+      @_vents.once 'LW.CardConnected', (event, data) =>
+        @_vents.once 'LW.FirmwareVersionRecovered', (event, data) =>
+          data.lW.getOperationMode()
+          data.lW.plugged()
+          @emit 'connected', @
+        data.lW.recoverFirmwareVersion()
+      @_lwCard = new LW(0, new BTChip(@lwCard), @_vents)
+    else
+      l 'BOOTLOADER'
+      # TODO: Remove with vincent refactoring
+      @_lwCard = dongle: @lwCard
+      @emit 'connected', @
+      _.defer => @_setState(ledger.wallet.States.BLANK)
 
   disconnect: () ->
     @_setState(ledger.wallet.States.DISCONNECTED)
@@ -48,6 +57,8 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     if @_numberOfRetry?
       @manager.removeRestorableState(state) for state in @manager.findRestorableStates({label: 'numberOfRetry'})
       @manager.addRestorableState({label: 'numberOfRetry', numberOfRetry: @_numberOfRetry}, 45000)
+
+  isInBootloaderMode: -> if @_productId is 0x1808 or @_productId is 0x1807 then yes else no
 
   getFirmwareUpdater: () -> ledger.fup.FirmwareUpdater.instance
 

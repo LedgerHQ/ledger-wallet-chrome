@@ -45,7 +45,7 @@ class @DevicesManager extends EventEmitter
           if oldDevices[device_id]?
             @_devices[device_id] = oldDevices[device_id]
           else
-            @_devices[device_id] = {id: device_id}
+            @_devices[device_id] = {id: device_id, productId: device['productId'], vendorId: device['vendorId']}
         oldDevicesList = _.values(oldDevices)
         devicesList = _.values(@_devices)
         oldDifferences = (item for item in devicesList when _.indexOf(oldDevicesList, item) == -1)
@@ -53,8 +53,10 @@ class @DevicesManager extends EventEmitter
         differences = newDifferences.concat(oldDifferences)
         for difference in differences
           if _.where(oldDevices, {id: difference.id}).length > 0
+            l 'unplug', difference
             @emit 'unplug', difference
           else
+            l 'plug', difference
             @emit 'plug', difference
 
 

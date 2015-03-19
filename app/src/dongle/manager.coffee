@@ -22,6 +22,7 @@ class @ledger.dongle.Manager extends EventEmitter
 
   # Start observing if dongles are plugged in or unnplugged
   start: () ->
+    return
     return if @_running
     _running = yes
     @_interval = setInterval @_checkIfDongleIsPluggedIn.bind(@), 200
