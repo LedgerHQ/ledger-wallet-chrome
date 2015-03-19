@@ -6,16 +6,18 @@ require_script = (url, callback) ->
       script.onreadystatechange = callback;
       script.onload = script.onreadystatechange;
   document.getElementsByTagName('head')[0].appendChild(script)
+  script
 
 @require = (urls, callback) ->
   self = this
+  scripts = []
   if (urls instanceof Array)
     index = -1
     require_array = ->
       if (index + 1 < urls.length)
-        require_script(urls[++index], require_array)
+        scripts.push require_script(urls[++index], require_array)
       else
-        callback.bind(self)()
+        callback.bind(self)(scripts)
     do require_array
   else
-    require_script(urls, callback.bind(self))
+    scripts.push require_script(urls, => callback?(scripts))

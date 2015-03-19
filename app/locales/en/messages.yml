@@ -14,11 +14,13 @@ common:
   time_format: 'LT'
   close: "Close"
   cancel: "Cancel"
-
-  dialogs:
-    yes: "Yes"
-    no: "No"
-    confirmation: "Confirmation"
+  finish: "Finish"
+  confirm: "Confirm"
+  confirmation: "Confirmation"
+  send: "Send"
+  yes: "Yes"
+  no: "No"
+  may_take_a_while: "Please wait, this operation may take a few moments."
 
   keycard:
     uppercase_letters: "Uppercase letters"
@@ -32,6 +34,8 @@ common:
     invalid_receiver_address: "Recipient bitcoin address is incorrect."
     invalid_amount: "The amount to send is invalid."
     unknown: "An unknown error occured."
+    secure_screen_cancelled_transaction: "The smartphone cancelled the transaction."
+    secure_screen_invalid_pin: "The smartphone returned a wrong pin code."
 
   qrcode:
     present: "Present the recipient QR code in front of the webcam."
@@ -48,7 +52,7 @@ onboarding:
       you_can_unplug: "You can now safely unplug your Ledger Wallet."
 
     pin:
-      enter_your_pin_code: "Enter you PIN code to unlock your wallet:"
+      enter_your_pin_code: "Enter your PIN code to unlock your wallet:"
       i_lost_my_pin_code: "If you forgot your PIN code, visit our help center."
 
     opening:
@@ -203,7 +207,7 @@ wallet:
       status: "Status"
       sender: "From"
       receiver: "To"
-      identifier: "Identifiant"
+      identifier: "Identifier"
       send_by_email: "SEND BY EMAIL"
       print: "PRINT"
       close: "CLOSE"
@@ -236,7 +240,7 @@ wallet:
     index:
       title: "RECEIVE BITCOINS"
       amount: "AMOUNT (OPTIONAL)"
-      amount_placeholder: "amount"
+      amount_placeholder: "Amount"
       receiver_account: "CREDIT ACCOUNT"
       receiver_address: "BITCOIN ADDRESS TO RECEIVE"
       qr_code_explanation: "This QR code can be scanned<br/>by the person who wants to send you bitcoins."
@@ -245,60 +249,80 @@ wallet:
       close: "CLOSE"
 
   send:
+    common:
+      send_bitcoins: "Send Bitcoins"
+      other_validation_methods: "Other validation methods"
+
     index:
-      title: "SEND BITCOINS"
-      amount: "AMOUNT"
-      amount_placeholder: "amount"
-      sender_account: "DEBIT ACCOUNT"
-      receiver_address: "RECIPIENT BITCOIN ADDRESS"
-      receiver_address_placeholder: "bitcoin address"
-      total_spent: "TOTAL SPENT"
+      amount: "Amount"
+      amount_placeholder: "Amount"
+      sender_account: "Debit account"
+      receiver_address: "Recipient Bitcoin address"
+      receiver_address_placeholder: "Bitcoin address"
+      total_spent: "Total spent"
       transaction_fees_text: "(incl. 0.0001 BTC of transaction fees)"
-      send: "SEND"
-      close: "CLOSE"
-      confirm: "CONFIRM"
       close_scanner: "Close scanner"
       qr_scanner: "Scan QR code"
 
-    validation:
-      title: "Required validation code"
+    card:
       grab_your_card: "Grab your <b>security card</b> and type on your keyboard the letter or digit in the black box for each highlighted value:"
       entered_code: "Entered code:"
       address_to_validate: "Recipient's Bitcoin address to validate."
       amount_and_address_to_validate: "Amount and recipient's Bitcoin address to validate."
       to: "to"
 
-    mobile_validation:
-      title: "[ALPHA]Waiting for mobile validation"
-      content: "[ALPHA]Please confirm the transaction on your mobile device"
+    method:
+      select_method: "Please select a validation method in order to authenticate the outgoing transaction from your Ledger Wallet:"
+      pair_a_mobile_phone: "Pair a mobile phone"
+      mobile_phone: "Mobile phone"
+      security_card: "Security card"
+      single_paired_device: "%s pairing"
+      multiple_paired_devices: "%s pairings"
+
+    mobile:
+      sending_transaction: "Sending transaction to \"%s\"..."
+      open_mobile_app: "Open the Ledger Wallet mobile app to validate the transaction."
 
     processing:
-      sending: "Sending..."
-      validating: "Validating transaction..."
-      may_take_a_while: "Please wait, this operation may take a few moments."
+      finalizing_transaction: "Finalizing transaction..."
 
     preparing:
-      title: "Preparing transaction..."
-      may_take_a_while: "Please wait, this operation may take a few moments."
+      preparing_transaction: "Preparing transaction..."
 
-    error:
-      title: "Sending failed"
-      unable_to_send_bitcoins: "The transaction could not be completed."
-      close: "Close"
-
-    success:
-      title: "Sending succeeded"
-      able_to_send_bitcoins: "The transaction successfully completed."
-      close: "Close"
-      confirmed_in_a_few_minutes: "The operation will appear as confirmed in a few minutes."
+    errors:
+      sending_failed: "Sending failed"
+      sending_succeeded: "Sending succeeded"
+      transaction_completed: "The transaction successfully completed."
 
   pairing:
     common:
-      pair_a_new_mobile: "PAIR A NEW MOBILE PHONE"
+      pair_a_new_mobile: "Pair a mobile phone"
+
+    errors:
+      pairing_failed: "Pairing failed"
+      pairing_succeeded: "Pairing succeeded"
+      dongle_is_now_paired: "Your Ledger Wallet is now paired<br />with your mobile phone \"%s\"."
+      inconsistent_state: "Something wrong happened (inconsistent state)."
+      client_cancelled: "The mobile application cancelled the pairing process."
+      dongle_needs_power_cycle: "Your Ledger Wallet needs to be unplugged and plugged back<br/>to pair a new mobile phone."
+      invalid_challenge_response: "The security card validation code is incorrect."
+      dongle_cancelled: "Your Ledger Wallet cancelled the pairing process."
+      unknown: "An unknown error occurred."
 
     index:
       download_the_app: "<b>Download</b> the Ledger Wallet mobile app."
       compatibility_details_available: "Compatibility details and installation guides are available from our <b>help center</b>."
-      open_the_app: "<b>Scan<b/> the pairing QR code."
+      open_the_app: "<b>Scan</b> the pairing QR code."
       tap_pair: "Tap “Pair a new Ledger Wallet” to start the scanner."
       scan_this_qrcode: "Scan this pairing QR code."
+
+    progress:
+      pairing_with_mobile_device: "Pairing in progress..."
+      follow_instructions: "Follow the instructions displayed on the mobile phone screen."
+
+    finalizing:
+      assign_a_name: "To finish, please give a name to this mobile phone."
+      placeholder_name: "Mobile phone name"
+      default_name: "My mobile phone"
+      name_already_used_by_paired_device: "This name is already used by another mobile phone."
+      please_enter_a_name: "Please enter a mobile phone name."

@@ -7,6 +7,8 @@ class ledger.m2fa.PairedSecureScreen
   id: null # Pairing id
   createdAt: null # Pairing creation date
   name: null # Pairing name
+  uuid: null # Phone UUID
+  platform: null # Phone platform
   version: VERSION
 
   constructor: (base) ->
@@ -17,6 +19,8 @@ class ledger.m2fa.PairedSecureScreen
     @id = base['id']
     @createdAt = new Date(base['created_at'])
     @name = base['name']
+    @uuid = base['uuid']
+    @platform = base['platform']
     @version = VERSION
 
   toStore: (store) ->
@@ -24,6 +28,8 @@ class ledger.m2fa.PairedSecureScreen
       id: @id
       created_at: @createdAt.getTime()
       name: @name
+      uuid: @uuid
+      platform: @platform
       version: VERSION
     data = {}
     data["__m2fa_#{@id}"] = serialized
@@ -31,6 +37,10 @@ class ledger.m2fa.PairedSecureScreen
     @
 
   toSyncedStore: () -> @toStore(ledger.storage.sync)
+
+  removeFromStore: (store) -> store.remove(["__m2fa_#{@id}"])
+
+  removeFromSyncedStore: -> @removeFromStore(ledger.storage.sync)
 
   @fromStore: (id, store, callback = _.noop) ->
     closure = new CompletionClosure()
@@ -43,7 +53,7 @@ class ledger.m2fa.PairedSecureScreen
 
   @fromSyncedStore: (id, callback = _.noop) -> @fromStore(id, ledger.storage.sync, callback)
 
-  @create: (id, name) -> new @(id: id, name: name, created_at: new Date().getTime(), version: VERSION)
+  @create: (id, data) -> new @(id: id, name: data['name'], created_at: new Date().getTime(), uuid: data['uuid'], platform: data['platform'], version: VERSION)
 
   @getAllFromStore: (store, callback = _.noop) ->
     closure = new CompletionClosure()
@@ -66,4 +76,37 @@ class ledger.m2fa.PairedSecureScreen
     closure.readonly()
 
   @getMostRecentFromSyncedStore: (callback = _.noop) -> @getMostRecentFromStore(ledger.storage.sync, callback)
+
+  @getByNameFromStore: (store, name, callback = _.noop) ->
+    closure = new CompletionClosure(callback)
+    @getAllFromStore store, (result, error) ->
+      return closure.failure(error) if error?
+      closure.success(_(result).where(name: name)[0])
+    closure.readonly()
+
+  @getByNameFromSyncedStore: (name, callback = _.noop) -> @getByNameFromStore(ledger.storage.sync, name, callback)
+
+  @getAllGroupedByPropertyFromStore: (store, property, callback = _.noop) ->
+    closure = new CompletionClosure(callback)
+    @getAllFromStore store, (screens, error) ->
+      return closure.failure(error) if error?
+      groups = _.groupBy screens, (s) -> s[property]
+      closure.success(groups)
+    closure.readonly()
+
+  @getAllGroupedByPropertyFromSyncedStore: (property, callback = _.noop) -> @getAllGroupedByPropertyFromStore(ledger.storage.sync, property, callback)
+
+  @getAllGroupedByUuidFromStore: (store, callback = _.noop) -> @getAllGroupedByPropertyFromStore(store, 'uuid', callback)
+
+  @getAllGroupedByUuidFromSyncedStore: (callback = _.noop) -> @getAllGroupedByUuidFromStore(ledger.storage.sync, callback)
+
+  @getScreensByUuidFromStore: (store, uuid, callback = _.noop) ->
+    closure = new CompletionClosure(callback)
+    @getAllFromStore store, (result, error) ->
+      return closure.failure(error) if error?
+      closure.success(_(result).where(uuid: uuid))
+    closure.readonly()
+
+  @getScreensByUuidFromSyncedStore: (uuid, callback = _.noop) -> @getScreensByUuidFromStore(ledger.storage.sync, uuid, callback)
+
 

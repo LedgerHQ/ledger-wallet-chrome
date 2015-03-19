@@ -60,14 +60,13 @@
   .indication(@color) {
     color: @color;
     line-height: 25px;
-    letter-spacing: -0.4px;
     position: relative;
     top: -6px;
   }
 
   .strong {
     font-weight: @font-weight-semibold;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.3px;
   }
 
   .black-indication {
@@ -113,7 +112,7 @@
       color: @color;
       text-decoration: none;
       text-transform: uppercase;
-      letter-spacing: -1px;
+      letter-spacing: -0.6px;
 
       &:hover {
         color: darken(@color, @color-strong-darken-value);
@@ -130,7 +129,7 @@
       font-size: @font-size-very-very-very-large;
     }
 
-      &.back {
+    &.back {
       .colored(@color-soft-grey);
 
       > i {

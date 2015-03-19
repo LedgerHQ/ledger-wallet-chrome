@@ -1,6 +1,6 @@
 name: "__MSG_application_name__"
 description: "__MSG_application_small_description__"
-version: "1.0.7"
+version: "1.1.0"
 manifest_version: 2
 minimum_chrome_version: "38"
 default_locale: "en"
@@ -31,6 +31,13 @@ permissions:
       -
         vendorId: 9601
         productId: 19324
+      -
+        vendorId: 9601
+        productId: 6151
+
+      -
+        vendorId: 9601
+        productId: 6152
 
 optional_permissions:
   - "videoCapture"

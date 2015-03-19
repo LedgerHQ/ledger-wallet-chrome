@@ -1,17 +1,48 @@
+###
+  View controllers are the bridge between models and view. They are responsible of fetching data and injecting them in views.
+  View controllers are automatically bound to an eco HTML template depending of the class name. For example an instance of
+  'NamespaceHereFoxyViewController' will render the template located at 'views/namespace/here/foxy.eco'.
+
+  @example How to use the view property of view controller
+    class MyFoxyViewController extends ViewController
+      view:
+        foxyButton: "#foxy_button"
+        foxyInput: "#foxy_input"
+
+      onAfterRender: ->
+        super
+        @view.foxyButton.on 'click', =>
+          foxyValue = foxyInput.val()
+          ... Do something with the value ...
+
+###
 class @ViewController extends @EventEmitter
 
   renderedSelector: undefined
   parentViewController: undefined
+
+  ###
+    A hash of view selectors that will be selected after the view render. (See the example in the class description)
+  ###
   view: {}
 
   constructor: (params = {}, routedUrl = "") ->
     @params = _.defaults(params, @defaultParams)
     @routedUrl = routedUrl
+    @_isRendered = no
+    # bind all methods to self
+    for key, value of @
+      if _.isFunction(value) and value != @constructor
+        @[key] = value.bind(@)
     @initialize()
 
   initialize: ->
 
+  ###
+    Selects elements in the controller node with {http://api.jquery.com/category/selectors/ jQuery selector}
 
+    @return [jQuery.Element] The result of the selector
+  ###
   select: (selectorString) ->
     $(@renderedSelector).find(selectorString)
 
@@ -22,6 +53,7 @@ class @ViewController extends @EventEmitter
     @emit 'beforeRender', {sender: @}
     render @viewPath(), @, (html) =>
       selector.html(html)
+      @_isRendered = yes
       do @onAfterRender
       @emit 'afterRender', {sender: @}
 
@@ -83,3 +115,7 @@ class @ViewController extends @EventEmitter
 
   # Called when the view controller is detached from a parent view controller
   onDetach: ->
+
+  # Checks if the UI of the current view controller is already rendered in its selector or not.
+  # @return [Boolean] True if the view controller is rendered, false otherwise
+  isRendered: -> @_isRendered

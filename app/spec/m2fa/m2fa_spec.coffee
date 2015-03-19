@@ -6,7 +6,7 @@ describe "m2fa", ->
 
   beforeEach ->
     @$ = ledger.m2fa
-    spyOn(@$, 'Client').and.returnValue jasmine.createSpyObj('client', ['on','off','sendChallenge','rejectPairing','confirmPairing','requestValidation'])
+    spyOn(@$, 'Client').and.returnValue jasmine.createSpyObj('client', ['on','off','once','sendChallenge','rejectPairing','confirmPairing','requestValidation'])
     @$._clientFactory = (pairingId) -> new ledger.m2fa.Client(pairingId)
 
   it "init device pairing with a new random pairingId, a client, listen client event, and return the pairingId and a promise", ->
@@ -20,7 +20,7 @@ describe "m2fa", ->
     expect(client).toBeDefined()
     expect(@$.Client).toHaveBeenCalledWith(pairingId)
     
-    expect(client.on.calls.count()).toBe(2)
+    expect(client.on.calls.count()).toBe(3)
     expect(client.on.calls.argsFor(0)[0]).toBe('m2fa.identify')
     expect(client.on.calls.argsFor(0)[1]).toEqual(jasmine.any(Function))
     expect(client.on.calls.argsFor(1)[0]).toBe('m2fa.challenge')
@@ -32,9 +32,11 @@ describe "m2fa", ->
     expect(result[1].constructor.name).toBe('Promise')
 
   it "prefix pairingId when it save asociated label", ->
-    spyOn(ledger.storage.sync, 'set')
-    @$.setPairingLabel("a_random_pairing_id", "label")
-    expect(ledger.storage.sync.set).toHaveBeenCalledWith("__m2fa_a_random_pairing_id": "label")
+    spyOn(ledger.m2fa.PairedSecureScreen, 'create').and.callThrough()
+    spyOn(ledger.m2fa.PairedSecureScreen.prototype, 'toStore')
+    @$.saveSecureScreen("a_random_pairing_id", "label")
+    expect(ledger.m2fa.PairedSecureScreen.create).toHaveBeenCalledWith("a_random_pairing_id", "label")
+    expect(ledger.m2fa.PairedSecureScreen.prototype.toStore).toHaveBeenCalled()
 
   it "remove pairingId prefix when it get all pairing labels", ->
     spyOn(ledger.storage.sync, 'keys').and.callFake (cb) -> cb(["__m2fa_a_random_pairing_id", 'onOtherBadKey'])
@@ -50,12 +52,15 @@ describe "m2fa", ->
     tx =
       _out: {authorizationPaired: "XxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx"}
     pairingId = "a_random_pairing_id"
-    client = jasmine.createSpyObj('client',['on','off','sendChallenge','rejectPairing','confirmPairing','requestValidation'])
+    client = jasmine.createSpyObj('client',['on','off','once','sendChallenge','rejectPairing','confirmPairing','requestValidation'])
     spyOn(@$, '_getClientFor').and.returnValue(client)
+    spyOn(ledger.api.M2faRestClient.instance, 'wakeUpSecureScreens')
     
     [c, r] = @$.validateTx(tx, pairingId)
 
     expect(r.constructor.name).toBe('Promise')
+
+    expect(ledger.api.M2faRestClient.instance.wakeUpSecureScreens).toHaveBeenCalledWith([pairingId])
 
     expect(@$._getClientFor).toHaveBeenCalledWith(pairingId)
     expect(client.off.calls.count()).toBe(2)
@@ -71,9 +76,12 @@ describe "m2fa", ->
   it "get call validateTx for each client on validateTxOnAll", ->
     tx =
       _out: {authorizationPaired: "XxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx"}
-    spyOn(@$, 'getPairingIds').and.returnValue(then: ((cb) -> cb("a_random_pairing_id":"label")))
-    spyOn(@$, 'validateTx').and.returnValue(Q.defer().promise)
+    spyOn(@$, 'getPairingIds').and.returnValue(Q([{"a_random_pairing_id":"label"}]))
+    spyOn(@$, 'validateTx').and.returnValue(Q())
+    console.log(typeof ledger.api.M2faRestClient.instance)
+    spyOn(ledger.api.M2faRestClient.instance, 'wakeUpSecureScreens')
     [c, r] = @$.validateTxOnAll(tx)
+    expect(ledger.api.M2faRestClient.instance.wakeUpSecureScreens).toHaveBeenCalledWith(["a_random_pairing_id"])
     expect(@$.validateTx.calls.count()).toBe(1)
     expect(@$.validateTx.calls.argsFor(0)).toEqual([tx,"a_random_pairing_id"])
 

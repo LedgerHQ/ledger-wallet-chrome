@@ -1,8 +1,8 @@
 class @CommonDialogsConfirmationDialogViewController extends @DialogViewController
 
-  positiveLocalizableKey: 'common.dialogs.yes'
-  negativeLocalizableKey: 'common.dialogs.no'
-  titleLocalizableKey: 'common.dialogs.confirmation'
+  positiveLocalizableKey: 'common.yes'
+  negativeLocalizableKey: 'common.no'
+  titleLocalizableKey: 'common.confirmation'
 
   clickPositive: ->
     @emit 'click:positive'

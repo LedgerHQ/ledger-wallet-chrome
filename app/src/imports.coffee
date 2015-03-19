@@ -111,7 +111,8 @@
         'utils/stream'
         'utils/completion_closure'
         'utils/try'
-        'utils/application/base_application'
+        'utils/comparison_result'
+        'utils/amount'
 
         ## Crypto
         'utils/crypto/aes'
@@ -172,11 +173,17 @@
         'wallet/extended_public_key'
 
         'utils/database/database'
+        'base/base_application'
         'base/model_context'
         'base/model'
         'base/migrations'
         'base/view_controller'
         'base/navigation_controller'
+
+        ## Dongle
+        'dongle/dongle'
+        'dongle/transaction'
+        'dongle/manager'
 
         ## Mobile 2FA
         'm2fa/m2fa'
@@ -186,6 +193,12 @@
         'm2fa/transaction_validation_request'
         'm2fa/paired_secure_screen'
 
+        ## Firmware Update
+        'fup/firmware_update_request'
+        'fup/firmware_updater'
+        'fup/firmwares_manifest'
+        'fup/utils'
+
         ## Models
         'models/wallet'
         'models/account'
@@ -194,12 +207,13 @@
 
         ## Dialog Management
         'utils/dialogs'
-        '../views/base/dialog'
+        '../views/common/dialogs/dialog'
         'base/dialog_view_controller'
 
         ## Common controllers
         # Dialogs
         'controllers/common/dialogs/common_dialogs_confirmation_dialog_view_controller'
+        'controllers/common/dialogs/common_dialogs_message_dialog_view_controller'
 
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller'
@@ -216,12 +230,11 @@
 
         # Send
         'controllers/wallet/send/wallet_send_index_dialog_view_controller'
-        'controllers/wallet/send/wallet_send_mobile_validation_dialog_view_controller'
-        'controllers/wallet/send/wallet_send_validation_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_mobile_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_card_dialog_view_controller'
         'controllers/wallet/send/wallet_send_processing_dialog_view_controller'
         'controllers/wallet/send/wallet_send_preparing_dialog_view_controller'
-        'controllers/wallet/send/wallet_send_error_dialog_view_controller'
-        'controllers/wallet/send/wallet_send_success_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_method_dialog_view_controller'
 
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'
@@ -250,8 +263,6 @@
         # Pairing
         'controllers/wallet/pairing/wallet_pairing_index_dialog_view_controller'
         'controllers/wallet/pairing/wallet_pairing_progress_dialog_view_controller'
-        'controllers/wallet/pairing/wallet_pairing_error_dialog_view_controller'
-        'controllers/wallet/pairing/wallet_pairing_success_dialog_view_controller'
         'controllers/wallet/pairing/wallet_pairing_finalizing_dialog_view_controller'
 
         # i18n
@@ -276,4 +287,14 @@
         '../spec/m2fa/m2fa_spec'
 
         '../spec/spec_helper'
+
+        ## Update controllers
+        'controllers/update/update_navigation_controller'
+        'controllers/update/update_view_controller'
+        'controllers/update/update_plug_view_controller'
+        'controllers/update/update_seed_view_controller'
+        'controllers/update/update_erasing_view_controller'
+        'controllers/update/update_unplug_view_controller'
+        'controllers/update/update_reloadblfromos_view_controller'
+
       ]

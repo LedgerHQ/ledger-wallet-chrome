@@ -148,6 +148,24 @@ class @CompletionClosure
     @_tryFulfill()
 
   ###
+    @overload
+      @param [CompletionClosure] defer
+      @return [CompletionClosure] self
+
+    @overload
+      @param [Q.defer] defer
+      @return [CompletionClosure] self
+  ###
+  thenForward: (defer) ->
+    deferType = typeof defer
+    if deferType == 'object' && defer instanceof CompletionClosure
+      @then( (=> defer.success.apply(defer, arguments)), (=> defer.failure.apply(defer, arguments)) )
+    else if deferType == 'object' && defer instanceof Q.defer
+      @then( (=> defer.resolve.apply(defer, arguments)), (=> defer.reject.apply(defer, arguments)) )
+    else
+      throw new ArgumentError(if promiseType == 'object' then promise.constructor.name else promiseType)
+
+  ###
     Returns 'yes' if completed else 'no'
     @return [Boolean]
   ###
@@ -158,20 +176,20 @@ class @CompletionClosure
   _tryNotify: () ->
     return unless @isCompleted()
     [result, error] = @_complete
-    if @_func? and (result? or error?)
+    if @_func?
       @_complete = []
       @_func(result, error)
 
   _tryFulfill: () ->
     return unless @isCompleted()
     [result, error] = @_complete
-    if not @_isQFulfilled and @_qDefferedObject?
-      @_qDefferedObject.fulfill(result) if @isSuccessful()
-      @_qDefferedObject?.reject(error) if @isFailed()
+    if not @_isQFulfilled and @_qDeferredObject?
+      @_qDeferredObject.resolve(result) if @isSuccessful()
+      @_qDeferredObject?.reject(error) if @isFailed()
       @_isQFulfilled = yes
-    if not @_isJqFulfilled and @_jqDefferedObject?
-      @_jqDefferedObject.resolve(result) if @isSuccessful()
-      @_jqDefferedObject.reject(error) if @isFailed()
+    if not @_isJqFulfilled and @_jqDeferredObject?
+      @_jqDeferredObject.resolve(result) if @isSuccessful()
+      @_jqDeferredObject.reject(error) if @isFailed()
       @_isJqFulfilled = yes
 
   _qDeffered: () ->
@@ -181,10 +199,10 @@ class @CompletionClosure
     @_qDeferredObject
 
   _jqDeffered: () ->
-    unless @_jqDefferedObject?
-      @_jqDefferedObject = jQuery.Deferred()
+    unless @_jqDeferredObject?
+      @_jqDeferredObject = jQuery.Deferred()
       @_tryFulfill()
-    @_jqDefferedObject
+    @_jqDeferredObject
 
   ###
     Returns a readonly version of the closure
@@ -232,7 +250,7 @@ class @CompletionClosure
 
     @return [Q.Promise]
   ###
-  then: (fulfilled, rejected = null, progressed = null) -> @q().then(onSuccess, onFailure, progressed)
+  then: (fulfilled, rejected = undefined, progressed = undefined) -> @q().then(fulfilled, rejected, progressed)
 
   ###
     Shorthand for completionClosure.q().fail()

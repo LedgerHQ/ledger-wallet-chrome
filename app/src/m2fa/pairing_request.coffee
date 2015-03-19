@@ -23,12 +23,12 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
     DEAD: 3
 
   @Errors:
-    InconsistentState: "Inconsistent state"
-    ClientCancelled: "Client cancelled: consider power cycling your dongle"
-    NeedPowerCycle: "Dongle needs to be power cycled"
-    InvalidChallengeResponse: "Invalid challenge response"
-    Cancelled: "Cancelled"
-    UnknownError: "Unknown error"
+    InconsistentState: "inconsistent_state"
+    ClientCancelled: "client_cancelled"
+    NeedPowerCycle: "dongle_needs_power_cycle"
+    InvalidChallengeResponse: "invalid_challenge_response"
+    Cancelled: "dongle_cancelled"
+    UnknownError: "unknown"
 
   constructor: (pairindId, promise, client) ->
     @pairingId = pairindId
@@ -37,6 +37,7 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
     @_client.pairedDongleName = @_secureScreenName
     @_currentState = ledger.m2fa.PairingRequest.States.WAITING
     @_onComplete = new CompletionClosure()
+    @_identifyData = {}
 
     promise.then(
       (result) =>
@@ -58,11 +59,12 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
         try
           switch progress
             when 'pubKeyReceived'
-              return _failure(ledger.m2fa.PairingRequest.Errors.InconsistentState) if @_currentState isnt ledger.m2fa.PairingRequest.States.WAITING
+              @_identifyData = _.clone(@_client.lastIdentifyData)
+              return @_failure(ledger.m2fa.PairingRequest.Errors.InconsistentState) if @_currentState isnt ledger.m2fa.PairingRequest.States.WAITING
               @_currentState = ledger.m2fa.PairingRequest.States.CHALLENGING
               @emit 'join'
             when 'challengeReceived'
-              return _failure(ledger.m2fa.PairingRequest.Errors.InconsistentState) if @_currentState isnt ledger.m2fa.PairingRequest.States.CHALLENGING
+              return @_failure(ledger.m2fa.PairingRequest.Errors.InconsistentState) if @_currentState isnt ledger.m2fa.PairingRequest.States.CHALLENGING
               @_currentState = ledger.m2fa.PairingRequest.States.FINISHING
               @emit 'answerChallenge'
             when 'secureScreenDisconnect'
@@ -84,11 +86,15 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
 
   getCurrentState: () -> @_currentState
 
+  getSuggestedDeviceName: -> @_identifyData?['name']
+
+  getDeviceUuid: -> @_identifyData?['uuid']
+
   cancel: () ->
     @_promise = null
     @_secureScreenName.failure('cancel')
     @_client.stopIfNeccessary()
-    @_onComplete = null
+    @_onComplete = new CompletionClosure()
     @emit 'cancel'
     do @off
 

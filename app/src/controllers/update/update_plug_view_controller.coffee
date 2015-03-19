@@ -1,0 +1,2 @@
+class @UpdatePlugViewController extends @UpdateViewController
+

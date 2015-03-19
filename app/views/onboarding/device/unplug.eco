@@ -1,6 +1,6 @@
 <div id="content-container">
   <div class="logo-container">
-    <img src="../../assets/images/onboarding/large_logo.png" width="244" height="181">
+    <img src="../../assets/images/onboarding/large_logo.png" width="256" height="156">
   </div>
   <div class="greyed-container">
     <img src="../../assets/images/onboarding/device/unplug_wallet.png" width="187" height="44" />

@@ -1,6 +1,6 @@
 # routes that do not need a plugged ledger wallet
 ledger.router ?= {}
-ledger.router.ignorePluggedWalletForRouting = yes
+ledger.router.ignorePluggedWalletForRouting = @ledger.isDev
 ledger.router.pluggedWalletRoutesExceptions = [
   '/',
   '/onboarding/device/plug'
@@ -10,7 +10,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
 @declareRoutes = (route, app) ->
   ## Default
   route '/', ->
-    app.router.go '/onboarding/device/plug', {animateIntro: yes}
+    if app.isInWalletMode()
+      app.router.go '/onboarding/device/plug', {animateIntro: yes}
+    else
+      app.router.go '/update/seed'
 
   ## Onboarding
   # Device
@@ -87,11 +90,6 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new WalletReceiveIndexDialogViewController()
     dialog.show()
 
-  # Pairing
-  route '/wallet/pairing/index', (params) ->
-    dialog = new WalletPairingIndexDialogViewController()
-    dialog.show()
-
   # Help
   route '/wallet/help/index', (params) ->
     window.open t 'application.support_url'
@@ -99,3 +97,20 @@ ledger.router.pluggedWalletRoutesExceptions = [
   # Operations
   route '/wallet/accounts/{id}/operations', (params) ->
     app.navigate WALLET_LAYOUT, WalletOperationsIndexViewController
+
+  ## Firmware Update
+
+  route 'update/plug', (params) ->
+    app.navigate UPDATE_LAYOUT, UpdatePlugViewController
+
+  route 'update/unplug', (params) ->
+    app.navigate UPDATE_LAYOUT, UpdateUnplugViewController
+
+  route 'update/seed', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateSeedViewController
+
+  route 'update/erasing', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateErasingViewController
+
+  route '/update/reloadblfromos', ->
+    app.navigate UPDATE_LAYOUT, UpdateReloadblfromosViewController

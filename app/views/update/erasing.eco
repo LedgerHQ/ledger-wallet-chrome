@@ -1,0 +1,13 @@
+<div style="background-color: #880000;width: 100%;height: 100%">
+
+  <div id="default">
+    Erasing
+    <button id="eraseSeed" data-href="#approveSeedErasure">Erase me!</button>
+  </div>
+
+  <div id="powerCycle">
+    Power cycle your dongle now!
+    <p id="remainingStep"></p>
+  </div>
+
+</div>
