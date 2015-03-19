@@ -1,4 +1,4 @@
-@import (reference) "../../application";
+@import (reference) "../../common";
 
 section {
   > header {
@@ -7,19 +7,15 @@ section {
     }
   }
 
-  .text {
-    letter-spacing: -0.3px;
+  > .message {
+    .regular-text;
+    margin-top: 5px;
     line-height: 20px;
   }
 
-  > .message {
-    .text();
-    margin-top: 5px;
-  }
-
   > .abstract {
-    .text();
-    font-weight: @font-weight-semibold;
-    margin-top: @metrics-medium-padding - 5px;
+    .bold-regular-text;
+    margin-top: @metrics-almost-medium-padding;
+    line-height: 20px;
   }
 }
