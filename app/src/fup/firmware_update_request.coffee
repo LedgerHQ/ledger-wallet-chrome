@@ -120,6 +120,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     return @_connectionCompletion if @_connectionCompletion?
     completion = new CompletionClosure(callback)
     registerWallet = (wallet) =>
+      @_lastMode = if wallet.isInBootloaderMode() then Modes.Bootloader else Modes.Os
       @_wallet = wallet
       wallet.once 'disconnected', =>
         @_setCurrentState(States.Undefined)
@@ -266,6 +267,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
 
   _processInitStageBootloader: ->
+    l 'BOOT LOADER'
 
   _getVersion: (forceBl, callback) -> @_wallet.getRawFirmwareVersion(@_lastMode is Modes.Bootloader, forceBl, callback)
 

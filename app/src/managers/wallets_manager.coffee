@@ -12,7 +12,6 @@ class @WalletsManager extends EventEmitter
 
   connectCard: (card) ->
     try
-      l card
       @emit 'connecting', card
       result = []
       @cardFactory.list_async()

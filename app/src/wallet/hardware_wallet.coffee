@@ -44,7 +44,6 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
         data.lW.recoverFirmwareVersion()
       @_lwCard = new LW(0, new BTChip(@lwCard), @_vents)
     else
-      l 'BOOTLOADER'
       # TODO: Remove with vincent refactoring
       @_lwCard = dongle: @lwCard
       @emit 'connected', @
