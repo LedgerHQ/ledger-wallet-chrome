@@ -13,58 +13,60 @@
         margin-top: 5px;
         border: 1px solid @color-light-grey;
         border-radius: @border-radius-default-value;
-        width: 108px;
-        padding: 3px 6px;
+        padding: 3px 8px;
         margin-right: 8px;
         background-color: @color-white;
 
-        > div {
-          margin-left: -19px;
-          > .suggest {
-            position: absolute;
-            height: 18px;
-            width: 156px;
-            top: 3px;
-            left: 0px;
-            padding: 5px;
-            font-size: 14px;
-            font-family: "Open Sans";
-            letter-spacing: -0.3px;
-            background-color: transparent;
-            color: @color-light-grey;
-          }
-        }
-
-        input {
-          background: transparent;
-          outline: none;
-          border: 0;
-          font-size: @font-size-large;
-          font-family: "Open Sans";
-          letter-spacing: -0.3px;
-          color: @color-grey-blue;
-          padding: 5px;
-          position: relative;
-          z-index: 10;
-          width: 78px;
-
-          &[readonly] {
-            -webkit-user-select: none;
-          }
-        }
-
-        .seed-invalid {
-          color: @color-invalid-red;
-        }
-
         > span {
+          margin-top: 2px;
           display: block;
           text-align: left;
-          width: 40px;
+          width: @metrics-small-padding + 2;
           letter-spacing: -0.5px;
           font-size: @font-size-small;
           color: @color-dark-grey;
           font-weight: @font-weight-semibold;
+        }
+
+        > div {
+
+          width: 82px;
+          height: 20px;
+          font-size: @font-size-medium;
+          font-family: "Open Sans";
+          letter-spacing: -0.3px;
+
+          > input {
+            background: transparent;
+            outline: none;
+            border: 0;
+            font-size: inherit;
+            font-family: inherit;
+            letter-spacing: inherit;
+            width: 80px;
+            height: 18px;
+            color: @color-grey-blue;
+            position: relative;
+            z-index: 10;
+
+            &[readonly] {
+              -webkit-user-select: none;
+            }
+
+            &.seed-invalid {
+              color: @color-invalid-red;
+              font-weight: @font-weight-semibold;
+            }
+          }
+
+          > .suggest {
+            position: absolute;
+            top: 4px;
+            left: 1px;
+            width: inherit;
+            height: inherit;
+            color: @color-soft-grey;
+          }
         }
       }
     }

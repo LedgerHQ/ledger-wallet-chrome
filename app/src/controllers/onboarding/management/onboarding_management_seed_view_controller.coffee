@@ -5,8 +5,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     invalidLabel: '#invalid_label'
     indicationLabel: '#indication_label'
     continueButton: '#continue_button'
-    copyButton: '#copy_button'
-    printButton: '#print_button'
+    actionsContainer: "#actions_container"
   navigation:
     continueUrl: '/onboarding/management/summary'
 
@@ -72,7 +71,6 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       input.on 'blur', ->
         return if self.params.wallet_mode == 'create'
         self._inputIsValid $(this)
-          
       input.on 'paste', ->
         setTimeout =>
           words = $(this).val().split(/[^A-Za-z]/)
@@ -112,6 +110,16 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
         for i in [0 .. words.length - 1]
           @view.inputs[i].val(words[i])
 
+      # hide copy button
+      if @params.wallet_mode == 'create'
+        @view.actionsContainer.show()
+      else
+        @view.actionsContainer.hide()
+
+      # validate words
+      for input in @view.inputs
+        @_inputIsValid($(input))
+
     # validate mnemonic
     if @_mnemonicIsValid()
       @view.invalidLabel.fadeOut(if animated then 250 else 0)
@@ -122,14 +130,6 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       else
         @view.invalidLabel.fadeOut(if animated then 250 else 0)
       @view.continueButton.addClass 'disabled'
-
-    # hide copy button
-    if @params.wallet_mode == 'create'
-      @view.copyButton.show()
-      @view.printButton.show()
-    else
-      @view.copyButton.hide()
-      @view.printButton.hide()
 
   _writtenMnemonic: ->
     mnemonic = ''
@@ -144,7 +144,8 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     ledger.bitcoin.bip39.mnemonicIsValid(@params.mnemonic)
 
   _inputIsValid: (input) ->
-    if input.val() != "" and input.val() not in ledger.bitcoin.bip39.wordlist
+    text = _.str.trim(input.val()).toLowerCase()
+    if text != "" and text not in ledger.bitcoin.bip39.wordlist
       input.addClass 'seed-invalid'
     else
       input.removeClass 'seed-invalid'

@@ -9,6 +9,8 @@ common:
   date_format: 'DD/MM/YYYY à HH:mm'
   close: "Close"
   cancel: "Cancel"
+  print: "Print"
+  copy: "Copy"
 
   dialogs:
     yes: "Si"
@@ -124,8 +126,6 @@ onboarding:
       invalid_recovery_phrase: "La frase de restauración no es válida."
       it_wont_be_displayed_again: "Su frase de restauración no se mostrará de nuevo."
       without_it: "Sin ella, no tendrá acceso a su monedero en caso de pérdida."
-      copy: "Copie la frase de restauración en el portapapeles"
-      print: "IMPRIMIR"
 
     summary:
       your_wallet_is: "Su monedero esta"
