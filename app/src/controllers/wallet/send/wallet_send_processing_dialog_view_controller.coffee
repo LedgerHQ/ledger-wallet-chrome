@@ -17,7 +17,7 @@ class @WalletSendProcessingDialogViewController extends @DialogViewController
           reason = switch error.code
             when ledger.errors.SignatureError then 'wrong_keycode'
             when ledger.errors.UnknownError then 'unknown'
-          dialog = new WalletSendErrorDialogViewController reason: reason
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors." + reason))
           dialog.show()
       else
         @_startSending()
@@ -28,8 +28,8 @@ class @WalletSendProcessingDialogViewController extends @DialogViewController
       return if not @isShown()
       @dismiss =>
         if error?
-          dialog = new WalletSendErrorDialogViewController reason: 'network_no_response'
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.network_no_response"))
           dialog.show()
         else
-          dialog = new WalletSendSuccessDialogViewController
+          dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.send.errors.sending_succeeded"), subtitle: t("wallet.send.errors.transaction_completed"))
           dialog.show()

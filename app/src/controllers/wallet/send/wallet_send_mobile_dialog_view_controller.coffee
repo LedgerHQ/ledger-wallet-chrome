@@ -11,7 +11,7 @@ class @WalletSendMobileDialogViewController extends @DialogViewController
       if error?
         @_request = null
         @dismiss =>
-          dialog = new WalletSendErrorDialogViewController reason: error
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors." + error))
           dialog.show()
       else
         dialog = new WalletSendProcessingDialogViewController transaction: @params.transaction, keycode: keycode
