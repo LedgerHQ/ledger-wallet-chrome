@@ -1,0 +1,55 @@
+@import (reference) "../../constants";
+@import (reference) "../../common";
+
+section#send_card_dialog {
+  width: @dialog-width-send;
+
+  > div.regular-text {
+    line-height: 20px;
+    margin-top: @metrics-small-padding;
+  }
+
+  > #validation_container {
+    display: flex;
+    margin-top: @metrics-almost-medium-padding;
+
+    > #validation_texts {
+      flex-grow: 1;
+
+      > #validation_indication {
+        .bold-regular-text;
+        letter-spacing: 0px;
+
+        > mark {
+          color: @color-invalid-red;
+          font-weight: @font-weight-bold;
+          background-color: transparent;
+        }
+      }
+
+      #validation_subtitle {
+        margin-top: @metrics-almost-small-padding;
+      }
+    }
+  }
+
+  div.keycard {
+    margin-top: @metrics-medium-padding;
+  }
+}
+
+#dialogs_container {
+  div.dialog-actions-bar {
+    align-items: center;
+  }
+
+  #entered_code {
+    .regular-text;
+    display: flex;
+    align-items: center;
+
+    > .tiny-pincode {
+      margin-left: 10px;
+    }
+  }
+}

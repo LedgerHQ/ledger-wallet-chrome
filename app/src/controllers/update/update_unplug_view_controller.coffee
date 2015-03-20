@@ -1,0 +1,2 @@
+class @UpdateUnplugViewController extends @UpdateViewController
+

@@ -11,11 +11,13 @@ common:
   cancel: "Annuler"
   print: "Imprimer"
   copy: "Copier"
-
-  dialogs:
-    yes: "Oui"
-    no: "Non"
-    confirmation: "Confirmation"
+  finish: "Terminer"
+  confirm: "Confirmer"
+  confirmation: "Confirmation"
+  send: "Envoyer"
+  yes: "Oui"
+  no: "Non"
+  may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
 
   keycard:
     uppercase_letters: "Majuscules"
@@ -29,6 +31,8 @@ common:
     invalid_receiver_address: "L'adresse bitcoin à créditer n'est pas correcte."
     invalid_amount: "Le montant à envoyer n'est pas valide."
     unknown: "Une erreur inconnue est survenue."
+    secure_screen_cancelled_transaction: "Le smartphone a annulé la transaction."
+    secure_screen_invalid_pin: "Le smartphone a retourné un mauvais code pin."
 
   qrcode:
     present: "Présentez le code QR de réception devant la webcam."
@@ -233,7 +237,7 @@ wallet:
     index:
       title: "RECEVOIR DES BITCOINS"
       amount: "MONTANT (OPTIONNEL)"
-      amount_placeholder: "montant"
+      amount_placeholder: "Montant"
       receiver_account: "COMPTE À CRÉDITER"
       receiver_address: "ADRESSE BITCOIN DE RÉCEPTION"
       qr_code_explanation: "Code QR à scanner par la personne<br />qui souhaite vous envoyer des bitcoins."
@@ -242,56 +246,65 @@ wallet:
       close: "ANNULER"
 
   send:
+    common:
+      send_bitcoins: "Envoyer des Bitcoins"
+      other_validation_methods: "Autres méthodes de validation"
+
     index:
-      title: "ENVOYER DES BITCOINS"
-      amount: "MONTANT"
-      amount_placeholder: "montant"
-      sender_account: "COMPTE À DÉBITER"
-      receiver_address: "ADRESSE BITCOIN À CRÉDITER"
-      receiver_address_placeholder: "adresse bitcoin"
-      total_spent: "TOTAL DÉPENSÉ"
+      amount: "Montant"
+      amount_placeholder: "Montant"
+      sender_account: "Compte à débiter"
+      receiver_address: "Adresse Bitcoin du destinataire"
+      receiver_address_placeholder: "Adresse Bitcoin"
+      total_spent: "Total dépensé"
       transaction_fees_text: "(dont 0.0001 BTC de frais de transaction)"
-      send: "ENVOYER"
-      close: "ANNULER"
-      confirm: "CONFIRMER"
       close_scanner: "Fermer scanner"
       qr_scanner: "Scanner code QR"
 
-    validation:
-      title: "Code de validation nécessaire"
+    card:
       grab_your_card: "Munissez-vous de votre <b>carte de sécurité</b> et tapez sur votre clavier la lettre ou chiffre indiqué dans la case noire pour chaque valeur en surbrillance :"
       entered_code: "Code entré :"
-      address_to_validate: "Adresse Bitcoin du destinataire à vérifier."
-      amount_and_address_to_validate: "Montant et adresse Bitcoin du destinataire à vérifier."
+      address_to_validate: "Adresse Bitcoin du destinataire à valider."
+      amount_and_address_to_validate: "Montant et adresse Bitcoin du destinataire à valider."
       to: "à"
 
-    mobile_validation:
-      title: "[ALPHA]Waiting for mobile validation"
-      content: "[ALPHA]Please confirm the transaction on your mobile device"
+    method:
+      select_method: "Sélectionnez une méthode de validation pour authentifier la transaction sortante depuis votre Ledger Wallet:"
+      pair_a_mobile_phone: "Associer un téléphone mobile"
+      mobile_phone: "Téléphone mobile"
+      security_card: "Carte de sécurité"
+      single_paired_device: "%s association"
+      multiple_paired_devices: "%s associations"
+
+    mobile:
+      sending_transaction: "Envoi de la transaction à \"%s\"..."
+      open_mobile_app: "Ouvrez l'application mobile Ledger Wallet pour valider cette transaction."
 
     processing:
-      sending: "Envoi en cours..."
-      validating: "Validation de la transaction..."
-      may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
+      finalizing_transaction: "Finalisation de la transaction..."
 
     preparing:
-      title: "Préparation de la transaction..."
-      may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
+      preparing_transaction: "Préparation de la transaction..."
 
-    error:
-      title: "Envoi échoué"
-      unable_to_send_bitcoins: "La transaction n’a pas pu être effectuée."
-      close: "Fermer"
-
-    success:
-      title: "Envoi terminé"
-      able_to_send_bitcoins: "La transaction a bien été effectuée."
-      close: "Fermer"
-      confirmed_in_a_few_minutes: "L'opération apparaîtra comme confirmée dans quelques minutes."
+    errors:
+      sending_failed: "Envoi échoué"
+      sending_succeeded: "Envoi terminé"
+      transaction_completed: "La transaction a bien été effectuée."
 
   pairing:
     common:
-      pair_a_new_mobile: "Associer un nouveau téléphone"
+      pair_a_new_mobile: "Associer un téléphone mobile"
+
+    errors:
+      pairing_failed: "Association échouée"
+      pairing_succeeded: "Association réussie"
+      dongle_is_now_paired: "Votre Ledger Wallet est maintenant associé<br />avec votre téléphone mobile \"%s\"."
+      inconsistent_state: "Quelque chose ne s'est pas bien déroulé (état inconsistant)."
+      client_cancelled: "L'application mobile a annulé la procédure d'association."
+      dongle_needs_power_cycle: "Votre Ledger Wallet nécessite d'être débranché puis rebranché<br />pour associer un nouveau téléphone mobile."
+      invalid_challenge_response: "Le code de validation de la carte de sécurité est incorrect."
+      dongle_cancelled: "Votre Ledger Wallet a annulé la procédure d'association."
+      unknown: "Une erreur inconnue est survenue."
 
     index:
       download_the_app: "<b>Téléchargez</b> l'application mobile Ledger Wallet."
@@ -299,3 +312,14 @@ wallet:
       open_the_app: "<b>Scannez</b> le code QR d'association."
       tap_pair: "Touchez “Associer un nouveau Ledger Wallet” pour démarrer le scanner."
       scan_this_qrcode: "Scannez ce code QR d'association."
+
+    progress:
+      pairing_with_mobile_device: "Association en cours..."
+      follow_instructions: "Suivez les instructions affichées à l'écran du téléphone mobile."
+
+    finalizing:
+      assign_a_name: "Pour terminer, donnez un nom à ce téléphone mobile."
+      placeholder_name: "Nom du téléphone mobile"
+      default_name: "Mon téléphone mobile"
+      name_already_used_by_paired_device: "Ce nom est déjà utilisé par un autre téléphone mobile."
+      please_enter_a_name: "Veuillez entrer un nom pour ce téléphone mobile."

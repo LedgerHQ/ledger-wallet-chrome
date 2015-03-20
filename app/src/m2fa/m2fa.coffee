@@ -41,8 +41,12 @@ _.extend @ledger.m2fa,
   # Allow you to assign a label to a pairingId (ex: "mobile Pierre").
   # @params [String] pairingId
   # @params [String] label
-  saveSecureScreen: (pairingId, label) ->
-    ledger.m2fa.PairedSecureScreen.create(pairingId, label).toSyncedStore()
+  saveSecureScreen: (pairingId, screenData) ->
+    data =
+      name: screenData['name']
+      platform: screenData['platform']
+      uuid: screenData['uuid']
+    ledger.m2fa.PairedSecureScreen.create(pairingId, data).toSyncedStore()
 
   # @return Promise an object where each key is pairingId and the value the associated label.
   getPairingIds: () ->
@@ -106,11 +110,29 @@ _.extend @ledger.m2fa,
               @clients[pId].stopIfNeccessary() for pId, lbl of pairingIds when pId isnt pairingId
             d.notify(msg)
           .then (transaction) -> d.resolve(transaction)
-          .fail (er) -> throw er
+          .fail (er) -> d.reject er
           .done()
     .fail (er) ->
       e er
       throw er
+    [clients, d.promise]
+
+  validateTxOnMultipleIds: (tx, pairingIds) ->
+    d = Q.defer()
+    clients = []
+    ledger.api.M2faRestClient.instance.wakeUpSecureScreens(pairingIds)
+    for pairingId in pairingIds
+      do (pairingId) =>
+        [client, promise] = @_validateTx(tx, pairingId)
+        clients.push client
+        promise.progress (msg) =>
+          if msg == 'accepted'
+            # Close all other client
+            @clients[pId].stopIfNeccessary() for pId in pairingIds when pId isnt pairingId
+          d.notify(msg)
+        .then (transaction) -> d.resolve(transaction)
+        .fail (er) -> d.reject er
+        .done()
     [clients, d.promise]
 
   # Creates a transaction validation request and starts the validation process.
@@ -121,8 +143,12 @@ _.extend @ledger.m2fa,
     new ledger.m2fa.TransactionValidationRequest(clients, promise)
 
   requestValidation: (tx, screen) ->
-    [client, promise] = @validateTx(tx, screen.id)
-    new ledger.m2fa.TransactionValidationRequest([client], promise, tx, screen)
+    unless _(screen).isArray()
+      [client, promise] = @validateTx(tx, screen.id)
+      new ledger.m2fa.TransactionValidationRequest([client], promise, tx, screen)
+    else
+      [clients, promise] = @validateTxOnMultipleIds(tx, _(screen).map (e) -> e.id)
+      new ledger.m2fa.TransactionValidationRequest(clients, promise)
 
   requestValidationForLastPairing: (tx) ->
     [client, promise] = @validateTx(tx)
@@ -160,16 +186,18 @@ _.extend @ledger.m2fa,
       client.stopIfNeccessary()
 
   _onChallenge: (client, data, d) ->
+    screenData = _.clone(client.lastIdentifyData)
     d.notify("challengeReceived")
     l("%c[_onChallenge] challengeReceived", "color: #4444cc", data)
     try
       ledger.wallet.safe().confirmSecureScreen(data).then( =>
-        l("%c[_onChallenge] SUCCESS !!!", "color: #00ff00" )
+        l("%c[_onChallenge] SUCCESS !!!", "color: #00ff00", data )
         client.confirmPairing()
         d.notify("secureScreenConfirmed")
         client.pairedDongleName.onComplete (name, err) =>
           return d.reject('cancel') if err?
-          d.resolve @saveSecureScreen(client.pairingId, name)
+          screenData['name'] = name
+          d.resolve @saveSecureScreen(client.pairingId, screenData)
       ).fail( (e) =>
         l("%c[_onChallenge] >>>  FAILURE  <<<", "color: #ff0000", e)
         client.rejectPairing()

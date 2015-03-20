@@ -48,7 +48,6 @@ class ledger.wallet.transaction.Transaction
       callback?(null, {title: 'An error occured', code: ledger.errors.UnknownError})
 
   validate: (validationKey, callback) ->
-    debugger
     throw 'Transaction must me prepared before validation' if not @_out? or not @_validationMode?
 
     validationKey = ("0#{char}" for char in validationKey).join('') if @getValidationMode() == ledger.wallet.transaction.Transaction.ValidationModes.KEYCARD

@@ -1,5 +1,5 @@
 @ledger.specs ||= {}
-@ledger.specs.run = ->
+@ledger.specs.run = (specsToRun = null) ->
   render "spec_runner", {}, (html) ->
     ledger.app._navigationControllerSelector().html(html)
     env = jasmine.getEnv()
@@ -13,5 +13,5 @@
     )
     env.addReporter(htmlReporter)
     htmlReporter.initialize()
-    env.execute()
-  return undefined
+    env.execute(specsToRun)
+  return

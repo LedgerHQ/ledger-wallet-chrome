@@ -10,6 +10,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   constructor: ->
     @_navigationController = null
+    @donglesManager = new ledger.dongle.Manager()
     @devicesManager = new DevicesManager()
     @walletsManager = new WalletsManager(this)
     @router = new Router(@)
@@ -22,14 +23,17 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     configureApplication @
     @_listenClickEvents()
     @_listenWalletEvents()
+    @_listenDongleEvents()
     @onStart()
     @devicesManager.start()
+    @donglesManager.start()
 
 
   ###
     Reloads the whole application.
   ###
   reload: () ->
+    @donglesManager.stop()
     @devicesManager.stop()
     chrome.runtime.reload()
 
@@ -53,7 +57,9 @@ class ledger.base.application.BaseApplication extends @EventEmitter
         @handleAction(actionName, parameters) if newUrl.hash.length > 0
 
       if @_navigationController == null or @_navigationController.constructor.name != layoutName
+        @_navigationController?.onDetach()
         @_navigationController = new window[layoutName]()
+        @_navigationController.onAttach()
         controller = new viewController(newUrl.params(), data.url)
         controller.on 'afterRender', onControllerRendered.bind(@)
         @_navigationController.push controller
@@ -141,6 +147,18 @@ class ledger.base.application.BaseApplication extends @EventEmitter
         (Try => @onDongleIsUnlocked(wallet)).printError()
       (Try => @onDongleConnected(wallet)).printError()
 
+  _listenDongleEvents: () ->
+    # Dongle management & dongle events re-dispatching
+    @donglesManager.on 'connected', (event, dongle) =>
+      @dongle = dongle
+      dongle.once 'disconnected', =>
+        _.defer => (Try => @onDongleIsDisconnected(dongle)).printError()
+        @dongle = null
+      dongle.once 'state:error', =>
+        (Try => @onDongleNeedsUnplug(dongle)).printError()
+      dongle.once 'state:unlocked', =>
+        (Try => @onDongleIsUnlocked(dongle)).printError()
+      (Try => @onDongleConnected(dongle)).printError()
 
   onConnectingDongle: (card) ->
 

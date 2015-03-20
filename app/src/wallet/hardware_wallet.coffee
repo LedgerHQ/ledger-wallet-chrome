@@ -27,19 +27,27 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   _state: ledger.wallet.States.UNDEFINED
 
-  constructor: (@manager, @id, @lwCard) ->
+  constructor: (@manager, card, @lwCard) ->
+    @id = card.id
+    @_productId = card.productId
     @_xpubs = {}
     @_vents = new EventEmitter()
     do @_listenStateChanges
 
   connect: () ->
-    @_vents.once 'LW.CardConnected', (event, data) =>
-      @_vents.once 'LW.FirmwareVersionRecovered', (event, data) =>
-        data.lW.getOperationMode()
-        data.lW.plugged()
-        @emit 'connected', @
-      data.lW.recoverFirmwareVersion()
-    @_lwCard = new LW(0, new BTChip(@lwCard), @_vents)
+    unless @isInBootloaderMode()
+      @_vents.once 'LW.CardConnected', (event, data) =>
+        @_vents.once 'LW.FirmwareVersionRecovered', (event, data) =>
+          data.lW.getOperationMode()
+          data.lW.plugged()
+          @emit 'connected', @
+        data.lW.recoverFirmwareVersion()
+      @_lwCard = new LW(0, new BTChip(@lwCard), @_vents)
+    else
+      # TODO: Remove with vincent refactoring
+      @_lwCard = dongle: card: @lwCard
+      @emit 'connected', @
+      _.defer => @_setState(ledger.wallet.States.BLANK)
 
   disconnect: () ->
     @_setState(ledger.wallet.States.DISCONNECTED)
@@ -48,6 +56,8 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     if @_numberOfRetry?
       @manager.removeRestorableState(state) for state in @manager.findRestorableStates({label: 'numberOfRetry'})
       @manager.addRestorableState({label: 'numberOfRetry', numberOfRetry: @_numberOfRetry}, 45000)
+
+  isInBootloaderMode: -> if @_productId is 0x1808 or @_productId is 0x1807 then yes else no
 
   getFirmwareUpdater: () -> ledger.fup.FirmwareUpdater.instance
 
@@ -239,6 +249,38 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     @sendAdpu(adpu, [0x9000])
 
   sendAdpu: (cla, ins, p1, p2, opt1, opt2, opt3, wrapScript) -> @_lwCard.dongle.card.sendApdu_async(cla, ins, p1, p2, opt1, opt2, opt3, wrapScript)
+
+  ###
+    Gets the raw version {ByteString} of the dongle.
+
+    @param [Boolean] isInBootLoaderMode Must be true if the current dongle is in bootloader mode.
+    @param [Boolean] forceBl Force the call in BootLoader mode
+    @param [Function] callback Called once the version is retrieved. The callback must be prototyped like size `(version, error) ->`
+    @return [CompletionClosure]
+  ###
+  getRawFirmwareVersion: (isInBootLoaderMode, forceBl = no, callback = null) -> @_getRawFirmwareVersion(isInBootLoaderMode, forceBl, new CompletionClosure(callback)).readonly()
+
+  _getRawFirmwareVersion: (isInBootLoaderMode, forceBl, completion) ->
+    adpu = new ByteString((if !isInBootLoaderMode and !forceBl then "E0C4000000" else "F001000000"), HEX)
+    @_lwCard.dongle.card.exchange_async(adpu).then (result) =>
+      if !isInBootLoaderMode and !forceBl
+        if @_lwCard.dongle.card.SW is 0x9000
+          completion.success([result.byteAt(1), (result.byteAt(2) << 16) + (result.byteAt(3) << 8) + result.byteAt(4)])
+        else
+          # Not initialized now - Retry
+          @_getRawFirmwareVersion(isInBootLoaderMode, yes, completion)
+      else
+        if @_lwCard.dongle.card.SW is 0x9000
+          completion.success([0, (result.byteAt(5) << 16) + (result.byteAt(6) << 8) + result.byteAt(7)])
+        else if !isInBootLoaderMode and (@_lwCard.dongle.card.SW is 0x6d00 or @_lwCard.dongle.card.SW is 0x6e00)
+          #  Unexpected - let's say it's 1.4.3
+          completion.success([0, (1 << 16) + (4 << 8) + (3)])
+        else
+          completion.failure(new Error("Failed to get version"))
+        return
+    .fail (error) ->
+      completion.failure(error)
+    completion
 
   _setState: (newState) ->
     @_state = newState

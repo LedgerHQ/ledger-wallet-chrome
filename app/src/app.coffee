@@ -1,16 +1,14 @@
 require @ledger.imports, ->
 
-  Modes =
-    Wallet: "Wallet"
-    FirmwareUpdate: "FirmwareUpdate"
-
   class Application extends ledger.base.application.BaseApplication
 
-    Modes: Modes
+    Modes:
+      Wallet: "Wallet"
+      FirmwareUpdate: "FirmwareUpdate"
 
     onStart: ->
       @_listenAppEvents()
-      @setExecutionMode(Modes.Wallet)
+      @setExecutionMode(@Modes.Wallet)
 
     ###
       Sets the execution mode of the application. In Wallet mode, the application handles the wallets state by starting services,
@@ -21,14 +19,14 @@ require @ledger.imports, ->
 
     ###
     setExecutionMode: (newMode) ->
-      throw "Unknown execution mode: #{newMode}. Available modes are ledger.app.Wallet or ledger.app.FirmwareUpdate." if _(_.values(Modes)).find((m) -> m is newMode).length is 0
+      throw "Unknown execution mode: #{newMode}. Available modes are ledger.app.Wallet or ledger.app.FirmwareUpdate." if _(_.values(@Modes)).find((m) -> m is newMode).length is 0
       return if newMode is @_currentMode
       @_currentMode = newMode
       if @isInWalletMode()
         @router.go '/'
       else if @isInFirmwareUpdateMode()
         @_releaseWallet()
-
+        @router.go '/'
       return
 
     ###
@@ -36,14 +34,14 @@ require @ledger.imports, ->
 
       @return [Boolean] True if the application is in wallet mode, false otherwise
     ###
-    isInWalletMode: -> @_currentMode is Modes.Wallet
+    isInWalletMode: -> @_currentMode is @Modes.Wallet
 
     ###
       Checks if the application is in firmware update mode.
 
       @return [Boolean] True if the application is in firmware update mode, false otherwise.
     ###
-    isInFirmwareUpdateMode: -> @_currentMode is Modes.FirmwareUpdate
+    isInFirmwareUpdateMode: -> @_currentMode is @Modes.FirmwareUpdate
 
     onConnectingDongle: (card) ->
       @emit 'dongle:connecting', card if @isInWalletMode()
@@ -102,6 +100,7 @@ require @ledger.imports, ->
 
   @WALLET_LAYOUT = 'WalletNavigationController'
   @ONBOARDING_LAYOUT = 'OnboardingNavigationController'
+  @UPDATE_LAYOUT = 'UpdateNavigationController'
 
   Model.commitRelationship()
 
