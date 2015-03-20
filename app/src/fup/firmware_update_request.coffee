@@ -183,6 +183,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         when States.LoadingOs then do @_processLoadOs
         when States.LoadingBootloader then do @_processLoadBootloader
         when States.LoadingBootloaderReloader then do @_processLoadBootloaderReloader
+        else @_failure(Errors.InconsistentState)
 
   _processInitStageOs: ->
     @_wallet.getState (state) =>
@@ -290,7 +291,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_handleCurrentState()
       else
         SEND_RACE_BL = (1 << 16) + (3 << 8) + (11)
-        @_exchangeNeedsExtraTimeout = result[1] < SEND_RACE_BL
+        @_exchangeNeedsExtraTimeout = version[1] < SEND_RACE_BL
         @_setCurrentState(States.LoadingBootloaderReloader)
         @_handleCurrentState()
 
@@ -313,9 +314,20 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processLoadBootloader: ->
     l 'Load Bootloader now'
+    @_findOriginalKey(ledger.fup.updates.BL_LOADER).then (offset) =>
+      @_processLoadingScript(ledger.fup.updates.BL_LOADER[offset], States.LoadingBootloader)
+    .then => @_waitForDisconnectDongle()
+    .fail (ex) =>
+      # TODO: Proper error handle. Both error from find original key and load script
 
   _processLoadBootloaderReloader: ->
     l 'Load Bootloader reloader now'
+    @_findOriginalKey(ledger.fup.updates.RELOADER_FROM_BL).then (offset) =>
+      @_processLoadingScript(ledger.fup.updates.RELOADER_FROM_BL[offset], States.LoadingBootloaderReloader)
+    .then => @_waitForDisconnectDongle()
+    .fail (ex) =>
+      e ex
+      # TODO: Proper error handle. Both error from find original key and load script
 
   _getVersion: (forceBl, callback) -> @_wallet.getRawFirmwareVersion(@_lastMode is Modes.Bootloader, forceBl, callback)
 
@@ -416,6 +428,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       e ex
 
   _findOriginalKey: (loadingArray, offset = 0) ->
+    l loadingArray, offset
     throw new Error("Key not found") if offset >= loadingArray.length
     @_wallet._lwCard.dongle.card.exchange_async(new ByteString(loadingArray[offset][0], HEX)).then (result) =>
       if @_wallet._lwCard.dongle.card.SW == 0x9000
@@ -423,6 +436,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       else
         @_findOriginalKey(loadingArray, offset + 1)
     .fail (er) =>
+      e er
       throw new Error("Communication Error")
 
   _notifyProgress: (state, offset, total) -> _.defer => @_onProgress?(state, offset, total)
