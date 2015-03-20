@@ -45,10 +45,14 @@ class @OnboardingManagementPinViewController extends @OnboardingViewController
       @params.pin_kind = 'auto'
       @params.pin = @_randomPinCode()
       do @_updateUI
+    @view.autoPinCode.on 'click', =>
+      @view.autoRadio.change()
     @view.manualRadio.on 'change', =>
       @params.pin_kind = 'manual'
       @params.pin = undefined
       do @_updateUI
+    @view.manualPinCode.on 'click', =>
+      @view.manualRadio.change()
     @view.manualPinCode.on 'change', =>
       @params.pin = @view.manualPinCode.value()
       do @_updateUI
@@ -61,8 +65,11 @@ class @OnboardingManagementPinViewController extends @OnboardingViewController
     # pin codes
     @view.autoPinCode.setEnabled(@_isPinKindAuto())
     @view.manualPinCode.setEnabled(!@_isPinKindAuto())
+    @view.manualPinCode.setStealsFocus(@_isPinKindAuto() is no then yes)
     if !@_isPinKindAuto()
       @view.manualPinCode.focus()
+    else
+      @view.autoRadio.focus()
 
     # helper links
     if @_isPinKindAuto()

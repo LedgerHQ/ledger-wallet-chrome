@@ -9,6 +9,8 @@ common:
   date_format: 'DD/MM/YYYY à HH:mm'
   close: "Close"
   cancel: "Cancel"
+  print: "Print"
+  copy: "Copy"
   finish: "Finish"
   confirm: "Confirm"
   confirmation: "Confirmación"
