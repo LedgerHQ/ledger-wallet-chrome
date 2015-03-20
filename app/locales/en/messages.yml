@@ -9,6 +9,8 @@ common:
   date_format: 'MM/DD/YYYY at HH:mm'
   close: "Close"
   cancel: "Cancel"
+  print: "Print"
+  copy: "Copy"
   finish: "Finish"
   confirm: "Confirm"
   confirmation: "Confirmation"
@@ -127,7 +129,7 @@ onboarding:
       your_recovery_phrase: "Your recovery phrase:"
       invalid_recovery_phrase: "The recovery phrase is invalid."
       it_wont_be_displayed_again: "Your recovery phrase won't be displayed again."
-      without_it: "Without it, you will not be able to access your wallet in case of loss."
+      without_it: "Without it, you will not be able to access your Bitcoins in case of loss."
 
     summary:
       your_wallet_is: "Your wallet is"

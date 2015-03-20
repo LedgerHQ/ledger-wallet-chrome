@@ -1,7 +1,14 @@
 <div id="content-container">
   <div class="title-container">
-    <div class="page-title"><%= t 'onboarding.management.' + @params.wallet_mode + '_my_wallet' %></div>
-    <div class="page-subtitle"><%= t 'application.name' %></div>
+    <div class="titles">
+      <div class="page-title"><%= t 'onboarding.management.' + @params.wallet_mode + '_my_wallet' %></div>
+      <div class="page-subtitle"><%= t 'application.name' %></div>
+    </div>
+    <div id="actions_container" class="actions no-print">
+      <a class="action" href="#print"><i class="fa fa-print"></i><br /><%= t 'common.print' %></a>
+      <div class="separator"></div>
+      <a class="action" href="#copy"><i class="fa fa-paste"></i><br /><%= t 'common.copy' %></a>
+    </div>
   </div>
   <div class="greyed-container detailed">
     <div class="index">
@@ -13,9 +20,7 @@
     </div>
   </div>
   <div class="page-content-container">
-    <div id="seed_container">
-
-    </div>
+    <div id="seed_container"></div>
     <div id="invalid_label"><span class="invalid-indication"><%= t 'onboarding.management.seed.invalid_recovery_phrase' %></span></div>
     <div id="indication_label"><span class="grey-indication-strong"><%= t 'onboarding.management.seed.it_wont_be_displayed_again' %></span> <span class="grey-indication"><%= t 'onboarding.management.seed.without_it' %></span></div>
   </div>
