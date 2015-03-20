@@ -1,5 +1,6 @@
 # A store able to synchronize with a remote crypted store. This store has an extra method in order to order a push or pull
 # operations
+# @event pulled Emitted once the store is pulled from the remote API
 class ledger.storage.SyncedStore extends ledger.storage.SecureStore
 
   PULL_INTERVAL_DELAY: ledger.config.syncRestClient.pullIntervalDelay || 10000
@@ -43,13 +44,15 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     super(cb)
     @client.delete_settings()
 
-  # @return A jQuery promise
+  # @return A promise
   _pull: ->
     @client.get_settings_md5().then( (md5) =>
       return undefined if md5 == @lastMd5
       @client.get_settings().then (items) =>
         @mergeStrategy(items).then =>
           @_setLastMd5(md5)
+          @emit('pulled')
+          l 'emit pulled!'
           items
     ).catch( (jqXHR) =>
       # Data not synced already

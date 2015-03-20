@@ -52,7 +52,7 @@
         '../libs/sha256'
         '../libs/checkBitcoinAddress'
         '../libs/lru'
-        '../libs/moment.min'
+        '../libs/moment'
         '../libs/lokijs.min'
         '../libs/bitcoinjs-min'
 

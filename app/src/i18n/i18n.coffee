@@ -1,26 +1,30 @@
 class ledger.i18n
 
+  # syncStore instance
+  @syncStore: undefined
+  # chromeStore instance
+  @chromeStore: undefined
   # Contain all the translation files
   @translations: {}
   # User favorite language
   @userFavLang: undefined
   # User favorite language and region
-  @userFavLangAndRegion: undefined
+  @userFavLocale: undefined
   # Languages + regions tags that represent the user's Chrome browser preferences
   @browserAcceptLanguages: undefined
   # Language tag that depends on the browser UI language
   @browserUiLang: undefined
   # Supported languages by the app (when translation is done)
   @Languages: {}
-
-  @syncStore: undefined
-  # chromeStore instance
-  @chromeStore: undefined
-
+  # [Boolean] If userFavLang is set into chromeStore or not
+  @userFavLangChromeStoreIsSet: undefined
+  # [Boolean] If userFavLocale is set into chromeStore or not
+  @userFavLocaleChromeStoreIsSet: undefined
 
 
   @init: (cb) =>
     #@syncStore = new ledger.storage.SyncedStore('i18n')
+
     @chromeStore = new ledger.storage.ChromeStore('i18n')
 
     @Languages = Object.keys(ledger.i18n.Languages)
@@ -28,29 +32,53 @@ class ledger.i18n
     for tag in @Languages
       @loadTrad(tag)
 
-    @setUserBrowserUiLang()
-    @fetchUserBrowserAcceptLangs()
-    .then(@userFavLangFromChromeStore)
-    .then(@setUserFavLangIntoChromeStore)
-    .then(@setMomentLocale)
+    # Manage text translation
+    @setBoolUserFavLangChromeStore()
+    .then(
+      () =>
+
+        if @userFavLangChromeStoreIsSet
+          l 'Language: store is set'
+          @loadUserFavLangFromChromeStore()
+          .catch (err) -> l(err)
+          .done()
+
+        else
+          l 'Language: store is not set'
+          @setUserBrowserUiLang()
+          @fetchUserBrowserAcceptLangs()
+          .then(() -> @setUserFavLangFromBrowserAcceptLanguages)
+          .then(@setUserFavLangIntoChromeStore)
+          .then(@setBoolUserFavLangChromeStore)
+          .catch (err) -> l(err)
+          .done()
+    )
     .catch (err) -> l(err)
     .done()
 
-    ###
-      if userFavLag is set into chrome store
-        @setUserBrowserUiLang()
-        @fetchUserBrowserAcceptLangs()
-        .then(@userFavLangFromChromeStore)
-        .then(@setMomentLocale)
 
-      else
-        @setUserBrowserUiLang()
-        @fetchUserBrowserAcceptLangs()
-        .then(@setUserFavLangIntoChromeStore)
-        .then(@setMomentLocale)
-    ###
+    # Manage date, time and currency converters
+    @setBoolLocaleChromeStore()
+    .then(
+      () =>
+
+        if @userFavLocaleChromeStoreIsSet
+          l 'Locale: store is set'
+          @loadLocaleFromChromeStore()
+          .then(@setMomentLocale)
+        else
+          l 'Locale: store is not set'
+          @setLocaleIntoChromeStore()
+          .then(@setBoolLocaleChromeStore)
+          @setMomentLocale()
+    )
+    .catch (err) -> l(err)
+    .done()
+
+    @onPulledSyncStore()
 
     cb()
+
 
 
   ###
@@ -65,10 +93,10 @@ class ledger.i18n
 
     @return [Promise] promise Promise containing the user favorite languages with regions
   ###
-  @fetchUserBrowserAcceptLangs: () ->
+  @fetchUserBrowserAcceptLangs: () =>
     deferred = Q.defer()
-    chrome.i18n.getAcceptLanguages (requestedLocales) ->
-      ledger.i18n.browserAcceptLanguages = requestedLocales
+    chrome.i18n.getAcceptLanguages (requestedLocales) =>
+      @browserAcceptLanguages = requestedLocales
       deferred.resolve(requestedLocales)
 
     return deferred.promise
@@ -82,22 +110,29 @@ class ledger.i18n
   ###
   @setUserFavLangByUI: (tag) ->
     if tag.length > 2
-      throw new Error 'Tag language must be two characters. Use ledger.i18n.setUserFavLangAndRegionByUI() if you want to set the region'
+      throw new Error 'Tag language must be two characters. Use ledger.i18n.setLocaleByUI() if you want to set the region'
     ledger.i18n.userFavLang = tag
     @setUserFavLangIntoChromeStore()
 
 
   ###
-    Set user favorite language via the app UI
+    Set user locale via the app UI
 
-    @param [String] tag Codified language tag - cf. BCP 47 recommendation, composed by the IETF/IANA RFC 5646 and RFC 4647 - Official list here : http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
+    @param [String] tag Codified (BCP 47) language tag - Official list here : http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
     @return [String] @userFavLang The favorite user language
   ###
-  @setUserFavLangAndRegionByUI: (tag) ->
+  @setLocaleByUI: (tag) =>
     if tag.length < 5
       throw new Error 'Tag language must be at least five characters. Use ledger.i18n.setUserFavLangByUI() if you want to set the language without the region'
-    ledger.i18n.userFavLangAndRegion = tag
-    @setUserFavLangAndRegionIntoChromeStore()
+
+    if tag.substr(0, 2) isnt @userFavLang
+      throw new Error 'You cannot set a locale which does not correspond to the user favorite language'
+
+    @userFavLocale = tag
+
+    @setLocaleIntoChromeStore()
+    @setMomentLocale()
+
 
 
   ###
@@ -111,78 +146,126 @@ class ledger.i18n
         i++
         ledger.i18n.userFavLang = ledger.i18n.browserAcceptLanguages[i]
       else
-        ledger.i18n.userFavLangAndRegion = ledger.i18n.browserAcceptLanguages[i]
+        ledger.i18n.userFavLocale = ledger.i18n.browserAcceptLanguages[i]
+
+
+  ###
+    SyncedStore
+  ###
+  @onPulledSyncStore: () ->
+    try
+      ledger.storage.sync.on('pulled', (r) ->
+        l 'pulllled!'
+        l r
+      )
+    catch err
+      l err
 
 
   ###
     Set user favorite language into chromeStore (Local Storage)
   ###
   @setUserFavLangIntoChromeStore: (tag) =>
-    tag ?= @userFavLang
+    tag ?= @userFavLang || @browserUiLang
+    @userFavLang = tag
 
     ledger.i18n.chromeStore.set({i18n_userFavLang: tag})
+    @setBoolUserFavLangChromeStore()
 
-    ###
-    if @userFavLang isnt undefined
-      l(@userFavLang)
-      ledger.i18n.chromeStore.set({i18n_userFavLang: tag})
-    else if @browserUiLang isnt undefined
-      l @browserUiLang, 'setUserFavLangIntoChromeStore'
-      ledger.i18n.chromeStore.set({i18n_userFavLang: ledger.i18n.browserUiLang})
-    else if @browserAcceptLanguages isnt undefined
-      @setUserFavLangFromBrowserAcceptLanguages()
-      ledger.i18n.chromeStore.set({i18n_userFavLang: tag})
-      l @browserAcceptLanguages
-    else
-      l('en')
-      ledger.i18n.chromeStore.set({i18n_userFavLang: 'en', i18n_userFavLangAndRegion: 'en-US'})
-    ###
+   
 
   ###
-    Set user favorite language with region into chromeStore (Local Storage)
+    Set user locale into chromeStore (Local Storage)
   ###
-  @setUserFavLangAndRegionIntoChromeStore: () =>
-    if @userFavLangAndRegion isnt undefined
-      l(@userFavLangAndRegion)
-      ledger.i18n.chromeStore.set({i18n_userFavLangAndRegion: ledger.i18n.userFavLangAndRegion})
-    else if @browserUiLang isnt undefined
-      l @browserUiLang, 'setUserFavLangIntoChromeStore'
-      ledger.i18n.chromeStore.set({i18n_userFavLangAndRegion: ledger.i18n.browserUiLang})
-    else if @browserAcceptLanguages isnt undefined
-      @setUserFavLangFromBrowserAcceptLanguages()
-      ledger.i18n.chromeStore.set({i18n_userFavLangAndRegion: ledger.i18n.userFavLangAndRegion})
-      l @browserAcceptLanguages
-    else
-      l('en')
-      ledger.i18n.chromeStore.set({i18n_userFavLangAndRegion: 'en-US'})
+  @setLocaleIntoChromeStore: (tag) =>
+    tag ?= @userFavLocale || @browserUiLang
+    @userFavLocale = tag
+
+    ledger.i18n.chromeStore.set({i18n_userFavLocale: tag})
+    @setBoolLocaleChromeStore()
+
 
 
   ###
     Set and Get @userFavLang from chromeStore (Local Storage)
+
+    @return [Promise]
   ###
-  @userFavLangFromChromeStore: () =>
+  @loadUserFavLangFromChromeStore: () =>
     deferred = Q.defer()
     # Set userFavLang from chromeStore
     @chromeStore.get('i18n_userFavLang', (r) ->
+      if Array.isArray(r.i18n_userFavLang)
+        r.i18n_userFavLang = r.i18n_userFavLang[0]
       ledger.i18n.userFavLang = r.i18n_userFavLang
       deferred.resolve(r)
     )
-    return @userFavLang
+    return deferred.promise
+
+
+  ###
+    Set and Get @userFavLocale from chromeStore (Local Storage)
+
+    @return [Promise]
+  ###
+  @loadLocaleFromChromeStore: () =>
+    deferred = Q.defer()
+    # Set userFavLocale from chromeStore
+    @chromeStore.get('i18n_userFavLocale', (r) ->
+      if Array.isArray(r.i18n_userFavLocale)
+        r.i18n_userFavLocale = r.i18n_userFavLocale[0]
+      ledger.i18n.userFavLocale = r.i18n_userFavLocale
+      deferred.resolve(r)
+    )
+    return deferred.promise
 
 
   ###
     Check if userFavLang is set into chromeStore (Local Storage)
   ###
-  @checkUserFavLangChromeStore: () =>
+  @setBoolUserFavLangChromeStore: () =>
     deferred = Q.defer()
-    # Set userFavLang from chromeStore
-    @chromeStore.get('i18n_userFavLang', (r) ->
-      l r.i18n_userFavLang
-      #l (r.i18n_userFavLang is null or undefined)
+    @chromeStore.get('i18n_userFavLang', (r) =>
+      #l r.i18n_userFavLang
+      if r.i18n_userFavLang isnt undefined
+        @userFavLangChromeStoreIsSet = true
+      else
+        @userFavLangChromeStoreIsSet = false
       deferred.resolve(r)
     )
-    return @userFavLang
+    return deferred.promise
 
+
+  ###
+    Check if userFavLocale is set into chromeStore (Local Storage)
+  ###
+  @setBoolLocaleChromeStore: () =>
+    deferred = Q.defer()
+    @chromeStore.get('i18n_userFavLocale', (r) =>
+      #l r.i18n_userFavLocale
+      if r.i18n_userFavLocale isnt undefined
+        @userFavLocaleChromeStoreIsSet = true
+      else
+        @userFavLocaleChromeStoreIsSet = false
+      deferred.resolve(r)
+    )
+    return deferred.promise  
+
+    
+  ###
+    Remove key 'i18n_userFavLang' from chrome Store
+  ###
+  @removeUserFavLangChromeStore: () =>
+    @chromeStore.remove('i18n_userFavLang', l)
+    @setBoolUserFavLangChromeStore()
+
+
+  ###
+    Remove key 'i18n_userFavLocale' from chrome Store
+  ###
+  @removeLocaleChromeStore: () =>
+    @chromeStore.remove('i18n_userFavLocale', l)
+    @setBoolLocaleChromeStore()  
 
 
   ###
@@ -206,10 +289,10 @@ class ledger.i18n
     @param [String] messageId Unique identifier of the message
     @return [String] localized message
   ###
-  @t = (messageId) ->
+  @t = (messageId) =>
     messageId = _.string.replace(messageId, '.', '_')
 
-    res = ledger.i18n.translations[ledger.i18n.userFavLang][messageId]['message']
+    res = @.translations[@userFavLang][messageId]['message']
 
     return res if res? and res.length > 0
     return messageId
@@ -222,7 +305,6 @@ class ledger.i18n
     @return [String] The formatted amount
   ###
   @formatAmount = (amount) ->
-    @detectIntlSupport()
 
     options =
       style: "currency"
@@ -235,8 +317,8 @@ class ledger.i18n
   ###
     Set the locale for Moment.js
   ###
-  @setMomentLocale = () ->
-    moment.locale(@userFavLangAndRegion)
+  @setMomentLocale = () =>
+    moment.locale(@userFavLocale.toLowerCase())
 
 
   ###
