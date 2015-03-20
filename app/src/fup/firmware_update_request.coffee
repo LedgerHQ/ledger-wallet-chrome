@@ -7,9 +7,10 @@ States =
   ReloadingBootloaderFromOs: 3
   LoadingBootloader: 4
   LoadingReloader: 5
-  LoadingOs: 6
-  InitializingOs: 7
-  Done: 8
+  LoadingBootloaderReloader: 6
+  LoadingOs: 7
+  InitializingOs: 8
+  Done: 9
 
 Modes =
   Os: 0
@@ -57,6 +58,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_approvedStates = []
     @_stateCache = {} # This holds the state related data
     @_exchangeNeedsExtraTimeout = no
+    @_isWaitForDongleSilent = no
 
   ###
     Stops all current tasks and listened events.
@@ -116,7 +118,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   ###
   hasKeyCardSeed: () -> if @_keyCardSeed? then yes else no
 
-  _waitForConnectedDongle: (callback = undefined) ->
+  _waitForConnectedDongle: (callback = undefined, silent = no) ->
+    @_isWaitForDongleSilent = silent
     return @_connectionCompletion if @_connectionCompletion?
     completion = new CompletionClosure(callback)
     registerWallet = (wallet) =>
@@ -125,7 +128,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       wallet.once 'disconnected', =>
         @_setCurrentState(States.Undefined)
         @_wallet = null
-        @_waitForConnectedDongle()
+        @_waitForConnectedDongle(null, @_isWaitForDongleSilent)
       @_handleCurrentState()
       completion.success(wallet)
 
@@ -133,7 +136,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     try
       unless wallet?
         @_connectionCompletion = completion.readonly()
-        _.defer => @emit 'plug'
+        delay = if !silent then 0 else 1000
+        l "Wait for connection", silent
+        setTimeout (=> @emit 'plug' unless @_wallet?), delay
         ledger.app.walletsManager.once 'connected', (e, wallet) =>
           @_connectionCompletion = null
           registerWallet(wallet)
@@ -144,11 +149,11 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     completion.readonly()
 
 
-  _waitForDisconnectDongle: (callback = undefined) ->
+  _waitForDisconnectDongle: (callback = undefined, silent = no) ->
     return @_disconnectionCompletion if @_disconnectionCompletion?
     completion = new CompletionClosure(callback)
     if @_wallet?
-      @emit 'unplug'
+      @emit 'unplug' unless silent
       @_disconnectionCompletion = completion.readonly()
       @_wallet.once 'disconnected', =>
         @_disconnectionCompletion = null
@@ -158,14 +163,14 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       completion.success()
     completion.readonly()
 
-  _waitForPowerCycle: (callback = undefined ) -> @_waitForDisconnectDongle().then(=> @_waitForConnectedDongle(callback).promise())
+  _waitForPowerCycle: (callback = undefined, silent = no) -> @_waitForDisconnectDongle(null, silent).then(=> @_waitForConnectedDongle(callback, silent).promise())
 
   _handleCurrentState: () ->
     # If there is no dongle wait for one
-    (return @_waitForConnectedDongle =>) unless @_wallet?
+    (return @_waitForConnectedDongle()) unless @_wallet?
 
     # Otherwise handle the current by calling the right method depending on the last mode and the state
-    if LastMode is Modes.Os
+    if @_lastMode is Modes.Os
       switch @_currentState
         when States.Undefined then do @_processInitStageOs
         when States.ReloadingBootloaderFromOs then do @_processReloadBootloaderFromOs
@@ -175,7 +180,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     else
       switch @_currentState
         when States.Undefined then do @_processInitStageBootloader
-        when States.LoadingBootloader then null
+        when States.LoadingOs then do @_processLoadOs
+        when States.LoadingBootloader then do @_processLoadBootloader
+        when States.LoadingBootloaderReloader then do @_processLoadBootloaderReloader
 
   _processInitStageOs: ->
     @_wallet.getState (state) =>
@@ -185,6 +192,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       else
         l 'Time to update'
         @_fup.getFirmwareUpdateAvailability @_wallet, @_lastMode is Modes.Bootloader, no, (availability, error) =>
+          # TODO: Handle error unable to get firmware version
           @_dongleVersion = availability.dongleVersion
           switch availability.result
             when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Overwrite
@@ -227,17 +235,19 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processInitOs: ->
     l 'Time to init OS'
-    @_waitForUserApproval('initos')
+    currentInitScript = _(ledger.fup.updates.OS_INIT).last()[1]
+    moddedInitScript = []
+    for i in [0...currentInitScript.length]
+      moddedInitScript.push currentInitScript[i]
+      if i is currentInitScript.length - 2
+        moddedInitScript.push "D026000011" + "04" + @_keyCardSeed.toString(HEX)
+    @_processLoadingScript moddedInitScript, States.InitializingOs, yes
     .then =>
-      @_removeUserApproval('initos')
-      currentInitScript = _(ledger.fup.updates.OS_INIT).last()[1]
-      moddedInitScript = []
-      for i in [0...currentInitScript.length]
-        moddedInitScript.push currentInitScript[i]
-        if i is currentInitScript.length - 2
-          moddedInitScript.push "D026000011" + "04" + @_keyCardSeed.toString(HEX)
-      @_processLoadingScript moddedInitScript, States.InitializingOs, yes
-      .then
+      @_setCurrentState(States.Done)
+      @_isOsLoaded = no
+      @_onComplete.success()
+    .fail =>
+      # TODO: Handle error during init OS
 
   _processReloadBootloaderFromOs: ->
     l 'Time to reload bootloader from os'
@@ -254,9 +264,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         # TODO: Handle This firmware is not supported
         return
       l 'Process loading'
+      @_isWaitForDongleSilent = yes
       @_processLoadingScript ledger.fup.updates.BL_RELOADER[index][1], States.ReloadingBootloaderFromOs
       .then =>
-        @_waitForPowerCycle()
+        @_waitForPowerCycle(null, yes)
       .fail (e) =>
         l 'Failure', e
         # TODO: If e is 0x6985 -> Error loading reloader. If the dongle is set up, make sure to erase the seed before updating the firmware
@@ -267,7 +278,44 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
 
   _processInitStageBootloader: ->
-    l 'BOOT LOADER'
+    @_lastVersion = null
+    @_wallet.getRawFirmwareVersion yes, yes, (version, error) =>
+      return @_failure() if error? # TODO: Handle error unable to get firmware version
+      @_lastVersion = version
+      if ledger.fup.utils.compareVersions(version, ledger.fup.versions.Nano.CurrentVersion.Bootloader).eq()
+        @_setCurrentState(States.LoadingOs)
+        @_handleCurrentState()
+      else if ledger.fup.utils.compareVersions(version, ledger.fup.versions.Nano.CurrentVersion.Reloader).eq()
+        @_setCurrentState(States.LoadingBootloader)
+        @_handleCurrentState()
+      else
+        SEND_RACE_BL = (1 << 16) + (3 << 8) + (11)
+        @_exchangeNeedsExtraTimeout = result[1] < SEND_RACE_BL
+        @_setCurrentState(States.LoadingBootloaderReloader)
+        @_handleCurrentState()
+
+  _processLoadOs: ->
+    l 'Load OS now'
+    @_isOsLoaded = no
+    @_findOriginalKey(ledger.fup.updates.OS_LOADER).then (offset) =>
+      @_isWaitForDongleSilent = yes
+      @_processLoadingScript(ledger.fup.updates.OS_LOADER[offset], States.LoadingOs).then (result) =>
+        @_isOsLoaded = yes
+        @_setCurrentState(States.Undefined)
+        _.delay (=> @_waitForPowerCycle(null, yes)), 200
+      .fail (e) =>
+        @_isWaitForDongleSilent = no
+        @_setCurrentState(States.Undefined)
+        @_failure() # TODO: Handle properly
+    .fail (e) =>
+      @_isWaitForDongleSilent = no
+      @_setCurrentState(States.Undefined)
+
+  _processLoadBootloader: ->
+    l 'Load Bootloader now'
+
+  _processLoadBootloaderReloader: ->
+    l 'Load Bootloader reloader now'
 
   _getVersion: (forceBl, callback) -> @_wallet.getRawFirmwareVersion(@_lastMode is Modes.Bootloader, forceBl, callback)
 
@@ -367,8 +415,14 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     catch ex
       e ex
 
+  _findOriginalKey: (loadingArray, offset = 0) ->
+    throw new Error("Key not found") if offset >= loadingArray.length
+    @_wallet._lwCard.dongle.card.exchange_async(new ByteString(loadingArray[offset][0], HEX)).then (result) =>
+      if @_wallet._lwCard.dongle.card.SW == 0x9000
+        offset
+      else
+        @_findOriginalKey(loadingArray, offset + 1)
+    .fail (er) =>
+      throw new Error("Communication Error")
+
   _notifyProgress: (state, offset, total) -> _.defer => @_onProgress?(state, offset, total)
-
-
-
-LastMode = ledger.fup.FirmwareUpdateRequest.Modes.Os

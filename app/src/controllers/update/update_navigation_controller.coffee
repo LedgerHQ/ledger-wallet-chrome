@@ -26,10 +26,14 @@ class @UpdateNavigationController extends @NavigationController
   _onReloadingBootloaderFromOs: ->
     ledger.app.router.go '/update/reloadblfromos'
 
+  _onLoadingOs: ->
+    ledger.app.router.go '/update/loados'
+
   _onStateChanged: (newState, oldState) ->
     switch newState
       when ledger.fup.FirmwareUpdateRequest.States.Erasing then @_onErasingDongle()
       when ledger.fup.FirmwareUpdateRequest.States.ReloadingBootloaderFromOs then @_onReloadingBootloaderFromOs()
+      when ledger.fup.FirmwareUpdateRequest.States.LoadingOs then @_onLoadingOs()
 
   _onNeedsUserApproval: ->
     if @topViewController()?.isRendered()

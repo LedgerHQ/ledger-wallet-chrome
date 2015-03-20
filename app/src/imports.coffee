@@ -290,5 +290,6 @@
         'controllers/update/update_erasing_view_controller'
         'controllers/update/update_unplug_view_controller'
         'controllers/update/update_reloadblfromos_view_controller'
+        'controllers/update/update_loados_view_controller'
 
       ]

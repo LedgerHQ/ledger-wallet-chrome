@@ -14,7 +14,7 @@
   V1_4_11: 0x0001040b0146
   V1_4_12: 0x0001040c0146
   V1_4_13: 0x0001040d0146
-  V_LW_1_0_0: 0x20010000010f
+  V1_0_0B: 0x20010000010f
 
 @ledger.wallet.Attestation =
   String: "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
@@ -45,7 +45,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       @_lwCard = new LW(0, new BTChip(@lwCard), @_vents)
     else
       # TODO: Remove with vincent refactoring
-      @_lwCard = dongle: @lwCard
+      @_lwCard = dongle: card: @lwCard
       @emit 'connected', @
       _.defer => @_setState(ledger.wallet.States.BLANK)
 
@@ -277,6 +277,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
           completion.success([0, (1 << 16) + (4 << 8) + (3)])
         else
           completion.failure(new Error("Failed to get version"))
+        return
     .fail (error) ->
       completion.failure(error)
     completion

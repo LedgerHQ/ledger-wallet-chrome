@@ -6,7 +6,7 @@
     <button id="start" data-href="#approveUpdate">Update me!</button>
   </div>
 
-  <div id="progress">
+  <div id="progress" style="font-size: xx-large; color: #ffffff;">
     0%
   </div>
 
