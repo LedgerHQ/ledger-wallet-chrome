@@ -129,7 +129,7 @@ onboarding:
       your_recovery_phrase: "Su frase de restauración :"
       invalid_recovery_phrase: "La frase de restauración no es válida."
       it_wont_be_displayed_again: "Su frase de restauración no se mostrará de nuevo."
-      without_it: "Sin ella, no tendrá acceso a su monedero en caso de pérdida."
+      without_it: "Sin ella, no tendrá acceso a su Bitcoins en caso de pérdida."
 
     summary:
       your_wallet_is: "Su monedero esta"
