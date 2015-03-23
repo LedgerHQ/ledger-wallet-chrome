@@ -8,7 +8,6 @@ class @UpdateNavigationController extends @NavigationController
     @_request.on 'needsUserApproval', @_onNeedsUserApproval
     @_request.onProgress @_onProgress.bind(@)
     ledger.fup.FirmwareUpdater.instance.load =>
-
     window.fup = @_request # TODO: REMOVE THIS
 
   onDetach: ->

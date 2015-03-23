@@ -78,7 +78,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   onProgress: (callback) -> @_onProgress = callback
 
-
   ###
     Approves the current request state and continue its execution.
   ###
@@ -98,7 +97,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   ###
   getTargetVersion: -> ledger.fup.utils.versionToString(ledger.fup.versions.Nano.CurrentVersion.Os)
 
-
   ###
     Sets the key card seed used during the firmware update process. The seed must be a 32 characters string formatted as
     an hexadecimal value.
@@ -114,6 +112,21 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_keyCardSeed = seed.getValue()
     @emit "setKeyCardSeed"
     @_handleCurrentState()
+
+  ###
+    Checks if a given keycard seed is valid or not. The seed must be a 32 characters string formatted as
+    an hexadecimal value.
+
+    @param [String] keyCardSeed A 32 characters string formatted as an hexadecimal value (i.e. '01294b7431234b5323f5588ce7d02703'
+  ###
+  checkIfKeyCardSeedIsValid: (keyCardSeed) -> @_keyCardSeedToByteString(keyCardSeed).isSuccess()
+
+  _keyCardSeedToByteString: (keyCardSeed, safe = no) ->
+    throw new Error(Errors.InvalidSeedSize) if not keyCardSeed? or keyCardSeed.length != 32
+    seed = Try => new ByteString(keyCardSeed, HEX)
+    throw new Error(Errors.InvalidSeedFormat) if seed.isFailure() or seed.getValue()?.length != 16
+    seed
+
 
   ###
     Gets the current state.
@@ -331,10 +344,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _getVersion: (forceBl, callback) -> @_wallet.getRawFirmwareVersion(@_lastMode is Modes.Bootloader, forceBl, callback)
 
-  _compareVersion: (v1, v2) ->
-
   _failure: (reason) ->
-    @emit "error", cause: reason
+    @emit "error", cause: new ledger.StandardError(reason)
     @_waitForPowerCycle()
 
   _attemptToFailDonglePinCode: (pincode) ->
