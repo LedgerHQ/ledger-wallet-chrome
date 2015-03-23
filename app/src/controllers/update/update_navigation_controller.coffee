@@ -50,7 +50,6 @@ class @UpdateNavigationController extends @NavigationController
       @topViewController().once 'afterRender', => @topViewController().onNeedsUserApproval()
 
   _onProgress: (state, current, total) ->
-    l 'on progress', arguments
     if @topViewController()?.isRendered()
       @topViewController().onProgress(state, current, total)
     else

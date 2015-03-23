@@ -10,6 +10,7 @@ _.extend ledger.errors,
   NotFound: 102
   NetworkError: 103
   AuthenticationFailed: 104
+  InconsistentState: 105
 
   # Dongle errors
   NotSupportedDongle: 200
@@ -22,6 +23,17 @@ _.extend ledger.errors,
   # Wallet errors
   NotEnoughFunds: 300
   SignatureError: 301
+
+  # Firmware update errors
+  UnableToRetrieveVersion: 400
+  InvalidSeedSize: 401
+  InvalidSeedFormat: 402
+  FailedToInitOs: 404
+  CommunicationError: 405
+  UnsupportedFirmware: 406
+  ErrorDongleMayHaveASeed: 407
+  ErrorDueToCardPersonalization: 408
+  HigherVersion: 409
 
   DefaultMessages:
     0: "StandardError"
@@ -41,6 +53,8 @@ _.extend ledger.errors,
 
     300: "Not enough funds"
     301: "Signature error"
+
+
 
   create: (code, title, error) -> code: code, title: title, error: error
   throw: (code, message) -> throw new ledger.StandardError(code, message)
