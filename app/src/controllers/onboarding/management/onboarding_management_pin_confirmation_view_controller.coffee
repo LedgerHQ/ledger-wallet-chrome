@@ -25,12 +25,14 @@ class @OnboardingManagementPinconfirmationViewController extends @OnboardingView
   _insertPinCode: ->
     @view.pinCode = new ledger.pin_codes.PinCode()
     @view.pinCode.insertAfter(@select('div.page-content-container > div'))
-    @view.pinCode.setStealsFocus yes
+    @view.pinCode.focus()
 
   _updateUI: (animated = yes) ->
     if @_isPinValid()
       @view.invalidLabel.fadeOut(if animated then 250 else 0)
       @view.continueButton.removeClass 'disabled'
+      @view.continueButton.removeAttr 'tabIndex'
+
     else
       if animated == no
         @view.invalidLabel.fadeOut(0)
@@ -40,6 +42,8 @@ class @OnboardingManagementPinconfirmationViewController extends @OnboardingView
         else
           @view.invalidLabel.fadeOut(if animated then 250 else 0)
       @view.continueButton.addClass 'disabled'
+      @view.continueButton.attr('tabIndex', '-1')
+
 
   _isPinValid: ->
     @view.pinCode.value()? and @params.pin? and @view.pinCode.value() == @params.pin

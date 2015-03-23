@@ -37,6 +37,7 @@ class @OnboardingManagementPinViewController extends @OnboardingViewController
     @view.autoPinCode.insertAfter(@select('#choice-auto > label')[0])
     @view.autoPinCode.setProtected no
     @view.autoPinCode.setReadonly yes
+    @view.autoPinCode.setTabNavigation no
     @view.manualPinCode = new ledger.pin_codes.PinCode()
     @view.manualPinCode.insertAfter(@select('#choice-manual > label')[0])
 
@@ -88,8 +89,11 @@ class @OnboardingManagementPinViewController extends @OnboardingViewController
     # navigation
     if @_isPinValid()
       @view.continueButton.removeClass 'disabled'
+      @view.continueButton.removeAttr 'tabIndex'
+
     else
       @view.continueButton.addClass 'disabled'
+      @view.continueButton.attr('tabIndex', '-1')
 
   _isPinKindAuto: ->
     @params.pin_kind == 'auto'

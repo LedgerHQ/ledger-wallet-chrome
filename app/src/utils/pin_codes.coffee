@@ -243,6 +243,10 @@ class ledger.pin_codes.PinCode extends EventEmitter
     if steals
       @focus()
 
+  setTabNavigation: (tabNavigation) ->
+    tabIndex = if tabNavigation then 0 else -1
+    @_input().tabIndex = tabIndex
+
   # Gets the current enabled flag.
   # @return [Boolean] The current enabled flag.
   isEnabled: ->
@@ -265,6 +269,11 @@ class ledger.pin_codes.PinCode extends EventEmitter
 
   stealsFocus: ->
     return @_stealsFocus
+
+  # Gets the current tab navigation state (can we focus on the input with the keyboard navigation).
+  # @return [Boolean] The current tab navigation state.
+  tabNavigation: ->
+    return @_input().tabIndex isnt -1
 
   # @private
   _input: ->
