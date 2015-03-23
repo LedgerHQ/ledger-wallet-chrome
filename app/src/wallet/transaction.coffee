@@ -9,21 +9,21 @@ class ledger.wallet.transaction.Transaction
     KEYCARD: 0x02
     SECURE_SCREEN: 0x03
 
-  init: (@amount, @fees, @recipientAddress) ->
+  init: (@amount, @fees, @recipientAddress, @inputs, @changePath) ->
     @amount = ledger.wallet.Value.from(amount)
     @fees = ledger.wallet.Value.from(fees)
     @_isValidated = no
+    @_btInputs = []
+    @_btcAssociatedKeyPath = []
+    for input in inputs
+      splitTransaction = ledger.app.wallet._lwCard.dongle.splitTransaction(new ByteString(input.raw, HEX))
+      @_btInputs.push [splitTransaction, input.output_index]
+      @_btcAssociatedKeyPath.push input.paths[0]
 
-  prepare: (@inputs, @changePath, callback) ->
-    throw 'Transaction must me initialized before preparation' if not @amount? or not @fees? or not @recipientAddress?
+  prepare: (callback) ->
+    throw new ledger.StandardError(ledger.errors.TransactionNotInitialized) if not @amount? or not @fees? or not @recipientAddress?
+    completion = new CompletionClosure(callback)
     try
-      @_btInputs = []
-      @_btcAssociatedKeyPath = []
-      for input in inputs
-        splitTransaction = ledger.app.wallet._lwCard.dongle.splitTransaction(new ByteString(input.raw, HEX))
-        @_btInputs.push [splitTransaction, input.output_index]
-        @_btcAssociatedKeyPath.push input.paths[0]
-
       ledger.app.wallet._lwCard.dongle.createPaymentTransaction_async(
         @_btInputs,
         @_btcAssociatedKeyPath,
@@ -40,12 +40,12 @@ class ledger.wallet.transaction.Transaction
         @_out.authorizationPaired = @_out.authorizationPaired.toString(HEX) if @_out.authorizationPaired?
         @_out.authorizationReference = @_out.authorizationReference.toString(HEX) if @_out.authorizationReference?
         @_validationMode = result.authorizationRequired
-        callback?(@)
+        completion.success(this)
       .fail (error) =>
-        callback?(null, {title: 'Signature Error', code: ledger.errors.SignatureError})
+        completion.failure(new ledger.StandardError(ledger.errors.SignatureError))
     catch error
-      e error
-      callback?(null, {title: 'An error occured', code: ledger.errors.UnknownError})
+      completion.failure(new ledger.StandardError(ledger.errors.UnknownError))
+    completion.readonly()
 
   validate: (validationKey, callback) ->
     throw 'Transaction must me prepared before validation' if not @_out? or not @_validationMode?
@@ -155,6 +155,73 @@ class ledger.wallet.transaction.Transaction
 
   setHash: (hash) -> @hash = hash
 
+  ###
+  Creates a new transaction asynchronously. The created transaction will only be initialized (i.e. it will only retrieve
+  a sufficient number of input to perform the transaction)
+
+  @param {ledger.wallet.Value} amount The amount to send expressed in satoshi
+  @param {ledger.wallet.Value} fees The miner fees expressed in satoshi
+  @param {String} address The recipient address
+  @param {Array<String>} inputsPath The paths of the addresses to use in order to perform the transaction
+  @param {String} changePath The path to use for the change
+  @option [Function] callback The callback called once the transaction is created
+  @return [CompletionClosure] A closure
+  ###
+  @create: ({amount, fees, address, inputsPath, changePath}, callback = null) ->
+    completion = new CompletionClosure(callback)
+    return completion.failure(new ledger.StandardError(ledger.errors.DustTransaction)) if amount.lte(ledger.transaction.MINIMUM_OUTPUT_VALUE)
+    amount = ledger.wallet.Value.from(amount)
+    fees = ledger.wallet.Value.from(fees)
+    transaction = new ledger.wallet.transaction.Transaction()
+    transaction.init(amount, fees, address)
+    ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
+      return completion.failure(error) if error?
+      # Collect each valid outputs and sort them by desired priority
+      validOutputs = _(output for output in outputs when output.paths.length > 0).sortBy (output) ->  -output['confirmatons']
+
+      return completion.failure(new ledger.StandardError(ledger.errors.NotEnoughFunds)) if validOutputs.length == 0
+
+      finalOutputs = []
+      collectedAmount = new ledger.wallet.Value()
+      requiredAmount = amount.add(fees)
+      hadNetworkFailure = no
+      # For each valid outputs we try to get its raw transaction.
+      _.async.each validOutputs, (output, done, hasNext) ->
+        ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
+          if error?
+            hadNetworkFailure = yes
+            return do done
+
+          output.raw = rawTransaction
+          finalOutputs.push output
+          collectedAmount = collectedAmount.add output.value
+          changeAmount = collectedAmount.substract(amount).substract(fees)
+          if hasNext is true and collectedAmount.lt(requiredAmount) and changeAmount.lte(5400)
+            # We have enough funds but if we send this, we will make a dust transaction so continue to collect
+            do done
+          else if hasNext is false and collectedAmount.lt(requiredAmount) and changeAmount.lte(5400)
+            # We have enough funds but if we send this, we will make a dust transaction so add the dust in miner fees
+            fees = fees.add(changeAmount)
+            transaction = new ledger.wallet.transaction.Transaction()
+            transaction.init(amount, fees, address, finalOutputs)
+            completion.success(transaction)
+          else if hasNext is false and collectedAmount.lt(requiredAmount) and hadNetworkFailure
+            # Not enough funds but error is probably caused by a previous network issue
+            completion.failure(new ledger.StandardError(ledger.errors.NetworkError))
+          else if hasNext is false and collectedAmount.lt(requiredAmount)
+            # Not enough available funds
+            callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds})
+            completion.failure(new ledger.StandardError(ledger.errors.NotEnoughFunds))
+          else if collectedAmount.gte requiredAmount
+            # We have reached our required amount. It's time to prepare the transaction
+            transaction = new ledger.wallet.transaction.Transaction()
+            transaction.init(amount, fees, address, finalOutputs)
+            completion.success(transaction)
+          else
+            # Continue to collect funds
+            do done
+    completion.readonly()
+
 createAndPrepareTransaction = (amount, fees, recipientAddress, inputsPath, changePath, callback) ->
   amount = ledger.wallet.Value.from(amount)
   fees = ledger.wallet.Value.from(fees)
@@ -204,9 +271,11 @@ createAndPrepareTransaction = (amount, fees, recipientAddress, inputsPath, chang
           # Continue to collect funds
           do done
 
+
 _.extend ledger.wallet.transaction,
 
     MINIMUM_CONFIRMATIONS: 1
+    MINIMUM_OUTPUT_VALUE: 5430
 
     createAndPrepareTransaction: (amount, fees, recipientAddress, inputsAccounts, changeAccount, callback) ->
       inputsAccounts = [inputsAccounts] unless _.isArray inputsAccounts
