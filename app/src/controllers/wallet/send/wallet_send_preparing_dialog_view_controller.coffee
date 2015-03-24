@@ -35,7 +35,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
       ledger.m2fa.PairedSecureScreen.getAllGroupedByUuidFromSyncedStore (groups, error) =>
         groups = _.values(_.omit(groups, undefined)) if groups?
         ## if paired and only one pairing id exists
-        if error? or not groups? or groups.length != 1 or transaction.getValidationMode() != ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN
+        if error? or not groups? or groups.length != 1
           methodBlock(transaction)
         else
           mobileBlock(transaction, groups[0])
