@@ -31,6 +31,7 @@ common:
     invalid_receiver_address: "Recipient bitcoin address is incorrect."
     invalid_amount: "The amount to send is invalid."
     unknown: "An unknown error occured."
+    unable_to_validate: "Unable to validate transaction."
     secure_screen_cancelled_transaction: "The smartphone cancelled the transaction."
     secure_screen_invalid_pin: "The smartphone returned a wrong pin code."
 
