@@ -233,6 +233,7 @@
         'controllers/wallet/send/wallet_send_card_dialog_view_controller'
         'controllers/wallet/send/wallet_send_processing_dialog_view_controller'
         'controllers/wallet/send/wallet_send_preparing_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_validating_dialog_view_controller'
         'controllers/wallet/send/wallet_send_method_dialog_view_controller'
 
         # Receive

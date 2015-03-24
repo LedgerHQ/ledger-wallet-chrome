@@ -286,6 +286,9 @@ wallet:
     preparing:
       preparing_transaction: "Preparing transaction..."
 
+    validating:
+      validating_transaction: "Validating transaction..."
+
     errors:
       sending_failed: "Sending failed"
       sending_succeeded: "Sending succeeded"
