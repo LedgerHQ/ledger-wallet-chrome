@@ -265,9 +265,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         moddedInitScript.push "D026000011" + "04" + @_keyCardSeed.toString(HEX)
     @_processLoadingScript moddedInitScript, States.InitializingOs, yes
     .then =>
-      @_setCurrentState(States.Done)
+      @_success()
       @_isOsLoaded = no
-      @_onComplete.success()
     .fail =>
       @_failure(Errors.FailedToInitOs)
 
@@ -331,14 +330,14 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _processLoadBootloader: ->
     @_findOriginalKey(ledger.fup.updates.BL_LOADER).then (offset) =>
       @_processLoadingScript(ledger.fup.updates.BL_LOADER[offset], States.LoadingBootloader)
-    .then => @_waitForDisconnectDongle()
+    .then => @_waitForPowerCycle(null, yes)
     .fail (ex) =>
       @_failure(Errors.CommunicationError)
 
   _processLoadBootloaderReloader: ->
     @_findOriginalKey(ledger.fup.updates.RELOADER_FROM_BL).then (offset) =>
       @_processLoadingScript(ledger.fup.updates.RELOADER_FROM_BL[offset], States.LoadingBootloaderReloader)
-    .then => @_waitForDisconnectDongle()
+    .then => @_waitForPowerCycle(null, yes)
     .fail (ex) =>
       @_failure(ledger.errors.CommunicationError)
 
@@ -347,6 +346,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _failure: (reason) ->
     @emit "error", cause: new ledger.StandardError(reason)
     @_waitForPowerCycle()
+
+  _success: ->
+    @_setCurrentState(States.DONE)
+    _.defer => @cancel()
 
   _attemptToFailDonglePinCode: (pincode) ->
     deferred = Q.defer()
