@@ -10,7 +10,8 @@ class @WalletSendProcessingDialogViewController extends @DialogViewController
 
   _startSignature: ->
     # sign transaction
-    @params.transaction.validate @params.keycode, (transaction, error) =>
+    validation = if @params.keycode? then @params.transaction.validateWithKeycard(@params.keycode) else @params.transaction.validateWithPinCode(@params.pincode)
+    validation.onComplete (transaction, error) =>
       return if not @isShown()
       if error?
         @dismiss =>

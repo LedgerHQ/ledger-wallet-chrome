@@ -9,7 +9,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
     account = Account.find(index: 0).first()
 
     # fetch amount
-    ledger.wallet.transaction.createAndPrepareTransaction @params.amount, 10000, @params.address, account, account, (transaction, error) =>
+    account.createTransaction amount: @params.amount, fees: 10000, address: @params.address, (transaction, error) =>
       return if not @isShown()
       if error?
         reason = switch error.code
@@ -23,9 +23,9 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
 
   _routeToNextDialog: (transaction) ->
     cardBlock = (transaction) =>
-      @getDialog().push new WalletSendCardDialogViewController(transaction: transaction, options: {hideOtherValidationMethods: true})
+      @getDialog().push new WalletSendValidatingDialogViewController(transaction: transaction, options: {hideOtherValidationMethods: true}, validationMode: 'card')
     mobileBlock = (transaction, secureScreens) =>
-      @getDialog().push new WalletSendMobileDialogViewController(transaction: transaction, secureScreens: secureScreens)
+      @getDialog().push new WalletSendValidatingDialogViewController(transaction: transaction, secureScreens: secureScreens, validationMode: 'mobile')
     methodBlock = (transaction) =>
       @getDialog().push new WalletSendMethodDialogViewController(transaction: transaction)
 

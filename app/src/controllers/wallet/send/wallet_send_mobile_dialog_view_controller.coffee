@@ -7,14 +7,14 @@ class @WalletSendMobileDialogViewController extends @DialogViewController
     super
     ## request validation
     @_request = ledger.m2fa.requestValidation(@params.transaction, @params.secureScreens)
-    @_request.onComplete (keycode, error) =>
+    @_request.onComplete (pincode, error) =>
       if error?
         @_request = null
         @dismiss =>
           dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors." + error))
           dialog.show()
       else
-        dialog = new WalletSendProcessingDialogViewController transaction: @params.transaction, keycode: keycode
+        dialog = new WalletSendProcessingDialogViewController transaction: @params.transaction, pincode: pincode
         @getDialog().push dialog
     ## update UI
     @view.mobileName.text _.str.sprintf(t('wallet.send.mobile.sending_transaction'), @params.secureScreens[0].name)

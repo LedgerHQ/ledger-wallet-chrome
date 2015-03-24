@@ -42,26 +42,25 @@ class ledger.wallet.transaction.Transaction
         @_validationMode = result.authorizationRequired
         completion.success(this)
       .fail (error) =>
+        e error
         completion.failure(new ledger.StandardError(ledger.errors.SignatureError))
     catch error
+      e error
       completion.failure(new ledger.StandardError(ledger.errors.UnknownError))
     completion.readonly()
 
-  validate: (validationKey, callback) ->
+  validateWithPinCode: (validationPinCode, callback = null) -> @_validate(new ByteString(validationPinCode, ASCII), callback)
+
+  validateWithKeycard: (validationKey, callback = null) -> @_validate(new ByteString(("0#{char}" for char in validationKey).join(''), HEX), callback)
+
+  _validate: (validationKey, callback = null) ->
     throw 'Transaction must me prepared before validation' if not @_out? or not @_validationMode?
-
-    validationKey = ("0#{char}" for char in validationKey).join('') if @getValidationMode() == ledger.wallet.transaction.Transaction.ValidationModes.KEYCARD
-
+    completion = new CompletionClosure(callback)
     out = _.clone(@_out)
 
     out.scriptData = new ByteString @_out.scriptData, HEX
     out.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in @_out.trustedInputs)
     out.publicKeys = (new ByteString(publicKey, HEX) for publicKey in @_out.publicKeys)
-
-    validationKey = switch @_validationMode
-      when ledger.wallet.transaction.Transaction.ValidationModes.KEYCARD then new ByteString(validationKey, HEX)
-      when ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN then new ByteString(validationKey, ASCII)
-      when ledger.wallet.transaction.Transaction.ValidationModes.PIN then new ByteString(validationKey, ASCII)
     try
       ledger.app.wallet._lwCard.dongle.createPaymentTransaction_async(
         @_btInputs,
@@ -78,11 +77,12 @@ class ledger.wallet.transaction.Transaction
         .then (rawTransaction) =>
           @_isValidated = yes
           @_transaction = rawTransaction
-          _.defer => callback?(this)
+          completion.success(this)
         .fail (error) ->
-          _.defer => callback?(null, {title: 'Signature Error', code: ledger.errors.SignatureError, error})
+          completion.failWithStandardError(ledger.errors.SignatureError)
     catch error
-      callback?(null, {title: 'Unknown Error', code: ledger.errors.UnknownError, error})
+      completion.failWithStandardError(ledger.errors.UnknownError)
+    completion.readonly()
 
   isValidated: () -> @_isValidated
 
@@ -99,7 +99,11 @@ class ledger.wallet.transaction.Transaction
 
   getValidationDetails: () ->
     indexes = []
-    indexesKeyCard = @_out.indexesKeyCard
+    if @_validationMode is ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN
+      numberOfCharacters = parseInt(@_out.indexesKeyCard.substring(0, 2), 16)
+      indexesKeyCard = @_out.indexesKeyCard.substring(2, numberOfCharacters * 2 + 2)
+    else
+      indexesKeyCard = @_out.indexesKeyCard
     amount = ''
     if ledger.app.wallet.getIntFirmwareVersion() < ledger.wallet.Firmware.V1_4_13
       stringifiedAmount = @amount.toString()
@@ -144,12 +148,15 @@ class ledger.wallet.transaction.Transaction
         keycardIndexes.push decimalPart.charAt(1)
         keycardIndexes.push decimalPart.charAt(2)
 
-    indexesKeyCard = @_out.indexesKeyCard
+    if @_validationMode is ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN
+      numberOfCharacters = parseInt(@_out.indexesKeyCard.substring(0, 2), 16)
+      indexesKeyCard = @_out.indexesKeyCard.substring(2, numberOfCharacters * 2 + 2)
+    else
+      indexesKeyCard = @_out.indexesKeyCard
     while indexesKeyCard.length >= 2
       index = indexesKeyCard.substring(0, 2)
       indexesKeyCard = indexesKeyCard.substring(2)
       indexes.push parseInt(index, 16)
-
     keycardIndexes.push @recipientAddress[index] for index in indexes
     keycardIndexes
 
@@ -169,11 +176,9 @@ class ledger.wallet.transaction.Transaction
   ###
   @create: ({amount, fees, address, inputsPath, changePath}, callback = null) ->
     completion = new CompletionClosure(callback)
-    return completion.failure(new ledger.StandardError(ledger.errors.DustTransaction)) if amount.lte(ledger.transaction.MINIMUM_OUTPUT_VALUE)
     amount = ledger.wallet.Value.from(amount)
     fees = ledger.wallet.Value.from(fees)
-    transaction = new ledger.wallet.transaction.Transaction()
-    transaction.init(amount, fees, address)
+    return completion.failure(new ledger.StandardError(ledger.errors.DustTransaction)) if amount.lte(ledger.wallet.transaction.MINIMUM_OUTPUT_VALUE)
     ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
       return completion.failure(error) if error?
       # Collect each valid outputs and sort them by desired priority
@@ -195,7 +200,7 @@ class ledger.wallet.transaction.Transaction
           output.raw = rawTransaction
           finalOutputs.push output
           collectedAmount = collectedAmount.add output.value
-          changeAmount = collectedAmount.substract(amount).substract(fees)
+          changeAmount = collectedAmount.subtract(amount).subtract(fees)
           if hasNext is true and collectedAmount.lt(requiredAmount) and changeAmount.lte(5400)
             # We have enough funds but if we send this, we will make a dust transaction so continue to collect
             do done
@@ -203,7 +208,7 @@ class ledger.wallet.transaction.Transaction
             # We have enough funds but if we send this, we will make a dust transaction so add the dust in miner fees
             fees = fees.add(changeAmount)
             transaction = new ledger.wallet.transaction.Transaction()
-            transaction.init(amount, fees, address, finalOutputs)
+            transaction.init(amount, fees, address, finalOutputs, changePath)
             completion.success(transaction)
           else if hasNext is false and collectedAmount.lt(requiredAmount) and hadNetworkFailure
             # Not enough funds but error is probably caused by a previous network issue
@@ -215,7 +220,7 @@ class ledger.wallet.transaction.Transaction
           else if collectedAmount.gte requiredAmount
             # We have reached our required amount. It's time to prepare the transaction
             transaction = new ledger.wallet.transaction.Transaction()
-            transaction.init(amount, fees, address, finalOutputs)
+            transaction.init(amount, fees, address, finalOutputs, changePath)
             completion.success(transaction)
           else
             # Continue to collect funds
