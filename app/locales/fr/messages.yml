@@ -15,6 +15,7 @@ common:
   confirm: "Confirmer"
   confirmation: "Confirmation"
   send: "Envoyer"
+  continue: "Continuer"
   yes: "Oui"
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
@@ -156,6 +157,16 @@ onboarding:
       configuration_failed_recover: "Restauration échouée"
       error_occured: "Une erreur sérieuse est survenue. Contactez le support pour obtenir de l'aide."
       contact_support: "CONTACTER LE SUPPORT"
+
+update:
+  common:
+    firmware_update: "Mise à jour de la puce"
+
+  index:
+    important_notice: "Informations importantes"
+    update_process: "Le processus de mise à jour nécessite d'effacer votre Ledger Wallet.<br />Vos Bitcoins resteront en sécurité si vous possédez votre livret de restauration pour retrouver l'accès à vos comptes."
+    clicking_continue: "En cliquant sur CONTINUER, vous confirmez posséder le <b>code QR de votre carte de sécurité</b> et les <b>24 mots de votre phrase de restauration</b>. Vous perdrez vos Bitcoins si vous tentez de mettre à jour votre Ledger Wallet sans ces informations requises."
+    please_note: "Note: Vous devrez associer votre smartphone à nouveau pour réactiver la validation mobile."
 
 wallet:
   defaults:

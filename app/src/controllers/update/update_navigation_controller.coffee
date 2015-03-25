@@ -1,5 +1,10 @@
 class @UpdateNavigationController extends @NavigationController
 
+  view:
+    pageSubtitle: "#page_subtitle"
+    previousButton: "#previous_button"
+    nextButton: "#next_button"
+
   onAttach: ->
     @_request = ledger.fup.FirmwareUpdater.instance.requestFirmwareUpdate()
     @_request.on 'plug', => @_onPlugDongle()
@@ -9,6 +14,17 @@ class @UpdateNavigationController extends @NavigationController
     @_request.onProgress @_onProgress.bind(@)
     ledger.fup.FirmwareUpdater.instance.load =>
     window.fup = @_request # TODO: REMOVE THIS
+
+  renderChild: ->
+    super
+    @topViewController().once 'afterRender', =>
+      # update page subtitle
+      @view.pageSubtitle.text t @topViewController().localizablePageSubtitle
+      # update navigation
+      @view.previousButton.html '<i class="fa fa-angle-left"></i> ' + t(@topViewController().localizablePreviousButton)
+      @view.nextButton.html t(@topViewController().localizableNextButton) + ' <i class="fa fa-angle-right"></i>'
+      if @topViewController().navigation?.nextRoute? then @view.nextButton.show() else @view.nextButton.hide()
+      if @topViewController().navigation?.previousRoute? then @view.previousButton.show() else @view.previousButton.hide()
 
   onDetach: ->
     @_request.cancel()

@@ -15,6 +15,7 @@ common:
   confirm: "Confirm"
   confirmation: "Confirmation"
   send: "Send"
+  continue: "Continue"
   yes: "Yes"
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
@@ -156,6 +157,16 @@ onboarding:
       configuration_failed_recover: "Recovery failed"
       error_occured: "A serious error occured. Please contact support for further assistance."
       contact_support: "CONTACT SUPPORT"
+
+update:
+  common:
+    firmware_update: "Chip firmware update"
+
+  index:
+    important_notice: "Important notice"
+    update_process: "The update process requires to erase your Ledger Wallet.<br />Your Bitcoins will remain safe if you have your recovery sheet with you to restore your accounts."
+    clicking_continue: "By clicking CONTINUE, you confirm to be in possession of your <b>security card QR code</b> and your <b>24 words recovery phrase</b>. You will lose your Bitcoins if you attempt to update your Ledger Wallet without these required information."
+    please_note: "Please note: You will need to pair your smartphone again to re-enable mobile validation."
 
 wallet:
   defaults:

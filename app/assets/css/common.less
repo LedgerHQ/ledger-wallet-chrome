@@ -3,9 +3,12 @@
 
 // containers classes
 .main-container {
+  display: flex;
+  flex-direction: column;
   background-color: @color-background-color;
   .fullsize;
 }
+
 .error-container {
   .bold-invalid-text;
   padding: @metrics-large-padding 0;
@@ -96,7 +99,12 @@ a {
   font-weight: @weight;
 
   b {
-    font-weight: @font-weight-semibold;
+    & when (@weight = @font-weight-regular) {
+      font-weight: @font-weight-semibold;
+    }
+    & when (@weight = @font-weight-light) {
+      font-weight: @font-weight-regular;
+    }
   }
 
   a {
@@ -143,6 +151,28 @@ a {
 .light-grey-text-huge {
   .text(@color-dark-grey, @font-size-giga-giga-large, @font-weight-light);
   letter-spacing: -2px;
+}
+.page-title {
+  font-weight: @font-weight-light;
+  font-size: @font-size-ultra-ultra-ultra-large;
+  color: @color-dark-grey-blue;
+  letter-spacing: -2px;
+}
+.page-subtitle {
+  font-weight: @font-weight-light;
+  font-size: @font-size-extra-extra-large;
+  color: @color-soft-grey;
+  letter-spacing: -1px;
+  margin-top: 15px;
+}
+.page-indication {
+  .text(@color-black, @font-size-large, @font-weight-light);
+  line-height: 26px;
+}
+.page-large-indication {
+  .text(@color-black, @font-size-very-large, @font-weight-regular);
+  line-height: 30px;
+  letter-spacing: -0.5px;
 }
 
 // icons

@@ -285,6 +285,7 @@
         ## Update controllers
         'controllers/update/update_navigation_controller'
         'controllers/update/update_view_controller'
+        'controllers/update/update_index_view_controller'
         'controllers/update/update_plug_view_controller'
         'controllers/update/update_seed_view_controller'
         'controllers/update/update_erasing_view_controller'
@@ -293,5 +294,4 @@
         'controllers/update/update_loados_view_controller'
         'controllers/update/update_loadblreloader_view_controller'
         'controllers/update/update_loadbl_view_controller'
-
       ]
