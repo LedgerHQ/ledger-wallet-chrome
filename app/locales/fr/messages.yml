@@ -177,6 +177,11 @@ update:
     unplug_your_wallet: "Débranchez votre Ledger Wallet"
     remove_your_wallet: "Retirez votre Ledger Wallet du port USB."
 
+  seed:
+    security_card_qrcode: "Code QR de carte de sécurité"
+    enter_characters: "Entrez les 32 caractères du code QR de votre carte de sécurité :"
+    on_the_left: "Ils sont situés sur la page de gauche de votre livret de restauration, en dessous du code QR."
+
 wallet:
   defaults:
     operations: &default-operations-translation

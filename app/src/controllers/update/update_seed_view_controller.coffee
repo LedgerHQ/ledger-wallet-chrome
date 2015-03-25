@@ -1,18 +1,32 @@
 class @UpdateSeedViewController extends UpdateViewController
 
+  localizablePageSubtitle: "update.seed.security_card_qrcode"
+  navigation:
+    nextRoute: ""
+    previousRoute: ""
   view:
     seedInput: "#seed_input"
+    validCheck: "#valid_check"
 
-  submitSeed: ->
-    try
-      @getRequest().setKeyCardSeed(@view.seedInput.val())
-    catch er
-      switch er
-        when ledger.fup.FirmwareUpdateRequest.Errors.InvalidSeedFormat then @onInvalidSeedFormat()
-        when ledger.fup.FirmwareUpdateRequest.Errors.InvalidSeedSize then @onInvalidSeedSize()
+  onAfterRender: ->
+    super
+    @_listenEvents()
+    @_updateValidCheck()
 
-  onInvalidSeedFormat: ->
-    e 'Wrong format'
+  navigateNext: ->
+    @getRequest().setKeyCardSeed(@view.seedInput.val())
 
-  onInvalidSeedSize: ->
-    e 'Wrong length'
+  shouldEnableNextButton: ->
+    @getRequest().checkIfKeyCardSeedIsValid @view.seedInput.val()
+
+  _listenEvents: ->
+    # force focus
+    @view.seedInput.on 'blur', => @view.seedInput.focus()
+    _.defer => @view.seedInput.focus()
+    # listen input
+    @view.seedInput.on 'input', =>
+      @parentViewController.updateNavigationItems()
+      @_updateValidCheck()
+
+  _updateValidCheck: ->
+    if @getRequest().checkIfKeyCardSeedIsValid @view.seedInput.val() then @view.validCheck.show() else @view.validCheck.hide()

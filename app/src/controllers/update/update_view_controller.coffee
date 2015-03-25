@@ -20,6 +20,18 @@ class @UpdateViewController extends @ViewController
     if @navigation?.previousRoute?
       ledger.app.router.go @navigation.previousRoute, @navigation.previousParams
 
+  shouldShowPreviousButton: ->
+    @navigation?.previousRoute?
+
+  shouldShowNextButton: ->
+    @navigation?.nextRoute?
+
+  shouldEnablePreviousButton: ->
+    true
+
+  shouldEnableNextButton: ->
+    true
+
   getRequest: -> @parentViewController._request
 
   ###

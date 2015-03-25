@@ -177,6 +177,11 @@ update:
     unplug_your_wallet: "Unplug your Ledger Wallet"
     remove_your_wallet: "Remove your Ledger Wallet from the USB port."
 
+  seed:
+    security_card_qrcode: "Security card QR code"
+    enter_characters: "Enter your security card QR code 32 characters:"
+    on_the_left: "They are printed on the left page of your recovery sheet, below the QR code."
+
 wallet:
   defaults:
     operations: &default-operations-translation
