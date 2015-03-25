@@ -29,7 +29,6 @@ class ledger.formatters.bitcoin
   ###
   @formatUnit: (value, unit, precision = -1) ->
     return if not value? or not unit?
-
     switch unit
       when 'BTC'
         unit = 8
@@ -42,14 +41,11 @@ class ledger.formatters.bitcoin
           throw new Error("'unit' must be BTC, mBTC or uBTC")
         catch e
           console.log(e.name + ": " + e.message)
-
     # Check if value is an integer
     if !(value == parseInt(value, 10))
       throw new Error('Satoshi value must be an integer')
-
     #val = value * Math.pow(10, -unit)
     #l(val)
-
     integerPart = new Bitcoin.BigInteger(value.toString())
     .divide Bitcoin.BigInteger.valueOf(10).pow(unit)
 
@@ -68,14 +64,10 @@ class ledger.formatters.bitcoin
 
         fractionalPart = _.str.lpad(Math.ceil(fractionalPart).toString(), precision, '0')
 
-    #l(integerPart.toString())
-    #l(fractionalPart.toString())
     value = integerPart + '.' + fractionalPart
-
     # remove . if necessary
     if _.str.endsWith value, '.'
       value = _.str.splice value, -1, 1
-
     return value
 
 
@@ -101,7 +93,6 @@ class ledger.formatters.bitcoin
     @formatUnit(value, "BTC", precision)
 
 
-
   ###
     This method converts Satoshi to mBTC
 
@@ -113,7 +104,6 @@ class ledger.formatters.bitcoin
     @formatUnit(value, "mBTC", precision)
 
 
-
   ###
     This method converts Satoshi to uBTC
 
@@ -123,8 +113,6 @@ class ledger.formatters.bitcoin
   ###
   @fromSatoshiToMicroBTC: (value, precision) ->
     @formatUnit(value, "uBTC", precision)
-
-
 
 
   ###
@@ -139,7 +127,6 @@ class ledger.formatters.bitcoin
   ###
   @fromBtcToSatoshi: (value) ->
     return if not value?
-
     value = value * Math.pow(10, 8)
     # to string
     value = value.toString()
@@ -153,7 +140,6 @@ class ledger.formatters.bitcoin
   ###
   @fromMilliBtcToSatoshi: (value) ->
     return if not value?
-
     value = value * Math.pow(10, 5)
     # to string
     value = value.toString()
@@ -167,7 +153,6 @@ class ledger.formatters.bitcoin
   ###
   @fromMicroBtcToSatoshi: (value) ->
     return if not value?
-
     value = value * Math.pow(10, 2)
     # to string
     value = value.toString()

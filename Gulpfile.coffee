@@ -165,6 +165,11 @@ tasks =
     .pipe concat 'i18n_languages.js'
     .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/src/i18n"
 
+  regions: () ->
+    gulp.src 'app/src/i18n/regions.yml'
+    .pipe yaml()
+    .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/src/i18n"
+
   js: () ->
     gulp.src 'app/**/*.js'
     .pipe plumber()
@@ -228,6 +233,7 @@ tasks =
       tasks.html
       tasks.less
       tasks.buildLangFile
+      tasks.regions
     ]
     run = (tasks.promisify(task()) for task in run)
     Q.all(run).then ->
