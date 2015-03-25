@@ -19,6 +19,7 @@ _.extend ledger.errors,
   WrongPinCode: 203
   DongleLocked: 204
   UnableToGetBitIdAddress: 205
+  DongleNotCertified: 206
 
   # Wallet errors
   NotEnoughFunds: 300

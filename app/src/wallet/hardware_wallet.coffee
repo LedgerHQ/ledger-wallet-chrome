@@ -16,12 +16,20 @@
   V1_4_13: 0x0001040d0146
   V_LW_1_0_0: 0x20010000010f
 
-@ledger.wallet.Attestation =
-  String: "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
+ProductionAttestation = "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
+BetaAttestation = "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
+
+Attestation =
+  String: ProductionAttestation
   Bytes: []
 
-for i in [0...(ledger.wallet.Attestation.String.length / 2)]
-  ledger.wallet.Attestation.Bytes.push parseInt(ledger.wallet.Attestation.String.substring(i, i + 2), 16)
+for i in [0...(Attestation.String.length / 2)]
+  Attestation.Bytes.push parseInt(Attestation.String.substring(i, i + 2), 16)
+Attestation.xPoint = Attestation.String.substr(2).substr(0, (Attestation.String.length - 2) / 2)
+Attestation.yPoint = Attestation.String.substr(2).substr((Attestation.String.length - 2) / 2)
+
+
+@ledger.wallet.Attestation
 
 class @ledger.wallet.HardwareWallet extends EventEmitter
 
@@ -185,43 +193,45 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
   getExtendedPublicKeys: () -> @_xpubs
 
   isDongleCertified: (callback) ->
+    completion = new CompletionClosure(callback)
     randomValues = new Uint32Array(2)
     crypto.getRandomValues(randomValues)
     random = _.str.lpad(randomValues[0].toString(16), 8, '0') + _.str.lpad(randomValues[1].toString(16), 8, '0')
-    adpu = 'E0C2000008' + random
-    p = @sendAdpu new ByteString(adpu, HEX), [0x9000]
-    p.then (result) =>
+    # 24.2. GET DEVICE ATTESTATION
+    @sendAdpu(new ByteString("E0"+"C2"+"00"+"00"+"08"+random, HEX), [0x9000])
+    .then (result) =>
       attestation = result.toString(HEX)
-      @attestation =
-        raw: attestation
-        keyBatchId: attestation.substring(0, 8)
-        keyDerivationId: attestation.substring(8, 16)
-        supportedOperationBitFlag: attestation.substring(16, 18)
-        firmwareMajor: attestation.substring(18, 22)
-        firmwareMinor: attestation.substring(22, 24)
-        firmarePatch: attestation.substring(24, 26)
-        loaderIdMajor: attestation.substring(26, 28)
-        loaderIdMinor: attestation.substring(28, 30)
-        signature: attestation.substring(30)
-      l @attestation, random
-      try
-        SHA256  = new  JSUCrypt.hash.SHA256()
-        domain =  JSUCrypt.ECFp.getEcDomainByName("secp256k1")
-        pubKey = new JSUCrypt.key.EcFpPublicKey(256, domain)
-        pubKey.W =
-          getUncompressedForm: -> ledger.wallet.Attestation.Bytes
-        l ledger.wallet.Attestation.Bytes
-        ecsig = new JSUCrypt.signature.ECDSA(SHA256)
-        ecsig.init(pubKey,  JSUCrypt.signature.MODE_VERIFY)
-        sigBytes = (parseInt(@attestation.signature.substring(i, i + 2), 16) for i in [0...(@attestation.signature.length / 2)])
-        ver = ecsig.verify(random, sigBytes)
-        l sigBytes
-        l 'Verif', ver
-        return
-      catch er
-        e er
-    p.fail (result) =>
-      e result
+      dataToSign = attestation.substring(16,32) + random
+      dataSig = attestation.substring(32)
+      l 'Signed before', dataSig
+      dataSig = "30" + dataSig.substr(2)
+      dataSigBytes = (parseInt(n,16) for n in dataSig.match(/\w\w/g))
+      l 'Random ', random
+      l 'Data to sign', dataToSign
+      l 'Attestation', Attestation.String
+      l 'Signed', dataSig
+      l 'Bytes', dataSigBytes
+      sha = new JSUCrypt.hash.SHA256()
+      domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
+      affinePoint = new JSUCrypt.ECFp.AffinePoint(Attestation.xPoint, Attestation.yPoint)
+      pubkey = new JSUCrypt.key.EcFpPublicKey(256, domain, affinePoint)
+      ecsig = new JSUCrypt.signature.ECDSA(sha)
+      ecsig.init(pubkey, JSUCrypt.signature.MODE_VERIFY)
+      l 'att', ecsig.verify(dataToSign, dataSigBytes)
+      if ecsig.verify(dataToSign, dataSigBytes)
+        l 'Attestation OK'
+        completion.success(this)
+      else
+        l 'Wrong attestation'
+        completion.failure(new ledger.StandardError(ledger.errors.DongleNotCertified))
+      l Attestation
+      return
+    .fail (err) =>
+      e err
+      error = new ledger.StandardError(Errors.SignatureError, err)
+      completion.failure(error)
+    .done()
+    completion.readonly()
 
   # @return A Q.Promise
   randomBitIdAddress: () ->
