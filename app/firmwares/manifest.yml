@@ -13,4 +13,4 @@ versions:
      beta: true
 
 current_version:
-  <<: *HW_1_4_13
+  <<: *LW_1_0_0B

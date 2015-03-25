@@ -31,7 +31,7 @@ class ledger.fup.FirmwareUpdater
       return completion.failure(error) if error?
       @_lastVersion = version
       if ledger.fup.utils.compareVersions(@_lastVersion, ledger.fup.versions.Nano.CurrentVersion.Os).eq()
-        completion.success(result: FirmwareAvailabilityResult.Overwrite, available: yes, dongleVersion: version, currentVersion: ledger.fup.versions.Nano.CurrentVersion.Os)
+        completion.success(result: FirmwareAvailabilityResult.Overwrite, available: no, dongleVersion: version, currentVersion: ledger.fup.versions.Nano.CurrentVersion.Os)
       else if ledger.fup.utils.compareVersions(@_lastVersion, ledger.fup.versions.Nano.CurrentVersion.Os).gt()
         completion.success(result: FirmwareAvailabilityResult.Higher, available: no, dongleVersion: version, currentVersion: ledger.fup.versions.Nano.CurrentVersion.Os)
       else
