@@ -3,7 +3,7 @@ ledger.converters ?= {}
 ###
   This class is a namespace and cannot be instantiated
 ###
-class ledger.converters.bitcoin
+class ledger.converters
 
   ###
     This constructor prevent the class to be instantiated
@@ -20,7 +20,7 @@ class ledger.converters.bitcoin
     Currency converter to satoshi
 
     @example Converts to Satoshi
-      ledger.converters.bitcoin.currencyToSatoshi('USD', 50)
+      ledger.converters.currencyToSatoshi('USD', 50)
 
     @param [String] currency The currency that you want to convert
     @param [Number] currencyValue The amount in the given currency

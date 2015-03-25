@@ -69,7 +69,7 @@ class @WalletSendCardDialogViewController extends @DialogViewController
     decal = 0
     # add amount
     if validationDetails.needsAmountValidation
-      value = ledger.formatters.bitcoin.fromValue(validationDetails.amount.text)
+      value = ledger.formatters.fromValue(validationDetails.amount.text)
       # normalize value
       dotIndex = value.indexOf '.'
       if dotIndex == -1

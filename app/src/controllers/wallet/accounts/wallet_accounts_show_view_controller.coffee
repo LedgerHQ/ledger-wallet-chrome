@@ -13,13 +13,13 @@ class @WalletAccountsShowViewController extends @ViewController
     super
     # fetch balances
     balance = Wallet.instance.getBalance()
-    @view.confirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
-    @view.unconfirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.unconfirmed)
+    @view.confirmedBalance.text ledger.formatters.fromValue(balance.wallet.total)
+    @view.unconfirmedBalance.text ledger.formatters.fromValue(balance.wallet.unconfirmed)
 
     # listen events
     ledger.app.on 'wallet:balance:changed', (event, balance) =>
-      @view.confirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
-      @view.unconfirmedBalance.text ledger.formatters.bitcoin.fromValue(balance.wallet.unconfirmed)
+      @view.confirmedBalance.text ledger.formatters.fromValue(balance.wallet.total)
+      @view.unconfirmedBalance.text ledger.formatters.fromValue(balance.wallet.unconfirmed)
 
     account = @getAccount()
     @view.accountName.text account.get 'name'

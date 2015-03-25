@@ -1,6 +1,6 @@
 describe "Currency converters", ->
 
-  converters = ledger.converters.bitcoin
+  converters = ledger.converters
 
   beforeEach ->
     ledger.tasks.TickerTask.instance.getCache = ->

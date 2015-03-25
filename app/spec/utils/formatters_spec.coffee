@@ -1,6 +1,6 @@
 describe "Unit Formatters -", ->
 
-  formatters = ledger.formatters.bitcoin
+  formatters = ledger.formatters
 
   it "should return a String", ->
     res = formatters.formatUnit(1000, 'BTC', -1)

@@ -3,7 +3,7 @@ ledger.formatters ?= {}
 ###
   This class is a namespace and cannot be instantiated
 ###
-class ledger.formatters.bitcoin
+class ledger.formatters
 
   @defaultUnit: 'BTC'
 
