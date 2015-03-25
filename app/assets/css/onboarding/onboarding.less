@@ -1,8 +1,6 @@
 @import (reference) "../constants";
 
 .main-container {
-  display: flex;
-  flex-direction: column;
   justify-content: center;
 }
 #content-container {
@@ -93,4 +91,15 @@
 
   @import "device";
   @import "management";
+}
+
+
+
+@media print {
+  #content-container { 
+    height: 900px;
+    .navigation-container, .action-bar {
+      display: none;
+    }
+  }
 }

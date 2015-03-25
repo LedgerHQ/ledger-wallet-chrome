@@ -1,40 +1,36 @@
 class @WalletSendProcessingDialogViewController extends @DialogViewController
 
   view:
-    title: '#title'
-    spinnerContainer: '#spinner_container'
+    contentContainer: '#content_container'
 
   onAfterRender: ->
     super
-    @view.spinner = ledger.spinners.createLargeSpinner(@view.spinnerContainer[0])
+    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
     do @_startSignature
 
   _startSignature: ->
-    @view.title.text t 'wallet.send.processing.validating'
     # sign transaction
-    @params.transaction.validate @params.keycode, (transaction, error) =>
+    validation = if @params.keycode? then @params.transaction.validateWithKeycard(@params.keycode) else @params.transaction.validateWithPinCode(@params.pincode)
+    validation.onComplete (transaction, error) =>
       return if not @isShown()
       if error?
-        @once 'dismiss', =>
+        @dismiss =>
           reason = switch error.code
             when ledger.errors.SignatureError then 'wrong_keycode'
             when ledger.errors.UnknownError then 'unknown'
-          dialog = new WalletSendErrorDialogViewController reason: reason
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors." + reason))
           dialog.show()
-        @dismiss()
       else
         @_startSending()
 
   _startSending: ->
-    @view.title.text t 'wallet.send.processing.sending'
     # push transaction
     ledger.api.TransactionsRestClient.instance.postTransaction @params.transaction, (transaction, error) =>
       return if not @isShown()
-      @once 'dismiss', =>
+      @dismiss =>
         if error?
-          dialog = new WalletSendErrorDialogViewController reason: 'network_no_response'
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.network_no_response"))
           dialog.show()
         else
-          dialog = new WalletSendSuccessDialogViewController
+          dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.send.errors.sending_succeeded"), subtitle: t("wallet.send.errors.transaction_completed"))
           dialog.show()
-      @dismiss()

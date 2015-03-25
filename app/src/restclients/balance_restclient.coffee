@@ -19,4 +19,4 @@ class ledger.api.BalanceRestClient extends ledger.api.RestClient
               accountBalance.unconfirmed = accountBalance.total - accountBalance.confirmed
               callback?(accountBalance)
             do done
-          onError: @networkErrorCallback(callback)
+          onFailure: @networkErrorCallback(callback)

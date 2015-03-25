@@ -37,14 +37,13 @@ class ledger.wallet.HDWallet
     @_store = store
     @_store.get ['accounts'], (result) =>
       @_accounts = []
-      result.accounts = parseInt(result.accounts) if result.accounts?
-      return callback()? unless result.accounts?
-      _.async.each [0..result.accounts - 1], (accountIndex, done, hasNext) =>
+      return callback?() unless result.accounts?
+      _.async.each [0...result.accounts], (accountIndex, done, hasNext) =>
         try
           account = new ledger.wallet.HDWallet.Account(@, accountIndex, @_store)
           account.initialize () =>
             @_accounts.push account
-            do done
+            done?()
             callback?() unless hasNext
         catch er
           e er
@@ -88,8 +87,7 @@ class ledger.wallet.HDWallet.Account
 
   initialize: (callback) ->
     @_store.get [@_storeId], (result) =>
-      accountJsonString = result[@_storeId]
-      @_account = JSON.parse(accountJsonString) if accountJsonString?
+      @_account = result[@_storeId]
       @_initialize()
       @initializeXpub callback
 
@@ -140,28 +138,35 @@ class ledger.wallet.HDWallet.Account
       when 'change' then @getChangeAddressPath(index)
       when 'public' then @getPublicAddressPath(index)
 
-  getCurrentChangeAddress: () -> ledger.wallet.HDWallet.instance.cache?.get(@getCurrentChangeAddressPath())
-  getCurrentPublicAddress: () -> ledger.wallet.HDWallet.instance.cache?.get(@getCurrentPublicAddressPath())
+  getCurrentChangeAddress: () -> @wallet.cache?.get(@getCurrentChangeAddressPath())
+  getCurrentPublicAddress: () -> @wallet.cache?.get(@getCurrentPublicAddressPath())
 
   notifyPathsAsUsed: (paths) ->
+    paths = [paths] unless _.isArray(paths)
     for path in paths
       path = path.replace("#{@wallet.getRootDerivationPath()}/0'/", '').split('/')
       switch path[0]
-        when '0' then @_notifyPublicAddressIndexAsUsed path[1]
-        when '1' then @_notifyChangeAddressIndexAsUsed path[1]
+        when '0' then @_notifyPublicAddressIndexAsUsed parseInt(path[1])
+        when '1' then @_notifyChangeAddressIndexAsUsed parseInt(path[1])
     return
 
   _notifyPublicAddressIndexAsUsed: (index) ->
+    l 'Notify public change', index, 'current is', @_account.currentPublicIndex
     if index < @_account.currentPublicIndex
+      l 'Index is less than current'
       derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
       @_account.excludedPublicPaths = _.without @_account.excludedPublicPaths, derivationPath
     else if index > @_account.currentPublicIndex
+      l 'Index is more than current'
       difference =  index - (@_account.currentPublicIndex + 1)
       @_account.excludedPublicPaths ?= []
       for i in [0...difference]
         derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index - i - 1}"
         @_account.excludedPublicPaths.push derivationPath unless _.contains(@_account.excludedPublicPaths, derivationPath)
       @_account.currentPublicIndex = parseInt(index) + 1
+    else if index == @_account.currentPublicIndex
+        l 'Index is equal to current'
+        @shiftCurrentPublicAddressPath()
     @save()
 
   _notifyChangeAddressIndexAsUsed: (index) ->
@@ -175,6 +180,8 @@ class ledger.wallet.HDWallet.Account
         derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index - i - 1}"
         @_account.excludedChangePaths.push derivationPath unless _.contains(@_account.excludedChangePaths, derivationPath)
       @_account.currentChangeIndex = parseInt(index) + 1
+    else if index == @_account.currentChangeIndex
+      @shiftCurrentChangeAddressPath()
     @save()
 
   shiftCurrentPublicAddressPath: (callback) ->
@@ -211,27 +218,27 @@ class ledger.wallet.HDWallet.Account
 openStores = (wallet, done) ->
   wallet.getBitIdAddress "", (bitIdAddress) =>
     wallet.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>
-      l pubKey
       if not pubKey?.bitcoinAddress? or not bitIdAddress?
         ledger.app.emit 'wallet:initialization:fatal_error'
         return
-      ledger.storage.openStores bitIdAddress, pubKey.bitcoinAddress.value, done
+      ledger.storage.openStores bitIdAddress, pubKey.bitcoinAddress.value
+      done?()
 
 openHdWallet = (wallet, done) ->
-  ledger.wallet.HDWallet.instance = new ledger.wallet.HDWallet()
-  ledger.wallet.HDWallet.instance.initialize ledger.storage.wallet, () ->
+  hdWallet = new ledger.wallet.HDWallet()
+  hdWallet.initialize ledger.storage.wallet, () =>
+    ledger.wallet.HDWallet.instance = hdWallet
     ledger.tasks.AddressDerivationTask.instance.start()
     _.defer =>
-      for accountIndex in [0...ledger.wallet.HDWallet.instance.getAccountsCount()]
-        ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.HDWallet.instance.getRootDerivationPath()}/#{accountIndex}'", _.noop
-      do done
+      for accountIndex in [0...hdWallet.getAccountsCount()]
+        ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{hdWallet.getRootDerivationPath()}/#{accountIndex}'", _.noop
+      done?()
 
 openAddressCache = (wallet, done) ->
-  try
-    ledger.wallet.HDWallet.instance.cache = new ledger.wallet.HDWallet.Cache(ledger.wallet.HDWallet.instance)
-    ledger.wallet.HDWallet.instance.cache.initialize done
-  catch er
-    e er
+  cache = new ledger.wallet.HDWallet.Cache(ledger.wallet.HDWallet.instance)
+  cache.initialize =>
+    ledger.wallet.HDWallet.instance.cache = cache
+    done?()
 
 restoreStructure = (wallet, done) ->
   if ledger.wallet.HDWallet.instance.isEmpty()
@@ -247,7 +254,7 @@ restoreStructure = (wallet, done) ->
 
 completeInitialization = (wallet, done) ->
   ledger.wallet.HDWallet.instance.isInitialized = yes
-  do done
+  done?()
 
 _.extend ledger.wallet,
 

@@ -14,24 +14,40 @@
   V1_4_11: 0x0001040b0146
   V1_4_12: 0x0001040c0146
   V1_4_13: 0x0001040d0146
+  V_LW_1_0_0: 0x20010000010f
+
+@ledger.wallet.Attestation =
+  String: "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
+  Bytes: []
+
+for i in [0...(ledger.wallet.Attestation.String.length / 2)]
+  ledger.wallet.Attestation.Bytes.push parseInt(ledger.wallet.Attestation.String.substring(i, i + 2), 16)
 
 class @ledger.wallet.HardwareWallet extends EventEmitter
 
   _state: ledger.wallet.States.UNDEFINED
 
-  constructor: (@manager, @id, @lwCard) ->
+  constructor: (@manager, card, @lwCard) ->
+    @id = card.id
+    @_productId = card.productId
     @_xpubs = {}
     @_vents = new EventEmitter()
     do @_listenStateChanges
 
   connect: () ->
-    @_vents.once 'LW.CardConnected', (event, data) =>
-      @_vents.once 'LW.FirmwareVersionRecovered', (event, data) =>
-        data.lW.getOperationMode()
-        data.lW.plugged()
-        @emit 'connected', @
-      data.lW.recoverFirmwareVersion()
-    @_lwCard = new LW(0, new BTChip(@lwCard), @_vents)
+    unless @isInBootloaderMode()
+      @_vents.once 'LW.CardConnected', (event, data) =>
+        @_vents.once 'LW.FirmwareVersionRecovered', (event, data) =>
+          data.lW.getOperationMode()
+          data.lW.plugged()
+          @emit 'connected', @
+        data.lW.recoverFirmwareVersion()
+      @_lwCard = new LW(0, new BTChip(@lwCard), @_vents)
+    else
+      # TODO: Remove with vincent refactoring
+      @_lwCard = dongle: card: @lwCard
+      @emit 'connected', @
+      _.defer => @_setState(ledger.wallet.States.BLANK)
 
   disconnect: () ->
     @_setState(ledger.wallet.States.DISCONNECTED)
@@ -40,6 +56,12 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     if @_numberOfRetry?
       @manager.removeRestorableState(state) for state in @manager.findRestorableStates({label: 'numberOfRetry'})
       @manager.addRestorableState({label: 'numberOfRetry', numberOfRetry: @_numberOfRetry}, 45000)
+
+  isInBootloaderMode: -> if @_productId is 0x1808 or @_productId is 0x1807 then yes else no
+
+  getFirmwareUpdater: () -> ledger.fup.FirmwareUpdater.instance
+
+  isFirmwareUpdateAvailable: () -> @getFirmwareUpdater().isFirmwareUpdateAvailable(this)
 
   getFirmwareVersion: () -> @_lwCard.getFirmwareVersion()
 
@@ -61,7 +83,6 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
             ## This needs a BIG refactoring
             l @getFirmwareVersion()
             if @getIntFirmwareVersion() >= ledger.wallet.Firmware.V1_4_13
-              l 'GOT 13'
               # ledger.app.wallet._lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).then(function (){l('done');}).fail(e)
               #.sendApdu_async(0xe0, 0x26, 0x00, 0x00, new ByteString(Convert.toHexByte(operationMode), HEX), [0x9000])
               @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
@@ -108,27 +129,12 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   getBitIdAddress: (message, callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
-
-    onSuccess = (e, data) =>
-      _.defer =>
-        @_bitIdData = data.result
-        callback?(@_bitIdData.bitcoinAddress.value)
-        do unbind
-
-    onFailure = (ev, error) =>
-      _.defer =>
-        callback?(null, error)
-        do unbind
-
-    unbind = =>
-      @_vents.off 'LW.getBitIDAddress', onSuccess
-      @_vents.off 'LW.ErrorOccured', onFailure
-    if @_bitIdData?
+    @_lwCard.getBitIDAddress(message)
+    .then (data) =>
+      @_bitIdData = data
       callback?(@_bitIdData.bitcoinAddress.value)
-    else
-      @_vents.on 'LW.getBitIDAddress', onSuccess
-      @_vents.on 'LW.ErrorOccured', onFailure
-      @_lwCard.getBitIDAddress(message)
+    .fail (error) => callback?(null, error)
+    return
 
   signMessageWithBitId: (message, callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
@@ -177,6 +183,104 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       callback xpub
 
   getExtendedPublicKeys: () -> @_xpubs
+
+  isDongleCertified: (callback) ->
+    randomValues = new Uint32Array(2)
+    crypto.getRandomValues(randomValues)
+    random = _.str.lpad(randomValues[0].toString(16), 8, '0') + _.str.lpad(randomValues[1].toString(16), 8, '0')
+    adpu = 'E0C2000008' + random
+    p = @sendAdpu new ByteString(adpu, HEX), [0x9000]
+    p.then (result) =>
+      attestation = result.toString(HEX)
+      @attestation =
+        raw: attestation
+        keyBatchId: attestation.substring(0, 8)
+        keyDerivationId: attestation.substring(8, 16)
+        supportedOperationBitFlag: attestation.substring(16, 18)
+        firmwareMajor: attestation.substring(18, 22)
+        firmwareMinor: attestation.substring(22, 24)
+        firmarePatch: attestation.substring(24, 26)
+        loaderIdMajor: attestation.substring(26, 28)
+        loaderIdMinor: attestation.substring(28, 30)
+        signature: attestation.substring(30)
+      l @attestation, random
+      try
+        SHA256  = new  JSUCrypt.hash.SHA256()
+        domain =  JSUCrypt.ECFp.getEcDomainByName("secp256k1")
+        pubKey = new JSUCrypt.key.EcFpPublicKey(256, domain)
+        pubKey.W =
+          getUncompressedForm: -> ledger.wallet.Attestation.Bytes
+        l ledger.wallet.Attestation.Bytes
+        ecsig = new JSUCrypt.signature.ECDSA(SHA256)
+        ecsig.init(pubKey,  JSUCrypt.signature.MODE_VERIFY)
+        sigBytes = (parseInt(@attestation.signature.substring(i, i + 2), 16) for i in [0...(@attestation.signature.length / 2)])
+        ver = ecsig.verify(random, sigBytes)
+        l sigBytes
+        l 'Verif', ver
+        return
+      catch er
+        e er
+    p.fail (result) =>
+      e result
+
+  # @return A Q.Promise
+  randomBitIdAddress: () ->
+    d = Q.defer()
+    i = sjcl.random.randomWords(1) & 0xffff
+    ledger.wallet.pathsToAddresses(["0'/0/0xb11e/#{i}"], _.bind(d.resolve,d))
+    return d.promise
+
+  # @param [String] pubKey public key, hex encoded.
+  # @return A promise which resolve with a 32 bytes length pairing blob hex encoded.
+  initiateSecureScreen: (pubKey) ->
+    throw 'Wallet is not connected and unlocked' if @_state != ledger.wallet.States.UNLOCKED
+    throw "Invalid pubKey" unless pubKey.match(/^[0-9A-Fa-f]{130}$/)
+    adpu = new ByteString("E0"+"12"+"01"+"00"+"41"+pubKey, HEX)
+    console.log("[initiateSecureScreen] adpu:", adpu.toString(HEX))
+    @sendAdpu(adpu, [0x9000]).then (d) -> d.toString()
+
+  # @param [String] data challenge response, hex encoded.
+  # @return A promise which resolve if pairing is successful.
+  confirmSecureScreen: (data) ->
+    throw 'Wallet is not connected and unlocked' if @_state != ledger.wallet.States.UNLOCKED
+    throw "Invalid challenge resp" unless data.match(/^[0-9A-Fa-f]{32}$/)
+    adpu = new ByteString("E0"+"12"+"02"+"00"+"10"+data, HEX)
+    console.log("[confirmSecureScreen] adpu:", adpu.toString(HEX))
+    @sendAdpu(adpu, [0x9000])
+
+  sendAdpu: (cla, ins, p1, p2, opt1, opt2, opt3, wrapScript) -> @_lwCard.dongle.card.sendApdu_async(cla, ins, p1, p2, opt1, opt2, opt3, wrapScript)
+
+  ###
+    Gets the raw version {ByteString} of the dongle.
+
+    @param [Boolean] isInBootLoaderMode Must be true if the current dongle is in bootloader mode.
+    @param [Boolean] forceBl Force the call in BootLoader mode
+    @param [Function] callback Called once the version is retrieved. The callback must be prototyped like size `(version, error) ->`
+    @return [CompletionClosure]
+  ###
+  getRawFirmwareVersion: (isInBootLoaderMode, forceBl = no, callback = null) -> @_getRawFirmwareVersion(isInBootLoaderMode, forceBl, new CompletionClosure(callback)).readonly()
+
+  _getRawFirmwareVersion: (isInBootLoaderMode, forceBl, completion) ->
+    adpu = new ByteString((if !isInBootLoaderMode and !forceBl then "E0C4000000" else "F001000000"), HEX)
+    @_lwCard.dongle.card.exchange_async(adpu).then (result) =>
+      if !isInBootLoaderMode and !forceBl
+        if @_lwCard.dongle.card.SW is 0x9000
+          completion.success([result.byteAt(1), (result.byteAt(2) << 16) + (result.byteAt(3) << 8) + result.byteAt(4)])
+        else
+          # Not initialized now - Retry
+          @_getRawFirmwareVersion(isInBootLoaderMode, yes, completion)
+      else
+        if @_lwCard.dongle.card.SW is 0x9000
+          completion.success([0, (result.byteAt(5) << 16) + (result.byteAt(6) << 8) + result.byteAt(7)])
+        else if !isInBootLoaderMode and (@_lwCard.dongle.card.SW is 0x6d00 or @_lwCard.dongle.card.SW is 0x6e00)
+          #  Unexpected - let's say it's 1.4.3
+          completion.success([0, (1 << 16) + (4 << 8) + (3)])
+        else
+          completion.failure(new Error("Failed to get version"))
+        return
+    .fail (error) ->
+      completion.failure(error)
+    completion
 
   _setState: (newState) ->
     @_state = newState
@@ -229,4 +333,3 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
             _.defer () ->
               params.do(data, ev)
     unbind
-

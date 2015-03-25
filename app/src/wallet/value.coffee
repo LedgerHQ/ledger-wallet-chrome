@@ -30,9 +30,9 @@ class ledger.wallet.Value
     value = Value.from(value) unless _(value).isKindOf(ledger.wallet.Value)
     new Value(@_number.add(value._number))
 
-  substract: (value) ->
+  subtract: (value) ->
     value = Value.from(value) unless _(value).isKindOf(ledger.wallet.Value)
-    new Value(@_number.substract(value._number))
+    new Value(@_number.subtract(value._number))
 
   multiply: (value) ->
     value = Value.from(value) unless _(value).isKindOf(ledger.wallet.Value)

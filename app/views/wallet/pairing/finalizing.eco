@@ -1,0 +1,15 @@
+<section id="pairing_finalizing_dialog">
+  <header>
+    <h1><%= t 'wallet.pairing.common.pair_a_new_mobile' %></h1>
+  </header>
+  <div id="content_container">
+    <img src="../assets/images/wallet/pairing_icon.png" width="108" height="60" />
+    <input id="phone_name_input" class="large-text-input" placeholder="<%= t 'wallet.pairing.finalizing.placeholder_name' %>"/>
+    <div class="regular-grey-text-small"><%= t 'wallet.pairing.finalizing.assign_a_name' %></div>
+    <div id="error_label" class="bold-invalid-text"></div>
+  </div>
+</section>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="action-rounded-button" href="#terminate"><%= t 'common.finish' %></a>
+</div>

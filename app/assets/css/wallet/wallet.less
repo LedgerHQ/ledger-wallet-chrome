@@ -3,9 +3,6 @@
 @import "top-menu";
 
 .main-container {
-  display: flex;
-  flex-direction: column;
-
   #navigation_controller_content {
     padding: @metrics-large-padding @metrics-medium-padding;
     overflow: auto;
@@ -61,7 +58,7 @@ section {
           vertical-align: top;
         }
         &.optional {
-          color: @color-soft-grey;
+          color: @color-dark-grey;
         }
       }
 
@@ -76,7 +73,7 @@ section {
 
     tbody tr[data-href] {
       &:hover {
-        background-color: #f5f5f5;
+        background-color: #f4f4f4;
       }
     }
 
@@ -144,25 +141,6 @@ section {
           width: 200px;
         }
       }
-    }
-  }
-
-  &#send_processing_dialog, &#send_preparing_dialog {
-    text-align: center;
-
-    > #spinner_container {
-      > .spinner {
-        margin-top: @metrics-small-padding;
-      }
-    }
-
-    > #title {
-      margin-top: @metrics-extra-large-padding;
-    }
-
-    > .regular-grey-text-small {
-      margin: 0 @metrics-small-padding;
-      margin-top: @metrics-almost-small-padding;
     }
   }
 }

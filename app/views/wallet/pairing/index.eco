@@ -1,0 +1,27 @@
+<section id="pairing_index_dialog">
+  <header>
+    <h1><%= t 'wallet.pairing.common.pair_a_new_mobile' %></h1>
+  </header>
+  <div class="step-container">
+    <div class="step-number">1.</div>
+    <div class="step-content">
+      <div class="step-indication"><%- t 'wallet.pairing.index.download_the_app' %></div>
+      <div class="step-explanation"><a href="#openSupport"><%- t 'wallet.pairing.index.compatibility_details_available' %></a></div>
+    </div>
+  </div>
+  <div class="step-container">
+    <div class="step-number">2.</div>
+    <div class="step-content">
+      <div class="step-indication"><%- t 'wallet.pairing.index.open_the_app' %></div>
+      <div class="step-explanation"><%- t 'wallet.pairing.index.tap_pair' %></div>
+    </div>
+  </div>
+  <div id="qrcode_container">
+    <div id="qrcode_frame"></div>
+    <div class="qrcode-indication"><%- t 'wallet.pairing.index.scan_this_qrcode' %></div>
+  </div>
+</section>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
+</div>

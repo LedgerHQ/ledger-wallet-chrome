@@ -1,0 +1,5 @@
+<div class="dialog_container" id="dialog_container_<%= @dialog_id %>">
+  <div id="dialog_<%= @dialog_id %>" class="dialog" style="visibility: hidden">
+
+  </div>
+</div>

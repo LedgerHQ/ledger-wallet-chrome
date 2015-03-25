@@ -1,0 +1,7 @@
+<div style="background-color: #008800;width: 100%;height: 100%">
+
+  Seed
+  <input id="seed_input" type="text" />
+  <button data-href="#submitSeed">OK</button>
+
+</div>

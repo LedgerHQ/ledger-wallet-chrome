@@ -1,0 +1,8 @@
+<section id="error_dialog">
+  <img src="../assets/images/common/large_error.png" width="50" height="50" />
+  <div class="uppercase-section-title">FAILED</div>
+  <% if @params.reason?: %>
+    <div class="regular-grey-text-small"><%= @params.reason %></div>
+  <% end %>
+  <a href="#dismiss" class="cancel-rounded-button"><%= t 'wallet.send.error.close' %></a>
+</section>

@@ -1,30 +1,47 @@
 ledger.api ?= {}
 
-class ledger.api.RestClient
+class ledger.api.HttpClient extends @HttpClient
+  constructor: () -> super
 
-  @singleton: () -> @instance = new @()
+  authenticated: ->
+    authenticatedHttpClient = ledger.api.authenticated(@_baseUrl)
+    for key, value of @headers
+      authenticatedHttpClient.setHttpHeader key, value
+    authenticatedHttpClient
+
+class ledger.api.RestClient
+  @API_BASE_URL: ledger.config.restClient.baseUrl
+
+  @singleton: () -> @instance ||= new @()
 
   http: () ->
-    new HttpClient('https://api.ledgerwallet.com/')
+    @_client ||= @_httpClientFactory()
+    @_client.setHttpHeader 'X-Ledger-Locale', chrome.i18n.getUILanguage()
+    @_client.setHttpHeader 'X-Ledger-Platform', 'chrome'
+    @_client.setHttpHeader 'X-Ledger-Environment', ledger.env
+    @_client
 
   networkErrorCallback: (callback) ->
     errorCallback = (xhr, status, message) ->
         callback(null, {xhr, status, message, code: ledger.errors.NetworkError})
     errorCallback
 
-  authenticate: (callback) ->
-    @http().setHttpHeader 'X-LedgerWallet-AuthToken', ledger.api.RestClient.AuthToken
-    if ledger.api.RestClient.AuthToken?
-      do callback
-    else
-      @_performAuthenticationFirstStep () =>
+  _httpClientFactory: -> new ledger.api.HttpClient(ledger.config.restClient.baseUrl)
 
+class ledger.api.AuthRestClient extends ledger.api.RestClient
+  _httpClientFactory: -> super().authenticated(@baseUrl)
 
-  _performAuthenticationFirstStep: (callback) ->
-    ledger.app.wallet.getBitIdAddress (bitidAddress) =>
-      @http().get
-        url: "bitid/authenticate?address=#{bitidAddress}"
-        onSuccess: (authentication) ->
-          l authentication
+@testRestClientAuthenticate = ->
+  f = ->
+    ledger.app.wallet.getBitIdAddress (address) ->
+      r = new ledger.api.AuthRestClient()
+      r.http().get
+        url: "accountsettings/#{address}"
+        onSuccess: () -> l arguments
         onError: () ->
-          l arguments
+          e arguments
+  ledger.app.wallet.getState (state) ->
+    if state is ledger.wallet.States.LOCKED
+      ledger.app.wallet.unlockWithPinCode '0000', f
+    else
+      do f

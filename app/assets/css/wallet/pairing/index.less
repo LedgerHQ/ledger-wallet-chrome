@@ -1,0 +1,42 @@
+@import (reference) "../../common";
+
+section#pairing_index_dialog {
+  width: @dialog-width-pairing;
+
+  > .step-container {
+    display: flex;
+    flex-direction: row;
+    margin-top: @metrics-almost-medium-padding;
+
+    > .step-number {
+      .light-grey-text-huge;
+      flex-shrink: 0;
+    }
+
+    > .step-content {
+      margin-left: @metrics-almost-medium-padding;
+
+      > .step-indication {
+        .regular-text;
+      }
+
+      > .step-explanation {
+        .regular-grey-text-small;
+        margin-top: @metrics-very-small-padding;
+        line-height: 20px;
+      }
+    }
+  }
+
+  > #qrcode_container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: @metrics-medium-padding;
+
+    > .qrcode-indication {
+      .regular-grey-text-small;
+      margin-top: @metrics-small-padding;
+    }
+  }
+}

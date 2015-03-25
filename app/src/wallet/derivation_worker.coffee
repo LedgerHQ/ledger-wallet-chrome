@@ -1,23 +1,27 @@
-importScripts(
-    '../utils/log.js'
-    '../../libs/bitcoinjs-min.js'
-    '../../libs/lw-api-js/lib/bitcoinjs-min.js'
-    'extended_public_key.js'
-    '../../libs/lw-api-js/lib/inheritance.js'
-    '../../libs/lw-api-js/lib/BitcoinExternal.js'
-    '../../libs/lw-api-js/btchip-js-api/ByteString.js'
-    '../../libs/lw-api-js/btchip-js-api/Convert.js'
-    '../../libs/lw-api-js/btchip-js-api/GlobalConstants.js'
-    '../../libs/lw-api-js/ucrypt/JSUCrypt.js'
-    '../../libs/lw-api-js/ucrypt/helpers.js'
-    '../../libs/lw-api-js/ucrypt/hash.js'
-    '../../libs/lw-api-js/ucrypt/sha256.js'
-    '../../libs/lw-api-js/ucrypt/ripemd160.js'
-    '../../libs/underscore-min.js'
-    '../../libs/underscore.string.min.js'
-    '../utils/object.js'
-    'value.js'
-)
+try
+  importScripts(
+      '../utils/log.js'
+      '../../libs/bitcoinjs-min.js'
+      '../../libs/lw-api-js/lib/bitcoinjs-min.js'
+      'extended_public_key.js'
+      '../../libs/lw-api-js/lib/inheritance.js'
+      '../../libs/lw-api-js/lib/BitcoinExternal.js'
+      '../../libs/lw-api-js/btchip-js-api/ByteString.js'
+      '../../libs/lw-api-js/btchip-js-api/Convert.js'
+      '../../libs/lw-api-js/btchip-js-api/GlobalConstants.js'
+      '../../libs/lw-api-js/ucrypt/JSUCrypt.js'
+      '../../libs/lw-api-js/ucrypt/helpers.js'
+      '../../libs/lw-api-js/ucrypt/hash.js'
+      '../../libs/lw-api-js/ucrypt/sha256.js'
+      '../../libs/lw-api-js/ucrypt/ripemd160.js'
+      '../../libs/underscore-min.js'
+      '../../libs/underscore.string.min.js'
+      '../utils/object.js'
+      'value.js'
+  )
+catch er
+  console.error er
+  return
 
 LastQueryId = 0x8000000
 QueryHandlers = []
@@ -60,9 +64,10 @@ class WorkerWallet
 
   getPublicAddress: (path, callback) ->
     sendCommand 'private:getPublicAddress', [path], (result, error) =>
-      result.publicKey = new ByteString(result.publicKey, HEX)
-      result.bitcoinAddress = new ByteString(result.bitcoinAddress, HEX)
-      result.chainCode = new ByteString(result.chainCode, HEX)
+      if result?
+        result.publicKey = new ByteString(result.publicKey, HEX)
+        result.bitcoinAddress = new ByteString(result.bitcoinAddress, HEX)
+        result.chainCode = new ByteString(result.chainCode, HEX)
       callback?(result, error)
 
 

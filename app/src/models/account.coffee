@@ -16,6 +16,21 @@ class @Account extends Model
 
   ## Operations
 
+  ###
+    Creates a new transaction asynchronously. The created transaction will only be initialized (i.e. it will only retrieve
+    a sufficient number of input to perform the transaction)
+
+    @param {ledger.wallet.Value} amount The amount to send expressed in satoshi
+    @param {ledger.wallet.Value} fees The miner fees expressed in satoshi
+    @param {String} address The recipient address
+    @option [Function] callback The callback called once the transaction is created
+    @return [CompletionClosure] A closure
+  ###
+  createTransaction: ({amount, fees, address}, callback) ->
+    inputsPath = @getHDWalletAccount().getAllPublicAddressesPaths()
+    changePath = @getHDWalletAccount().getCurrentChangeAddressPath()
+    ledger.wallet.transaction.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
+
   addRawTransactionAndSave: (rawTransaction, callback = _.noop) ->
     hdAccount = ledger.wallet.HDWallet.instance?.getAccount(@get('index'))
     ledger.wallet.pathsToAddresses hdAccount.getAllPublicAddressesPaths(), (publicAddresses) =>
@@ -43,7 +58,7 @@ class @Account extends Model
       result.updates.push update if update?
 
     if hasAddressesInOutput
-      [insert, update] = @_addRawReceptionTransaction rawTransaction, publicAddresses.concat(changeAddresses)
+      [insert, update] = @_addRawReceptionTransaction rawTransaction, publicAddresses
       result.inserts.push insert if insert?
       result.updates.push update if update?
     result

@@ -401,7 +401,7 @@ var BTChip = Class.create({
           	  var scriptBlocks = [];
           	  var offset = 0;
           	  while (offset != script.length) {
-          	  	var blockSize = (script.length - offset > 255 ? 255 : script.length - offset);
+          	  	var blockSize = (script.length - offset > 251 ? 251 : script.length - offset);
           	  	scriptBlocks.push(script.bytes(offset, blockSize));
           	  	offset += blockSize;
           	  }
@@ -543,6 +543,19 @@ var BTChip = Class.create({
                   result['authorizationRequired'] = outData.byteAt(1 + scriptDataLength);
                   result['indexesKeyCard'] = outData.bytes(2 + scriptDataLength).toString(HEX);
                   /* FIN MODIF NESS */
+                  /* MODIF VINCENT */
+                  var authorizationMode = outData.byteAt(1 + scriptDataLength);
+                  var offset = 1 + scriptDataLength + 1;
+                  if (authorizationMode == 0x02) {
+                    result['authorizationReference'] = outData.bytes(offset);
+                  }
+                  if (authorizationMode == 0x03) {
+                    var referenceLength = outData.byteAt(offset++);
+                    result['authorizationReference'] = outData.bytes(offset, referenceLength);
+                    offset += referenceLength;
+                    result['authorizationPaired'] = outData.bytes(offset);
+                  }
+                  /* FIN MODIF VINCENT */
                   return result;
                 });
 	}, 
@@ -669,7 +682,7 @@ var BTChip = Class.create({
                         function (input, finishedCallback) {
                           targetTransaction['inputs'][i]['script'] = regularOutputs[i]['script'];			
                           var resultHash;			
-                          currentObject.startUntrustedHashTransactionInput_async(firstRun, targetTransaction, trustedInputs).then(function(result) {;
+                          currentObject.startUntrustedHashTransactionInput_async(firstRun, targetTransaction, trustedInputs).then(function(result) {
                             currentObject.hashOutputBase58_async(changePath, outputAddress, amount, fees).then(function (resultHash) {
                               if (resultHash['scriptData'].length != 0) {
                                       scriptData = resultHash['scriptData'];
@@ -692,6 +705,10 @@ var BTChip = Class.create({
                                       resumeData['scriptData'] = scriptData;
                                       resumeData['trustedInputs'] = trustedInputs;
                                       resumeData['publicKeys'] = publicKeys;
+                                      /* ADD VINCENT */
+                                      resumeData['authorizationReference'] = resultHash['authorizationReference'];
+                                      resumeData['authorizationPaired'] = resultHash['authorizationPaired'];
+                                      /* FIN ADD VINCENT */
                                       // return current state
                                       deferred.resolve(resumeData);
                               }

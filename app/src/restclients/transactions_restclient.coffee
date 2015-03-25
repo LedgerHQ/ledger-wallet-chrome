@@ -6,7 +6,6 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     @http().get
       url: "blockchain/transactions/#{transactionHash}/hex"
       onSuccess: (response) ->
-        l response
         callback?(response.hex)
       onError: @networkErrorCallback(callback)
 
@@ -41,9 +40,9 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     stream
 
   postTransaction: (transaction, callback) ->
-    @http().postForm
-      url: "blockchain/pushtx"
-      params: {tx: transaction.getSignedTransaction()}
+    @http().post
+      url: "blockchain/pushtx",
+      data: {tx: transaction.getSignedTransaction()}
       onSuccess: (response) ->
         transaction.setHash(response.transaction_hash)
         callback?(transaction)
