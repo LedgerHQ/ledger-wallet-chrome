@@ -294,4 +294,7 @@
         'controllers/update/update_loados_view_controller'
         'controllers/update/update_loadblreloader_view_controller'
         'controllers/update/update_loadbl_view_controller'
+
+        # API
+        'api'
       ]

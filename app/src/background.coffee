@@ -6,9 +6,13 @@ chrome.app.runtime.onLaunched.addListener =>
       minHeight: 640
 
 chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse)=>
-  console.log request
-  console.log sender
-  switch request.request
+  if typeof request.request == "string"
+    req = request.request
+  else
+    req = request.request.command
+    data = request.request
+  console.log req
+  switch req
     when 'ping' then sendResponse yes
     when 'launch'
       chrome.app.window.create 'views/layout.html',
@@ -18,7 +22,10 @@ chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse)=>
           minHeight: 640
       sendResponse yes
     when 'bitid'
-      console.log request.url
-      console.log request.nonce
-      console.log request.unsecure
+      console.log data.uri
+      payload = {
+        command: 'bitid',
+        uri: data.uri
+      }
+      chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
       sendResponse yes
