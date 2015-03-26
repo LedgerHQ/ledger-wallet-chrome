@@ -78,6 +78,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   onProgress: (callback) -> @_onProgress = callback
 
+  hasGrantedErasurePermission: -> _.contains(@_approvedStates, "erasure")
+
   ###
     Approves the current request state and continue its execution.
   ###
