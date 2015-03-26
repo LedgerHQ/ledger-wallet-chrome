@@ -53,7 +53,9 @@ require @ledger.imports, ->
       else
         @emit 'dongle:forged', @wallet
 
-    onDongleIsInBootloaderMode: (wallet) -> @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
+    onDongleIsInBootloaderMode: (wallet) ->
+      @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
+      ledger.app.router.go '/'
 
     onDongleNeedsUnplug: (wallet) ->
       @emit 'dongle:unplugged', @wallet if @isInWalletMode()
