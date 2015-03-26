@@ -55,6 +55,8 @@ Signals :
 class @ledger.dongle.Dongle extends EventEmitter
 
   # @property
+  id: undefined
+  # @property
   deviceId: undefined
   # @property
   productId: undefined
@@ -75,8 +77,9 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   constructor: (card) ->
     super
-    deviceId = card.deviceId
-    productId = card.productId
+    @id = card.deviceId
+    @deviceId = card.deviceId
+    @productId = card.productId
     @_btchip = new BTChip(card)
 
     unless @isInBootloaderMode()
@@ -162,8 +165,8 @@ class @ledger.dongle.Dongle extends EventEmitter
       attestation = result.toString(HEX)
       dataToSign = attestation.substring(16,32) + random
       dataSig = attestation.substring(32)
+      dataSig = "30" + dataSig.substr(2)
       dataSigBytes = (parseInt(n,16) for n in dataSig.match(/\w\w/g))
-
       sha = new JSUCrypt.hash.SHA256()
       domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
       affinePoint = new JSUCrypt.ECFp.AffinePoint(Attestation.xPoint, Attestation.yPoint)
@@ -171,14 +174,32 @@ class @ledger.dongle.Dongle extends EventEmitter
       ecsig = new JSUCrypt.signature.ECDSA(sha)
       ecsig.init(pubkey, JSUCrypt.signature.MODE_VERIFY)
       if ecsig.verify(dataToSign, dataSigBytes)
-        completion.success()
+        completion.success(this)
       else
-        completion.failure()
+        completion.failure(new ledger.StdError(Errors.DongleNotCertified))
+      return
+      # attestation = result.toString(HEX)
+      # dataToSign = attestation.substring(16,32) + random
+      # dataSig = attestation.substring(32)#.replace(/^\w\w/,'30')
+      # dataSigBytes = (parseInt(n,16) for n in dataSig.match(/\w\w/g))
+
+      # sha = new JSUCrypt.hash.SHA256()
+      # domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
+      # affinePoint = new JSUCrypt.ECFp.AffinePoint(Attestation.xPoint, Attestation.yPoint)
+      # pubkey = new JSUCrypt.key.EcFpPublicKey(256, domain, affinePoint)
+      # ecsig = new JSUCrypt.signature.ECDSA(sha)
+      # ecsig.init(pubkey, JSUCrypt.signature.MODE_VERIFY)
+      # if ecsig.verify(dataToSign, dataSigBytes)
+      #   console.log("isCertified success")
+      #   _.defer => completion.success()
+      # else
+      #   console.log("isCertified failure")
+      #   _.defer => completion.failure()
+      # return
     .fail (err) =>
+      console.error("Fail check if isCertified :", err)
       error = new ledger.StdError(Errors.SignatureError, err)
       completion.failure(error)
-    .catch (error) ->
-      console.error("Fail check if isCertified :", error)
     .done()
     completion.readonly()
 
@@ -218,12 +239,12 @@ class @ledger.dongle.Dongle extends EventEmitter
         console.error("Fail to unlockWithPinCode 2 :", error)
       .done()
     .fail (err) =>
-      error = new ledger.StdError(Error.WrongPinCode, err)
+      error = new ledger.StdError(Errors.WrongPinCode, err)
       console.error("Fail to unlockWithPinCode 1 :", err)
       if err.match(/6faa|63c0/)
         @_setState(States.BLANK)
-        error.code = Error.DongleLocked
-      else
+        error.code = Errors.DongleLocked
+      else if ! err.match(/63c\d/)
         @_setState(States.ERROR)
       if err.match(/63c\d/)
         error.retryCount = parseInt(err.substr(-1))

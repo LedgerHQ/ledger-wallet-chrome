@@ -41,10 +41,10 @@ class @ledger.dongle.Manager extends EventEmitter
 
   _checkIfDongleIsPluggedIn: () ->
     @_getDevices (devices) =>
-      pluggedIds = (device.device || device.deviceId for device in devices)
-      for id in pluggedIds when ! @_dongles[id]?
-        @_connectDongle(id)
-      for id, dongle of @_dongles when pluggedIds.indexOf(+id) == -1
+      for device in devices
+        device.deviceId = parseInt(device.deviceId || device.device)
+        @_connectDongle(device) unless @_dongles[device.deviceId]?
+      for id, dongle of @_dongles when _(devices).where(deviceId: +id).length == 0
         dongle.disconnect()
 
   _getDevices: (cb) ->
@@ -57,7 +57,8 @@ class @ledger.dongle.Manager extends EventEmitter
         cb?(devices) unless hasNext
         next()
 
-  _connectDongle: (deviceId) ->
+  _connectDongle: (device) ->
+    @emit 'connecting', device
     try
       result = []
       @cardFactory.list_async()
@@ -71,13 +72,15 @@ class @ledger.dongle.Manager extends EventEmitter
         result = result.concat(cards)
         return if result.length == 0
         @cardFactory.getCardTerminal(result[0]).getCard_async().then (card) =>
-          @_dongles[deviceId] = new ledger.dongle.Dongle(card)
-          @_dongles[deviceId].once 'state:locked', (event) => @emit 'connected', @_dongles[deviceId]
-          @_dongles[deviceId].once 'state:blank', (event) => @emit 'connected', @_dongles[deviceId]
-          @_dongles[deviceId].once 'forged', (event) => @emit 'forged', @_dongles[deviceId]
-          @_dongles[deviceId].once 'state:disconnected', (event) =>
-            delete @_dongles[deviceId]
-            @emit 'disconnected', @_dongles[deviceId]
+          _.extend card, deviceId: device.deviceId, productId: device.productId, vendorId: device.vendorId
+          dongle = new ledger.dongle.Dongle(card)
+          @_dongles[device.deviceId] = dongle
+          dongle.once 'state:locked', (event) => @emit 'connected', dongle
+          dongle.once 'state:blank', (event) => @emit 'connected', dongle
+          dongle.once 'forged', (event) => @emit 'forged', dongle
+          dongle.once 'state:disconnected', (event) =>
+            delete @_dongles[device.deviceId]
+            @emit 'disconnected', dongle
     catch er
       e er
 

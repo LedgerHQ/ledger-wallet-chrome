@@ -129,6 +129,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   _listenDongleEvents: () ->
     # Dongle management & dongle events re-dispatching
+    @donglesManager.on 'connecting', (event, dongle) => (Try => @onConnectingDongle(dongle)).printError()
     @donglesManager.on 'connected', (event, dongle) =>
       @dongle = dongle
       dongle.once 'state:disconnected', =>
@@ -138,7 +139,11 @@ class ledger.base.application.BaseApplication extends @EventEmitter
         (Try => @onDongleNeedsUnplug(dongle)).printError()
       dongle.once 'state:unlocked', =>
         (Try => @onDongleIsUnlocked(dongle)).printError()
-      (Try => @onDongleConnected(dongle)).printError()
+      if dongle.isInBootloaderMode()
+        (Try => @onDongleIsInBootloaderMode(dongle)).printError()
+      else
+        dongle.isCertified (dongle, error) =>
+          (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
 
   onConnectingDongle: (card) ->
 

@@ -24,8 +24,8 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
         node.fadeIn(if animated then 250 else 0)
 
   navigateContinue: ->
-    ledger.app.wallet.getState (state) =>
-      if state == ledger.wallet.States.LOCKED
+    ledger.app.dongle.getState (state) =>
+      if state == ledger.dongle.States.LOCKED
         ledger.app.router.go '/onboarding/device/pin'
       else
         ledger.app.router.go '/onboarding/management/welcome'
@@ -34,9 +34,9 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
     ledger.app.router.go '/onboarding/device/forged'
 
   _listenEvents: ->
-    if ledger.app.wallet?
-      ledger.app.wallet.isDongleCertified (__, error) =>
-        return unless ledger.app.wallet?
+    if ledger.app.dongle?
+      ledger.app.dongle.isCertified (__, error) =>
+        return unless ledger.app.dongle?
         unless error?
           do @navigateContinue
         else
