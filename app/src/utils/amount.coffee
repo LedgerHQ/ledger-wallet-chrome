@@ -30,8 +30,8 @@ class @ledger.Amount
 
   # @param [ledger.Amount] amount
   # @return [ledger.Amount]
-  substract: (amount) ->
-    new Amount(@_number.substract(amount._number))
+  subtract: (amount) ->
+    new Amount(@_number.subtract(amount._number))
 
   # @param [String, Number, Bitcoin.BigInteger] number
   # @return [ledger.Amount]
