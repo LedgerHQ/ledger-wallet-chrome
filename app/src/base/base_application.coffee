@@ -97,6 +97,17 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     handled
 
   ###
+    Requests the application to perform or perform again a dongle certification process
+  ###
+  performDongleAttestation: ->
+    @wallet?.isDongleCertified (dongle, error) =>
+      (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
+
+
+
+
+
+  ###
     Returns the jQuery element used as the main div container in which controllers will render themselves.
 
     @return [jQuery.Element] The jQuery element of the controllers container
@@ -148,7 +159,8 @@ class ledger.base.application.BaseApplication extends @EventEmitter
       if wallet.isInBootloaderMode()
         (Try => @onDongleIsInBootloaderMode(wallet)).printError()
       else
-        wallet.isDongleCertified (dongle, error) => (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
+        @performDongleAttestation()
+
 
 
   _listenDongleEvents: () ->
