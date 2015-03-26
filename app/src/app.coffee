@@ -9,6 +9,7 @@ require @ledger.imports, ->
     onStart: ->
       @_listenAppEvents()
       @setExecutionMode(@Modes.Wallet)
+      @router.go '/'
 
     ###
       Sets the execution mode of the application. In Wallet mode, the application handles the wallets state by starting services,
@@ -22,11 +23,8 @@ require @ledger.imports, ->
       throw "Unknown execution mode: #{newMode}. Available modes are ledger.app.Wallet or ledger.app.FirmwareUpdate." if _(_.values(@Modes)).find((m) -> m is newMode).length is 0
       return if newMode is @_currentMode
       @_currentMode = newMode
-      if @isInWalletMode()
-        @router.go '/'
-      else if @isInFirmwareUpdateMode()
+      if @isInFirmwareUpdateMode()
         @_releaseWallet()
-        @router.go '/'
       return
 
     ###

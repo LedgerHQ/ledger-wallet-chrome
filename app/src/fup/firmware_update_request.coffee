@@ -355,7 +355,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_waitForPowerCycle()
 
   _success: ->
-    @_setCurrentState(States.DONE)
+    @_setCurrentState(States.Done)
     _.defer => @cancel()
 
   _attemptToFailDonglePinCode: (pincode) ->

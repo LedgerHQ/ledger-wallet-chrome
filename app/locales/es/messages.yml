@@ -18,9 +18,11 @@ common:
   continue: "Continue"
   erase: "Erase"
   update: "Update"
+  restore: "Restore"
   yes: "Si"
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
+  get_help: "Pongase en contacto con el centro de ayuda en support.ledgerwallet.com"
 
   keycard:
     uppercase_letters: "Mayúsculas"
@@ -56,6 +58,9 @@ onboarding:
       enter_your_pin_code: "Ingrese su PIN para desbloquear su billetera :"
       i_lost_my_pin_code: "Si ha olvidado su PIN, por favor visite nuestro Centro de asistencia."
 
+    connecting:
+      is_connecting: "Verifying authenticity of your Ledger Wallet..."
+
     opening:
       is_opening: "Por favor, espere mientras abre su monedero..."
       is_synchronizing: "Sincronizando su cartera. Esto puede tardar varios minutos..."
@@ -76,6 +81,10 @@ onboarding:
         device_unsupported: "Su monedero no esta aceptado"
         unsuported_kind: "Este tipo de monedero no esta aceptado por la aplicación Ledger Wallet."
         get_help: "Pongase en contacto con el centro de ayuda en support.ledgerwallet.com"
+
+      forged:
+        device_forged: "This Ledger Wallet is not genuine"
+        forbidden_access: "For safety reasons, you are not authorized to use this  application."
 
   management:
     back: "RETORNO"
@@ -194,6 +203,19 @@ update:
     update_confirmation: "Update confirmation"
     wallet_is_ready: "Your Ledger Wallet is erased and ready to be updated."
     clicking_continue: "The firmware will update from %s to %s."
+
+  loading:
+    updating_wallet: "Update in progress"
+    loading: "Loading %s..."
+
+  done:
+    successfully_updated: "Your Ledger Wallet has been successfully updated."
+    update_succeeded: "Update succeeded"
+    use_24_words: "Use your 24 words recovery phrase from your recovery sheet to restore your Bitcoins."
+
+  error:
+    update_failed: "Update failed"
+    error_updated: "An error occurred while updating your Ledger Wallet (code: %s)."
 
 wallet:
   defaults:

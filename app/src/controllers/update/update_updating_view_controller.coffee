@@ -1,12 +1,13 @@
 class @UpdateUpdatingViewController extends UpdateViewController
 
   navigation:
-    nextRoute: ""
+    nextRoute: "/update/loading"
   localizablePageSubtitle: "update.updating.update_confirmation"
   localizableNextButton: "common.update"
 
   navigateNext: ->
     @getRequest().approveCurrentState()
+    super
 
   onBeforeRender: ->
     super

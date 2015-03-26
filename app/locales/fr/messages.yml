@@ -18,9 +18,11 @@ common:
   continue: "Continuer"
   erase: "Effacer"
   update: "Mettre à jour"
+  restore: "Restaurer"
   yes: "Oui"
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
+  get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
 
   keycard:
     uppercase_letters: "Majuscules"
@@ -57,7 +59,7 @@ onboarding:
       i_lost_my_pin_code: "Si vous avez oublié votre code PIN, consultez notre centre d'aide."
 
     connecting:
-      is_connecting: "Vérification de l'authenticité de votre Ledger Nano.."
+      is_connecting: "Vérification de l'authenticité de votre Ledger Wallet..."
 
     opening:
       is_opening: "Veuillez patienter pendant l'ouverture de votre portefeuille..."
@@ -81,9 +83,8 @@ onboarding:
         get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
 
       forged:
-        device_forged: "Ledger Wallet non authentique"
+        device_forged: "Ce Ledger Wallet n'est pas authentique"
         forbidden_access: "Pour des raisons de sécurité, vous n'êtes pas autorisé à utiliser cette application."
-
 
   management:
     back: "RETOUR"
@@ -202,6 +203,19 @@ update:
     update_confirmation: "Confirmation de mise à jour"
     wallet_is_ready: "Votre Ledger Wallet est effacé et prêt à être mis à jour."
     clicking_continue: "La puce sera mise à jour depuis %s vers %s."
+
+  loading:
+    updating_wallet: "Mise à jour en cours"
+    loading: "Chargement de %s..."
+
+  done:
+    successfully_updated: "Votre Ledger Wallet à bien été mis à jour."
+    update_succeeded: "Mise à jour réussie"
+    use_24_words: "Utilisez les 24 mots de votre phrase de restauration pour restaurer vos Bitcoins."
+
+  error:
+    update_failed: "Mise à jour échouée"
+    error_updated: "Une erreur est survenue pendant la mise à jour de votre Ledger Wallet (code: %s)."
 
 wallet:
   defaults:
