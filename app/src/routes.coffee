@@ -128,3 +128,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   route '/update/loading', ->
     app.navigate UPDATE_LAYOUT, UpdateLoadingViewController
+
+  route '/update/done', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateDoneViewController
+
+  route '/update/error', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateErrorViewController

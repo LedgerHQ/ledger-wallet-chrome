@@ -1,0 +1,5 @@
+<div id="view_controller_content">
+  <img src="../assets/images/common/large_check.png" width="50" height="50" />
+  <div class="page-large-indication"><%- t 'update.done.successfully_updated' %></div>
+  <div class="page-indication"><%- t 'update.done.use_24_words' %></div>
+</div>

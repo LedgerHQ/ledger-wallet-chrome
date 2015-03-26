@@ -294,5 +294,7 @@
         'controllers/update/update_unplug_view_controller'
         'controllers/update/update_updating_view_controller'
         'controllers/update/update_loading_view_controller'
+        'controllers/update/update_done_view_controller'
+        'controllers/update/update_error_view_controller'
 
       ]
