@@ -16,6 +16,7 @@ common:
   confirmation: "Confirmation"
   send: "Send"
   continue: "Continue"
+  erase: "Erase"
   yes: "Yes"
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
@@ -189,6 +190,12 @@ update:
     security_card_qrcode: "Security card QR code"
     enter_characters: "Enter your security card QR code 32 characters:"
     on_the_left: "They are printed on the left page of your recovery sheet, below the QR code."
+
+  erasing:
+    erasure_confirmation: "Erasure confirmation"
+    ready_to_start_process: "You are now ready to start the update process."
+    factory_settings: "To continue, your Ledger Wallet needs to be erased to use its factory settings."
+    please_note: "Please note: DO NOT go further if you don’t have your recovery sheet with you."
 
 wallet:
   defaults:

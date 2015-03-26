@@ -16,6 +16,7 @@ common:
   confirmation: "Confirmation"
   send: "Envoyer"
   continue: "Continuer"
+  erase: "Effacer"
   yes: "Oui"
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
@@ -189,6 +190,12 @@ update:
     security_card_qrcode: "Code QR de carte de sécurité"
     enter_characters: "Entrez les 32 caractères du code QR de votre carte de sécurité :"
     on_the_left: "Ils sont situés sur la page de gauche de votre livret de restauration, en dessous du code QR."
+
+  erasing:
+    erasure_confirmation: "Confirmation d'effacement"
+    ready_to_start_process: "Vous êtes maintenant prêt(e) à démarrer le processus de mise à jour."
+    factory_settings: "Pour continuer, votre Ledger Wallet nécessite d'être effacé pour utiliser ses réglages d'usine."
+    please_note: "Note: Veuillez NE PAS continuer si vous ne possédez pas votre livret de restauration."
 
 wallet:
   defaults:

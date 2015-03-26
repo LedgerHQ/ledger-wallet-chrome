@@ -57,7 +57,9 @@ class @UpdateNavigationController extends @NavigationController
 
   _onStateChanged: (newState, oldState) ->
     switch newState
-      when ledger.fup.FirmwareUpdateRequest.States.Erasing then @_onErasingDongle()
+      when ledger.fup.FirmwareUpdateRequest.States.Erasing
+        unless @_request.hasGrantedErasurePermission()
+          @_onErasingDongle()
       when ledger.fup.FirmwareUpdateRequest.States.ReloadingBootloaderFromOs then @_onReloadingBootloaderFromOs()
       when ledger.fup.FirmwareUpdateRequest.States.LoadingOs then @_onLoadingOs()
       when ledger.fup.FirmwareUpdateRequest.States.LoadingBootloaderReloader then @_onLoadingBootloaderReloader()
