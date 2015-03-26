@@ -114,6 +114,7 @@
         'utils/try'
         'utils/comparison_result'
         'utils/amount'
+        'utils/progressbars'
 
         ## Crypto
         'utils/crypto/aes'
@@ -292,7 +293,6 @@
         'controllers/update/update_erasing_view_controller'
         'controllers/update/update_unplug_view_controller'
         'controllers/update/update_updating_view_controller'
-        'controllers/update/update_loados_view_controller'
-        'controllers/update/update_loadblreloader_view_controller'
-        'controllers/update/update_loadbl_view_controller'
+        'controllers/update/update_loading_view_controller'
+
       ]

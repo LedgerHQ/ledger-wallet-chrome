@@ -52,12 +52,12 @@ onboarding:
       unlock_my_wallet: "Unlock my wallet"
       you_can_unplug: "You can now safely unplug your Ledger Wallet."
 
-    connecting:
-      is_connecting: "Verifying authenticity of your Ledger Wallet..."
-
     pin:
       enter_your_pin_code: "Enter your PIN code to unlock your wallet:"
       i_lost_my_pin_code: "If you forgot your PIN code, visit our help center."
+
+    connecting:
+      is_connecting: "Verifying authenticity of your Ledger Wallet..."
 
     opening:
       is_opening: "Please wait while your wallet is opening..."
@@ -83,7 +83,6 @@ onboarding:
       forged:
         device_forged: "This Ledger Wallet is not genuine"
         forbidden_access: "For safety reasons, you are not authorized to use this  application."
-
 
   management:
     back: "BACK"
@@ -202,6 +201,10 @@ update:
     update_confirmation: "Update confirmation"
     wallet_is_ready: "Your Ledger Wallet is erased and ready to be updated."
     clicking_continue: "The firmware will update from %s to %s."
+
+  loading:
+    updating_wallet: "Update in progress"
+    loading: "Loading %s..."
 
 wallet:
   defaults:

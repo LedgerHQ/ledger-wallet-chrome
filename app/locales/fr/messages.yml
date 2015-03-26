@@ -57,7 +57,7 @@ onboarding:
       i_lost_my_pin_code: "Si vous avez oublié votre code PIN, consultez notre centre d'aide."
 
     connecting:
-      is_connecting: "Vérification de l'authenticité de votre Ledger Nano.."
+      is_connecting: "Vérification de l'authenticité de votre Ledger Wallet..."
 
     opening:
       is_opening: "Veuillez patienter pendant l'ouverture de votre portefeuille..."
@@ -83,7 +83,6 @@ onboarding:
       forged:
         device_forged: "Ledger Wallet non authentique"
         forbidden_access: "Pour des raisons de sécurité, vous n'êtes pas autorisé à utiliser cette application."
-
 
   management:
     back: "RETOUR"
@@ -202,6 +201,10 @@ update:
     update_confirmation: "Confirmation de mise à jour"
     wallet_is_ready: "Votre Ledger Wallet est effacé et prêt à être mis à jour."
     clicking_continue: "La puce sera mise à jour depuis %s vers %s."
+
+  loading:
+    updating_wallet: "Mise à jour en cours"
+    loading: "Chargement de %s..."
 
 wallet:
   defaults:
