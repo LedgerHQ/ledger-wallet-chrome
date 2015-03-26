@@ -17,7 +17,7 @@ Firmware =
   V1_4_11: 0x0001040b0146
   V1_4_12: 0x0001040c0146
   V1_4_13: 0x0001040d0146
-  V1_0_0B: 0x20010000010f
+  V_LW_1_0_0: 0x20010000010f
 
 # Ledger OS pubKey, used for pairing.
 Attestation =
@@ -50,10 +50,12 @@ Signals :
 class @ledger.dongle.Dongle extends EventEmitter
 
   # @property
-  device_id: undefined
+  deviceId: undefined
+  # @property
+  productId: undefined
   # @property [String]
   state: States.UNDEFINED
-  # @property [Integer]
+  # @property [ByteString]
   firmwareVersion: undefined
   # @property [Integer]
   operationMode: undefined
@@ -61,27 +63,33 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @property [BtChip]
   _btchip: undefined
   # @property [Array<ledger.wallet.ExtendedPublicKey>]
-  _xpubs = []
+  _xpubs: []
 
   # @private @property [String] pin used to unlock dongle.
   _pin = undefined
 
-  constructor: (@device_id, card) ->
+  constructor: (card) ->
     super
+    deviceId = card.deviceId
+    productId = card.productId
     @_btchip = new BTChip(card)
-    @_recoverFirmwareVersion().then( =>
-      return @_recoverOperationMode()
-    ).then( =>
-      # Set dongle state on failure.
-      @getPublicAddress("0'/0/0").then( =>
-        # @todo Se connecter directement à la carte sans redemander le PIN
-        console.warn("Dongle is already unlock ! Case not handle => Pin Code Required.")
-        @_setState(States.LOCKED)
-      ).catch( ->
+
+    unless @isInBootloaderMode()
+      @_recoverFirmwareVersion().then( =>
+        console.log("FirmwareVersion recovered", @firmwareVersion)
+        @_recoverOperationMode()
+        # Set dongle state on failure.
+        @getPublicAddress("0'/0/0").then( =>
+          # @todo Se connecter directement à la carte sans redemander le PIN
+          console.warn("Dongle is already unlock ! Case not handle => Pin Code Required.")
+          @_setState(States.LOCKED)
+        ).catch( ->
+        ).done()
+      ).catch( (error) =>
+        console.error("Fail to initialize Dongle :", error)
       ).done()
-    ).catch( (error) =>
-      console.error("Fail to initialize Dongle :", error)
-    ).done()
+    else
+      _.defer => @_setState(States.BLANK)
 
   # Called when 
   disconnect: () -> @_setState(States.DISCONNECTED)
@@ -90,7 +98,8 @@ class @ledger.dongle.Dongle extends EventEmitter
   getStringFirmwareVersion: -> @firmwareVersion.byteAt(1) + "." + @firmwareVersion.byteAt(2) + "." + @firmwareVersion.byteAt(3)
   
   # @return [Integer] Firmware version, 0x20010000010f for example.
-  getIntFirmwareVersion: -> @firmwareVersion
+  getIntFirmwareVersion: ->
+    parseInt(@firmwareVersion.toString(HEX), 16)
 
   ###
     Gets the raw version {ByteString} of the dongle.
@@ -125,6 +134,9 @@ class @ledger.dongle.Dongle extends EventEmitter
       console.error("Fail to getRawFirmwareVersion :", error)
     .done()
     completion.readonly()
+
+  # @return [Boolean]
+  isInBootloaderMode: -> if @productId is 0x1808 or @productId is 0x1807 then yes else no
 
   # @return [ledger.fup.FirmwareUpdater]
   getFirmwareUpdater: () -> ledger.fup.FirmwareUpdater.instance
@@ -189,7 +201,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       # 19.7. SET OPERATION MODE
       @_sendApdu(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
       .then =>
-        if @firmwareVersion >= ledger.dongle.Firmware.V1_4_13
+        if @getIntFirmwareVersion() >= ledger.dongle.Firmware.V1_4_13
           # 19.7. SET OPERATION MODE
           @_sendApdu(0xE0, 0x26, 0x01, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).fail(=> e('Unlock FAIL', arguments)).done()
         @_setState(States.UNLOCKED)
@@ -209,7 +221,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         error.code = Error.DongleLocked
       else
         @_setState(States.ERROR)
-      if data.match(/63c\d/)
+      if err.match(/63c\d/)
         error.retryCount = parseInt(err.substr(-1))
       completion.failure(error)
     .catch (error) ->
@@ -255,7 +267,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       keyMap || BTChip.QWERTY_KEYMAP_NEW,
       restoreSeed?,
       bytesSeed
-    ).then( ->
+    ).then( =>
       if restoreSeed?
         msg = "Seed restored, please reopen the extension"
       else
