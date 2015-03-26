@@ -76,6 +76,7 @@ require @ledger.imports, ->
               ledger.tasks.OperationsConsumptionTask.instance.start()
 
     onDongleIsDisconnected: (wallet) ->
+      @emit 'dongle:disconnected'
       return unless @isInWalletMode()
       @_releaseWallet()
 

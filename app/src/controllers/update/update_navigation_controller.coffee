@@ -11,6 +11,10 @@ class @UpdateNavigationController extends @NavigationController
     @_request.on 'unplug', =>  @_onDongleNeedPowerCycle()
     @_request.on 'stateChanged', (ev, data) => @_onStateChanged(data.newState, data.oldState)
     @_request.on 'needsUserApproval', @_onNeedsUserApproval
+    ledger.app.on 'dongle:disconnected', =>
+      if _(@topViewController()).isKindOf(UpdateIndexViewController) or _(@topViewController()).isKindOf(UpdateSeedViewController)
+        ledger.app.setExecutionMode(ledger.app.Modes.Wallet)
+        ledger.app.router.go '/onboarding/device/plug', animateIntro: no
     @_request.onProgress @_onProgress.bind(@)
     ledger.fup.FirmwareUpdater.instance.load =>
     window.fup = @_request # TODO: REMOVE THIS
