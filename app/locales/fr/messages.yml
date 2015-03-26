@@ -53,6 +53,9 @@ onboarding:
       enter_your_pin_code: "Entez votre code PIN pour dévérouiller votre portefeuille :"
       i_lost_my_pin_code: "Si vous avez oublié votre code PIN, consultez notre centre d'aide."
 
+    connecting:
+      is_connecting: "Connexion à votre Ledger Wallet..."
+
     opening:
       is_opening: "Veuillez patienter pendant l'ouverture de votre portefeuille..."
       is_synchronizing: "Synchronisation de votre portefeuille. Ceci peut prendre plusieurs minutes..."

@@ -40,18 +40,11 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
     , 1500
 
   navigateContinue: ->
-    if ledger.app.wallet.isInBootloaderMode()
-      ledger.app.setExecutionMode(ledger.app.Modes.FirmwareUpdate)
-      return
-    ledger.app.wallet.getState (state) =>
-      if state == ledger.wallet.States.LOCKED
-        ledger.app.router.go '/onboarding/device/pin'
-      else
-        ledger.app.router.go '/onboarding/management/welcome'
+    ledger.app.router.go '/onboarding/device/connecting'
 
   _listenEvents: ->
     if ledger.app.wallet?
       do @navigateContinue
     else
-      ledger.app.once 'dongle:connected', =>
+      ledger.app.once 'dongle:connecting', =>
         do @navigateContinue

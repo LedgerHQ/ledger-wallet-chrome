@@ -249,6 +249,7 @@
         'controllers/onboarding/device/onboarding_device_pin_view_controller'
         'controllers/onboarding/device/onboarding_device_opening_view_controller'
         'controllers/onboarding/device/onboarding_device_error_view_controller'
+        'controllers/onboarding/device/onboarding_device_connecting_view_controller'
 
         # Management
         'controllers/onboarding/management/onboarding_management_security_view_controller'

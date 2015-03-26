@@ -49,6 +49,9 @@ onboarding:
       unlock_my_wallet: "Unlock my wallet"
       you_can_unplug: "You can now safely unplug your Ledger Wallet."
 
+    connecting:
+      is_connecting: "Connecting your Ledger Wallet..."
+
     pin:
       enter_your_pin_code: "Enter your PIN code to unlock your wallet:"
       i_lost_my_pin_code: "If you forgot your PIN code, visit our help center."

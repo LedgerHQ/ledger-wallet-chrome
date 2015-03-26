@@ -23,6 +23,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/device/unplug', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUnplugViewController
 
+  route '/onboarding/device/connecting', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceConnectingViewController
+
   route '/onboarding/device/pin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDevicePinViewController
 

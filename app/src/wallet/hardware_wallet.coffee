@@ -203,28 +203,18 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       attestation = result.toString(HEX)
       dataToSign = attestation.substring(16,32) + random
       dataSig = attestation.substring(32)
-      l 'Signed before', dataSig
       dataSig = "30" + dataSig.substr(2)
       dataSigBytes = (parseInt(n,16) for n in dataSig.match(/\w\w/g))
-      l 'Random ', random
-      l 'Data to sign', dataToSign
-      l 'Attestation', Attestation.String
-      l 'Signed', dataSig
-      l 'Bytes', dataSigBytes
       sha = new JSUCrypt.hash.SHA256()
       domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
       affinePoint = new JSUCrypt.ECFp.AffinePoint(Attestation.xPoint, Attestation.yPoint)
       pubkey = new JSUCrypt.key.EcFpPublicKey(256, domain, affinePoint)
       ecsig = new JSUCrypt.signature.ECDSA(sha)
       ecsig.init(pubkey, JSUCrypt.signature.MODE_VERIFY)
-      l 'att', ecsig.verify(dataToSign, dataSigBytes)
       if ecsig.verify(dataToSign, dataSigBytes)
-        l 'Attestation OK'
         completion.success(this)
       else
-        l 'Wrong attestation'
         completion.failure(new ledger.StandardError(ledger.errors.DongleNotCertified))
-      l Attestation
       return
     .fail (err) =>
       e err

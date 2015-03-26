@@ -145,9 +145,10 @@ class ledger.base.application.BaseApplication extends @EventEmitter
       wallet.once 'state:unlocked', =>
         (Try => @onDongleIsUnlocked(wallet)).printError()
       (Try => @onDongleConnected(wallet)).printError()
-      wallet.isDongleCertified (dongle, error) =>
-        l arguments
-        (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
+      if wallet.isInBootloaderMode()
+        (Try => @onDongleIsInBootloaderMode(wallet)).printError()
+      else
+        wallet.isDongleCertified (dongle, error) => (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
 
 
   _listenDongleEvents: () ->
@@ -165,12 +166,14 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   onConnectingDongle: (card) ->
 
-  onDongleConnected: (wallet) ->
+  onDongleConnected: (dongle) ->
 
-  onDongleNeedsUnplug: (wallet) ->
+  onDongleNeedsUnplug: (dongle) ->
 
-  onDongleIsUnlocked: (wallet) ->
+  onDongleIsUnlocked: (dongle) ->
 
-  onDongleIsDisconnected: (wallet) ->
+  onDongleIsDisconnected: (dongle) ->
 
-  onDongleCertificationDone: (wallet, isCertified) ->
+  onDongleCertificationDone: (dongle, isCertified) ->
+
+  onDongleIsInBootloaderMode: (dongle) ->
