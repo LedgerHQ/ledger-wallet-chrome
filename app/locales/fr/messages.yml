@@ -17,6 +17,7 @@ common:
   send: "Envoyer"
   continue: "Continuer"
   erase: "Effacer"
+  update: "Mettre à jour"
   yes: "Oui"
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
@@ -196,6 +197,11 @@ update:
     ready_to_start_process: "Vous êtes maintenant prêt(e) à démarrer le processus de mise à jour."
     factory_settings: "Pour continuer, votre Ledger Wallet nécessite d'être effacé pour utiliser ses réglages d'usine."
     please_note: "Note: Veuillez NE PAS continuer si vous ne possédez pas votre livret de restauration."
+
+  updating:
+    update_confirmation: "Confirmation de mise à jour"
+    wallet_is_ready: "Votre Ledger Wallet est effacé et prêt à être mis à jour."
+    clicking_continue: "La puce sera mise à jour depuis %s vers %s."
 
 wallet:
   defaults:

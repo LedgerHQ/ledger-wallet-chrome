@@ -44,7 +44,7 @@ class @UpdateNavigationController extends @NavigationController
     ledger.app.router.go '/update/unplug'
 
   _onReloadingBootloaderFromOs: ->
-    ledger.app.router.go '/update/reloadblfromos'
+    ledger.app.router.go '/update/updating'
 
   _onLoadingOs: ->
     ledger.app.router.go '/update/loados'

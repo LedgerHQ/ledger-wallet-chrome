@@ -1,0 +1,5 @@
+<div id="view_controller_content">
+  <img src="../assets/images/update/skyrocket.png" width="46" height="46" />
+  <div class="page-large-indication"><%- t 'update.updating.wallet_is_ready' %></div>
+  <div class="page-indication"><%= _.str.sprintf(t('update.updating.clicking_continue'), @dongleVersion, @targetVersion) %></div>
+</div>
