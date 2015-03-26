@@ -4,6 +4,6 @@ class @OnboardingManagementSecurityViewController extends @OnboardingViewControl
     continueUrl: '/onboarding/management/pin'
 
   navigationContinueParams: ->
-    dongle_mode: @params.dongle_mode
+    wallet_mode: @params.wallet_mode
     rootUrl: @params.rootUrl
     back: @representativeUrl()

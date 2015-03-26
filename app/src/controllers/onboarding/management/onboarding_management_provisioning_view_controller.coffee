@@ -5,5 +5,5 @@ class @OnboardingManagementProvisioningViewController extends @OnboardingViewCon
     @view.spinner = ledger.spinners.createLargeSpinner(@select('div.greyed-container')[0])
     ledger.app.dongle.setup @params.pin, @params.seed, (success) =>
       setTimeout =>
-        ledger.app.router.go '/onboarding/management/done', if success then {dongle_mode: @params.dongle_mode} else {dongle_mode: @params.dongle_mode, error: 1}
+        ledger.app.router.go '/onboarding/management/done', if success then {wallet_mode: @params.wallet_mode} else {wallet_mode: @params.wallet_mode, error: 1}
       , 3000

@@ -4,7 +4,7 @@ class @OnboardingManagementSummaryViewController extends @OnboardingViewControll
     continueUrl: '/onboarding/management/provisioning'
 
   navigationContinueParams: ->
-    dongle_mode: @params.dongle_mode
+    wallet_mode: @params.wallet_mode
     back: @representativeUrl()
     pin: @params.pin
     rootUrl: @params.rootUrl

@@ -10,11 +10,11 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
 
   initialize: ->
     super
-    if @params.dongle_mode == 'create'
+    if @params.wallet_mode == 'create'
       @params.mnemonic = ledger.bitcoin.bip39.generateMnemonic()
 
   navigationContinueParams: ->
-    dongle_mode: @params.dongle_mode
+    wallet_mode: @params.wallet_mode
     back: @representativeUrl()
     pin: @params.pin
     rootUrl: @params.rootUrl
@@ -45,7 +45,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
   _listenEvents: ->
     for input in @view.inputs
       input.on 'keydown', =>
-        return if @params.dongle_mode == 'create'
+        return if @params.wallet_mode == 'create'
         setTimeout =>
           @params.mnemonic = @_writtenMnemonic()
           do @_updateUI
@@ -54,14 +54,14 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
   _updateUI: (animated = yes) ->
     if animated == no
       # hide indication label
-      if @params.dongle_mode == 'create'
+      if @params.wallet_mode == 'create'
         @view.indicationLabel.show()
       else
         @view.indicationLabel.hide()
 
       # switch of readonly
       for input in @view.inputs
-        if @params.dongle_mode == 'create'
+        if @params.wallet_mode == 'create'
           input.prop 'readonly', yes
           input.prop 'disabled', yes
         else

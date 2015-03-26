@@ -27,7 +27,7 @@ class @OnboardingManagementPinViewController extends @OnboardingViewController
     do @_updateUI
 
   navigationContinueParams: ->
-    dongle_mode: @params.dongle_mode
+    wallet_mode: @params.wallet_mode
     pin: @params.pin
     back: @representativeUrl()
     rootUrl: @params.rootUrl
