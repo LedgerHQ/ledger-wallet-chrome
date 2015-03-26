@@ -12,6 +12,7 @@
         '../libs/sjcl/sha512'
         '../libs/jquery.selectric.min'
         '../libs/qrcode.min'
+        '../libs/jquery.suggest'
         '../public/tooltipster/js/jquery.tooltipster.min'
         '../libs/lw-api-js/lib/bitcoinjs-min'
         '../libs/lw-api-js/lib/util'
@@ -206,7 +207,7 @@
 
         ## Dialog Management
         'utils/dialogs'
-        '../views/base/dialog'
+        '../views/common/dialogs/dialog'
         'base/dialog_view_controller'
 
         ## Common controllers
@@ -233,8 +234,7 @@
         'controllers/wallet/send/wallet_send_card_dialog_view_controller'
         'controllers/wallet/send/wallet_send_processing_dialog_view_controller'
         'controllers/wallet/send/wallet_send_preparing_dialog_view_controller'
-        'controllers/wallet/send/wallet_send_error_dialog_view_controller'
-        'controllers/wallet/send/wallet_send_success_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_validating_dialog_view_controller'
         'controllers/wallet/send/wallet_send_method_dialog_view_controller'
 
         # Receive
@@ -250,6 +250,7 @@
         'controllers/onboarding/device/onboarding_device_pin_view_controller'
         'controllers/onboarding/device/onboarding_device_opening_view_controller'
         'controllers/onboarding/device/onboarding_device_error_view_controller'
+        'controllers/onboarding/device/onboarding_device_connecting_view_controller'
 
         # Management
         'controllers/onboarding/management/onboarding_management_security_view_controller'
@@ -286,9 +287,13 @@
         ## Update controllers
         'controllers/update/update_navigation_controller'
         'controllers/update/update_view_controller'
+        'controllers/update/update_index_view_controller'
         'controllers/update/update_plug_view_controller'
         'controllers/update/update_seed_view_controller'
         'controllers/update/update_erasing_view_controller'
         'controllers/update/update_unplug_view_controller'
-
+        'controllers/update/update_updating_view_controller'
+        'controllers/update/update_loados_view_controller'
+        'controllers/update/update_loadblreloader_view_controller'
+        'controllers/update/update_loadbl_view_controller'
       ]

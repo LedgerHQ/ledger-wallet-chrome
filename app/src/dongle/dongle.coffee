@@ -20,9 +20,14 @@ Firmware =
   V_LW_1_0_0: 0x20010000010f
 
 # Ledger OS pubKey, used for pairing.
+ProductionAttestation = "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
+BetaAttestation = "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
+
 Attestation =
-  String: "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
+  String: ProductionAttestation
 Attestation.Bytes = parseInt(hex, 16) for hex in Attestation.String.match(/\w\w/g)
+Attestation.xPoint = Attestation.String.substr(2,64)
+Attestation.yPoint = Attestation.String.substr(64)
 
 # This path do not need a verified PIN to sign messages.
 BitIdRootPath = "0'/0/0xb11e"

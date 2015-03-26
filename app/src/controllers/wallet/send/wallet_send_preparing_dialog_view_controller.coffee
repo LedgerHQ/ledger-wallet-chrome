@@ -18,18 +18,28 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
           when ledger.errors.NetworkError then 'network_no_response'
           when ledger.errors.NotEnoughFunds then 'unsufficient_balance'
         @dismiss =>
-          dialog = new WalletSendErrorDialogViewController reason: reason
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors." + reason))
           dialog.show()
       else
-        dialog = switch transaction.getValidationMode()
-          when ledger.wallet.transaction.Transaction.ValidationModes.KEYCARD
-              new WalletSendCardDialogViewController transaction: transaction
-          when ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN
-              new WalletSendMobileDialogViewController transaction: transaction
-        @getDialog().push dialog
+        @_routeToNextDialog(transaction)
 
-  onDismiss: ->
-    super
+  _routeToNextDialog: (transaction) ->
+    cardBlock = (transaction) =>
+      @getDialog().push new WalletSendValidatingDialogViewController(transaction: transaction, options: {hideOtherValidationMethods: true}, validationMode: 'card')
+    mobileBlock = (transaction, secureScreens) =>
+      @getDialog().push new WalletSendValidatingDialogViewController(transaction: transaction, secureScreens: secureScreens, validationMode: 'mobile')
+    methodBlock = (transaction) =>
+      @getDialog().push new WalletSendMethodDialogViewController(transaction: transaction)
 
-  onDetach: ->
-    super
+    # if mobile validation is supported
+    if ledger.app.wallet.getIntFirmwareVersion() >= ledger.wallet.Firmware.V_LW_1_0_0
+      # fetch grouped paired screens
+      ledger.m2fa.PairedSecureScreen.getAllGroupedByUuidFromSyncedStore (groups, error) =>
+        groups = _.values(_.omit(groups, undefined)) if groups?
+        ## if paired and only one pairing id exists
+        if error? or not groups? or groups.length != 1
+          methodBlock(transaction)
+        else
+          mobileBlock(transaction, groups[0])
+    else
+      cardBlock(transaction)

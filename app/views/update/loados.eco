@@ -1,0 +1,8 @@
+<div style="background-color: #ba9d37;width: 100%;height: 100%">
+  Loading OS <p id="version"></p>
+
+  <div id="progress" style="font-size: xx-large; color: #ffffff;">
+    0%
+  </div>
+
+</div>

@@ -111,7 +111,7 @@ class @ledger.dialogs.DialogsController
 
     @_selector.show(0, =>  @_selector.addClass('display')) if @_dialogs.length is 0
 
-    @_selector.append(JST['base/dialog']({dialog_id: dialog._id}))
+    @_selector.append(JST['common/dialogs/dialog']({dialog_id: dialog._id}))
     @_selector.find("#dialog_#{dialog._id}").on 'click', ((e) -> e.preventDefault())
     if @_dialogs.length == 0
       @_selector.show()

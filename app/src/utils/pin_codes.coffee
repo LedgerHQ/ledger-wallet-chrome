@@ -307,6 +307,11 @@ class ledger.pin_codes.PinCode extends EventEmitter
         return if !self.isEnabled() or self.isReadonly()
         e.preventDefault()
 
+    # listen click on element
+    $(@_el).on 'click', ->
+      if !self.isEnabled()
+        self.emit 'click'
+
     # listen changes in input
     $(@_input()).on 'change keyup keydown focus blur', (e) ->
       return if !self.isEnabled() or self.isReadonly()

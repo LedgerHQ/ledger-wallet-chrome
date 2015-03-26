@@ -10,14 +10,15 @@ class @WalletSendProcessingDialogViewController extends @DialogViewController
 
   _startSignature: ->
     # sign transaction
-    @params.transaction.validate @params.keycode, (transaction, error) =>
+    validation = if @params.keycode? then @params.transaction.validateWithKeycard(@params.keycode) else @params.transaction.validateWithPinCode(@params.pincode)
+    validation.onComplete (transaction, error) =>
       return if not @isShown()
       if error?
         @dismiss =>
           reason = switch error.code
             when ledger.errors.SignatureError then 'wrong_keycode'
             when ledger.errors.UnknownError then 'unknown'
-          dialog = new WalletSendErrorDialogViewController reason: reason
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors." + reason))
           dialog.show()
       else
         @_startSending()
@@ -28,8 +29,8 @@ class @WalletSendProcessingDialogViewController extends @DialogViewController
       return if not @isShown()
       @dismiss =>
         if error?
-          dialog = new WalletSendErrorDialogViewController reason: 'network_no_response'
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.network_no_response"))
           dialog.show()
         else
-          dialog = new WalletSendSuccessDialogViewController
+          dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.send.errors.sending_succeeded"), subtitle: t("wallet.send.errors.transaction_completed"))
           dialog.show()

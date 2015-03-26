@@ -96,6 +96,14 @@ class AuthenticatedHttpClient extends @HttpClient
       @_authToken = data['token']
       deferred.resolve()
 
+  getAuthToken: (callback = null) ->
+    completion = new CompletionClosure(callback)
+    if @isAuthenticated()
+      completion.success(@_authToken)
+    else
+      @_authenticate().then(-> completion.success(@_authToken)).fail((ex) -> completion.failure(ex))
+    completion.readonly()
+
   @instance: (baseUrl = ledger.config.restClient.baseUrl) -> @_instance ?= new @(baseUrl)
 
 _.extend ledger.api,

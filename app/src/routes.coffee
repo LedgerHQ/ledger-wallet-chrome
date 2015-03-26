@@ -13,7 +13,7 @@ ledger.router.pluggedWalletRoutesExceptions = [
     if app.isInWalletMode()
       app.router.go '/onboarding/device/plug', {animateIntro: yes}
     else
-      app.router.go '/update/seed'
+      app.router.go '/update/index'
 
   ## Onboarding
   # Device
@@ -22,6 +22,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   route '/onboarding/device/unplug', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUnplugViewController
+
+  route '/onboarding/device/connecting', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceConnectingViewController
 
   route '/onboarding/device/pin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDevicePinViewController
@@ -48,6 +51,12 @@ ledger.router.pluggedWalletRoutesExceptions = [
     app.router.go '/onboarding/device/error',
       error: t 'onboarding.device.errors.unsupported.device_unsupported'
       message: t 'onboarding.device.errors.unsupported.unsuported_kind'
+      indication: t 'onboarding.device.errors.unsupported.get_help'
+
+  route '/onboarding/device/forged', (params) ->
+    app.router.go '/onboarding/device/error',
+      error: t 'onboarding.device.errors.forged.device_forged'
+      message: t 'onboarding.device.errors.forged.forbidden_access'
       indication: t 'onboarding.device.errors.unsupported.get_help'
 
   # Management
@@ -90,11 +99,6 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new WalletReceiveIndexDialogViewController()
     dialog.show()
 
-  # Pairing
-  route '/wallet/pairing/index', (params) ->
-    dialog = new WalletPairingIndexDialogViewController()
-    dialog.show()
-
   # Help
   route '/wallet/help/index', (params) ->
     window.open t 'application.support_url'
@@ -104,15 +108,29 @@ ledger.router.pluggedWalletRoutesExceptions = [
     app.navigate WALLET_LAYOUT, WalletOperationsIndexViewController
 
   ## Firmware Update
+  route '/update/index', (params) ->
+    app.navigate UPDATE_LAYOUT, UpdateIndexViewController
 
-  route 'update/plug', (params) ->
+  route '/update/plug', (params) ->
     app.navigate UPDATE_LAYOUT, UpdatePlugViewController
 
-  route 'update/unplug', (params) ->
+  route '/update/unplug', (params) ->
     app.navigate UPDATE_LAYOUT, UpdateUnplugViewController
 
-  route 'update/seed', (param) ->
+  route '/update/seed', (param) ->
     app.navigate UPDATE_LAYOUT, UpdateSeedViewController
 
-  route 'update/erasing', (param) ->
+  route '/update/erasing', (param) ->
     app.navigate UPDATE_LAYOUT, UpdateErasingViewController
+
+  route '/update/updating', ->
+    app.navigate UPDATE_LAYOUT, UpdateUpdatingViewController
+
+  route '/update/loados', ->
+    app.navigate UPDATE_LAYOUT, UpdateLoadosViewController
+
+  route '/update/loadbl', ->
+    app.navigate UPDATE_LAYOUT, UpdateLoadblViewController
+
+  route '/update/loadrblreloader', ->
+    app.navigate UPDATE_LAYOUT, UpdateLoadblreloaderViewController

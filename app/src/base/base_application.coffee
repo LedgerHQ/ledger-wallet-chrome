@@ -149,3 +149,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   onDongleIsUnlocked: (dongle) ->
 
   onDongleIsDisconnected: (dongle) ->
+
+  onDongleCertificationDone: (dongle, isCertified) ->
+
+  onDongleIsInBootloaderMode: (dongle) ->

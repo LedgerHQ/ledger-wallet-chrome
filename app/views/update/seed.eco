@@ -1,7 +1,12 @@
-<div style="background-color: #008800;width: 100%;height: 100%">
-
-  Seed
-  <input id="seed_input" type="text" />
-  <button data-href="#submitSeed">OK</button>
-
+<div id="view_controller_content">
+  <div class="page-large-indication"><%- t 'update.seed.enter_characters' %></div>
+  <div class="page-indication"><%- t 'update.seed.on_the_left' %></div>
+  <div class="seed_container">
+    <div class="spacer"></div>
+    <div class="seed"></div>
+    <input id="seed_input" spellcheck="false" maxlength="32"></input>
+    <div class="spacer">
+      <img id="valid_check" src="../assets/images/common/large_check.png" width="30" height="30" />
+    </div>
+  </div>
 </div>

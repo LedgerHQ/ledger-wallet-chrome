@@ -19,7 +19,7 @@ class TryResult
   getError: () -> @_error
   getValue: () -> @_value
   isFailure: -> if @_error? then yes else no
-  isSuccess: -> not @isSuccess()
+  isSuccess: -> not @isFailure()
 
   then: (func) -> @promise().then(func)
   fail: (func) -> @promise().fail(func)

@@ -5,6 +5,8 @@ DevicesInfo = [
   {productId: 0x1b7c, vendorId: 0x2581, type: 'usb'}
   {productId: 0x2b7c, vendorId: 0x2581, type: 'hid'}
   {productId: 0x3b7c, vendorId: 0x2581, type: 'hid'}
+  {productId: 0x1808, vendorId: 0x2581, type: 'usb'}
+  {productId: 0x1807, vendorId: 0x2581, type: 'hid'}
 ]
 
 # A dongle manager for keeping the dongles registry and observing dongle state.
@@ -19,6 +21,8 @@ class @ledger.dongle.Manager extends EventEmitter
 
   constructor: (app) ->
     @cardFactory = new ChromeapiPlugupCardTerminalFactory()
+    @factoryDongleBootloader = new ChromeapiPlugupCardTerminalFactory(0x1808)
+    @factoryDongleBootloaderHID = new ChromeapiPlugupCardTerminalFactory(0x1807)
 
   # Start observing if dongles are plugged in or unnplugged
   start: () ->
@@ -55,14 +59,22 @@ class @ledger.dongle.Manager extends EventEmitter
 
   _connectDongle: (deviceId) ->
     try
-      @cardFactory.list_async().then (result) =>
+      result = []
+      @cardFactory.list_async()
+      .then (cards) =>
+        result = result.concat(cards)
+        @factoryDongleBootloader.list_async()
+      .then (cards) =>
+        result = result.concat(cards)
+        @factoryDongleBootloaderHID.list_async()
+      .then (cards) =>
+        result = result.concat(cards)
         return if result.length == 0
         @cardFactory.getCardTerminal(result[0]).getCard_async().then (card) =>
           @_dongles[deviceId] = new ledger.dongle.Dongle(card)
-          @_dongles[deviceId].once 'state:locked', (event) =>
-            @emit 'connected', @_dongles[deviceId]
-          @_dongles[deviceId].once 'state:blank', (event) =>
-            @emit 'connected', @_dongles[deviceId]
+          @_dongles[deviceId].once 'state:locked', (event) => @emit 'connected', @_dongles[deviceId]
+          @_dongles[deviceId].once 'state:blank', (event) => @emit 'connected', @_dongles[deviceId]
+          @_dongles[deviceId].once 'forged', (event) => @emit 'forged', @_dongles[deviceId]
           @_dongles[deviceId].once 'state:disconnected', (event) =>
             delete @_dongles[deviceId]
             @emit 'disconnected', @_dongles[deviceId]

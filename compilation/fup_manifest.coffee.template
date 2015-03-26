@@ -17,37 +17,52 @@ _.extend ledger.fup.versions,
 
 ledger.fup.updates ?= {}
 
-_.extend ledger.fup.updates,
+ledger.fup.setupUpdates = ->
 
-  RELOADER_FROM_BL: [
+  _.extend ledger.fup.updates,
 
-    <% for e in @reloader_from_bl:%><%= e %>
-    <% end %>
-  ]
+    RELOADER_FROM_BL: [
 
-  BL_LOADER: [
-
-    <% for e in @bl_loader:%><%= e %>
-    <% end %>
-  ]
-
-  OS_LOADER: [
-
-    <% for e in @os_loader:%><%= e %>
-    <% end %>
-  ]
-
-  BL_RELOADER: [
-
-    <%for e in @bl_reloader: %>[<%- e[0] %>, <%= e[1] %>]
-    <% end %>
-  ]
-
-  OS_INIT: [
-
-      <%for e in @os_init: %>[<%- e[0] %>, <%= e[1] %>]
+      <% for e in @reloader_from_bl:%><%= e %>
       <% end %>
-  ]
+    ]
+
+    BL_LOADER: [
+
+      <% for e in @bl_loader:%><%= e %>
+      <% end %>
+    ]
+
+    OS_LOADER: [
+
+      <% for e in @os_loader:%><%= e %>
+      <% end %>
+    ]
+
+    BL_RELOADER: [
+
+      <%for e in @bl_reloader: %>[<%- e[0] %>, <%= e[1] %>]
+      <% end %>
+    ]
+
+    OS_INIT: [
+
+        <%for e in @os_init: %>[<%- e[0] %>, <%= e[1] %>]
+        <% end %>
+    ]
+
+ledger.fup.clearUpdates = ->
+  ledger.fup.updates = {}
+  <% for e in @reloader_from_bl: %>window.<%= e %> = undefined
+  <% end %>
+  <% for e in @bl_loader: %>window.<%= e %> = undefined
+  <% end %>
+  <% for e in @os_loader: %>window.<%= e %> = undefined
+  <% end %>
+  <% for e in @bl_reloader: %>window.<%= e[1] %> = undefined
+  <% end %>
+  <% for e in @os_init: %>window.<%= e[1] %> = undefined
+  <% end %>
 
 ledger.fup.imports = [
 

@@ -18,7 +18,6 @@
           <div class="action-bar">
             <a class="action-rounded-button" href="/wallet/send/index"><%= t 'wallet.accounts.show.detail.send' %></a>
             <a class="action-rounded-button" href="/wallet/receive/index"><%= t 'wallet.accounts.show.detail.receive' %></a>
-            <a class="action-rounded-button" href="/wallet/pairing/index">Pairing</a>
           </div>
         </td>
       </tr>
