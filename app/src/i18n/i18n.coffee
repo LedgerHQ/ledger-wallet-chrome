@@ -273,14 +273,20 @@ class ledger.i18n
     .catch (err) -> l(err)
     .done()
     tag = @favLang.memoryValue || @browserUiLang
-    l @favLang.memoryValue
-    l tag
+    # set memoryValue
+    @favLang.memoryValue ?= tag
     # set tag language to one of the store
     #l 'set tag to chrome store'
     @chromeStore.set({i18n_favLang: tag})
     if ledger.storage.sync?
       #l 'set tag to sync store'
       ledger.storage.sync.set({i18n_favLang: tag})
+    # Update @syncStoreIsSet and @chromeStoreIsSet
+    @checkLangIntoStores()
+    # Update @syncStoreValue and @chromeStoreValue
+    .then(@setFavLangStoreValues)
+    .catch (err) -> l err
+    .done
     deferred.resolve()
     return deferred.promise
 
@@ -304,10 +310,10 @@ class ledger.i18n
     # Update everything
     @setFavLangStoreValues() # set chromeStoreValue and syncStoreValue
     .then () =>
-      #l 'Lang: check sync'
+      # l 'Lang: check sync'
       @checkFavLangSyncStoreEqChromeStore()
     .catch (err) =>
-      #l err, ' - Lang: syncing'
+      # l err, ' - Lang: syncing'
       @syncLangStores()
     deferred.resolve()
     return deferred.promise
@@ -342,13 +348,6 @@ class ledger.i18n
   ###
   @checkLangIntoStores: () =>
     deferred = Q.defer()
-    @chromeStore.get 'i18n_favLang', (r) =>
-      if r.i18n_favLang isnt undefined
-        @favLang.chromeStoreIsSet = true
-        deferred.resolve('@chromeStore.get r.i18n_favLang ' + r.i18n_favLang + ' is set into chromeStore')
-      else
-        @favLang.chromeStoreIsSet = false
-        deferred.reject('@chromeStore.get r.i18n_favLang ' + r.i18n_favLang + ' is not set into chromeStore')
     if ledger.storage.sync?
       ledger.storage.sync.get 'i18n_favLang', (r) =>
         if r.i18n_favLang isnt undefined
@@ -356,7 +355,15 @@ class ledger.i18n
           deferred.resolve('ledger.storage.sync.get r.i18n_favLang ' + r.i18n_favLang + ' is set into syncStore')
         else
           @favLang.syncStoreIsSet = false
-          deferred.reject('ledger.storage.sync.get r.i18n_favLang is not set into syncStore')
+          deferred.reject('ledger.storage.sync.get r.i18n_favLang' + r.i18n_favLang + ' is not set into syncStore')
+    else
+      @chromeStore.get 'i18n_favLang', (r) =>
+        if r.i18n_favLang isnt undefined
+          @favLang.chromeStoreIsSet = true
+          deferred.resolve('@chromeStore.get r.i18n_favLang ' + r.i18n_favLang + ' is set into chromeStore')
+        else
+          @favLang.chromeStoreIsSet = false
+          deferred.reject('@chromeStore.get r.i18n_favLang ' + r.i18n_favLang + ' is not set into chromeStore')
     return deferred.promise
 
 
