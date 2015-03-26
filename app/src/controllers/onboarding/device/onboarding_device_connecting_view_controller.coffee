@@ -31,11 +31,16 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
         ledger.app.router.go '/onboarding/management/welcome'
 
   navigateError: ->
-    ledger.app.router.go '/onboarding/device/unsupported'
+    ledger.app.router.go '/onboarding/device/forged'
 
   _listenEvents: ->
     if ledger.app.wallet?
-      do @navigateContinue
+      ledger.app.wallet.isDongleCertified (__, error) =>
+        return unless ledger.app.wallet?
+        unless error?
+          do @navigateContinue
+        else
+          do @navigateError
     else
       ledger.app.once 'dongle:connected', => do @navigateContinue
       ledger.app.once 'dongle:forged', => do @navigateError

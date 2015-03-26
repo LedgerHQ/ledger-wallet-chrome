@@ -55,7 +55,7 @@ onboarding:
       i_lost_my_pin_code: "Si vous avez oublié votre code PIN, consultez notre centre d'aide."
 
     connecting:
-      is_connecting: "Connexion à votre Ledger Wallet..."
+      is_connecting: "Vérification de l'authenticité de votre Ledger Nano.."
 
     opening:
       is_opening: "Veuillez patienter pendant l'ouverture de votre portefeuille..."
@@ -77,6 +77,11 @@ onboarding:
         device_unsupported: "Portefeuille non pris en charge"
         unsuported_kind: "Ce type de portefeuille n’est pas pris en charge par l’application Ledger Wallet."
         get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
+
+      forged:
+        device_forged: "Ledger Wallet non authentique"
+        forbidden_access: "Pour des raisons de sécurité, vous n'êtes pas autorisé à utiliser cette application."
+
 
   management:
     back: "RETOUR"

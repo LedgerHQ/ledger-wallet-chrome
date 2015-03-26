@@ -53,6 +53,12 @@ ledger.router.pluggedWalletRoutesExceptions = [
       message: t 'onboarding.device.errors.unsupported.unsuported_kind'
       indication: t 'onboarding.device.errors.unsupported.get_help'
 
+  route '/onboarding/device/forged', (params) ->
+    app.router.go '/onboarding/device/error',
+      error: t 'onboarding.device.errors.forged.device_forged'
+      message: t 'onboarding.device.errors.forged.forbidden_access'
+      indication: t 'onboarding.device.errors.unsupported.get_help'
+
   # Management
   route '/onboarding/management/security', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementSecurityViewController

@@ -51,7 +51,7 @@ onboarding:
       you_can_unplug: "You can now safely unplug your Ledger Wallet."
 
     connecting:
-      is_connecting: "Connecting your Ledger Wallet..."
+      is_connecting: "Verifying authenticity of your Ledger Wallet..."
 
     pin:
       enter_your_pin_code: "Enter your PIN code to unlock your wallet:"
@@ -77,6 +77,11 @@ onboarding:
         device_unsupported: "Unsupported wallet"
         unsuported_kind: "This type of wallet is not supported by the Ledger Wallet application."
         get_help: "Please visit our help center at support.ledgerwallet.com for more information."
+
+      forged:
+        device_forged: "This Ledger Wallet is not genuine"
+        forbidden_access: "For safety reasons, you are not authorized to use this  application."
+
 
   management:
     back: "BACK"
