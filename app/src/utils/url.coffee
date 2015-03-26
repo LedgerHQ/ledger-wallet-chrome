@@ -22,10 +22,20 @@
       params = parser.search.substring(1)
       _.chain(params.split('&')).map (params) ->
         p = params.split '='
-        [decodeURIComponent(p[0]), decodeURIComponent(p[1])]
+        [decodeURIComponent(p[0]), ledger.url.parseValue(p[1])]
       .object().value()
     parser
 
+  parseValue: (str) ->
+    val = decodeURIComponent(str)
+    if val is "true"
+      true
+    else if val is "false"
+      false
+    else if not _.isNaN(_.str.toNumber(val))
+      _.str.toNumber(val)
+    else
+      val
   #
   createRelativeUrlWithFragmentedUrl: (url, fragmentedUrl) ->
     parsedUrl = ledger.url.parseAsUrl url

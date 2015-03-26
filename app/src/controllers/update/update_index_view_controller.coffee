@@ -9,6 +9,3 @@ class @UpdateIndexViewController extends @UpdateViewController
   navigatePrevious: ->
     ledger.app.setExecutionMode(ledger.app.Modes.Wallet)
     super
-
-  shouldShowPreviousButton: ->
-    super and @params?.hidePreviousButton? is not yes
