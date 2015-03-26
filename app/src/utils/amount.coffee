@@ -20,29 +20,29 @@ class @ledger.Amount
     new Amount(new Bitcoin.BigInteger(Math.trunc(+value).toString()))
 
   # @param [Bitcoin.BigInteger] value The amount value in satoshi.
-  constructor: (value) ->
-    @_number = value.clone()
+  constructor: (value=Bitcoin.BigInteger.ZERO) ->
+    @_value = value.clone()
 
   # @param [ledger.Amount] amount
   # @return [ledger.Amount]
   add: (amount) ->
-    new Amount(@_number.add(amount._number))
+    new Amount(@_value.add(amount._value))
 
   # @param [ledger.Amount] amount
   # @return [ledger.Amount]
   subtract: (amount) ->
-    new Amount(@_number.subtract(amount._number))
+    new Amount(@_value.subtract(amount._value))
 
   # @param [String, Number, Bitcoin.BigInteger] number
   # @return [ledger.Amount]
   multiply: (number) ->
     number = new Bitcoin.BigInteger(number.toString()) unless _(number).isKindOf(Bitcoin.BigInteger)
-    new Amount(@_number.multiply(value._number))
+    new Amount(@_value.multiply(number._value))
 
-  # @param [ledger.Amount] amount
+  # @param [ledger.Amount, Number, ] amount
   # @return [Number]
   compare: (amount) ->
-    @_number.compareTo(value.amount)
+    @_value.compareTo(amount._value)
 
   # @return [Boolean]
   lt: (amount) -> @compare(amount) < 0
@@ -73,6 +73,6 @@ class @ledger.Amount
   # @return [String]
   toSatoshiString: (base=10) -> @toSatoshiNumber().toString(base)
   # @return [Number]
-  toSatoshiNumber: () -> @_number.intValue()
+  toSatoshiNumber: () -> @_value.intValue()
   # @return [Bitcoin.BigInteger]
-  toBigInteger: () -> @_number.clone()
+  toBigInteger: () -> @_value.clone()

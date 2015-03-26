@@ -23,6 +23,7 @@ _.extend ledger.errors,
   # Wallet errors
   NotEnoughFunds: 300
   SignatureError: 301
+  DustTransaction: 302
 
   ledger.errors.SignatureError
 
@@ -45,6 +46,7 @@ _.extend ledger.errors,
 
     300: "Not enough funds"
     301: "Signature error"
+    302: "Dust transaction"
 
   create: (code, title, error) -> code: code, title: title, error: error
   throw: (code, message) -> throw new ledger.StandardError(code, message)

@@ -58,7 +58,6 @@ class @ledger.dongle.Manager extends EventEmitter
       @cardFactory.list_async().then (result) =>
         return if result.length == 0
         @cardFactory.getCardTerminal(result[0]).getCard_async().then (card) =>
-          console.log("Going to create Dongle", deviceId)
           @_dongles[deviceId] = new ledger.dongle.Dongle(card)
           @_dongles[deviceId].once 'state:locked', (event) =>
             @emit 'connected', @_dongles[deviceId]

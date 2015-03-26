@@ -23,11 +23,11 @@ class ledger.dongle.Transaction
   #
   @ValidationModes: ValidationModes
   #
-  @DEFAULT_FEES: Amount.fromBtc(0.00005)
+  @DEFAULT_FEES: Amount.fromBits(50)
   #
   @MINIMUM_CONFIRMATIONS: 1
   #
-  @MINIMUM_OUTPUT_VALUE: 5430
+  @MINIMUM_OUTPUT_VALUE: Amount.fromSatoshi(5430)
 
   # @property [ledger.Amount]
   amount: undefined
@@ -188,26 +188,22 @@ class ledger.dongle.Transaction
   # @param [?] changeAccount
   # @param [Function] callback
   # @return [CompletionClosure]
-  @createAndPrepareTransaction: (amount, fees, recipientAddress, inputsAccounts, changeAccount, callback=undefined) ->
+  @createAndPrepare: (amount, fees, recipientAddress, inputsAccounts, changeAccount, callback=undefined) ->
     completion = new CompletionClosure(callback)
     inputsAccounts = [inputsAccounts] unless _.isArray inputsAccounts
     inputsPaths = _.flatten(inputsAccount.getHDWalletAccount().getAllAddressesPaths() for inputsAccount in inputsAccounts)
     changePath = changeAccount.getHDWalletAccount().getCurrentChangeAddressPath()
     requiredAmount = amount.add(fees)
-    l "Required amount", requiredAmount.toString()
     if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
-      return completion.failure(new ledger.StandardError(ledger.errors.DustTransaction))
-    ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
-      return completion.error(Errors.NetworkError, error) if error?
-      
+      return completion.failure(new ledger.StdError(Errors.DustTransaction))
+    ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPaths, (outputs, error) ->
+      return completion.failure(Errors.NetworkError, error) if error?
       # Collect each valid outputs and sort them by desired priority
       validOutputs = _.chain(outputs)
         .filter((output) -> output.paths.length > 0)
         .sortBy((output) -> -output['confirmations'])
         .value()
-      l "Valid outputs :", validOutputs
-      return completion.error(Errors.NotEnoughFunds) if validOutputs.length == 0
-      
+      return completion.failure(Errors.NotEnoughFunds) if validOutputs.length == 0
       # For each valid outputs we try to get its raw transaction.
       finalOutputs = []
       collectedAmount = new Amount()
@@ -220,8 +216,7 @@ class ledger.dongle.Transaction
 
           output.raw = rawTransaction
           finalOutputs.push(output)
-          collectedAmount = collectedAmount.add(output.value)
-          l "Required amount :", requiredAmount.toString(), ", Collected amount :", collectedAmount.toString(), "has next ?", hasNext
+          collectedAmount = collectedAmount.add(Amount.fromSatoshi(output.value))
 
           if collectedAmount.gte(requiredAmount)
             # We have reached our required amount. It's time to prepare the transaction
@@ -233,8 +228,7 @@ class ledger.dongle.Transaction
             # Continue to collect funds
             done()
           else if hadNetworkFailure
-            completion.error(Errors.NetworkError)
+            completion.failure(Errors.NetworkError)
           else
-            completion.error(Errors.NotEnoughFunds)
-
+            completion.failure(Errors.NotEnoughFunds)
     completion.readonly()

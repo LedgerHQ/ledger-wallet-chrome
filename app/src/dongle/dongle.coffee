@@ -76,7 +76,6 @@ class @ledger.dongle.Dongle extends EventEmitter
 
     unless @isInBootloaderMode()
       @_recoverFirmwareVersion().then( =>
-        console.log("FirmwareVersion recovered", @firmwareVersion)
         @_recoverOperationMode()
         # Set dongle state on failure.
         @getPublicAddress("0'/0/0").then( =>
@@ -420,8 +419,8 @@ class @ledger.dongle.Dongle extends EventEmitter
   @param [Array] associatedKeysets
   @param changePath
   @param [String] recipientAddress
-  @param [Integer] amount
-  @param [Integer] fee
+  @param [Amount] amount
+  @param [Amount] fee
   @param [Integer] lockTime
   @param [Integer] sighashType
   @param [String] authorization hex encoded
@@ -429,17 +428,18 @@ class @ledger.dongle.Dongle extends EventEmitter
   @return [Q.Promise] Resolve with resumeData
   ###
   createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
-    resumeData = _.clone(resumeData)
-    resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)
-    resumeData.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in resumeData.trustedInputs)
-    resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
+    if resumeData?
+      resumeData = _.clone(resumeData)
+      resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)
+      resumeData.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in resumeData.trustedInputs)
+      resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
     @_btchip.createPaymentTransaction_async(
       inputs, associatedKeysets, changePath,
       new ByteString(recipientAddress, ASCII),
       amount.toByteString(),
       fees.toByteString(),
-      lockTime && lockTime.toByteString(),
-      sighashType && sighashType.toByteString(),
+      lockTime && new ByteString(Convert.toHexInt(lockTime), HEX),
+      sighashType && new ByteString(Convert.toHexInt(sighashType), HEX),
       authorization && new ByteString(authorization, HEX),
       resumeData
     ).then (result) ->

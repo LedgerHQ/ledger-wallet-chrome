@@ -9,9 +9,9 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
     account = Account.find(index: 0).first()
 
     # fetch amount
-    amount = ledger.Amount.fromSatoshi(@params.amount)
-    fee = ledger.Amount.fromSatoshi(10000)
-    ledger.dongle.createAndPrepareTransaction amount, fee, @params.address, account, account, (transaction, error) =>
+    amount = ledger.Amount.fromBtc(@params.amount)
+    fee = ledger.dongle.Transaction.DEFAULT_FEES
+    ledger.dongle.Transaction.createAndPrepare amount, fee, @params.address, account, account, (transaction, error) =>
       return if not @isShown()
       if error?
         reason = switch error.code

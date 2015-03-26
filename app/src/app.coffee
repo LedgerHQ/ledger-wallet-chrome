@@ -53,19 +53,15 @@ require @ledger.imports, ->
       @emit 'dongle:unplugged', @dongle if @isInWalletMode()
 
     onDongleIsUnlocked: (dongle) ->
-      console.log("onDongleIsUnlocked")
       return unless @isInWalletMode()
       @emit 'dongle:unlocked', @dongle
       @emit 'wallet:initializing'
       ledger.wallet.initialize @dongle, =>
         ledger.db.init =>
-          console.log("db.inited")
           ledger.db.contexts.open()
           Wallet.initializeWallet =>
-            console.log("emit wallet:initialized")
             @emit 'wallet:initialized'
             _.defer =>
-              console.log("wallet:initialized defers")
               Wallet.instance.retrieveAccountsBalances()
               ledger.tasks.TransactionObserverTask.instance.start()
               ledger.tasks.OperationsSynchronizationTask.instance.start()

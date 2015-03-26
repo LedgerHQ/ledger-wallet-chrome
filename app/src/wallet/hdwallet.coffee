@@ -35,9 +35,7 @@ class ledger.wallet.HDWallet
 
   initialize: (store, callback) ->
     @_store = store
-    console.log("Going to get acounts")
     @_store.get ['accounts'], (result) =>
-      console.log("Accounts result", result)
       @_accounts = []
       return callback?() unless result.accounts?
       _.async.each [0...result.accounts], (accountIndex, done, hasNext) =>
@@ -88,9 +86,7 @@ class ledger.wallet.HDWallet.Account
       callback?()
 
   initialize: (callback) ->
-    console.log("Going to get #{[@_storeId]}")
     @_store.get [@_storeId], (result) =>
-      console.log("Get result", result)
       @_account = result[@_storeId]
       @_initialize()
       @initializeXpub callback
@@ -220,7 +216,6 @@ class ledger.wallet.HDWallet.Account
     @_store.set saveHash, callback
 
 openStores = (dongle, done) ->
-  console.log("Going to openStores")
   Try =>
     dongle.getBitIdAddress (address) =>
       Try =>
@@ -232,18 +227,15 @@ openStores = (dongle, done) ->
               ledger.app.emit 'wallet:initialization:fatal_error'
               return
             ledger.storage.openStores bitIdAddress, pubKey.bitcoinAddress.value
-            console.log("Done openStores")
             done?()
           .printError()
       .printError()
   .printError()
 
 openHdWallet = (dongle, done) ->
-  console.log("Going to openHdWallet")
   Try =>
     hdWallet = new ledger.wallet.HDWallet()
     hdWallet.initialize ledger.storage.wallet, () =>
-      console.log("HdWallet initialized")
       Try =>
         ledger.wallet.HDWallet.instance = hdWallet
         ledger.tasks.AddressDerivationTask.instance.start()
@@ -251,26 +243,21 @@ openHdWallet = (dongle, done) ->
           Try =>
             for accountIndex in [0...hdWallet.getAccountsCount()]
               ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{hdWallet.getRootDerivationPath()}/#{accountIndex}'", _.noop
-            console.log("Done openHdWallet")
             done?()
           .printError()
       .printError()
   .printError()
 
 openAddressCache = (dongle, done) ->
-  console.log("Going to openAddressCache")
   cache = new ledger.wallet.HDWallet.Cache(ledger.wallet.HDWallet.instance)
   cache.initialize =>
     ledger.wallet.HDWallet.instance.cache = cache
-    console.log("Done openAddressCache")
     done?()
 
 restoreStructure = (dongle, done) ->
-  console.log("Going to restoreStructure")
   if ledger.wallet.HDWallet.instance.isEmpty()
     ledger.app.emit 'wallet:initialization:creation'
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'done', () =>
-      console.log("Done restoreStructure")
       done?()
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'fatal_error', () =>
       ledger.storage.local.clear()
@@ -278,13 +265,10 @@ restoreStructure = (dongle, done) ->
     ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
   else
     ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
-    console.log("Done restoreStructure")
     done?()
 
 completeInitialization = (dongle, done) ->
-  console.log("Going to completeInitialization")
   ledger.wallet.HDWallet.instance.isInitialized = yes
-  console.log("Done completeInitialization")
   done?()
 
 _.extend ledger.wallet,
