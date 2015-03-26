@@ -53,17 +53,20 @@ class @ledger.dongle.Manager extends EventEmitter
         cb?(devices) unless hasNext
         next()
 
-  _connectDongle: (device_id) ->
+  _connectDongle: (deviceId) ->
     try
       @cardFactory.list_async().then (result) =>
         return if result.length == 0
         @cardFactory.getCardTerminal(result[0]).getCard_async().then (card) =>
-          @_dongles[device_id] = new ledger.dongle.Dongle(device_id, card)
-          @_dongles[device_id].once 'state:locked', (event) =>
-            @emit 'connected', @_dongles[device_id]
-          @_dongles[device_id].once 'state:disconnected', (event) =>
-            delete @_dongles[device_id]
-            @emit 'disconnected', @_dongles[device_id]
+          console.log("Going to create Dongle", deviceId)
+          @_dongles[deviceId] = new ledger.dongle.Dongle(card)
+          @_dongles[deviceId].once 'state:locked', (event) =>
+            @emit 'connected', @_dongles[deviceId]
+          @_dongles[deviceId].once 'state:blank', (event) =>
+            @emit 'connected', @_dongles[deviceId]
+          @_dongles[deviceId].once 'state:disconnected', (event) =>
+            delete @_dongles[deviceId]
+            @emit 'disconnected', @_dongles[deviceId]
     catch er
       e er
 
