@@ -32,8 +32,6 @@
       true
     else if val is "false"
       false
-    else if not _.isNaN(_.str.toNumber(val))
-      _.str.toNumber(val)
     else
       val
   #
