@@ -15,6 +15,7 @@ common:
   confirm: "Confirm"
   confirmation: "Confirmation"
   send: "Send"
+  continue: "Continue"
   yes: "Yes"
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
@@ -64,13 +65,13 @@ onboarding:
     errors:
       frozen:
         wallet_is_frozen: "Your wallet is frozen"
-        blank_next_time: "Your Ledger Wallet configuration has been deleted but your accounts and bitcoins remain safe."
-        unplug_plug: "Unplug then plug back your Ledger Wallet to recover your accounts and bitcoins."
+        blank_next_time: "Your Ledger Wallet configuration has been deleted but your accounts and Bitcoins remain safe."
+        unplug_plug: "Unplug then plug back your Ledger Wallet to recover your accounts and Bitcoins."
 
       wrongpin:
         wrong_pin: "Wrong PIN code"
         tries_left: "%s attempt(s) left before freezing your wallet."
-        unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and bitcoins."
+        unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and Bitcoins."
 
       unsupported:
         device_unsupported: "Unsupported wallet"
@@ -104,7 +105,7 @@ onboarding:
       use_as_new: "Create a new wallet"
       if_its_your_first_wallet: "Configure your new Ledger Wallet if it's your first purchase"
       recover_wallet: "Recover an existing wallet"
-      if_you_lost_your_wallet: "Regain access to your accounts and bitcoins if you froze or lost your Ledger Wallet"
+      if_you_lost_your_wallet: "Regain access to your accounts and Bitcoins if you froze or lost your Ledger Wallet"
 
     pin:
       choose_your: "Choose your"
@@ -138,8 +139,8 @@ onboarding:
     summary:
       your_wallet_is: "Your wallet is"
       almost_ready: "almost ready"
-      use_your_bitcoins_create: "In a few moments, you will be able to use your bitcoins in the fastest possible way"
-      use_your_bitcoins_other: "In a few moments, you will be able to use your bitcoins in the fastest possible way again"
+      use_your_bitcoins_create: "In a few moments, you will be able to use your Bitcoins in the fastest possible way"
+      use_your_bitcoins_other: "In a few moments, you will be able to use your Bitcoins in the fastest possible way again"
       by_clicking_finish_create: "By clicking FINISH, you confirm that you have chosen a secured PIN code and written down your recovery phrase."
       by_clicking_finish_other: "By clicking FINISH, you confirm that you have chosen a new secured PIN code."
       your_wallet_mode_create: "Your wallet will be created."
@@ -154,11 +155,35 @@ onboarding:
       you_can_access_your_wallet: "You can now access your wallet safely."
       configuration_is_complete_create: "Creation completed"
       configuration_is_complete_recover: "Recovery completed"
-      unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and bitcoins."
+      unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and Bitcoins."
       configuration_failed_create: "Creation failed"
       configuration_failed_recover: "Recovery failed"
       error_occured: "A serious error occured. Please contact support for further assistance."
       contact_support: "CONTACT SUPPORT"
+
+update:
+  common:
+    firmware_update: "Chip firmware update"
+    need_to_repeat_several_times: "You may need to repeat this step several times."
+
+  index:
+    important_notice: "Important notice"
+    update_process: "The update process requires to erase your Ledger Wallet.<br />Your Bitcoins will remain safe if you have your recovery sheet with you to restore your accounts."
+    clicking_continue: "By clicking CONTINUE, you confirm to be in possession of your <b>security card QR code</b> and your <b>24 words recovery phrase</b>. You will lose your Bitcoins if you attempt to update your Ledger Wallet without these required information."
+    please_note: "Please note: You will need to pair your smartphone again to re-enable mobile validation."
+
+  plug:
+    plug_your_wallet: "Plug your Ledger Wallet"
+    insert_your_wallet: "Insert your Ledger Wallet in the USB port."
+
+  unplug:
+    unplug_your_wallet: "Unplug your Ledger Wallet"
+    remove_your_wallet: "Remove your Ledger Wallet from the USB port."
+
+  seed:
+    security_card_qrcode: "Security card QR code"
+    enter_characters: "Enter your security card QR code 32 characters:"
+    on_the_left: "They are printed on the left page of your recovery sheet, below the QR code."
 
 wallet:
   defaults:
@@ -244,7 +269,7 @@ wallet:
       amount_placeholder: "Amount"
       receiver_account: "CREDIT ACCOUNT"
       receiver_address: "BITCOIN ADDRESS TO RECEIVE"
-      qr_code_explanation: "This QR code can be scanned<br/>by the person who wants to send you bitcoins."
+      qr_code_explanation: "This QR code can be scanned<br/>by the person who wants to send you Bitcoins."
       send_by_email: "SEND BY EMAIL"
       print: "PRINT"
       close: "CLOSE"

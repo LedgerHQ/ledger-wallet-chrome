@@ -119,7 +119,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
     @param [String] keyCardSeed A 32 characters string formatted as an hexadecimal value (i.e. '01294b7431234b5323f5588ce7d02703'
   ###
-  checkIfKeyCardSeedIsValid: (keyCardSeed) -> @_keyCardSeedToByteString(keyCardSeed).isSuccess()
+  checkIfKeyCardSeedIsValid: (keyCardSeed) -> (Try => @_keyCardSeedToByteString(keyCardSeed)).isSuccess()
 
   _keyCardSeedToByteString: (keyCardSeed, safe = no) ->
     throw new Error(Errors.InvalidSeedSize) if not keyCardSeed? or keyCardSeed.length != 32

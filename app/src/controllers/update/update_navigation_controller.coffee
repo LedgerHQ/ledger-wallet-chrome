@@ -1,5 +1,10 @@
 class @UpdateNavigationController extends @NavigationController
 
+  view:
+    pageSubtitle: "#page_subtitle"
+    previousButton: "#previous_button"
+    nextButton: "#next_button"
+
   onAttach: ->
     @_request = ledger.fup.FirmwareUpdater.instance.requestFirmwareUpdate()
     @_request.on 'plug', => @_onPlugDongle()
@@ -10,8 +15,24 @@ class @UpdateNavigationController extends @NavigationController
     ledger.fup.FirmwareUpdater.instance.load =>
     window.fup = @_request # TODO: REMOVE THIS
 
+  renderChild: ->
+    super
+    @topViewController().once 'afterRender', =>
+      # update page subtitle
+      @view.pageSubtitle.text t @topViewController().localizablePageSubtitle
+      # update navigation
+      @updateNavigationItems()
+
   onDetach: ->
     @_request.cancel()
+
+  updateNavigationItems: ->
+    @view.previousButton.html '<i class="fa fa-angle-left"></i> ' + t(@topViewController().localizablePreviousButton)
+    @view.nextButton.html t(@topViewController().localizableNextButton) + ' <i class="fa fa-angle-right"></i>'
+    if @topViewController().shouldShowNextButton() then @view.nextButton.show() else @view.nextButton.hide()
+    if @topViewController().shouldShowPreviousButton() then @view.previousButton.show() else @view.previousButton.hide()
+    if @topViewController().shouldEnableNextButton() then @view.nextButton.removeClass 'disabled' else @view.nextButton.addClass 'disabled'
+    if @topViewController().shouldEnablePreviousButton() then @view.previousButton.removeClass 'disabled' else @view.previousButton.addClass 'disabled'
 
   _onPlugDongle: ->
     ledger.app.router.go '/update/plug'
