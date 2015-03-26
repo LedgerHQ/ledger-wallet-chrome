@@ -25,11 +25,15 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
 
   navigateContinue: ->
     ledger.app.wallet.isFirmwareUpdateAvailable()
-    ledger.app.wallet.getState (state) =>
-      if state == ledger.wallet.States.LOCKED
-        ledger.app.router.go '/onboarding/device/pin'
+    ledger.app.wallet?.isFirmwareUpdateAvailable (isAvailable) =>
+      if isAvailable
+        ledger.app.router.go '/onboarding/device/update'
       else
-        ledger.app.router.go '/onboarding/management/welcome'
+        ledger.app.wallet.getState (state) =>
+          if state == ledger.wallet.States.LOCKED
+            ledger.app.router.go '/onboarding/device/pin'
+          else
+            ledger.app.router.go '/onboarding/management/welcome'
 
   navigateError: ->
     ledger.app.wallet?.isDongleBetaCertified (__, error) =>
@@ -37,8 +41,9 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
         ledger.app.router.go '/onboarding/device/forged'
       else
         ledger.app.wallet?.isFirmwareOverwriteOrUpdateAvailable (isAvailable) =>
-          if isAvailable and not ledger.fup.versions.Nano.CurrentVersion.Beta
-            l 'NEW VERSION'
+          if isAvailable #and not ledger.fup.versions.Nano.CurrentVersion.Beta
+            ledger.app.setExecutionMode(ledger.app.Modes.FirmwareUpdate)
+            ledger.app.router.go '/'
           else
             @navigateContinue()
 
