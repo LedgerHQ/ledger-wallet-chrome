@@ -273,8 +273,8 @@ class ledger.i18n
     .catch (err) -> l(err)
     .done()
     tag = @favLang.memoryValue || @browserUiLang
-    l @favLang.memoryValue
-    l tag
+    #l @favLang.memoryValue
+    #l tag
     # set tag language to one of the store
     #l 'set tag to chrome store'
     @chromeStore.set({i18n_favLang: tag})

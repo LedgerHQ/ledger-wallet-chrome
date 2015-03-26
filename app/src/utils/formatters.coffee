@@ -5,7 +5,9 @@ ledger.formatters ?= {}
 ###
 class ledger.formatters
 
-  @defaultUnit: 'BTC'
+  @getDefaultUnit: () =>
+    #@defaultUnit = ledger.preferences.instance.getUIbtcUnit()
+    @defaultUnit = 'BTC'
 
   ###
     This constructor prevent the class to be instantiated
@@ -156,3 +158,6 @@ class ledger.formatters
     value = value * Math.pow(10, 2)
     # to string
     value = value.toString()
+
+
+ledger.formatters.getDefaultUnit()

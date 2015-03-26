@@ -5,6 +5,8 @@ ledger.converters ?= {}
 ###
 class ledger.converters
 
+  @defaultCurrency: 'USD'
+
   ###
     This constructor prevent the class to be instantiated
 
@@ -22,12 +24,12 @@ class ledger.converters
     @example Converts to Satoshi
       ledger.converters.currencyToSatoshi('USD', 50)
 
-    @param [String] currency The currency that you want to convert
     @param [Number] currencyValue The amount in the given currency
+    @param [String] currency The currency that you want to convert
     @return [Number] The formatted amount in satoshi
   ###
-  @currencyToSatoshi: (currency, currencyValue) ->
-    return if not currency? || not currencyValue?
+  @currencyToSatoshi: (currencyValue, currency) =>
+    currency ?= @defaultCurrency
     currencies = ledger.tasks.TickerTask.instance.getCache()
     # satoshiValueCurrency is the amount in Satoshi for 1 in the given currency
     satoshiValueCurrency = currencies[currency].values[2]['toSatoshis'].value
@@ -38,13 +40,16 @@ class ledger.converters
   ###
     Converter from satoshi to a given currency
 
-    @param [String] currency The currency to which you want your output
     @param [Number] satoshiValue The amount in satoshi
+    @param [String] currency The currency to which you want your output
     @return [Number] The formatted amount in the given currency
   ###
-  @satoshiToCurrency: (currency, satoshiValue) ->
-    return if not currency? || not satoshiValue?
+  @satoshiToCurrency: (satoshiValue, currency) =>
+    currency ?= @defaultCurrency
+    l currency
     currencies = ledger.tasks.TickerTask.instance.getCache()
+    l currencies[currency]
+
     # currencyValueBTC is the amount in the given currency for 1 BTC
     currencyValueBTC = currencies[currency].values[0]['fromBTC'].value
     val = currencyValueBTC * Math.pow(10, -8)
@@ -55,12 +60,12 @@ class ledger.converters
   ###
     Converter from satoshi to a given currency with formatting
 
-    @param [String] currency The currency to which you want your output
     @param [Number] satoshiValue The amount in satoshi
+    @param [String] currency The currency to which you want your output
     @return [Number] The formatted amount in the given currency
   ###
-  @satoshiToCurrencyFormatted: (currency, satoshiValue) ->
-    return if not currency? || not satoshiValue?
+  @satoshiToCurrencyFormatted: (satoshiValue, currency) =>
+    currency ?= @defaultCurrency
     currencies = ledger.tasks.TickerTask.instance.getCache()
     # currencyValueBTC is the amount in the given currency for 1 BTC
     currencyValueBTC = currencies[currency].values[0]['fromBTC'].value
