@@ -163,7 +163,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       unless wallet?
         @_connectionCompletion = completion.readonly()
         delay = if !silent then 0 else 1000
-        l "Wait for connection", silent
         setTimeout (=> @emit 'plug' unless @_wallet?), delay
         ledger.app.walletsManager.once 'connected', (e, wallet) =>
           @_connectionCompletion = null
@@ -262,9 +261,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     index = 0
     while index < ledger.fup.updates.OS_INIT.length and !ledger.fup.utils.compareVersions(ledger.fup.versions.Nano.CurrentVersion.Os, ledger.fup.updates.OS_INIT[index][0]).eq()
       index += 1
-    l 'LOAD INIT OS', index
     currentInitScript = if ledger.fup.updates.OS_INIT[index]? then ledger.fup.updates.OS_INIT[index][1] else _(ledger.fup.updates.OS_INIT).last()[1]
-    l 'TEST', ledger.fup.updates.OS_INIT[index][1] == ledger.fup.updates.OS_INIT[3][1]
     moddedInitScript = []
     for i in [0...currentInitScript.length]
       moddedInitScript.push currentInitScript[i]
@@ -285,7 +282,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       index = 0
       while index < ledger.fup.updates.BL_RELOADER.length and !ledger.fup.utils.compareVersions(@_dongleVersion, ledger.fup.updates.BL_RELOADER[index][0]).eq()
         index += 1
-      l 'LOAD BL', index
       if index is ledger.fup.updates.BL_RELOADER.length
         @_failure(Errors.UnsupportedFirmware)
         return
@@ -321,7 +317,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_isOsLoaded = no
     @_findOriginalKey(ledger.fup.updates.OS_LOADER).then (offset) =>
       @_isWaitForDongleSilent = yes
-      l 'LOAD OS', offset
       @_processLoadingScript(ledger.fup.updates.OS_LOADER[offset], States.LoadingOs).then (result) =>
         @_isOsLoaded = yes
         @_setCurrentState(States.Undefined)
@@ -431,7 +426,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
             @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
         else
           @_exchangeNeedsExtraTimeout = no
-          # TODO: Place Logger here
           throw new Error('Unexpected status ' + @_getCard().SW)
       .fail (ex) =>
         return @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1) if offset is adpus.length - 1

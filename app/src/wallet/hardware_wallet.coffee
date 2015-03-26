@@ -238,7 +238,8 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     .fail (err) =>
       e err
       error = new ledger.StandardError(Errors.SignatureError, err)
-      completion.failure(error)
+      #completion.failure(error)
+      return
     .done()
     completion.readonly()
 
