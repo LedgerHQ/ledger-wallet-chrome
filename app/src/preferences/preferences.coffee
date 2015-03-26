@@ -2,20 +2,16 @@ ledger.preferences ?= {}
 
 ledger.preferences.init = (cb) ->
   ledger.preferences.instance = new ledger.preferences.Preferences
-
-  ledger.app.on 'wallet:initialized', () ->
-    if ledger.storage.sync?
-      obj = ledger.preferences.instance.prefs
-
-      getAllPrefs = (keys, values, index = 0) ->
-        return if index > keys.length - 1
-        deferred = Q.defer()
-        ledger.storage.sync.get 'preferences_' + keys[index], (res) ->
-          ledger.preferences.instance.prefs[keys[index]] = res['preferences_' + keys[index]] ? values[index]
-          deferred.resolve(getAllPrefs(keys, values, index + 1))
-        deferred.promise
-
-      getAllPrefs(_.keys(obj), _.values(obj)).then cb?().done()
+  if ledger.storage.sync?
+    obj = ledger.preferences.instance.prefs
+    getAllPrefs = (keys, values, index = 0) ->
+      return if index > keys.length - 1
+      deferred = Q.defer()
+      ledger.storage.sync.get 'preferences_' + keys[index], (res) ->
+        ledger.preferences.instance.prefs[keys[index]] = res['preferences_' + keys[index]] ? values[index]
+        deferred.resolve(getAllPrefs(keys, values, index + 1))
+      deferred.promise
+    getAllPrefs(_.keys(obj), _.values(obj)).then(=> cb?()).done()
 
 
 class ledger.preferences.Preferences
@@ -55,9 +51,15 @@ class ledger.preferences.Preferences
     @prefs.btcUnit
 
   setUIBtcUnit: (value) ->
-    @prefs.btcUnit = value
+    if value isnt 'BTC' and value isnt 'mBTC' and value isnt 'uBTC' and value isnt 'satoshi'
+      try
+        throw new Error("'BtcUnit' must be BTC, mBTC, uBTC or satoshi")
+      catch e
+        console.log(e.name + ": " + e.message)
+        return null
     if ledger.storage.sync?
       ledger.storage.sync.set({preferences_btcUnit: value})
+      @prefs.btcUnit = value
     else
       throw new Error 'You must initialized your wallet'
 
@@ -69,9 +71,9 @@ class ledger.preferences.Preferences
     @prefs.currency
 
   setUICurrency: (value) ->
-    @prefs.currency = value
     if ledger.storage.sync?
       ledger.storage.sync.set({preferences_currency: value})
+      @prefs.currency = value
     else
       throw new Error 'You must initialized your wallet'
 
@@ -83,9 +85,9 @@ class ledger.preferences.Preferences
     @prefs.miningFee
 
   setUIMiningFee: (value) ->
-    @prefs.miningFee = value
     if ledger.storage.sync?
       ledger.storage.sync.set({preferences_miningFee: value})
+      @prefs.miningFee = value
     else
       throw new Error 'You must initialized your wallet'
 
@@ -97,11 +99,8 @@ class ledger.preferences.Preferences
     @prefs.blockchainExplorator
 
   setUIBlockchainExplorator: (value) ->
-    @prefs.blockchainExplorator = value
     if ledger.storage.sync?
       ledger.storage.sync.set({preferences_blockchainExplorator: value})
+      @prefs.blockchainExplorator = value
     else
       throw new Error 'You must initialized your wallet'
-
-
-window.onload = ledger.preferences.init

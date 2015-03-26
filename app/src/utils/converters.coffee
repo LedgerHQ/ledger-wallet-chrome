@@ -5,8 +5,6 @@ ledger.converters ?= {}
 ###
 class ledger.converters
 
-  @defaultCurrency: 'USD'
-
   ###
     This constructor prevent the class to be instantiated
 
@@ -29,7 +27,7 @@ class ledger.converters
     @return [Number] The formatted amount in satoshi
   ###
   @currencyToSatoshi: (currencyValue, currency) =>
-    currency ?= @defaultCurrency
+    currency ?= ledger.preferences.instance.getUICurrency()
     currencies = ledger.tasks.TickerTask.instance.getCache()
     # satoshiValueCurrency is the amount in Satoshi for 1 in the given currency
     satoshiValueCurrency = currencies[currency].values[2]['toSatoshis'].value
@@ -45,7 +43,7 @@ class ledger.converters
     @return [Number] The formatted amount in the given currency
   ###
   @satoshiToCurrency: (satoshiValue, currency) =>
-    currency ?= @defaultCurrency
+    currency ?= ledger.preferences.instance.getUICurrency()
     l currency
     currencies = ledger.tasks.TickerTask.instance.getCache()
     l currencies[currency]
@@ -65,7 +63,7 @@ class ledger.converters
     @return [Number] The formatted amount in the given currency
   ###
   @satoshiToCurrencyFormatted: (satoshiValue, currency) =>
-    currency ?= @defaultCurrency
+    currency ?= ledger.preferences.instance.getUICurrency()
     currencies = ledger.tasks.TickerTask.instance.getCache()
     # currencyValueBTC is the amount in the given currency for 1 BTC
     currencyValueBTC = currencies[currency].values[0]['fromBTC'].value

@@ -5,10 +5,6 @@ ledger.formatters ?= {}
 ###
 class ledger.formatters
 
-  @getDefaultUnit: () =>
-    #@defaultUnit = ledger.preferences.instance.getUIbtcUnit()
-    @defaultUnit = 'BTC'
-
   ###
     This constructor prevent the class to be instantiated
 
@@ -38,9 +34,11 @@ class ledger.formatters
         unit = 5
       when 'uBTC'
         unit = 2
+      when 'satoshi'
+        unit = 0
       else
         try
-          throw new Error("'unit' must be BTC, mBTC or uBTC")
+          throw new Error("'BtcUnit' must be BTC, mBTC, uBTC or satoshi")
         catch e
           console.log(e.name + ": " + e.message)
     # Check if value is an integer
@@ -81,7 +79,7 @@ class ledger.formatters
     @return [String] The formatted value
   ###
   @fromValue: (value, precision) ->
-    @formatUnit(value, @defaultUnit, precision)
+    @formatUnit(value, ledger.preferences.instance.getUIBtcUnit(), precision)
 
 
   ###
@@ -158,6 +156,3 @@ class ledger.formatters
     value = value * Math.pow(10, 2)
     # to string
     value = value.toString()
-
-
-ledger.formatters.getDefaultUnit()

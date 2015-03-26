@@ -64,12 +64,13 @@ require @ledger.imports, ->
         ledger.db.init =>
           ledger.db.contexts.open()
           Wallet.initializeWallet =>
-            @emit 'wallet:initialized'
-            _.defer =>
-              Wallet.instance.retrieveAccountsBalances()
-              ledger.tasks.TransactionObserverTask.instance.start()
-              ledger.tasks.OperationsSynchronizationTask.instance.start()
-              ledger.tasks.OperationsConsumptionTask.instance.start()
+            ledger.preferences.init =>
+              @emit 'wallet:initialized'
+              _.defer =>
+                Wallet.instance.retrieveAccountsBalances()
+                ledger.tasks.TransactionObserverTask.instance.start()
+                ledger.tasks.OperationsSynchronizationTask.instance.start()
+                ledger.tasks.OperationsConsumptionTask.instance.start()
 
     onDongleIsDisconnected: (wallet) ->
       return unless @isInWalletMode()
