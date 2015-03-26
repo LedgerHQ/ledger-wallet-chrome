@@ -18,12 +18,16 @@ Amount = ledger.Amount
     console.log("Prepared tx :", tx)
 ###
 class ledger.dongle.Transaction
+  Transaction = @
+
   #
   @ValidationModes: ValidationModes
   #
   @DEFAULT_FEES: Amount.fromBtc(0.00005)
   #
   @MINIMUM_CONFIRMATIONS: 1
+  #
+  @MINIMUM_OUTPUT_VALUE: 5430
 
   # @property [ledger.Amount]
   amount: undefined
@@ -58,7 +62,13 @@ class ledger.dongle.Transaction
   # @param [ledger.Amount] amount
   # @param [ledger.Amount] fees
   # @param [String] recipientAddress
-  constructor: (@dongle, @amount, @fees, @recipientAddress) ->
+  constructor: (@dongle, @amount, @fees, @recipientAddress, @inputs, @changePath) ->
+    @_btInputs = []
+    @_btcAssociatedKeyPath = []
+    for input in inputs
+      splitTransaction = @dongle.splitTransaction(input)
+      @_btInputs.push [splitTransaction, input.output_index]
+      @_btcAssociatedKeyPath.push input.paths[0]
 
   # @return [Boolean]
   isValidated: () -> @_isValidated
@@ -82,20 +92,10 @@ class ledger.dongle.Transaction
   # @param [String] changePath
   # @param [Function] callback
   # @return [CompletionClosure]
-  prepare: (@inputs, @changePath, callback=undefined) ->
+  prepare: (callback=undefined) ->
     if not @amount? or not @fees? or not @recipientAddress?
       ledger.throw('Transaction must me initialized before preparation')
     completion = new CompletionClosure(callback)
-    try
-      @_btInputs = []
-      @_btcAssociatedKeyPath = []
-      for input in inputs
-        splitTransaction = @dongle.splitTransaction(input)
-        @_btInputs.push [splitTransaction, input.output_index]
-        @_btcAssociatedKeyPath.push input.paths[0]
-    catch err
-      completion.failure(new ledger.StdError(Errors.UnknowError, err))
-
     @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
     .then (@_resumeData) =>
       @_validationMode = @_resumeData.authorizationRequired
@@ -104,21 +104,25 @@ class ledger.dongle.Transaction
     .fail (error) =>
       completion.failure(new ledger.StdError(Errors.SignatureError))
     .done()
-
     completion.readonly()
   
   # @param [String] validationKey 4 chars ASCII encoded
   # @param [Function] callback
   # @return [CompletionClosure]
-  validate: (validationKey, callback=undefined) ->
+  validateWithPinCode: (validationPinCode, callback=undefined) -> @_validate(validationPinCode, callback)
+
+  # @param [String] validationKey 4 chars ASCII encoded
+  # @param [Function] callback
+  # @return [CompletionClosure]
+  validateWithKeycard: (validationKey, callback = null) -> @_validate(("0#{char}" for char in validationKey).join(''), callback)
+
+  # @param [String] validationKey 4 chars ASCII encoded
+  # @param [Function] callback
+  # @return [CompletionClosure]
+  _validate: (validationKey, callback=undefined) ->
     if not @_resumeData? or not @_validationMode?
       ledger.throw('Transaction must me prepared before validation')
     completion = new CompletionClosure(callback)
-    # Convert ASCII encoded validationKey to HEX encoded validationKey
-    if @_validationMode == ValidationModes.KEYCARD
-      validationKey = ("0#{char}" for char in validationKey.split('')).join('') 
-    else
-      validationKey = (validationKey.charCodeAt(i).toString(16) for i in [0...validationKey.length]).join('')
     @dongle.createPaymentTransaction(
       @_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees,
       undefined, # Default lockTime
@@ -191,8 +195,8 @@ class ledger.dongle.Transaction
     changePath = changeAccount.getHDWalletAccount().getCurrentChangeAddressPath()
     requiredAmount = amount.add(fees)
     l "Required amount", requiredAmount.toString()
-
-    transaction = new ledger.dongle.Transaction(ledger.app.dongle, amount, fees, recipientAddress)
+    if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+      return completion.failure(new ledger.StandardError(ledger.errors.DustTransaction))
     ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
       return completion.error(Errors.NetworkError, error) if error?
       
@@ -221,7 +225,8 @@ class ledger.dongle.Transaction
 
           if collectedAmount.gte(requiredAmount)
             # We have reached our required amount. It's time to prepare the transaction
-            transaction.prepare(finalOutputs, changePath)
+            transaction = new ledger.dongle.Transaction(ledger.app.dongle, amount, fees, recipientAddress, finalOutputs, changePath)
+            transaction.prepare()
             .then => completion.success(transaction)
             .fail (error) => completion.failure(error)
           else if hasNext is true
