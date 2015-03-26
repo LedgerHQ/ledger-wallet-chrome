@@ -43,7 +43,7 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
         ledger.app.wallet?.isFirmwareOverwriteOrUpdateAvailable (isAvailable) =>
           if isAvailable #and not ledger.fup.versions.Nano.CurrentVersion.Beta
             ledger.app.setExecutionMode(ledger.app.Modes.FirmwareUpdate)
-            ledger.app.router.go '/'
+            ledger.app.router.go '/update/index', {hidePreviousButton: yes}
           else
             @navigateContinue()
 
