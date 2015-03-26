@@ -4,7 +4,12 @@ class @UpdateErasingViewController extends UpdateViewController
   localizablePageSubtitle: "update.erasing.erasure_confirmation"
   navigation:
     nextRoute: ""
-    previousRoute: ""
+    previousRoute: "/onboarding/device/plug"
+    previousParams: {animateIntro: no}
+
+  navigatePrevious: ->
+    ledger.app.setExecutionMode(ledger.app.Modes.Wallet)
+    super
 
   navigateNext: ->
     @getRequest().approveCurrentState()
