@@ -11,6 +11,8 @@ versions:
      os: 1.1.0.0
      reloader: 0.1.33.0
      beta: true
+     whats_new: 'onboarding.device.update.new_1_0_0'
+
 
 current_version:
   <<: *LW_1_0_0B

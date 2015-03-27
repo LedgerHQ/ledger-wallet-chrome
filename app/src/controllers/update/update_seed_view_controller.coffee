@@ -3,7 +3,8 @@ class @UpdateSeedViewController extends UpdateViewController
   localizablePageSubtitle: "update.seed.security_card_qrcode"
   navigation:
     nextRoute: ""
-    previousRoute: ""
+    previousRoute: "/onboarding/device/plug"
+    previousParams: {animateIntro: no}
   view:
     seedInput: "#seed_input"
     validCheck: "#valid_check"
@@ -12,6 +13,10 @@ class @UpdateSeedViewController extends UpdateViewController
     super
     @_listenEvents()
     @_updateValidCheck()
+
+  navigatePrevious: ->
+    ledger.app.setExecutionMode(ledger.app.Modes.Wallet)
+    super
 
   navigateNext: ->
     @getRequest().setKeyCardSeed(@view.seedInput.val())

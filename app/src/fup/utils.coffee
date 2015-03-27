@@ -16,5 +16,5 @@ _.extend ledger.fup.utils,
   versionToString: (v) ->
     return null unless v?
     version = v[1]
-    info = if v[0] is 0 then "HW1" else "Ledger"
+    info = if v[0] is 0 then "HW1" else "Ledger OS"
     "#{info} #{(version >> 16) & 0xff}.#{(version >> 8) & 0xff}.#{version & 0xff}"

@@ -34,6 +34,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/device/opening', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceOpeningViewController
 
+  route '/onboarding/device/update', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUpdateViewController
+
   route '/onboarding/device/error', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceErrorViewController
 
@@ -125,14 +128,14 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/update/erasing', (param) ->
     app.navigate UPDATE_LAYOUT, UpdateErasingViewController
 
-  route '/update/reloadblfromos', ->
-    app.navigate UPDATE_LAYOUT, UpdateReloadblfromosViewController
+  route '/update/updating', ->
+    app.navigate UPDATE_LAYOUT, UpdateUpdatingViewController
 
-  route '/update/loados', ->
-    app.navigate UPDATE_LAYOUT, UpdateLoadosViewController
+  route '/update/loading', ->
+    app.navigate UPDATE_LAYOUT, UpdateLoadingViewController
 
-  route '/update/loadbl', ->
-    app.navigate UPDATE_LAYOUT, UpdateLoadblViewController
+  route '/update/done', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateDoneViewController
 
-  route '/update/loadrblreloader', ->
-    app.navigate UPDATE_LAYOUT, UpdateLoadblreloaderViewController
+  route '/update/error', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateErrorViewController

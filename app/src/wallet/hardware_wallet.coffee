@@ -16,17 +16,15 @@
   V1_4_13: 0x0001040d0146
   V_LW_1_0_0: 0x20010000010f
 
-ProductionAttestation = "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
-BetaAttestation = "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
-
 Attestation =
-  String: ProductionAttestation
-  Bytes: []
-
-for i in [0...(Attestation.String.length / 2)]
-  Attestation.Bytes.push parseInt(Attestation.String.substring(i, i + 2), 16)
+  String: "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
 Attestation.xPoint = Attestation.String.substr(2).substr(0, (Attestation.String.length - 2) / 2)
 Attestation.yPoint = Attestation.String.substr(2).substr((Attestation.String.length - 2) / 2)
+
+BetaAttestation =
+  String: "04e69fd3c044865200e66f124b5ea237c918503931bee070edfcab79a00a25d6b5a09afbee902b4b763ecf1f9c25f82d6b0cf72bce3faf98523a1066948f1a395f"
+BetaAttestation.xPoint = BetaAttestation.String.substr(2).substr(0, (BetaAttestation.String.length - 2) / 2)
+BetaAttestation.yPoint = BetaAttestation.String.substr(2).substr((BetaAttestation.String.length - 2) / 2)
 
 
 @ledger.wallet.Attestation
@@ -69,7 +67,25 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   getFirmwareUpdater: () -> ledger.fup.FirmwareUpdater.instance
 
-  isFirmwareUpdateAvailable: () -> @getFirmwareUpdater().isFirmwareUpdateAvailable(this)
+  isFirmwareUpdateAvailable: (callback = null) ->
+    completion = new CompletionClosure(callback)
+    @getFirmwareUpdater().getFirmwareUpdateAvailability(this)
+    .then (availablity) ->
+      completion.success(availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update)
+    .fail (er) ->
+      completion.failure(er)
+    .done()
+    completion.readonly()
+
+  isFirmwareOverwriteOrUpdateAvailable: (callback = null) ->
+    completion = new CompletionClosure(callback)
+    @getFirmwareUpdater().getFirmwareUpdateAvailability(this)
+    .then (availablity) ->
+      completion.success(availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update or availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Overwrite)
+    .fail (er) ->
+      completion.failure(er)
+    .done()
+    completion.readonly()
 
   getFirmwareVersion: () -> @_lwCard.getFirmwareVersion()
 
@@ -192,12 +208,15 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   getExtendedPublicKeys: () -> @_xpubs
 
-  isDongleCertified: (callback) ->
+  isDongleCertified: (callback = null) -> @_checkDongleCertification(Attestation, callback)
+
+  isDongleBetaCertified: (callback = null) -> @_checkDongleCertification(BetaAttestation, callback)
+
+  _checkDongleCertification: (Attestation, callback) ->
     completion = new CompletionClosure(callback)
     randomValues = new Uint32Array(2)
     crypto.getRandomValues(randomValues)
     random = _.str.lpad(randomValues[0].toString(16), 8, '0') + _.str.lpad(randomValues[1].toString(16), 8, '0')
-    # 24.2. GET DEVICE ATTESTATION
     @sendAdpu(new ByteString("E0"+"C2"+"00"+"00"+"08"+random, HEX), [0x9000])
     .then (result) =>
       attestation = result.toString(HEX)
@@ -219,7 +238,8 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     .fail (err) =>
       e err
       error = new ledger.StandardError(Errors.SignatureError, err)
-      completion.failure(error)
+      #completion.failure(error)
+      return
     .done()
     completion.readonly()
 

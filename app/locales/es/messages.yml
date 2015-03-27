@@ -16,9 +16,14 @@ common:
   confirmation: "Confirmación"
   send: "Send"
   continue: "Continue"
+  erase: "Erase"
+  update: "Update"
+  restore: "Restore"
+  later: "Later"
   yes: "Si"
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
+  get_help: "Pongase en contacto con el centro de ayuda en support.ledgerwallet.com"
 
   keycard:
     uppercase_letters: "Mayúsculas"
@@ -54,10 +59,17 @@ onboarding:
       enter_your_pin_code: "Ingrese su PIN para desbloquear su billetera :"
       i_lost_my_pin_code: "Si ha olvidado su PIN, por favor visite nuestro Centro de asistencia."
 
+    connecting:
+      is_connecting: "Verifying authenticity of your Ledger Wallet..."
+
     opening:
       is_opening: "Por favor, espere mientras abre su monedero..."
       is_synchronizing: "Sincronizando su cartera. Esto puede tardar varios minutos..."
       not_opening: "Si su cartera Ledger no se abre, consulte el centro de asistencia."
+
+    update:
+      new_firmware_available: "A new firmware update is available for your Ledger Wallet (%s)."
+      new_1_0_0: "This update adds a new authentication to validate outgoing transactions on your smartphone."
 
     errors:
       frozen:
@@ -74,6 +86,10 @@ onboarding:
         device_unsupported: "Su monedero no esta aceptado"
         unsuported_kind: "Este tipo de monedero no esta aceptado por la aplicación Ledger Wallet."
         get_help: "Pongase en contacto con el centro de ayuda en support.ledgerwallet.com"
+
+      forged:
+        device_forged: "This Ledger Wallet is not genuine"
+        forbidden_access: "For safety reasons, you are not authorized to use this  application."
 
   management:
     back: "RETORNO"
@@ -181,6 +197,30 @@ update:
     security_card_qrcode: "Security card QR code"
     enter_characters: "Enter your security card QR code 32 characters:"
     on_the_left: "They are printed on the left page of your recovery sheet, below the QR code."
+
+  erasing:
+    erasure_confirmation: "Erasure confirmation"
+    ready_to_start_process: "You are now ready to start the update process."
+    factory_settings: "To continue, your Ledger Wallet needs to be erased to use its factory settings."
+    please_note: "Please note: DO NOT go further if you don’t have your recovery sheet with you."
+
+  updating:
+    update_confirmation: "Update confirmation"
+    wallet_is_ready: "Your Ledger Wallet is erased and ready to be updated."
+    clicking_continue: "The firmware will update from %s to %s."
+
+  loading:
+    updating_wallet: "Update in progress"
+    loading: "Loading %s..."
+
+  done:
+    successfully_updated: "Your Ledger Wallet has been successfully updated."
+    update_succeeded: "Update succeeded"
+    use_24_words: "Use your 24 words recovery phrase from your recovery sheet to restore your Bitcoins."
+
+  error:
+    update_failed: "Update failed"
+    error_updated: "An error occurred while updating your Ledger Wallet (code: %s)."
 
 wallet:
   defaults:

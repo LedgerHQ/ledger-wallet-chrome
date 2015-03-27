@@ -10,7 +10,7 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
 
   onAfterRender: ->
     super
-    if @params.animateIntro
+    if @params.animateIntro is true
       do @_animateIntro
     else
       do @_listenEvents
