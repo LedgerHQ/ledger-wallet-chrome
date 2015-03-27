@@ -51,7 +51,7 @@ class ledger.i18n
     for tag in @Languages
       @loadTrad(tag)
 
-    initLangAndLocale = () =>
+    initLang = () =>
       # Lang: Manage text translation
       @checkLangIntoStores()# is Lang set into one of the store ?
       .then (info) =>
@@ -69,10 +69,12 @@ class ledger.i18n
       .catch (err) =>
         l err, ' - Lang: syncing'
         @syncLangStores()
+      .done()
+
+    initLocale = () =>
       # Locale: Manage date, time and currency converters
-      .then () =>
-        l 'check locale into stores'
-        @checkLocaleIntoStores()# is Locale set into one of the store ?
+      l 'check locale into stores'
+      @checkLocaleIntoStores()# is Locale set into one of the store ?
       .then (info) =>
         l info, ' - Loading locale'
         @loadLocale()# @Locale <- Stores
@@ -93,8 +95,11 @@ class ledger.i18n
         @setMomentLocale()
       .done()
 
-    initLangAndLocale()
-    ledger.app.on('wallet:initialized', initLangAndLocale)
+    initLang()
+    initLocale()
+    ledger.app.on('wallet:initialized', initLang)
+    ledger.app.on('wallet:initialized', initLocale)
+
 
     cb()
 
