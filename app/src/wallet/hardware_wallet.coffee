@@ -153,23 +153,14 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   getBitIdAddress: (callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
-    @_lwCard.getBitIDAddress()
+    @_lwCard.getBitIDAddress("0'/0/0xb11e")
     .then (data) =>
       @_bitIdData = data
       callback?(@_bitIdData.bitcoinAddress.value)
     .fail (error) => callback?(null, error)
     return
 
-  getBitIdAddressWithDerivation: (derivationPath, callback) ->
-    throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
-    @_lwCard.getBitIDAddress(derivationPath)
-    .then (data) =>
-      @_bitIdData = data
-      callback?(@_bitIdData.bitcoinAddress.value)
-    .fail (error) => callback?(null, error)
-    return
-
-  signMessageWithBitId: (message, callback) ->
+  signMessageWithBitId: (derivationPath, message, callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
 
     onSuccess = (e, data) =>
@@ -187,7 +178,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       @_vents.off 'LW.getMessageSignature:error', onFailure
     @_vents.on 'LW.getMessageSignature', onSuccess
     @_vents.on 'LW.getMessageSignature:error', onFailure
-    @_lwCard.getMessageSignature(message)
+    @_lwCard.getMessageSignature(derivationPath, message)
 
   getPublicAddress: (derivationPath, callback) ->
     throw 'Cannot get a public while the key is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED

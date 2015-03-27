@@ -356,24 +356,19 @@ LW.prototype = {
     },
 
     getBitIDAddress: function (derivationPath){
-        LWTools.console("LW.getBitIDAddress", 3);
         var deferred = Q.defer()
+        LWTools.console("LW.getBitIDAddress(" + derivationPath + ")", 3);
         var lW = this;
-
-        if (typeof derivationPath == "undefined") {
-            derivation = "0'/0/0xb11e";
-        }
-        LWTools.console("BitID derivation: " + derivation, 3);
 
         try {
 
-            return lW.dongle.getWalletPublicKey_async(derivation).then(function(result) {
+            return lW.dongle.getWalletPublicKey_async(derivationPath).then(function(result) {
                 LWTools.console("BitID public key :", 3);
                 LWTools.console(result, 3);
-                lW.bitIdPubKey = result.publicKey;
-                lW.bitIdDerivation = derivation
+                lW.bitIdAddress = result;
+                lW.bitIdDerivationPath = derivationPath;
                 lW.event('LW.getBitIDAddress', {lW: lW, result: result});
-                deferred.resolve(result)
+                deferred.resolve(result);
                 return result;
             }).fail(function(error) {
                 LWTools.console("BitID public key fail", 2);
@@ -421,17 +416,18 @@ LW.prototype = {
         return d.promise
     },
 
-    getMessageSignature: function(message) {
-        LWTools.console("LW.getMessageSignature", 3);
+    getMessageSignature: function(derivationPath, message) {
         var lW = this;
 
-        return lW.getBitIDAddress(message).then(function(result) {
-            LWTools.console('signMessage ( ' + message + ')', 3);
+        if (lW.bitIdDerivationPath == derivationPath) {
+            LWTools.console('LW.getMessageSignature(' + derivationPath + ',' + message + ')', 3);
             message = new ByteString(message,ASCII);
             pin = new ByteString(lW.PIN,ASCII);
 
-            return lW.dongle.signMessagePrepare_async(lW.bitIdDerivation, message).then(function(result) {
+            return lW.dongle.signMessagePrepare_async(derivationPath, message).then(function(result) {
+                LWTools.console('LlW.dongle.signMessagePrepare_async');
                 return lW.dongle.signMessageSign_async(pin).then(function(result) {
+                    LWTools.console('LlW.dongle.signMessageSign_async');
 
                     function convertBase64(data) {
                         var codes = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -485,7 +481,7 @@ LW.prototype = {
                     var signature = result.signature;
 
                     try {
-                        var signedMessage = convertMessageSignature(lW.bitIdPubKey, new ByteString(message, ASCII), signature);
+                        var signedMessage = convertMessageSignature(lW.bitIdAddress.publicKey, new ByteString(message, ASCII), signature);
                         lW.event("LW.getMessageSignature", signedMessage);
                         return signedMessage;
                     } catch (e) {
@@ -494,7 +490,10 @@ LW.prototype = {
                     };
                 });
             })
-        });
+        } else {
+            return lW.getBitIDAddress(derivationPath).then(function(result) {
+                return lW.getMessageSignature(derivationPath, message);
+            });
+        };
     }
 }
-

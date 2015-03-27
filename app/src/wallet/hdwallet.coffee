@@ -216,7 +216,7 @@ class ledger.wallet.HDWallet.Account
     @_store.set saveHash, callback
 
 openStores = (wallet, done) ->
-  wallet.getBitIdAddress "", (bitIdAddress) =>
+  wallet.getBitIdAddress (bitIdAddress) =>
     wallet.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>
       if not pubKey?.bitcoinAddress? or not bitIdAddress?
         ledger.app.emit 'wallet:initialization:fatal_error'
