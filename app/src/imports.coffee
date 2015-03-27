@@ -288,6 +288,8 @@
 
         '../spec/spec_helper'
 
+        '../spec/i18n/i18n_spec'
+
         ## Update controllers
         'controllers/update/update_navigation_controller'
         'controllers/update/update_view_controller'
