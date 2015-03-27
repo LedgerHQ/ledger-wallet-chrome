@@ -193,9 +193,10 @@ class ledger.wallet.Transaction
   @option [Function] callback The callback called once the transaction is created
   @return [CompletionClosure] A closure
   ###
-  @create: ({amount, fees, address, inputsPath, changePath, inputsAccounts, changeAccount}, callback = null) ->
+  @create: ({amount, fees, address, inputsPath, changePath}, callback = null) ->
     completion = new CompletionClosure(callback)
-    return completion.failure(new ledger.StdError(Errors.DustTransaction)) if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+    return completion.failure(new ledger.StdError(Errors.DustTransaction)).readonly() if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+    return completion.failure(new ledger.StdError(Errors.NotEnoughFunds)).readonly() unless inputsPath?.length
     requiredAmount = amount.add(fees)
 
     ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
@@ -242,7 +243,7 @@ class ledger.wallet.Transaction
   # @return [CompletionClosure]
   @createAndPrepare: (amount, fees, recipientAddress, inputsAccounts, changeAccount, callback=undefined) ->
     completion = new CompletionClosure(callback)
-    inputsPath = inputsPath.concat _.flatten(inputsAccount.getHDWalletAccount().getAllAddressesPaths() for inputsAccount in inputsAccounts)
+    inputsPath = _.flatten(inputsAccount.getHDWalletAccount().getAllAddressesPaths() for inputsAccount in inputsAccounts)
     changePath = changeAccount.getHDWalletAccount().getCurrentChangeAddressPath()
     @create(amount: amount, fees: fees, recipientAddress: recipientAddress, inputsAccounts: inputsAccounts, changeAccount: changeAccount)
     .fail (error) => completion.failure(error)

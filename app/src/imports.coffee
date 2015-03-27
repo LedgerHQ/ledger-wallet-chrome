@@ -139,10 +139,8 @@
         'base/errors'
 
         ## Managers
-        'managers/devices_manager'
         'managers/schemes_manager'
         'managers/permissions_manager'
-        'managers/wallets_manager'
 
         ## Rest clients
         'restclients/authentication'
@@ -163,7 +161,6 @@
         'tasks/address_derivation_task'
 
         ## Wallet
-        'wallet/hardware_wallet'
         'wallet/utils'
         'wallet/transaction'
         'wallet/value'
@@ -182,7 +179,6 @@
         ## Dongle
         'dongle/dongle'
         'dongle/utils'
-        'dongle/transaction'
         'dongle/manager'
 
         ## Mobile 2FA
