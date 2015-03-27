@@ -64,7 +64,7 @@ _.extend @ledger.m2fa,
     d.promise
 
   # Validate with M2FA that tx is correct.
-  # @param [Object] tx A ledger.dongle.Transaction
+  # @param [ledger.wallet.Transaction] tx
   # @param [String] pairingId The paired mobile to send validation.
   # @return A Q promise.
   validateTx: (tx, pairingId) ->
@@ -92,7 +92,7 @@ _.extend @ledger.m2fa,
     [client , d.promise]
 
   # Validate with M2FA that tx is correct on every paired mobile.
-  # @param [Object] tx A ledger.dongle.Transaction
+  # @param [ledger.wallet.Transaction] tx
   # @param [String] pairingId The paired mobile to send validation.
   # @return A Q promise.
   validateTxOnAll: (tx) ->

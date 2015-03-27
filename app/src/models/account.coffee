@@ -29,7 +29,7 @@ class @Account extends Model
   createTransaction: ({amount, fees, address}, callback) ->
     inputsPath = @getHDWalletAccount().getAllPublicAddressesPaths()
     changePath = @getHDWalletAccount().getCurrentChangeAddressPath()
-    ledger.wallet.transaction.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
+    ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
 
   addRawTransactionAndSave: (rawTransaction, callback = _.noop) ->
     hdAccount = ledger.wallet.HDWallet.instance?.getAccount(@get('index'))
