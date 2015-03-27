@@ -127,9 +127,18 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     @_vents.on 'LW.ErrorOccured', onFailure
     @_lwCard.performSetup(pincode, seed, 'qwerty')
 
-  getBitIdAddress: (message, callback) ->
+  getBitIdAddress: (callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
-    @_lwCard.getBitIDAddress(message)
+    @_lwCard.getBitIDAddress()
+    .then (data) =>
+      @_bitIdData = data
+      callback?(@_bitIdData.bitcoinAddress.value)
+    .fail (error) => callback?(null, error)
+    return
+
+  getBitIdAddressWithDerivation: (derivationPath, callback) ->
+    throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
+    @_lwCard.getBitIDAddress(derivationPath)
     .then (data) =>
       @_bitIdData = data
       callback?(@_bitIdData.bitcoinAddress.value)

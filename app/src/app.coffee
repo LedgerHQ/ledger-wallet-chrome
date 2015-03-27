@@ -9,7 +9,7 @@ require @ledger.imports, ->
     onStart: ->
       @_listenAppEvents()
       @setExecutionMode(@Modes.Wallet)
-      addEventListener "message", Api.listener, false
+      addEventListener "message", Api.listener.bind(Api), false
 
     ###
       Sets the execution mode of the application. In Wallet mode, the application handles the wallets state by starting services,

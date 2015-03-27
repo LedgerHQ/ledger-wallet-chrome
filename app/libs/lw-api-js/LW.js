@@ -355,17 +355,13 @@ LW.prototype = {
         });
     },
 
-    getBitIDAddress: function (uri){
+    getBitIDAddress: function (derivationPath){
         LWTools.console("LW.getBitIDAddress", 3);
         var deferred = Q.defer()
         var lW = this;
 
-        if (typeof uri == "undefined" || uri.indexOf("bitid") == -1) {
+        if (typeof derivationPath == "undefined") {
             derivation = "0'/0/0xb11e";
-        } else {
-            uri = uri.replace("bitid://", "").replace("bitid:", "");
-            uri = uri.substring(0, uri.indexOf("?"));
-            derivation = "0'/0xb11e'/" + sha256_digest(uri).substring(0,8);
         }
         LWTools.console("BitID derivation: " + derivation, 3);
 
