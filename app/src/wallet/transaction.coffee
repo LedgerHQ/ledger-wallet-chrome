@@ -181,33 +181,33 @@ class ledger.wallet.Transaction
 
     return details
 
-  # @param [ledger.Amount] amount
-  # @param [ledger.Amount] fees
-  # @param [String] recipientAddress
-  # @param [Array] inputsAccounts
-  # @param [?] changeAccount
-  # @param [Function] callback
-  # @return [CompletionClosure]
-  @createAndPrepare: (amount, fees, recipientAddress, inputsAccounts, changeAccount, callback=undefined) ->
+  ###
+  Creates a new transaction asynchronously. The created transaction will only be initialized (i.e. it will only retrieve
+  a sufficient number of input to perform the transaction)
+
+  @param {ledger.Amount} amount The amount to send (expressed in satoshi)
+  @param {ledger.Amount} fees The miner fees (expressed in satoshi)
+  @param {String} address The recipient address
+  @param {Array<String>} inputsPath The paths of the addresses to use in order to perform the transaction
+  @param {String} changePath The path to use for the change
+  @option [Function] callback The callback called once the transaction is created
+  @return [CompletionClosure] A closure
+  ###
+  @create: ({amount, fees, address, inputsPath, changePath, inputsAccounts, changeAccount}, callback = null) ->
     completion = new CompletionClosure(callback)
-    inputsAccounts = [inputsAccounts] unless _.isArray inputsAccounts
-    inputsPaths = _.flatten(inputsAccount.getHDWalletAccount().getAllAddressesPaths() for inputsAccount in inputsAccounts)
-    changePath = changeAccount.getHDWalletAccount().getCurrentChangeAddressPath()
+    return completion.failure(new ledger.StdError(Errors.DustTransaction)) if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
     requiredAmount = amount.add(fees)
-    if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
-      return completion.failure(new ledger.StdError(Errors.DustTransaction))
-    ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPaths, (outputs, error) ->
-      return completion.failure(Errors.NetworkError, error) if error?
+
+    ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
+      return completion.failure(new ledger.StdError(Errors.NetworkError, error)) if error?
       # Collect each valid outputs and sort them by desired priority
-      validOutputs = _.chain(outputs)
-        .filter((output) -> output.paths.length > 0)
-        .sortBy((output) -> -output['confirmations'])
-        .value()
-      return completion.failure(Errors.NotEnoughFunds) if validOutputs.length == 0
-      # For each valid outputs we try to get its raw transaction.
+      validOutputs = _(output for output in outputs when output.paths.length > 0).sortBy (output) ->  -output['confirmatons']
+      return completion.failure(new ledger.StdError(Errors.NotEnoughFunds)) if validOutputs.length == 0
       finalOutputs = []
       collectedAmount = new Amount()
       hadNetworkFailure = no
+
+      # For each valid outputs we try to get its raw transaction.
       _.async.each validOutputs, (output, done, hasNext) =>
         ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
           if error?
@@ -219,11 +219,11 @@ class ledger.wallet.Transaction
           collectedAmount = collectedAmount.add(Amount.fromSatoshi(output.value))
 
           if collectedAmount.gte(requiredAmount)
+            changeAmount = collectedAmount.subtract(requiredAmount)
+            fees = fees.add(changeAmount) if changeAmount.lte(5400)
             # We have reached our required amount. It's time to prepare the transaction
             transaction = new Transaction(ledger.app.dongle, amount, fees, recipientAddress, finalOutputs, changePath)
-            transaction.prepare()
-            .then => completion.success(transaction)
-            .fail (error) => completion.failure(error)
+            completion.success(transaction)
           else if hasNext is true
             # Continue to collect funds
             done()
@@ -231,4 +231,23 @@ class ledger.wallet.Transaction
             completion.failure(Errors.NetworkError)
           else
             completion.failure(Errors.NotEnoughFunds)
+    completion.readonly()
+
+  # @param [ledger.Amount] amount
+  # @param [ledger.Amount] fees
+  # @param [String] recipientAddress
+  # @param [Array<ledger.wallet.HDWallet.Account>] inputsAccounts The accounts of the addresses to use in order to perform the transaction
+  # @param [ledger.wallet.HDWallet.Account] changeAccount The account to use for the change
+  # @param [Function] callback
+  # @return [CompletionClosure]
+  @createAndPrepare: (amount, fees, recipientAddress, inputsAccounts, changeAccount, callback=undefined) ->
+    completion = new CompletionClosure(callback)
+    inputsPath = inputsPath.concat _.flatten(inputsAccount.getHDWalletAccount().getAllAddressesPaths() for inputsAccount in inputsAccounts)
+    changePath = changeAccount.getHDWalletAccount().getCurrentChangeAddressPath()
+    @create(amount: amount, fees: fees, recipientAddress: recipientAddress, inputsAccounts: inputsAccounts, changeAccount: changeAccount)
+    .fail (error) => completion.failure(error)
+    .then (tx) =>
+      tx.prepare()
+      .then () => completion.success(tx)
+      .fail (error) => completion.failure(error)
     completion.readonly()
