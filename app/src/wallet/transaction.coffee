@@ -178,7 +178,8 @@ class ledger.wallet.transaction.Transaction
     completion = new CompletionClosure(callback)
     amount = ledger.wallet.Value.from(amount)
     fees = ledger.wallet.Value.from(fees)
-    return completion.failure(new ledger.StandardError(ledger.errors.DustTransaction)) if amount.lte(ledger.wallet.transaction.MINIMUM_OUTPUT_VALUE)
+    return completion.failure(new ledger.StandardError(ledger.errors.DustTransaction)).readonly() if amount.lte(ledger.wallet.transaction.MINIMUM_OUTPUT_VALUE)
+    return completion.failure(new ledger.StandardError(ledger.errors.NotEnoughFunds)).readonly() unless inputsPath?.length
     ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
       return completion.failure(error) if error?
       # Collect each valid outputs and sort them by desired priority

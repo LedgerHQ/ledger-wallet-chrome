@@ -3,6 +3,7 @@ _.async =
   each: (array, callback) ->
     index = 0
     length = array.length
+    return callback?(no, "Empty array") if ! length
     done = ->
       return if index >= length
       index += 1
