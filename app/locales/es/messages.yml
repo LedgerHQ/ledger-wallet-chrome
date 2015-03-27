@@ -19,6 +19,7 @@ common:
   erase: "Erase"
   update: "Update"
   restore: "Restore"
+  later: "Later"
   yes: "Si"
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
@@ -65,6 +66,10 @@ onboarding:
       is_opening: "Por favor, espere mientras abre su monedero..."
       is_synchronizing: "Sincronizando su cartera. Esto puede tardar varios minutos..."
       not_opening: "Si su cartera Ledger no se abre, consulte el centro de asistencia."
+
+    update:
+      new_firmware_available: "A new firmware update is available for your Ledger Wallet (%s)."
+      new_1_0_0: "This update adds a new authentication to validate outgoing transactions on your smartphone."
 
     errors:
       frozen:

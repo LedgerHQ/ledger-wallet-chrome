@@ -51,7 +51,8 @@ class ledger.fup.FirmwareUpdater
     @_request = new ledger.fup.FirmwareUpdateRequest(@)
     @_request
 
-  _cancelRequest: (request) -> @_request = null if request is @_request
+  _cancelRequest: (request) ->
+    @_request = null if request is @_request
 
   load: (callback) ->
     require ledger.fup.imports, (scripts) =>

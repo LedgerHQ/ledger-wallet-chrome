@@ -43,7 +43,6 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
     ledger.app.router.go '/onboarding/device/connecting'
 
   _listenEvents: ->
-    l ledger.app.wallet
     if ledger.app.wallet?
       do @navigateContinue
     else

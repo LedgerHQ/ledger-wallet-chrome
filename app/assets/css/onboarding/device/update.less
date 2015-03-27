@@ -3,13 +3,19 @@
 div.greyed-container {
   text-align: center;
 
-  .spinner {
-    margin-top: 20px;
-    margin-bottom: 60px;
+  > .black-indication {
+    margin-top: @metrics-small-padding;
   }
 
-  > .medium-indication {
-    margin-top: @metrics-small-padding;
-    display: block;
+  > .small-indication {
+    margin-top: @metrics-almost-small-padding;
+  }
+
+  > .actions-container {
+    margin-top: @metrics-medium-padding;
+
+    > .action-rounded-button {
+      margin-left: @metrics-very-small-padding;
+    }
   }
 }
