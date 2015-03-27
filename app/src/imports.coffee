@@ -240,6 +240,9 @@
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'
 
+        # BitID
+        'controllers/wallet/bitid/wallet_bitid_index_dialog_view_controller'
+
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
         'controllers/onboarding/onboarding_navigation_controller'
@@ -298,5 +301,6 @@
         'controllers/update/update_done_view_controller'
         'controllers/update/update_error_view_controller'
 
-        # API
+        ## API
         'api'
+    ]

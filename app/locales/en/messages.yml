@@ -392,3 +392,7 @@ wallet:
       default_name: "My mobile phone"
       name_already_used_by_paired_device: "This name is already used by another mobile phone."
       please_enter_a_name: "Please enter a mobile phone name."
+
+  bitid:
+    common:
+      connect: "Authenticate on a website"

@@ -1,0 +1,19 @@
+<section id="bitid_index_dialog">
+  <header>
+    <h1><%= t 'wallet.bitid.common.connect' %></h1>
+  </header>
+  <table class="no-table-head">
+    <tbody>
+      <tr>
+        <td class="row-title"><%= t 'wallet.send.index.receiver_address' %></td>
+        <td class="align-right" id="bitid_url"></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+<div id="error_container"></div>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
+  <a class="action-rounded-button" href="#confirm" id="confirm_button"><%= t 'common.confirm' %></a>
+</div>

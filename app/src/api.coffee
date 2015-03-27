@@ -11,7 +11,7 @@ class @Api
   @has_session: (data) ->
     chrome.runtime.sendMessage {
       command: 'has_session',
-      result: ledger.app.wallet? ? true : false
+      result: ledger.app.isInWalletMode? ? true : false
     }
 
   @bitid: (data) ->
@@ -20,6 +20,7 @@ class @Api
     uri = data.uri.replace("bitid://", "").replace("bitid:", "")
     uri = uri.substring(0, uri.indexOf("?"))
     derivationPath = "0'/0xb11e'/" + sha256_digest(uri).substring(0,8)
+    ledger.app.router.go '/wallet/bitid/index'
     ledger.app.wallet.getBitIdAddressWithDerivation derivationPath, (result) ->
       address = result
       ledger.app.wallet.signMessageWithBitId data.uri, (result) ->
