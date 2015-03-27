@@ -29,6 +29,7 @@ class @WalletsManager extends EventEmitter
               _.defer =>
                 @_wallets[card.id] = new ledger.wallet.HardwareWallet(this, card, lwCard)
                 @_wallets[card.id].once 'connected', (event, wallet) => @emit 'connected', wallet
+                @_wallets[card.id].once 'forged', (event, wallet) => @emit 'forged', wallet
                 @_wallets[card.id].connect()
     catch er
       e er

@@ -3,7 +3,8 @@ ledger.router ?= {}
 ledger.router.ignorePluggedWalletForRouting = @ledger.isDev
 ledger.router.pluggedWalletRoutesExceptions = [
   '/',
-  '/onboarding/device/plug'
+  '/onboarding/device/plug',
+  '/onboarding/device/connecting'
 ]
 
 # routes declarations
@@ -23,11 +24,18 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/device/unplug', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUnplugViewController
 
+  route '/onboarding/device/connecting', (params) ->
+    l 'Routing'
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceConnectingViewController
+
   route '/onboarding/device/pin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDevicePinViewController
 
   route '/onboarding/device/opening', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceOpeningViewController
+
+  route '/onboarding/device/update', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUpdateViewController
 
   route '/onboarding/device/error', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceErrorViewController
@@ -48,6 +56,12 @@ ledger.router.pluggedWalletRoutesExceptions = [
     app.router.go '/onboarding/device/error',
       error: t 'onboarding.device.errors.unsupported.device_unsupported'
       message: t 'onboarding.device.errors.unsupported.unsuported_kind'
+      indication: t 'onboarding.device.errors.unsupported.get_help'
+
+  route '/onboarding/device/forged', (params) ->
+    app.router.go '/onboarding/device/error',
+      error: t 'onboarding.device.errors.forged.device_forged'
+      message: t 'onboarding.device.errors.forged.forbidden_access'
       indication: t 'onboarding.device.errors.unsupported.get_help'
 
   # Management
@@ -111,17 +125,17 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/update/seed', (param) ->
     app.navigate UPDATE_LAYOUT, UpdateSeedViewController
 
-  route '?update/erasing', (param) ->
+  route '/update/erasing', (param) ->
     app.navigate UPDATE_LAYOUT, UpdateErasingViewController
 
-  route '/update/reloadblfromos', ->
-    app.navigate UPDATE_LAYOUT, UpdateReloadblfromosViewController
+  route '/update/updating', ->
+    app.navigate UPDATE_LAYOUT, UpdateUpdatingViewController
 
-  route '/update/loados', ->
-    app.navigate UPDATE_LAYOUT, UpdateLoadosViewController
+  route '/update/loading', ->
+    app.navigate UPDATE_LAYOUT, UpdateLoadingViewController
 
-  route '/update/loadbl', ->
-    app.navigate UPDATE_LAYOUT, UpdateLoadblViewController
+  route '/update/done', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateDoneViewController
 
-  route '/update/loadrblreloader', ->
-    app.navigate UPDATE_LAYOUT, UpdateLoadblreloaderViewController
+  route '/update/error', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateErrorViewController

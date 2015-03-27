@@ -114,6 +114,7 @@
         'utils/try'
         'utils/comparison_result'
         'utils/amount'
+        'utils/progressbars'
 
         ## Crypto
         'utils/crypto/aes'
@@ -249,6 +250,8 @@
         'controllers/onboarding/device/onboarding_device_pin_view_controller'
         'controllers/onboarding/device/onboarding_device_opening_view_controller'
         'controllers/onboarding/device/onboarding_device_error_view_controller'
+        'controllers/onboarding/device/onboarding_device_connecting_view_controller'
+        'controllers/onboarding/device/onboarding_device_update_view_controller'
 
         # Management
         'controllers/onboarding/management/onboarding_management_security_view_controller'
@@ -290,11 +293,10 @@
         'controllers/update/update_seed_view_controller'
         'controllers/update/update_erasing_view_controller'
         'controllers/update/update_unplug_view_controller'
-        'controllers/update/update_reloadblfromos_view_controller'
-        'controllers/update/update_loados_view_controller'
-        'controllers/update/update_loadblreloader_view_controller'
-        'controllers/update/update_loadbl_view_controller'
+        'controllers/update/update_updating_view_controller'
+        'controllers/update/update_loading_view_controller'
+        'controllers/update/update_done_view_controller'
+        'controllers/update/update_error_view_controller'
 
         # API
         'api'
-      ]

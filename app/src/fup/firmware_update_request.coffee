@@ -78,6 +78,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   onProgress: (callback) -> @_onProgress = callback
 
+  hasGrantedErasurePermission: -> _.contains(@_approvedStates, "erasure")
+
   ###
     Approves the current request state and continue its execution.
   ###
@@ -119,7 +121,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
     @param [String] keyCardSeed A 32 characters string formatted as an hexadecimal value (i.e. '01294b7431234b5323f5588ce7d02703'
   ###
-  checkIfKeyCardSeedIsValid: (keyCardSeed) -> @_keyCardSeedToByteString(keyCardSeed).isSuccess()
+  checkIfKeyCardSeedIsValid: (keyCardSeed) -> (Try => @_keyCardSeedToByteString(keyCardSeed)).isSuccess()
 
   _keyCardSeedToByteString: (keyCardSeed, safe = no) ->
     throw new Error(Errors.InvalidSeedSize) if not keyCardSeed? or keyCardSeed.length != 32
@@ -161,7 +163,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       unless wallet?
         @_connectionCompletion = completion.readonly()
         delay = if !silent then 0 else 1000
-        l "Wait for connection", silent
         setTimeout (=> @emit 'plug' unless @_wallet?), delay
         ledger.app.walletsManager.once 'connected', (e, wallet) =>
           @_connectionCompletion = null
@@ -226,7 +227,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
               else
                 @_setCurrentState(States.ReloadingBootloaderFromOs)
                 @_handleCurrentState()
-            when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update
+            when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update, ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Higher
               index = 0
               while index < ledger.fup.updates.OS_INIT.length and !ledger.fup.utils.compareVersions(@_dongleVersion, ledger.fup.updates.OS_INIT[index][0]).eq()
                 index += 1
@@ -257,7 +258,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .done()
 
   _processInitOs: ->
-    currentInitScript = _(ledger.fup.updates.OS_INIT).last()[1]
+    index = 0
+    while index < ledger.fup.updates.OS_INIT.length and !ledger.fup.utils.compareVersions(ledger.fup.versions.Nano.CurrentVersion.Os, ledger.fup.updates.OS_INIT[index][0]).eq()
+      index += 1
+    currentInitScript = if ledger.fup.updates.OS_INIT[index]? then ledger.fup.updates.OS_INIT[index][1] else _(ledger.fup.updates.OS_INIT).last()[1]
     moddedInitScript = []
     for i in [0...currentInitScript.length]
       moddedInitScript.push currentInitScript[i]
@@ -265,9 +269,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         moddedInitScript.push "D026000011" + "04" + @_keyCardSeed.toString(HEX)
     @_processLoadingScript moddedInitScript, States.InitializingOs, yes
     .then =>
-      @_setCurrentState(States.Done)
+      @_success()
       @_isOsLoaded = no
-      @_onComplete.success()
     .fail =>
       @_failure(Errors.FailedToInitOs)
 
@@ -292,8 +295,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           when 0x6faa then @_failure(Errors.ErrorDueToCardPersonalization)
           else @_failure(Errors.CommunicationError)
         @_waitForDisconnectDongle()
-
-
 
   _processInitStageBootloader: ->
     @_lastVersion = null
@@ -331,14 +332,14 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _processLoadBootloader: ->
     @_findOriginalKey(ledger.fup.updates.BL_LOADER).then (offset) =>
       @_processLoadingScript(ledger.fup.updates.BL_LOADER[offset], States.LoadingBootloader)
-    .then => @_waitForDisconnectDongle()
+    .then => @_waitForPowerCycle(null, yes)
     .fail (ex) =>
       @_failure(Errors.CommunicationError)
 
   _processLoadBootloaderReloader: ->
     @_findOriginalKey(ledger.fup.updates.RELOADER_FROM_BL).then (offset) =>
       @_processLoadingScript(ledger.fup.updates.RELOADER_FROM_BL[offset], States.LoadingBootloaderReloader)
-    .then => @_waitForDisconnectDongle()
+    .then => @_waitForPowerCycle(null, yes)
     .fail (ex) =>
       @_failure(ledger.errors.CommunicationError)
 
@@ -347,6 +348,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _failure: (reason) ->
     @emit "error", cause: new ledger.StandardError(reason)
     @_waitForPowerCycle()
+
+  _success: ->
+    @_setCurrentState(States.Done)
+    _.defer => @cancel()
 
   _attemptToFailDonglePinCode: (pincode) ->
     deferred = Q.defer()
@@ -421,7 +426,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
             @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
         else
           @_exchangeNeedsExtraTimeout = no
-          # TODO: Place Logger here
           throw new Error('Unexpected status ' + @_getCard().SW)
       .fail (ex) =>
         return @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1) if offset is adpus.length - 1
