@@ -4,6 +4,8 @@ ledger.router.ignorePluggedWalletForRouting = @ledger.isDev
 ledger.router.pluggedWalletRoutesExceptions = [
   '/',
   '/onboarding/device/plug'
+  '/onboarding/device/connecting'
+  '/onboarding/device/forged'
 ]
 
 # routes declarations
