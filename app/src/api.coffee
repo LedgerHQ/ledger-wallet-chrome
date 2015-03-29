@@ -15,13 +15,8 @@ class @Api
     }
 
   @bitid: (data) ->
-    console.log "BitID"
-    console.log data
-    uri = data.uri.replace("bitid://", "").replace("bitid:", "")
-    uri = uri.substring(0, uri.indexOf("?"))
-    derivationPath = "0'/0xb11e'/0x" + sha256_digest(uri).substring(0,8)
-    ledger.app.router.go '/wallet/bitid/index'
-    ledger.app.wallet.signMessageWithBitId derivationPath, data.uri, (result) ->
+    ledger.app.router.go '/wallet/bitid/index', {uri: data.uri}
+    ledger.app.wallet.signMessageWithBitId ledger.bitcoin.bitid.uriToDerivationPath(data.uri), data.uri, (result) ->
       chrome.runtime.sendMessage {
         command: 'bitid',
         address: ledger.app.wallet._lwCard.bitIdAddress.bitcoinAddress.value,

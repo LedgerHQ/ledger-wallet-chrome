@@ -142,5 +142,5 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   # BitID
   route '/wallet/bitid/index', (params) ->
-    dialog = new WalletBitidIndexDialogViewController()
+    dialog = new WalletBitidIndexDialogViewController(params)
     dialog.show()

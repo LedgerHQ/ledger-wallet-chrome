@@ -6,7 +6,7 @@
     <tbody>
       <tr>
         <td class="row-title"><%= t 'wallet.send.index.receiver_address' %></td>
-        <td class="align-right" id="bitid_url"></td>
+        <td class="align-right" id="bitid_domain"></td>
       </tr>
     </tbody>
   </table>

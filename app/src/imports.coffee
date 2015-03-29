@@ -125,6 +125,7 @@
         'utils/bitcoin/bitcoin'
         'utils/bitcoin/bip39_wordlist'
         'utils/bitcoin/bip39'
+        'utils/bitcoin/bitid'
 
         ## Storage
         'utils/storage/store'
