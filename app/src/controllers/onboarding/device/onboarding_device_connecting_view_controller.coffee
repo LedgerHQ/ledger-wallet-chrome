@@ -24,7 +24,6 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
         node.fadeIn(if animated then 250 else 0)
 
   navigateContinue: ->
-    ledger.app.wallet.isFirmwareUpdateAvailable()
     ledger.app.wallet?.isFirmwareUpdateAvailable (isAvailable) =>
       if isAvailable
         ledger.app.router.go '/onboarding/device/update'

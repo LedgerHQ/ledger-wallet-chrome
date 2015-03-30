@@ -106,7 +106,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @wallet?.isDongleCertified (dongle, error) =>
       (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
       @_dongleAttestationLock = off
-
+    return
 
 
 
