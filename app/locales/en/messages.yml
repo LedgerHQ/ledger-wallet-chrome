@@ -336,8 +336,8 @@ wallet:
 
     method:
       select_method: "Please select a validation method in order to authenticate the outgoing transaction from your Ledger Wallet:"
-      pair_a_mobile_phone: "Pair a mobile phone"
-      mobile_phone: "Mobile phone"
+      pair_a_mobile_phone: "Pair a smartphone"
+      mobile_phone: "Smartphone"
       security_card: "Security card"
       single_paired_device: "%s pairing"
       multiple_paired_devices: "%s pairings"
@@ -362,15 +362,15 @@ wallet:
 
   pairing:
     common:
-      pair_a_new_mobile: "Pair a mobile phone"
+      pair_a_new_mobile: "Pair a smartphone"
 
     errors:
       pairing_failed: "Pairing failed"
       pairing_succeeded: "Pairing succeeded"
-      dongle_is_now_paired: "Your Ledger Wallet is now paired<br />with your mobile phone \"%s\"."
+      dongle_is_now_paired: "Your Ledger Wallet is now paired<br />with your smartphone \"%s\"."
       inconsistent_state: "Something wrong happened (inconsistent state)."
       client_cancelled: "The mobile application cancelled the pairing process."
-      dongle_needs_power_cycle: "Your Ledger Wallet needs to be unplugged and plugged back<br/>to pair a new mobile phone."
+      dongle_needs_power_cycle: "Your Ledger Wallet needs to be unplugged and plugged back<br/>to pair a new smartphone."
       invalid_challenge_response: "The security card validation code is incorrect."
       dongle_cancelled: "Your Ledger Wallet cancelled the pairing process."
       unknown: "An unknown error occurred."
@@ -379,16 +379,16 @@ wallet:
       download_the_app: "<b>Download</b> the Ledger Wallet mobile app."
       compatibility_details_available: "Compatibility details and installation guides are available from our <b>help center</b>."
       open_the_app: "<b>Scan</b> the pairing QR code."
-      tap_pair: "Tap “Pair a new Ledger Wallet” to start the scanner."
+      tap_pair: "Tap “Pair a Ledger Wallet” to start the scanner."
       scan_this_qrcode: "Scan this pairing QR code."
 
     progress:
       pairing_with_mobile_device: "Pairing in progress..."
-      follow_instructions: "Follow the instructions displayed on the mobile phone screen."
+      follow_instructions: "Follow the instructions displayed on the smartphone screen."
 
     finalizing:
-      assign_a_name: "To finish, please give a name to this mobile phone."
-      placeholder_name: "Mobile phone name"
-      default_name: "My mobile phone"
-      name_already_used_by_paired_device: "This name is already used by another mobile phone."
-      please_enter_a_name: "Please enter a mobile phone name."
+      assign_a_name: "To finish, please give a name to this smartphone."
+      placeholder_name: "Smartphone name"
+      default_name: "My smartphone"
+      name_already_used_by_paired_device: "This name is already used by another smartphone."
+      please_enter_a_name: "Please enter a smartphone name."
