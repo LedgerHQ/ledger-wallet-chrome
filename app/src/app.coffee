@@ -45,6 +45,7 @@ require @ledger.imports, ->
       @emit 'dongle:connecting', card if @isInWalletMode()
 
     onDongleConnected: (wallet) ->
+      @performDongleAttestation() if @isInWalletMode()
 
     onDongleCertificationDone: (wallet, isCertified) ->
       return unless @isInWalletMode()

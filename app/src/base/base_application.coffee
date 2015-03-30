@@ -14,6 +14,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @devicesManager = new DevicesManager()
     @walletsManager = new WalletsManager(this)
     @router = new Router(@)
+    @_dongleAttestationLock = off
     ledger.dialogs.manager.initialize($('#dialogs_container'))
 
   ###
@@ -100,9 +101,11 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     Requests the application to perform or perform again a dongle certification process
   ###
   performDongleAttestation: ->
+    return if @_dongleAttestationLock is on
+    @_dongleAttestationLock = on
     @wallet?.isDongleCertified (dongle, error) =>
       (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
-
+      @_dongleAttestationLock = off
 
 
 
@@ -158,8 +161,6 @@ class ledger.base.application.BaseApplication extends @EventEmitter
       (Try => @onDongleConnected(wallet)).printError()
       if wallet.isInBootloaderMode()
         (Try => @onDongleIsInBootloaderMode(wallet)).printError()
-      else
-        @performDongleAttestation()
 
 
 
