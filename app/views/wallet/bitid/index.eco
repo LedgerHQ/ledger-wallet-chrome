@@ -1,15 +1,16 @@
 <section id="bitid_index_dialog">
   <header>
-    <h1><%= t 'wallet.bitid.common.connect' %></h1>
+    <h1><%= t 'wallet.bitid.index.title' %></h1>
   </header>
-  <table class="no-table-head">
-    <tbody>
-      <tr>
-        <td class="row-title"><%= t 'wallet.send.index.receiver_address' %></td>
-        <td class="align-right" id="bitid_domain"></td>
-      </tr>
-    </tbody>
-  </table>
+  <%= t 'wallet.bitid.index.connect' %>
+  <p>
+  <%= t 'wallet.bitid.index.domain' %>
+  <br>
+  <div id="bitid_domain">
+  <p>  
+  <%= t 'wallet.bitid.index.address' %>
+  <br>
+  <div id="bitid_address">
 </section>
 <div id="error_container"></div>
 <div class="dialog-actions-bar">

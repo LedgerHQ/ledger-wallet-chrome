@@ -394,5 +394,8 @@ wallet:
       please_enter_a_name: "Please enter a mobile phone name."
 
   bitid:
-    common:
-      connect: "Authenticate on a website"
+    index:
+      title: "Connect with BitID"
+      domain: "Domain"
+      address: "Address"
+      connect: "Do you wish to authenticate on the following service?"

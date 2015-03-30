@@ -14,6 +14,7 @@ function LW (id, dongle, deviceManager) {
     this.operationMode = null;              /* BTChip Operation Mode */
     this.wallets = new Array();             /* Contains the list of wallets */
     this.deviceManager = deviceManager;
+    this.bitIdAddress = new Array();
 
     /* Event : LW.CardConnected */
     this.event('LW.CardConnected', {lW: this})
@@ -365,8 +366,7 @@ LW.prototype = {
             return lW.dongle.getWalletPublicKey_async(derivationPath).then(function(result) {
                 LWTools.console("BitID public key :", 3);
                 LWTools.console(result, 3);
-                lW.bitIdAddress = result;
-                lW.bitIdDerivationPath = derivationPath;
+                lW.bitIdAddress[derivationPath] = result;
                 lW.event('LW.getBitIDAddress', {lW: lW, result: result});
                 deferred.resolve(result);
                 return result;
@@ -419,15 +419,17 @@ LW.prototype = {
     getMessageSignature: function(derivationPath, message) {
         var lW = this;
 
-        if (lW.bitIdDerivationPath == derivationPath) {
+        if (typeof lW.bitIdAddress[derivationPath] == "object") {
             LWTools.console('LW.getMessageSignature(' + derivationPath + ',' + message + ')', 3);
             message = new ByteString(message,ASCII);
             pin = new ByteString(lW.PIN,ASCII);
 
             return lW.dongle.signMessagePrepare_async(derivationPath, message).then(function(result) {
                 LWTools.console('LlW.dongle.signMessagePrepare_async');
+                LWTools.console(result);
                 return lW.dongle.signMessageSign_async(pin).then(function(result) {
                     LWTools.console('LlW.dongle.signMessageSign_async');
+                    LWTools.console(result);
 
                     function convertBase64(data) {
                         var codes = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -481,7 +483,7 @@ LW.prototype = {
                     var signature = result.signature;
 
                     try {
-                        var signedMessage = convertMessageSignature(lW.bitIdAddress.publicKey, new ByteString(message, ASCII), signature);
+                        var signedMessage = convertMessageSignature(lW.bitIdAddress[derivationPath].publicKey, new ByteString(message, ASCII), signature);
                         lW.event("LW.getMessageSignature", signedMessage);
                         return signedMessage;
                     } catch (e) {

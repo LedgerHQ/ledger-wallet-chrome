@@ -11,14 +11,15 @@ class @Api
   @has_session: (data) ->
     chrome.runtime.sendMessage {
       command: 'has_session',
-      result: @_state is ledger.wallet.States.UNLOCKED ? true : false
-    }
+      result: ledger.app.wallet? && (ledger.app.wallet._state is ledger.wallet.States.UNLOCKED) ? true : false
+    }    
 
   @bitid: (data) ->
+    @derivationPath = ledger.bitcoin.bitid.uriToDerivationPath(data.uri)
     ledger.app.router.go '/wallet/bitid/index', {uri: data.uri}
-    ledger.app.wallet.signMessageWithBitId ledger.bitcoin.bitid.uriToDerivationPath(data.uri), data.uri, (result) ->
+    ledger.app.wallet.signMessageWithBitId @derivationPath, data.uri, (result) ->
       chrome.runtime.sendMessage {
         command: 'bitid',
-        address: ledger.app.wallet._lwCard.bitIdAddress.bitcoinAddress.value,
+        address: ledger.app.wallet._lwCard.bitIdAddress[Api.derivationPath].bitcoinAddress.value,
         signature: result
       }

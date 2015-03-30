@@ -7,10 +7,11 @@ chrome.app.runtime.onLaunched.addListener =>
 
 chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse) =>
   console.log "onMessageExternal received"
+  console.log request
   window.externalSendResponse = sendResponse
   if typeof request.request == "string"
     req = request.request
-  else
+  else if request.request?
     req = request.request.command
     data = request.request
     console.log data
@@ -28,14 +29,16 @@ chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse) =>
       payload = {
         command: 'has_session'
       }
-      chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
+      if chrome.app.window.get("main_window")?
+        chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
     when 'bitid'
       console.log data.uri
       payload = {
         command: 'bitid',
         uri: data.uri
       }
-      chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
+      if chrome.app.window.get("main_window")?
+        chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
   return true
 
 chrome.runtime.onMessage.addListener (request, sender, sendResponse) =>

@@ -4,8 +4,9 @@ class @WalletBitidIndexDialogViewController extends DialogViewController
     confirmButton: '#confirm_button'
     errorContainer: '#error_container'
     bitidDomain: '#bitid_domain'
+    bitidAddress: '#bitid_address'
 
-  onShow: ->
+  onAfterRender: ->
     super
     @view.bitidDomain.text(ledger.bitcoin.bitid.uriToDerivationUrl(@params['?params'].uri))
 
