@@ -336,8 +336,8 @@ wallet:
 
     method:
       select_method: "Sélectionnez une méthode de validation pour authentifier la transaction sortante depuis votre Ledger Wallet:"
-      pair_a_mobile_phone: "Associer un téléphone mobile"
-      mobile_phone: "Téléphone mobile"
+      pair_a_mobile_phone: "Associer un smartphone"
+      mobile_phone: "Smartphone"
       security_card: "Carte de sécurité"
       single_paired_device: "%s association"
       multiple_paired_devices: "%s associations"
@@ -362,15 +362,15 @@ wallet:
 
   pairing:
     common:
-      pair_a_new_mobile: "Associer un téléphone mobile"
+      pair_a_new_mobile: "Associer un smartphone"
 
     errors:
       pairing_failed: "Association échouée"
       pairing_succeeded: "Association réussie"
-      dongle_is_now_paired: "Votre Ledger Wallet est maintenant associé<br />avec votre téléphone mobile \"%s\"."
+      dongle_is_now_paired: "Votre Ledger Wallet est maintenant associé<br />avec votre smartphone \"%s\"."
       inconsistent_state: "Quelque chose ne s'est pas bien déroulé (état inconsistant)."
       client_cancelled: "L'application mobile a annulé la procédure d'association."
-      dongle_needs_power_cycle: "Votre Ledger Wallet nécessite d'être débranché puis rebranché<br />pour associer un nouveau téléphone mobile."
+      dongle_needs_power_cycle: "Votre Ledger Wallet nécessite d'être débranché puis rebranché<br />pour associer un nouveau smartphone."
       invalid_challenge_response: "Le code de validation de la carte de sécurité est incorrect."
       dongle_cancelled: "Votre Ledger Wallet a annulé la procédure d'association."
       unknown: "Une erreur inconnue est survenue."
@@ -379,16 +379,16 @@ wallet:
       download_the_app: "<b>Téléchargez</b> l'application mobile Ledger Wallet."
       compatibility_details_available: "Détails de compatibilité et guides d'installation disponibles sur notre <b>centre d'aide</b>."
       open_the_app: "<b>Scannez</b> le code QR d'association."
-      tap_pair: "Touchez “Associer un nouveau Ledger Wallet” pour démarrer le scanner."
+      tap_pair: "Touchez “Associer un Ledger Wallet” pour démarrer le scanner."
       scan_this_qrcode: "Scannez ce code QR d'association."
 
     progress:
       pairing_with_mobile_device: "Association en cours..."
-      follow_instructions: "Suivez les instructions affichées à l'écran du téléphone mobile."
+      follow_instructions: "Suivez les instructions affichées à l'écran du smartphone."
 
     finalizing:
-      assign_a_name: "Pour terminer, donnez un nom à ce téléphone mobile."
-      placeholder_name: "Nom du téléphone mobile"
-      default_name: "Mon téléphone mobile"
-      name_already_used_by_paired_device: "Ce nom est déjà utilisé par un autre téléphone mobile."
-      please_enter_a_name: "Veuillez entrer un nom pour ce téléphone mobile."
+      assign_a_name: "Pour terminer, donnez un nom à ce smartphone."
+      placeholder_name: "Nom du smartphone"
+      default_name: "Mon smartphone"
+      name_already_used_by_paired_device: "Ce nom est déjà utilisé par un autre smartphone."
+      please_enter_a_name: "Veuillez entrer un nom pour ce smartphone."
