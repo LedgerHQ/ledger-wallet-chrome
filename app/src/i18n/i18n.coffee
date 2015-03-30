@@ -49,20 +49,15 @@ class ledger.i18n
   @init: (cb) =>
     @chromeStore = new ledger.storage.ChromeStore('i18n')
 
-    # Know about the supported languages and load the translation files
-    @Languages = Object.keys(@Languages)
-    for tag in @Languages
-      @loadTrad(tag)
-
-    initLang = () =>
+    initLangAndLocale = () =>
       # Lang: Manage text translation
       @checkLangIntoStores()# is Lang set into one of the store ?
       .then (info) =>
         l info, ' - Loading favLang'
         @loadLang()# @favLang <- Stores
       .catch (err) =>
-        l err, ' - setFavLang'
-        @setFavLang()# @favLang -> Stores
+        l 'Get initial value for Lang and Locale and send it to stores - ', err
+        @getLangAndLocaleFromBrowserAndStoreIt()
       .then () =>
         l 'Lang: set chromeStoreValue and syncStoreValue from stores'
         @setFavLangStoreValues()# set chromeStoreValue and syncStoreValue
@@ -72,17 +67,15 @@ class ledger.i18n
       .catch (err) =>
         l err, ' - Lang: syncing'
         @syncLangStores()
-      .done()
-
-    initLocale = () =>
       # Locale: Manage date, time and currency converters
-      @checkLocaleIntoStores()# is Locale set into one of the store ?
+      .then () =># is Locale set into one of the store ?
+        l '@checkLocaleIntoStores'
+        @checkLocaleIntoStores()
       .then (info) =>
         l info, ' - Loading locale'
         @loadLocale()# @Locale <- Stores
       .catch (err) =>
-        l err, ' - set locale to stores'
-        @setLocale()# @Locale -> Stores
+        l err
       .then () =>
         l 'Locale: set storevalues'
         @setLocaleStoreValues()# set chromeStoreValue and syncStoreValue
@@ -92,24 +85,41 @@ class ledger.i18n
       .catch (err) =>
         l err, ' - Locale: syncing'
         @syncLocaleStores()
-      .finally () =>
+      .then () =>
         l 'set Moment.js Locale'
         @setMomentLocale()
       .done()
 
-    @loadUserBrowserUiLang()
-    .then(@loadUserBrowserAcceptLangs)
-    .then(@setLangAndLocaleMemory)
-    .then(initLang)
-    .then(initLocale)
+    @loadTranslationFiles()
+    .then(initLangAndLocale)
     .then(cb)
     .done()
-
-    ledger.app.on('wallet:initialized', initLang)
-    ledger.app.on('wallet:initialized', initLocale)
+    ledger.app.on('wallet:initialized', initLangAndLocale)
 
 
   # General ####
+
+  ###
+    Know about the supported languages and load the translation files
+  ###
+  @loadTranslationFiles: () =>
+    deferred = Q.defer()
+    @Languages = Object.keys(@Languages)
+    for tag in @Languages
+      @loadTrad(tag)
+    deferred.resolve()
+    return deferred.promise
+
+
+  ###
+    Get lang form browser prefs and store it 
+  ###
+  @getLangAndLocaleFromBrowserAndStoreIt: () =>
+    @loadUserBrowserUiLang()
+    .then(@loadUserBrowserAcceptLangs)
+    .then(@setLangAndLocaleMemoryFromBrowser)
+    .then(@setFavLang)# @favLang -> Stores
+    .then(@setLocale)# @favLocale -> Stores
 
   ###
     Set favLang.chromeStoreValue and @favLang.syncStoreValue from the stores
@@ -134,7 +144,7 @@ class ledger.i18n
 
 
   ###
-    Set favLocale.chromeStoreValue and @favLocale.syncStoreValue from the stores
+    Set favLocale.chromeStoreValue and @favLocale.syncStoreValue from both stores
   ###
   @setLocaleStoreValues: () =>
     deferred = Q.defer()
@@ -248,34 +258,38 @@ class ledger.i18n
     deferred = Q.defer()
     chrome.i18n.getAcceptLanguages (requestedLocales) =>
       @browserAcceptLanguages = requestedLocales
+      l @browserAcceptLanguages
       deferred.resolve()
     return deferred.promise
 
 
   ###
-    Set @favLang.memoryValue and @favLocale.memoryValue with one of the browser accept language (@browserAcceptLanguages), fallback on browser UI language
+    Set @favLang.memoryValue with one of the browser accept language (@browserAcceptLanguages), fallback on browser UI language
   ###
-  @setLangAndLocaleMemory: () =>
+  @setLangAndLocaleMemoryFromBrowser: () =>
     deferred = Q.defer()
-    doneLocale = false
-    doneLang = false
+    done = false
     if @browserAcceptLanguages?
-      for tag, i in @browserAcceptLanguages
-        # Take the first tag with more than 2 chars
-        if @browserAcceptLanguages[i].length > 2 and !doneLocale
-          @favLocale.memoryValue = @browserAcceptLanguages[i]
-          #l @favLocale.memoryValue, '@favLocale.memoryValue'
-          doneLocale = true
-        # Take the first tag with less than 3 chars that is part of our supported languages (@Languages)
-        if @browserAcceptLanguages[i].length < 3 and !doneLang and @browserAcceptLanguages[i] in @Languages
-          @favLang.memoryValue = @browserAcceptLanguages[i]
-          #l @favLang.memoryValue, '@favLang.memoryValue'
-          doneLang = true
+      for tag in @browserAcceptLanguages
+        # Take the first tag that is part of our supported languages (@Languages)
+        if tag.substr(0, 2) in @Languages and !done
+          # tag xx
+          if tag.length < 3
+            l tag
+            @favLang.memoryValue = tag
+            # Set the locale as same as the lang
+            @favLocale.memoryValue = tag
+          # tag xx-xx
+          else
+            @favLocale.memoryValue = tag
+            tag = tag.substr(0, 2)
+            @favLang.memoryValue = tag
+          done = true
     # Fallback to browser UI language if vars are still not set
-    if not @favLocale.memoryValue?
-      @favLocale.memoryValue = @browserUiLang
     if not @favLang.memoryValue?
       @favLang.memoryValue = @browserUiLang
+    if not @favLocale.memoryValue?
+      @favLocale.memoryValue = @browserUiLang
     # Fallback to English if the favorite language is not supported
     if @favLang.memoryValue not in @Languages
       @favLang.memoryValue = 'en'
@@ -286,35 +300,27 @@ class ledger.i18n
   # User Favorite Language ####
 
   ###
-    Set user favorite language into stores
+    Set user favorite language into stores from memory
   ###
   @setFavLang: () =>
-    deferred = Q.defer()
-    tag = @favLang.memoryValue
-    l @favLang.memoryValue
     # set tag language to one of the store
-    #l 'set tag to chrome store'
-    @chromeStore.set({i18n_favLang: tag})
     if ledger.storage.sync?
       #l 'set tag to sync store'
-      ledger.storage.sync.set({i18n_favLang: tag})
+      ledger.storage.sync.set({i18n_favLang: @favLang.memoryValue})
+    else
+      @chromeStore.set({i18n_favLang: @favLang.memoryValue})
     # Update @syncStoreIsSet and @chromeStoreIsSet
     @checkLangIntoStores()
     # Update @syncStoreValue and @chromeStoreValue
     .then(@setFavLangStoreValues)
-    .catch (err) -> l err
-    .done()
-    deferred.resolve()
-    return deferred.promise
 
 
   ###
-    Set user favorite language into stores By UI
+    Set user favorite language into memory and both stores By UI
 
     @param [String] tag Codified (BCP 47) language tag - Official list here : http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
   ###
   @setFavLangByUI: (tag) =>
-    deferred = Q.defer()
     # If tag language is set manually
     if tag?
       if tag.length > 2
@@ -332,8 +338,48 @@ class ledger.i18n
     .catch (err) =>
       # l err, ' - Lang: syncing'
       @syncLangStores()
-    deferred.resolve()
-    return deferred.promise
+
+
+  ###
+    Set user locale (region) to one of the stores
+
+    @param [String] tag Codified (BCP 47) language tag - Official list here : http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
+  ###
+  @setLocale: () =>
+    # set tag language to one of the store
+    if ledger.storage.sync?
+      #l 'set locale tag to sync store'
+      ledger.storage.sync.set({i18n_favLocale: @favLocale.memoryValue})
+    else
+      #l 'set locale tag to chrome store'
+      @chromeStore.set({i18n_favLocale: @favLocale.memoryValue})
+    # Update @syncStoreIsSet and @chromeStoreIsSet
+    @checkLocaleIntoStores()
+    # Update @syncStoreValue and @chromeStoreValue
+    .then(@setLocaleStoreValues)
+    # Set the locale for Moment.js
+    .then(@setMomentLocale)
+
+
+  ###
+    Set user locale (region) into memory and both stores by UI
+
+    @param [String] tag Codified (BCP 47) language tag - Official list here : http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
+  ###
+  @setLocaleByUI: (tag) =>
+    # If tag language is set manually
+    if tag?
+      @favLocale.memoryValue = tag
+    @chromeStore.set({i18n_favLocale: @favLocale.memoryValue})
+    if ledger.storage.sync?
+      #l 'set locale tag to sync store'
+      ledger.storage.sync.set({i18n_favLocale: @favLocale.memoryValue})
+    # Update @syncStoreIsSet and @chromeStoreIsSet
+    @checkLocaleIntoStores()
+    # Update @syncStoreValue and @chromeStoreValue
+    .then(@setLocaleStoreValues)
+    # Set the locale for Moment.js
+    .then(@setMomentLocale)
 
 
   ###
@@ -343,15 +389,15 @@ class ledger.i18n
   ###
   @loadLang: () =>
     deferred = Q.defer()
-    # Set favLang from chromeStore
-    @chromeStore.get 'i18n_favLang', (r) =>
-      if Array.isArray(r.i18n_favLang)
-        r.i18n_favLang = r.i18n_favLang[0]
-      @favLang.memoryValue = r.i18n_favLang
-
     if ledger.storage.sync?
       # Set @favLang from syncStore
       ledger.storage.sync.get 'i18n_favLang', (r) =>
+        if Array.isArray(r.i18n_favLang)
+          r.i18n_favLang = r.i18n_favLang[0]
+        @favLang.memoryValue = r.i18n_favLang
+    else
+      # Set favLang from chromeStore
+      @chromeStore.get 'i18n_favLang', (r) =>
         if Array.isArray(r.i18n_favLang)
           r.i18n_favLang = r.i18n_favLang[0]
         @favLang.memoryValue = r.i18n_favLang
@@ -386,12 +432,6 @@ class ledger.i18n
 
 
   ###
-    Check if user prefs had not change TODO
-  ###
-  @checkChangePrefs: () =>
-    #
-
-  ###
     Remove key 'i18n_favLang' from sync Store
   ###
   @removeUserFavLangSyncStore: () =>
@@ -405,37 +445,6 @@ class ledger.i18n
   @removeUserFavLangChromeStore: () =>
     @chromeStore.remove('i18n_favLang', l)
     @checkLangIntoStores()
-
-
-  # User Favorite Locale ####
-
-  ###
-    Set user locale (region) to one of the stores
-
-    @param [String] tag Codified (BCP 47) language tag - Official list here : http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
-  ###
-  @setLocale: (tag) =>
-    deferred = Q.defer()
-    # If tag language is set manually
-    if tag?
-      @favLocale.memoryValue = tag
-    else
-      #l 'set locale tag to chrome store'
-    @chromeStore.set({i18n_favLocale: @favLocale.memoryValue})
-    # set tag language to one of the store
-    if ledger.storage.sync?
-      #l 'set locale tag to sync store'
-      ledger.storage.sync.set({i18n_favLocale: @favLocale.memoryValue})
-    # Update @syncStoreIsSet and @chromeStoreIsSet
-    @checkLocaleIntoStores()
-    # Update @syncStoreValue and @chromeStoreValue
-    .then(@setLocaleStoreValues)
-    # Set the locale for Moment.js
-    .then(@setMomentLocale)
-    .catch (err) -> l err
-    .done()
-    deferred.resolve()
-    return deferred.promise
 
 
 
@@ -487,7 +496,7 @@ class ledger.i18n
           deferred.resolve('@chromeStore.get r.i18n_favLocale ' + r.i18n_favLocale + ' is set into chromeStore')
         else
           @favLocale.chromeStoreIsSet = false
-          deferred.reject('@chromeStore.get r.i18n_favLocale ' + r.i18n_favLocale + ' is not set neither into synced Store or chromeStore')
+          deferred.reject('@chromeStore.get r.i18n_favLocale ' + r.i18n_favLocale + ' is not set into chromeStore')
     return deferred.promise
 
 
@@ -506,8 +515,6 @@ class ledger.i18n
     @chromeStore.remove('i18n_favLocale', l)
     @checkLocaleIntoStores()
 
-
-  # ######
 
   ###
     Fetch translation file

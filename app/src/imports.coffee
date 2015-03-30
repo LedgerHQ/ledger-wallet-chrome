@@ -283,8 +283,8 @@
         '../spec/utils/formatters_spec'
         '../spec/utils/converters_spec'
 
-        '../spec/m2fa/client_spec'
-        '../spec/m2fa/m2fa_spec'
+        #'../spec/m2fa/client_spec'
+        #'../spec/m2fa/m2fa_spec'
 
         '../spec/spec_helper'
 
