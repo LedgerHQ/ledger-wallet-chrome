@@ -42,7 +42,8 @@ common:
     secure_screen_invalid_pin: "The smartphone returned a wrong pin code."
 
   qrcode:
-    present: "Present the recipient QR code in front of the webcam."
+    scan_qrcode: "Scan QR code"
+    present: "Present the QR code in front of the webcam."
     nowebcam: "No webcam is detected on your computer."
 
 onboarding:

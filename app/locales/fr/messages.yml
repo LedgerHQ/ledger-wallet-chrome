@@ -42,7 +42,8 @@ common:
     secure_screen_invalid_pin: "Le smartphone a retourné un mauvais code pin."
 
   qrcode:
-    present: "Présentez le code QR de réception devant la webcam."
+    scan_qrcode: "Scanner code QR"
+    present: "Présentez le code QR devant la webcam."
     nowebcam: "Aucune webcam n'est détectée sur votre ordinateur."
 
 onboarding:
@@ -214,7 +215,7 @@ update:
     loading: "Chargement de %s..."
 
   done:
-    successfully_updated: "Votre Ledger Wallet à bien été mis à jour."
+    successfully_updated: "Votre Ledger Wallet a bien été mis à jour."
     update_succeeded: "Mise à jour réussie"
     use_24_words: "Utilisez les 24 mots de votre phrase de restauration pour restaurer vos Bitcoins."
 
