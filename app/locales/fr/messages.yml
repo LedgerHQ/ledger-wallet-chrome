@@ -75,13 +75,13 @@ onboarding:
     errors:
       frozen:
         wallet_is_frozen: "Portefeuille bloqué"
-        blank_next_time: "La configuration de votre Ledger Wallet a été effacée mais vos comptes et Bitcoins restent en sécurité."
-        unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour restaurer vos comptes et Bitcoins."
+        blank_next_time: "La configuration de votre Ledger Wallet a été effacée mais vos comptes et bitcoins restent en sécurité."
+        unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour restaurer vos comptes et bitcoins."
 
       wrongpin:
         wrong_pin: "Code PIN erroné"
         tries_left: "Il vous reste %s essai(s) avant de bloquer votre portefeuille."
-        unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder vos comptes et Bitcoins."
+        unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder vos comptes et bitcoins."
 
       unsupported:
         device_unsupported: "Portefeuille non pris en charge"
@@ -119,7 +119,7 @@ onboarding:
       use_as_new: "Créer un nouveau portefeuille"
       if_its_your_first_wallet: "Configurez votre nouveau Ledger Wallet s'il s'agit de votre premier achat"
       recover_wallet: "Restaurer un portefeuille existant"
-      if_you_lost_your_wallet: "Retrouvez l'accès à vos comptes et Bitcoins si vous avez bloqué ou perdu votre Ledger Wallet"
+      if_you_lost_your_wallet: "Retrouvez l'accès à vos comptes et bitcoins si vous avez bloqué ou perdu votre Ledger Wallet"
 
     pin:
       choose_your: "Choisissez votre"
@@ -148,13 +148,13 @@ onboarding:
       your_recovery_phrase: "Votre phrase de restauration :"
       invalid_recovery_phrase: "La phrase de restauration est invalide."
       it_wont_be_displayed_again: "Votre phrase de restauration ne sera pas affichée à nouveau."
-      without_it: "Sans elle, vous n'aurez plus accès à vos Bitcoins en cas de perte."
+      without_it: "Sans elle, vous n'aurez plus accès à vos bitcoins en cas de perte."
 
     summary:
       your_wallet_is: "Votre portefeuille est"
       almost_ready: "bientôt prêt"
-      use_your_bitcoins_create: "Dans quelques instants, vous pourrez utiliser vos Bitcoins de la façon la plus sécurisée possible"
-      use_your_bitcoins_other: "Dans quelques instants, vous pourrez de nouveau utiliser vos Bitcoins de la façon la plus sécurisée possible"
+      use_your_bitcoins_create: "Dans quelques instants, vous pourrez utiliser vos bitcoins de la façon la plus sécurisée possible"
+      use_your_bitcoins_other: "Dans quelques instants, vous pourrez de nouveau utiliser vos bitcoins de la façon la plus sécurisée possible"
       by_clicking_finish_create: "En cliquant sur TERMINER, vous confirmez avoir choisi un code PIN sécurisé et noté votre phrase de restauration."
       by_clicking_finish_other: "En cliquant sur TERMINER, vous confirmez avoir choisi un nouveau code PIN sécurisé."
       your_wallet_mode_create: "Votre portefeuille sera crée."
@@ -169,7 +169,7 @@ onboarding:
       you_can_access_your_wallet: "Vous pouvez maintenant accéder à votre portefeuille en toute sécurité."
       configuration_is_complete_create: "Création terminée"
       configuration_is_complete_recover: "Restauration terminée"
-      unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder à vos comptes et Bitcoins."
+      unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder à vos comptes et bitcoins."
       configuration_failed_create: "Création échouée"
       configuration_failed_recover: "Restauration échouée"
       error_occured: "Une erreur sérieuse est survenue. Contactez le support pour obtenir de l'aide."
@@ -307,14 +307,14 @@ wallet:
       amount_placeholder: "Montant"
       receiver_account: "COMPTE À CRÉDITER"
       receiver_address: "ADRESSE BITCOIN DE RÉCEPTION"
-      qr_code_explanation: "Code QR à scanner par la personne<br />qui souhaite vous envoyer des Bitcoins."
+      qr_code_explanation: "Code QR à scanner par la personne<br />qui souhaite vous envoyer des bitcoins."
       send_by_email: "ENVOYER PAR EMAIL"
       print: "IMPRIMER"
       close: "ANNULER"
 
   send:
     common:
-      send_bitcoins: "Envoyer des Bitcoins"
+      send_bitcoins: "Envoyer des bitcoins"
       other_validation_methods: "Autres méthodes de validation"
 
     index:

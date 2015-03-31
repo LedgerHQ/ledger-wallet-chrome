@@ -75,13 +75,13 @@ onboarding:
     errors:
       frozen:
         wallet_is_frozen: "Your wallet is frozen"
-        blank_next_time: "Your Ledger Wallet configuration has been deleted but your accounts and Bitcoins remain safe."
-        unplug_plug: "Unplug then plug back your Ledger Wallet to recover your accounts and Bitcoins."
+        blank_next_time: "Your Ledger Wallet configuration has been deleted but your accounts and bitcoins remain safe."
+        unplug_plug: "Unplug then plug back your Ledger Wallet to recover your accounts and bitcoins."
 
       wrongpin:
         wrong_pin: "Wrong PIN code"
         tries_left: "%s attempt(s) left before freezing your wallet."
-        unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and Bitcoins."
+        unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and bitcoins."
 
       unsupported:
         device_unsupported: "Unsupported wallet"
@@ -119,7 +119,7 @@ onboarding:
       use_as_new: "Create a new wallet"
       if_its_your_first_wallet: "Configure your new Ledger Wallet if it's your first purchase"
       recover_wallet: "Recover an existing wallet"
-      if_you_lost_your_wallet: "Regain access to your accounts and Bitcoins if you froze or lost your Ledger Wallet"
+      if_you_lost_your_wallet: "Regain access to your accounts and bitcoins if you froze or lost your Ledger Wallet"
 
     pin:
       choose_your: "Choose your"
@@ -148,13 +148,13 @@ onboarding:
       your_recovery_phrase: "Your recovery phrase:"
       invalid_recovery_phrase: "The recovery phrase is invalid."
       it_wont_be_displayed_again: "Your recovery phrase won't be displayed again."
-      without_it: "Without it, you will not be able to access your Bitcoins in case of loss."
+      without_it: "Without it, you will not be able to access your bitcoins in case of loss."
 
     summary:
       your_wallet_is: "Your wallet is"
       almost_ready: "almost ready"
-      use_your_bitcoins_create: "In a few moments, you will be able to use your Bitcoins in the fastest possible way"
-      use_your_bitcoins_other: "In a few moments, you will be able to use your Bitcoins in the fastest possible way again"
+      use_your_bitcoins_create: "In a few moments, you will be able to use your bitcoins in the fastest possible way"
+      use_your_bitcoins_other: "In a few moments, you will be able to use your bitcoins in the fastest possible way again"
       by_clicking_finish_create: "By clicking FINISH, you confirm that you have chosen a secured PIN code and written down your recovery phrase."
       by_clicking_finish_other: "By clicking FINISH, you confirm that you have chosen a new secured PIN code."
       your_wallet_mode_create: "Your wallet will be created."
@@ -169,7 +169,7 @@ onboarding:
       you_can_access_your_wallet: "You can now access your wallet safely."
       configuration_is_complete_create: "Creation completed"
       configuration_is_complete_recover: "Recovery completed"
-      unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and Bitcoins."
+      unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and bitcoins."
       configuration_failed_create: "Creation failed"
       configuration_failed_recover: "Recovery failed"
       error_occured: "A serious error occured. Please contact support for further assistance."
@@ -307,14 +307,14 @@ wallet:
       amount_placeholder: "Amount"
       receiver_account: "CREDIT ACCOUNT"
       receiver_address: "BITCOIN ADDRESS TO RECEIVE"
-      qr_code_explanation: "This QR code can be scanned<br/>by the person who wants to send you Bitcoins."
+      qr_code_explanation: "This QR code can be scanned<br/>by the person who wants to send you bitcoins."
       send_by_email: "SEND BY EMAIL"
       print: "PRINT"
       close: "CLOSE"
 
   send:
     common:
-      send_bitcoins: "Send Bitcoins"
+      send_bitcoins: "Send bitcoins"
       other_validation_methods: "Other validation methods"
 
     index:
