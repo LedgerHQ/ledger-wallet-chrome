@@ -94,6 +94,7 @@ class AuthenticatedHttpClient extends @HttpClient
     .fail () =>  if deferred.retryNumber-- > 0 then @_performAuthenticate(deferred) else deferred.reject([jqXHR, statusText, errorThrown])
     .then (data) =>
       @_authToken = data['token']
+      ledger.app.emit 'wallet:authenticated'
       deferred.resolve()
 
   getAuthToken: (callback = null) ->

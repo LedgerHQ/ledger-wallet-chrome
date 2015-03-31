@@ -24,6 +24,7 @@ common:
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
   get_help: "Please visit our help center at support.ledgerwallet.com for more information."
+  signing: "Signing..."
 
   keycard:
     uppercase_letters: "Uppercase letters"
@@ -399,3 +400,9 @@ wallet:
       domain: "Domain"
       address: "Address"
       connect: "Do you wish to authenticate on the following service?"
+    auth:
+      authenticating: "Authenticating"
+      login: "Login in process"
+      succeeded: "Authentication success"
+      completed: "You have been connected to the service"
+      failed: "Authentication failed"

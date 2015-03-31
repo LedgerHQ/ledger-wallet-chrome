@@ -361,59 +361,68 @@ LW.prototype = {
         LWTools.console("LW.getBitIDAddress(" + derivationPath + ")", 3);
         var lW = this;
 
-        try {
+        if (typeof lW.bitIdAddress[derivationPath] == "object") {
+            result = lW.bitIdAddress[derivationPath];
+            lW.event('LW.getBitIDAddress', {lW: lW, result: result});
+            deferred.resolve(result);
+            return deferred.promise;
+        } else {
 
-            return lW.dongle.getWalletPublicKey_async(derivationPath).then(function(result) {
-                LWTools.console("BitID public key :", 3);
-                LWTools.console(result, 3);
-                lW.bitIdAddress[derivationPath] = result;
-                lW.event('LW.getBitIDAddress', {lW: lW, result: result});
-                deferred.resolve(result);
-                return result;
-            }).fail(function(error) {
-                LWTools.console("BitID public key fail", 2);
-                LWTools.console(error, 2);
+            try {
 
-                if (error.indexOf("6982") >= 0) {
+                return lW.dongle.getWalletPublicKey_async(derivationPath).then(function(result) {
+                    LWTools.console("BitID public key :", 3);
+                    LWTools.console(result, 3);
+                    lW.bitIdAddress[derivationPath] = result;
+                    lW.event('LW.getBitIDAddress', {lW: lW, result: result});
+                    deferred.resolve(result);
+                    return result;
+                }).fail(function(error) {
+                    LWTools.console("BitID public key fail", 2);
+                    LWTools.console(error, 2);
 
-                    LWTools.console("PINRequired", 2);
+                    if (error.indexOf("6982") >= 0) {
 
-                    /* Event : LW.PINRequired */
-                    lW.event('LW.PINRequired',  {lW: lW});
-                    deferred.reject({lW: lW})
+                        LWTools.console("PINRequired", 2);
 
-                } else if (error.indexOf("6985") >= 0) {
+                        /* Event : LW.PINRequired */
+                        lW.event('LW.PINRequired',  {lW: lW});
+                        deferred.reject({lW: lW})
 
-                    LWTools.console("BlankCard", 2);
+                    } else if (error.indexOf("6985") >= 0) {
 
-                    lW.setupCard();
+                        LWTools.console("BlankCard", 2);
 
-                } else if (error.indexOf("6faa") >= 0) {
+                        lW.setupCard();
 
-                    LWTools.console("CardLocked", 2);
+                    } else if (error.indexOf("6faa") >= 0) {
 
-                    /* Event : LW.ErrorOccured */
-                    lW.event('LW.ErrorOccured', {lW: lW, title: 'dongleLocked', message: error});
-                    deferred.reject({lW: lW, title: 'dongleLocked', message: error})
-                } else {
+                        LWTools.console("CardLocked", 2);
 
-                    LWTools.console("public key fail", 1);
-                    LWTools.console(error, 1);
+                        /* Event : LW.ErrorOccured */
+                        lW.event('LW.ErrorOccured', {lW: lW, title: 'dongleLocked', message: error});
+                        deferred.reject({lW: lW, title: 'dongleLocked', message: error})
+                    } else {
 
-                    /* Event : LW.ErrorOccured */
-                    lW.event('LW.ErrorOccured', {lW: lW, title: 'error', message: error});
-                    deferred.reject({lW: lW, title: 'error', message: error})
-                }
+                        LWTools.console("public key fail", 1);
+                        LWTools.console(error, 1);
+
+                        /* Event : LW.ErrorOccured */
+                        lW.event('LW.ErrorOccured', {lW: lW, title: 'error', message: error});
+                        deferred.reject({lW: lW, title: 'error', message: error})
+                    }
 
 
-                return false;
-            });
+                    return false;
+                });
+            }
+            catch(e) {
+                LWTools.console("Get public key failed", 1);
+                LWTools.console(e, 1);
+            }
         }
-        catch(e) {
-            LWTools.console("Get public key failed", 1);
-            LWTools.console(e, 1);
-        }
-        return d.promise
+
+        return deferred.promise
     },
 
     getMessageSignature: function(derivationPath, message) {
@@ -423,6 +432,7 @@ LW.prototype = {
             LWTools.console('LW.getMessageSignature(' + derivationPath + ',' + message + ')', 3);
             message = new ByteString(message,ASCII);
             pin = new ByteString(lW.PIN,ASCII);
+            lW.currentDerivationPath = derivationPath;
 
             return lW.dongle.signMessagePrepare_async(derivationPath, message).then(function(result) {
                 LWTools.console('LlW.dongle.signMessagePrepare_async');
@@ -481,6 +491,7 @@ LW.prototype = {
                     }
 
                     var signature = result.signature;
+                    LWTools.console("derivationPath: " + derivationPath + " message: " + message);
 
                     try {
                         var signedMessage = convertMessageSignature(lW.bitIdAddress[derivationPath].publicKey, new ByteString(message, ASCII), signature);

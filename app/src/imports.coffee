@@ -243,6 +243,7 @@
 
         # BitID
         'controllers/wallet/bitid/wallet_bitid_index_dialog_view_controller'
+        'controllers/wallet/bitid/wallet_bitid_authenticating_dialog_view_controller'
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
