@@ -182,9 +182,9 @@ update:
 
   index:
     important_notice: "Informations importantes"
-    update_process: "Le processus de mise à jour nécessite d'effacer votre Ledger Wallet.<br />Vos Bitcoins resteront en sécurité si vous possédez votre livret de restauration pour retrouver l'accès à vos comptes."
-    clicking_continue: "En cliquant sur CONTINUER, vous confirmez posséder le <b>code QR de votre carte de sécurité</b> et les <b>24 mots de votre phrase de restauration</b>. Vous perdrez vos Bitcoins si vous tentez de mettre à jour votre Ledger Wallet sans ces informations requises."
-    please_note: "Note: Vous devrez associer votre smartphone à nouveau pour réactiver la validation mobile."
+    update_process: "Le processus de mise à jour nécessite une réinitialisation de votre Ledger Wallet.<br />Votre livret de restauration vous permettra de retrouver l'accès à vos bitcoins."
+    clicking_continue: "En cliquant sur CONTINUER, vous confirmez posséder le <b>code QR de votre carte de sécurité</b> et les <b>24 mots de votre phrase de restauration</b>. Si vous tentez de mettre à jour votre Ledger Wallet sans ces informations, vous perdrez vos bitcoins."
+    please_note: "Note: Vous devrez associer votre smartphone à nouveau pour réactiver le second facteur mobile."
 
   plug:
     plug_your_wallet: "Branchez votre Ledger Wallet"
@@ -195,15 +195,14 @@ update:
     remove_your_wallet: "Retirez votre Ledger Wallet du port USB."
 
   seed:
-    security_card_qrcode: "Code QR de carte de sécurité"
-    enter_characters: "Entrez les 32 caractères du code QR de votre carte de sécurité :"
-    on_the_left: "Ils sont situés sur la page de gauche de votre livret de restauration, en dessous du code QR."
+    security_card_qrcode: "Carte de sécurité"
+    enter_characters: "Scannez le code QR (ou saisissez les 32 caractères) de votre carte de sécurité :"
+    on_the_left: "Il est situé sur la page de gauche de votre livret de restauration."
 
   erasing:
-    erasure_confirmation: "Confirmation d'effacement"
+    erasure_confirmation: "Confirmation de réinitialisation"
     ready_to_start_process: "Vous êtes maintenant prêt(e) à démarrer le processus de mise à jour."
-    factory_settings: "Pour continuer, votre Ledger Wallet nécessite d'être effacé pour utiliser ses réglages d'usine."
-    please_note: "Note: Veuillez NE PAS continuer si vous ne possédez pas votre livret de restauration."
+    factory_settings: "Pour continuer, vous devez posséder vos 24 mots de votre phrase de restauration."
 
   updating:
     update_confirmation: "Confirmation de mise à jour"
@@ -213,11 +212,12 @@ update:
   loading:
     updating_wallet: "Mise à jour en cours"
     loading: "Chargement de %s..."
+    do_not_unplug: "Merci de patentier. Veillez à ne pas débrancher votre Ledger Wallet."
 
   done:
     successfully_updated: "Votre Ledger Wallet a bien été mis à jour."
     update_succeeded: "Mise à jour réussie"
-    use_24_words: "Utilisez les 24 mots de votre phrase de restauration pour restaurer vos Bitcoins."
+    use_24_words: "Utilisez les 24 mots de votre phrase de restauration pour restaurer vos bitcoins."
 
   error:
     update_failed: "Mise à jour échouée"

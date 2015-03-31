@@ -182,9 +182,9 @@ update:
 
   index:
     important_notice: "Important notice"
-    update_process: "The update process requires to erase your Ledger Wallet.<br />Your Bitcoins will remain safe if you have your recovery sheet with you to restore your accounts."
-    clicking_continue: "By clicking CONTINUE, you confirm to be in possession of your <b>security card QR code</b> and your <b>24 words recovery phrase</b>. You will lose your Bitcoins if you attempt to update your Ledger Wallet without these required information."
-    please_note: "Please note: You will need to pair your smartphone again to re-enable mobile validation."
+    update_process: "The update process requires to erase your Ledger Wallet.<br />Your recovery sheet will allow you to restore your bitcoins."
+    clicking_continue: "By clicking CONTINUE, you confirm to be in possession of your <b>security card QR code</b> and your <b>24 words recovery phrase</b>. If you attempt to update your Ledger Wallet without these information, you will loose your bitcoins."
+    please_note: "Please note: You will need to pair your smartphone again to re-enable mobile second factor authentication."
 
   plug:
     plug_your_wallet: "Plug your Ledger Wallet"
@@ -195,15 +195,14 @@ update:
     remove_your_wallet: "Remove your Ledger Wallet from the USB port."
 
   seed:
-    security_card_qrcode: "Security card QR code"
-    enter_characters: "Enter your security card QR code 32 characters:"
-    on_the_left: "They are printed on the left page of your recovery sheet, below the QR code."
+    security_card_qrcode: "Security card"
+    enter_characters: "Scan (or type the 32 characters) your security card QR code:"
+    on_the_left: "You will find it on the left page of your recovery sheet."
 
   erasing:
-    erasure_confirmation: "Erasure confirmation"
+    erasure_confirmation: "Reset confirmation"
     ready_to_start_process: "You are now ready to start the update process."
-    factory_settings: "To continue, your Ledger Wallet needs to be erased to use its factory settings."
-    please_note: "Please note: DO NOT go further if you don’t have your recovery sheet with you."
+    factory_settings: "To continue, you need your 24 words recovery phrase."
 
   updating:
     update_confirmation: "Update confirmation"
@@ -213,11 +212,12 @@ update:
   loading:
     updating_wallet: "Update in progress"
     loading: "Loading %s..."
+    do_not_unplug: "Please wait. Do not unplug your Ledger Wallet."
 
   done:
     successfully_updated: "Your Ledger Wallet has been successfully updated."
     update_succeeded: "Update succeeded"
-    use_24_words: "Use your 24 words recovery phrase from your recovery sheet to restore your Bitcoins."
+    use_24_words: "Use your 24 words recovery phrase from your recovery sheet to restore your bitcoins."
 
   error:
     update_failed: "Update failed"
