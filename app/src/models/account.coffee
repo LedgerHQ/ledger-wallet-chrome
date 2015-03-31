@@ -27,7 +27,7 @@ class @Account extends Model
     @return [CompletionClosure] A closure
   ###
   createTransaction: ({amount, fees, address}, callback) ->
-    inputsPath = @getHDWalletAccount().getAllPublicAddressesPaths()
+    inputsPath = @getHDWalletAccount().getAllAddressesPaths()
     changePath = @getHDWalletAccount().getCurrentChangeAddressPath()
     ledger.wallet.transaction.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
 
