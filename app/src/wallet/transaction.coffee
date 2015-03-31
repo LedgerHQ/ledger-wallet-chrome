@@ -178,8 +178,12 @@ class ledger.wallet.transaction.Transaction
     completion = new CompletionClosure(callback)
     amount = ledger.wallet.Value.from(amount)
     fees = ledger.wallet.Value.from(fees)
-    return completion.failure(new ledger.StandardError(ledger.errors.DustTransaction)).readonly() if amount.lte(ledger.wallet.transaction.MINIMUM_OUTPUT_VALUE)
-    return completion.failure(new ledger.StandardError(ledger.errors.NotEnoughFunds)).readonly() unless inputsPath?.length
+    if amount.lte(ledger.wallet.transaction.MINIMUM_OUTPUT_VALUE)
+      completion.failure(new ledger.StandardError(ledger.errors.DustTransaction))
+      return completion.readonly()
+    unless inputsPath?.length
+      completion.failure(new ledger.StandardError(ledger.errors.NotEnoughFunds))
+      return completion.readonly()
     ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
       return completion.failure(error) if error?
       # Collect each valid outputs and sort them by desired priority
@@ -205,7 +209,7 @@ class ledger.wallet.transaction.Transaction
           if hasNext is true and collectedAmount.lt(requiredAmount) and changeAmount.lte(5400)
             # We have enough funds but if we send this, we will make a dust transaction so continue to collect
             do done
-          else if hasNext is false and collectedAmount.lt(requiredAmount) and changeAmount.lte(5400)
+          else if hasNext is false and collectedAmount.lt(requiredAmount) and changeAmount.lte(5400) and changeAmount.gt(-1)
             # We have enough funds but if we send this, we will make a dust transaction so add the dust in miner fees
             fees = fees.add(changeAmount)
             transaction = new ledger.wallet.transaction.Transaction()

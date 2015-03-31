@@ -1,0 +1,11 @@
+<section id="dialogs_qrcode_dialog">
+  <header>
+    <h1><%= t 'common.qrcode.scan_qrcode' %></h1>
+  </header>
+  <div id="video_capture_container"></div>
+  <div class="regular-grey-text-small"><%= t 'common.qrcode.present' %></div>
+</section>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a href="#dismiss" class="cancel-rounded-button"><%= t 'common.cancel' %></a>
+</div>

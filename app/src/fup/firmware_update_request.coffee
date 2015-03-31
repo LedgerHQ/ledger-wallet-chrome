@@ -54,6 +54,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   @ExchangeTimeout: ExchangeTimeout
 
   constructor: (firmwareUpdater) ->
+    @_id = _.uniqueId("fup")
     @_fup = firmwareUpdater
     @_keyCardSeed = null
     @_currentState = States.Undefined
@@ -66,12 +67,14 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_exchangeNeedsExtraTimeout = no
     @_isWaitForDongleSilent = no
     @_isCancelled = no
+    @_eventHandler = []
 
   ###
     Stops all current tasks and listened events.
   ###
   cancel: () ->
     @off()
+    _(@_eventHandler).each ([object, event, handler]) -> object?.off?(event, handler)
     @_onProgress = null
     @_isCancelled = yes
     @_fup._cancelRequest(this)
@@ -151,10 +154,12 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     registerWallet = (wallet) =>
       @_lastMode = if wallet.isInBootloaderMode() then Modes.Bootloader else Modes.Os
       @_wallet = wallet
-      wallet.once 'disconnected', =>
+      handler =  =>
         @_setCurrentState(States.Undefined)
         @_wallet = null
         @_waitForConnectedDongle(null, @_isWaitForDongleSilent)
+      wallet.once 'disconnected', handler
+      @_eventHandler.push [wallet, 'disconnected', handler]
       @_handleCurrentState()
       completion.success(wallet)
 
@@ -164,9 +169,11 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_connectionCompletion = completion.readonly()
         delay = if !silent then 0 else 1000
         setTimeout (=> @emit 'plug' unless @_wallet?), delay
-        ledger.app.walletsManager.once 'connected', (e, wallet) =>
+        handler = (e, wallet) =>
           @_connectionCompletion = null
           registerWallet(wallet)
+        ledger.app.walletsManager.once 'connected', handler
+        @_eventHandler.push [ledger.app.walletsManager, 'connected', handler]
       else
         registerWallet(wallet)
     catch er
@@ -319,7 +326,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_isWaitForDongleSilent = yes
       @_processLoadingScript(ledger.fup.updates.OS_LOADER[offset], States.LoadingOs).then (result) =>
         @_isOsLoaded = yes
-        @_setCurrentState(States.Undefined)
         _.delay (=> @_waitForPowerCycle(null, yes)), 200
       .fail (e) =>
         @_isWaitForDongleSilent = no

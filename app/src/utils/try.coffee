@@ -25,7 +25,7 @@ class TryResult
   fail: (func) -> @promise().fail(func)
   promise: () -> @_deffered.promise
 
-  printError: -> @fail (er) => e er
+  printError: -> @fail => e @_error
 
 ###
   Executes the function passed in parameter. Try returns a {TryResult} which represents the computation of the function that

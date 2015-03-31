@@ -215,6 +215,7 @@
         # Dialogs
         'controllers/common/dialogs/common_dialogs_confirmation_dialog_view_controller'
         'controllers/common/dialogs/common_dialogs_message_dialog_view_controller'
+        'controllers/common/dialogs/common_dialogs_qrcode_dialog_view_controller'
 
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller'

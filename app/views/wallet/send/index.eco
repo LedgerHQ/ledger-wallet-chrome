@@ -24,14 +24,9 @@
     </tbody>
   </table>
 </section>
-<div id="video_capture_container">
-  <div id="qrcode_video"></div>
-  <div id="qrcode_indication" class="regular-grey-text-small"><%= t 'common.qrcode.present' %></div>
-</div>
 <div id="error_container"></div>
 <div class="dialog-actions-bar">
-  <a class="uppercase-action" id="open_scanner_button"><%= t 'wallet.send.index.qr_scanner' %></a>
-  <a class="uppercase-action" href="#closeScanner" id="close_scanner_button"><%= t 'wallet.send.index.close_scanner' %></a>
+  <a id="open_scanner_button" class="cancel-rounded-button"><i class="fa fa-camera"></i></a>
   <div class="left-spacer"></div>
   <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
   <a class="action-rounded-button" href="#send" id="send_button"><%= t 'common.send' %></a>
