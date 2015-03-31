@@ -4,5 +4,5 @@
     <div id="bar_container"></div>
     <div id="progress" class="percent page-indication">0%</div>
   </div>
-  <div class="page-indication"><%- t 'common.may_take_a_while' %></div>
+  <div class="page-indication"><%- t 'update.loading.do_not_unplug' %></div>
 </div>

@@ -14,8 +14,16 @@
     > .spacer {
       display: flex;
       align-items: center;
-      justify-content: flex-end;
-      width: 50px;
+
+      &.left {
+        justify-content: flex-start;
+        width: 63px;
+      }
+
+      &.right {
+        justify-content: flex-end;
+        width: 50px;
+      }
     }
 
     > input {

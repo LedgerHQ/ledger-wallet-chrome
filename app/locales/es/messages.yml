@@ -42,7 +42,8 @@ common:
     secure_screen_invalid_pin: "The smartphone returned a wrong pin code."
 
   qrcode:
-    present: "Present the recipient QR code in front of the webcam."
+    scan_qrcode: "Scan QR code"
+    present: "Present the QR code in front of the webcam."
     nowebcam: "No webcam is detected on your computer."
 
 onboarding:
@@ -74,13 +75,13 @@ onboarding:
     errors:
       frozen:
         wallet_is_frozen: "Monedero bloqueado"
-        blank_next_time: "La configuración de su monedero Ledger fue borrada pero tu cuenta Bitcoins esta segura."
-        unplug_plug: "Desconecte y vuelva a conectar su monedero Ledger Monedero para restaurar sus cuentas y Bitcoins."
+        blank_next_time: "La configuración de su monedero Ledger fue borrada pero tu cuenta bitcoins esta segura."
+        unplug_plug: "Desconecte y vuelva a conectar su monedero Ledger Monedero para restaurar sus cuentas y bitcoins."
 
       wrongpin:
         wrong_pin: "PIN incorrecto"
         tries_left: "Usted tiene %s prueba(s) antes de bloquear su monedero."
-        unplug_plug: "Desconecte y vuelva a conectar el Monedero Ledger para acceder a sus cuentas y Bitcoins."
+        unplug_plug: "Desconecte y vuelva a conectar el Monedero Ledger para acceder a sus cuentas y bitcoins."
 
       unsupported:
         device_unsupported: "Su monedero no esta aceptado"
@@ -118,7 +119,7 @@ onboarding:
       use_as_new: "Crear un nuevo monedero"
       if_its_your_first_wallet: "Configure su nuevo monedero Ledger"
       recover_wallet: "Restaurar un monedero existente"
-      if_you_lost_your_wallet: "Encuentra el acceso a sus cuentas y Bitcoins si ha bloqueado o perdido su monedero Ledger"
+      if_you_lost_your_wallet: "Encuentra el acceso a sus cuentas y bitcoins si ha bloqueado o perdido su monedero Ledger"
 
     pin:
       choose_your: "Eligir su"
@@ -147,13 +148,13 @@ onboarding:
       your_recovery_phrase: "Su frase de restauración :"
       invalid_recovery_phrase: "La frase de restauración no es válida."
       it_wont_be_displayed_again: "Su frase de restauración no se mostrará de nuevo."
-      without_it: "Sin ella, no tendrá acceso a su Bitcoins en caso de pérdida."
+      without_it: "Sin ella, no tendrá acceso a su bitcoins en caso de pérdida."
 
     summary:
       your_wallet_is: "Su monedero esta"
       almost_ready: "listo en un momento"
-      use_your_bitcoins_create: "En un momento, usted podra utilizar sus Bitcoins de la manera más segura posible"
-      use_your_bitcoins_other: "En algunos momentos se podra utilizar de nuevo sus Bitcoins de la manera más segura posible"
+      use_your_bitcoins_create: "En un momento, usted podra utilizar sus bitcoins de la manera más segura posible"
+      use_your_bitcoins_other: "En algunos momentos se podra utilizar de nuevo sus bitcoins de la manera más segura posible"
       by_clicking_finish_create: "Al hacer clic en Finalizar, confirmas que has elegido un PIN seguro y tenga en cuenta su frase de restauración."
       by_clicking_finish_other: "Al hacer clic en Finalizar, usted confirma que ha elegido un nuevo PIN seguro."
       your_wallet_mode_create: "Su monedero se creará."
@@ -168,7 +169,7 @@ onboarding:
       you_can_access_your_wallet: "Ahora puede acceder a su monedero en toda seguridad."
       configuration_is_complete_create: "Creación completa"
       configuration_is_complete_recover: "Restauración acabada"
-      unplug_plug: "Desconecte y vuelva a conectar el monedero Ledger para acceder a sus cuentas y Bitcoins."
+      unplug_plug: "Desconecte y vuelva a conectar el monedero Ledger para acceder a sus cuentas y bitcoins."
       configuration_failed_create: "Creación anulada"
       configuration_failed_recover: "Restauración anulada"
       error_occured: "Se ha producido un error grave. Contactar con el soporte de ayuda."
@@ -181,9 +182,9 @@ update:
 
   index:
     important_notice: "Important notice"
-    update_process: "The update process requires to erase your Ledger Wallet.<br />Your Bitcoins will remain safe if you have your recovery sheet with you to restore your accounts."
-    clicking_continue: "By clicking CONTINUE, you confirm to be in possession of your <b>security card QR code</b> and your <b>24 words recovery phrase</b>. You will lose your Bitcoins if you attempt to update your Ledger Wallet without these required information."
-    please_note: "Please note: You will need to pair your smartphone again to re-enable mobile validation."
+    update_process: "The update process requires to erase your Ledger Wallet.<br />Your recovery sheet will allow you to restore your bitcoins."
+    clicking_continue: "By clicking CONTINUE, you confirm to be in possession of your <b>security card QR code</b> and your <b>24 words recovery phrase</b>. If you attempt to update your Ledger Wallet without these information, you will loose your bitcoins."
+    please_note: "Please note: You will need to pair your smartphone again to re-enable mobile second factor authentication."
 
   plug:
     plug_your_wallet: "Plug your Ledger Wallet"
@@ -194,15 +195,14 @@ update:
     remove_your_wallet: "Remove your Ledger Wallet from the USB port."
 
   seed:
-    security_card_qrcode: "Security card QR code"
-    enter_characters: "Enter your security card QR code 32 characters:"
-    on_the_left: "They are printed on the left page of your recovery sheet, below the QR code."
+    security_card_qrcode: "Security card"
+    enter_characters: "Scan (or type the 32 characters) your security card QR code:"
+    on_the_left: "You will find it on the left page of your recovery sheet."
 
   erasing:
-    erasure_confirmation: "Erasure confirmation"
+    erasure_confirmation: "Reset confirmation"
     ready_to_start_process: "You are now ready to start the update process."
-    factory_settings: "To continue, your Ledger Wallet needs to be erased to use its factory settings."
-    please_note: "Please note: DO NOT go further if you don’t have your recovery sheet with you."
+    factory_settings: "To continue, you need your 24 words recovery phrase."
 
   updating:
     update_confirmation: "Update confirmation"
@@ -212,11 +212,12 @@ update:
   loading:
     updating_wallet: "Update in progress"
     loading: "Loading %s..."
+    do_not_unplug: "Please wait. Do not unplug your Ledger Wallet."
 
   done:
     successfully_updated: "Your Ledger Wallet has been successfully updated."
     update_succeeded: "Update succeeded"
-    use_24_words: "Use your 24 words recovery phrase from your recovery sheet to restore your Bitcoins."
+    use_24_words: "Use your 24 words recovery phrase from your recovery sheet to restore your bitcoins."
 
   error:
     update_failed: "Update failed"
@@ -306,7 +307,7 @@ wallet:
       amount_placeholder: "Cantidad"
       receiver_account: "CUENTA DE CREDITO"
       receiver_address: "DIRECCIÓN DE RECEPCIÓN BITCOIN"
-      qr_code_explanation: "Escáner de códigos QR por la persona que desea <br /> usted enviar Bitcoins"
+      qr_code_explanation: "Escáner de códigos QR por la persona que desea <br /> usted enviar bitcoins"
       send_by_email: "ENVIAR POR MAIL"
       print: "IMPRIMIR"
       close: "CANCELAR"
