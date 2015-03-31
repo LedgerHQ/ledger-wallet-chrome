@@ -17,10 +17,10 @@ class ledger.managers.System extends EventEmitter
       name = OperatingSystems.Windows
     else if navigator.appVersion.indexOf("Mac") != -1
       name = OperatingSystems.MacOS
-    else if navigator.appVersion.indexOf("X11") != -1
-      name = OperatingSystems.Unix
     else if navigator.appVersion.indexOf("Linux") != -1
       name = OperatingSystems.Linux
+    else if navigator.appVersion.indexOf("X11") != -1
+      name = OperatingSystems.Unix
     return name
 
   isWindows: -> @operatingSystemName() is OperatingSystems.Windows
