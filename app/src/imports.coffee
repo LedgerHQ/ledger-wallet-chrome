@@ -144,6 +144,7 @@
         'managers/schemes_manager'
         'managers/permissions_manager'
         'managers/wallets_manager'
+        'managers/system_manager'
 
         ## Rest clients
         'restclients/authentication'
@@ -298,5 +299,6 @@
         'controllers/update/update_loading_view_controller'
         'controllers/update/update_done_view_controller'
         'controllers/update/update_error_view_controller'
+        'controllers/update/update_linux_view_controller'
 
       ]
