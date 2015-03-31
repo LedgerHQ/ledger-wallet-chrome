@@ -1,5 +1,13 @@
 # Changelog
 
+1.1.0
+=====
+- Add mobile second factor authentication for validating transactions
+- Add pairing process to bind a Ledger Wallet with a smartphone
+- Add firmware update process
+- UI improvements
+- Bug fixes
+
 1.0.7
 =====
 - Improve transactions synchronization

@@ -220,6 +220,16 @@ update:
     update_succeeded: "Update succeeded"
     use_24_words: "Use your 24 words recovery phrase from your recovery sheet to restore your bitcoins."
 
+  linux:
+    linux_users: "Linux users"
+    follow_instructions: "Follow these instructions to ensure your Ledger Wallet gets recognized once updated:"
+    first: "1. First, open your terminal and edit this file (root permissions are required):"
+    fc: "sudo vi /etc/udev/rules.d/20-hw1.rules"
+    second: "2. Add this line:"
+    sc: "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"2581\", ATTRS{idProduct}==\"3b7c\", MODE=\"0660\", GROUP=\"plugdev\""
+    third: "3. Finally, close the file and execute this command (root permissions are required):"
+    tc: "sudo udevadm control --reload-rules"
+
   error:
     update_failed: "Update failed"
     error_updated: "An error occurred while updating your Ledger Wallet (code: %s)."
