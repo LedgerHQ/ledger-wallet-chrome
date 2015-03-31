@@ -214,6 +214,9 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   _checkDongleCertification: (Attestation, callback) ->
     completion = new CompletionClosure(callback)
+    if @getIntFirmwareVersion() < ledger.wallet.Firmware.V_LW_1_0_0
+      completion.success(true)
+      return completion.readonly()
     randomValues = new Uint32Array(2)
     crypto.getRandomValues(randomValues)
     random = _.str.lpad(randomValues[0].toString(16), 8, '0') + _.str.lpad(randomValues[1].toString(16), 8, '0')
