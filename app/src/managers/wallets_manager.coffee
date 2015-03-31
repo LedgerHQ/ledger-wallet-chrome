@@ -12,6 +12,7 @@ class @WalletsManager extends EventEmitter
 
   connectCard: (card) ->
     try
+      card.isInBootloaderMode = if card.productId is 0x1808 or card.productId is 0x1807 then yes else no
       @emit 'connecting', card
       result = []
       @cardFactory.list_async()

@@ -42,7 +42,7 @@ require @ledger.imports, ->
     isInFirmwareUpdateMode: -> @_currentMode is @Modes.FirmwareUpdate
 
     onConnectingDongle: (card) ->
-      @emit 'dongle:connecting', card if @isInWalletMode()
+      @emit 'dongle:connecting', card if @isInWalletMode() and !card.isInBootloaderMode
 
     onDongleConnected: (wallet) ->
       @performDongleAttestation() if @isInWalletMode() and not wallet.isInBootloaderMode()
