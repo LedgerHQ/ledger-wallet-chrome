@@ -2,55 +2,160 @@ describe "Internationalization and Localization -", ->
   i18n = ledger.i18n
   chromeStore = new ledger.storage.ChromeStore('i18n')
 
-  it "should change the language", ->
-    i18n.setFavLangByUI('es')
-    expect(i18n.favLang.memoryValue).toBe('es')
+  describe "Test setFavLangByUI() - ", ->
 
-  it "should sync the language to chrome store", (done) ->
-    i18n.setFavLangByUI('en')
-    res = ''
-    call = () ->
-      d = Q.defer()
-      chromeStore.get 'i18n_favLang', (r) ->
-        if Array.isArray(r.i18n_favLang)
-          r.i18n_favLang = r.i18n_favLang[0]
-        res = r.i18n_favLang
-        d.resolve(res)
-      return d.promise
+    it "should change the language", ->
+      i18n.setFavLangByUI('es')
+      expect(i18n.favLang.memoryValue).toBe('es')
 
-    call()
-    .then (res) ->
-      expect(res).toBe('en')
-      done()
-    .done()
+    it "should sync the language to chrome store", (done) ->
+      i18n.setFavLangByUI('en')
+      res = ''
+      call = () ->
+        d = Q.defer()
+        chromeStore.get 'i18n_favLang', (r) ->
+          if Array.isArray(r.i18n_favLang)
+            r.i18n_favLang = r.i18n_favLang[0]
+          res = r.i18n_favLang
+          d.resolve(res)
+        return d.promise
+      call()
+      .then (res) ->
+        expect(res).toBe('en')
+        done()
+      .done()
 
-
-  it "should sync the language to synced store", ->
-    i18n.setFavLangByUI('fr')
-    res = ''
-    ledger.storage.sync.get 'i18n_favLang', (r) ->
-      if Array.isArray(r.i18n_favLang)
-        r.i18n_favLang = r.i18n_favLang[0]
-      #l 'syncstore', r.i18n_favLang
-      res = r.i18n_favLang
-      deferred.resolve()
-    expect(res).toBe('fr')
-
-
-  fit "should set two chars tag lang and locale", (done) ->
-    ledger.storage.sync.clear()
-    i18n.loadUserBrowserAcceptLangs = () -> #
-    i18n.browserAcceptLanguages = ['be', 'en', 'zh-tw', 'fr']
-
-    i18n.init(done) ->
-      expect(i18n.favLang.memoryValue).toBe('en')
-      expect(i18n.favLocale.memoryValue).toBe('en')
-      done()
+    it "should sync the language to synced store", (done) ->
+      i18n.setFavLangByUI('fr')
+      res = ''
+      call = () ->
+        d = Q.defer()
+        ledger.storage.sync.get 'i18n_favLang', (r) ->
+          if Array.isArray(r.i18n_favLang)
+            r.i18n_favLang = r.i18n_favLang[0]
+          res = r.i18n_favLang
+          d.resolve(res)
+        return d.promise
+      call()
+      .then (res) ->
+        expect(res).toBe('fr')
+        done()
+      .done()
 
 
-  it "should set two chars tag lang and four chars tag locale", ->
-    ledger.storage.sync.clear()
-    i18n.browserAcceptLanguages = ['be', 'en-GB', 'zh-tw', 'fr']
-    i18n.init()
-    expect(i18n.favLang.memoryValue).toBe('en')
-    expect(i18n.favLocale.memoryValue).toBe('en-GB')
+  describe "Test setLocaleByUI() - ", ->
+
+    it "should change the locale", (done) ->
+      i18n.setLocaleByUI('en-GB')
+      .then ->
+        expect(i18n.favLocale.memoryValue).toBe('en-GB')
+      .then ->
+        expect(moment.locale()).toBe('en-gb')
+        done()
+      .done()
+
+    it "should sync the locale to chrome store", (done) ->
+      i18n.setLocaleByUI('zh-tw')
+      res = ''
+      call = () ->
+        d = Q.defer()
+        chromeStore.get 'i18n_favLocale', (r) ->
+          if Array.isArray(r.i18n_favLocale)
+            r.i18n_favLang = r.i18n_favLocale[0]
+          res = r.i18n_favLocale
+          d.resolve(res)
+        return d.promise
+      call()
+      .then (res) ->
+        expect(res).toBe('zh-tw')
+        done()
+      .done()
+
+    it "should sync the locale to synced store", (done) ->
+      i18n.setLocaleByUI('fr-CA')
+      res = ''
+      call = () ->
+        d = Q.defer()
+        ledger.storage.sync.get 'i18n_favLocale', (r) ->
+          if Array.isArray(r.i18n_favLocale)
+            r.i18n_favLocale = r.i18n_favLocale[0]
+          res = r.i18n_favLocale
+          d.resolve(res)
+        return d.promise
+      call()
+      .then (res) ->
+        expect(res).toBe('fr-CA')
+        done()
+      .done()
+
+
+
+  describe "Check lang and locale memory and stores values after full initialization", ->
+
+    beforeEach (done) ->
+      ledger.storage.sync.clear ->
+        chrome.storage.local.clear -> done()
+
+    it "should set two chars tag lang and four chars tag locale", (done) ->
+      i18n.browserAcceptLanguages = ['be', 'fr-CA', 'zh-tw', 'fr']
+      i18n.loadUserBrowserAcceptLangs = () -> i18n.browserAcceptLanguages
+      i18n.init ->
+        expect(i18n.favLang.memoryValue).toBe('fr')
+        expect(i18n.favLang.chromeStoreValue).toBe('fr')
+        expect(i18n.favLang.syncStoreValue).toBe('fr')
+        expect(i18n.favLocale.memoryValue).toBe('fr-CA')
+        expect(i18n.favLocale.chromeStoreValue).toBe('fr-CA')
+        expect(i18n.favLocale.syncStoreValue).toBe('fr-CA')
+        done()
+
+    it "should set two chars tag lang and locale", (done) ->
+      i18n.browserAcceptLanguages = ['zh', 'es', 'en-GB', 'it']
+      i18n.loadUserBrowserAcceptLangs = () -> i18n.browserAcceptLanguages
+      i18n.init ->
+        expect(i18n.favLang.memoryValue).toBe('es')
+        expect(i18n.favLang.chromeStoreValue).toBe('es')
+        expect(i18n.favLang.syncStoreValue).toBe('es')
+        expect(i18n.favLocale.memoryValue).toBe('es')
+        expect(i18n.favLocale.chromeStoreValue).toBe('es')
+        expect(i18n.favLocale.syncStoreValue).toBe('es')
+        done()
+
+    it "should fallback to browser UI lang - chrome.i18n.getUILanguage()", (done) ->
+      i18n.browserAcceptLanguages = ['dfr', 'huj', 'jla', 'dede', 'lp']
+      i18n.loadUserBrowserAcceptLangs = () -> i18n.browserAcceptLanguages
+      i18n.init ->
+        expect(i18n.favLang.memoryValue).toBe(chrome.i18n.getUILanguage())
+        expect(i18n.favLang.chromeStoreValue).toBe(chrome.i18n.getUILanguage())
+        expect(i18n.favLang.syncStoreValue).toBe(chrome.i18n.getUILanguage())
+        expect(i18n.favLocale.memoryValue).toBe(chrome.i18n.getUILanguage())
+        expect(i18n.favLocale.chromeStoreValue).toBe(chrome.i18n.getUILanguage())
+        expect(i18n.favLocale.syncStoreValue).toBe(chrome.i18n.getUILanguage())
+        done()
+
+    it "should have sync store set", (done) ->
+      i18n.browserAcceptLanguages = ['be', 'fr-CA', 'zh-tw', 'fr']
+      i18n.loadUserBrowserAcceptLangs = () -> i18n.browserAcceptLanguages
+      i18n.init ->
+        expect(i18n.favLang.syncStoreIsSet).toBe(true)
+        expect(i18n.favLocale.syncStoreIsSet).toBe(true)
+        done()
+
+
+    afterEach (done) ->
+      ledger.storage.sync.clear ->
+        chrome.storage.local.clear -> done()
+      i18n.favLang =
+        memoryValue: undefined
+        syncStoreValue: undefined
+        chromeStoreValue: undefined
+        syncStoreIsSet: undefined
+        chromeStoreIsSet: undefined
+        storesAreSync: undefined
+
+      i18n.favLocale =
+        memoryValue: undefined
+        syncStoreValue: undefined
+        chromeStoreValue: undefined
+        syncStoreIsSet: undefined
+        chromeStoreIsSet: undefined
+        storesAreSync: undefined
