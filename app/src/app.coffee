@@ -9,8 +9,8 @@ require @ledger.imports, ->
     onStart: ->
       @_listenAppEvents()
       ledger.i18n.init =>
+        @setExecutionMode(@Modes.Wallet)
         @router.go('/')
-      @setExecutionMode(@Modes.Wallet)
 
     ###
       Sets the execution mode of the application. In Wallet mode, the application handles the wallets state by starting services,

@@ -5,9 +5,9 @@
 @ledger.config ?= {}
 _.extend @ledger.config,
   m2fa:
-    baseUrl: 'wss://ws01.ledgerwallet.com/2fa/channels' #'ws://nicolasbigot.fr:9000/2fa/channels'
+    baseUrl: 'wss://ws.ledgerwallet.com/2fa/channels' #'ws://nicolasbigot.fr:9000/2fa/channels'
   restClient:
-    baseUrl: 'https://api02.ledgerwallet.com/'
+    baseUrl: 'https://api.ledgerwallet.com/'
   syncRestClient:
     pullIntervalDelay: 10000
     pullThrottleDelay: 1000

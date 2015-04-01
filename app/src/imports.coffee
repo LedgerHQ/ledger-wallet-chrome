@@ -286,10 +286,12 @@
         '../spec/utils/formatters_spec'
         '../spec/utils/converters_spec'
 
-        '../spec/m2fa/client_spec'
-        '../spec/m2fa/m2fa_spec'
+        #'../spec/m2fa/client_spec'
+        #'../spec/m2fa/m2fa_spec'
 
         '../spec/spec_helper'
+
+        '../spec/i18n/i18n_spec'
 
         ## Update controllers
         'controllers/update/update_navigation_controller'
