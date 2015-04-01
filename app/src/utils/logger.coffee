@@ -7,9 +7,10 @@ class @ledger.utils.Logger
 
   # Logger's constructor
   # @param [Boolean] active or not the Logger
-  constructor: (@_active) ->
+  constructor: (tag, @_active) ->
+    @_tag = tag
     @_mode = if window.ledger.isDev then "debug" else "release"
-    @store = new ledger.storage.ChromeStore("logs")
+    @store = @constructor.store()
 
   # Sets the active state
   # @param [Boolean] active or not the logger.
@@ -40,7 +41,7 @@ class @ledger.utils.Logger
   # @param [String] msg Message to log.
   info: (msg) ->
     if @_active
-       @_storeLog(msg, "INFO")
+      @_storeLog(msg, "INFO")
       if(@_mode == "debug")
         console.info(msg)
 
@@ -62,25 +63,28 @@ class @ledger.utils.Logger
 
   # Retreive saved logs
   # @param [Function] cb A callback invoked once we get the logs as an array
-  logs: (cb) ->
-    self = @
-    @store.keys(
-      (keys) ->
-        self.store.get( keys,
-          (items) ->
-            cb(_.values(items))
-        )
-    )
+  logs: (cb) -> @constructor.logs()
 
   # Save a log in chrome local storage
   # @private
   # @param [String] msg Message to log.
   # @param [String] msgType Log level.
   _storeLog: (msg, msgType) ->
-      now = new Date();
+      now = new Date()
       log = {}
-      log[now.getTime()] = {"date": now.toUTCString(), "type" : msgType, "msg" : msg}
+      log[now.getTime()] = date: now.toUTCString(), type: msgType, msg: msg, tag: @_tag
       @clear()
       @store.set(log)
 
-@ledger.utils.logger = new ledger.utils.Logger(true)
+  @store: ->
+    unless @_store?
+      @_store = new ledger.storage.ChromeStore("logs")
+    @_store
+
+  @logs: (cb) ->
+    completion = new CompletionClosure(cb)
+    @store().keys (keys) =>
+      @store().get keys, (items) => completion.success(_.values(items))
+    completion.readonly()
+
+ledger.utils.logger = new ledger.utils.Logger("DeprecatedLogger", true)
