@@ -32,5 +32,9 @@ class @WalletSendProcessingDialogViewController extends @DialogViewController
           dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.network_no_response"))
           dialog.show()
         else
+          console.log transaction
+          Api.callback 
+            message: "success"
+            transaction: transaction
           dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.send.errors.sending_succeeded"), subtitle: t("wallet.send.errors.transaction_completed"))
           dialog.show()

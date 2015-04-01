@@ -32,11 +32,18 @@ chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse) =>
       if chrome.app.window.get("main_window")?
         chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
     when 'bitid'
-      console.log data.uri
       payload = {
         command: 'bitid',
         uri: data.uri,
         silent: data.silent
+      }
+      if chrome.app.window.get("main_window")?
+        chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
+    when 'send_payment'
+      payload = {
+        command: 'send_payment',
+        address: data.address,
+        amount: data.amount
       }
       if chrome.app.window.get("main_window")?
         chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"

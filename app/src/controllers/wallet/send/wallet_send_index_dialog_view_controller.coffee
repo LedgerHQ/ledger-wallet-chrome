@@ -10,6 +10,10 @@ class @WalletSendIndexDialogViewController extends DialogViewController
 
   onAfterRender: () ->
     super
+    if @params['?params'].amount?
+      @view.amountInput.val @params['?params'].amount
+    if @params['?params'].address?
+      @view.receiverInput.val @params['?params'].address
     @view.amountInput.amountInput()
     @view.errorContainer.hide()
     do @_updateTotalInput
@@ -18,6 +22,10 @@ class @WalletSendIndexDialogViewController extends DialogViewController
   onShow: ->
     super
     @view.amountInput.focus()
+
+  cancel: ->
+    Api.callback_cancel 'send_payment'
+    @dismiss()
 
   send: ->
     nextError = @_nextFormError()

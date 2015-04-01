@@ -27,13 +27,15 @@ class @WalletBitidIndexDialogViewController extends DialogViewController
         else
           @view.confirmButton.text t('common.confirm')
 
+  cancel: ->
+    Api.callback_cancel 'bitid'
+    @dismiss()
+
   confirm: ->
-    chrome.runtime.sendMessage {
-      command: 'bitid',
+    Api.callback_success 'bitid',
       address: @address,
       signature: @signature,
       uri: @uri
-    }
     if typeof @signature != "string" || @signature.length == 0 || @doNotBroadcast == "true"
       @dismiss()
     else
