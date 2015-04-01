@@ -22,35 +22,35 @@ class ledger.preferences.Preferences
     btcUnit: 'BTC'
     currency: 'USD'
     miningFee: '10000'
-    blockchainExplorator: 'https://blockchain.info/'
+    blockchainExplorer: 'https://blockchain.info/'
 
   ###
     Language
   ###
-  getUILanguage: () ->
+  getLanguage: () ->
     ledger.i18n.favLang.memoryValue
 
-  setUILanguage: (value) ->
+  setLanguage: (value) ->
     ledger.i18n.setFavLangByUI(value)
 
 
   ###
     Locale - Region preference for Date and currency formatting
   ###
-  getUILocale: () ->
+  getLocale: () ->
     ledger.i18n.favLocale.memoryValue
 
-  setUILocale: (value) ->
+  setLocale: (value) ->
     ledger.i18n.setLocaleByUI(value)
 
 
   ###
     BTC Unit
   ###
-  getUIBtcUnit: () ->
+  getBtcUnit: () ->
     @prefs.btcUnit
 
-  setUIBtcUnit: (value) ->
+  setBtcUnit: (value) ->
     if value isnt 'BTC' and value isnt 'mBTC' and value isnt 'uBTC' and value isnt 'satoshi'
       try
         throw new Error("'BtcUnit' must be BTC, mBTC, uBTC or satoshi")
@@ -67,10 +67,10 @@ class ledger.preferences.Preferences
   ###
     Fiat currency equivalent
   ###
-  getUICurrency: () ->
+  getCurrency: () ->
     @prefs.currency
 
-  setUICurrency: (value) ->
+  setCurrency: (value) ->
     if ledger.storage.sync?
       ledger.storage.sync.set({preferences_currency: value})
       @prefs.currency = value
@@ -81,10 +81,10 @@ class ledger.preferences.Preferences
   ###
     Mining Fee
   ###
-  getUIMiningFee: () ->
+  getMiningFee: () ->
     @prefs.miningFee
 
-  setUIMiningFee: (value) ->
+  setMiningFee: (value) ->
     if ledger.storage.sync?
       ledger.storage.sync.set({preferences_miningFee: value})
       @prefs.miningFee = value
@@ -93,14 +93,14 @@ class ledger.preferences.Preferences
 
 
   ###
-    Blockchain explorator
+    Blockchain explorer
   ###
-  getUIBlockchainExplorator: () ->
-    @prefs.blockchainExplorator
+  getBlockchainExplorer: () ->
+    @prefs.blockchainExplorer
 
-  setUIBlockchainExplorator: (value) ->
+  setBlockchainExplorer: (value) ->
     if ledger.storage.sync?
-      ledger.storage.sync.set({preferences_blockchainExplorator: value})
-      @prefs.blockchainExplorator = value
+      ledger.storage.sync.set({preferences_blockchainExplorer: value})
+      @prefs.blockchainExplorer = value
     else
       throw new Error 'You must initialized your wallet'

@@ -79,7 +79,7 @@ class ledger.formatters
     @return [String] The formatted value
   ###
   @fromValue: (value, precision) ->
-    @formatUnit(value, ledger.preferences.instance.getUIBtcUnit(), precision)
+    @formatUnit(value, ledger.preferences.instance.getBtcUnit(), precision)
 
 
   ###
