@@ -61,11 +61,6 @@ _.extend ledger.errors,
     301: "Signature error"
     302: "Dust transaction"
 
-
-
-  create: (code, title, error) -> code: code, title: title, error: error
-  throw: (code, message) -> throw new ledger.StandardError(code, message)
-
 # @exemple Initializations
 #   new ledger.StdError("an error message")
 #   new ledger.StdError(NotFound, "an error message")

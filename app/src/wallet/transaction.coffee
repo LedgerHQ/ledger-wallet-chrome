@@ -102,7 +102,7 @@ class ledger.wallet.Transaction
       @authorizationPaired = @_resumeData.authorizationPaired
       completion.success()
     .fail (error) =>
-      completion.failure(new ledger.StdError(Errors.SignatureError))
+      completion.failure(ledger.StdError(Errors.SignatureError))
     .done()
     completion.readonly()
   
@@ -134,7 +134,7 @@ class ledger.wallet.Transaction
       @_isValidated = yes
       _.defer => completion.success()
     .fail (error) =>
-      _.defer => completion.failure(new ledger.StdError(Errors.SignatureError, error))
+      _.defer => completion.failure(ledger.StdError(Errors.SignatureError, error))
     .done()
     completion.readonly()
 
@@ -195,15 +195,15 @@ class ledger.wallet.Transaction
   ###
   @create: ({amount, fees, address, inputsPath, changePath}, callback = null) ->
     completion = new CompletionClosure(callback)
-    return completion.failure(new ledger.StdError(Errors.DustTransaction)) && completion.readonly() if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
-    return completion.failure(new ledger.StdError(Errors.NotEnoughFunds)) && completion.readonly() unless inputsPath?.length
+    return completion.failure(ledger.StdError(Errors.DustTransaction)) && completion.readonly() if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+    return completion.failure(ledger.StdError(Errors.NotEnoughFunds)) && completion.readonly() unless inputsPath?.length
     requiredAmount = amount.add(fees)
 
     ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
-      return completion.failure(new ledger.StdError(Errors.NetworkError, error)) if error?
+      return completion.failure(ledger.StdError(Errors.NetworkError, error)) if error?
       # Collect each valid outputs and sort them by desired priority
       validOutputs = _(output for output in outputs when output.paths.length > 0).sortBy (output) ->  -output['confirmatons']
-      return completion.failure(new ledger.StdError(Errors.NotEnoughFunds)) if validOutputs.length == 0
+      return completion.failure(ledger.StdError(Errors.NotEnoughFunds)) if validOutputs.length == 0
       finalOutputs = []
       collectedAmount = new Amount()
       hadNetworkFailure = no

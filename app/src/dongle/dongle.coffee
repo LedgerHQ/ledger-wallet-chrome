@@ -138,9 +138,9 @@ class @ledger.dongle.Dongle extends EventEmitter
           #  Unexpected - let's say it's 1.4.3
           completion.success([0, (1 << 16) + (4 << 8) + (3)])
         else
-          completion.failure(new ledger.StdError(ledger.errors.UnknowError, "Failed to get version"))
+          completion.failure(ledger.StdError(ledger.errors.UnknowError, "Failed to get version"))
     .fail (error) ->
-      completion.failure(new ledger.StdError(ledger.errors.UnknowError, error))
+      completion.failure(ledger.StdError(ledger.errors.UnknowError, error))
     .catch (error) ->
       console.error("Fail to getRawFirmwareVersion :", error)
     .done()
@@ -159,7 +159,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     .then (availablity) ->
       completion.success(availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update)
     .fail (er) ->
-      completion.failure(new StdError(er))
+      completion.failure(ledger.StdError(er))
     .done()
     completion.readonly()
 
@@ -170,7 +170,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     .then (availablity) ->
       completion.success(availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update or availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Overwrite)
     .fail (er) ->
-      completion.failure(new StdError(er))
+      completion.failure(ledger.StdError(er))
     .done()
     completion.readonly()
 
@@ -205,7 +205,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       if ecsig.verify(dataToSign, dataSigBytes)
         completion.success(this)
       else
-        completion.failure(new ledger.StdError(Errors.DongleNotCertified))
+        completion.failure(ledger.StdError(Errors.DongleNotCertified))
       return
       # attestation = result.toString(HEX)
       # dataToSign = attestation.substring(16,32) + random
@@ -227,7 +227,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       # return
     .fail (err) =>
       console.error("Fail check if isCertified :", err)
-      error = new ledger.StdError(Errors.SignatureError, err)
+      error = ledger.StdError(Errors.SignatureError, err)
       completion.failure(error)
     .done()
     completion.readonly()
@@ -261,14 +261,14 @@ class @ledger.dongle.Dongle extends EventEmitter
         @_setState(States.UNLOCKED)
         completion.success()
       .fail (err) =>
-        error = new ledger.StdError(Errors.NotSupportedDongle, err)
+        error = ledger.StdError(Errors.NotSupportedDongle, err)
         console.log("unlockWithPinCode 2 fail :", err)
         completion.failure(error)
       .catch (error) ->
         console.error("Fail to unlockWithPinCode 2 :", error)
       .done()
     .fail (err) =>
-      error = new ledger.StdError(Errors.WrongPinCode, err)
+      error = ledger.StdError(Errors.WrongPinCode, err)
       console.error("Fail to unlockWithPinCode 1 :", err)
       if err.match(/6faa|63c0/)
         @_setState(States.BLANK)
@@ -330,7 +330,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       @_setState(States.ERROR, msg)
       completion.success()
     ).fail( (err) =>
-      error = new ledger.StdError(Errors.UnknowError, err)
+      error = ledger.StdError(Errors.UnknowError, err)
       completion.failure(error)
     ).catch( (error) ->
       console.error("Fail to setup :", error)
@@ -351,15 +351,15 @@ class @ledger.dongle.Dongle extends EventEmitter
     .fail (err) =>
       if err.match("6982") # Pin required
         @_setState(States.LOCKED)
-        error = new ledger.StdError(Errors.DongleLocked, err)
+        error = ledger.StdError(Errors.DongleLocked, err)
       else if err.match("6985") # Error ?
         @_setState(States.BLANK)
-        error = new ledger.StdError(Errors.BlankDongle, err)
+        error = ledger.StdError(Errors.BlankDongle, err)
       else if err.match("6faa")
         @_setState(States.ERROR)
-        error = new ledger.StdError(Errors.UnknowError, err)
+        error = ledger.StdError(Errors.UnknowError, err)
       else
-        error = new ledger.StdError(Errors.UnknowError, err)
+        error = ledger.StdError(Errors.UnknowError, err)
       _.defer -> completion.failure(error)
     .catch (error) ->
       console.error("Fail to getPublicAddress :", error)
