@@ -20,5 +20,4 @@ class @Api
     }    
 
   @bitid: (data) ->
-    @derivationPath = ledger.bitcoin.bitid.uriToDerivationPath(data.uri)
-    ledger.app.router.go '/wallet/bitid/index', {uri: data.uri}
+    ledger.app.router.go '/wallet/bitid/index', {uri: data.uri, silent: data.silent}

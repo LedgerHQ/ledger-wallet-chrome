@@ -9,7 +9,9 @@ class @WalletBitidIndexDialogViewController extends DialogViewController
   onAfterRender: ->
     super
     @view.confirmButton.addClass "disabled"
+    chrome.app.window.current().show()
     @uri = @params['?params'].uri
+    @doNotBroadcast = @params['?params'].silent
     @derivationPath = ledger.bitcoin.bitid.uriToDerivationPath(@uri)
     @view.bitidDomain.text ledger.bitcoin.bitid.uriToDerivationUrl(@uri)
     ledger.app.wallet._lwCard.getBitIDAddress @derivationPath
@@ -18,8 +20,12 @@ class @WalletBitidIndexDialogViewController extends DialogViewController
       @view.bitidAddress.text(@address)
       ledger.app.wallet.signMessageWithBitId @derivationPath, @uri, (result) =>
         @signature = result
-        @view.confirmButton.text t('common.confirm')
         @view.confirmButton.removeClass "disabled"
+        if typeof @signature != "string" || @signature.length == 0
+          @view.errorContainer.text t('bitid.errors.signature_failed')
+          @view.confirmButton.text t('common.close')
+        else
+          @view.confirmButton.text t('common.confirm')
 
   confirm: ->
     chrome.runtime.sendMessage {
@@ -28,5 +34,8 @@ class @WalletBitidIndexDialogViewController extends DialogViewController
       signature: @signature,
       uri: @uri
     }
-    dialog = new WalletBitidAuthenticatingDialogViewController uri: @uri, address: @address, signature: @signature
-    @getDialog().push dialog
+    if typeof @signature != "string" || @signature.length == 0 || @doNotBroadcast == "true"
+      @dismiss()
+    else
+      dialog = new WalletBitidAuthenticatingDialogViewController uri: @uri, address: @address, signature: @signature
+      @getDialog().push dialog

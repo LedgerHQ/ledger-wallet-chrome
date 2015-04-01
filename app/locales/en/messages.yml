@@ -417,3 +417,5 @@ wallet:
       succeeded: "Authentication success"
       completed: "You have been connected to the service"
       failed: "Authentication failed"
+    errors:
+      signature_failed: "Failed to sign the challenge. Remove and reinsert the Nano."

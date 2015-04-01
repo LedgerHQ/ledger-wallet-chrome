@@ -429,17 +429,12 @@ LW.prototype = {
         var lW = this;
 
         if (typeof lW.bitIdAddress[derivationPath] == "object") {
-            LWTools.console('LW.getMessageSignature(' + derivationPath + ',' + message + ')', 3);
             message = new ByteString(message,ASCII);
             pin = new ByteString(lW.PIN,ASCII);
             lW.currentDerivationPath = derivationPath;
 
             return lW.dongle.signMessagePrepare_async(derivationPath, message).then(function(result) {
-                LWTools.console('LlW.dongle.signMessagePrepare_async');
-                LWTools.console(result);
                 return lW.dongle.signMessageSign_async(pin).then(function(result) {
-                    LWTools.console('LlW.dongle.signMessageSign_async');
-                    LWTools.console(result);
 
                     function convertBase64(data) {
                         var codes = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -491,7 +486,6 @@ LW.prototype = {
                     }
 
                     var signature = result.signature;
-                    LWTools.console("derivationPath: " + derivationPath + " message: " + message);
 
                     try {
                         var signedMessage = convertMessageSignature(lW.bitIdAddress[derivationPath].publicKey, new ByteString(message, ASCII), signature);

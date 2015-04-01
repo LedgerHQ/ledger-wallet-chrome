@@ -35,7 +35,8 @@ chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse) =>
       console.log data.uri
       payload = {
         command: 'bitid',
-        uri: data.uri
+        uri: data.uri,
+        silent: data.silent
       }
       if chrome.app.window.get("main_window")?
         chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"

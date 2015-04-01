@@ -417,3 +417,5 @@ wallet:
       succeeded: "Identification réussie"
       completed: "Vous avez été connecté sur le service"
       failed: "Identification échouée"
+    errors:
+      signature_failed: "Erreur dans la signature. Retirez et réinsérez le Nano."
