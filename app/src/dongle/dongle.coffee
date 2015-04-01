@@ -49,7 +49,6 @@ _.extend @ledger.dongle,
 
 ###
 Signals :
-  @emit connected
   @emit state:changed(States)
   @emit state:locked
   @emit state:unlocked
@@ -95,7 +94,7 @@ class @ledger.dongle.Dongle extends EventEmitter
           # @todo Se connecter directement à la carte sans redemander le PIN
           console.warn("Dongle is already unlock ! Case not handle => Pin Code Required.")
           @_setState(States.LOCKED)
-        ).catch( ->
+        ).catch( (e) -> #console.error(e)
         ).done()
       ).catch( (error) =>
         console.error("Fail to initialize Dongle :", error)
@@ -153,19 +152,39 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @return [ledger.fup.FirmwareUpdater]
   getFirmwareUpdater: () -> ledger.fup.FirmwareUpdater.instance
 
-  # @return [Boolean]
-  isFirmwareUpdateAvailable: () -> @getFirmwareUpdater().isFirmwareUpdateAvailable(this)
+  # @return [CompletionClosure]
+  isFirmwareUpdateAvailable: (callback=undefined) ->
+    completion = new CompletionClosure(callback)
+    @getFirmwareUpdater().getFirmwareUpdateAvailability(this)
+    .then (availablity) ->
+      completion.success(availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update)
+    .fail (er) ->
+      completion.failure(new StdError(er))
+    .done()
+    completion.readonly()
+
+  # @return [CompletionClosure]
+  isFirmwareOverwriteOrUpdateAvailable: (callback=undefined) ->
+    completion = new CompletionClosure(callback)
+    @getFirmwareUpdater().getFirmwareUpdateAvailability(this)
+    .then (availablity) ->
+      completion.success(availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update or availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Overwrite)
+    .fail (er) ->
+      completion.failure(new StdError(er))
+    .done()
+    completion.readonly()
 
   # Verify that dongle firmware is "official".
   # @param [Function] callback Optional argument
   # @return [CompletionClosure]
-  # isCertified: (callback=undefined) -> @_checkDongleCertification(Attestation, callback)
-  isCertified: (callback=undefined) -> @_checkDongleCertification(BetaAttestation, callback)
+  # isCertified: (callback=undefined) -> @_checkCertification(Attestation, callback)
+  isCertified: (callback=undefined) -> @_checkCertification(Attestation, callback)
 
-  isBetaCertified: (callback=undefined) -> @_checkDongleCertification(BetaAttestation, callback)
+  isBetaCertified: (callback=undefined) -> @_checkCertification(BetaAttestation, callback)
 
-  _checkDongleCertification: (Attestation, callback) ->
+  _checkCertification: (Attestation, callback) ->
     completion = new CompletionClosure(callback)
+    return (completion.success(true) || completion.readonly()) if @getIntFirmwareVersion() < Firmware.V_LW_1_0_0
     randomValues = new Uint32Array(2)
     crypto.getRandomValues(randomValues)
     random = _.str.lpad(randomValues[0].toString(16), 8, '0') + _.str.lpad(randomValues[1].toString(16), 8, '0')
@@ -289,7 +308,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       bytesSeed = new ByteString(restoreSeed, HEX)
       if bytesSeed.length != 32
         e('Invalid seed :', restoreSeed)
-        return completion.failure().readonly()
+        return (completion.failure() || completion.readonly())
 
     l("Setup in progress ... please wait")
     @_btchip.setupNew_async(
@@ -422,6 +441,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     @_sendApdu(new ByteString("E0"+"12"+"01"+"00"+"41"+pubKey, HEX), [0x9000])
     .then( (d) -> completion.success(d.toString()) )
     .fail( (error) -> completion.failure(error) )
+    .done()
     completion.readonly()
 
   # @param [String] resp challenge response, hex encoded.
@@ -435,6 +455,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     @_sendApdu(new ByteString("E0"+"12"+"02"+"00"+"10"+resp, HEX), [0x9000])
     .then( () -> completion.success() )
     .fail( (error) -> completion.failure(error) )
+    .done()
     completion.readonly()
 
   # @param [String] path
@@ -443,7 +464,7 @@ class @ledger.dongle.Dongle extends EventEmitter
   getExtendedPublicKey: (path, callback=undefined) ->
     ledger.throw(Errors.DongleLocked) if @state != States.UNLOCKED
     completion = new CompletionClosure(callback)
-    return completion.success(@_xpubs[path]).readonly() if @_xpubs[path]?
+    return (completion.success(@_xpubs[path]) || completion.readonly()) if @_xpubs[path]?
     xpub = new ledger.wallet.ExtendedPublicKey(@, path)
     xpub.initialize () =>
       @_xpubs[path] = xpub

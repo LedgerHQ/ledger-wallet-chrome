@@ -1,0 +1,32 @@
+@import (reference) "common";
+
+.qrcode {
+  overflow: hidden;
+  .fullsize;
+
+  > .video {
+    .fullsize;
+    background-color: @color-extra-light-grey;
+  }
+
+  > .overlay {
+    .fullsize;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url("@{images-url}/common/qrcode_borders.png");
+    background-position: center center;
+    background-size: 170px 170px;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+    color: @color-soft-grey;
+    position: relative;
+    top: -100%;
+    .regular-grey-text-small;
+
+    &.errored {
+      background-image: none;
+      opacity: 1;
+    }
+  }
+}

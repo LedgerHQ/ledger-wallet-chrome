@@ -114,6 +114,7 @@
         'utils/try'
         'utils/comparison_result'
         'utils/amount'
+        'utils/progressbars'
 
         ## Crypto
         'utils/crypto/aes'
@@ -141,6 +142,7 @@
         ## Managers
         'managers/schemes_manager'
         'managers/permissions_manager'
+        'managers/system_manager'
 
         ## Rest clients
         'restclients/authentication'
@@ -210,6 +212,7 @@
         # Dialogs
         'controllers/common/dialogs/common_dialogs_confirmation_dialog_view_controller'
         'controllers/common/dialogs/common_dialogs_message_dialog_view_controller'
+        'controllers/common/dialogs/common_dialogs_qrcode_dialog_view_controller'
 
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller'
@@ -247,6 +250,7 @@
         'controllers/onboarding/device/onboarding_device_opening_view_controller'
         'controllers/onboarding/device/onboarding_device_error_view_controller'
         'controllers/onboarding/device/onboarding_device_connecting_view_controller'
+        'controllers/onboarding/device/onboarding_device_update_view_controller'
 
         # Management
         'controllers/onboarding/management/onboarding_management_security_view_controller'
@@ -289,7 +293,9 @@
         'controllers/update/update_erasing_view_controller'
         'controllers/update/update_unplug_view_controller'
         'controllers/update/update_updating_view_controller'
-        'controllers/update/update_loados_view_controller'
-        'controllers/update/update_loadblreloader_view_controller'
-        'controllers/update/update_loadbl_view_controller'
+        'controllers/update/update_loading_view_controller'
+        'controllers/update/update_done_view_controller'
+        'controllers/update/update_error_view_controller'
+        'controllers/update/update_linux_view_controller'
+
       ]

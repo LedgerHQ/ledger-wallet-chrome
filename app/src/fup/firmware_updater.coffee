@@ -21,13 +21,13 @@ class ledger.fup.FirmwareUpdater
     @_scripts = []
 
   ###
-    Checks if a firmware update is available for the given wallet.
+    Checks if a firmware update is available for the given dongle.
 
     @return [Boolean] True if a firmware update is available, false otherwise.
   ###
-  getFirmwareUpdateAvailability: (wallet, bootloaderMode = no, forceBl = no, callback = undefined) ->
+  getFirmwareUpdateAvailability: (dongle, bootloaderMode = no, forceBl = no, callback = undefined) ->
     completion = new CompletionClosure(callback)
-    wallet.getRawFirmwareVersion bootloaderMode, forceBl, (version, error) =>
+    dongle.getRawFirmwareVersion bootloaderMode, forceBl, (version, error) =>
       return completion.failure(error) if error?
       @_lastVersion = version
       if ledger.fup.utils.compareVersions(@_lastVersion, ledger.fup.versions.Nano.CurrentVersion.Os).eq()
@@ -51,7 +51,8 @@ class ledger.fup.FirmwareUpdater
     @_request = new ledger.fup.FirmwareUpdateRequest(@)
     @_request
 
-  _cancelRequest: (request) -> @_request = null if request is @_request
+  _cancelRequest: (request) ->
+    @_request = null if request is @_request
 
   load: (callback) ->
     require ledger.fup.imports, (scripts) =>

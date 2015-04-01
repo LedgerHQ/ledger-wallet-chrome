@@ -54,6 +54,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   @ExchangeTimeout: ExchangeTimeout
 
   constructor: (firmwareUpdater) ->
+    @_id = _.uniqueId("fup")
     @_fup = firmwareUpdater
     @_keyCardSeed = null
     @_currentState = States.Undefined
@@ -66,12 +67,14 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_exchangeNeedsExtraTimeout = no
     @_isWaitForDongleSilent = no
     @_isCancelled = no
+    @_eventHandler = []
 
   ###
     Stops all current tasks and listened events.
   ###
   cancel: () ->
     @off()
+    _(@_eventHandler).each ([object, event, handler]) -> object?.off?(event, handler)
     @_onProgress = null
     @_isCancelled = yes
     @_fup._cancelRequest(this)
@@ -151,10 +154,12 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     registerDongle = (dongle) =>
       @_lastMode = if dongle.isInBootloaderMode() then Modes.Bootloader else Modes.Os
       @_dongle = dongle
-      dongle.once 'disconnected', =>
+      handler =  =>
         @_setCurrentState(States.Undefined)
         @_dongle = null
         @_waitForConnectedDongle(null, @_isWaitForDongleSilent)
+      dongle.once 'state:disconnected', handler
+      @_eventHandler.push [dongle, 'state:disconnected', handler]
       @_handleCurrentState()
       completion.success(dongle)
 
@@ -163,17 +168,17 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       unless dongle?
         @_connectionCompletion = completion.readonly()
         delay = if !silent then 0 else 1000
-        l "Wait for connection", silent
         setTimeout (=> @emit 'plug' unless @_dongle?), delay
-        ledger.app.donglesManager.once 'connected', (e, dongle) =>
+        handler = (e, dongle) =>
           @_connectionCompletion = null
           registerDongle(dongle)
+        ledger.app.donglesManager.once 'connected', handler
+        @_eventHandler.push [ledger.app.donglesManager, 'connected', handler]
       else
         registerDongle(dongle)
     catch er
       e er
     completion.readonly()
-
 
   _waitForDisconnectDongle: (callback = undefined, silent = no) ->
     return @_disconnectionCompletion if @_disconnectionCompletion?
@@ -181,7 +186,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     if @_dongle?
       @emit 'unplug' unless silent
       @_disconnectionCompletion = completion.readonly()
-      @_dongle.once 'disconnected', =>
+      @_dongle.once 'state:disconnected', =>
         @_disconnectionCompletion = null
         @_dongle = null
         completion.success()
@@ -262,9 +267,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     index = 0
     while index < ledger.fup.updates.OS_INIT.length and !ledger.fup.utils.compareVersions(ledger.fup.versions.Nano.CurrentVersion.Os, ledger.fup.updates.OS_INIT[index][0]).eq()
       index += 1
-    l 'LOAD INIT OS', index
     currentInitScript = if ledger.fup.updates.OS_INIT[index]? then ledger.fup.updates.OS_INIT[index][1] else _(ledger.fup.updates.OS_INIT).last()[1]
-    l 'TEST', ledger.fup.updates.OS_INIT[index][1] == ledger.fup.updates.OS_INIT[3][1]
     moddedInitScript = []
     for i in [0...currentInitScript.length]
       moddedInitScript.push currentInitScript[i]
@@ -285,7 +288,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       index = 0
       while index < ledger.fup.updates.BL_RELOADER.length and !ledger.fup.utils.compareVersions(@_dongleVersion, ledger.fup.updates.BL_RELOADER[index][0]).eq()
         index += 1
-      l 'LOAD BL', index
       if index is ledger.fup.updates.BL_RELOADER.length
         @_failure(Errors.UnsupportedFirmware)
         return
@@ -321,10 +323,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_isOsLoaded = no
     @_findOriginalKey(ledger.fup.updates.OS_LOADER).then (offset) =>
       @_isWaitForDongleSilent = yes
-      l 'LOAD OS', offset
       @_processLoadingScript(ledger.fup.updates.OS_LOADER[offset], States.LoadingOs).then (result) =>
         @_isOsLoaded = yes
-        @_setCurrentState(States.Undefined)
         _.delay (=> @_waitForPowerCycle(null, yes)), 200
       .fail (e) =>
         @_isWaitForDongleSilent = no
@@ -355,7 +355,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_waitForPowerCycle()
 
   _success: ->
-    @_setCurrentState(States.DONE)
+    @_setCurrentState(States.Done)
     _.defer => @cancel()
 
   _attemptToFailDonglePinCode: (pincode) ->
@@ -431,7 +431,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
             @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
         else
           @_exchangeNeedsExtraTimeout = no
-          # TODO: Place Logger here
           throw new Error('Unexpected status ' + @_getCard().SW)
       .fail (ex) =>
         return @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1) if offset is adpus.length - 1

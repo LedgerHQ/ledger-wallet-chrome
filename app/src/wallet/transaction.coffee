@@ -195,8 +195,8 @@ class ledger.wallet.Transaction
   ###
   @create: ({amount, fees, address, inputsPath, changePath}, callback = null) ->
     completion = new CompletionClosure(callback)
-    return completion.failure(new ledger.StdError(Errors.DustTransaction)).readonly() if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
-    return completion.failure(new ledger.StdError(Errors.NotEnoughFunds)).readonly() unless inputsPath?.length
+    return completion.failure(new ledger.StdError(Errors.DustTransaction)) && completion.readonly() if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+    return completion.failure(new ledger.StdError(Errors.NotEnoughFunds)) && completion.readonly() unless inputsPath?.length
     requiredAmount = amount.add(fees)
 
     ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->

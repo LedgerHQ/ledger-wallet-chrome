@@ -58,6 +58,7 @@ class @ledger.dongle.Manager extends EventEmitter
         next()
 
   _connectDongle: (device) ->
+    device.isInBootloaderMode = _.contains([0x1807, 0x1808], device.productId)
     @emit 'connecting', device
     try
       result = []
@@ -84,4 +85,4 @@ class @ledger.dongle.Manager extends EventEmitter
     catch er
       e er
 
-  getConnectedDongle: -> _(_.values(@_dongles)).filter (w) -> w.state isnt ledger.dongle.States.DISCONNECTED
+  getConnectedDongles: -> _(_.values(@_dongles)).filter (w) -> w.state isnt ledger.dongle.States.DISCONNECTED

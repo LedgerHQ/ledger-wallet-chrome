@@ -4,6 +4,8 @@ ledger.router.ignorePluggedWalletForRouting = @ledger.isDev
 ledger.router.pluggedWalletRoutesExceptions = [
   '/',
   '/onboarding/device/plug'
+  '/onboarding/device/connecting'
+  '/onboarding/device/forged'
 ]
 
 # routes declarations
@@ -31,6 +33,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   route '/onboarding/device/opening', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceOpeningViewController
+
+  route '/onboarding/device/update', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUpdateViewController
 
   route '/onboarding/device/error', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceErrorViewController
@@ -126,11 +131,14 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/update/updating', ->
     app.navigate UPDATE_LAYOUT, UpdateUpdatingViewController
 
-  route '/update/loados', ->
-    app.navigate UPDATE_LAYOUT, UpdateLoadosViewController
+  route '/update/loading', ->
+    app.navigate UPDATE_LAYOUT, UpdateLoadingViewController
 
-  route '/update/loadbl', ->
-    app.navigate UPDATE_LAYOUT, UpdateLoadblViewController
+  route '/update/done', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateDoneViewController
 
-  route '/update/loadrblreloader', ->
-    app.navigate UPDATE_LAYOUT, UpdateLoadblreloaderViewController
+  route '/update/linux', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateLinuxViewController
+
+  route '/update/error', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateErrorViewController

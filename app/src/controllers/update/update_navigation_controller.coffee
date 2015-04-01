@@ -11,6 +11,11 @@ class @UpdateNavigationController extends @NavigationController
     @_request.on 'unplug', =>  @_onDongleNeedPowerCycle()
     @_request.on 'stateChanged', (ev, data) => @_onStateChanged(data.newState, data.oldState)
     @_request.on 'needsUserApproval', @_onNeedsUserApproval
+    ledger.app.on 'dongle:disconnected', =>
+      if _(@topViewController()).isKindOf(UpdateIndexViewController) or _(@topViewController()).isKindOf(UpdateSeedViewController) or _(@topViewController()).isKindOf(UpdateDoneViewController) or _(@topViewController()).isKindOf(UpdateErrorViewController)
+        ledger.app.setExecutionMode(ledger.app.Modes.Wallet)
+        ledger.app.router.go '/onboarding/device/plug', animateIntro: no
+    @_request.on 'error', (event, error) => @_onError(error)
     @_request.onProgress @_onProgress.bind(@)
     ledger.fup.FirmwareUpdater.instance.load =>
     window.fup = @_request # TODO: REMOVE THIS
@@ -47,13 +52,13 @@ class @UpdateNavigationController extends @NavigationController
     ledger.app.router.go '/update/updating'
 
   _onLoadingOs: ->
-    ledger.app.router.go '/update/loados'
+    ledger.app.router.go '/update/loading'
 
-  _onLoadingBootloaderReloader: ->
-    ledger.app.router.go '/update/loadrblreloader'
+  _onDone: ->
+    ledger.app.router.go '/update/done'
 
-  _onLoadingBootloader: ->
-    ledger.app.router.go '/update/loadbl'
+  _onError: (error) ->
+    ledger.app.router.go '/update/error', {errorCode: error.code}
 
   _onStateChanged: (newState, oldState) ->
     switch newState
@@ -62,8 +67,9 @@ class @UpdateNavigationController extends @NavigationController
           @_onErasingDongle()
       when ledger.fup.FirmwareUpdateRequest.States.ReloadingBootloaderFromOs then @_onReloadingBootloaderFromOs()
       when ledger.fup.FirmwareUpdateRequest.States.LoadingOs then @_onLoadingOs()
-      when ledger.fup.FirmwareUpdateRequest.States.LoadingBootloaderReloader then @_onLoadingBootloaderReloader()
-      when ledger.fup.FirmwareUpdateRequest.States.LoadingBootloader then @_onLoadingBootloader()
+      when ledger.fup.FirmwareUpdateRequest.States.LoadingBootloaderReloader then @_onLoadingOs()
+      when ledger.fup.FirmwareUpdateRequest.States.LoadingBootloader then @_onLoadingOs()
+      when ledger.fup.FirmwareUpdateRequest.States.Done then @_onDone()
 
   _onNeedsUserApproval: ->
     if @topViewController()?.isRendered()

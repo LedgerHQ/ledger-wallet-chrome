@@ -98,7 +98,7 @@ class @CompletionClosure
     @_complete = [value, null]
     @_tryNotify()
     @_tryFulfill()
-    @
+    return
 
   ###
     Completes the closure with an error. This method will call the onComplete function if possible or keep the error until
@@ -114,7 +114,7 @@ class @CompletionClosure
     @_complete = [null, error]
     @_tryNotify()
     @_tryFulfill()
-    @
+    return
 
   ###
     Completes the closure with a standard error. This method will call the onComplete function if possible or keep the error until
@@ -140,7 +140,6 @@ class @CompletionClosure
       @success(value)
     else
       @fail(error)
-    @
 
   ###
     Sets the callback closure. If the CompletionClosure is already completed and no callback has been submitted yet,

@@ -12,6 +12,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @_navigationController = null
     @donglesManager = new ledger.dongle.Manager()
     @router = new Router(@)
+    @_dongleAttestationLock = off
     ledger.dialogs.manager.initialize($('#dialogs_container'))
 
   ###
@@ -92,6 +93,19 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     handled
 
   ###
+    Requests the application to perform or perform again a dongle certification process
+  ###
+  performDongleAttestation: ->
+    return if @_dongleAttestationLock is on
+    @_dongleAttestationLock = on
+    @dongle?.isCertified (dongle, error) =>
+      (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
+      @_dongleAttestationLock = off
+    return
+
+
+
+  ###
     Returns the jQuery element used as the main div container in which controllers will render themselves.
 
     @return [jQuery.Element] The jQuery element of the controllers container
@@ -139,11 +153,10 @@ class ledger.base.application.BaseApplication extends @EventEmitter
         (Try => @onDongleNeedsUnplug(dongle)).printError()
       dongle.once 'state:unlocked', =>
         (Try => @onDongleIsUnlocked(dongle)).printError()
+
+      (Try => @onDongleConnected(dongle)).printError()
       if dongle.isInBootloaderMode()
         (Try => @onDongleIsInBootloaderMode(dongle)).printError()
-      else
-        dongle.isCertified (dongle, error) =>
-          (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
 
   onConnectingDongle: (card) ->
 

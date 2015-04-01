@@ -6,7 +6,12 @@ class @UpdateUpdatingViewController extends UpdateViewController
   localizableNextButton: "common.update"
 
   navigateNext: ->
-    @getRequest().approveCurrentState()
+    if ledger.managers.system.isLinux() or ledger.managers.system.isUnknown()
+      @navigation.nextRoute = "/update/linux"
+    else
+      @getRequest().approveCurrentState()
+      @navigation.nextRoute = "/update/loading"
+    super
 
   onBeforeRender: ->
     super

@@ -10,7 +10,7 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
 
   onAfterRender: ->
     super
-    if @params.animateIntro
+    if @params.animateIntro is true
       do @_animateIntro
     else
       do @_listenEvents
@@ -43,7 +43,7 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
     ledger.app.router.go '/onboarding/device/connecting'
 
   _listenEvents: ->
-    if ledger.app.dongle?
+    if ledger.app.dongle? and !ledger.app.dongle.isInBootloaderMode()
       do @navigateContinue
     else
       ledger.app.once 'dongle:connecting', =>
