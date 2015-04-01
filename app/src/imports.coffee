@@ -134,6 +134,9 @@
         'utils/storage/object_store'
         'utils/storage/storage'
 
+        ## Logger
+        'utils/logger'
+
         ## Data synchronization
 
         ## Errors
