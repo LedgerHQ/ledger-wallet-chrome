@@ -71,7 +71,7 @@ _.extend ledger.errors,
     self.code = code
     self.name = _.invert(ledger.errors)[code]
     self.localizedMessage = -> t(@_i18nId())
-    seld._i18nId = -> "common.errors.#{_.underscore(@name)}"
+    self._i18nId = -> "common.errors.#{_.underscore(@name)}"
     return self
 
   throw: (code, msg) => throw @new(code, msg)
