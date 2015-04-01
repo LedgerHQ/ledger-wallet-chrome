@@ -151,6 +151,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @walletsManager.on 'connecting', (event, card) => (Try => @onConnectingDongle(card)).printError()
     @walletsManager.on 'connected', (event, wallet) =>
       @wallet = wallet
+      @_dongleAttestationLock = off
       wallet.once 'disconnected', =>
         _.defer => (Try => @onDongleIsDisconnected(wallet)).printError()
         @wallet = null
