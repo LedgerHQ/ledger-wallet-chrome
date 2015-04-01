@@ -18,7 +18,7 @@ class @Api
   @hasSession: (data) ->
     chrome.runtime.sendMessage {
       command: 'has_session',
-      result: Api._has_session
+      success: Api._has_session
     }    
 
   @sendPayment: (data) ->
@@ -28,13 +28,14 @@ class @Api
   @bitid: (data) ->
     ledger.app.router.go '/wallet/bitid/index', {uri: data.uri, silent: data.silent}
 
-  @callback_cancel: (command) ->
+  @callback_cancel: (command, message) ->
     chrome.runtime.sendMessage 
       command: command,
-      result: false
+      success: false,
+      message: message
 
   @callback_success: (command, data) ->
-    chrome.runtime.sendMessage 
-      command: command,
-      result: true,
-      data      
+    chrome.runtime.sendMessage $.extend {
+        command: command,
+        success: true 
+      }, data

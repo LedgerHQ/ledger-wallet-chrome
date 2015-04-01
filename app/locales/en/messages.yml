@@ -371,6 +371,7 @@ wallet:
       sending_failed: "Sending failed"
       sending_succeeded: "Sending succeeded"
       transaction_completed: "The transaction successfully completed."
+      cancelled: "Payment cancelled"
 
   pairing:
     common:
@@ -418,4 +419,5 @@ wallet:
       completed: "You have been connected to the service"
       failed: "Authentication failed"
     errors:
+      cancelled: "Authentication cancelled"
       signature_failed: "Failed to sign the challenge. Remove and reinsert the Nano."

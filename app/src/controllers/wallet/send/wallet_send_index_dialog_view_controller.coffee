@@ -24,7 +24,7 @@ class @WalletSendIndexDialogViewController extends DialogViewController
     @view.amountInput.focus()
 
   cancel: ->
-    Api.callback_cancel 'send_payment'
+    Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
     @dismiss()
 
   send: ->

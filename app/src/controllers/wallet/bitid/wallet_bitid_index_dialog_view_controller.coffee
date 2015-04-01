@@ -22,13 +22,13 @@ class @WalletBitidIndexDialogViewController extends DialogViewController
         @signature = result
         @view.confirmButton.removeClass "disabled"
         if typeof @signature != "string" || @signature.length == 0
-          @view.errorContainer.text t('bitid.errors.signature_failed')
+          @view.errorContainer.text t('wallet.bitid.errors.signature_failed')
           @view.confirmButton.text t('common.close')
         else
           @view.confirmButton.text t('common.confirm')
 
   cancel: ->
-    Api.callback_cancel 'bitid'
+    Api.callback_cancel 'bitid', t('wallet.bitid.errors.cancelled')
     @dismiss()
 
   confirm: ->

@@ -97,6 +97,13 @@ class ledger.wallet.transaction.Transaction
 
   getRecipientAddress: () -> @receiverAddress
 
+  serialize: ->
+    amount: @amount.toNumber(),
+    address: @receiverAddress,
+    fee: @fees.toNumber(),
+    hash: @hash,
+    raw: @getSignedTransaction()
+
   getValidationDetails: () ->
     indexes = []
     if @_validationMode is ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN
