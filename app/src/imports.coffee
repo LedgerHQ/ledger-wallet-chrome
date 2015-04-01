@@ -138,6 +138,7 @@
 
         ## Errors
         'base/errors'
+        'utils/http_error'
 
         ## Managers
         'managers/devices_manager'

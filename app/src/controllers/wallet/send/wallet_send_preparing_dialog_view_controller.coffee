@@ -11,6 +11,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
     # fetch amount
     account.createTransaction amount: @params.amount, fees: 10000, address: @params.address, (transaction, error) =>
       return if not @isShown()
+      l 'Create tx', error
       if error?
         reason = switch error.code
           when ledger.errors.NetworkError then 'network_no_response'
