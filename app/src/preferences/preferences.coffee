@@ -41,7 +41,7 @@ class ledger.preferences.Preferences
     ledger.i18n.favLocale.memoryValue
 
   setUILocale: (value) ->
-    ledger.i18n.setLocale(value)
+    ledger.i18n.setLocaleByUI(value)
 
 
   ###

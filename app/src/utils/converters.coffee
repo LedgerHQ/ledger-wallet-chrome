@@ -44,9 +44,7 @@ class ledger.converters
   ###
   @satoshiToCurrency: (satoshiValue, currency) =>
     currency ?= ledger.preferences.instance.getUICurrency()
-    l currency
     currencies = ledger.tasks.TickerTask.instance.getCache()
-    l currencies[currency]
 
     # currencyValueBTC is the amount in the given currency for 1 BTC
     currencyValueBTC = currencies[currency].values[0]['fromBTC'].value

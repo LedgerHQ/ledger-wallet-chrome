@@ -22,15 +22,15 @@ describe "Currency converters", ->
 
 
   it "should converts EUR to Satoshi", ->
-    res = converters.currencyToSatoshi('EUR', 555)
+    res = converters.currencyToSatoshi(555, 'EUR')
     expect(res).toBe(204344895)
 
 
   it "should converts EUR to Satoshi - decimal number", ->
-    res = converters.currencyToSatoshi('EUR', 555.78)
+    res = converters.currencyToSatoshi(555.78, 'EUR')
     expect(res).toBe(204632082)
 
 
   it "should converts Satoshi to EUR", ->
-    res = converters.satoshiToCurrency('EUR', 9999999)
+    res = converters.satoshiToCurrency(9999999, 'EUR')
     expect(res).toBe(25)
