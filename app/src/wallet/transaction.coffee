@@ -94,7 +94,7 @@ class ledger.wallet.Transaction
   # @return [CompletionClosure]
   prepare: (callback=undefined) ->
     if not @amount? or not @fees? or not @recipientAddress?
-      ledger.throw('Transaction must me initialized before preparation')
+      Errors.throw('Transaction must me initialized before preparation')
     completion = new CompletionClosure(callback)
     @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
     .then (@_resumeData) =>
@@ -102,7 +102,7 @@ class ledger.wallet.Transaction
       @authorizationPaired = @_resumeData.authorizationPaired
       completion.success()
     .fail (error) =>
-      completion.failure(ledger.StdError(Errors.SignatureError))
+      completion.failure(Errors.new(Errors.SignatureError))
     .done()
     completion.readonly()
   
@@ -121,7 +121,7 @@ class ledger.wallet.Transaction
   # @return [CompletionClosure]
   _validate: (validationKey, callback=undefined) ->
     if not @_resumeData? or not @_validationMode?
-      ledger.throw('Transaction must me prepared before validation')
+      Errors.throw('Transaction must me prepared before validation')
     completion = new CompletionClosure(callback)
     @dongle.createPaymentTransaction(
       @_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees,
@@ -134,7 +134,7 @@ class ledger.wallet.Transaction
       @_isValidated = yes
       _.defer => completion.success()
     .fail (error) =>
-      _.defer => completion.failure(ledger.StdError(Errors.SignatureError, error))
+      _.defer => completion.failure(Errors.new(Errors.SignatureError, error))
     .done()
     completion.readonly()
 
@@ -195,15 +195,15 @@ class ledger.wallet.Transaction
   ###
   @create: ({amount, fees, address, inputsPath, changePath}, callback = null) ->
     completion = new CompletionClosure(callback)
-    return completion.failure(ledger.StdError(Errors.DustTransaction)) && completion.readonly() if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
-    return completion.failure(ledger.StdError(Errors.NotEnoughFunds)) && completion.readonly() unless inputsPath?.length
+    return completion.failure(Errors.new(Errors.DustTransaction)) && completion.readonly() if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+    return completion.failure(Errors.new(Errors.NotEnoughFunds)) && completion.readonly() unless inputsPath?.length
     requiredAmount = amount.add(fees)
 
     ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
-      return completion.failure(ledger.StdError(Errors.NetworkError, error)) if error?
+      return completion.failure(Errors.new(Errors.NetworkError, error)) if error?
       # Collect each valid outputs and sort them by desired priority
       validOutputs = _(output for output in outputs when output.paths.length > 0).sortBy (output) ->  -output['confirmatons']
-      return completion.failure(ledger.StdError(Errors.NotEnoughFunds)) if validOutputs.length == 0
+      return completion.failure(Errors.new(Errors.NotEnoughFunds)) if validOutputs.length == 0
       finalOutputs = []
       collectedAmount = new Amount()
       hadNetworkFailure = no

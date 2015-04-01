@@ -138,9 +138,9 @@ class @ledger.dongle.Dongle extends EventEmitter
           #  Unexpected - let's say it's 1.4.3
           completion.success([0, (1 << 16) + (4 << 8) + (3)])
         else
-          completion.failure(ledger.StdError(ledger.errors.UnknowError, "Failed to get version"))
+          completion.failure(Errors.new(ledger.errors.UnknowError, "Failed to get version"))
     .fail (error) ->
-      completion.failure(ledger.StdError(ledger.errors.UnknowError, error))
+      completion.failure(Errors.new(ledger.errors.UnknowError, error))
     .catch (error) ->
       console.error("Fail to getRawFirmwareVersion :", error)
     .done()
@@ -159,7 +159,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     .then (availablity) ->
       completion.success(availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update)
     .fail (er) ->
-      completion.failure(ledger.StdError(er))
+      completion.failure(Errors.new(er))
     .done()
     completion.readonly()
 
@@ -170,7 +170,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     .then (availablity) ->
       completion.success(availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update or availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Overwrite)
     .fail (er) ->
-      completion.failure(ledger.StdError(er))
+      completion.failure(Errors.new(er))
     .done()
     completion.readonly()
 
@@ -205,7 +205,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       if ecsig.verify(dataToSign, dataSigBytes)
         completion.success(this)
       else
-        completion.failure(ledger.StdError(Errors.DongleNotCertified))
+        completion.failure(Errors.new(Errors.DongleNotCertified))
       return
       # attestation = result.toString(HEX)
       # dataToSign = attestation.substring(16,32) + random
@@ -227,7 +227,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       # return
     .fail (err) =>
       console.error("Fail check if isCertified :", err)
-      error = ledger.StdError(Errors.SignatureError, err)
+      error = Errors.new(Errors.SignatureError, err)
       completion.failure(error)
     .done()
     completion.readonly()
@@ -247,7 +247,7 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [CompletionClosure]
   unlockWithPinCode: (pin, callback=undefined) ->
-    ledger.throw(Errors.DongleAlreadyUnlock) if @state isnt States.LOCKED
+    Errors.throw(Errors.DongleAlreadyUnlock) if @state isnt States.LOCKED
     completion = new CompletionClosure(callback)
     _pin = pin
     @_btchip.verifyPin_async(new ByteString(_pin, ASCII))
@@ -261,14 +261,14 @@ class @ledger.dongle.Dongle extends EventEmitter
         @_setState(States.UNLOCKED)
         completion.success()
       .fail (err) =>
-        error = ledger.StdError(Errors.NotSupportedDongle, err)
+        error = Errors.new(Errors.NotSupportedDongle, err)
         console.log("unlockWithPinCode 2 fail :", err)
         completion.failure(error)
       .catch (error) ->
         console.error("Fail to unlockWithPinCode 2 :", error)
       .done()
     .fail (err) =>
-      error = ledger.StdError(Errors.WrongPinCode, err)
+      error = Errors.new(Errors.WrongPinCode, err)
       console.error("Fail to unlockWithPinCode 1 :", err)
       if err.match(/6faa|63c0/)
         @_setState(States.BLANK)
@@ -298,7 +298,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     @return [CompletionClosure]
   ###
   setup: (pin, options={}, callback=undefined) ->
-    ledger.throw(Errors.DongleNotBlank) if @state isnt States.BLANK
+    Errors.throw(Errors.DongleNotBlank) if @state isnt States.BLANK
     [options, callback] = [callback, options] if ! callback && typeof options == 'function'
     [restoreSeed, keyMap] = [options.restoreSeed, options.keyMap]
     completion = new CompletionClosure(callback)
@@ -330,7 +330,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       @_setState(States.ERROR, msg)
       completion.success()
     ).fail( (err) =>
-      error = ledger.StdError(Errors.UnknowError, err)
+      error = Errors.new(Errors.UnknowError, err)
       completion.failure(error)
     ).catch( (error) ->
       console.error("Fail to setup :", error)
@@ -342,7 +342,7 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [CompletionClosure]
   getPublicAddress: (path, callback=undefined) ->
-    ledger.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
+    Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
     completion = new CompletionClosure(callback)
     @_btchip.getWalletPublicKey_async(path)
     .then (result) =>
@@ -351,15 +351,15 @@ class @ledger.dongle.Dongle extends EventEmitter
     .fail (err) =>
       if err.match("6982") # Pin required
         @_setState(States.LOCKED)
-        error = ledger.StdError(Errors.DongleLocked, err)
+        error = Errors.new(Errors.DongleLocked, err)
       else if err.match("6985") # Error ?
         @_setState(States.BLANK)
-        error = ledger.StdError(Errors.BlankDongle, err)
+        error = Errors.new(Errors.BlankDongle, err)
       else if err.match("6faa")
         @_setState(States.ERROR)
-        error = ledger.StdError(Errors.UnknowError, err)
+        error = Errors.new(Errors.UnknowError, err)
       else
-        error = ledger.StdError(Errors.UnknowError, err)
+        error = Errors.new(Errors.UnknowError, err)
       _.defer -> completion.failure(error)
     .catch (error) ->
       console.error("Fail to getPublicAddress :", error)
@@ -398,7 +398,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     @return [CompletionClosure]
   ###
   getBitIdAddress: (subpath=undefined, callback=undefined) ->
-    ledger.throw(Errors.DongleLocked) if @state isnt States.UNLOCKED
+    Errors.throw(Errors.DongleLocked) if @state isnt States.UNLOCKED
     [subpath, callback] = [callback, subpath] if ! callback && typeof subpath == 'function'
     path = ledger.dongle.BitIdRootPath
     path += "/#{subpath}" if subpath?
@@ -434,8 +434,8 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [CompletionClosure] Resolve with a 32 bytes length pairing blob hex encoded.
   initiateSecureScreen: (pubKey, callback=undefined) ->
-    ledger.throw(Errors.DongleLocked) if @state != States.UNLOCKED
-    ledger.throw(Errors.InvalidArgument, "Invalid pubKey : #{pubKey}") unless pubKey.match(/^[0-9A-Fa-f]{130}$/)
+    Errors.throw(Errors.DongleLocked) if @state != States.UNLOCKED
+    Errors.throw(Errors.InvalidArgument, "Invalid pubKey : #{pubKey}") unless pubKey.match(/^[0-9A-Fa-f]{130}$/)
     completion = new CompletionClosure(callback)
     # 19.3. SETUP SECURE SCREEN
     @_sendApdu(new ByteString("E0"+"12"+"01"+"00"+"41"+pubKey, HEX), [0x9000])
@@ -448,8 +448,8 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [CompletionClosure] Resolve if pairing is successful.
   confirmSecureScreen: (resp, callback=undefined) ->
-    ledger.throw(Errors.DongleLocked) if @state != States.UNLOCKED
-    ledger.throw(Errors.InvalidArgument, "Invalid challenge resp : #{resp}") unless resp.match(/^[0-9A-Fa-f]{32}$/)
+    Errors.throw(Errors.DongleLocked) if @state != States.UNLOCKED
+    Errors.throw(Errors.InvalidArgument, "Invalid challenge resp : #{resp}") unless resp.match(/^[0-9A-Fa-f]{32}$/)
     completion = new CompletionClosure(callback)
     # 19.3. SETUP SECURE SCREEN
     @_sendApdu(new ByteString("E0"+"12"+"02"+"00"+"10"+resp, HEX), [0x9000])
@@ -462,7 +462,7 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [CompletionClosure] Resolve if pairing is successful.
   getExtendedPublicKey: (path, callback=undefined) ->
-    ledger.throw(Errors.DongleLocked) if @state != States.UNLOCKED
+    Errors.throw(Errors.DongleLocked) if @state != States.UNLOCKED
     completion = new CompletionClosure(callback)
     return (completion.success(@_xpubs[path]) || completion.readonly()) if @_xpubs[path]?
     xpub = new ledger.wallet.ExtendedPublicKey(@, path)

@@ -60,24 +60,18 @@ _.extend ledger.errors,
     300: "Not enough funds"
     301: "Signature error"
     302: "Dust transaction"
+  
+  # @exemple Initializations
+  #   ledger.error.new("an error message")
+  #   ledger.error.new(NotFound, "an error message")
+  new: (code, msg) -> 
+    defaultMessage = ledger.errors.DefaultMessages[code]
+    [code, msg] = [0, code] if defaultMessage == undefined
+    self = new Error(msg || defaultMessage)
+    self.code = code
+    self.name = _.invert(ledger.errors)[code]
+    self.localizedMessage = -> t(@_i18nId())
+    seld._i18nId = -> "common.errors.#{_.underscore(@name)}"
+    return self
 
-# @exemple Initializations
-#   new ledger.StdError("an error message")
-#   new ledger.StdError(NotFound, "an error message")
-ledger.StdError = (code, msg)->
-  defaultMessage = ledger.errors.DefaultMessages[code]
-  [code, msg] = [0, code] if defaultMessage == undefined
-  self = new Error(msg || defaultMessage)
-  self.code = code
-  self.name = _.invert(ledger.errors)[code]
-  self.__proto__ = ledger.StdError.prototype
-  return self
-ledger.StdError.prototype.__proto__= Error.prototype
-
-ledger.StdError.prototype.localizedMessage = ->
-    t(@_i18nId())
-
-ledger.StdError.prototype._i18nId = ->
-    "common.errors.#{_.underscore(@name)}"
-
-ledger.throw = (code, message) => throw ledger.StdError(code, message)
+  throw: (code, msg) => throw @new(code, msg)
