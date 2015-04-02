@@ -1,6 +1,6 @@
 name: "__MSG_application_name__"
 description: "__MSG_application_small_description__"
-version: "1.1.0"
+version: "1.1.1"
 manifest_version: 2
 minimum_chrome_version: "38"
 default_locale: "en"
@@ -62,6 +62,12 @@ commands:
       default: "Ctrl+Shift+R"
       mac: "Command+Shift+R"
     description: "Reload the application"
+
+  update-firmware:
+    suggested_key:
+      default: "Ctrl+Shift+U"
+      mac: "Command+Shift+U"
+    description: "Update the chip firmware"
 
 icons:
   16: "assets/images/icon-16.png"

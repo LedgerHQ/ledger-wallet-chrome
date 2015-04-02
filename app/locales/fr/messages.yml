@@ -20,6 +20,8 @@ common:
   update: "Mettre à jour"
   restore: "Restaurer"
   later: "Plus tard"
+  reset: "Réinitialiser"
+  back: "Retour"
   yes: "Oui"
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
@@ -196,7 +198,7 @@ update:
     remove_your_wallet: "Retirez votre Ledger Wallet du port USB."
 
   seed:
-    security_card_qrcode: "Carte de sécurité"
+    security_card_qrcode: "Code QR de la carte de sécurité"
     enter_characters: "Scannez le code QR (ou saisissez les 32 caractères) de votre carte de sécurité :"
     on_the_left: "Il est situé sur la page de gauche de votre livret de restauration."
 
@@ -229,6 +231,11 @@ update:
     sc: "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"2581\", ATTRS{idProduct}==\"3b7c\", MODE=\"0660\", GROUP=\"plugdev\""
     third: "3. Enfin, fermer le fichier et exécutez cette commande (permissions root requises):"
     tc: "sudo udevadm control --reload-rules"
+
+  cardcheck:
+      security_card_check: "Vérification de la carte de sécurité"
+      make_sure: "Merci de vous assurer que ces valeurs sont correctes sur votre carte de sécurité:"
+      four_characters: "Ne cliquez pas sur CONTINUER si les 4 caractères ne correspondent pas à ceux de votre carte."
 
   error:
     update_failed: "Mise à jour échouée"

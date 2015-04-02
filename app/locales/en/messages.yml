@@ -20,6 +20,8 @@ common:
   update: "Update"
   restore: "Restore"
   later: "Later"
+  reset: "Reset"
+  back: "Back"
   yes: "Yes"
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
@@ -196,7 +198,7 @@ update:
     remove_your_wallet: "Remove your Ledger Wallet from the USB port."
 
   seed:
-    security_card_qrcode: "Security card"
+    security_card_qrcode: "Security card QR code"
     enter_characters: "Scan (or type the 32 characters) your security card QR code:"
     on_the_left: "You will find it on the left page of your recovery sheet."
 
@@ -229,6 +231,11 @@ update:
     sc: "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"2581\", ATTRS{idProduct}==\"3b7c\", MODE=\"0660\", GROUP=\"plugdev\""
     third: "3. Finally, close the file and execute this command (root permissions are required):"
     tc: "sudo udevadm control --reload-rules"
+
+  cardcheck:
+      security_card_check: "Security card check"
+      make_sure: "Please make sure these values are correct on your security card:"
+      four_characters: "Do not click CONTINUE if the 4 highlighted characters are not the same as yours."
 
   error:
     update_failed: "Update failed"
