@@ -18,8 +18,9 @@ _.extend ledger.errors,
   DongleAlreadyUnlock: 202
   WrongPinCode: 203
   DongleLocked: 204
-  UnableToGetBitIdAddress: 205
+  BlankDongle: 205
   DongleNotCertified: 206
+  UnableToGetBitIdAddress: 207
 
   # Wallet errors
   NotEnoughFunds: 300
@@ -52,23 +53,25 @@ _.extend ledger.errors,
     202: "Dongle already unlock"
     203: "Wrong PIN code"
     204: "Dongle locked"
-    205: "Unable to get BitId address"
+    205: "Blank dongle"
+    206: "Dongle not certified"
+    207: "Unable to get BitId address"
 
     300: "Not enough funds"
     301: "Signature error"
-
-
-
-  create: (code, title, error) -> code: code, title: title, error: error
-  throw: (code, message) -> throw new ledger.StandardError(code, message)
-
-class ledger.StandardError extends Error
+    302: "Dust transaction"
+  
   # @exemple Initializations
-  #   new ledger.StandardError("an error message")
-  #   new ledger.StandardError(NotFound, "an error message")
-  constructor: (@code, message=undefined) ->
-    [@code, @message] = [0, @code] if ledger.errors.DefaultMessages[@code] == undefined
-    super(message || ledger.errors.DefaultMessages[@code])
+  #   ledger.error.new("an error message")
+  #   ledger.error.new(NotFound, "an error message")
+  new: (code, msg) -> 
+    defaultMessage = ledger.errors.DefaultMessages[code]
+    [code, msg] = [0, code] if defaultMessage == undefined
+    self = new Error(msg || defaultMessage)
+    self.code = code
+    self.name = _.invert(ledger.errors)[code]
+    self.localizedMessage = -> t(@_i18nId())
+    self._i18nId = -> "common.errors.#{_.underscore(@name)}"
+    return self
 
-  name: ->
-    _.invert(ledger.errors)[@code]
+  throw: (code, msg) => throw @new(code, msg)

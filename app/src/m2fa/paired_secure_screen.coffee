@@ -43,56 +43,56 @@ class ledger.m2fa.PairedSecureScreen
   removeFromSyncedStore: -> @removeFromStore(ledger.storage.sync)
 
   @fromStore: (id, store, callback = _.noop) ->
-    closure = new CompletionClosure()
-    closure.onComplete callback
+    d = ledger.defer()
+    d.onComplete callback
     store.get "__m2fa_#{id}", (objects) ->
       result = if objects.length > 0 then new @(objects[0]) else null
       error = if objects.length is 0 then ledger.errors.NotFound else null
-      closure.complete(result, error)
-    closure.readonly()
+      d.complete(result, error)
+    d.promise
 
   @fromSyncedStore: (id, callback = _.noop) -> @fromStore(id, ledger.storage.sync, callback)
 
   @create: (id, data) -> new @(id: id, name: data['name'], created_at: new Date().getTime(), uuid: data['uuid'], platform: data['platform'], version: VERSION)
 
   @getAllFromStore: (store, callback = _.noop) ->
-    closure = new CompletionClosure()
-    closure.onComplete callback
+    d = ledger.defer()
+    d.onComplete callback
     store.keys (keys) =>
       keys = _.filter(keys, (key) -> key.match(/^__m2fa_/))
-      return closure.success([]) if keys.length is 0
+      return d.resolve([]) if keys.length is 0
       store.get keys, (objects) =>
         screens = (new @(object) for k, object of objects)
-        closure.success(screens)
-    closure.readonly()
+        d.resolve(screens)
+    d.promise
 
   @getAllFromSyncedStore: (callback = _.noop) -> @getAllFromStore(ledger.storage.sync, callback)
 
   @getMostRecentFromStore: (store, callback = _.noop) ->
-    closure = new CompletionClosure(callback)
+    d = ledger.defer(callback)
     @getAllFromStore store, (screens) ->
-      return closure.failure(ledger.errors.NotFound) if screens.length is 0
-      closure.success(_(screens).max (screen) -> screen.createdAt.getTime())
-    closure.readonly()
+      return d.rejectWithError(ledger.errors.NotFound) if screens.length is 0
+      d.resolve(_(screens).max (screen) -> screen.createdAt.getTime())
+    d.promise
 
   @getMostRecentFromSyncedStore: (callback = _.noop) -> @getMostRecentFromStore(ledger.storage.sync, callback)
 
   @getByNameFromStore: (store, name, callback = _.noop) ->
-    closure = new CompletionClosure(callback)
+    d = ledger.defer(callback)
     @getAllFromStore store, (result, error) ->
-      return closure.failure(error) if error?
-      closure.success(_(result).where(name: name)[0])
-    closure.readonly()
+      return d.reject(error) if error?
+      d.resolve(_(result).where(name: name)[0])
+    d.promise
 
   @getByNameFromSyncedStore: (name, callback = _.noop) -> @getByNameFromStore(ledger.storage.sync, name, callback)
 
   @getAllGroupedByPropertyFromStore: (store, property, callback = _.noop) ->
-    closure = new CompletionClosure(callback)
+    d = ledger.defer(callback)
     @getAllFromStore store, (screens, error) ->
-      return closure.failure(error) if error?
+      return d.reject(error) if error?
       groups = _.groupBy screens, (s) -> s[property]
-      closure.success(groups)
-    closure.readonly()
+      d.resolve(groups)
+    d.promise
 
   @getAllGroupedByPropertyFromSyncedStore: (property, callback = _.noop) -> @getAllGroupedByPropertyFromStore(ledger.storage.sync, property, callback)
 
@@ -101,11 +101,11 @@ class ledger.m2fa.PairedSecureScreen
   @getAllGroupedByUuidFromSyncedStore: (callback = _.noop) -> @getAllGroupedByUuidFromStore(ledger.storage.sync, callback)
 
   @getScreensByUuidFromStore: (store, uuid, callback = _.noop) ->
-    closure = new CompletionClosure(callback)
+    d = ledger.defer(callback)
     @getAllFromStore store, (result, error) ->
-      return closure.failure(error) if error?
-      closure.success(_(result).where(uuid: uuid))
-    closure.readonly()
+      return d.reject(error) if error?
+      d.resolve(_(result).where(uuid: uuid))
+    d.promise
 
   @getScreensByUuidFromSyncedStore: (uuid, callback = _.noop) -> @getScreensByUuidFromStore(ledger.storage.sync, uuid, callback)
 

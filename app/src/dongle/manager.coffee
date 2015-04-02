@@ -5,6 +5,8 @@ DevicesInfo = [
   {productId: 0x1b7c, vendorId: 0x2581, type: 'usb'}
   {productId: 0x2b7c, vendorId: 0x2581, type: 'hid'}
   {productId: 0x3b7c, vendorId: 0x2581, type: 'hid'}
+  {productId: 0x1808, vendorId: 0x2581, type: 'usb'}
+  {productId: 0x1807, vendorId: 0x2581, type: 'hid'}
 ]
 
 # A dongle manager for keeping the dongles registry and observing dongle state.
@@ -19,10 +21,11 @@ class @ledger.dongle.Manager extends EventEmitter
 
   constructor: (app) ->
     @cardFactory = new ChromeapiPlugupCardTerminalFactory()
+    @factoryDongleBootloader = new ChromeapiPlugupCardTerminalFactory(0x1808)
+    @factoryDongleBootloaderHID = new ChromeapiPlugupCardTerminalFactory(0x1807)
 
   # Start observing if dongles are plugged in or unnplugged
   start: () ->
-    return
     return if @_running
     _running = yes
     @_interval = setInterval @_checkIfDongleIsPluggedIn.bind(@), 200
@@ -38,11 +41,10 @@ class @ledger.dongle.Manager extends EventEmitter
 
   _checkIfDongleIsPluggedIn: () ->
     @_getDevices (devices) =>
-      oldDongles = @_dongles
-      newIds = device.device || device.deviceId for device in devices
-      for id in newIds when ! @_dongles[id]?
-        @_connectDongle(id)
-      for dongle in @_dongles when newIds.indexOf(dongle.device_id) == -1
+      for device in devices
+        device.deviceId = parseInt(device.deviceId || device.device)
+        @_connectDongle(device) unless @_dongles[device.deviceId]?
+      for id, dongle of @_dongles when _(devices).where(deviceId: +id).length == 0
         dongle.disconnect()
 
   _getDevices: (cb) ->
@@ -55,22 +57,32 @@ class @ledger.dongle.Manager extends EventEmitter
         cb?(devices) unless hasNext
         next()
 
-  _connectDongle: (device_id) ->
+  _connectDongle: (device) ->
+    device.isInBootloaderMode = _.contains([0x1807, 0x1808], device.productId)
+    @emit 'connecting', device
     try
-      @cardFactory.list_async().then (result) =>
-        setTimeout =>
-          if result.length > 0
-            @cardFactory.getCardTerminal(result[0]).getCard_async().then (card) =>
-              setTimeout () =>
-                @_dongles[device_id] = new ledger.wallet.Dongle(device_id, card)
-                @_dongles[device_id].once 'state:locked', (event, dongle) =>
-                  @emit 'connected', dongle
-                @_dongles[device_id].once 'state:disconnected', (event, dongle) =>
-                  delete @_dongle[dongle.device_id]
-                  @emit 'disconnected', dongle
-
-        , 0
+      result = []
+      @cardFactory.list_async()
+      .then (cards) =>
+        result = result.concat(cards)
+        @factoryDongleBootloader.list_async()
+      .then (cards) =>
+        result = result.concat(cards)
+        @factoryDongleBootloaderHID.list_async()
+      .then (cards) =>
+        result = result.concat(cards)
+        return if result.length == 0
+        @cardFactory.getCardTerminal(result[0]).getCard_async().then (card) =>
+          _.extend card, deviceId: device.deviceId, productId: device.productId, vendorId: device.vendorId
+          dongle = new ledger.dongle.Dongle(card)
+          @_dongles[device.deviceId] = dongle
+          dongle.once 'state:locked', (event) => @emit 'connected', dongle
+          dongle.once 'state:blank', (event) => @emit 'connected', dongle
+          dongle.once 'forged', (event) => @emit 'forged', dongle
+          dongle.once 'state:disconnected', (event) =>
+            delete @_dongles[device.deviceId]
+            @emit 'disconnected', dongle
     catch er
       e er
 
-  getConnectedDongle: -> _(_.values(@_dongles)).filter (w) -> w._state isnt ledger.wallet.States.DISCONNECTED
+  getConnectedDongles: -> _(_.values(@_dongles)).filter (w) -> w.state isnt ledger.dongle.States.DISCONNECTED

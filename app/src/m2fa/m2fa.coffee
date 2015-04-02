@@ -64,7 +64,7 @@ _.extend @ledger.m2fa,
     d.promise
 
   # Validate with M2FA that tx is correct.
-  # @param [Object] tx A ledger.wallet.Transaction
+  # @param [ledger.wallet.Transaction] tx
   # @param [String] pairingId The paired mobile to send validation.
   # @return A Q promise.
   validateTx: (tx, pairingId) ->
@@ -88,11 +88,11 @@ _.extend @ledger.m2fa,
     client.once 'm2fa.reject', ->
       client.stopIfNeccessary()
       d.reject('cancelled')
-    client.requestValidation(tx._out.authorizationPaired)
+    client.requestValidation(tx.authorizationPaired)
     [client , d.promise]
 
   # Validate with M2FA that tx is correct on every paired mobile.
-  # @param [Object] tx A ledger.wallet.Transaction
+  # @param [ledger.wallet.Transaction] tx
   # @param [String] pairingId The paired mobile to send validation.
   # @return A Q promise.
   validateTxOnAll: (tx) ->
@@ -154,7 +154,7 @@ _.extend @ledger.m2fa,
     [client, promise] = @validateTx(tx)
 
   _nextPairingId: () -> 
-    # ledger.wallet.safe.randomBitIdAddress()
+    # ledger.dongle.unlocked().randomBitIdAddress()
     @_randomPairingId()
 
   # @return a random 16 bytes pairingId + 1 checksum byte hex encoded.
@@ -171,7 +171,7 @@ _.extend @ledger.m2fa,
     d.notify("pubKeyReceived", pubKey)
     l("%c[_onIdentify] pubKeyReceived", "color: #4444cc", pubKey)
     try
-      ledger.wallet.safe().initiateSecureScreen(pubKey).then((challenge) ->
+      ledger.dongle.unlocked().initiateSecureScreen(pubKey).then((challenge) ->
         l("%c[_onIdentify] challenge received:", "color: #4444cc", challenge)
         d.notify("sendChallenge", challenge)
         client.sendChallenge(challenge)
@@ -190,7 +190,7 @@ _.extend @ledger.m2fa,
     d.notify("challengeReceived")
     l("%c[_onChallenge] challengeReceived", "color: #4444cc", data)
     try
-      ledger.wallet.safe().confirmSecureScreen(data).then( =>
+      ledger.dongle.unlocked().confirmSecureScreen(data).then( =>
         l("%c[_onChallenge] SUCCESS !!!", "color: #00ff00", data )
         client.confirmPairing()
         d.notify("secureScreenConfirmed")

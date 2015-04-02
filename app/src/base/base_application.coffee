@@ -11,8 +11,6 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   constructor: ->
     @_navigationController = null
     @donglesManager = new ledger.dongle.Manager()
-    @devicesManager = new DevicesManager()
-    @walletsManager = new WalletsManager(this)
     @router = new Router(@)
     @_dongleAttestationLock = off
     ledger.dialogs.manager.initialize($('#dialogs_container'))
@@ -24,10 +22,8 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     configureApplication @
     @_listenCommands()
     @_listenClickEvents()
-    @_listenWalletEvents()
     @_listenDongleEvents()
     @onStart()
-    @devicesManager.start()
     @donglesManager.start()
 
 
@@ -36,7 +32,6 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   ###
   reload: () ->
     @donglesManager.stop()
-    @devicesManager.stop()
     chrome.runtime.reload()
 
   ###
@@ -104,7 +99,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   performDongleAttestation: ->
     return if @_dongleAttestationLock is on
     @_dongleAttestationLock = on
-    @wallet?.isDongleCertified (dongle, error) =>
+    @dongle?.isCertified (dongle, error) =>
       (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
       @_dongleAttestationLock = off
     return
@@ -154,37 +149,22 @@ class ledger.base.application.BaseApplication extends @EventEmitter
         return no
       yes
 
-  _listenWalletEvents: () ->
-    # Wallet management & wallet events re-dispatching
-    @walletsManager.on 'connecting', (event, card) => (Try => @onConnectingDongle(card)).printError()
-    @walletsManager.on 'connected', (event, wallet) =>
-      @wallet = wallet
-      @_dongleAttestationLock = off
-      wallet.once 'disconnected', =>
-        _.defer => (Try => @onDongleIsDisconnected(wallet)).printError()
-        @wallet = null
-      wallet.once 'unplugged', =>
-        (Try => @onDongleNeedsUnplug(wallet)).printError()
-      wallet.once 'state:unlocked', =>
-        (Try => @onDongleIsUnlocked(wallet)).printError()
-      (Try => @onDongleConnected(wallet)).printError()
-      if wallet.isInBootloaderMode()
-        (Try => @onDongleIsInBootloaderMode(wallet)).printError()
-
-
-
   _listenDongleEvents: () ->
     # Dongle management & dongle events re-dispatching
+    @donglesManager.on 'connecting', (event, dongle) => (Try => @onConnectingDongle(dongle)).printError()
     @donglesManager.on 'connected', (event, dongle) =>
       @dongle = dongle
-      dongle.once 'disconnected', =>
-        _.defer => (Try => @onDongleIsDisconnected(dongle)).printError()
+      dongle.once 'state:disconnected', =>
         @dongle = null
+        _.defer => (Try => @onDongleIsDisconnected(dongle)).printError()
       dongle.once 'state:error', =>
         (Try => @onDongleNeedsUnplug(dongle)).printError()
       dongle.once 'state:unlocked', =>
         (Try => @onDongleIsUnlocked(dongle)).printError()
+
       (Try => @onDongleConnected(dongle)).printError()
+      if dongle.isInBootloaderMode()
+        (Try => @onDongleIsInBootloaderMode(dongle)).printError()
 
   onConnectingDongle: (card) ->
 

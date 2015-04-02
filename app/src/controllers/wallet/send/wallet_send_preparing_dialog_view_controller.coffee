@@ -9,7 +9,9 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
     account = Account.find(index: 0).first()
 
     # fetch amount
-    account.createTransaction amount: @params.amount, fees: 10000, address: @params.address, (transaction, error) =>
+    amount = ledger.Amount.fromBtc(@params.amount)
+    fee = ledger.wallet.Transaction.DEFAULT_FEES
+    ledger.wallet.Transaction.createAndPrepare amount, fee, @params.address, account, account, (transaction, error) =>
       return if not @isShown()
       if error?
         reason = switch error.code
@@ -30,7 +32,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
       @getDialog().push new WalletSendMethodDialogViewController(transaction: transaction)
 
     # if mobile validation is supported
-    if ledger.app.wallet.getIntFirmwareVersion() >= ledger.wallet.Firmware.V_LW_1_0_0
+    if ledger.app.dongle.getIntFirmwareVersion() >= ledger.dongle.Firmware.V_LW_1_0_0
       # fetch grouped paired screens
       ledger.m2fa.PairedSecureScreen.getAllGroupedByUuidFromSyncedStore (groups, error) =>
         groups = _.values(_.omit(groups, undefined)) if groups?

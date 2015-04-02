@@ -27,7 +27,9 @@ class AuthenticatedHttpClient extends @HttpClient
 
   # Performs an authentication and then a safe call (i.e. a call that cannot fail due to authentication issue)
   _authenticateAndPerfomSafeCall: (request, deferred) ->
-    @_authenticate().then(_.bind(@_performSafeCall, @, request, deferred)).fail(_.bind(@_reportFailure, @, request, deferred))
+    @_authenticate()
+    .then(_.bind(@_performSafeCall, @, request, deferred))
+    .fail(_.bind(@_reportFailure, @, request, deferred))
 
   # Tries to recover from an usafe call (i.e. a call performed without being sure that the current auth token is valid)
   _recoverUnsafeCallFailure: (request, deferred, error) ->
@@ -74,35 +76,35 @@ class AuthenticatedHttpClient extends @HttpClient
 
   _authenticate: () ->
     return @_deferredAuthentication if @_deferredAuthentication?
-    @_deferredAuthentication = jQuery.Deferred()
+    @_deferredAuthentication = ledger.defer()
     @_performAuthenticate(@_deferredAuthentication)
     @_deferredAuthentication
 
   _performAuthenticate: (deferred) ->
     bitidAddress = null
     deferred.retryNumber ?= 3
-    CompletionClosure.defer(ledger.app.wallet.getBitIdAddress, ledger.app.wallet).jq()
-    .fail (error) => deferred.reject([null, "Unable to get bitId address", error])
+    ledger.app.dongle.getBitIdAddress()
+    .fail (error) => deferred.rejectWithError([null, "Unable to get bitId address", error])
     .then (address) =>
-      bitidAddress = address
-      @_client.jqAjax type: "GET", url: "bitid/authenticate/#{bitidAddress}", dataType: 'json'
+      bitidAddress = address.bitcoinAddress.value
+      @_client.jqAjax(type: "GET", url: "bitid/authenticate/#{bitidAddress}", dataType: 'json')
     .fail (jqXHR, statusText, errorThrown) =>
       if deferred.retryNumber-- > 0 then @_performAuthenticate(deferred) else deferred.reject([jqXHR, statusText, errorThrown])
-    .then (data) => CompletionClosure.defer(ledger.app.wallet.signMessageWithBitId, ledger.app.wallet, data['message']).jq()
-    .fail () => deferred.reject([null, "Unable to sign message", error])
+    .then (data) => ledger.app.dongle.signMessageWithBitId(data['message'])
+    .fail (error) => deferred.reject([null, "Unable to sign message", error])
     .then (signature) => @_client.jqAjax(type: "POST", url: 'bitid/authenticate', data: {address: bitidAddress, signature: signature}, contentType: 'application/json', dataType: 'json')
-    .fail () =>  if deferred.retryNumber-- > 0 then @_performAuthenticate(deferred) else deferred.reject([jqXHR, statusText, errorThrown])
+    .fail (error) =>  if deferred.retryNumber-- > 0 then @_performAuthenticate(deferred) else deferred.reject(error)
     .then (data) =>
       @_authToken = data['token']
       deferred.resolve()
 
   getAuthToken: (callback = null) ->
-    completion = new CompletionClosure(callback)
+    d = ledger.defer(callback)
     if @isAuthenticated()
-      completion.success(@_authToken)
+      d.resolve(@_authToken)
     else
-      @_authenticate().then(-> completion.success(@_authToken)).fail((ex) -> completion.failure(ex))
-    completion.readonly()
+      @_authenticate().then(-> d.resolve(@_authToken)).fail((ex) -> d.reject(ex))
+    d.promise
 
   @instance: (baseUrl = ledger.config.restClient.baseUrl) -> @_instance ?= new @(baseUrl)
 

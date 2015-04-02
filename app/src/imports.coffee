@@ -92,7 +92,7 @@
         'utils/lru'
         'utils/formatters'
         'utils/stream'
-        'utils/completion_closure'
+        'utils/defer'
         'utils/try'
         'utils/comparison_result'
         'utils/amount'
@@ -127,10 +127,8 @@
         'utils/http_error'
 
         ## Managers
-        'managers/devices_manager'
         'managers/schemes_manager'
         'managers/permissions_manager'
-        'managers/wallets_manager'
         'managers/system_manager'
 
         ## Rest clients
@@ -152,7 +150,6 @@
         'tasks/address_derivation_task'
 
         ## Wallet
-        'wallet/hardware_wallet'
         'wallet/utils'
         'wallet/transaction'
         'wallet/value'
@@ -171,7 +168,7 @@
 
         ## Dongle
         'dongle/dongle'
-        'dongle/transaction'
+        'dongle/utils'
         'dongle/manager'
 
         ## Mobile 2FA

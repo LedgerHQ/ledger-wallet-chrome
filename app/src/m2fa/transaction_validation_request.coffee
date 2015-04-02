@@ -13,22 +13,22 @@ class @ledger.m2fa.TransactionValidationRequest extends @EventEmitter
     InvalidResult: "secure_screen_invalid_pin"
 
   constructor: (clients, promise) ->
-    @_completion = new CompletionClosure
+    @_completion = ledger.defer()
     @_clients = clients
     promise
     .then (result) =>
       if result?
-        @_completion.success(result)
+        @_completion.resolve(result)
         @emit "complete", result
       else
-        @_completion.failure(ledger.m2fa.TransactionValidationRequest.errors.InvalidResult)
+        @_completion.reject(ledger.m2fa.TransactionValidationRequest.errors.InvalidResult)
         @emit "error"
     .fail (error) =>
       switch error
         when 'cancelled'
           l @_completion
           try
-            @_completion.failure(ledger.m2fa.TransactionValidationRequest.errors.TransactionCancelled)
+            @_completion.reject(ledger.m2fa.TransactionValidationRequest.errors.TransactionCancelled)
           catch er
             e er
           @emit "error"
@@ -42,13 +42,10 @@ class @ledger.m2fa.TransactionValidationRequest extends @EventEmitter
     do @off
     unless @_completion.isCompleted()
       @_completion.onComplete _.noop
-      @_completion.failure 'Operation cancelled'
+      @_completion.reject 'Operation cancelled'
     for client in @_clients
       do client?.off
       do client?.stopIfNeccessary
     @_clients = []
 
   onComplete: (cb) -> @_completion.onComplete cb
-
-
-

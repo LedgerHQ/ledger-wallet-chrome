@@ -6,18 +6,18 @@ GlobalContext = @
 
 class ledger.wallet.ExtendedPublicKey
 
-  constructor: (wallet, derivationPath) ->
+  constructor: (dongle, derivationPath) ->
     @_derivationPath = derivationPath
     if derivationPath[derivationPath.length - 1] isnt '/'
       @_derivationPath += '/'
-    @_wallet = wallet
+    @_dongle = dongle
 
   initialize: (callback) ->
     derivationPath = @_derivationPath.substring(0, @_derivationPath.length - 1)
     path = derivationPath.split '/'
     bitcoin = new BitcoinExternal()
     finalize = (fingerprint) =>
-      @_wallet.getPublicAddress derivationPath, (nodeData, error) =>
+      @_dongle.getPublicAddress derivationPath, (nodeData, error) =>
         return callback?(null, error) if error?
         publicKey = bitcoin.compressPublicKey nodeData.publicKey
         depth = path.length
@@ -31,7 +31,7 @@ class ledger.wallet.ExtendedPublicKey
 
     if path.length > 1
       prevPath = path.slice(0, -1).join '/'
-      @_wallet.getPublicAddress prevPath, (nodeData, error) =>
+      @_dongle.getPublicAddress prevPath, (nodeData, error) =>
         return callback?(null, error) if error?
         publicKey = bitcoin.compressPublicKey nodeData.publicKey
         ripemd160 = new JSUCrypt.hash.RIPEMD160()
