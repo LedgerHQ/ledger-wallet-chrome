@@ -38,9 +38,6 @@ class ledger.qr_codes.Scanner extends EventEmitter
       @overlayEl.text t 'common.qrcode.nowebcam'
       @emit 'error', videoError
 
-    qrcode.callback = (data) =>
-      @emit 'qrcode', data
-
   stop: ->
     return if not @mainEl?
     @localStream?.stop()
@@ -51,11 +48,14 @@ class ledger.qr_codes.Scanner extends EventEmitter
     @overlayEl = undefined
     @localStream = undefined
     @mainEl = undefined
-    qrcode.callback = undefined
 
   _decodeCallback: ->
     if @localStream?
       try
-        @canvasTagEl.get(0).getContext('2d').drawImage(@videoTagEl.get(0), 0, 0, @canvasTagEl.width(), @canvasTagEl.height())
-        qrcode.decode()
+        context = @canvasTagEl.get(0).getContext('2d')
+        context.drawImage(@videoTagEl.get(0), 0, 0, @canvasTagEl.width(), @canvasTagEl.height())
+        result = zbarProcessImageData(context.getImageData(0, 0, @canvasTagEl.width(), @canvasTagEl.height()))
+        if result?.length > 0
+          qrcode = result[0][2]
+          @emit 'qrcode', qrcode if qrcode?
       _.delay @_decodeCallback.bind(@), 250

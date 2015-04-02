@@ -56,6 +56,7 @@
         '../libs/moment.min'
         '../libs/lokijs.min'
         '../libs/bitcoinjs-min'
+        '../libs/zbarqrcode'
 
         # Used be m2fa.DebugClient
         '../libs/lw-api-js/ucrypt/ka'
@@ -63,25 +64,6 @@
         '../libs/lw-api-js/ucrypt/cipher'
         '../libs/lw-api-js/ucrypt/des'
         '../libs/lw-api-js/ucrypt/ecdh'
-
-        ## QR Code
-        '../libs/jsqrcode/grid'
-        '../libs/jsqrcode/version'
-        '../libs/jsqrcode/detector'
-        '../libs/jsqrcode/formatinf'
-        '../libs/jsqrcode/errorlevel'
-        '../libs/jsqrcode/bitmat'
-        '../libs/jsqrcode/datablock'
-        '../libs/jsqrcode/bmparser'
-        '../libs/jsqrcode/datamask'
-        '../libs/jsqrcode/rsdecoder'
-        '../libs/jsqrcode/gf256poly'
-        '../libs/jsqrcode/gf256'
-        '../libs/jsqrcode/decoder'
-        '../libs/jsqrcode/qrcode'
-        '../libs/jsqrcode/findpat'
-        '../libs/jsqrcode/alignpat'
-        '../libs/jsqrcode/databr'
 
         ## Application configuration
         'configuration'
