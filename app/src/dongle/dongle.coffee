@@ -291,22 +291,21 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   @overload setup(pin, options={}, callback=undefined)
     @param [String] pin
-    @param [Object] options
+    @param [String] restoreSeed
       @options options [String] restoreSeed
       @options options [ByteString] keyMap
     @param [Function] callback
     @return [Q.Promise]
   ###
-  setup: (pin, options={}, callback=undefined) ->
+  setup: (pin, restoreSeed, callback=undefined) ->
     Errors.throw(Errors.DongleNotBlank) if @state isnt States.BLANK
-    [options, callback] = [callback, options] if ! callback && typeof options == 'function'
-    [restoreSeed, keyMap] = [options.restoreSeed, options.keyMap]
+    [restoreSeed, callback] = [callback, restoreSeed] if ! callback && typeof restoreSeed == 'function'
     d = ledger.defer(callback)
 
     # Validate seed
     if restoreSeed?
       bytesSeed = new ByteString(restoreSeed, HEX)
-      if bytesSeed.length != 32
+      if bytesSeed.length != 64
         e('Invalid seed :', restoreSeed)
         return d.reject().promise
 
@@ -318,7 +317,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       BTChip.VERSION_BITCOIN_P2SH_MAINNET,
       new ByteString(pin, ASCII),
       undefined,
-      keyMap || BTChip.QWERTY_KEYMAP_NEW,
+      BTChip.QWERTY_KEYMAP_NEW,
       restoreSeed?,
       bytesSeed
     ).then( =>
