@@ -5,8 +5,8 @@ class CurrencyCache
 
   _cache = {}
   chromeStore = new ledger.storage.ChromeStore('ticker')
-  chromeStore.get 'ticker_cache', (r) =>
-    _cache = r.ticker_cache?
+  #chromeStore.get 'ticker_cache', (r) =>
+  # _cache = r.ticker_cache?
 
 
   get: () ->
