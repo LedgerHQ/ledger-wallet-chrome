@@ -20,6 +20,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   ###
   start: ->
     configureApplication @
+    @_listenCommands()
     @_listenClickEvents()
     @_listenDongleEvents()
     @onStart()
@@ -112,6 +113,13 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   ###
   _navigationControllerSelector: -> $('#controllers_container')
 
+  _listenCommands: ->
+    chrome.commands.onCommand.addListener (command) =>
+      switch command
+        when 'reload-page' then do @reloadUi
+        when 'reload-application' then do @reload
+        when 'update-firmware' then do @onCommandFirmwareUpdate
+
   ###
     Catches click on links and dispatch them if possible to the router.
   ###
@@ -171,3 +179,5 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   onDongleCertificationDone: (dongle, isCertified) ->
 
   onDongleIsInBootloaderMode: (dongle) ->
+
+  onCommandFirmwareUpdate: ->

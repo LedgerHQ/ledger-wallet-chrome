@@ -1,0 +1,64 @@
+@import (reference) "../common";
+
+#view_controller_content {
+  > .page-indication {
+    margin-top: @metrics-very-small-padding;
+  }
+
+  > .security-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: @metrics-very-small-padding;
+
+    .container {
+      display: flex;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 58px;
+      margin-left: 6px;
+      font-size: @font-size-ultra-large;
+
+      &:first-child {
+        margin-left: 0;
+      }
+
+      &.light {
+        color: @color-dark-grey;
+        opacity: 0.6;
+      }
+      
+      &.very-light {
+        color: @color-dark-grey;
+        opacity: 0.3;
+      }
+    }
+
+    > .labels {
+      .container;
+
+      > .label {
+        .item;
+        font-weight: @font-weight-light;
+      }
+    }
+
+    > .values {
+      .container;
+      margin-top: 3px;
+
+      > .value {
+        .item;
+        font-weight: @font-weight-regular;
+        background-color: @color-white;
+        border: 1px solid @color-light-grey;
+        border-radius: @border-radius-very-large-value;
+      }
+    }
+  }
+}

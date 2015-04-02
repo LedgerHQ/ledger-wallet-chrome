@@ -81,6 +81,10 @@ require @ledger.imports, ->
       return unless @isInWalletMode()
       @_releaseWallet()
 
+    onCommandFirmwareUpdate: ->
+      @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
+      @router.go '/'
+
     _listenAppEvents: () ->
 
       @on 'wallet:operations:sync:failed', =>

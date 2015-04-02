@@ -233,22 +233,3 @@ class ledger.wallet.Transaction
           else
             d.rejectWithError(Errors.NotEnoughFunds)
     d.promise
-
-  # @param [ledger.Amount] amount
-  # @param [ledger.Amount] fees
-  # @param [String] recipientAddress
-  # @param [Array<ledger.wallet.HDWallet.Account>] inputsAccounts The accounts of the addresses to use in order to perform the transaction
-  # @param [ledger.wallet.HDWallet.Account] changeAccount The account to use for the change
-  # @param [Function] callback
-  # @return [Q.Promise]
-  @createAndPrepare: (amount, fees, recipientAddress, inputsAccounts, changeAccount, callback=undefined) ->
-    d = ledger.defer(callback)
-    inputsPath = _.flatten(inputsAccount.getHDWalletAccount().getAllAddressesPaths() for inputsAccount in inputsAccounts)
-    changePath = changeAccount.getHDWalletAccount().getCurrentChangeAddressPath()
-    @create(amount: amount, fees: fees, recipientAddress: recipientAddress, inputsAccounts: inputsAccounts, changeAccount: changeAccount)
-    .fail (error) => d.reject(error)
-    .then (tx) =>
-      tx.prepare()
-      .then () => d.resolve(tx)
-      .fail (error) => d.reject(error)
-    d.promise
