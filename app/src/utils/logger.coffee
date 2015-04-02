@@ -11,8 +11,8 @@ class @ledger.utils.Logger
     @_tag = tag
     @_mode = if window.ledger.isDev then "debug" else "release"
     @store = @constructor.store()
-    @_loggers ?= {}
-    @_loggers[tag] = this
+    @constructor._loggers ?= {}
+    @constructor._loggers[tag] = this
 
   # Sets the active state
   # @param [Boolean] active or not the logger.
