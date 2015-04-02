@@ -91,8 +91,7 @@ class @ledger.utils.Logger
 
   @getLoggerByTag: (tag) ->
     @_loggers ?= {}
-    unless @_logger[tag]?
-      @_logger[tag] = new @(tag)
+    new @(tag) unless @_logger[tag]?
     @_logger[tag]
 
 
