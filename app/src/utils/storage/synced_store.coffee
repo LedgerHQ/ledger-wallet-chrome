@@ -52,7 +52,6 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         @mergeStrategy(items).then =>
           @_setLastMd5(md5)
           @emit('pulled')
-          l 'emit pulled!'
           items
     ).catch( (jqXHR) =>
       # Data not synced already

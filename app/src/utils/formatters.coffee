@@ -41,11 +41,7 @@ class ledger.formatters
           throw new Error("'BtcUnit' must be BTC, mBTC, uBTC or satoshi")
         catch e
           console.log(e.name + ": " + e.message)
-    # Check if value is an integer
-    if !(value == parseInt(value, 10))
-      throw new Error('Satoshi value must be an integer')
-    #val = value * Math.pow(10, -unit)
-    #l(val)
+
     integerPart = new Bitcoin.BigInteger(value.toString())
     .divide Bitcoin.BigInteger.valueOf(10).pow(unit)
 

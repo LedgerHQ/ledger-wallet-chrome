@@ -92,9 +92,15 @@ describe "Internationalization and Localization -", ->
 
   describe "Check lang and locale memory and stores values after full initialization", ->
 
+    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
+
     beforeEach (done) ->
       ledger.storage.sync.clear ->
         chrome.storage.local.clear -> done()
+      #originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
+      #jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
+
 
     it "should set two chars tag lang and four chars tag locale", (done) ->
       i18n.browserAcceptLanguages = ['be', 'fr-CA', 'zh-tw', 'fr']
@@ -159,3 +165,5 @@ describe "Internationalization and Localization -", ->
         syncStoreIsSet: undefined
         chromeStoreIsSet: undefined
         storesAreSync: undefined
+
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout

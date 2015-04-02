@@ -9,9 +9,8 @@ class ledger.api.CurrenciesRestClient extends ledger.api.RestClient
     r = new ledger.api.RestClient()
     r.http().get
       url: "currencies/all/exchange_rates"
-      onSuccess: (data, statusText, jqXHR) ->
+      onSuccess: (data) ->
         cb?(data, null)
-
       onError: @networkErrorCallback(cb)
 
 
@@ -19,7 +18,6 @@ class ledger.api.CurrenciesRestClient extends ledger.api.RestClient
     r = new ledger.api.RestClient()
     r.http().get
       url: "currencies/" + currency + "/exchange_rate"
-      onSuccess: (data, statusText, jqXHR) ->
+      onSuccess: (data) ->
         cb?(data, null)
-
       onError: @networkErrorCallback(cb)

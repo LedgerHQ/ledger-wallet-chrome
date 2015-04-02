@@ -15,9 +15,7 @@ describe "Unit Formatters -", ->
     expect(res).toEqual( jasmine.any(String) )
 
 
-  it "should throw an error if 'value' is a decimal number", ->
-    expect( formatters.formatUnit.bind(null, 1000.55, 'BTC', -1) ).toThrowError()
-    # .0 have not effect
+  it "should .0xx have not effect", ->
     expect(formatters.formatUnit(10.00, 'BTC')).toBe('0.0000001')
 
 

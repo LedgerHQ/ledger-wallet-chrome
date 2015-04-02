@@ -92,6 +92,7 @@ class ledger.i18n
     @loadTranslationFiles()
     .then () =>
       initLangAndLocale()
+    .catch (err) -> l err
     .then () =>
       cb()
     .catch (err) -> l err
@@ -541,7 +542,6 @@ class ledger.i18n
   @t: (messageId) =>
     messageId = _.string.replace(messageId, '.', '_')
     res = @.translations[@favLang.memoryValue][messageId]['message']
-
     return res if res? and res.length > 0
     return messageId
 

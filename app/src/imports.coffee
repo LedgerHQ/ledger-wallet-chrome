@@ -284,21 +284,21 @@
         '../spec/jasmine/jasmine-html'
         '../spec/jasmine/boot'
 
+        '../spec/i18n/i18n_spec'
+
         '../spec/utils/storage/store_spec'
         '../spec/utils/storage/chrome_store_spec'
         '../spec/utils/storage/secure_store_spec'
-        '../spec/restclients/synced_rest_client_spec'
+        #'../spec/restclients/synced_rest_client_spec'
         '../spec/utils/storage/synced_store_spec'
         '../spec/utils/bitcoin/bip39_spec'
         '../spec/utils/formatters_spec'
         '../spec/utils/converters_spec'
 
-        '../spec/m2fa/client_spec'
-        '../spec/m2fa/m2fa_spec'
+        #'../spec/m2fa/client_spec'
+        #'../spec/m2fa/m2fa_spec'
 
         '../spec/spec_helper'
-
-        '../spec/i18n/i18n_spec'
 
         ## Update controllers
         'controllers/update/update_navigation_controller'
