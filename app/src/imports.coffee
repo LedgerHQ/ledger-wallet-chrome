@@ -115,6 +115,7 @@
         'utils/comparison_result'
         'utils/amount'
         'utils/progressbars'
+        'utils/keycard'
 
         ## Crypto
         'utils/crypto/aes'
@@ -302,7 +303,8 @@
         'controllers/update/update_updating_view_controller'
         'controllers/update/update_loading_view_controller'
         'controllers/update/update_done_view_controller'
-        'controllers/update/update_error_view_controller'
         'controllers/update/update_linux_view_controller'
+        'controllers/update/update_cardcheck_view_controller'
+        'controllers/update/update_error_view_controller'
 
       ]

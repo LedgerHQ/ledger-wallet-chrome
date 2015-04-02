@@ -1,6 +1,6 @@
 class @UpdateErasingViewController extends UpdateViewController
 
-  localizableNextButton: "common.erase"
+  localizableNextButton: "common.reset"
   localizablePageSubtitle: "update.erasing.erasure_confirmation"
   navigation:
     nextRoute: ""
