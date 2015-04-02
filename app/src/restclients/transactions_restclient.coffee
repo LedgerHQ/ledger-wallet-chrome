@@ -48,6 +48,14 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
         callback?(transaction)
       onError: @networkErrorCallback(callback)
 
+  postTransactionHex: (txHex, callback) ->
+    @http().post
+      url: "blockchain/pushtx",
+      data: {tx: txHex}
+      onSuccess: (response) ->
+        callback?(response.transaction_hash)
+      onError: @networkErrorCallback(callback)
+
   refreshTransaction: (transactions, callback) ->
     outTransactions = []
     _.async.each transactions, (transaction, done, hasNext) =>
