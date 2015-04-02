@@ -27,9 +27,7 @@ class AuthenticatedHttpClient extends @HttpClient
 
   # Performs an authentication and then a safe call (i.e. a call that cannot fail due to authentication issue)
   _authenticateAndPerfomSafeCall: (request, deferred) ->
-    @_authenticate()
-    .then(_.bind(@_performSafeCall, @, request, deferred))
-    .fail(_.bind(@_reportFailure, @, request, deferred))
+    @_authenticate().then(_.bind(@_performSafeCall, @, request, deferred)).fail(_.bind(@_reportFailure, @, request, deferred))
 
   # Tries to recover from an usafe call (i.e. a call performed without being sure that the current auth token is valid)
   _recoverUnsafeCallFailure: (request, deferred, error) ->
@@ -75,10 +73,11 @@ class AuthenticatedHttpClient extends @HttpClient
   isAuthenticated: -> if @_authToken? then yes else no
 
   _authenticate: () ->
-    return @_deferredAuthentication if @_deferredAuthentication?
-    @_deferredAuthentication = ledger.defer()
-    @_performAuthenticate(@_deferredAuthentication)
-    @_deferredAuthentication
+    return @authenticationPromise if @authenticationPromise?
+    d = ledger.defer()
+    @authenticationPromise = d.promise
+    @_performAuthenticate(d)
+    @authenticationPromise
 
   _performAuthenticate: (deferred) ->
     bitidAddress = null
