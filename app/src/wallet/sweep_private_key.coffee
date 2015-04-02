@@ -29,7 +29,6 @@ _.extend ledger.wallet,
 
           txBuilder.sign(index, ecKey) for input, index in txBuilder.tx.ins
           txHex = txBuilder.build().toHex()
-          console.log(txHex)
           ledger.api.TransactionsRestClient.instance.postTransactionHex txHex, (txHash, error) =>
             completion.complete(txHash, error)
         else
