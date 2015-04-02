@@ -98,7 +98,7 @@ class @CompletionClosure
     @_complete = [value, null]
     @_tryNotify()
     @_tryFulfill()
-    @
+    return
 
   ###
     Completes the closure with an error. This method will call the onComplete function if possible or keep the error until
@@ -114,7 +114,17 @@ class @CompletionClosure
     @_complete = [null, error]
     @_tryNotify()
     @_tryFulfill()
-    @
+    return
+
+  ###
+    Completes the closure with a standard error. This method will call the onComplete function if possible or keep the error until
+    a callback is submitted.
+
+    @param [Any] error An error to failed the closure
+    @return [CompletionClosure] self
+    @throw If the closure is already completed
+  ###
+  failWithStandardError: (errorCode) -> @failure(new ledger.StandardError(errorCode))
 
   ###
     Completes the closure either by a success or an error. If both error and result are null, the closure will be failed
@@ -130,7 +140,6 @@ class @CompletionClosure
       @success(value)
     else
       @fail(error)
-    @
 
   ###
     Sets the callback closure. If the CompletionClosure is already completed and no callback has been submitted yet,

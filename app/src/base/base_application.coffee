@@ -14,6 +14,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @devicesManager = new DevicesManager()
     @walletsManager = new WalletsManager(this)
     @router = new Router(@)
+    @_dongleAttestationLock = off
     ledger.dialogs.manager.initialize($('#dialogs_container'))
 
   ###
@@ -97,6 +98,19 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     handled
 
   ###
+    Requests the application to perform or perform again a dongle certification process
+  ###
+  performDongleAttestation: ->
+    return if @_dongleAttestationLock is on
+    @_dongleAttestationLock = on
+    @wallet?.isDongleCertified (dongle, error) =>
+      (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
+      @_dongleAttestationLock = off
+    return
+
+
+
+  ###
     Returns the jQuery element used as the main div container in which controllers will render themselves.
 
     @return [jQuery.Element] The jQuery element of the controllers container
@@ -134,10 +148,10 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   _listenWalletEvents: () ->
     # Wallet management & wallet events re-dispatching
-    @walletsManager.on 'connecting', (event, card) =>
-      (Try => @onConnectingDongle(card)).printError()
+    @walletsManager.on 'connecting', (event, card) => (Try => @onConnectingDongle(card)).printError()
     @walletsManager.on 'connected', (event, wallet) =>
       @wallet = wallet
+      @_dongleAttestationLock = off
       wallet.once 'disconnected', =>
         _.defer => (Try => @onDongleIsDisconnected(wallet)).printError()
         @wallet = null
@@ -146,6 +160,10 @@ class ledger.base.application.BaseApplication extends @EventEmitter
       wallet.once 'state:unlocked', =>
         (Try => @onDongleIsUnlocked(wallet)).printError()
       (Try => @onDongleConnected(wallet)).printError()
+      if wallet.isInBootloaderMode()
+        (Try => @onDongleIsInBootloaderMode(wallet)).printError()
+
+
 
   _listenDongleEvents: () ->
     # Dongle management & dongle events re-dispatching
@@ -162,10 +180,14 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   onConnectingDongle: (card) ->
 
-  onDongleConnected: (wallet) ->
+  onDongleConnected: (dongle) ->
 
-  onDongleNeedsUnplug: (wallet) ->
+  onDongleNeedsUnplug: (dongle) ->
 
-  onDongleIsUnlocked: (wallet) ->
+  onDongleIsUnlocked: (dongle) ->
 
-  onDongleIsDisconnected: (wallet) ->
+  onDongleIsDisconnected: (dongle) ->
+
+  onDongleCertificationDone: (dongle, isCertified) ->
+
+  onDongleIsInBootloaderMode: (dongle) ->

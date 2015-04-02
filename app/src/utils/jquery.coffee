@@ -19,7 +19,7 @@ $.fn.extend
     @on 'keydown', (e) ->
 
       # Check if it already contains a decimal point
-      if (@value.indexOf('.') != -1 or @value.length == 0) and e.keyCode == 110
+      if (@value.indexOf('.') != -1) and e.keyCode == 110
         e.preventDefault
         return no
 
@@ -35,4 +35,4 @@ $.fn.extend
         parts.splice(parts.length - 1, 0, '.')
         @value = parts.join('')
       if @value.indexOf('.') == 0
-        @value = ''
+        @value = '0.'

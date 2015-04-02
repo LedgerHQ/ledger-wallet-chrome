@@ -16,11 +16,11 @@ class @WalletSendMethodDialogViewController extends @DialogViewController
 
   selectMobileGroup: (params) ->
     secureScreens = @mobilesGroups[params.index]
-    dialog = new WalletSendMobileDialogViewController(secureScreens: secureScreens, transaction: @params.transaction)
+    dialog = new WalletSendValidatingDialogViewController(secureScreens: secureScreens, transaction: @params.transaction, validationMode: 'mobile')
     @getDialog().push dialog
 
   selectSecurityCard: ->
-    dialog = new WalletSendCardDialogViewController(transaction: @params.transaction)
+    dialog = new WalletSendValidatingDialogViewController(transaction: @params.transaction, validationMode: 'card')
     @getDialog().push dialog
 
   _refreshMobilesList: ->

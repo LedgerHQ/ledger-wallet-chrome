@@ -12,6 +12,7 @@
         '../libs/sjcl/sha512'
         '../libs/jquery.selectric.min'
         '../libs/qrcode.min'
+        '../libs/jquery.suggest'
         '../public/tooltipster/js/jquery.tooltipster.min'
         '../libs/lw-api-js/lib/bitcoinjs-min'
         '../libs/lw-api-js/lib/util'
@@ -113,6 +114,7 @@
         'utils/try'
         'utils/comparison_result'
         'utils/amount'
+        'utils/progressbars'
 
         ## Crypto
         'utils/crypto/aes'
@@ -142,6 +144,7 @@
         'managers/schemes_manager'
         'managers/permissions_manager'
         'managers/wallets_manager'
+        'managers/system_manager'
 
         ## Rest clients
         'restclients/authentication'
@@ -214,6 +217,7 @@
         # Dialogs
         'controllers/common/dialogs/common_dialogs_confirmation_dialog_view_controller'
         'controllers/common/dialogs/common_dialogs_message_dialog_view_controller'
+        'controllers/common/dialogs/common_dialogs_qrcode_dialog_view_controller'
 
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller'
@@ -234,6 +238,7 @@
         'controllers/wallet/send/wallet_send_card_dialog_view_controller'
         'controllers/wallet/send/wallet_send_processing_dialog_view_controller'
         'controllers/wallet/send/wallet_send_preparing_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_validating_dialog_view_controller'
         'controllers/wallet/send/wallet_send_method_dialog_view_controller'
 
         # Receive
@@ -249,6 +254,8 @@
         'controllers/onboarding/device/onboarding_device_pin_view_controller'
         'controllers/onboarding/device/onboarding_device_opening_view_controller'
         'controllers/onboarding/device/onboarding_device_error_view_controller'
+        'controllers/onboarding/device/onboarding_device_connecting_view_controller'
+        'controllers/onboarding/device/onboarding_device_update_view_controller'
 
         # Management
         'controllers/onboarding/management/onboarding_management_security_view_controller'
@@ -286,8 +293,8 @@
         '../spec/utils/formatters_spec'
         '../spec/utils/converters_spec'
 
-        #'../spec/m2fa/client_spec'
-        #'../spec/m2fa/m2fa_spec'
+        '../spec/m2fa/client_spec'
+        '../spec/m2fa/m2fa_spec'
 
         '../spec/spec_helper'
 
@@ -296,9 +303,14 @@
         ## Update controllers
         'controllers/update/update_navigation_controller'
         'controllers/update/update_view_controller'
+        'controllers/update/update_index_view_controller'
         'controllers/update/update_plug_view_controller'
         'controllers/update/update_seed_view_controller'
         'controllers/update/update_erasing_view_controller'
         'controllers/update/update_unplug_view_controller'
-        'controllers/update/update_reloadblfromos_view_controller'
+        'controllers/update/update_updating_view_controller'
+        'controllers/update/update_loading_view_controller'
+        'controllers/update/update_done_view_controller'
+        'controllers/update/update_error_view_controller'
+        'controllers/update/update_linux_view_controller'
       ]

@@ -16,12 +16,18 @@
   V1_4_13: 0x0001040d0146
   V_LW_1_0_0: 0x20010000010f
 
-@ledger.wallet.Attestation =
+Attestation =
   String: "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
-  Bytes: []
+Attestation.xPoint = Attestation.String.substr(2).substr(0, (Attestation.String.length - 2) / 2)
+Attestation.yPoint = Attestation.String.substr(2).substr((Attestation.String.length - 2) / 2)
 
-for i in [0...(ledger.wallet.Attestation.String.length / 2)]
-  ledger.wallet.Attestation.Bytes.push parseInt(ledger.wallet.Attestation.String.substring(i, i + 2), 16)
+BetaAttestation =
+  String: "04e69fd3c044865200e66f124b5ea237c918503931bee070edfcab79a00a25d6b5a09afbee902b4b763ecf1f9c25f82d6b0cf72bce3faf98523a1066948f1a395f"
+BetaAttestation.xPoint = BetaAttestation.String.substr(2).substr(0, (BetaAttestation.String.length - 2) / 2)
+BetaAttestation.yPoint = BetaAttestation.String.substr(2).substr((BetaAttestation.String.length - 2) / 2)
+
+
+@ledger.wallet.Attestation
 
 class @ledger.wallet.HardwareWallet extends EventEmitter
 
@@ -45,7 +51,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       @_lwCard = new LW(0, new BTChip(@lwCard), @_vents)
     else
       # TODO: Remove with vincent refactoring
-      @_lwCard = dongle: @lwCard
+      @_lwCard = dongle: card: @lwCard
       @emit 'connected', @
       _.defer => @_setState(ledger.wallet.States.BLANK)
 
@@ -61,7 +67,25 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   getFirmwareUpdater: () -> ledger.fup.FirmwareUpdater.instance
 
-  isFirmwareUpdateAvailable: () -> @getFirmwareUpdater().isFirmwareUpdateAvailable(this)
+  isFirmwareUpdateAvailable: (callback = null) ->
+    completion = new CompletionClosure(callback)
+    @getFirmwareUpdater().getFirmwareUpdateAvailability(this)
+    .then (availablity) ->
+      completion.success(availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update)
+    .fail (er) ->
+      completion.failure(er)
+    .done()
+    completion.readonly()
+
+  isFirmwareOverwriteOrUpdateAvailable: (callback = null) ->
+    completion = new CompletionClosure(callback)
+    @getFirmwareUpdater().getFirmwareUpdateAvailability(this)
+    .then (availablity) ->
+      completion.success(availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update or availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Overwrite)
+    .fail (er) ->
+      completion.failure(er)
+    .done()
+    completion.readonly()
 
   getFirmwareVersion: () -> @_lwCard.getFirmwareVersion()
 
@@ -184,44 +208,43 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   getExtendedPublicKeys: () -> @_xpubs
 
-  isDongleCertified: (callback) ->
+  isDongleCertified: (callback = null) -> @_checkDongleCertification(Attestation, callback)
+
+  isDongleBetaCertified: (callback = null) -> @_checkDongleCertification(BetaAttestation, callback)
+
+  _checkDongleCertification: (Attestation, callback) ->
+    completion = new CompletionClosure(callback)
+    if @getIntFirmwareVersion() < ledger.wallet.Firmware.V_LW_1_0_0
+      completion.success(true)
+      return completion.readonly()
     randomValues = new Uint32Array(2)
     crypto.getRandomValues(randomValues)
     random = _.str.lpad(randomValues[0].toString(16), 8, '0') + _.str.lpad(randomValues[1].toString(16), 8, '0')
-    adpu = 'E0C2000008' + random
-    p = @sendAdpu new ByteString(adpu, HEX), [0x9000]
-    p.then (result) =>
+    @sendAdpu(new ByteString("E0"+"C2"+"00"+"00"+"08"+random, HEX), [0x9000])
+    .then (result) =>
       attestation = result.toString(HEX)
-      @attestation =
-        raw: attestation
-        keyBatchId: attestation.substring(0, 8)
-        keyDerivationId: attestation.substring(8, 16)
-        supportedOperationBitFlag: attestation.substring(16, 18)
-        firmwareMajor: attestation.substring(18, 22)
-        firmwareMinor: attestation.substring(22, 24)
-        firmarePatch: attestation.substring(24, 26)
-        loaderIdMajor: attestation.substring(26, 28)
-        loaderIdMinor: attestation.substring(28, 30)
-        signature: attestation.substring(30)
-      l @attestation, random
-      try
-        SHA256  = new  JSUCrypt.hash.SHA256()
-        domain =  JSUCrypt.ECFp.getEcDomainByName("secp256k1")
-        pubKey = new JSUCrypt.key.EcFpPublicKey(256, domain)
-        pubKey.W =
-          getUncompressedForm: -> ledger.wallet.Attestation.Bytes
-        l ledger.wallet.Attestation.Bytes
-        ecsig = new JSUCrypt.signature.ECDSA(SHA256)
-        ecsig.init(pubKey,  JSUCrypt.signature.MODE_VERIFY)
-        sigBytes = (parseInt(@attestation.signature.substring(i, i + 2), 16) for i in [0...(@attestation.signature.length / 2)])
-        ver = ecsig.verify(random, sigBytes)
-        l sigBytes
-        l 'Verif', ver
-        return
-      catch er
-        e er
-    p.fail (result) =>
-      e result
+      dataToSign = attestation.substring(16,32) + random
+      dataSig = attestation.substring(32)
+      dataSig = "30" + dataSig.substr(2)
+      dataSigBytes = (parseInt(n,16) for n in dataSig.match(/\w\w/g))
+      sha = new JSUCrypt.hash.SHA256()
+      domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
+      affinePoint = new JSUCrypt.ECFp.AffinePoint(Attestation.xPoint, Attestation.yPoint)
+      pubkey = new JSUCrypt.key.EcFpPublicKey(256, domain, affinePoint)
+      ecsig = new JSUCrypt.signature.ECDSA(sha)
+      ecsig.init(pubkey, JSUCrypt.signature.MODE_VERIFY)
+      if ecsig.verify(dataToSign, dataSigBytes)
+        completion.success(this)
+      else
+        completion.failure(new ledger.StandardError(ledger.errors.DongleNotCertified))
+      return
+    .fail (err) =>
+      e err
+      error = new ledger.StandardError(Errors.SignatureError, err)
+      #completion.failure(error)
+      return
+    .done()
+    completion.readonly()
 
   # @return A Q.Promise
   randomBitIdAddress: () ->
@@ -277,6 +300,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
           completion.success([0, (1 << 16) + (4 << 8) + (3)])
         else
           completion.failure(new Error("Failed to get version"))
+        return
     .fail (error) ->
       completion.failure(error)
     completion

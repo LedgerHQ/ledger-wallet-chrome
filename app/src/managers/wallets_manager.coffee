@@ -12,6 +12,7 @@ class @WalletsManager extends EventEmitter
 
   connectCard: (card) ->
     try
+      card.isInBootloaderMode = if card.productId is 0x1808 or card.productId is 0x1807 then yes else no
       @emit 'connecting', card
       result = []
       @cardFactory.list_async()
@@ -29,6 +30,7 @@ class @WalletsManager extends EventEmitter
               _.defer =>
                 @_wallets[card.id] = new ledger.wallet.HardwareWallet(this, card, lwCard)
                 @_wallets[card.id].once 'connected', (event, wallet) => @emit 'connected', wallet
+                @_wallets[card.id].once 'forged', (event, wallet) => @emit 'forged', wallet
                 @_wallets[card.id].connect()
     catch er
       e er

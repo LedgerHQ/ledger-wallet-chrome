@@ -4,6 +4,8 @@ ledger.router.ignorePluggedWalletForRouting = @ledger.isDev
 ledger.router.pluggedWalletRoutesExceptions = [
   '/',
   '/onboarding/device/plug'
+  '/onboarding/device/connecting'
+  '/onboarding/device/forged'
 ]
 
 # routes declarations
@@ -13,7 +15,7 @@ ledger.router.pluggedWalletRoutesExceptions = [
     if app.isInWalletMode()
       app.router.go '/onboarding/device/plug', {animateIntro: yes}
     else
-      app.router.go '/update/seed'
+      app.router.go '/update/index'
 
   ## Onboarding
   # Device
@@ -23,11 +25,17 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/device/unplug', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUnplugViewController
 
+  route '/onboarding/device/connecting', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceConnectingViewController
+
   route '/onboarding/device/pin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDevicePinViewController
 
   route '/onboarding/device/opening', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceOpeningViewController
+
+  route '/onboarding/device/update', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUpdateViewController
 
   route '/onboarding/device/error', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceErrorViewController
@@ -48,6 +56,12 @@ ledger.router.pluggedWalletRoutesExceptions = [
     app.router.go '/onboarding/device/error',
       error: t 'onboarding.device.errors.unsupported.device_unsupported'
       message: t 'onboarding.device.errors.unsupported.unsuported_kind'
+      indication: t 'onboarding.device.errors.unsupported.get_help'
+
+  route '/onboarding/device/forged', (params) ->
+    app.router.go '/onboarding/device/error',
+      error: t 'onboarding.device.errors.forged.device_forged'
+      message: t 'onboarding.device.errors.forged.forbidden_access'
       indication: t 'onboarding.device.errors.unsupported.get_help'
 
   # Management
@@ -99,18 +113,32 @@ ledger.router.pluggedWalletRoutesExceptions = [
     app.navigate WALLET_LAYOUT, WalletOperationsIndexViewController
 
   ## Firmware Update
+  route '/update/index', (params) ->
+    app.navigate UPDATE_LAYOUT, UpdateIndexViewController
 
-  route 'update/plug', (params) ->
+  route '/update/plug', (params) ->
     app.navigate UPDATE_LAYOUT, UpdatePlugViewController
 
-  route 'update/unplug', (params) ->
+  route '/update/unplug', (params) ->
     app.navigate UPDATE_LAYOUT, UpdateUnplugViewController
 
-  route 'update/seed', (param) ->
+  route '/update/seed', (param) ->
     app.navigate UPDATE_LAYOUT, UpdateSeedViewController
 
-  route 'update/erasing', (param) ->
+  route '/update/erasing', (param) ->
     app.navigate UPDATE_LAYOUT, UpdateErasingViewController
 
-  route '/update/reloadblfromos', ->
-    app.navigate UPDATE_LAYOUT, UpdateReloadblfromosViewController
+  route '/update/updating', ->
+    app.navigate UPDATE_LAYOUT, UpdateUpdatingViewController
+
+  route '/update/loading', ->
+    app.navigate UPDATE_LAYOUT, UpdateLoadingViewController
+
+  route '/update/done', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateDoneViewController
+
+  route '/update/linux', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateLinuxViewController
+
+  route '/update/error', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateErrorViewController

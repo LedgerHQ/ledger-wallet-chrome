@@ -1,0 +1,113 @@
+@import (reference) "../common";
+
+.main-container {
+  background-image: url('../../../images/update/towers.png');
+  background-repeat: repeat-x;
+  background-position: bottom center;
+  background-size: 570px 170px;
+  justify-content: center;
+
+  > #content_container {
+    height: 640px;
+    display: flex;
+    flex-direction: column;
+    padding: @metrics-ultra-large-padding @metrics-large-padding;
+
+    > #title_container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    > #dynamic_container {
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+      justify-content: center;
+
+      .centered-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .navigation-item {
+        width: 130px;
+        flex-shrink: 0;
+
+        > a {
+          .colored(@color, @font-weight: @font-weight-light) {
+            font-size: @font-size-very-large;
+            font-weight: @font-weight;
+            color: @color;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: -0.6px;
+
+            &:hover {
+              color: darken(@color, @color-strong-darken-value);
+            }
+
+            &.disabled {
+              color: @color-light-grey;
+              pointer-events: none;
+              font-weight: @font-weight;
+            }
+          }
+
+          > i {
+            font-size: @font-size-very-very-very-large;
+          }
+
+          &.back {
+            .colored(@color-soft-grey);
+
+            > i {
+              margin-right: 5px;
+            }
+          }
+
+          &.continue {
+            .colored(@color-action-green, @font-weight-semibold);
+            font-weight: @font-weight-semibold;
+
+            > i {
+              margin-left: 5px;
+            }
+          }
+        }
+      }
+
+      > #left_navigation, > #right_navigation {
+        .centered-container;
+        .navigation-item;
+      }
+
+      > #left_navigation {
+        align-items: flex-start;
+      }
+
+      > #right_navigation {
+        align-items: flex-end;
+      }
+
+      > #navigation_controller_content {
+        .centered-container;
+        text-align: center;
+        padding: 0 @metrics-small-padding;
+        flex-grow: 1;
+        align-items: center;
+
+        .page-indication {
+          > b {
+            color: @color-invalid-red;
+          }
+        }
+      }
+    }
+
+    > #empty_container {
+      height: 70px;
+    }
+  }
+}

@@ -2,18 +2,7 @@
 
 PREDEFINED_CHANGE_ADDRESSES = []
 PREDEFINED_PUBLIC_ADDRESSES = [
-  "1P78Rgr9j2zjXzgSLGrBtrcCMtMXT9Xcph"
-  "1N78dYebs1F3mE9HnqEtZJtSiGMcrnwWGa"
-  "1LLmKpkcipSY3jbRmbK1E8QPduPEoU7XBE"
-  "1CN48KfRbGx2NqY7aEMxxXLNkqGr3Z9pUy"
-  "13UYbtyCqStgAJ4zNYyuKdZF8NV3zweLzp"
-  "1Np3B317y2vEaU3VweQfCbvBxEoEonPsv1"
-  "1MCN7i7GCoLjJNzX7oqCcd2SYhkhwNr6qk"
-  "14NDJh45EBVAihEBTuQwpLht3ouyFA6krw"
-  "14PKwmc61g26Rsnw1MPi77FYXKTZiJiUDf"
-  "15D9MY3bqmTHiiLLQVUWsGYjsu2XxBLsJx"
-  "1EDLmH7BBE2apBCvUVp7J9dzZ4RYVHCY4Y"
-  "1MrpXW4dUz4FgFhNwkeqHqsWJDn12mPZPe"
+  "1KAkAp8Jxan81z72WzDpS27Az1FXB3tmak"
 ]
 
 pathsToPredefinedAddresses = (paths, callback) ->

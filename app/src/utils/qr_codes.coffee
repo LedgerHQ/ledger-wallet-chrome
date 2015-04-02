@@ -1,57 +1,61 @@
 ledger.qr_codes ?= {}
 
 class ledger.qr_codes.Scanner extends EventEmitter
-  renderedNode: undefined
   localStream: undefined
+  mainEl: undefined
   videoEl: undefined
-  canvasEl: undefined
+  canvasTagEl: undefined
+  videoTagEl: undefined
   overlayEl: undefined
 
   startInNode: (node) ->
-    return if @renderedNode?
-    @renderedNode = $(node)
-    height = @renderedNode.height()
-    width = @renderedNode.width()
+    return if @mainEl?
+    renderedNode = $(node)
+    height = renderedNode.height()
+    width = renderedNode.width()
 
-    overlayEl = $('<div id="qrcode_overlay"></div>').appendTo(@renderedNode)
-    @overlayEl = overlayEl.get(0)
-    videoEl = $('<video width="' + width + 'px" height="' + height + 'px"></video>').appendTo(@renderedNode)
-    @videoEl = videoEl.get(0)
-    canvasEl = $('<canvas id="qr-canvas" width="' + width + 'px" height="' + height + 'px" style="display:none;"></canvas>').appendTo(@renderedNode)
-    @canvasEl = canvasEl.get(0)
+    # build els
+    @mainEl = $('<div class="qrcode"></div>')
+    @overlayEl = $('<div class="overlay"></div>')
+    @videoEl = $('<div class="video"></div>')
+    @videoTagEl = $('<video width="' + width + 'px" height="' + height + 'px"></video>')
+    @canvasTagEl = $('<canvas id="qr-canvas" width="' + width + 'px" height="' + height + 'px" style="display:none;"></canvas>')
+    @videoEl.append @videoTagEl
+    @videoEl.append @canvasTagEl
+    @mainEl.append @videoEl
+    @mainEl.append @overlayEl
+    renderedNode.append @mainEl
 
-    navigator.webkitGetUserMedia {video: true},
-    (stream) =>
+    # start capture
+    navigator.webkitGetUserMedia {video: true}, (stream) =>
       @localStream = stream
-      @videoEl.src = (window.URL && window.URL.createObjectURL(stream)) || stream
-      @videoEl.play()
+      @videoTagEl.get(0).src = (window.URL && window.URL.createObjectURL(stream)) || stream
+      @videoTagEl.get(0).play()
       _.delay @_decodeCallback.bind(@), 1000
       @emit 'success', stream
-    ,
-    (videoError) =>
-      $(@overlayEl).addClass 'errored'
-      $(@overlayEl).text t 'common.qrcode.nowebcam'
+    , (videoError) =>
+      @overlayEl.addClass 'errored'
+      @overlayEl.text t 'common.qrcode.nowebcam'
       @emit 'error', videoError
 
     qrcode.callback = (data) =>
       @emit 'qrcode', data
 
   stop: ->
-    return if not @renderedNode?
-    @localStream.stop() if @localStream?
-    @videoEl.pause()
-    $(@videoEl).remove()
-    $(@canvasEl).remove()
-    $(@overlayEl).remove()
+    return if not @mainEl?
+    @localStream?.stop()
+    @videoTagEl?.get(0).pause()
     @videoEl = undefined
-    @canvasEl = undefined
-    @renderedNode = undefined
+    @canvasTagEl = undefined
+    @videoTagEl = undefined
+    @overlayEl = undefined
     @localStream = undefined
+    @mainEl = undefined
     qrcode.callback = undefined
 
   _decodeCallback: ->
     if @localStream?
       try
-        @canvasEl.getContext('2d').drawImage(@videoEl, 0, 0, $(@canvasEl).width(), $(@canvasEl).height());
+        @canvasTagEl.get(0).getContext('2d').drawImage(@videoTagEl.get(0), 0, 0, @canvasTagEl.width(), @canvasTagEl.height())
         qrcode.decode()
       _.delay @_decodeCallback.bind(@), 250

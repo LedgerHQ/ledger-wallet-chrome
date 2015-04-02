@@ -14,13 +14,21 @@ common:
   time_format: 'LT'
   close: "Fermer"
   cancel: "Annuler"
+  print: "Imprimer"
+  copy: "Copier"
   finish: "Terminer"
   confirm: "Confirmer"
   confirmation: "Confirmation"
   send: "Envoyer"
+  continue: "Continuer"
+  erase: "Effacer"
+  update: "Mettre à jour"
+  restore: "Restaurer"
+  later: "Plus tard"
   yes: "Oui"
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
+  get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
 
   keycard:
     uppercase_letters: "Majuscules"
@@ -34,11 +42,13 @@ common:
     invalid_receiver_address: "L'adresse bitcoin à créditer n'est pas correcte."
     invalid_amount: "Le montant à envoyer n'est pas valide."
     unknown: "Une erreur inconnue est survenue."
+    unable_to_validate: "Impossible de valider la transaction."
     secure_screen_cancelled_transaction: "Le smartphone a annulé la transaction."
     secure_screen_invalid_pin: "Le smartphone a retourné un mauvais code pin."
 
   qrcode:
-    present: "Présentez le code QR de réception devant la webcam."
+    scan_qrcode: "Scanner code QR"
+    present: "Présentez le code QR devant la webcam."
     nowebcam: "Aucune webcam n'est détectée sur votre ordinateur."
 
 onboarding:
@@ -55,10 +65,17 @@ onboarding:
       enter_your_pin_code: "Entez votre code PIN pour dévérouiller votre portefeuille :"
       i_lost_my_pin_code: "Si vous avez oublié votre code PIN, consultez notre centre d'aide."
 
+    connecting:
+      is_connecting: "Vérification de l'authenticité de votre Ledger Wallet..."
+
     opening:
       is_opening: "Veuillez patienter pendant l'ouverture de votre portefeuille..."
       is_synchronizing: "Synchronisation de votre portefeuille. Ceci peut prendre plusieurs minutes..."
       not_opening: "Si votre Ledger Wallet ne s'ouvre pas, consultez notre centre d'aide."
+
+    update:
+      new_firmware_available: "Une nouvelle mise à jour de la puce de votre Ledger Wallet est disponible (%s)."
+      new_1_0_0: "Cette mise à jour ajoute une nouvelle authentification des transactions sortantes sur votre smartphone."
 
     errors:
       frozen:
@@ -75,6 +92,10 @@ onboarding:
         device_unsupported: "Portefeuille non pris en charge"
         unsuported_kind: "Ce type de portefeuille n’est pas pris en charge par l’application Ledger Wallet."
         get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
+
+      forged:
+        device_forged: "Ce Ledger Wallet n'est pas authentique"
+        forbidden_access: "Pour des raisons de sécurité, vous n'êtes pas autorisé à utiliser cette application."
 
   management:
     back: "RETOUR"
@@ -132,7 +153,7 @@ onboarding:
       your_recovery_phrase: "Votre phrase de restauration :"
       invalid_recovery_phrase: "La phrase de restauration est invalide."
       it_wont_be_displayed_again: "Votre phrase de restauration ne sera pas affichée à nouveau."
-      without_it: "Sans elle, vous n'aurez plus accès à votre portefeuille en cas de perte."
+      without_it: "Sans elle, vous n'aurez plus accès à vos bitcoins en cas de perte."
 
     summary:
       your_wallet_is: "Votre portefeuille est"
@@ -158,6 +179,64 @@ onboarding:
       configuration_failed_recover: "Restauration échouée"
       error_occured: "Une erreur sérieuse est survenue. Contactez le support pour obtenir de l'aide."
       contact_support: "CONTACTER LE SUPPORT"
+
+update:
+  common:
+    firmware_update: "Mise à jour de la puce"
+    need_to_repeat_several_times: "Vous pouvez être amené(e) à répéter cette opération plusieurs fois."
+
+  index:
+    important_notice: "Informations importantes"
+    update_process: "Le processus de mise à jour nécessite une réinitialisation de votre Ledger Wallet.<br />Votre livret de restauration vous permettra de retrouver l'accès à vos bitcoins."
+    clicking_continue: "En cliquant sur CONTINUER, vous confirmez posséder le <b>code QR de votre carte de sécurité</b> et les <b>24 mots de votre phrase de restauration</b>. Si vous tentez de mettre à jour votre Ledger Wallet sans ces informations, vous perdrez vos bitcoins."
+    please_note: "Note: Vous devrez associer votre smartphone à nouveau pour réactiver le second facteur mobile."
+
+  plug:
+    plug_your_wallet: "Branchez votre Ledger Wallet"
+    insert_your_wallet: "Insérez votre Ledger Wallet dans le port USB."
+
+  unplug:
+    unplug_your_wallet: "Débranchez votre Ledger Wallet"
+    remove_your_wallet: "Retirez votre Ledger Wallet du port USB."
+
+  seed:
+    security_card_qrcode: "Carte de sécurité"
+    enter_characters: "Scannez le code QR (ou saisissez les 32 caractères) de votre carte de sécurité :"
+    on_the_left: "Il est situé sur la page de gauche de votre livret de restauration."
+
+  erasing:
+    erasure_confirmation: "Confirmation de réinitialisation"
+    ready_to_start_process: "Vous êtes maintenant prêt(e) à démarrer le processus de mise à jour."
+    factory_settings: "Pour continuer, vous devez posséder vos 24 mots de votre phrase de restauration."
+
+  updating:
+    update_confirmation: "Confirmation de mise à jour"
+    wallet_is_ready: "Votre Ledger Wallet est effacé et prêt à être mis à jour."
+    clicking_continue: "La puce sera mise à jour depuis %s vers %s."
+
+  loading:
+    updating_wallet: "Mise à jour en cours"
+    loading: "Chargement de %s..."
+    do_not_unplug: "Merci de patentier. Veillez à ne pas débrancher votre Ledger Wallet."
+
+  done:
+    successfully_updated: "Votre Ledger Wallet a bien été mis à jour."
+    update_succeeded: "Mise à jour réussie"
+    use_24_words: "Utilisez les 24 mots de votre phrase de restauration pour restaurer vos bitcoins."
+
+  linux:
+    linux_users: "Utilisateurs Linux"
+    follow_instructions: "Suivez ces instructions pour assurer que votre Ledger Wallet soit reconnu une fois mis à jour :"
+    first: "1. Premièrement, ouvrez votre terminal et éditez ce fichier (permissions root requises):"
+    fc: "sudo vi /etc/udev/rules.d/20-hw1.rules"
+    second: "2. Ajoutez cette ligne:"
+    sc: "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"2581\", ATTRS{idProduct}==\"3b7c\", MODE=\"0660\", GROUP=\"plugdev\""
+    third: "3. Enfin, fermer le fichier et exécutez cette commande (permissions root requises):"
+    tc: "sudo udevadm control --reload-rules"
+
+  error:
+    update_failed: "Mise à jour échouée"
+    error_updated: "Une erreur est survenue pendant la mise à jour de votre Ledger Wallet (code: %s)."
 
 wallet:
   defaults:
@@ -250,7 +329,7 @@ wallet:
 
   send:
     common:
-      send_bitcoins: "Envoyer des Bitcoins"
+      send_bitcoins: "Envoyer des bitcoins"
       other_validation_methods: "Autres méthodes de validation"
 
     index:
@@ -273,8 +352,8 @@ wallet:
 
     method:
       select_method: "Sélectionnez une méthode de validation pour authentifier la transaction sortante depuis votre Ledger Wallet:"
-      pair_a_mobile_phone: "Associer un téléphone mobile"
-      mobile_phone: "Téléphone mobile"
+      pair_a_mobile_phone: "Associer un smartphone"
+      mobile_phone: "Smartphone"
       security_card: "Carte de sécurité"
       single_paired_device: "%s association"
       multiple_paired_devices: "%s associations"
@@ -289,6 +368,9 @@ wallet:
     preparing:
       preparing_transaction: "Préparation de la transaction..."
 
+    validating:
+      validating_transaction: "Validation de la transaction..."
+
     errors:
       sending_failed: "Envoi échoué"
       sending_succeeded: "Envoi terminé"
@@ -296,15 +378,15 @@ wallet:
 
   pairing:
     common:
-      pair_a_new_mobile: "Associer un téléphone mobile"
+      pair_a_new_mobile: "Associer un smartphone"
 
     errors:
       pairing_failed: "Association échouée"
       pairing_succeeded: "Association réussie"
-      dongle_is_now_paired: "Votre Ledger Wallet est maintenant associé<br />avec votre téléphone mobile \"%s\"."
+      dongle_is_now_paired: "Votre Ledger Wallet est maintenant associé<br />avec votre smartphone \"%s\"."
       inconsistent_state: "Quelque chose ne s'est pas bien déroulé (état inconsistant)."
       client_cancelled: "L'application mobile a annulé la procédure d'association."
-      dongle_needs_power_cycle: "Votre Ledger Wallet nécessite d'être débranché puis rebranché<br />pour associer un nouveau téléphone mobile."
+      dongle_needs_power_cycle: "Votre Ledger Wallet nécessite d'être débranché puis rebranché<br />pour associer un nouveau smartphone."
       invalid_challenge_response: "Le code de validation de la carte de sécurité est incorrect."
       dongle_cancelled: "Votre Ledger Wallet a annulé la procédure d'association."
       unknown: "Une erreur inconnue est survenue."
@@ -313,16 +395,16 @@ wallet:
       download_the_app: "<b>Téléchargez</b> l'application mobile Ledger Wallet."
       compatibility_details_available: "Détails de compatibilité et guides d'installation disponibles sur notre <b>centre d'aide</b>."
       open_the_app: "<b>Scannez</b> le code QR d'association."
-      tap_pair: "Touchez “Associer un nouveau Ledger Wallet” pour démarrer le scanner."
+      tap_pair: "Touchez “Associer un Ledger Wallet” pour démarrer le scanner."
       scan_this_qrcode: "Scannez ce code QR d'association."
 
     progress:
       pairing_with_mobile_device: "Association en cours..."
-      follow_instructions: "Suivez les instructions affichées à l'écran du téléphone mobile."
+      follow_instructions: "Suivez les instructions affichées à l'écran du smartphone."
 
     finalizing:
-      assign_a_name: "Pour terminer, donnez un nom à ce téléphone mobile."
-      placeholder_name: "Nom du téléphone mobile"
-      default_name: "Mon téléphone mobile"
-      name_already_used_by_paired_device: "Ce nom est déjà utilisé par un autre téléphone mobile."
-      please_enter_a_name: "Veuillez entrer un nom pour ce téléphone mobile."
+      assign_a_name: "Pour terminer, donnez un nom à ce smartphone."
+      placeholder_name: "Nom du smartphone"
+      default_name: "Mon smartphone"
+      name_already_used_by_paired_device: "Ce nom est déjà utilisé par un autre smartphone."
+      please_enter_a_name: "Veuillez entrer un nom pour ce smartphone."

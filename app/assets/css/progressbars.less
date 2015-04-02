@@ -1,0 +1,23 @@
+@import (reference) "common";
+
+.progressbar {
+  @height: 2px;
+  height: @height;
+  width: 100px;
+  display: flex;
+  flex-direction: row;
+
+  > .left {
+    background-color: @color-soft-grey;
+    height: 100%;
+    border-top-left-radius: @height / 2;
+    border-bottom-left-radius: @height / 2;
+  }
+
+  > .right {
+    background-color: @color-light-grey;
+    height: 100%;
+    border-top-right-radius: @height / 2;
+    border-bottom-right-radius: @height / 2;
+  }
+}

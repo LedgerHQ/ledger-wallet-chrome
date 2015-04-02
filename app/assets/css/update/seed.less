@@ -1,0 +1,42 @@
+@import (reference) "../common";
+
+#view_controller_content {
+  > .page-indication {
+    margin-top: @metrics-very-small-padding;
+  }
+
+  > .seed_container {
+    margin-top: @metrics-small-padding;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    > .spacer {
+      display: flex;
+      align-items: center;
+
+      &.left {
+        justify-content: flex-start;
+        width: 63px;
+      }
+
+      &.right {
+        justify-content: flex-end;
+        width: 50px;
+      }
+    }
+
+    > input {
+      height: 36px;
+      width: 340px;
+      font-size: @font-size-very-very-large;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: @font-weight-light;
+      letter-spacing: -0.3px;
+      outline: none;
+      text-align: center;
+      border: 1px solid @color-light-grey;
+      border-radius: @border-radius-very-large-value;
+    }
+  }
+}
