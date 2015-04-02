@@ -62,6 +62,12 @@ commands:
       mac: "Command+Shift+R"
     description: "Reload the application"
 
+  update-firmware:
+    suggested_key:
+      default: "Ctrl+Shift+U"
+      mac: "Command+Shift+U"
+    description: "Update the chip firmware"
+
 icons:
   16: "assets/images/icon-16.png"
   32: "assets/images/icon-32.png"
