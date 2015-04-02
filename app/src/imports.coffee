@@ -110,7 +110,7 @@
         'utils/lru'
         'utils/formatters'
         'utils/stream'
-        'utils/completion_closure'
+        'utils/defer'
         'utils/try'
         'utils/comparison_result'
         'utils/amount'

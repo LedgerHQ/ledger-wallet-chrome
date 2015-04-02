@@ -33,10 +33,10 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
   constructor: (pairindId, promise, client) ->
     @pairingId = pairindId
     @_client = client
-    @_secureScreenName = new CompletionClosure()
+    @_secureScreenName = ledger.defer()
     @_client.pairedDongleName = @_secureScreenName
     @_currentState = ledger.m2fa.PairingRequest.States.WAITING
-    @_onComplete = new CompletionClosure()
+    @_onComplete = ledger.defer()
     @_identifyData = {}
 
     promise.then(
@@ -82,7 +82,7 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
   onComplete: (cb) -> @_onComplete.onComplete(cb)
 
   # Sets the secure screen name. This is a mandatory step for saving the paired secure screen
-  setSecureScreenName: (name) -> @_secureScreenName.success(name)
+  setSecureScreenName: (name) -> @_secureScreenName.resolve(name)
 
   getCurrentState: () -> @_currentState
 
@@ -92,20 +92,20 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
 
   cancel: () ->
     @_promise = null
-    @_secureScreenName.failure('cancel')
+    @_secureScreenName.reject('cancel')
     @_client.stopIfNeccessary()
-    @_onComplete = new CompletionClosure()
+    @_onComplete = ledger.defer()
     @emit 'cancel'
     do @off
 
   _failure: (reason) ->
     @_currentState = ledger.m2fa.PairingRequest.States.DEAD
     unless @_onComplete.isCompleted()
-      @_onComplete.failure(reason)
+      @_onComplete.reject(reason)
       @emit 'error', {reason: reason}
 
   _success: (screen) ->
     @_currentState = ledger.m2fa.PairingRequest.States.DEAD
     unless @_onComplete.isCompleted()
-      @_onComplete.success(screen)
+      @_onComplete.resolve(screen)
       @emit 'success'

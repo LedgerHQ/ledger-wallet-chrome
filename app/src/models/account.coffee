@@ -24,7 +24,7 @@ class @Account extends Model
     @param {ledger.Amount} fees The miner fees (expressed in satoshi)
     @param {String} address The recipient address
     @option [Function] callback The callback called once the transaction is created
-    @return [CompletionClosure] A closure
+    @return [Q.Promise] A closure
   ###
   createTransaction: ({amount, fees, address}, callback) ->
     inputsPath = @getHDWalletAccount().getAllAddressesPaths()

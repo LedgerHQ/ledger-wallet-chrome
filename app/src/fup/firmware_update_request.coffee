@@ -150,7 +150,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _waitForConnectedDongle: (callback = undefined, silent = no) ->
     @_isWaitForDongleSilent = silent
     return @_connectionCompletion if @_connectionCompletion?
-    completion = new CompletionClosure(callback)
+    d = ledger.defer(callback)
     registerDongle = (dongle) =>
       @_lastMode = if dongle.isInBootloaderMode() then Modes.Bootloader else Modes.Os
       @_dongle = dongle
@@ -161,12 +161,12 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       dongle.once 'state:disconnected', handler
       @_eventHandler.push [dongle, 'state:disconnected', handler]
       @_handleCurrentState()
-      completion.success(dongle)
+      d.resolve(dongle)
 
     [dongle] = ledger.app.donglesManager.getConnectedDongles()
     try
       unless dongle?
-        @_connectionCompletion = completion.readonly()
+        @_connectionCompletion = d.promise
         delay = if !silent then 0 else 1000
         setTimeout (=> @emit 'plug' unless @_dongle?), delay
         handler = (e, dongle) =>
@@ -178,21 +178,21 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         registerDongle(dongle)
     catch er
       e er
-    completion.readonly()
+    d.promise
 
   _waitForDisconnectDongle: (callback = undefined, silent = no) ->
     return @_disconnectionCompletion if @_disconnectionCompletion?
-    completion = new CompletionClosure(callback)
+    d = ledger.defer(callback)
     if @_dongle?
       @emit 'unplug' unless silent
-      @_disconnectionCompletion = completion.readonly()
+      @_disconnectionCompletion = d.promise
       @_dongle.once 'state:disconnected', =>
         @_disconnectionCompletion = null
         @_dongle = null
-        completion.success()
+        d.resolve()
     else
-      completion.success()
-    completion.readonly()
+      d.resolve()
+    d.promise
 
   _waitForPowerCycle: (callback = undefined, silent = no) -> @_waitForDisconnectDongle(null, silent).then(=> @_waitForConnectedDongle(callback, silent).promise())
 
@@ -410,9 +410,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     return
 
   _processLoadingScript: (adpus, state, ignoreSW, offset = 0) ->
-    completion = new CompletionClosure()
-    @_doProcessLoadingScript(adpus, state, ignoreSW, offset).then(-> completion.success()).fail((ex) -> completion.failure(ex))
-    completion.readonly()
+    d = ledger.defer()
+    @_doProcessLoadingScript(adpus, state, ignoreSW, offset).then(-> d.resolve()).fail((ex) -> d.reject(ex))
+    d.promise
 
   _doProcessLoadingScript: (adpus, state, ignoreSW, offset) ->
     @_notifyProgress(state, offset, adpus.length)

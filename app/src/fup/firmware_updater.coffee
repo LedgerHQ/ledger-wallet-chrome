@@ -26,17 +26,17 @@ class ledger.fup.FirmwareUpdater
     @return [Boolean] True if a firmware update is available, false otherwise.
   ###
   getFirmwareUpdateAvailability: (dongle, bootloaderMode = no, forceBl = no, callback = undefined) ->
-    completion = new CompletionClosure(callback)
+    d = ledger.defer(callback)
     dongle.getRawFirmwareVersion bootloaderMode, forceBl, (version, error) =>
-      return completion.failure(error) if error?
+      return d.reject(error) if error?
       @_lastVersion = version
       if ledger.fup.utils.compareVersions(@_lastVersion, ledger.fup.versions.Nano.CurrentVersion.Os).eq()
-        completion.success(result: FirmwareAvailabilityResult.Overwrite, available: no, dongleVersion: version, currentVersion: ledger.fup.versions.Nano.CurrentVersion.Os)
+        d.resolve(result: FirmwareAvailabilityResult.Overwrite, available: no, dongleVersion: version, currentVersion: ledger.fup.versions.Nano.CurrentVersion.Os)
       else if ledger.fup.utils.compareVersions(@_lastVersion, ledger.fup.versions.Nano.CurrentVersion.Os).gt()
-        completion.success(result: FirmwareAvailabilityResult.Higher, available: no, dongleVersion: version, currentVersion: ledger.fup.versions.Nano.CurrentVersion.Os)
+        d.resolve(result: FirmwareAvailabilityResult.Higher, available: no, dongleVersion: version, currentVersion: ledger.fup.versions.Nano.CurrentVersion.Os)
       else
-        completion.success(result: FirmwareAvailabilityResult.Update, available: yes, dongleVersion: version, currentVersion: ledger.fup.versions.Nano.CurrentVersion.Os)
-    completion.readonly()
+        d.resolve(result: FirmwareAvailabilityResult.Update, available: yes, dongleVersion: version, currentVersion: ledger.fup.versions.Nano.CurrentVersion.Os)
+    d.promise
 
   ###
     Creates and starts a new firmware update request. Once started the firmware update request will catch all connected

@@ -91,38 +91,38 @@ class ledger.wallet.Transaction
   # @param [Array<Object>] inputs
   # @param [String] changePath
   # @param [Function] callback
-  # @return [CompletionClosure]
+  # @return [Q.Promise]
   prepare: (callback=undefined) ->
     if not @amount? or not @fees? or not @recipientAddress?
       Errors.throw('Transaction must me initialized before preparation')
-    completion = new CompletionClosure(callback)
+    d = ledger.defer(callback)
     @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
     .then (@_resumeData) =>
       @_validationMode = @_resumeData.authorizationRequired
       @authorizationPaired = @_resumeData.authorizationPaired
-      completion.success()
+      d.resolve()
     .fail (error) =>
-      completion.failure(Errors.new(Errors.SignatureError))
+      d.rejectWithError(Errors.SignatureError)
     .done()
-    completion.readonly()
+    d.promise
   
   # @param [String] validationKey 4 chars ASCII encoded
   # @param [Function] callback
-  # @return [CompletionClosure]
+  # @return [Q.Promise]
   validateWithPinCode: (validationPinCode, callback=undefined) -> @_validate(validationPinCode, callback)
 
   # @param [String] validationKey 4 chars ASCII encoded
   # @param [Function] callback
-  # @return [CompletionClosure]
+  # @return [Q.Promise]
   validateWithKeycard: (validationKey, callback = null) -> @_validate(("0#{char}" for char in validationKey).join(''), callback)
 
   # @param [String] validationKey 4 chars ASCII encoded
   # @param [Function] callback
-  # @return [CompletionClosure]
+  # @return [Q.Promise]
   _validate: (validationKey, callback=undefined) ->
     if not @_resumeData? or not @_validationMode?
       Errors.throw('Transaction must me prepared before validation')
-    completion = new CompletionClosure(callback)
+    d = ledger.defer(callback)
     @dongle.createPaymentTransaction(
       @_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees,
       undefined, # Default lockTime
@@ -132,11 +132,11 @@ class ledger.wallet.Transaction
     )
     .then (@_transaction) =>
       @_isValidated = yes
-      _.defer => completion.success()
+      _.defer => d.resolve()
     .fail (error) =>
-      _.defer => completion.failure(Errors.new(Errors.SignatureError, error))
+      _.defer => d.rejectWithError(Errors.SignatureError, error)
     .done()
-    completion.readonly()
+    d.promise
 
   # Retrieve information that need to be confirmed by the user.
   # @return [Object]
@@ -191,19 +191,19 @@ class ledger.wallet.Transaction
   @param {Array<String>} inputsPath The paths of the addresses to use in order to perform the transaction
   @param {String} changePath The path to use for the change
   @option [Function] callback The callback called once the transaction is created
-  @return [CompletionClosure] A closure
+  @return [Q.Promise] A closure
   ###
   @create: ({amount, fees, address, inputsPath, changePath}, callback = null) ->
-    completion = new CompletionClosure(callback)
-    return completion.failure(Errors.new(Errors.DustTransaction)) && completion.readonly() if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
-    return completion.failure(Errors.new(Errors.NotEnoughFunds)) && completion.readonly() unless inputsPath?.length
+    d = ledger.defer(callback)
+    return d.rejectWithError(Errors.DustTransaction) && d.promise if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+    return d.rejectWithError(Errors.NotEnoughFunds) && d.promise unless inputsPath?.length
     requiredAmount = amount.add(fees)
 
     ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
-      return completion.failure(Errors.new(Errors.NetworkError, error)) if error?
+      return d.rejectWithError(Errors.NetworkError, error) if error?
       # Collect each valid outputs and sort them by desired priority
       validOutputs = _(output for output in outputs when output.paths.length > 0).sortBy (output) ->  -output['confirmatons']
-      return completion.failure(Errors.new(Errors.NotEnoughFunds)) if validOutputs.length == 0
+      return d.rejectWithError(Errors.NotEnoughFunds) if validOutputs.length == 0
       finalOutputs = []
       collectedAmount = new Amount()
       hadNetworkFailure = no
@@ -224,15 +224,15 @@ class ledger.wallet.Transaction
             fees = fees.add(changeAmount) if changeAmount.lte(5400)
             # We have reached our required amount. It's time to prepare the transaction
             transaction = new Transaction(ledger.app.dongle, amount, fees, recipientAddress, finalOutputs, changePath)
-            completion.success(transaction)
+            d.resolve(transaction)
           else if hasNext is true
             # Continue to collect funds
             done()
           else if hadNetworkFailure
-            completion.failure(Errors.NetworkError)
+            d.rejectWithError(Errors.NetworkError)
           else
-            completion.failure(Errors.NotEnoughFunds)
-    completion.readonly()
+            d.rejectWithError(Errors.NotEnoughFunds)
+    d.promise
 
   # @param [ledger.Amount] amount
   # @param [ledger.Amount] fees
@@ -240,15 +240,15 @@ class ledger.wallet.Transaction
   # @param [Array<ledger.wallet.HDWallet.Account>] inputsAccounts The accounts of the addresses to use in order to perform the transaction
   # @param [ledger.wallet.HDWallet.Account] changeAccount The account to use for the change
   # @param [Function] callback
-  # @return [CompletionClosure]
+  # @return [Q.Promise]
   @createAndPrepare: (amount, fees, recipientAddress, inputsAccounts, changeAccount, callback=undefined) ->
-    completion = new CompletionClosure(callback)
+    d = ledger.defer(callback)
     inputsPath = _.flatten(inputsAccount.getHDWalletAccount().getAllAddressesPaths() for inputsAccount in inputsAccounts)
     changePath = changeAccount.getHDWalletAccount().getCurrentChangeAddressPath()
     @create(amount: amount, fees: fees, recipientAddress: recipientAddress, inputsAccounts: inputsAccounts, changeAccount: changeAccount)
-    .fail (error) => completion.failure(error)
+    .fail (error) => d.reject(error)
     .then (tx) =>
       tx.prepare()
-      .then () => completion.success(tx)
-      .fail (error) => completion.failure(error)
-    completion.readonly()
+      .then () => d.resolve(tx)
+      .fail (error) => d.reject(error)
+    d.promise
