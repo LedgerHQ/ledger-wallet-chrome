@@ -87,4 +87,11 @@ class @ledger.utils.Logger
       @store().get keys, (items) => completion.success(_.values(items))
     completion.readonly()
 
+  @getLoggerByTag: (tag) ->
+    @_loggers ?= {}
+    unless @_logger[tag]?
+      @_logger[tag] = new @(tag)
+    @_logger[tag]
+
+
 ledger.utils.logger = new ledger.utils.Logger("DeprecatedLogger", true)

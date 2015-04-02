@@ -1,6 +1,5 @@
 @ledger.wallet ?= {}
 
-
 _.extend ledger.wallet,
 
   sweepPrivateKey: ({privateKey, account, txFee: 10000}, callback) ->
