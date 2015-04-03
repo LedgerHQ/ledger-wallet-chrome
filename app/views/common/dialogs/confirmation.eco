@@ -1,12 +1,15 @@
-<section>
-  <header>
-    <h1><%= t @titleLocalizableKey %></h1>
-  </header>
-  <div class="abstract"><%= t @abstractLocalizableKey %></div>
-  <div class="message"><%= t @messageLocalizableKey %><div>
+<section id="dialogs_confirmation_dialog">
+  <div class="spacer"></div>
+  <div id="content-container">
+    <img src="../assets/images/common/large_question.png" width="50" height="50" />
+    <div class="uppercase-section-title"><%= t 'common.confirmation' %></div>
+    <div class="regular-text-small"><%- t @messageLocalizableKey %></div>
+    <div class="dialog-actions-bar">
+      <div class="left-spacer"></div>
+      <a href="#clickNegative" class="cancel-rounded-button"><%= t @positiveLocalizableKey %></a>
+      <a href="#clickPositive" class="action-rounded-button"><%= t @negativeLocalizableKey %></a>
+      <div class="right-spacer"></div>
+    </div>
+  </div>
+  <div class="spacer"></div>
 </section>
-<div class="dialog-actions-bar">
-  <div class="left-spacer"></div>
-  <a href="#clickNegative" class="cancel-rounded-button"><%= t @positiveLocalizableKey %></a>
-  <a href="#clickPositive" class="action-rounded-button"><%= t @negativeLocalizableKey %></a>
-</div>

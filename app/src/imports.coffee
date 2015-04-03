@@ -230,6 +230,9 @@
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'
 
+        # Settings
+        'controllers/wallet/settings/wallet_settings_hardware_dialog_view_controller'
+
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
         'controllers/onboarding/onboarding_navigation_controller'

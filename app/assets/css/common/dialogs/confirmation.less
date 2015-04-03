@@ -1,21 +1,27 @@
 @import (reference) "../../common";
 
-section {
-  > header {
-    > h1 {
-      .uppercase-section-title;
+section#dialogs_confirmation_dialog {
+  display:flex;
+  max-width: @dialog-width-default;
+
+  > #content-container {
+    text-align: center;
+
+    > .uppercase-section-title {
+      margin-top: @metrics-small-padding;
+    }
+
+    > .regular-text-small {
+      margin-top: @metrics-very-small-padding;
+      line-height: 20px;
+    }
+
+    > .dialog-actions-bar {
+      margin-top: @metrics-almost-medium-padding;
     }
   }
 
-  > .message {
-    .regular-text;
-    margin-top: 5px;
-    line-height: 20px;
-  }
-
-  > .abstract {
-    .bold-regular-text;
-    margin-top: @metrics-almost-medium-padding;
-    line-height: 20px;
+  > .spacer {
+    width: @metrics-medium-padding;
   }
 }
