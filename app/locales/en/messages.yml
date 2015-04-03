@@ -26,6 +26,7 @@ common:
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
   get_help: "Please visit our help center at support.ledgerwallet.com for more information."
+  checking: "Checking..."
 
   keycard:
     uppercase_letters: "Uppercase letters"
@@ -42,6 +43,8 @@ common:
     unable_to_validate: "Unable to validate transaction."
     secure_screen_cancelled_transaction: "The smartphone cancelled the transaction."
     secure_screen_invalid_pin: "The smartphone returned a wrong pin code."
+    deleting_this_paired_smartphone: "By deleting this smartphone, you will no longer be able to manually validate transactions of this Ledger Wallet.<br />Do you want to continue?"
+    going_to_firmware_update: "By switching to firmware update mode, all your pending activites will be interrupted.<br />Do you want to continue ?"
 
   qrcode:
     scan_qrcode: "Scan QR code"
@@ -103,7 +106,6 @@ onboarding:
     create_my_wallet: "Create my wallet"
     recover_my_wallet: "Recover my wallet"
     cancel_wallet_configuration: "Do you want to cancel the configuration of your Ledger Wallet?"
-    wallet_not_affected: "No changes will be made to your wallet."
 
     security:
       security_informations: "<b>Security</b> information"
@@ -264,6 +266,7 @@ wallet:
       signout: 'LOCK'
       help: 'HELP'
       account: 'ACCOUNT'
+      settings: "SETTINGS"
 
   dashboard:
     index:
@@ -385,10 +388,10 @@ wallet:
     errors:
       pairing_failed: "Pairing failed"
       pairing_succeeded: "Pairing succeeded"
-      dongle_is_now_paired: "Your Ledger Wallet is now paired<br />with your smartphone \"%s\"."
+      dongle_is_now_paired: "Your Ledger Wallet is now paired with your smartphone \"%s\"."
       inconsistent_state: "Something wrong happened (inconsistent state)."
       client_cancelled: "The mobile application cancelled the pairing process."
-      dongle_needs_power_cycle: "Your Ledger Wallet needs to be unplugged and plugged back<br/>to pair a new smartphone."
+      dongle_needs_power_cycle: "Your Ledger Wallet needs to be unplugged and plugged back to pair a new smartphone."
       invalid_challenge_response: "The security card validation code is incorrect."
       dongle_cancelled: "Your Ledger Wallet cancelled the pairing process."
       unknown: "An unknown error occurred."
@@ -410,3 +413,22 @@ wallet:
       default_name: "My smartphone"
       name_already_used_by_paired_device: "This name is already used by another smartphone."
       please_enter_a_name: "Please enter a smartphone name."
+
+  settings:
+    common:
+      settings: "Settings"
+      other_settings: "Other settings"
+      hardware: "Hardware"
+      bitcoin: "Bitcoin"
+      tools: "Tools"
+      display: "Display"
+
+    hardware:
+      firmware: "Firmware"
+      paired_smartphones: "Paired smartphones"
+      flash_firmware: "Flash firmware"
+      no_update_available: "No update available"
+      update_available: "%s available!"
+      pair_a_smartphone: "Pair a smartphone"
+      single_paired_device: "%s pairing"
+      multiple_paired_devices: "%s pairings"

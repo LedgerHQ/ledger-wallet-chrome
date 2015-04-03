@@ -1,5 +1,12 @@
 # Changelog
 
+1.1.2
+=====
+- Improve QR code scanner
+- Improve app update detection
+- Add settings section
+- Add shortcut to go to firmware update mode
+
 1.1.1
 =====
 - Fix attestation freeze

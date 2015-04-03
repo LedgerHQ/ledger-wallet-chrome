@@ -21,27 +21,9 @@ class ledger.api.RestClient
     @_client.setHttpHeader 'X-Ledger-Environment', ledger.env
     @_client
 
-  networkErrorCallback: (callback) ->
-    errorCallback = (xhr, status, message) ->
-        callback(null, {xhr, status, message, code: ledger.errors.NetworkError})
-    errorCallback
+  networkErrorCallback: (callback) -> (xhr, status, message) -> callback?(null, new ledger.HttpError(xhr))
 
   _httpClientFactory: -> new ledger.api.HttpClient(ledger.config.restClient.baseUrl)
 
 class ledger.api.AuthRestClient extends ledger.api.RestClient
   _httpClientFactory: -> super().authenticated(@baseUrl)
-
-@testRestClientAuthenticate = ->
-  f = ->
-    ledger.app.wallet.getBitIdAddress (address) ->
-      r = new ledger.api.AuthRestClient()
-      r.http().get
-        url: "accountsettings/#{address}"
-        onSuccess: () -> l arguments
-        onError: () ->
-          e arguments
-  ledger.app.wallet.getState (state) ->
-    if state is ledger.wallet.States.LOCKED
-      ledger.app.wallet.unlockWithPinCode '0000', f
-    else
-      do f

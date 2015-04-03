@@ -298,9 +298,19 @@ a {
     margin-right: 6px;
   }
 }
-.light-grey-icon {
-  font-size: @font-size-very-very-large;
-  color: @color-light-grey;
+.icon(@color, @size) {
+  color: @color;
+  font-size: @size;
+
+  &:hover {
+    color: darken(@color, @color-very-strong-darken-value);
+  }
+}
+.light-grey-icon-large {
+  .icon(@color-light-grey, @font-size-very-very-large);
+}
+.light-grey-icon-medium {
+  .icon(@color-light-grey, @font-size-large);
 }
 
 // inputs

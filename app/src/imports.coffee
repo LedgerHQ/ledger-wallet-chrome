@@ -56,6 +56,7 @@
         '../libs/moment.min'
         '../libs/lokijs.min'
         '../libs/bitcoinjs-min'
+        '../libs/zbarqrcode'
 
         # Used be m2fa.DebugClient
         '../libs/lw-api-js/ucrypt/ka'
@@ -63,25 +64,6 @@
         '../libs/lw-api-js/ucrypt/cipher'
         '../libs/lw-api-js/ucrypt/des'
         '../libs/lw-api-js/ucrypt/ecdh'
-
-        ## QR Code
-        '../libs/jsqrcode/grid'
-        '../libs/jsqrcode/version'
-        '../libs/jsqrcode/detector'
-        '../libs/jsqrcode/formatinf'
-        '../libs/jsqrcode/errorlevel'
-        '../libs/jsqrcode/bitmat'
-        '../libs/jsqrcode/datablock'
-        '../libs/jsqrcode/bmparser'
-        '../libs/jsqrcode/datamask'
-        '../libs/jsqrcode/rsdecoder'
-        '../libs/jsqrcode/gf256poly'
-        '../libs/jsqrcode/gf256'
-        '../libs/jsqrcode/decoder'
-        '../libs/jsqrcode/qrcode'
-        '../libs/jsqrcode/findpat'
-        '../libs/jsqrcode/alignpat'
-        '../libs/jsqrcode/databr'
 
         ## Application configuration
         'configuration'
@@ -135,10 +117,14 @@
         'utils/storage/object_store'
         'utils/storage/storage'
 
+        ## Logger
+        'utils/logger'
+
         ## Data synchronization
 
         ## Errors
         'base/errors'
+        'utils/http_error'
 
         ## Managers
         'managers/devices_manager'
@@ -173,6 +159,7 @@
         'wallet/hdwallet'
         'wallet/cache'
         'wallet/extended_public_key'
+        'wallet/sweep_private_key'
 
         'utils/database/database'
         'base/base_application'
@@ -242,6 +229,9 @@
 
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'
+
+        # Settings
+        'controllers/wallet/settings/wallet_settings_hardware_dialog_view_controller'
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'

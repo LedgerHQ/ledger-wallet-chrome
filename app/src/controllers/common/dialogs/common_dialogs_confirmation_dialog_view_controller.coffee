@@ -3,6 +3,7 @@ class @CommonDialogsConfirmationDialogViewController extends @DialogViewControll
   positiveLocalizableKey: 'common.yes'
   negativeLocalizableKey: 'common.no'
   titleLocalizableKey: 'common.confirmation'
+  messageLocalizableKey: null
 
   clickPositive: ->
     @emit 'click:positive'
@@ -14,6 +15,3 @@ class @CommonDialogsConfirmationDialogViewController extends @DialogViewControll
 
   setMessageLocalizableKey: (key) ->
     @messageLocalizableKey = key
-
-  setAbstractLocalizableKey: (key) ->
-    @abstractLocalizableKey = key

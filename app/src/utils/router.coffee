@@ -5,6 +5,8 @@ class @Router extends @EventEmitter
   currentUrl: null
 
   constructor: (app) ->
+    @_logger = new ledger.utils.Logger("Router")
+
     # initialize router
     @_router = crossroads.create()
     @_router.normalizeFn = crossroads.NORM_AS_OBJECT
@@ -26,6 +28,7 @@ class @Router extends @EventEmitter
   go: (url, params) ->
     setTimeout( =>
       path = url.parseAsUrl().pathname
+      @_logger.info("Routing to [#{url}]")
       if ledger.app.wallet? or ledger.router.pluggedWalletRoutesExceptions.indexOf(path) != -1 or (ledger.router.ignorePluggedWalletForRouting? and ledger.router.ignorePluggedWalletForRouting == yes)
         url = ledger.url.createUrlWithParams(url, params)
         @_router.parse(url)
@@ -35,4 +38,5 @@ class @Router extends @EventEmitter
     route = @_router.addRoute url + ':?params::#action::?params:'
     route.matched.add callback.bind(route)
 
+  setLoggingEnabled: (enabled) -> @_logger.setActive(enabled)
 
