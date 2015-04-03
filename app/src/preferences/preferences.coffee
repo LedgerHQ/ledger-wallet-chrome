@@ -23,6 +23,7 @@ class ledger.preferences.Preferences
     currency: 'USD'
     miningFee: '10000'
     blockchainExplorer: 'https://blockchain.info/'
+    logState: true
 
   ###
     Language
@@ -104,3 +105,15 @@ class ledger.preferences.Preferences
       @prefs.blockchainExplorer = value
     else
       throw new Error 'You must initialized your wallet'
+
+
+  ###
+    Logs
+  ###
+  getLogState: () ->
+    @prefs.logState
+
+  setLogState: (value) ->
+    if typeof value is 'boolean'
+      throw new Error 'Log state must be a boolean'
+    @prefs.logState = value
