@@ -94,7 +94,7 @@ onboarding:
         get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
 
       forged:
-        device_forged: "Ce Ledger Wallet n'est pas authentique"
+        device_forged: "Ce Ledger Nano n'est pas authentique, ou la mise à jour du firmware a échoué"
         forbidden_access: "Pour des raisons de sécurité, vous n'êtes pas autorisé à utiliser cette application."
 
   management:

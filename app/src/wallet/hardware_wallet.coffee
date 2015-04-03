@@ -239,9 +239,8 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
         completion.failure(new ledger.StandardError(ledger.errors.DongleNotCertified))
       return
     .fail (err) =>
-      e err
-      error = new ledger.StandardError(Errors.SignatureError, err)
-      #completion.failure(error)
+      error = new ledger.StandardError(ledger.errors.SignatureError, err)
+      completion.failure(error)
       return
     .done()
     completion.readonly()

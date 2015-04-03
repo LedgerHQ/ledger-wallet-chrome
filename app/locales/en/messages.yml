@@ -94,8 +94,8 @@ onboarding:
         get_help: "Please visit our help center at support.ledgerwallet.com for more information."
 
       forged:
-        device_forged: "This Ledger Wallet is not genuine"
-        forbidden_access: "For safety reasons, you are not authorized to use this  application."
+        device_forged: "This Ledger Nano is not genuine, or firmware update has failed"
+        forbidden_access: "For safety reasons, you are not authorized to use this application."
 
   management:
     back: "BACK"
