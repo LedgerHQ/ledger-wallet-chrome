@@ -8,6 +8,14 @@ class @WalletSettingsHardwareDialogViewController extends @DialogViewController
     super
     @_refreshSmartphonesList()
 
+  flashFirmware: ->
+    dialog = new CommonDialogsConfirmationDialogViewController()
+    dialog.setMessageLocalizableKey 'common.errors.going_to_firmware_update'
+    dialog.once 'click:negative', =>
+      ledger.app.setExecutionMode(ledger.app.Modes.FirmwareUpdate)
+      ledger.app.router.go '/'
+    dialog.show()
+
   pairSmartphone: ->
     dialog = new WalletPairingIndexDialogViewController()
     dialog.show()

@@ -43,6 +43,7 @@ common:
     secure_screen_cancelled_transaction: "The smartphone cancelled the transaction."
     secure_screen_invalid_pin: "The smartphone returned a wrong pin code."
     deleting_this_paired_smartphone: "By deleting this smartphone, you will no longer be able to manually validate transactions of this Ledger Wallet.<br />Do you want to continue?"
+    going_to_firmware_update: "By switching to firmware update mode, all your pending activites will be interrupted.<br />Do you want to continue ?"
 
   qrcode:
     scan_qrcode: "Scan QR code"
@@ -428,6 +429,5 @@ wallet:
       no_update_available: "No update available"
       update_available: "%s available!"
       pair_a_smartphone: "Pair a smartphone"
-      no_paired_smartphone: "No paired smartphone"
       single_paired_device: "%s pairing"
       multiple_paired_devices: "%s pairings"
