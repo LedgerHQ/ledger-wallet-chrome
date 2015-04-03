@@ -44,6 +44,7 @@ common:
     secure_screen_cancelled_transaction: "Le smartphone a annulé la transaction."
     secure_screen_invalid_pin: "Le smartphone a retourné un mauvais code pin."
     deleting_this_paired_smartphone: "En supprimant ce smartphone, vous ne pourrez plus valider les transactions de ce Ledger Wallet.<br />Souhaitez-vous continuer ?"
+    going_to_firmware_update: "En passant en mode de mise à jour de la puce, toutes vos activités en cours seront interrompues.<br />Souhaitez-vous continuer ?"
 
   qrcode:
     scan_qrcode: "Scanner code QR"
@@ -429,6 +430,5 @@ wallet:
       no_update_available: "Aucune mise à jour disponible"
       update_available: "%s disponible!"
       pair_a_smartphone: "Associer un smartphone"
-      no_paired_smartphone: "Aucun smartphone associé"
       single_paired_device: "%s association"
       multiple_paired_devices: "%s associations"

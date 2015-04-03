@@ -9,9 +9,9 @@
         <div class="regular-text-small stretchable"><%= smartphonesGroup[0].name %></div>
         <div class="regular-soft-grey-text-small">
           <% if smartphonesGroup.length > 1: %>
-              <%= _.str.sprintf(t('wallet.send.method.multiple_paired_devices'), smartphonesGroup.length) %>
+              <%= _.str.sprintf(t('wallet.settings.hardware.multiple_paired_devices'), smartphonesGroup.length) %>
           <% else: %>
-              <%= _.str.sprintf(t('wallet.send.method.single_paired_device'), smartphonesGroup.length) %>
+              <%= _.str.sprintf(t('wallet.settings.hardware.single_paired_device'), smartphonesGroup.length) %>
           <% end %>
         </div>
         <a class="light-grey-icon-medium" href="#removeSmartphoneGroup(index=<%= i %>)"><i class="fa fa-trash"></i></a>
