@@ -1,5 +1,11 @@
 # Changelog
 
+1.1.1
+=====
+- Fix attestation freeze
+- UI improvements
+- Add update flow security card check
+
 1.1.0
 =====
 - Add mobile second factor authentication for validating transactions

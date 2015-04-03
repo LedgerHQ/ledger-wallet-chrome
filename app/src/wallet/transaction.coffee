@@ -220,7 +220,6 @@ class ledger.wallet.transaction.Transaction
             completion.failure(new ledger.StandardError(ledger.errors.NetworkError))
           else if hasNext is false and collectedAmount.lt(requiredAmount)
             # Not enough available funds
-            callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds})
             completion.failure(new ledger.StandardError(ledger.errors.NotEnoughFunds))
           else if collectedAmount.gte requiredAmount
             # We have reached our required amount. It's time to prepare the transaction
@@ -232,69 +231,9 @@ class ledger.wallet.transaction.Transaction
             do done
     completion.readonly()
 
-createAndPrepareTransaction = (amount, fees, recipientAddress, inputsPath, changePath, callback) ->
-  amount = ledger.wallet.Value.from(amount)
-  fees = ledger.wallet.Value.from(fees)
-  transaction = new ledger.wallet.transaction.Transaction()
-  transaction.init(amount, fees, recipientAddress)
-  ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
-    return callback?(null, {title: 'Network Error', error, code: ledger.errors.NetworkError}) if error?
-    validOutputs = []
-    # Collect each valid outputs
-    for output in outputs
-      continue if output.paths.length is 0
-      validOutputs.push output
-
-    # Sort outputs by desired priority
-    validOutputs = _(validOutputs).sortBy (output) -> -output['confirmatons']
-
-    return callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds}) if validOutputs.length == 0
-
-    finalOutputs = []
-    collectedAmount = new ledger.wallet.Value()
-    requiredAmount = amount.add(fees)
-    l "Required amount", requiredAmount.toString()
-    l validOutputs
-    hadNetworkFailure = no
-    # For each valid outputs we try to get its raw transaction.
-    _.async.each validOutputs, (output, done, hasNext) ->
-      ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
-        if error?
-          hadNetworkFailure = yes
-          return do done
-
-        l 'raw', hasNext, requiredAmount.toString(), collectedAmount.toString()
-        output.raw = rawTransaction
-        finalOutputs.push output
-        collectedAmount = collectedAmount.add output.value
-        if hasNext is false and collectedAmount.lt(requiredAmount) and hadNetworkFailure
-          # Not enough funds but error is probably caused by a previous network issue
-          callback?(null, {title: 'Network Error', code: ledger.errors.NetworkError})
-        else if hasNext is false and collectedAmount.lt(requiredAmount)
-          # Not enough available funds
-          callback?(null, {title: 'Not enough founds', code: ledger.errors.NotEnoughFunds})
-        else if collectedAmount.gte requiredAmount
-          l "Collected amount", collectedAmount.toString()
-          # We have reached our required amount. It's time to prepare the transaction
-          _.defer -> transaction.prepare(finalOutputs, changePath, callback)
-        else
-          # Continue to collect funds
-          do done
-
-
 _.extend ledger.wallet.transaction,
 
     MINIMUM_CONFIRMATIONS: 1
     MINIMUM_OUTPUT_VALUE: 5430
 
-    createAndPrepareTransaction: (amount, fees, recipientAddress, inputsAccounts, changeAccount, callback) ->
-      inputsAccounts = [inputsAccounts] unless _.isArray inputsAccounts
-
-      inputsPaths = []
-      changePath = changeAccount.getHDWalletAccount().getCurrentChangeAddressPath()
-
-      for inputsAccount in inputsAccounts
-        inputsPaths = inputsPaths.concat(inputsAccount.getHDWalletAccount().getAllAddressesPaths())
-
-      createAndPrepareTransaction amount, fees, recipientAddress, inputsPaths, changePath, callback
 

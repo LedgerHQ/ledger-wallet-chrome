@@ -6,15 +6,14 @@ var LWTools = {
         lvl = (typeof lvl === "undefined") ? 0 : lvl;
 
         if(lvl <= this.debug){
-
             if(lvl == 0){
-                console.log(message);
+                window.ledger.utils.logger.debug(message);
             }else if(lvl == 1){
-                console.error(message);
+                window.ledger.utils.logger.error(message);
             }else if(lvl == 2){
-                console.warn(message);
+                window.ledger.utils.logger.warn(message);
             }else if(lvl == 3){
-                console.info(message);
+                window.ledger.utils.logger.info(message);
             }
         }
     },
@@ -35,7 +34,7 @@ var LWTools = {
                         response = JSON.parse(response);
                     } finally {
                         resolve(response);
-                    }                    
+                    }
                 } else {
                     reject(Error(xhr.statusText));
                 }

@@ -109,4 +109,14 @@ class ledger.m2fa.PairedSecureScreen
 
   @getScreensByUuidFromSyncedStore: (uuid, callback = _.noop) -> @getScreensByUuidFromStore(ledger.storage.sync, uuid, callback)
 
+  @removePairedSecureScreensFromStore: (store, screens, callback = _.noop) ->
+    store.remove ("__m2fa_#{screen.id}" for screen in screens), callback
 
+  @removePairedSecureScreensFromSyncedStore: (screens, callback) -> @removePairedSecureScreensFromStore(ledger.storage.sync, screens, callback)
+
+  @removePairedSecureScreensByUuidFromStore: (store, uuid, callback = _.noop) ->
+    @getScreensByUuidFromStore store, uuid, (screens, error) =>
+      return callback(null, error) if error?
+      @removePairedSecureScreensFromStore(store, screens, callback)
+
+  @removePairedSecureScreensByUuidFromSyncedStore: (uuid, callback = _.noop) -> @removePairedSecureScreensByUuidFromStore(ledger.storage.sync, uuid, callback)

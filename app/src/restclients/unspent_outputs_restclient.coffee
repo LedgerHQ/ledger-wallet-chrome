@@ -8,8 +8,7 @@ class ledger.api.UnspentOutputsRestClient extends ledger.api.RestClient
       url: "blockchain/addresses/#{query}/unspents"
       onSuccess: (response) =>
         callback?(response)
-      onError: (xhr, status, message) =>
-        callback(null, {xhr, status, message})
+      onError: @networkErrorCallback(callback)
 
   getUnspentOutputsFromPaths: (addressesPaths, callback) ->
     ledger.wallet.pathsToAddresses addressesPaths, (addresses, notFound) =>
