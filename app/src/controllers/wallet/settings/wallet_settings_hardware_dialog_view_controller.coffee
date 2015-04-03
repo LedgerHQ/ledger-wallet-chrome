@@ -2,11 +2,15 @@ class @WalletSettingsHardwareDialogViewController extends @DialogViewController
 
   view:
     smartphonesTableContainer: "#smartphones_table_container"
+    currentVersionText: "#current_version_text"
+    updateAvailabilityText: "#update_availability_text"
+
   smartphonesGroups: []
 
   onAfterRender: ->
     super
     @_refreshSmartphonesList()
+    @_refreshFirmwareStatus()
 
   pairSmartphone: ->
     dialog = new WalletPairingIndexDialogViewController()
@@ -35,3 +39,13 @@ class @WalletSettingsHardwareDialogViewController extends @DialogViewController
         # clear node
         @view.smartphonesTableContainer.empty()
         @view.smartphonesTableContainer.append html
+
+  _refreshFirmwareStatus: ->
+    ledger.fup.FirmwareUpdater.instance.getFirmwareUpdateAvailability ledger.app.wallet, no, no, (availability, error) =>
+      return if error?
+      @view.updateAvailabilityText.text do =>
+        if availability.available
+          _.str.sprintf t('wallet.settings.hardware.update_available'), ledger.fup.utils.versionToString(availability.currentVersion)
+        else
+          t('wallet.settings.hardware.no_update_available')
+      @view.currentVersionText.text ledger.fup.utils.versionToString(availability.dongleVersion)

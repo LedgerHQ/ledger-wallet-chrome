@@ -26,6 +26,7 @@ common:
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
   get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
+  checking: "Vérification..."
 
   keycard:
     uppercase_letters: "Majuscules"

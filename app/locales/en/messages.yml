@@ -26,6 +26,7 @@ common:
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
   get_help: "Please visit our help center at support.ledgerwallet.com for more information."
+  checking: "Checking..."
 
   keycard:
     uppercase_letters: "Uppercase letters"

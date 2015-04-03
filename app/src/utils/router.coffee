@@ -5,7 +5,7 @@ class @Router extends @EventEmitter
   currentUrl: null
 
   constructor: (app) ->
-    @_logger = new ledger.utils.Logger("Router", yes) #TODO: Logging
+    @_logger = new ledger.utils.Logger("Router")
 
     # initialize router
     @_router = crossroads.create()

@@ -9,8 +9,8 @@
         <a class="uppercase-action" href="#flashFirmware"><i class="fa fa-flash"></i><%= t 'wallet.settings.hardware.flash_firmware' %></a>
       </div>
       <div class="row bottom">
-        <div class="regular-text-small stretchable">_version_</div>
-        <div class="regular-soft-grey-text-small">_available_</div>
+        <div class="regular-text-small stretchable" id="current_version_text"><%= t 'common.checking' %></div>
+        <div class="regular-soft-grey-text-small" id="update_availability_text"></div>
       </div>
     </div>
   </div>

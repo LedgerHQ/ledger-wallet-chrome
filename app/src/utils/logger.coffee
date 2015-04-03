@@ -7,7 +7,7 @@ class @ledger.utils.Logger
 
   # Logger's constructor
   # @param [Boolean] active or not the Logger
-  constructor: (tag, @_active = no) ->
+  constructor: (tag, @_active = ledger.config.enableLogging) ->
     @_tag = tag
     @_mode = if window.ledger.isDev then "debug" else "release"
     @store = @constructor.store()
@@ -95,4 +95,4 @@ class @ledger.utils.Logger
     @_loggers[tag]
 
 
-ledger.utils.logger = new ledger.utils.Logger("DeprecatedLogger", true)
+ledger.utils.logger = new ledger.utils.Logger("DeprecatedLogger")
