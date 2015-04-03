@@ -300,8 +300,6 @@ class ledger.i18n
     return deferred.promise
 
 
-  # User Favorite Language ####
-
   ###
     Set user favorite language into stores from memory
   ###
@@ -452,7 +450,7 @@ class ledger.i18n
 
 
   ###
-    Set and Get @userFavLocale from one of the store
+    Load @favLocale.memoryValue from one of the store
 
     @return [Promise]
   ###
@@ -486,7 +484,7 @@ class ledger.i18n
     deferred = Q.defer()
     if ledger.storage.sync?
       ledger.storage.sync.get 'i18n_favLocale', (r) =>
-        if r.i18n_favLocale isnt undefined  # and r.i18n_favLocale is @favLang.memoryValue
+        if r.i18n_favLocale isnt undefined
           @favLocale.syncStoreIsSet = true
           deferred.resolve('ledger.storage.sync.get r.i18n_favLocale ' + r.i18n_favLocale + ' is set into synced Store')
         else
@@ -534,6 +532,13 @@ class ledger.i18n
 
 
   ###
+   Set the locale for Moment.js
+  ###
+  @setMomentLocale: () =>
+    moment.locale(@favLocale.memoryValue.toLowerCase())
+
+
+  ###
     Translate a message id to a localized text
 
     @param [String] messageId Unique identifier of the message
@@ -561,13 +566,6 @@ class ledger.i18n
       currency: currency
       currencyDisplay: "symbol"
     (amount).toLocaleString(@favLocale.memoryValue, options)
-
-
-  ###
-    Set the locale for Moment.js
-  ###
-  @setMomentLocale: () =>
-    moment.locale(@favLocale.memoryValue.toLowerCase())
 
 
   ###
