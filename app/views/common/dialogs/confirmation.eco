@@ -1,6 +1,6 @@
 <section id="dialogs_confirmation_dialog">
   <div class="spacer"></div>
-  <div id="content-container">
+  <div class="content-container">
     <img src="../assets/images/common/large_question.png" width="50" height="50" />
     <div class="uppercase-section-title"><%= t 'common.confirmation' %></div>
     <div class="regular-text-small"><%- t @messageLocalizableKey %></div>
