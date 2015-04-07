@@ -2,6 +2,7 @@
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet gestiona sus cuentas Bitcoin de manera eficiente y segura."
   support_url: 'http://support.ledgerwallet.com/'
+  support_key_not_recognized_url: 'https://ledger.groovehq.com/knowledge_base/categories/troubleshooting-20'
 
 common:
   bitcoin_acronym: 'BTC'
