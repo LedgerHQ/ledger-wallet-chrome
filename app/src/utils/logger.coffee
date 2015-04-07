@@ -7,12 +7,12 @@ class @ledger.utils.Logger
 
   # Logger's constructor
   # @param [Boolean] active or not the Logger
-  constructor: (tag, @_active) ->
+  constructor: (tag, @_active = ledger.config.enableLogging) ->
     @_tag = tag
     @_mode = if window.ledger.isDev then "debug" else "release"
     @store = @constructor.store()
-    @_loggers ?= {}
-    @_loggers[tag] = this
+    @constructor._loggers ?= {}
+    @constructor._loggers[tag] = this
 
   # Sets the active state
   # @param [Boolean] active or not the logger.
@@ -33,35 +33,35 @@ class @ledger.utils.Logger
 
   # Log a debug message
   # @param [String] msg Message to log.
-  debug: (msg) ->
+  debug: (msg...) ->
     if @_active
       @_storeLog(msg, "DEBUG")
       if(@_mode == "debug")
-        console.debug(msg)
+        console.debug.apply(console, ["[#{@_tag}]"].concat(msg))
 
   # Log an info
   # @param [String] msg Message to log.
-  info: (msg) ->
+  info: (msg...) ->
     if @_active
       @_storeLog(msg, "INFO")
       if(@_mode == "debug")
-        console.info(msg)
+        console.info.apply(console, ["[#{@_tag}]"].concat(msg))
 
   # Log a warning
   # @param [String] msg Message to log.
-  warn: (msg) ->
+  warn: (msg...) ->
     if @_active
       @_storeLog(msg, "WARN")
       if(@_mode == "debug")
-        console.warn(msg)
+        console.warn.apply(console, ["[#{@_tag}]"].concat(msg))
 
   # Log an error
   # @param [String] msg Message to log.
-  error: (msg) ->
+  error: (msg...) ->
     if @_active
       @_storeLog(msg, "ERROR")
       if(@_mode == "debug")
-        console.error(msg)
+        console.error.apply(console, ["[#{@_tag}]"].concat(msg))
 
   # Retreive saved logs
   # @param [Function] cb A callback invoked once we get the logs as an array
@@ -91,8 +91,8 @@ class @ledger.utils.Logger
 
   @getLoggerByTag: (tag) ->
     @_loggers ?= {}
-    new @(tag) unless @_logger[tag]?
-    @_logger[tag]
+    new @(tag) unless @_loggers[tag]?
+    @_loggers[tag]
 
 
-ledger.utils.logger = new ledger.utils.Logger("DeprecatedLogger", true)
+ledger.utils.logger = new ledger.utils.Logger("DeprecatedLogger")

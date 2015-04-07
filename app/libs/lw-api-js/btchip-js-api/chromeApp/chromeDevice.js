@@ -232,20 +232,25 @@ hidDevice.prototype.open = function(callback) {
     debug("Open hidDevice");
     debug(this.device);
     var currentDevice = this;
-    chrome.hid.connect(this.device.deviceId, function(handle) {
-        if (!handle) {
-          debug("failed to connect");
-          if (callback) callback(false);
-        }
-        currentDevice.claimed = true;
-        chrome.runtime.sendMessage({usbClaimed: currentDevice});
-        currentDevice.handle = handle;
-        if (callback) callback(true);
+    chrome.hid.connect(this.device.deviceId, function (handle) {
+      if (!handle) {
+        debug("failed to connect");
+        if (callback) callback(false);
+      }
+      currentDevice.claimed = true;
+      chrome.runtime.sendMessage({usbClaimed: currentDevice});
+      currentDevice.handle = handle;
+      if (callback) callback(true);
     });
 }
 
 hidDevice.prototype.send = function(data, callback) {
   debug("=> " + data);
+  if (typeof this.handle === "undefined" || this.handle === null) {
+    if (callback)
+      callback({resultCode: 0, exception: new Error()});
+    return;
+  }
   chrome.hid.send(this.handle.connectionId, 0, hexToArrayBuffer(data), function() {
     if (callback) {
       var exception = (chrome.runtime.lastError ? "error " + chrome.runtime.lastError : undefined);            

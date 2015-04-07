@@ -235,6 +235,9 @@
         'controllers/wallet/bitid/wallet_bitid_index_dialog_view_controller'
         'controllers/wallet/bitid/wallet_bitid_authenticating_dialog_view_controller'
 
+        # Settings
+        'controllers/wallet/settings/wallet_settings_hardware_dialog_view_controller'
+
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
         'controllers/onboarding/onboarding_navigation_controller'
@@ -247,6 +250,7 @@
         'controllers/onboarding/device/onboarding_device_error_view_controller'
         'controllers/onboarding/device/onboarding_device_connecting_view_controller'
         'controllers/onboarding/device/onboarding_device_update_view_controller'
+        'controllers/onboarding/device/onboarding_device_unsupported_view_controller'
 
         # Management
         'controllers/onboarding/management/onboarding_management_security_view_controller'

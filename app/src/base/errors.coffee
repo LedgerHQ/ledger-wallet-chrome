@@ -20,6 +20,7 @@ _.extend ledger.errors,
   DongleLocked: 204
   UnableToGetBitIdAddress: 205
   DongleNotCertified: 206
+  CommunicationError: 207
 
   # Wallet errors
   NotEnoughFunds: 300

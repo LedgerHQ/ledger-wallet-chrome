@@ -7,7 +7,7 @@
     <div class="black-title"><%= if @params.error? then t 'onboarding.management.done.configuration_failed_' + @params.wallet_mode else t 'onboarding.management.done.configuration_is_complete_' + @params.wallet_mode %></div>
     <div class="black-indication"><%= if @params.error? then t 'onboarding.management.done.error_occured' else t 'onboarding.management.done.you_can_access_your_wallet' %></div>
     <% if not @params.error?: %>
-    <div class="small-indication"><%= t('onboarding.management.done.unplug_plug') %></div>
+    <div class="medium-indication"><%= t('onboarding.management.done.unplug_plug') %></div>
     <% else: %>
     <a href="#openSupport" class="action-rounded-button"><%= t 'onboarding.management.done.contact_support' %></a>
     <% end %>

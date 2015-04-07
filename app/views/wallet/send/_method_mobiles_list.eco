@@ -5,7 +5,7 @@
   </div>
   <% for mobilesGroup, i in @mobilesGroups: %>
   <a class="row <% if i == @mobilesGroups.length - 1: %><%= "bottom" %><% else: %><%= "middle" %><% end %>" href="#selectMobileGroup(index=<%= i %>)">
-    <div class="light-grey-icon"><i class="fa fa-mobile"></i></div>
+    <div class="light-grey-icon-large"><i class="fa fa-mobile"></i></div>
     <div class="regular-text-small stretchable"><%= mobilesGroup[0].name %></div>
     <div class="regular-soft-grey-text-small">
       <% if mobilesGroup.length > 1: %>
