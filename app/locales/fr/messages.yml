@@ -82,6 +82,10 @@ onboarding:
       not_linked: "Votre portefeuille matériel ne semble pas être lié à une carte de sécurité."
       please_update: "Pour utiliser ou générer un carte, veuillez mettre à jour la puce de votre portefeuille."
 
+    failed:
+      unexpected_error: "Une erreur est survenue pendant la communication avec votre portefeuille."
+      unplug: "Débranchez votre Ledger Wallet et réessayez. Si l'erreur persiste, une mise à jour de la puce peut-être nécessaire."
+
     errors:
       frozen:
         wallet_is_frozen: "Portefeuille bloqué"

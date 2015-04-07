@@ -43,6 +43,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/device/unsupported', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUnsupportedViewController
 
+  route '/onboarding/device/failed', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceFailedViewController
+
   route '/onboarding/device/wrongpin', (params) ->
     app.router.go '/onboarding/device/error',
       error: t 'onboarding.device.errors.wrongpin.wrong_pin'

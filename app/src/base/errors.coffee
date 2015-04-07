@@ -39,37 +39,14 @@ _.extend ledger.errors,
   ErrorDueToCardPersonalization: 408
   HigherVersion: 409
 
-  DefaultMessages:
-    0: "StandardError"
-
-    100: "Unknow error"
-    101: "Invalid argument"
-    102: "Not found"
-    103: "Network error"
-    104: "Authentication failed"
-
-    200: "Not supported dongle"
-    201: "Dongle not blank"
-    202: "Dongle already unlock"
-    203: "Wrong PIN code"
-    204: "Dongle locked"
-    205: "Unable to get BitId address"
-
-    300: "Not enough funds"
-    301: "Signature error"
-
-
-
   create: (code, title, error) -> code: code, title: title, error: error
   throw: (code, message) -> throw new ledger.StandardError(code, message)
 
 class ledger.StandardError extends Error
   # @exemple Initializations
-  #   new ledger.StandardError("an error message")
-  #   new ledger.StandardError(NotFound, "an error message")
-  constructor: (@code, message=undefined) ->
-    [@code, @message] = [0, @code] if ledger.errors.DefaultMessages[@code] == undefined
-    super(message || ledger.errors.DefaultMessages[@code])
+  #   new ledger.StandardError(ledger.errors.NotFound[, "an error message"])
+  constructor: (@code, @message=undefined) ->
+    super(@message)
 
   name: ->
     _.invert(ledger.errors)[@code]

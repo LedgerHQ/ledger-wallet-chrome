@@ -82,6 +82,10 @@ onboarding:
       not_linked: "Your hardware wallet does not seem to be linked to any security card."
       please_update: "To use or generate a security card, please update your hardware wallet firmware."
 
+    failed:
+      unexpected_error: "An error occurred while communicating with your wallet."
+      unplug: "Unplug your Ledger Wallet and try again. If the error persists, please consider updating the firmware again."
+
     errors:
       frozen:
         wallet_is_frozen: "Monedero bloqueado"

@@ -246,6 +246,7 @@
         'controllers/onboarding/device/onboarding_device_connecting_view_controller'
         'controllers/onboarding/device/onboarding_device_update_view_controller'
         'controllers/onboarding/device/onboarding_device_unsupported_view_controller'
+        'controllers/onboarding/device/onboarding_device_failed_view_controller'
 
         # Management
         'controllers/onboarding/management/onboarding_management_security_view_controller'
