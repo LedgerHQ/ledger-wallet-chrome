@@ -3,7 +3,4 @@
   <div class="page-indication"><%= t 'update.linux.first' %></div>
   <div class="shell-command"><%= t 'update.linux.fc' %></div>
   <div class="page-indication"><%= t 'update.linux.second' %></div>
-  <div class="shell-command"><%= t 'update.linux.sc' %></div>
-  <div class="page-indication"><%= t 'update.linux.third' %></div>
-  <div class="shell-command"><%= t 'update.linux.tc' %></div>
 </div>
