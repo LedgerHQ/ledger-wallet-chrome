@@ -2,6 +2,7 @@
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet gestiona sus cuentas Bitcoin de manera eficiente y segura."
   support_url: 'http://support.ledgerwallet.com/'
+  support_key_not_recognized_url: 'https://ledger.groovehq.com/knowledge_base/categories/troubleshooting-20'
 
 common:
   bitcoin_acronym: 'BTC'
@@ -225,13 +226,10 @@ update:
 
   linux:
     linux_users: "Linux users"
-    follow_instructions: "Follow these instructions to ensure your Ledger Wallet gets recognized once updated:"
-    first: "1. First, open your terminal and edit this file (root permissions are required):"
-    fc: "sudo vi /etc/udev/rules.d/20-hw1.rules"
-    second: "2. Add this line:"
-    sc: "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"2581\", ATTRS{idProduct}==\"3b7c\", MODE=\"0660\", GROUP=\"plugdev\""
-    third: "3. Finally, close the file and execute this command (root permissions are required):"
-    tc: "sudo udevadm control --reload-rules"
+    follow_instructions: "Your Ledger Wallet needs to be added to the list of known USB devices."
+    first: "Open your terminal and execute this command (root permissions are required):"
+    fc: "wget -q -O - https://www.ledgerwallet.com/support/add_udev_rules.sh | sudo bash"
+    second: "This step will automatically download a script that adds a new udev rule which is required to get your newly updated Ledger Wallet recognized by Linux."
 
   cardcheck:
       security_card_check: "Security card check"
