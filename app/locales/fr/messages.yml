@@ -78,6 +78,10 @@ onboarding:
       new_firmware_available: "Une nouvelle mise à jour de la puce de votre Ledger Wallet est disponible (%s)."
       new_1_0_0: "Cette mise à jour ajoute une nouvelle authentification des transactions sortantes sur votre smartphone."
 
+    unsupported:
+      not_linked: "Votre portefeuille matériel ne semble pas être lié à une carte de sécurité."
+      please_update: "Pour utiliser ou générer un carte, veuillez mettre à jour la puce de votre portefeuille."
+
     errors:
       frozen:
         wallet_is_frozen: "Portefeuille bloqué"
@@ -89,14 +93,10 @@ onboarding:
         tries_left: "Il vous reste %s essai(s) avant de bloquer votre portefeuille."
         unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder vos comptes et bitcoins."
 
-      unsupported:
-        device_unsupported: "Portefeuille non pris en charge"
-        unsuported_kind: "Ce type de portefeuille n’est pas pris en charge par l’application Ledger Wallet."
-        get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
-
       forged:
         device_forged: "Ce Ledger Nano n'est pas authentique, ou la mise à jour du firmware a échoué"
         forbidden_access: "Pour des raisons de sécurité, vous n'êtes pas autorisé à utiliser cette application."
+        get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
 
   management:
     back: "RETOUR"
