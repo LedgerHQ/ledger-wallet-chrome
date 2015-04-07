@@ -40,6 +40,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/device/error', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceErrorViewController
 
+  route '/onboarding/device/unsupported', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUnsupportedViewController
+
   route '/onboarding/device/wrongpin', (params) ->
     app.router.go '/onboarding/device/error',
       error: t 'onboarding.device.errors.wrongpin.wrong_pin'
@@ -52,17 +55,11 @@ ledger.router.pluggedWalletRoutesExceptions = [
       message: t 'onboarding.device.errors.frozen.blank_next_time'
       indication: t 'onboarding.device.errors.frozen.unplug_plug'
 
-  route '/onboarding/device/unsupported', (params) ->
-    app.router.go '/onboarding/device/error',
-      error: t 'onboarding.device.errors.unsupported.device_unsupported'
-      message: t 'onboarding.device.errors.unsupported.unsuported_kind'
-      indication: t 'onboarding.device.errors.unsupported.get_help'
-
   route '/onboarding/device/forged', (params) ->
     app.router.go '/onboarding/device/error',
       error: t 'onboarding.device.errors.forged.device_forged'
       message: t 'onboarding.device.errors.forged.forbidden_access'
-      indication: t 'onboarding.device.errors.unsupported.get_help'
+      indication: t 'onboarding.device.errors.forged.get_help'
 
   # Management
   route '/onboarding/management/security', (params) ->

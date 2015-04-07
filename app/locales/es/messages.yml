@@ -78,6 +78,10 @@ onboarding:
       new_firmware_available: "A new firmware update is available for your Ledger Wallet (%s)."
       new_1_0_0: "This update adds a new authentication to validate outgoing transactions on your smartphone."
 
+    unsupported:
+      not_linked: "Your hardware wallet does not seem to be linked to any security card."
+      please_update: "To use or generate a security card, please update your hardware wallet firmware."
+
     errors:
       frozen:
         wallet_is_frozen: "Monedero bloqueado"
@@ -89,14 +93,10 @@ onboarding:
         tries_left: "Usted tiene %s prueba(s) antes de bloquear su monedero."
         unplug_plug: "Desconecte y vuelva a conectar el Monedero Ledger para acceder a sus cuentas y bitcoins."
 
-      unsupported:
-        device_unsupported: "Su monedero no esta aceptado"
-        unsuported_kind: "Este tipo de monedero no esta aceptado por la aplicación Ledger Wallet."
-        get_help: "Pongase en contacto con el centro de ayuda en support.ledgerwallet.com"
-
       forged:
         device_forged: "This Ledger Wallet is not genuine"
         forbidden_access: "For safety reasons, you are not authorized to use this  application."
+        get_help: "Pongase en contacto con el centro de ayuda en support.ledgerwallet.com"
 
   management:
     back: "RETORNO"
