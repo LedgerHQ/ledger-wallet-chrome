@@ -82,14 +82,14 @@ class AuthenticatedHttpClient extends @HttpClient
   _performAuthenticate: (deferred) ->
     bitidAddress = null
     deferred.retryNumber ?= 3
-    ledger.app.dongle.getBitIdAddress()
+    ledger.bitcoin.bitid.getAddress()
     .fail (error) => deferred.rejectWithError([null, "Unable to get bitId address", error])
     .then (address) =>
       bitidAddress = address.bitcoinAddress.value
       @_client.jqAjax(type: "GET", url: "bitid/authenticate/#{bitidAddress}", dataType: 'json')
     .fail (jqXHR, statusText, errorThrown) =>
       if deferred.retryNumber-- > 0 then @_performAuthenticate(deferred) else deferred.reject([jqXHR, statusText, errorThrown])
-    .then (data) => ledger.app.dongle.signMessageWithBitId(data['message'])
+    .then (data) => ledger.bitcoin.bitid.signMessage(data['message'])
     .fail (error) => deferred.reject([null, "Unable to sign message", error])
     .then (signature) => @_client.jqAjax(type: "POST", url: 'bitid/authenticate', data: {address: bitidAddress, signature: signature}, contentType: 'application/json', dataType: 'json')
     .fail (error) =>  if deferred.retryNumber-- > 0 then @_performAuthenticate(deferred) else deferred.reject(error)

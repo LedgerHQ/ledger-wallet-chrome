@@ -74,4 +74,4 @@ _.extend ledger.errors,
     self._i18nId = -> "common.errors.#{_.underscore(@name)}"
     return self
 
-  throw: (code, msg) => throw @new(code, msg)
+  throw: (code, msg) -> throw @new(code, msg)

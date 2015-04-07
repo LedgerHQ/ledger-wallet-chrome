@@ -217,7 +217,7 @@ class ledger.wallet.HDWallet.Account
 
 openStores = (dongle, done) ->
   Try =>
-    dongle.getBitIdAddress (address) =>
+    ledger.bitcoin.bitid.getAddress (address) =>
       Try =>
         bitIdAddress = address.bitcoinAddress.value
         dongle.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>
