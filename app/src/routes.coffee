@@ -96,12 +96,12 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   # Send
   route '/wallet/send/index', (params) ->
-    dialog = new WalletSendIndexDialogViewController()
+    dialog = new WalletSendIndexDialogViewController(params)
     dialog.show()
 
   # Receive
   route '/wallet/receive/index', (params) ->
-    dialog = new WalletReceiveIndexDialogViewController()
+    dialog = new WalletReceiveIndexDialogViewController(params)
     dialog.show()
 
   # Help
@@ -145,3 +145,8 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   route '/update/error', (param) ->
     app.navigate UPDATE_LAYOUT, UpdateErrorViewController
+
+  # BitID
+  route '/wallet/bitid/index', (params) ->
+    dialog = new WalletBitidIndexDialogViewController(params)
+    dialog.show()

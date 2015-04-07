@@ -26,6 +26,7 @@ common:
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
   get_help: "Please visit our help center at support.ledgerwallet.com for more information."
+  signing: "Signing..."
 
   keycard:
     uppercase_letters: "Uppercase letters"
@@ -377,6 +378,7 @@ wallet:
       sending_failed: "Sending failed"
       sending_succeeded: "Sending succeeded"
       transaction_completed: "The transaction successfully completed."
+      cancelled: "Payment cancelled"
 
   pairing:
     common:
@@ -410,3 +412,19 @@ wallet:
       default_name: "My smartphone"
       name_already_used_by_paired_device: "This name is already used by another smartphone."
       please_enter_a_name: "Please enter a smartphone name."
+
+  bitid:
+    index:
+      title: "Connect with BitID"
+      domain: "Domain"
+      address: "Address"
+      connect: "Do you wish to authenticate on the following service?"
+    auth:
+      authenticating: "Authenticating"
+      login: "Login in process"
+      succeeded: "Authentication success"
+      completed: "You have been connected to the service"
+      failed: "Authentication failed"
+    errors:
+      cancelled: "Authentication cancelled"
+      signature_failed: "Failed to sign the challenge. Remove and reinsert the Nano."

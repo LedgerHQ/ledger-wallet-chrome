@@ -15,5 +15,5 @@
 <div class="dialog-actions-bar">
   <a id="other_validation_methods" class="uppercase-action" href="#otherValidationMethods"><%= t 'wallet.send.common.other_validation_methods' %></a>
   <div class="left-spacer"></div>
-  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
+  <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
 </div>

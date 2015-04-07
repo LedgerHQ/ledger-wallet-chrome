@@ -7,7 +7,9 @@ require @ledger.imports, ->
       FirmwareUpdate: "FirmwareUpdate"
 
     onStart: ->
+      Api.init()
       @_listenAppEvents()
+      addEventListener "message", Api.listener.bind(Api), false
       @setExecutionMode(@Modes.Wallet)
       @router.go '/'
 

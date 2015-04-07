@@ -108,6 +108,7 @@
         'utils/bitcoin/bitcoin'
         'utils/bitcoin/bip39_wordlist'
         'utils/bitcoin/bip39'
+        'utils/bitcoin/bitid'
 
         ## Storage
         'utils/storage/store'
@@ -227,6 +228,10 @@
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'
 
+        # BitID
+        'controllers/wallet/bitid/wallet_bitid_index_dialog_view_controller'
+        'controllers/wallet/bitid/wallet_bitid_authenticating_dialog_view_controller'
+
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
         'controllers/onboarding/onboarding_navigation_controller'
@@ -287,4 +292,6 @@
         'controllers/update/update_cardcheck_view_controller'
         'controllers/update/update_error_view_controller'
 
-      ]
+        ## API
+        'api'
+    ]

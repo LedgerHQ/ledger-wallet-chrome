@@ -46,6 +46,7 @@ externally_connectable:
   matches:
     - "*://*.ledgerwallet.com/*"
     - "*://ledgerwallet.com/*"
+    - "http://dev.ledgerwallet.com:3000/api"
 
 commands:
   reload-page:

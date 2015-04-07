@@ -343,6 +343,8 @@ class @ledger.dongle.Dongle extends EventEmitter
   getPublicAddress: (path, callback=undefined) ->
     Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
     d = ledger.defer(callback)
+    cachedAddr = ledger.wallet.HDWallet.instance?.cache?.get(path)
+    return d.resolve(cachedAddr).promise if cachedAddr?
     @_btchip.getWalletPublicKey_async(path)
     .then (result) =>
       ledger.wallet.HDWallet.instance?.cache?.set [[path, result.bitcoinAddress.value]]
@@ -385,49 +387,6 @@ class @ledger.dongle.Dongle extends EventEmitter
       d.reject(error)
     ).done()
     d.promise
-
-  ###
-  @overload getBitIdAddress(subpath=undefined, callback=undefined)
-    @param [Integer, String] subpath
-    @param [Function] callback Optional argument
-    @return [Q.Promise]
-
-  @overload getBitIdAddress(callback)
-    @param [Function] callback
-    @return [Q.Promise]
-  ###
-  getBitIdAddress: (subpath=undefined, callback=undefined) ->
-    Errors.throw(Errors.DongleLocked) if @state isnt States.UNLOCKED
-    [subpath, callback] = [callback, subpath] if ! callback && typeof subpath == 'function'
-    path = ledger.dongle.BitIdRootPath
-    path += "/#{subpath}" if subpath?
-    @getPublicAddress(path, callback)
-
-  ###
-  @overload signMessageWithBitId(message, callback=undefined)
-    @param [String] message
-    @param [Function] callback Optional argument
-    @return [Q.Promise]
-
-  @overload signMessageWithBitId(message, subpath=undefined, callback=undefined)
-    @param [String] message
-    @param [Integer, String] subpath Optional argument
-    @param [Function] callback Optional argument
-    @return [Q.Promise]
-
-  @see signMessage && getBitIdAddress
-  ###
-  signMessageWithBitId: (message, subpath=undefined, callback=undefined) ->
-    [subpath, callback] = [callback, subpath] if ! callback && typeof subpath == 'function'
-    path = ledger.dongle.BitIdRootPath
-    path += "/#{subpath}" if subpath?
-    @signMessage(message, path, callback)
-
-  # @param [Function] callback Optional argument
-  # @return [Q.Promise]
-  randomBitIdAddress: (callback=undefined) ->
-    i = sjcl.random.randomWords(1) & 0xffff
-    @getBitIdAddress(i, callback)
 
   # @param [String] pubKey public key, hex encoded.
   # @param [Function] callback Optional argument

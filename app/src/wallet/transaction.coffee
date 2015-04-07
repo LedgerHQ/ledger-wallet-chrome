@@ -88,6 +88,36 @@ class ledger.wallet.Transaction
   # @param [String] hash
   setHash: (hash) -> @hash = hash
 
+  serialize: ->
+    amount: @amount.toNumber(),
+    address: @receiverAddress,
+    fee: @fees.toNumber(),
+    hash: @hash,
+    raw: @getSignedTransaction()
+
+  getValidationDetails: () ->
+    indexes = []
+    if @_validationMode is ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN
+      numberOfCharacters = parseInt(@_out.indexesKeyCard.substring(0, 2), 16)
+      indexesKeyCard = @_out.indexesKeyCard.substring(2, numberOfCharacters * 2 + 2)
+    else
+      indexesKeyCard = @_out.indexesKeyCard
+    amount = ''
+    if ledger.app.wallet.getIntFirmwareVersion() < ledger.wallet.Firmware.V1_4_13
+      stringifiedAmount = @amount.toString()
+      stringifiedAmount = _.str.lpad(stringifiedAmount, 9, '0')
+      decimalPart = stringifiedAmount.substr(stringifiedAmount.length - 8)
+      integerPart = stringifiedAmount.substr(0, stringifiedAmount.length - 8)
+      firstAmountValidationIndex = integerPart.length - 1
+      lastAmountValidationIndex = firstAmountValidationIndex
+      if decimalPart isnt "00000000"
+        lastAmountValidationIndex += 3
+
+    while indexesKeyCard.length >= 2
+      index = indexesKeyCard.substring(0, 2)
+      indexesKeyCard = indexesKeyCard.substring(2)
+      indexes.push parseInt(index, 16)
+
   # @param [Array<Object>] inputs
   # @param [String] changePath
   # @param [Function] callback
