@@ -2,7 +2,7 @@ class @Api
 
   @init: ->
     @_has_session = false
-    ledger.app.on 'wallet:authenticated', ->
+    ledger.app.on 'dongle:unlocked', ->
       Api._has_session = true
 
   @listener: (event) ->
@@ -18,7 +18,7 @@ class @Api
   @hasSession: (data) ->
     chrome.runtime.sendMessage {
       command: 'has_session',
-      success: Api._has_session
+      success: @_has_session
     }    
 
   @sendPayment: (data) ->
