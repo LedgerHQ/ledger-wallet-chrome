@@ -14,6 +14,10 @@ class @Api
         @bitid(data)
       when  'send_payment'
         @sendPayment(data)
+      when 'sign_message'
+        @signMessage(data)
+      when 'cosign_transaction'
+        @cosignTransaction(data)
 
   @hasSession: (data) ->
     chrome.runtime.sendMessage {
@@ -22,8 +26,38 @@ class @Api
     }    
 
   @sendPayment: (data) ->
-    console.log "sendPayment"
     ledger.app.router.go '/wallet/send/index', {address: data.address, amount: data.amount}
+
+  @signMessage: (data) ->
+    try
+      ledger.app.wallet._lwCard.getBitIDAddress data.path
+      .then (result) =>
+        @address = result.bitcoinAddress.value
+        ledger.app.wallet._lwCard.dongle.getMessageSignature(data.path, data.message)
+        .then (result) =>
+          @callback_success('sign_message', signature: result, address: @address)
+          return
+        .fail (error) =>
+          @callback_cancel('sign_message', JSON.stringify(error))
+          return
+      .fail (error) =>
+        @callback_cancel('sign_message', JSON.stringify(error))
+        return
+    catch error
+      callback_cancel('sign_message', JSON.stringify(error))
+
+  @cosignTransaction: (data) ->
+    try
+      transaction = Bitcoin.Transaction.deserialize(data.transaction);
+      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(data.inputs, transaction, data.scripts, data.path)
+      .then (result) =>
+        @callback_success('cosign_transaction', signatures: result)
+        return
+      .fail (error) =>
+        @callback_cancel('cosign_transaction', JSON.stringify(error))
+        return
+    catch error
+      @callback_cancel('cosign_transaction', JSON.stringify(error))
 
   @bitid: (data) ->
     ledger.app.router.go '/wallet/bitid/index', {uri: data.uri, silent: data.silent}

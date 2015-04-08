@@ -51,6 +51,24 @@ chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse) =>
       }
       if chrome.app.window.get("main_window")?
         chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
+    when 'cosign_transaction'
+      payload = {
+        command: 'cosign_transaction',
+        inputs: data.inputs,
+        scripts: data.scripts,
+        path: data.path,
+        transaction: data.transaction
+      }
+      if chrome.app.window.get("main_window")?
+        chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
+    when 'sign_message'
+      payload = {
+        command: 'sign_message',
+        message: data.message,
+        path: data.path
+      }
+      if chrome.app.window.get("main_window")?
+        chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
   return true
 
 chrome.runtime.onMessage.addListener (request, sender, sendResponse) =>
