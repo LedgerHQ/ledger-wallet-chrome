@@ -161,7 +161,7 @@ class @ledger.utils.Logger
   @return String
   ###
   _stringify: (args...) ->
-    formatter = if typeof args[0] is 'string' then ""+args.shift() else ""
+    formatter = if typeof args[0] is 'string' then ""+args.shift().replace(/%/,'%%') else ""
     params = for arg in args
       formatter += " %s"
       if (! arg?) || typeof arg == 'string' || typeof arg == 'number' || typeof arg == 'boolean'
@@ -172,7 +172,7 @@ class @ledger.utils.Logger
         "HTMLElement." + arg.tagName
       else # Arrays and Hashs
         try
-          JSON.stringify(arg).replace(/\%/g, '%%')
+          JSON.stringify(arg)
         catch err
           "<< stringify error: #{err} >>"
     sprintf(formatter, params...)
@@ -183,11 +183,12 @@ class @ledger.utils.Logger
   ###
   _consolify: (level, args...) ->
     args = [].concat(args)
+
     # Add color
     if typeof args[0] is 'string'
-      args[0] = "%c" + args[0]
+      args[0] = "%c" + args[0].replace(/%/,'%%')
     else
-      args.splice 1, 0, "%c"
+      args.splice 0, 0, "%c"
     args.splice 1, 0, switch level
       when Levels.FATAL, Levels.ERROR then 'color: #f00'
       when Levels.WARN then 'color: #f60'
@@ -198,7 +199,7 @@ class @ledger.utils.Logger
       else 'color: #000'
 
     # Add arguments catchers to colorify strings
-    for arg in args[4..-1]
+    for arg in args[2..-1]
       args[0] += if typeof arg is 'string' then " %s"
       else if typeof arg is 'number' || typeof arg is 'boolean' then " %o"
       else if typeof arg is 'object' && arg instanceof RegExp then " %o"

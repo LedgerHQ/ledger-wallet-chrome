@@ -30,7 +30,7 @@ class @Router extends @EventEmitter
       path = url.parseAsUrl().pathname
       if ledger.app.dongle? or ledger.router.pluggedWalletRoutesExceptions.indexOf(path) != -1 or (ledger.router.ignorePluggedWalletForRouting? and ledger.router.ignorePluggedWalletForRouting == yes)
         url = ledger.url.createUrlWithParams(url, params)
-        # @_logger.info("Routing to [#{url}]")
+        @_logger.info("Routing to [#{url}]")
         @_router.parse(url)
     , 0)
 
