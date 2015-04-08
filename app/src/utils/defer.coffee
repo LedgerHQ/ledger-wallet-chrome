@@ -14,24 +14,17 @@
     @promise
     .then (result) -> callback(if result != undefined then result else true)
     .fail (reason) -> callback(false, reason)
-  defer.thenForward = (defer) ->
-    @promise
-    .then (result) => @resolve(result)
-    .fail (reason) => @reject(reason)
   defer.oldResolve = defer.resolve
   defer.oldReject = defer.reject
   defer.resolve = (args...) -> @oldResolve(args...); return @
   defer.reject = (args...) -> @oldReject(args...); return @
 
   # CompletionClosure legacy
-  defer.readonly = -> @promise
   defer.complete = (value, error) ->
     if error?
       @reject(error)
     else
       @resolve(value)
-  defer.success = (args...) -> @resolve(args...)
-  defer.failure = (args...) -> @reject(args...)
   defer.onComplete = defer.onFulfilled
 
   defer.onFulfilled(callback) if isCallback

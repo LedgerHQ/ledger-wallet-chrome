@@ -130,7 +130,7 @@ class @ledger.dongle.Dongle extends EventEmitter
           d.resolve([result.byteAt(1), (result.byteAt(2) << 16) + (result.byteAt(3) << 8) + result.byteAt(4)])
         else
           # Not initialized now - Retry
-          @getRawFirmwareVersion(isInBootLoaderMode, yes).thenForward(d)
+          d.resolve @getRawFirmwareVersion(isInBootLoaderMode, yes)
       else
         if sw is 0x9000
           d.resolve([0, (result.byteAt(5) << 16) + (result.byteAt(6) << 8) + result.byteAt(7)])
@@ -343,8 +343,6 @@ class @ledger.dongle.Dongle extends EventEmitter
   getPublicAddress: (path, callback=undefined) ->
     Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
     d = ledger.defer(callback)
-    cachedAddr = ledger.wallet.HDWallet.instance?.cache?.get(path)
-    return d.resolve(cachedAddr).promise if cachedAddr?
     @_btchip.getWalletPublicKey_async(path)
     .then (result) =>
       ledger.wallet.HDWallet.instance?.cache?.set [[path, result.bitcoinAddress.value]]
