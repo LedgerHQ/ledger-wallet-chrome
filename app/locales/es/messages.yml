@@ -36,6 +36,7 @@ common:
     unsufficient_balance: "El saldo de su monedero es insuficiente."
     wrong_keycode: "El código de validación no es correcta."
     network_no_response: "El servidor des transacciónes no ha respondido."
+    network_error: "Error de red."
     invalid_receiver_address: "La dirección Bitcoin de destino no es correcto."
     invalid_amount: "La cantidad enviada no es válida."
     unknown: "Se produjo un error desconocido."

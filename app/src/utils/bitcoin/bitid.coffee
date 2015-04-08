@@ -5,8 +5,13 @@ _.extend ledger.bitcoin.bitid,
 
   # This path do not need a verified PIN to sign messages.
   ROOT_PATH: "0'/0xb11e'"
-  # CALLBACK_PROXY_URL: "http://dev.ledgerwallet.com:3000/api/bitid"
-  CALLBACK_PROXY_URL: "http://localhost:3000/api/bitid"
+  CALLBACK_PROXY_URL: "http://dev.ledgerwallet.com:3000/api/bitid"
+  # CALLBACK_PROXY_URL: "http://localhost:3000/api/bitid"
+
+  uriToDerivationUrl: (uri) ->
+    url = uri.match(/^bitid:\/\/([^?]+)(?:\?.*)?$/)
+    ledger.errors.throw("Invalid BitId URI") unless url?
+    url[1]
 
   ###
   @param [String] uri
@@ -16,18 +21,16 @@ _.extend ledger.bitcoin.bitid,
   @param [Function] error
   @return [Q.Promise]
   ###
-  callback: (uri, address, signature, success, error) ->
-    ledger.defer $.ajax(
-       type: 'POST',
-       url: @CALLBACK_PROXY_URL,
-       dataType: 'json',
-       success: success,
-       error: error,
-       data:
-          uri: uri,
-          address: address,
-          signature: signature
-    )
+  callback: (uri, address, signature) ->
+    Q($.ajax(
+      type: 'POST',
+      url: @CALLBACK_PROXY_URL,
+      dataType: 'json',
+      data:
+        uri: uri,
+        address: address,
+        signature: signature
+    ))
 
   ###
   @overload getAddress(subpath=undefined, callback=undefined)
@@ -86,9 +89,7 @@ _.extend ledger.bitcoin.bitid,
     if subpath?
       @ROOT_PATH + "/#{subpath}"
     else if uri?
-      url = uri.match(/^bitid:(?:\/\/)?(\w+)(?:\?.*)?$/)
-      ledger.errors.throw("Invalid BitId URI") unless url?
-      @getPath(url: url[1])
+      @getPath(url: @uriToDerivationUrl(uri))
     else if url?
       @getPath(subpath: "0x" + sha256_digest(url).substring(0,8) + "/0")
     else

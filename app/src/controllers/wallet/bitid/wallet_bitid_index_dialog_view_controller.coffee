@@ -12,7 +12,8 @@ class @WalletBitidIndexDialogViewController extends DialogViewController
     chrome.app.window.current().show()
     @uri = @params['?params'].uri
     @doNotBroadcast = @params['?params'].silent
-    ledger.bitcoin.bitid.getAddress(uri: uri)
+    @view.bitidDomain.text ledger.bitcoin.bitid.uriToDerivationUrl(@uri)
+    ledger.bitcoin.bitid.getAddress(uri: @uri)
     .then (data) =>
       @address = data.bitcoinAddress.value
       @view.bitidAddress.text(@address)
