@@ -503,6 +503,38 @@ var BTChip = Class.create({
                 return deferred.promise;
 	},
 
+  startSimpleUntrustedHashTransactionInput_async: function(newTransaction, transaction) {
+    var currentObject = this;
+    var version_hex = new ByteString(Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(transaction.version), 4)), HEX);
+    var data = version_hex.concat(currentObject.createVarint(transaction['ins'].length));
+    var deferred = Q.defer();
+    currentObject.startUntrustedHashTransactionInputRaw_async(true, true, data).then(function (result) {
+      var i = 0;
+      async.eachSeries(
+        transaction['ins'],
+        function (input, finishedCallback) {
+          data = new ByteString(Convert.toHexByte(0x00), HEX);
+          var txhash = Bitcoin.convert.bytesToHex(Bitcoin.convert.hexToBytes(input.outpoint.hash).reverse());
+          var outpoint = Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(input.outpoint.index), 4));
+          data = data.concat(new ByteString(txhash, HEX)).concat(new ByteString(outpoint, HEX));
+          var scriptBytes = Bitcoin.convert.hexToBytes(input.script);
+          data = data.concat(currentObject.createVarint(scriptBytes.length));
+          currentObject.startUntrustedHashTransactionInputRaw_async(true, false, data).then(function(result) {
+            data = scriptBytes.concat(new ByteString(Bitcoin.convert.bytesToHex(input.sequence), HEX));
+            currentObject.startUntrustedHashTransactionInputRaw_async(true, false, data).then(function (result) {
+              i++;
+              finishedCallback();                            
+            }).fail(function (err) { deferred.reject(err); });
+          }).fail(function (err) { deferred.reject(err); });
+        },
+        function (finished) {
+          deferred.resolve(finished);
+        }
+      );
+    }).fail(function (err) { deferred.reject(err); });
+    return deferred.promise;
+  },
+
 	hashOutputInternal_async: function(outputType, path, outputAddress, amount, fees) {
 		if (typeof changeKey == "undefined") {
 			changeKey = new ByteString("", HEX);
@@ -909,6 +941,7 @@ BTChip.FLAG_RFC6979 = 0x80;
 BTChip.FEATURE_UNCOMPRESSED_KEYS = 0x01;
 BTChip.FEATURE_DETERMINISTIC_SIGNATURE = 0x02;
 BTChip.FEATURE_FREE_SIGHASHTYPE = 0x04;
+BTChip.FEATURE_NO_2FA_P2SH = 0x08;
 
 BTChip.VERSION_BITCOIN_MAINNET = 0;
 BTChip.VERSION_BITCOIN_P2SH_MAINNET = 5;

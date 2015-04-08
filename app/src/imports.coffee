@@ -52,6 +52,7 @@
         '../libs/BigInt'
         '../libs/sha256'
         '../libs/checkBitcoinAddress'
+        '../libs/bitcoinUtils'
         '../libs/lru'
         '../libs/moment.min'
         '../libs/lokijs.min'

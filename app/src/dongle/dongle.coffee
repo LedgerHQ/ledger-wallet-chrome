@@ -234,8 +234,8 @@ class @ledger.dongle.Dongle extends EventEmitter
 
     l("Setup in progress ... please wait")
     @_btchip.setupNew_async(
-      0x05,
-      BTChip.FEATURE_DETERMINISTIC_SIGNATURE,
+      BTChip.MODE_WALLET,
+      BTChip.FEATURE_DETERMINISTIC_SIGNATURE | BTChip.FEATURE_NO_2FA_P2SH,
       BTChip.VERSION_BITCOIN_MAINNET,
       BTChip.VERSION_BITCOIN_P2SH_MAINNET,
       new ByteString(pin, ASCII),
