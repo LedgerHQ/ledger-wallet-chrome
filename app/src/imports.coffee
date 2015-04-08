@@ -13,6 +13,7 @@
         '../libs/jquery.selectric.min'
         '../libs/qrcode.min'
         '../libs/jquery.suggest'
+        '../libs/cryptojs.min'
         '../public/tooltipster/js/jquery.tooltipster.min'
         '../libs/lw-api-js/lib/bitcoinjs-min'
         '../libs/lw-api-js/lib/util'
@@ -134,6 +135,9 @@
         'managers/permissions_manager'
         'managers/wallets_manager'
         'managers/system_manager'
+
+        ## Apps
+        'utils/apps/coinkite'
 
         ## Rest clients
         'restclients/authentication'

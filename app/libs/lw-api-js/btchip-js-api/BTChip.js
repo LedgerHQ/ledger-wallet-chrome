@@ -871,15 +871,9 @@ var BTChip = Class.create({
     var deferred = Q.defer();
     var firstRun = true;
 
-    console.log(inputs);
-
     async.eachSeries(
       inputs,
       function(input, finishedCallback) {
-        console.log("---------");
-        console.log(scripts);
-        console.log(input);
-        console.log(scripts[input[0]]);
         var script = new ByteString(scripts[input[0]].redeem, HEX);
         currentObject.startP2SHUntrustedHashTransactionInput_async(firstRun, transaction, script).then(function (result) {
           currentObject.untrustedHashTransactionInputFinalizeFull_async(transaction).then(function (result) {
