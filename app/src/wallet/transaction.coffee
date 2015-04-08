@@ -93,7 +93,7 @@ class ledger.wallet.transaction.Transaction
 
   getValidationMode: () -> @_validationMode
 
-  getAmout: () -> @amount
+  getAmount: () -> @amount
 
   getRecipientAddress: () -> @receiverAddress
 
