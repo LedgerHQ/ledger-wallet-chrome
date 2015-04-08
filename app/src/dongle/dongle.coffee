@@ -369,21 +369,20 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [String] path Optional argument
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
-  signMessage: (message, path, callback=undefined) ->
+  signMessage: (message, {path, pubKey}, callback=undefined) ->
+    @getPublicAddress(path).then((address) => @signMessage(message, path: path, pubKey: address.publicKey, callback)) if ! pubKey?
     d = ledger.defer(callback)
-    @getPublicAddress(path)
-    .then( (address) =>
-      message = new ByteString(message, ASCII)
-      return @_btchip.signMessagePrepare_async(path, message)
-      .then =>
-        return @_btchip.signMessageSign_async(new ByteString(_pin, ASCII))
-      .then (sig) =>
-        signedMessage = @_convertMessageSignature(address.publicKey, message, sig.signature)
-        d.resolve(signedMessage)
-    ).catch( (error) ->
+    message = new ByteString(message, ASCII)
+    @_btchip.signMessagePrepare_async(path, message)
+    .then =>
+      return @_btchip.signMessageSign_async(new ByteString(_pin, ASCII))
+    .then (sig) =>
+      signedMessage = @_convertMessageSignature(pubKey, message, sig.signature)
+      d.resolve(signedMessage)
+    .catch (error) ->
       console.error("Fail to signMessage :", error)
       d.reject(error)
-    ).done()
+    .done()
     d.promise
 
   # @param [String] pubKey public key, hex encoded.

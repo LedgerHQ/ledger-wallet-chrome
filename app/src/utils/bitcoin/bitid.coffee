@@ -6,7 +6,8 @@ _.extend ledger.bitcoin.bitid,
   # This path do not need a verified PIN to sign messages.
   ROOT_PATH: "0'/0xb11e'"
   CALLBACK_PROXY_URL: "http://dev.ledgerwallet.com:3000/api/bitid"
-  # CALLBACK_PROXY_URL: "http://localhost:3000/api/bitid"
+
+  _cache: {}
 
   uriToDerivationUrl: (uri) ->
     url = uri.match(/^bitid:\/\/([^?]+)(?:\?.*)?$/)
@@ -44,15 +45,20 @@ _.extend ledger.bitcoin.bitid,
   ###
   getAddress: (opts={}, callback=undefined) ->
     [opts, callback] = [{}, opts] if ! callback && typeof opts == 'function'
-    ledger.app.dongle.getPublicAddress(@getPath(opts), callback)
+    path = @getPath(opts)
+    return ledger.defer(callback).resolve(@_cache[path]).promise if @_cache[path]?
+    ledger.app.dongle.getPublicAddress(path, callback)
+    .then (address) =>
+      @_cache[path] = address
+      address
 
   ###
   @overload signMessage(message, callback=undefined)
     @param [String] message
-    @param [Object] optPath @see getPath
+    @param [Function] callback Optional argument
     @return [Q.Promise]
 
-  @overload signMessage(message, subpath=undefined, callback=undefined)
+  @overload signMessage(message, opts={}, callback=undefined)
     @param [String] message
     @param [Object] optPath @see getPath
     @param [Function] callback Optional argument
@@ -60,7 +66,9 @@ _.extend ledger.bitcoin.bitid,
   ###
   signMessage: (message, opts={}, callback=undefined) ->
     [opts, callback] = [{}, opts] if ! callback && typeof opts == 'function'
-    ledger.app.dongle.signMessage(message, @getPath(opts), callback)
+    path = @getPath(opts)
+    pubKey = @_cache[path]?.publicKey
+    ledger.app.dongle.signMessage(message, path: path, pubKey: pubKey, callback)
 
   ###
   @overload getPath(opts)
