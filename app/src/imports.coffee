@@ -316,5 +316,7 @@
         'controllers/apps/coinkite/keygen/apps_coinkite_keygen_show_dialog_view_controller'
         'controllers/apps/coinkite/cosign/apps_coinkite_cosign_index_dialog_view_controller'
         'controllers/apps/coinkite/cosign/apps_coinkite_cosign_fetching_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_show_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_signing_dialog_view_controller'
 
     ]
