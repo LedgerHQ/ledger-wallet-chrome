@@ -1,0 +1,32 @@
+@import (reference) "../../constants";
+@import (reference) "../../application";
+@import "top-menu";
+
+.main-container {
+  #navigation_controller_content {
+    padding: @metrics-large-padding @metrics-medium-padding;
+    overflow: auto;
+  }
+}
+
+section {
+  > .empty-container {
+    .regular-grey-text;
+    text-align: center;
+    padding: 130px 0;
+  }
+
+  &#receive_index_dialog, &#send_index_dialog {
+    #amount_row {
+      > td {
+        padding-bottom: 5px;
+        padding-top: @metrics-almost-small-padding + 3px;
+
+        > input {
+          margin-right: 5px;
+          width: 200px;
+        }
+      }
+    }
+  }
+}

@@ -22,7 +22,9 @@ common:
   restore: "Restaurer"
   later: "Plus tard"
   reset: "Réinitialiser"
+  save: "Enregistrer"
   back: "Retour"
+  next: "Suivant"
   yes: "Oui"
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
@@ -452,3 +454,50 @@ wallet:
       pair_a_smartphone: "Associer un smartphone"
       single_paired_device: "%s association"
       multiple_paired_devices: "%s associations"
+
+apps:
+  coinkite:
+    top_menu:
+      items:
+        settings: "Règlages"
+        coinkite: "Coinkite"
+        key: "Clé"
+        cosign: "Cosign"
+        wallet: "Wallet"
+    dashboard:
+      title: "Coinkite cosigning interface"
+    settings:
+      title: "Vos accès API à Coinkite"
+      api_key: "API key"
+      api_secret: "API secret"
+      api_key_placeholder: "Entrez votre clé API"
+      api_secret_placeholder: "Entrez le secret"
+      note: "Attention à bien activer la permission <b>cosign</b> sur cette clé API."
+    keygen:
+      processing:
+        title: "Clé de signature"
+        info: "Dérivation de la clé publique étendue pour Coinkite"
+      show:
+        title: "Clé de signature"
+        xpub: "Xpub"
+        signature: "Signature"
+        note: "Ces informations vous permettent d'ajouter ce Ledger Nano comme clé de signature sur votre wallet multisignature Coinkite."
+      errors:
+        derivation_failed: "Erreur dans le calcul de la clé publique étendue. Contactez le support"
+    cosign:
+      index:
+        title: "Cosigner une transaction"
+        request: "Request"
+        request_placeholder: "Entrez la référence"
+        note_header: "Cet outil vous permet de signer une transaction multisignature avec votre Ledger Wallet"
+        note_footer: "La référence request est indiquée sur la page de cosignature (<b>user request</b>)"
+      fetching:
+        title: "Récupération des informations"
+        info: "La transaction de cosignature est en cours d'analyse"
+      errors:
+        wrong_nano: "Transaction invalide"
+        wrong_nano_text: "Ce Ledger Nano ne fait pas partie des signataires de cette transaction. Impossible de continuer."
+        coinkite_api: "Erreur de l'API Coinkite"
+        invalid_request_ref: "Référence invalide (doit faire 17 cacractères)"
+        missing_api_key: "Clés API manquantes"
+        missing_api_key_text: "Vous devez renseigner votre clé API ainsi que le secret dans les règlages."

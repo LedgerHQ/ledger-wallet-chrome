@@ -3,6 +3,13 @@ class @Coinkite
   API_BASE: "https://api.coinkite.com"
   CK_PATH: "0xb11e'/0xffaa001'"
 
+  @factory: (callback) ->
+    ledger.storage.sync.get "__apps_coinkite_api_key", (r) =>
+      api_key = r.__apps_coinkite_api_key
+      ledger.storage.sync.get "__apps_coinkite_api_secret", (r) =>
+        secret = r.__apps_coinkite_api_secret
+        callback(new Coinkite(api_key, secret))
+
   constructor: (api_key, secret) ->
     @apiKey = api_key
     @secret = secret
@@ -17,6 +24,29 @@ class @Coinkite
     catch error
       callback?(null, error)
 
+  getRequestData: (request, callback) ->
+    url = '/v1/co-sign/' + request
+    @_setAuthHeaders(url)
+    @httpClient
+      .do type: 'GET', url: url
+      .then (data, statusText, jqXHR) =>
+        callback?(data, null)
+      .fail (error, statusText) =>
+        callback?(null, error.responseJSON.message + ' ' + error.responseJSON.help_msg)
+      .done()
+
+  getCosigner: (data, callback) ->
+    try
+      ledger.app.wallet.getExtendedPublicKey @CK_PATH, (key) =>
+        xpub = key._xpub58
+        data.cosigners.forEach (cosigner) ->
+          check = cosigner.xpubkey_check
+          if xpub.indexOf(check, xpub.length - check.length) > 0
+            callback cosigner.CK_refnum
+        callback null
+    catch
+      callback null
+
   getCosignData: (request, cosigner, callback) ->
     @request = request
     @cosigner = cosigner
@@ -27,7 +57,7 @@ class @Coinkite
       .then (data, statusText, jqXHR) =>
         callback?(data.signing_info, null)
       .fail (error, statusText) =>
-        callback?(null, error.responseJSON.help_msg)
+        callback?(null, error.responseJSON.message + ' ' + error.responseJSON.help_msg)
       .done()
 
   checkKeys: (check, callback) ->
