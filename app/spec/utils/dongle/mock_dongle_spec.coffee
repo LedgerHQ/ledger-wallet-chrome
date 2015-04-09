@@ -1,16 +1,15 @@
-
 States =
-  # Dongle juste created, not initialized.
+# Dongle juste created, not initialized.
   UNDEFINED: undefined
-  # PIN required.
+# PIN required.
   LOCKED: 'locked'
-  # PIN has been verified.
+# PIN has been verified.
   UNLOCKED: 'unlocked'
-  # No seed present, dongle must be setup.
+# No seed present, dongle must be setup.
   BLANK: 'blank'
-  # Dongle has been unplugged.
+# Dongle has been unplugged.
   DISCONNECTED: 'disconnected'
-  # An error appended, user must unplug/replug dongle.
+# An error appended, user must unplug/replug dongle.
   ERROR: 'error'
 
 Firmware =
@@ -38,6 +37,9 @@ BitIdRootPath = "0'/0/0xb11e"
 
 Errors = @ledger.errors
 
+Pin = undefined
+Seed = undefined
+
 # Populate dongle namespace.
 @ledger.dongle ?= {}
 _.extend @ledger.dongle,
@@ -46,18 +48,12 @@ _.extend @ledger.dongle,
   Attestation: Attestation
   BetaAttestation: BetaAttestation
   BitIdRootPath: BitIdRootPath
+  Pin: Pin
+  Seed: Seed
 
-###
-Signals :
-  @emit state:changed(States)
-  @emit state:locked
-  @emit state:unlocked
-  @emit state:blank
-  @emit state:disconnected
-  @emit state:error(args...)
-###
-class @ledger.dongle.Dongle extends EventEmitter
+class ledger.dongle.MockDongle extends EventEmitter
 
+  ###
   # @property
   id: undefined
   # @property
@@ -78,36 +74,27 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   # @private @property [String] pin used to unlock dongle.
   _pin = undefined
+  ###
 
-  constructor: (card) ->
+
+
+  constructor: () ->
     super
-    @id = card.deviceId
-    @deviceId = card.deviceId
-    @productId = card.productId
-    @_btchip = new BTChip(card)
 
     unless @isInBootloaderMode()
-      @_recoverFirmwareVersion().then( =>
-        @_recoverOperationMode()
-        # Set dongle state on failure.
-        @getPublicAddress("0'/0/0").then( =>
-          # @todo Se connecter directement à la carte sans redemander le PIN
-          console.warn("Dongle is already unlock ! Case not handle => Pin Code Required.")
-          @_setState(States.LOCKED)
-        ).catch( (e) -> #console.error(e)
-        ).done()
-      ).catch( (error) =>
-        console.error("Fail to initialize Dongle :", error)
-      ).done()
+      @getPublicAddress("0'/0/0").then =>
+        console.warn("Dongle is already unlock ! Case not handle => Pin Code Required.")
+        @_setState(States.LOCKED)
+      .catch (e) -> console.error(e)
+      .done()
     else
       _.defer => @_setState(States.BLANK)
 
-  # Called when 
   disconnect: () -> @_setState(States.DISCONNECTED)
 
   # @return [String] Firmware version, 1.0.0 for example.
   getStringFirmwareVersion: -> @firmwareVersion.byteAt(1) + "." + @firmwareVersion.byteAt(2) + "." + @firmwareVersion.byteAt(3)
-  
+
   # @return [Integer] Firmware version, 0x20010000010f for example.
   getIntFirmwareVersion: ->
     parseInt(@firmwareVersion.toString(HEX), 16)
@@ -207,24 +194,6 @@ class @ledger.dongle.Dongle extends EventEmitter
       else
         d.rejectWithError(Errors.DongleNotCertified)
       return
-      # attestation = result.toString(HEX)
-      # dataToSign = attestation.substring(16,32) + random
-      # dataSig = attestation.substring(32)#.replace(/^\w\w/,'30')
-      # dataSigBytes = (parseInt(n,16) for n in dataSig.match(/\w\w/g))
-
-      # sha = new JSUCrypt.hash.SHA256()
-      # domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
-      # affinePoint = new JSUCrypt.ECFp.AffinePoint(Attestation.xPoint, Attestation.yPoint)
-      # pubkey = new JSUCrypt.key.EcFpPublicKey(256, domain, affinePoint)
-      # ecsig = new JSUCrypt.signature.ECDSA(sha)
-      # ecsig.init(pubkey, JSUCrypt.signature.MODE_VERIFY)
-      # if ecsig.verify(dataToSign, dataSigBytes)
-      #   console.log("isCertified success")
-      #   _.defer => d.resolve()
-      # else
-      #   console.log("isCertified failure")
-      #   _.defer => d.reject()
-      # return
     .fail (err) =>
       console.error("Fail check if isCertified :", err)
       error = Errors.new(Errors.SignatureError, err)
@@ -283,24 +252,10 @@ class @ledger.dongle.Dongle extends EventEmitter
     .done()
     d.promise
 
-  ###
-  @overload setup(pin, callback)
-    @param [String] pin
-    @param [Function] callback
-    @return [Q.Promise]
 
-  @overload setup(pin, options={}, callback=undefined)
-    @param [String] pin
-    @param [String] restoreSeed
-      @options options [String] restoreSeed
-      @options options [ByteString] keyMap
-    @param [Function] callback
-    @return [Q.Promise]
-  ###
   setup: (pin, restoreSeed, callback=undefined) ->
     Errors.throw(Errors.DongleNotBlank) if @state isnt States.BLANK
     [restoreSeed, callback] = [callback, restoreSeed] if ! callback && typeof restoreSeed == 'function'
-    d = ledger.defer(callback)
 
     # Validate seed
     if restoreSeed?
@@ -308,64 +263,20 @@ class @ledger.dongle.Dongle extends EventEmitter
       if bytesSeed.length != 64
         e('Invalid seed :', restoreSeed)
         return d.reject().promise
+    @ledger.dongle.pin = pin
+    @ledger.dongle.seed = restoreSeed
 
-    l("Setup in progress ... please wait")
-    @_btchip.setupNew_async(
-      0x05,
-      BTChip.FEATURE_DETERMINISTIC_SIGNATURE,
-      BTChip.VERSION_BITCOIN_MAINNET,
-      BTChip.VERSION_BITCOIN_P2SH_MAINNET,
-      new ByteString(pin, ASCII),
-      undefined,
-      BTChip.QWERTY_KEYMAP_NEW,
-      restoreSeed?,
-      bytesSeed
-    ).then( =>
-      if restoreSeed?
-        msg = "Seed restored, please reopen the extension"
-      else
-        msg = "Plug the dongle into a secure host to read the generated seed, then reopen the extension"
-      console.warn(msg)
-      @_setState(States.ERROR, msg)
-      d.resolve()
-    ).fail( (err) =>
-      error = Errors.new(Errors.UnknowError, err)
-      d.reject(error)
-    ).catch( (error) ->
-      console.error("Fail to setup :", error)
-    ).done()
-
-    d.promise
 
   # @param [String] path
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
   getPublicAddress: (path, callback=undefined) ->
-    l path
-    l new Error().stack
     Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
     d = ledger.defer(callback)
-    @_btchip.getWalletPublicKey_async(path)
-    .then (result) =>
-      ledger.wallet.HDWallet.instance?.cache?.set [[path, result.bitcoinAddress.value]]
-      _.defer ->
-        l result
-        d.resolve(result)
-    .fail (err) =>
-      if err.match("6982") # Pin required
-        @_setState(States.LOCKED)
-        error = Errors.new(Errors.DongleLocked, err)
-      else if err.match("6985") # Error ?
-        @_setState(States.BLANK)
-        error = Errors.new(Errors.BlankDongle, err)
-      else if err.match("6faa")
-        @_setState(States.ERROR)
-        error = Errors.new(Errors.UnknowError, err)
-      else
-        error = Errors.new(Errors.UnknowError, err)
-      _.defer -> d.reject(error)
-    .catch (error) ->
-      console.error("Fail to getPublicAddress :", error)
+    seed = HDNode.fromSeedHex(ledger.dongle.Seed)
+    l seed
+    l path
+    # derive seed
     .done()
     d.promise
 
@@ -390,16 +301,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     ).done()
     d.promise
 
-  ###
-  @overload getBitIdAddress(subpath=undefined, callback=undefined)
-    @param [Integer, String] subpath
-    @param [Function] callback Optional argument
-    @return [Q.Promise]
 
-  @overload getBitIdAddress(callback)
-    @param [Function] callback
-    @return [Q.Promise]
-  ###
   getBitIdAddress: (subpath=undefined, callback=undefined) ->
     Errors.throw(Errors.DongleLocked) if @state isnt States.UNLOCKED
     [subpath, callback] = [callback, subpath] if ! callback && typeof subpath == 'function'
@@ -408,17 +310,6 @@ class @ledger.dongle.Dongle extends EventEmitter
     @getPublicAddress(path, callback)
 
   ###
-  @overload signMessageWithBitId(message, callback=undefined)
-    @param [String] message
-    @param [Function] callback Optional argument
-    @return [Q.Promise]
-
-  @overload signMessageWithBitId(message, subpath=undefined, callback=undefined)
-    @param [String] message
-    @param [Integer, String] subpath Optional argument
-    @param [Function] callback Optional argument
-    @return [Q.Promise]
-
   @see signMessage && getBitIdAddress
   ###
   signMessageWithBitId: (message, subpath=undefined, callback=undefined) ->
@@ -514,40 +405,10 @@ class @ledger.dongle.Dongle extends EventEmitter
           result = result.toString(HEX)
       return result
 
-  ###
-  @param [String] input hex encoded
-  @return [Object]
-    [Array<Byte>] version length is 4
-    [Array<Object>] inputs
-      [Array<Byte>] prevout length is 36
-      [Array<Byte>] script var length
-      [Array<Byte>] sequence length is 4
-    [Array<Object>] outputs
-      [Array<Byte>] amount length is 4
-      [Array<Byte>] script var length
-    [Array<Byte>] locktime length is 4
-  ###
-  splitTransaction: (input) ->
-    @_btchip.splitTransaction(new ByteString(input.raw, HEX))
 
+  ###
   _sendApdu: (cla, ins, p1, p2, opt1, opt2, opt3, wrapScript) -> @_btchip.card.sendApdu_async(cla, ins, p1, p2, opt1, opt2, opt3, wrapScript)
 
-  # @return [Q.Promise] Must be done
-  _recoverFirmwareVersion: ->
-    @_btchip.getFirmwareVersion_async().then( (result) =>
-      firmwareVersion = result['firmwareVersion']
-      if (firmwareVersion.byteAt(1) == 0x01) && (firmwareVersion.byteAt(2) == 0x04) && (firmwareVersion.byteAt(3) < 7)
-        l "Using old BIP32 derivation"
-        @_btchip.setDeprecatedBIP32Derivation()
-      if (firmwareVersion.byteAt(1) == 0x01) && (firmwareVersion.byteAt(2) == 0x04) && (firmwareVersion.byteAt(3) < 8)
-        l "Using old setup keymap encoding"
-        @_btchip.setDeprecatedSetupKeymap()
-      @_btchip.setCompressedPublicKeys(result['compressedPublicKeys'])
-      @firmwareVersion = firmwareVersion
-    ).fail( (error) =>
-      e("Firmware version not supported :", error)
-    )
-  
   # @return [Q.Promise] Must be done
   _recoverOperationMode: ->
     @_btchip.getOperationMode_async().then (mode) =>
@@ -591,3 +452,4 @@ class @ledger.dongle.Dongle extends EventEmitter
       output += if (i + 1) < data.length then codes.charAt((((b & 0x0f) << 2)) & 0x3f) else '='
       output += '='
     return output
+  ###

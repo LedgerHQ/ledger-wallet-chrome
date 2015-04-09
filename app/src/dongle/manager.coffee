@@ -44,7 +44,7 @@ class @ledger.dongle.Manager extends EventEmitter
       for device in devices
         device.deviceId = parseInt(device.deviceId || device.device)
         @_connectDongle(device) unless @_dongles[device.deviceId]?
-      for id, dongle of @_dongles when _(devices).where(deviceId: +id).length == 0
+      for id, dongle of @_dongles when not isNaN(+id) and _(devices).where(deviceId: +id).length == 0
         dongle.disconnect()
 
   _getDevices: (cb) ->
