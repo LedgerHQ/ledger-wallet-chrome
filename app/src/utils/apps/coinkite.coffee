@@ -27,8 +27,16 @@ class @Coinkite
       .then (data, statusText, jqXHR) =>
         callback?(data.signing_info, null)
       .fail (error, statusText) =>
-        callback?(null, error)
+        callback?(null, error.responseJSON.help_msg)
       .done()
+
+  checkKeys: (check, callback) ->
+    try
+      ledger.app.wallet.getExtendedPublicKey @CK_PATH, (key) =>
+        xpub = key._xpub58
+        callback?(xpub.indexOf(check, xpub.length - check.length) > 0)
+    catch error
+      callback?(false, error)
 
   cosignTransaction: (data, callback) ->
     inputs = data.inputs
@@ -45,7 +53,7 @@ class @Coinkite
           .then (data, statusText, jqXHR) =>
             callback?(data, null)
           .fail (error, statusText) =>
-            callback?(null, error)
+            callback?(null, error.responseJSON.help_msg)
           .done()        
       .fail (error) =>
         callback?(null, error)

@@ -508,19 +508,20 @@ var BTChip = Class.create({
     var version_hex = new ByteString(Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(transaction.version), 4)), HEX);
     var data = version_hex.concat(currentObject.createVarint(transaction['ins'].length));
     var deferred = Q.defer();
-    currentObject.startUntrustedHashTransactionInputRaw_async(true, true, data).then(function (result) {
+    currentObject.startUntrustedHashTransactionInputRaw_async(newTransaction, true, data).then(function (result) {
       var i = 0;
       async.eachSeries(
         transaction['ins'],
         function (input, finishedCallback) {
+          console.log(input);
           data = new ByteString(Convert.toHexByte(0x00), HEX);
           var txhash = Bitcoin.convert.bytesToHex(Bitcoin.convert.hexToBytes(input.outpoint.hash).reverse());
           var outpoint = Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(input.outpoint.index), 4));
           data = data.concat(new ByteString(txhash, HEX)).concat(new ByteString(outpoint, HEX));
           data = data.concat(currentObject.createVarint(redeemScript.length));
-          currentObject.startUntrustedHashTransactionInputRaw_async(true, false, data).then(function (result) {
+          currentObject.startUntrustedHashTransactionInputRaw_async(newTransaction, false, data).then(function (result) {
             data = redeemScript.concat(new ByteString("FFFFFFFF", HEX));
-            currentObject.startUntrustedHashTransactionInputRaw_async(true, false, data).then(function (result) {
+            currentObject.startUntrustedHashTransactionInputRaw_async(newTransaction, false, data).then(function (result) {
               i++;
               finishedCallback();                            
             }).fail(function (err) { deferred.reject(err); });
