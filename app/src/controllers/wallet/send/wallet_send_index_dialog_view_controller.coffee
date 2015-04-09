@@ -10,10 +10,10 @@ class @WalletSendIndexDialogViewController extends DialogViewController
 
   onAfterRender: () ->
     super
-    if @params['?params'].amount?
-      @view.amountInput.val @params['?params'].amount
-    if @params['?params'].address?
-      @view.receiverInput.val @params['?params'].address
+    if @params.amount?
+      @view.amountInput.val @params.amount
+    if @params.address?
+      @view.receiverInput.val @params.address
     @view.amountInput.amountInput()
     @view.errorContainer.hide()
     do @_updateTotalInput
