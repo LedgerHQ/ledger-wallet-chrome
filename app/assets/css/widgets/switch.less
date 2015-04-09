@@ -1,0 +1,46 @@
+@import (reference) "../constants";
+
+// Switch - Off by default
+.switch {
+
+  // Variables
+  @width-switch: 32px;
+  @height-switch: 18px;
+  @width-switch-circle: 14px;
+  @height-switch-circle: 14px;
+
+  width: @width-switch;
+  height: @height-switch;
+  border-radius: @width-switch/2;
+  padding: 2px;
+  box-sizing: border-box;
+  background-color: @color-light-grey;
+  &.switch-isOn {
+    background-color: @color-action-green;
+  }
+  &.switch-isAnimated {
+    transition-duration: 1s;
+  }
+
+  >.switch-circle {
+    width: @width-switch-circle;
+    height: @height-switch-circle;
+    border-radius: @width-switch-circle/2;
+    background-color: @color-white;
+    box-shadow: 0px 1px 1px #484848;
+    position: relative;
+    left: 0px;
+    &.switch-circle-isAnimated {
+      transition: all 100ms ease;
+    }
+    &.switch-circle-isOn {
+      position: relative;
+      left: @width-switch-circle;
+    }
+    &.switch-circle-isOn-isAnimated {
+      transition: all @animation-short-duration ease-in;
+    }
+  }
+}
+
+
