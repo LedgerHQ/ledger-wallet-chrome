@@ -37,16 +37,16 @@ class @ledger.dongle.Manager extends EventEmitter
   # Get the list of dongles
   # @return [Array] the list of dongles
   dongles: () ->
-    _.values(@_dongles)
+    _.values(@_dongles).filter (d) -> d?
 
   _checkIfDongleIsPluggedIn: () ->
     @_getDevices (devices) =>
       for device in devices
         device.deviceId = parseInt(device.deviceId || device.device)
         continue if ! device.deviceId
-        @_connectDongle(device) unless @_dongles[device.deviceId]?
+        @_connectDongle(device) unless @_dongles.hasOwnProperty(device.deviceId)
       for id, dongle of @_dongles when _(devices).where(deviceId: +id).length == 0
-        dongle.disconnect()
+        dongle.disconnect() if dongle?
 
   _getDevices: (cb) ->
     devices = []
@@ -60,6 +60,7 @@ class @ledger.dongle.Manager extends EventEmitter
 
   _connectDongle: (device) ->
     device.isInBootloaderMode = _.contains([0x1807, 0x1808], device.productId)
+    @_dongles[device.deviceId] = null
     @emit 'connecting', device
     try
       result = []
@@ -86,4 +87,4 @@ class @ledger.dongle.Manager extends EventEmitter
     catch er
       e er
 
-  getConnectedDongles: -> _(_.values(@_dongles)).filter (w) -> w.state isnt ledger.dongle.States.DISCONNECTED
+  getConnectedDongles: -> _(_.values(@_dongles)).filter (d) -> d? && d.state isnt ledger.dongle.States.DISCONNECTED

@@ -102,11 +102,9 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     return if @_dongleAttestationLock is on
     @_dongleAttestationLock = on
     @dongle?.isCertified (dongle, error) =>
-      (Try => @onDongleCertificationDone(dongle, error)).printError()
       @_dongleAttestationLock = off
+      (Try => @onDongleCertificationDone(dongle, error)).printError()
     return
-
-
 
   ###
     Returns the jQuery element used as the main div container in which controllers will render themselves.
