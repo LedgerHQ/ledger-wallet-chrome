@@ -1,5 +1,8 @@
 ledger.preferences ?= {}
 
+###
+  Init - Get all preferences from Synced Store, fallback to default values
+###
 ledger.preferences.init = (cb) ->
   ledger.preferences.instance = new ledger.preferences.Preferences
   if ledger.storage.sync?
@@ -7,13 +10,16 @@ ledger.preferences.init = (cb) ->
     getAllPrefs = (keys, values, index = 0) ->
       return if index > keys.length - 1
       deferred = Q.defer()
-      ledger.storage.sync.get 'preferences_' + keys[index], (res) ->
-        ledger.preferences.instance.prefs[keys[index]] = res['preferences_' + keys[index]] ? values[index]
+      ledger.storage.sync.get '__preferences_' + keys[index], (res) ->
+        ledger.preferences.instance.prefs[keys[index]] = res['__preferences_' + keys[index]] ? values[index]
         deferred.resolve(getAllPrefs(keys, values, index + 1))
       deferred.promise
     getAllPrefs(_.keys(obj), _.values(obj)).then(=> cb?()).done()
 
 
+###
+  Helpers to get/set preferences
+###
 class ledger.preferences.Preferences
 
   prefs:
@@ -26,31 +32,42 @@ class ledger.preferences.Preferences
     logState: true
 
   ###
-    Language
+    Get Language
+    @example Get the current language
+      ledger.preferences.instance.getLanguage()
   ###
   getLanguage: () ->
     ledger.i18n.favLang.memoryValue
 
+  ###
+    Set Language
+    @param [String] value Codified (BCP 47) language tag - Official list here : http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
+    @example Get the current language
+      ledger.preferences.instance.setLanguage('es')
+  ###
   setLanguage: (value) ->
     ledger.i18n.setFavLangByUI(value)
 
 
-  ###
-    Locale - Region preference for Date and currency formatting
-  ###
+  # Get Locale - Region preference for Date and currency formatting
   getLocale: () ->
     ledger.i18n.favLocale.memoryValue
 
+  ###
+    Set Locale - Region preference for Date and currency formatting
+    @param [String] value Codified (BCP 47) language tag - Official list here : http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
+    @example Set user favorite localization
+      ledger.preferences.instance.setLocale('en-GB')
+  ###
   setLocale: (value) ->
     ledger.i18n.setLocaleByUI(value)
 
 
-  ###
-    BTC Unit
-  ###
+  # Get BTC Unit
   getBtcUnit: () ->
     @prefs.btcUnit
 
+  # Set BTC Unit
   setBtcUnit: (value) ->
     if value isnt 'BTC' and value isnt 'mBTC' and value isnt 'uBTC' and value isnt 'satoshi'
       try
@@ -59,56 +76,53 @@ class ledger.preferences.Preferences
         console.log(e.name + ": " + e.message)
         return null
     if ledger.storage.sync?
-      ledger.storage.sync.set({preferences_btcUnit: value})
+      ledger.storage.sync.set({__preferences_btcUnit: value})
       @prefs.btcUnit = value
     else
       throw new Error 'You must initialized your wallet'
 
 
-  ###
-    Fiat currency equivalent
-  ###
+  # Get Fiat currency equivalent
   getCurrency: () ->
     @prefs.currency
 
+  # Set Fiat currency equivalent
   setCurrency: (value) ->
     if ledger.storage.sync?
-      ledger.storage.sync.set({preferences_currency: value})
+      ledger.storage.sync.set({__preferences_currency: value})
       @prefs.currency = value
     else
       throw new Error 'You must initialized your wallet'
 
 
-  ###
-    Mining Fee
-  ###
+  # Get Mining Fee
   getMiningFee: () ->
     @prefs.miningFee
 
+  # Set Mining Fee
   setMiningFee: (value) ->
     if ledger.storage.sync?
-      ledger.storage.sync.set({preferences_miningFee: value})
+      ledger.storage.sync.set({__preferences_miningFee: value})
       @prefs.miningFee = value
     else
       throw new Error 'You must initialized your wallet'
 
 
-  ###
-    Blockchain explorer
-  ###
+  # Get Blockchain explorer
   getBlockchainExplorer: () ->
     @prefs.blockchainExplorer
 
+  # Set Blockchain explorer
   setBlockchainExplorer: (value) ->
     if ledger.storage.sync?
-      ledger.storage.sync.set({preferences_blockchainExplorer: value})
+      ledger.storage.sync.set({__preferences_blockchainExplorer: value})
       @prefs.blockchainExplorer = value
     else
       throw new Error 'You must initialized your wallet'
 
 
   ###
-    Logs
+    If Logs must be visible todo
   ###
   getLogState: () ->
     @prefs.logState
