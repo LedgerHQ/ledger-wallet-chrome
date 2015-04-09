@@ -15,6 +15,12 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
   openSupport: ->
     window.open t 'application.support_url'
 
+  onDetach: ->
+    super
+    ledger.app.off 'dongle:connected'
+    ledger.app.off 'dongle:forged'
+    ledger.app.off 'dongle:communication_error'
+
   _hideContent: (hidden, animated = yes) ->
     @view.contentContainer.children().each (index, node) =>
       node = $(node)
@@ -51,3 +57,4 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
       ledger.app.performDongleAttestation()
     ledger.app.once 'dongle:connected', => do @navigateContinue
     ledger.app.once 'dongle:forged', => do @navigateError
+    ledger.app.once 'dongle:communication_error', => ledger.app.router.go '/onboarding/device/failed'

@@ -2,6 +2,7 @@
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet gestiona sus cuentas Bitcoin de manera eficiente y segura."
   support_url: 'http://support.ledgerwallet.com/'
+  support_key_not_recognized_url: 'https://ledger.groovehq.com/knowledge_base/categories/troubleshooting-20'
 
 common:
   bitcoin_acronym: 'BTC'
@@ -26,6 +27,7 @@ common:
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
   get_help: "Pongase en contacto con el centro de ayuda en support.ledgerwallet.com"
+  checking: "Checking..."
 
   keycard:
     uppercase_letters: "Mayúsculas"
@@ -43,6 +45,8 @@ common:
     unable_to_validate: "Unable to validate transaction."
     secure_screen_cancelled_transaction: "The smartphone cancelled the transaction."
     secure_screen_invalid_pin: "The smartphone returned a wrong pin code."
+    deleting_this_paired_smartphone: "By deleting this smartphone, you will no longer be able to manually validate transactions of this Ledger Wallet.<br />Do you want to continue?"
+    going_to_firmware_update: "By switching to firmware update mode, all your pending activites will be interrupted.<br />Do you want to continue ?"
 
   qrcode:
     scan_qrcode: "Scan QR code"
@@ -75,6 +79,14 @@ onboarding:
       new_firmware_available: "A new firmware update is available for your Ledger Wallet (%s)."
       new_1_0_0: "This update adds a new authentication to validate outgoing transactions on your smartphone."
 
+    unsupported:
+      not_linked: "Your hardware wallet does not seem to be linked to any security card."
+      please_update: "To use or generate a security card, please update your hardware wallet firmware."
+
+    failed:
+      unexpected_error: "An error occurred while communicating with your wallet."
+      unplug: "Unplug your Ledger Wallet and try again. If the error persists, please consider updating the firmware again."
+
     errors:
       frozen:
         wallet_is_frozen: "Monedero bloqueado"
@@ -86,14 +98,10 @@ onboarding:
         tries_left: "Usted tiene %s prueba(s) antes de bloquear su monedero."
         unplug_plug: "Desconecte y vuelva a conectar el Monedero Ledger para acceder a sus cuentas y bitcoins."
 
-      unsupported:
-        device_unsupported: "Su monedero no esta aceptado"
-        unsuported_kind: "Este tipo de monedero no esta aceptado por la aplicación Ledger Wallet."
-        get_help: "Pongase en contacto con el centro de ayuda en support.ledgerwallet.com"
-
       forged:
         device_forged: "This Ledger Wallet is not genuine"
         forbidden_access: "For safety reasons, you are not authorized to use this  application."
+        get_help: "Pongase en contacto con el centro de ayuda en support.ledgerwallet.com"
 
   management:
     back: "RETORNO"
@@ -104,7 +112,6 @@ onboarding:
     create_my_wallet: "Crear mi cartera"
     recover_my_wallet: "Restaurar mi cartera"
     cancel_wallet_configuration: "¿Quieres cancelar la configuración de su cartera Ledger?"
-    wallet_not_affected: "No se harán cambios a su monedero."
 
     security:
       security_informations: "Información de <b>seguridad</b>"
@@ -224,13 +231,10 @@ update:
 
   linux:
     linux_users: "Linux users"
-    follow_instructions: "Follow these instructions to ensure your Ledger Wallet gets recognized once updated:"
-    first: "1. First, open your terminal and edit this file (root permissions are required):"
-    fc: "sudo vi /etc/udev/rules.d/20-hw1.rules"
-    second: "2. Add this line:"
-    sc: "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"2581\", ATTRS{idProduct}==\"3b7c\", MODE=\"0660\", GROUP=\"plugdev\""
-    third: "3. Finally, close the file and execute this command (root permissions are required):"
-    tc: "sudo udevadm control --reload-rules"
+    follow_instructions: "Your Ledger Wallet needs to be added to the list of known USB devices."
+    first: "Open your terminal and execute this command (root permissions are required):"
+    fc: "wget -q -O - https://www.ledgerwallet.com/support/add_udev_rules.sh | sudo bash"
+    second: "This step will automatically download a script that adds a new udev rule which is required to get your newly updated Ledger Wallet recognized by Linux."
 
   cardcheck:
       security_card_check: "Security card check"
@@ -265,6 +269,7 @@ wallet:
       signout: 'LOCK'
       help: 'AYUDA'
       account: 'CUENTA'
+      settings: "SETTINGS"
 
   dashboard:
     index:
@@ -386,10 +391,10 @@ wallet:
     errors:
       pairing_failed: "Pairing failed"
       pairing_succeeded: "Pairing succeeded"
-      dongle_is_now_paired: "Your Ledger Wallet is now paired<br />with your smartphone \"%s\"."
+      dongle_is_now_paired: "Your Ledger Wallet is now paired with your smartphone \"%s\"."
       inconsistent_state: "Something wrong happened (inconsistent state)."
       client_cancelled: "The mobile application cancelled the pairing process."
-      dongle_needs_power_cycle: "Your Ledger Wallet needs to be unplugged and plugged back<br/>to pair a new smartphone."
+      dongle_needs_power_cycle: "Your Ledger Wallet needs to be unplugged and plugged back to pair a new smartphone."
       invalid_challenge_response: "The security card validation code is incorrect."
       dongle_cancelled: "Your Ledger Wallet cancelled the pairing process."
       unknown: "An unknown error occurred."
@@ -411,3 +416,22 @@ wallet:
       default_name: "My smartphone"
       name_already_used_by_paired_device: "This name is already used by another smartphone."
       please_enter_a_name: "Please enter a smartphone name."
+
+  settings:
+    common:
+      settings: "Settings"
+      other_settings: "Other settings"
+      hardware: "Hardware"
+      bitcoin: "Bitcoin"
+      tools: "Tools"
+      display: "Display"
+
+    hardware:
+      firmware: "Firmware"
+      paired_smartphones: "Paired smartphones"
+      flash_firmware: "Flash firmware"
+      no_update_available: "No update available"
+      update_available: "%s available!"
+      pair_a_smartphone: "Pair a smartphone"
+      single_paired_device: "%s pairing"
+      multiple_paired_devices: "%s pairings"

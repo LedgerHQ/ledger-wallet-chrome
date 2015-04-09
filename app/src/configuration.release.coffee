@@ -12,5 +12,6 @@ _.extend @ledger.config,
     pullIntervalDelay: 10000
     pullThrottleDelay: 1000
     pushDebounceDelay: 1000
+  defaultLoggingLevel: ledger.utils.Logger.None
 
 @configureApplication = (app) ->

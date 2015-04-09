@@ -49,12 +49,14 @@ require @ledger.imports, ->
     onDongleConnected: (dongle) ->
       @performDongleAttestation() if @isInWalletMode() and not dongle.isInBootloaderMode()
 
-    onDongleCertificationDone: (dongle, isCertified) ->
+    onDongleCertificationDone: (dongle, error) ->
       return unless @isInWalletMode()
-      if isCertified
+      if not error?
         @emit 'dongle:connected', @dongle
-      else
+      else if error.code is ledger.errors.DongleNotCertified
         @emit 'dongle:forged', @dongle
+      else if error.code is ledger.errors.CommunicationError
+        @emit 'dongle:communication_error', @dongle
 
     onDongleIsInBootloaderMode: (dongle) ->
       @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
@@ -88,7 +90,6 @@ require @ledger.imports, ->
       @router.go '/'
 
     _listenAppEvents: () ->
-
       @on 'wallet:operations:sync:failed', =>
         return unless @isInWalletMode()
         _.delay =>

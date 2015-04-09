@@ -34,7 +34,7 @@ class @ledger.utils.Logger
 
   # Logger's constructor
   # @param [Boolean] level of the Logger
-  constructor: (tag, @level=Levels.ALL) ->
+  constructor: (tag, @level=ledger.config.defaultLoggingLevel) ->
     @_tag = tag
     @level = Levels.ALL if @level is true
     @level = Levels.None if @level is false
@@ -216,7 +216,7 @@ class @ledger.utils.Logger
 
     console[method](args...)
 
-ledger.utils.logger = new ledger.utils.Logger("DeprecatedLogger", true)
+ledger.utils.logger = new ledger.utils.Logger("DeprecatedLogger")
 
 `
 var sprintf = (function() {

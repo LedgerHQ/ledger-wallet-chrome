@@ -243,11 +243,10 @@ class ledger.wallet.Transaction
         ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
           if error?
             hadNetworkFailure = yes
-            return done()
-
-          output.raw = rawTransaction
-          finalOutputs.push(output)
-          collectedAmount = collectedAmount.add(Amount.fromSatoshi(output.value))
+          else
+            output.raw = rawTransaction
+            finalOutputs.push(output)
+            collectedAmount = collectedAmount.add(Amount.fromSatoshi(output.value))
 
           if collectedAmount.gte(requiredAmount)
             changeAmount = collectedAmount.subtract(requiredAmount)

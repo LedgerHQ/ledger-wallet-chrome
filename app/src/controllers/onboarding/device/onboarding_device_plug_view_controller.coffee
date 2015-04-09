@@ -16,7 +16,7 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
       do @_listenEvents
 
   openSupport: ->
-    window.open t 'application.support_url'
+    window.open t 'application.support_key_not_recognized_url'
 
   _hideContent: (hidden, animated = yes) ->
     @view.contentContainer.children().each (index, node) =>

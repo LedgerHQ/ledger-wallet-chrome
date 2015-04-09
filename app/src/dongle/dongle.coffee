@@ -207,28 +207,8 @@ class @ledger.dongle.Dongle extends EventEmitter
       else
         d.rejectWithError(Errors.DongleNotCertified)
       return
-      # attestation = result.toString(HEX)
-      # dataToSign = attestation.substring(16,32) + random
-      # dataSig = attestation.substring(32)#.replace(/^\w\w/,'30')
-      # dataSigBytes = (parseInt(n,16) for n in dataSig.match(/\w\w/g))
-
-      # sha = new JSUCrypt.hash.SHA256()
-      # domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
-      # affinePoint = new JSUCrypt.ECFp.AffinePoint(Attestation.xPoint, Attestation.yPoint)
-      # pubkey = new JSUCrypt.key.EcFpPublicKey(256, domain, affinePoint)
-      # ecsig = new JSUCrypt.signature.ECDSA(sha)
-      # ecsig.init(pubkey, JSUCrypt.signature.MODE_VERIFY)
-      # if ecsig.verify(dataToSign, dataSigBytes)
-      #   console.log("isCertified success")
-      #   _.defer => d.resolve()
-      # else
-      #   console.log("isCertified failure")
-      #   _.defer => d.reject()
-      # return
     .fail (err) =>
-      console.error("Fail check if isCertified :", err)
-      error = Errors.new(Errors.SignatureError, err)
-      d.reject(error)
+      d.rejectWithError(Errors.CommunicationError, err)
     .done()
     d.promise
 

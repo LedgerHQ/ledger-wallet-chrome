@@ -2,6 +2,7 @@ application:
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet gère vos comptes Bitcoin de façon efficace et sécurisée."
   support_url: 'http://support.ledgerwallet.com/'
+  support_key_not_recognized_url: 'https://ledger.groovehq.com/knowledge_base/categories/troubleshooting-20'
 
 common:
   bitcoin_acronym: 'BTC'
@@ -27,6 +28,7 @@ common:
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
   get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
   signing: "Signature..."
+  checking: "Vérification..."
 
   keycard:
     uppercase_letters: "Majuscules"
@@ -44,6 +46,8 @@ common:
     unable_to_validate: "Impossible de valider la transaction."
     secure_screen_cancelled_transaction: "Le smartphone a annulé la transaction."
     secure_screen_invalid_pin: "Le smartphone a retourné un mauvais code pin."
+    deleting_this_paired_smartphone: "En supprimant ce smartphone, vous ne pourrez plus valider les transactions de ce Ledger Wallet.<br />Souhaitez-vous continuer ?"
+    going_to_firmware_update: "En passant en mode de mise à jour de la puce, toutes vos activités en cours seront interrompues.<br />Souhaitez-vous continuer ?"
 
   qrcode:
     scan_qrcode: "Scanner code QR"
@@ -76,6 +80,14 @@ onboarding:
       new_firmware_available: "Une nouvelle mise à jour de la puce de votre Ledger Wallet est disponible (%s)."
       new_1_0_0: "Cette mise à jour ajoute une nouvelle authentification des transactions sortantes sur votre smartphone."
 
+    unsupported:
+      not_linked: "Votre portefeuille matériel ne semble pas être lié à une carte de sécurité."
+      please_update: "Pour utiliser ou générer un carte, veuillez mettre à jour la puce de votre portefeuille."
+
+    failed:
+      unexpected_error: "Une erreur est survenue pendant la communication avec votre portefeuille."
+      unplug: "Débranchez votre Ledger Wallet et réessayez. Si l'erreur persiste, une mise à jour de la puce peut-être nécessaire."
+
     errors:
       frozen:
         wallet_is_frozen: "Portefeuille bloqué"
@@ -87,14 +99,10 @@ onboarding:
         tries_left: "Il vous reste %s essai(s) avant de bloquer votre portefeuille."
         unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder vos comptes et bitcoins."
 
-      unsupported:
-        device_unsupported: "Portefeuille non pris en charge"
-        unsuported_kind: "Ce type de portefeuille n’est pas pris en charge par l’application Ledger Wallet."
-        get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
-
       forged:
-        device_forged: "Ce Ledger Wallet n'est pas authentique"
+        device_forged: "Ce Ledger Nano n'est pas authentique, ou la mise à jour du firmware a échoué"
         forbidden_access: "Pour des raisons de sécurité, vous n'êtes pas autorisé à utiliser cette application."
+        get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
 
   management:
     back: "RETOUR"
@@ -105,7 +113,6 @@ onboarding:
     create_my_wallet: "Créer mon portefeuille"
     recover_my_wallet: "Restaurer mon portefeuille"
     cancel_wallet_configuration: "Souhaitez-vous annuler la configuration de votre Ledger Wallet ?"
-    wallet_not_affected: "Aucune modification ne sera apportée à votre portefeuille."
 
     security:
       security_informations: "Informations de <b>sécurité</b>"
@@ -225,13 +232,10 @@ update:
 
   linux:
     linux_users: "Utilisateurs Linux"
-    follow_instructions: "Suivez ces instructions pour assurer que votre Ledger Wallet soit reconnu une fois mis à jour :"
-    first: "1. Premièrement, ouvrez votre terminal et éditez ce fichier (permissions root requises):"
-    fc: "sudo vi /etc/udev/rules.d/20-hw1.rules"
-    second: "2. Ajoutez cette ligne:"
-    sc: "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"2581\", ATTRS{idProduct}==\"3b7c\", MODE=\"0660\", GROUP=\"plugdev\""
-    third: "3. Enfin, fermer le fichier et exécutez cette commande (permissions root requises):"
-    tc: "sudo udevadm control --reload-rules"
+    follow_instructions: "Votre Ledger Wallet a besoin d'être ajouté à la liste des périphériques USB connus."
+    first: "Ouvrez votre terminal et exécutez cette commande (permissions root requises):"
+    fc: "wget -q -O - https://www.ledgerwallet.com/support/add_udev_rules.sh | sudo bash"
+    second: "Cette commande téléchargera automatiquement un script qui ajoutera une nouvelle règle udev nécessaire pour que votre Ledger Wallet soit reconnu par Linux une fois mis à jour."
 
   cardcheck:
       security_card_check: "Vérification de la carte de sécurité"
@@ -266,6 +270,7 @@ wallet:
       signout: 'VERROUILLER'
       help: 'AIDE'
       account: 'COMPTE'
+      settings: "RÉGLAGES"
 
   dashboard:
     index:
@@ -388,10 +393,10 @@ wallet:
     errors:
       pairing_failed: "Association échouée"
       pairing_succeeded: "Association réussie"
-      dongle_is_now_paired: "Votre Ledger Wallet est maintenant associé<br />avec votre smartphone \"%s\"."
+      dongle_is_now_paired: "Votre Ledger Wallet est maintenant associé avec votre smartphone \"%s\"."
       inconsistent_state: "Quelque chose ne s'est pas bien déroulé (état inconsistant)."
       client_cancelled: "L'application mobile a annulé la procédure d'association."
-      dongle_needs_power_cycle: "Votre Ledger Wallet nécessite d'être débranché puis rebranché<br />pour associer un nouveau smartphone."
+      dongle_needs_power_cycle: "Votre Ledger Wallet nécessite d'être débranché puis rebranché pour associer un nouveau smartphone."
       invalid_challenge_response: "Le code de validation de la carte de sécurité est incorrect."
       dongle_cancelled: "Votre Ledger Wallet a annulé la procédure d'association."
       unknown: "Une erreur inconnue est survenue."
@@ -429,3 +434,21 @@ wallet:
     errors:
       cancelled: "Identification annulée"
       signature_failed: "Erreur dans la signature. Retirez et réinsérez le Nano."
+  settings:
+    common:
+      settings: "Réglages"
+      other_settings: "Autres réglages"
+      hardware: "Matériel"
+      bitcoin: "Bitcoin"
+      tools: "Outils"
+      display: "Affichage"
+
+    hardware:
+      firmware: "Logiciel de la puce"
+      paired_smartphones: "Smartphones associés"
+      flash_firmware: "Flasher la puce"
+      no_update_available: "Aucune mise à jour disponible"
+      update_available: "%s disponible!"
+      pair_a_smartphone: "Associer un smartphone"
+      single_paired_device: "%s association"
+      multiple_paired_devices: "%s associations"

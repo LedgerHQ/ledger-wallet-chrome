@@ -14,7 +14,12 @@
     display: flex;
     flex-grow: 1;
     align-items: stretch;
-    padding-left: @metrics-medium-padding;
+    padding: 0 @metrics-medium-padding;
+
+    #settings-item {
+      margin-left: auto;
+      margin-right: 0;
+    }
 
     .menu-item {
       color: @color-white;
@@ -23,8 +28,8 @@
       padding-top: 24px;
 
       &.selected {
-        >div {
-          >a {
+        > div {
+          > a {
             opacity: 0.75;
           }
 
@@ -34,12 +39,11 @@
         }
       }
 
-      >div {
-
+      > div {
         display: flex;
         flex-direction: column;
 
-        >a {
+        > a {
           font-size: @font-size-large;
           text-decoration: none;
           color: @color-white;
@@ -83,9 +87,6 @@
           flex-grow: 1;
         }
       }
-
-
-
     }
 
     .right {
