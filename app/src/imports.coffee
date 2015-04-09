@@ -100,6 +100,7 @@
         'utils/amount'
         'utils/progressbars'
         'utils/keycard'
+        'utils/promise_queue'
 
         ## Crypto
         'utils/crypto/aes'
