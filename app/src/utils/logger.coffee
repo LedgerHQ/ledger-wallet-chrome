@@ -1,7 +1,8 @@
+@ledger ?= {}
 @ledger.utils ?= {}
 
 Levels = {}
-for level, i in ["NONE", "RAW", "FATAL", "ERROR", "WARN", "GOOD", "INFO", "VERB", "DEBUG", "TRACE", "ALL"]
+for level, i in ["NONE", "RAW", "FATAL", "ERROR", "WARN", "BAD", "GOOD", "INFO", "VERB", "DEBUG", "TRACE", "ALL"]
   Levels[level] = i++
 
 ###
@@ -11,7 +12,10 @@ class @ledger.utils.Logger
   @Levels: Levels
 
   @_loggers: {}
-  @store: new ledger.storage.ChromeStore("logs")
+
+  # Return storage instance if initialized or undefined.
+  # @return [ledger.storage.ChromeStore, undefined]
+  @store: -> @_store ?= new ledger.storage?.ChromeStore("logs")
 
 #################################
 # Class methods
@@ -20,8 +24,8 @@ class @ledger.utils.Logger
   # @return [Q.Promise]
   @logs: (cb) ->
     d = ledger.defer(cb)
-    @store.keys (keys) =>
-      @store.get keys, (items) => d.resolve(_.values(items))
+    @store()?.keys (keys) =>
+      @store().get keys, (items) => d.resolve(_.values(items))
     d.promise
 
   # @return [legder.utils.Logger]
@@ -36,14 +40,18 @@ class @ledger.utils.Logger
   # @param [Boolean] level of the Logger
   constructor: (tag, @level=ledger.config.defaultLoggingLevel) ->
     @_tag = tag
+    @level = Levels[@level] if typeof @level == "string"
     @level = Levels.ALL if @level is true
     @level = Levels.None if @level is false
-    @store = @constructor.store
     @constructor._loggers[tag] = this
 
   #################################
   # Accessors
   #################################
+
+  # Return Logger class storage if initialized or undefined.
+  # @return [ledger.storage.ChromeStore, undefined]
+  store: -> @constructor.store()
 
   # Sets the log level
   # @param [Boolean] active or not the logger.
@@ -65,6 +73,7 @@ class @ledger.utils.Logger
   isErr: @prototype.isError
   isWarn: -> @level >= Levels.WARN
   isWarning: @prototype.isWarn
+  isBad: -> @level >= Levels.BAD
   isGood: -> @level >= Levels.GOOD
   isGood: @prototype.isSuccess
   isInfo: -> @level >= Levels.INFO
@@ -82,6 +91,7 @@ class @ledger.utils.Logger
   err: @prototype.error
   warn: (args...) -> @_log(Levels.WARN, args...)
   warning: @prototype.warn
+  bad: (args...) -> @_log(Levels.BAD, args...)
   good: (args...) -> @_log(Levels.GOOD, args...)
   success: @prototype.good
   info: (args...) -> @_log(Levels.INFO, args...)
@@ -97,9 +107,9 @@ class @ledger.utils.Logger
 
   # Clear logs from entries older than 24h
   clear: ->
-    @store.keys (keys) =>
+    @store()?.keys (keys) =>
       now = new Date().getTime()
-      @store.remove(key) for key in keys when (now - key > 86400000) # 86400000ms => 24h
+      @store().remove(key) for key in keys when (now - key > 86400000) # 86400000ms => 24h
 
   # Retreive saved logs
   # @param [Function] cb A callback invoked once we get the logs as an array
@@ -119,7 +129,7 @@ class @ledger.utils.Logger
       log = {}
       log[now.getTime()] = date: now.toUTCString(), type: msgType, msg: msg, tag: @_tag
       @clear()
-      @store.set(log)
+      @store()?.set(log)
 
   #################################
   # Protected. Formatting methods
@@ -137,7 +147,7 @@ class @ledger.utils.Logger
   _log: (level, args...) ->
     return unless level <= @level
     @_storeLog(@_stringify(args...), @levelName(level))
-    if window.ledger.isDev
+    if ledger.isDev
       args = (if level != Levels.RAW then [@_header(level)] else []).concat(args)
       @_consolify(level, args...)
 
@@ -190,7 +200,7 @@ class @ledger.utils.Logger
     else
       args.splice 0, 0, "%c"
     args.splice 1, 0, switch level
-      when Levels.FATAL, Levels.ERROR then 'color: #f00'
+      when Levels.FATAL, Levels.ERROR, Levels.BAD then 'color: #f00'
       when Levels.WARN then 'color: #f60'
       when Levels.INFO then 'color: #00f'
       when Levels.GOOD then 'color: #090'
@@ -210,13 +220,18 @@ class @ledger.utils.Logger
     method = switch level
       when Levels.FATAL, Levels.ERROR then "error"
       when Levels.WARN then "warn"
-      when Levels.INFO then "info"
+      when Levels.INFO, Levels.GOOD, Levels.BAD then "info"
       when Levels.DEBUG then "debug"
       else "log"
 
     console[method](args...)
 
 ledger.utils.logger = new ledger.utils.Logger("DeprecatedLogger")
+
+# Shortcuts
+if @ledger.isDev
+  @l = console.log.bind(console)
+  @e = console.error.bind(console)
 
 `
 var sprintf = (function() {

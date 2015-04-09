@@ -68,11 +68,13 @@
         ## Application configuration
         'configuration'
 
+        ## Logger
+        'utils/logger'
+
         ## Routes
         'routes'
 
         ## Utils
-        'utils/log'
         'utils/string'
         'utils/number'
         'utils/array'
@@ -117,9 +119,6 @@
         'utils/storage/synced_store'
         'utils/storage/object_store'
         'utils/storage/storage'
-
-        ## Logger
-        'utils/logger'
 
         ## Data synchronization
 

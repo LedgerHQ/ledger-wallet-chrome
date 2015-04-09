@@ -12,7 +12,11 @@ _.extend @ledger.config,
     pullIntervalDelay: 10000
     pullThrottleDelay: 1000
     pushDebounceDelay: 1000
-  defaultLoggingLevel: ledger.utils.Logger.INFO
+  defaultLoggingLevel: "INFO"
+  btcshipDebug: false
+
+# Btcship logging
+@DEBUG = ledger.config.btcshipDebug
 
 Q.longStackSupport = true
 
