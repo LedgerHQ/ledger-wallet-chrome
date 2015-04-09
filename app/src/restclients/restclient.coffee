@@ -21,7 +21,7 @@ class ledger.api.RestClient
     @_client.setHttpHeader 'X-Ledger-Environment', ledger.env
     @_client
 
-  networkErrorCallback: (callback) -> (xhr, status, message) -> callback?(null, new ledger.HttpError(xhr))
+  networkErrorCallback: (callback) -> (xhr, status, message) -> callback?(null, ledger.errors.newHttp(xhr))
 
   _httpClientFactory: -> new ledger.api.HttpClient(ledger.config.restClient.baseUrl)
 

@@ -75,3 +75,12 @@ _.extend ledger.errors,
     return self
 
   throw: (code, msg) -> throw @new(code, msg)
+
+  newHttp: (xhr) ->
+    self = @new(ledger.errors.NetworkError, xhr.statusText)
+    self._xhr = xhr
+    self.getXmlHttpRequest = -> @_xhr
+    self.getStatusCode = -> @getXmlHttpRequest().status
+    self.getStatusText = -> @getXmlHttpRequest().statusText
+    self.isDueToNoInternetConnectivity = -> @getStatusCode() is 0
+    return self

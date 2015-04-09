@@ -125,7 +125,6 @@
 
         ## Errors
         'base/errors'
-        'utils/http_error'
 
         ## Managers
         'managers/schemes_manager'
