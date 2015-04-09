@@ -207,6 +207,7 @@ class ledger.wallet.transaction.Transaction
         ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
           if error?
             hadNetworkFailure = yes
+            completion.failure(new ledger.StandardError(ledger.errors.NetworkError)) unless hasNext
             return do done
 
           output.raw = rawTransaction
