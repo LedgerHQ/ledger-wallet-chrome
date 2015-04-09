@@ -2,15 +2,16 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
 
   defaultParams:
     animateIntro: no
-
   view:
     currentAction: "#current_action"
+  timer: null
 
   onAfterRender: ->
     super
-    do @_listenEvents
+    @_listenEvents()
     @view.spinner = ledger.spinners.createLargeSpinner(@select('div.greyed-container')[0])
     @view.currentAction.text(t 'onboarding.device.connecting.is_connecting')
+    @_launchAttestation()
 
   openSupport: ->
     window.open t 'application.support_url'
@@ -21,15 +22,8 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
     ledger.app.off 'dongle:forged'
     ledger.app.off 'dongle:communication_error'
 
-  _hideContent: (hidden, animated = yes) ->
-    @view.contentContainer.children().each (index, node) =>
-      node = $(node)
-      if hidden == yes
-        node.fadeOut(if animated then 250 else 0)
-      else
-        node.fadeIn(if animated then 250 else 0)
-
-  navigateContinue: ->
+  _navigateContinue: ->
+    @_stopTimer()
     ledger.app.wallet?.isFirmwareUpdateAvailable (isAvailable) =>
       if isAvailable
         ledger.app.router.go '/onboarding/device/update'
@@ -40,7 +34,8 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
           else
             ledger.app.router.go '/onboarding/management/welcome'
 
-  navigateError: ->
+  _navigateForged: ->
+    @_stopTimer()
     ledger.app.wallet?.isDongleBetaCertified (__, error) =>
       if error?
         ledger.app.router.go '/onboarding/device/forged'
@@ -50,11 +45,26 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
             ledger.app.setExecutionMode(ledger.app.Modes.FirmwareUpdate)
             ledger.app.router.go '/update/index', {hidePreviousButton: yes}
           else
-            @navigateContinue()
+            @_navigateContinue()
+
+  _navigateError: ->
+    @_stopTimer()
+    ledger.app.router.go '/onboarding/device/failed'
 
   _listenEvents: ->
+    ledger.app.once 'dongle:connected', => @_navigateContinue()
+    ledger.app.once 'dongle:forged', => @_navigateForged()
+    ledger.app.once 'dongle:communication_error', => @_navigateError()
+
+  _stopTimer: ->
+    if @timer?
+      clearTimeout @timer
+      @timer = null
+
+  _launchAttestation: ->
     if ledger.app.wallet?
       ledger.app.performDongleAttestation()
-    ledger.app.once 'dongle:connected', => do @navigateContinue
-    ledger.app.once 'dongle:forged', => do @navigateError
-    ledger.app.once 'dongle:communication_error', => ledger.app.router.go '/onboarding/device/failed'
+    @timer = setTimeout =>
+      # attestation timed out
+      @_navigateError()
+    , 30000
