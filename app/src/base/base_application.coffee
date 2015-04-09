@@ -153,9 +153,9 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   _listenDongleEvents: () ->
     # Dongle management & dongle events re-dispatching
-    @donglesManager.on 'connecting', (event, dongle) =>
-      DongleLogger().info('Connecting', dongle.id)
-      (Try => @onConnectingDongle(dongle)).printError()
+    @donglesManager.on 'connecting', (event, device) =>
+      DongleLogger().info('Connecting', device.deviceId)
+      (Try => @onConnectingDongle(device)).printError()
     @donglesManager.on 'connected', (event, dongle) =>
       @dongle = dongle
       @_dongleAttestationLock = off
@@ -175,7 +175,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
         DongleLogger().info('Dongle is Bootloader mode', dongle.id)
         (Try => @onDongleIsInBootloaderMode(dongle)).printError()
 
-  onConnectingDongle: (card) ->
+  onConnectingDongle: (device) ->
 
   onDongleConnected: (dongle) ->
 

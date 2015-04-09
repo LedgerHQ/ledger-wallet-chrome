@@ -44,6 +44,7 @@ require @ledger.imports, ->
     isInFirmwareUpdateMode: -> @_currentMode is @Modes.FirmwareUpdate
 
     onConnectingDongle: (device) ->
+      console.log("onConnectingDongle with device", device.deviceId, @isInWalletMode(), device.isInBootloaderMode)
       @emit 'dongle:connecting', device if @isInWalletMode() and !device.isInBootloaderMode
 
     onDongleConnected: (dongle) ->
