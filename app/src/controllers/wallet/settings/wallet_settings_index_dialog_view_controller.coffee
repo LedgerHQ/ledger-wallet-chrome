@@ -1,0 +1,2 @@
+class @WalletSettingsIndexDialogViewController extends @DialogViewController
+
