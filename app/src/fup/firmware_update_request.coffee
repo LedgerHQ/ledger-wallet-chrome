@@ -110,7 +110,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @throw If the seed length is not 32 or if it is malformed
   ###
   setKeyCardSeed: (keyCardSeed) ->
-    return if @_keyCardSeed?
+    return if @_keyCardSeed? and @_currentState isnt States.Undefined
     throw new Error(Errors.InvalidSeedSize) if not keyCardSeed? or keyCardSeed.length != 32
     seed = Try => new ByteString(keyCardSeed, HEX)
     throw new Error(Errors.InvalidSeedFormat) if seed.isFailure() or seed.getValue()?.length != 16
@@ -232,8 +232,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
                 @_setCurrentState(States.InitializingOs)
                 @_handleCurrentState()
               else
-                @_setCurrentState(States.ReloadingBootloaderFromOs)
-                @_handleCurrentState()
+                @_wallet.isDongleBetaCertified (__, error) =>
+                  @_setCurrentState(if error? and ledger.fup.versions.Nano.CurrentVersion.Overwrite is false then States.InitializingOs else States.ReloadingBootloaderFromOs)
+                  @_handleCurrentState()
             when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update, ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Higher
               index = 0
               while index < ledger.fup.updates.OS_INIT.length and !ledger.fup.utils.compareVersions(@_dongleVersion, ledger.fup.updates.OS_INIT[index][0]).eq()
