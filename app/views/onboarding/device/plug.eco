@@ -2,6 +2,18 @@
     <div class="logo-container">
         <img src="../../assets/images/onboarding/large_logo.png" width="256" height="156">
     </div>
+    <div class="small-select">
+        <span class="small-select-title">Interface language</span>
+        <select class="small-select-select" name="language" id="language">
+            <option value="value1">Valeur 1</option>
+            <option value="value2">Val 2</option>
+            <option value="value3">Valeur 3</option>
+            <option value="value3">Valeur france 4</option>
+            <option value="value3">Valeur 5</option>
+            <option value="value3">Valeur Royaume-Uni 6</option>
+            <option value="value3">Valeur 7</option>
+        </select>
+    </div>
     <div class="greyed-container">
         <img src="../assets/images/common/plug_wallet.png" height="44" width="187"/>
 
