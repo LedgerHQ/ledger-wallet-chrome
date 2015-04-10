@@ -7,7 +7,7 @@
   <a class="row <% if i == @mobilesGroups.length - 1: %><%= "bottom" %><% else: %><%= "middle" %><% end %>" href="#selectMobileGroup(index=<%= i %>)">
     <div class="light-grey-icon-large"><i class="fa fa-mobile"></i></div>
     <div class="regular-text-small stretchable"><%= mobilesGroup[0].name %></div>
-    <div class="regular-soft-grey-text-small">
+    <div class="regular-grey-text-small">
       <% if mobilesGroup.length > 1: %>
       <%= _.str.sprintf(t('wallet.send.method.multiple_paired_devices'), mobilesGroup.length) %>
       <% else: %>
