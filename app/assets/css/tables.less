@@ -28,7 +28,8 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 18px @metrics-small-padding;
+    padding: 0 @metrics-small-padding;
+    height: 48px;
     background-color: @color;
     border: 1px solid @color-very-light-grey;
     border-radius: @border-radius-default-value;
@@ -36,6 +37,11 @@
     > .stretchable {
       flex-grow: 1;
       flex-shrink: 0;
+    }
+
+    &.freeform {
+      padding: 18px @metrics-small-padding;
+      height: auto;
     }
 
     &.top {

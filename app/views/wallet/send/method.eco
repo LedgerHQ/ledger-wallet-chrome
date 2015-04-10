@@ -5,7 +5,7 @@
   <div class="regular-text"><%- t 'wallet.send.method.select_method' %></div>
   <div id="mobile_table_container"></div>
   <div id="card_table" class="large-table">
-    <a class="header" href="#selectSecurityCard">
+    <a class="header fixed" href="#selectSecurityCard">
       <div class="uppercase-section-column stretchable"><%= t 'wallet.send.method.security_card' %></div>
       <div class="regular-grey-text"><i class="fa fa-angle-right"></i></div>
     </a>

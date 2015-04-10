@@ -36,6 +36,9 @@ class @WalletSettingsHardwareDialogViewController extends @DialogViewController
     dialog.show()
 
   _refreshSmartphonesList: ->
+    # get out if firmware does not support mobile second factor
+    if ledger.app.wallet.getIntFirmwareVersion() < ledger.wallet.Firmware.V_LW_1_0_0
+      return
     ledger.m2fa.PairedSecureScreen.getAllGroupedByUuidFromSyncedStore (smartphonesGroups, error) =>
       return if error? or not smartphonesGroups?
       smartphonesGroups = _.sortBy _.values(_.omit(smartphonesGroups, undefined)), (item) -> item[0]?.name
