@@ -103,7 +103,7 @@ class ledger.wallet.Transaction
     else
       indexesKeyCard = @_out.indexesKeyCard
     amount = ''
-    if ledger.app.wallet.getIntFirmwareVersion() < ledger.wallet.Firmware.V1_4_13
+    if ledger.app.dongle.getIntFirmwareVersion() < ledger.dongle.Firmware.V1_4_13
       stringifiedAmount = @amount.toString()
       stringifiedAmount = _.str.lpad(stringifiedAmount, 9, '0')
       decimalPart = stringifiedAmount.substr(stringifiedAmount.length - 8)
