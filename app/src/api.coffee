@@ -49,7 +49,7 @@ class @Api
   @cosignTransaction: (data) ->
     try
       transaction = Bitcoin.Transaction.deserialize(data.transaction);
-      ledger.app.dongle._btchip.signP2SHTransaction_async(data.inputs, transaction, data.scripts, data.path)
+      ledger.app.dongle.signP2SHTransaction(data.inputs, transaction, data.scripts, data.path)
       .then (result) =>
         @callback_success('cosign_transaction', signatures: result)
         return

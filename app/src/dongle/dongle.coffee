@@ -459,6 +459,13 @@ class @ledger.dongle.Dongle extends EventEmitter
         return result
 
   ###
+  @return [Q.Promise]
+  ###
+  signP2SHTransaction: (inputs, transaction, scripts, path) ->
+    _btchipQueue.enqueue "signP2SHTransaction", =>
+      @_btchip.signP2SHTransaction_async(inputs, transaction, scripts, path)
+
+  ###
   @param [String] input hex encoded
   @return [Object]
     [Array<Byte>] version length is 4
