@@ -29,18 +29,20 @@ jQuery.extend _EventEmitter.prototype, jQuery.EventEmitter
 
 class @EventEmitter
 
-  emit: (event, data) ->
+  _eventEmitter = null
+
+  _getEventEmitter: ->
     @_eventEmitter = new _EventEmitter() unless @_eventEmitter?
-    @_eventEmitter.emit event, data
+    @_eventEmitter
+
+  emit: (event, data) ->
+    @_getEventEmitter().emit event, data
 
   once: (event, handler) ->
-    @_eventEmitter = new _EventEmitter() unless @_eventEmitter?
-    @_eventEmitter.once event, handler
+    @_getEventEmitter().once event, handler
 
   on: (event, handler) ->
-    @_eventEmitter = new _EventEmitter() unless @_eventEmitter?
-    @_eventEmitter.on event, handler
+    @_getEventEmitter().on event, handler
 
   off: (event, handler) ->
-    @_eventEmitter = new _EventEmitter() unless @_eventEmitter?
-    @_eventEmitter.off event, handler
+    @_getEventEmitter().off event, handler

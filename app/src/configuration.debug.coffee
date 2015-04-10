@@ -9,11 +9,15 @@ _.extend @ledger.config,
   restClient:
     baseUrl: 'https://api.ledgerwallet.com/'
   syncRestClient:
-    pullIntervalDelay: 10000
+    pullIntervalDelay: 60000
     pullThrottleDelay: 1000
     pushDebounceDelay: 1000
+  defaultLoggingLevel: "INFO"
+  btcshipDebug: false
+
+# Btcship logging
+@DEBUG = ledger.config.btcshipDebug
 
 Q.longStackSupport = true
 
 @configureApplication = (app) ->
-

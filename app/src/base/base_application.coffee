@@ -3,6 +3,8 @@
 ledger.base ?= {}
 ledger.base.application ?= {}
 
+DongleLogger = -> ledger.utils.Logger.getLoggerByTag('AppDongle')
+
 ###
   Base class for the main application class. This class holds the non-specific part of the application (i.e. click dispatching, application lifecycle)
 ###
@@ -101,11 +103,9 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     return if @_dongleAttestationLock is on
     @_dongleAttestationLock = on
     @dongle?.isCertified (dongle, error) =>
-      (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
       @_dongleAttestationLock = off
+      (Try => @onDongleCertificationDone(dongle, error)).printError()
     return
-
-
 
   ###
     Returns the jQuery element used as the main div container in which controllers will render themselves.
@@ -152,22 +152,29 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   _listenDongleEvents: () ->
     # Dongle management & dongle events re-dispatching
-    @donglesManager.on 'connecting', (event, dongle) => (Try => @onConnectingDongle(dongle)).printError()
+    @donglesManager.on 'connecting', (event, device) =>
+      DongleLogger().info('Connecting', device.deviceId)
+      (Try => @onConnectingDongle(device)).printError()
     @donglesManager.on 'connected', (event, dongle) =>
       @dongle = dongle
+      @_dongleAttestationLock = off
+      DongleLogger().info("Connected", dongle.id)
       dongle.once 'state:disconnected', =>
+        DongleLogger().info('Disconnected', dongle.id)
         @dongle = null
         _.defer => (Try => @onDongleIsDisconnected(dongle)).printError()
       dongle.once 'state:error', =>
         (Try => @onDongleNeedsUnplug(dongle)).printError()
       dongle.once 'state:unlocked', =>
+        DongleLogger().info('Dongle unlocked', dongle.id)
         (Try => @onDongleIsUnlocked(dongle)).printError()
 
       (Try => @onDongleConnected(dongle)).printError()
       if dongle.isInBootloaderMode()
+        DongleLogger().info('Dongle is Bootloader mode', dongle.id)
         (Try => @onDongleIsInBootloaderMode(dongle)).printError()
 
-  onConnectingDongle: (card) ->
+  onConnectingDongle: (device) ->
 
   onDongleConnected: (dongle) ->
 
@@ -177,7 +184,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   onDongleIsDisconnected: (dongle) ->
 
-  onDongleCertificationDone: (dongle, isCertified) ->
+  onDongleCertificationDone: (dongle, error) ->
 
   onDongleIsInBootloaderMode: (dongle) ->
 

@@ -68,8 +68,8 @@ class ledger.wallet.HDWallet
 
 class ledger.wallet.HDWallet.Account
 
-  constructor: (dongle, index, store) ->
-    @dongle = dongle
+  constructor: (wallet, index, store) ->
+    @wallet = wallet
     @index = index
     @_store = store
     @_storeId = "account_#{@index}"
@@ -81,7 +81,7 @@ class ledger.wallet.HDWallet.Account
     @_account.currentPublicIndex ?= 0
 
   initializeXpub: (callback) ->
-    ledger.app.dongle.getExtendedPublicKey "#{@dongle.getRootDerivationPath()}/#{@index}'", (xpub) =>
+    ledger.app.dongle.getExtendedPublicKey "#{@wallet.getRootDerivationPath()}/#{@index}'", (xpub) =>
       @_xpub = xpub
       callback?()
 
@@ -92,7 +92,7 @@ class ledger.wallet.HDWallet.Account
       @initializeXpub callback
 
   release: () ->
-    @dongle = null
+    @wallet = null
     @_store = null
     @_storeId = null
     @index = null
@@ -101,7 +101,7 @@ class ledger.wallet.HDWallet.Account
     paths = []
     paths = paths.concat(@_account.importedChangePaths)
     for index in [0..@_account.currentChangeIndex]
-      paths.push "#{@dongle.getRootDerivationPath()}/#{@index}'/1/#{index}"
+      paths.push "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index}"
     paths = _.difference(paths, @_account.excludedChangePaths)
     paths
     _(paths).without(undefined)
@@ -110,7 +110,7 @@ class ledger.wallet.HDWallet.Account
     paths = []
     paths = paths.concat(@_account.importedPublicPaths)
     for index in [0..@_account.currentPublicIndex]
-      paths.push "#{@dongle.getRootDerivationPath()}/#{@index}'/0/#{index}"
+      paths.push "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
     paths = _.difference(paths, @_account.excludedPublicPaths)
     _(paths).without(undefined)
 
@@ -131,20 +131,20 @@ class ledger.wallet.HDWallet.Account
       when 'public' then @getCurrentPublicAddressPath(index)
 
 
-  getPublicAddressPath: (index) -> "#{@dongle.getRootDerivationPath()}/#{@index}'/0/#{index}"
-  getChangeAddressPath: (index) -> "#{@dongle.getRootDerivationPath()}/#{@index}'/1/#{index}"
+  getPublicAddressPath: (index) -> "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
+  getChangeAddressPath: (index) -> "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index}"
   getAddressPath: (index, type) ->
     switch type
       when 'change' then @getChangeAddressPath(index)
       when 'public' then @getPublicAddressPath(index)
 
-  getCurrentChangeAddress: () -> @dongle.cache?.get(@getCurrentChangeAddressPath())
-  getCurrentPublicAddress: () -> @dongle.cache?.get(@getCurrentPublicAddressPath())
+  getCurrentChangeAddress: () -> @wallet.cache?.get(@getCurrentChangeAddressPath())
+  getCurrentPublicAddress: () -> @wallet.cache?.get(@getCurrentPublicAddressPath())
 
   notifyPathsAsUsed: (paths) ->
     paths = [paths] unless _.isArray(paths)
     for path in paths
-      path = path.replace("#{@dongle.getRootDerivationPath()}/0'/", '').split('/')
+      path = path.replace("#{@wallet.getRootDerivationPath()}/0'/", '').split('/')
       switch path[0]
         when '0' then @_notifyPublicAddressIndexAsUsed parseInt(path[1])
         when '1' then @_notifyChangeAddressIndexAsUsed parseInt(path[1])
@@ -154,14 +154,14 @@ class ledger.wallet.HDWallet.Account
     l 'Notify public change', index, 'current is', @_account.currentPublicIndex
     if index < @_account.currentPublicIndex
       l 'Index is less than current'
-      derivationPath = "#{@dongle.getRootDerivationPath()}/#{@index}'/0/#{index}"
+      derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
       @_account.excludedPublicPaths = _.without @_account.excludedPublicPaths, derivationPath
     else if index > @_account.currentPublicIndex
       l 'Index is more than current'
       difference =  index - (@_account.currentPublicIndex + 1)
       @_account.excludedPublicPaths ?= []
       for i in [0...difference]
-        derivationPath = "#{@dongle.getRootDerivationPath()}/#{@index}'/0/#{index - i - 1}"
+        derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index - i - 1}"
         @_account.excludedPublicPaths.push derivationPath unless _.contains(@_account.excludedPublicPaths, derivationPath)
       @_account.currentPublicIndex = parseInt(index) + 1
     else if index == @_account.currentPublicIndex
@@ -171,13 +171,13 @@ class ledger.wallet.HDWallet.Account
 
   _notifyChangeAddressIndexAsUsed: (index) ->
     if index < @_account.currentChangeIndex
-      derivationPath = "#{@dongle.getRootDerivationPath()}/#{@index}'/1/#{index}"
+      derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index}"
       @_account.excludedChangePaths = _.without @_account.excludedChangePaths, derivationPath
     else if index > @_account.currentChangeIndex
       difference =  index - (@_account.currentChangeIndex + 1)
       @_account.excludedChangePaths ?= []
       for i in [0...difference]
-        derivationPath = "#{@dongle.getRootDerivationPath()}/#{@index}'/1/#{index - i - 1}"
+        derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/1/#{index - i - 1}"
         @_account.excludedChangePaths.push derivationPath unless _.contains(@_account.excludedChangePaths, derivationPath)
       @_account.currentChangeIndex = parseInt(index) + 1
     else if index == @_account.currentChangeIndex
@@ -217,7 +217,7 @@ class ledger.wallet.HDWallet.Account
 
 openStores = (dongle, done) ->
   Try =>
-    dongle.getBitIdAddress (address) =>
+    ledger.bitcoin.bitid.getAddress (address) =>
       Try =>
         bitIdAddress = address.bitcoinAddress.value
         dongle.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>

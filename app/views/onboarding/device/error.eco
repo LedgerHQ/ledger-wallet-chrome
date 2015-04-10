@@ -9,7 +9,7 @@
     <div class="black-indication"><%= @params.message %></div>
     <% end %>
     <% if @params.indication?: %>
-    <div class="small-indication"><%= @params.indication %></div>
+    <div class="medium-indication"><%= @params.indication %></div>
     <% end %>
   </div>
 </div>

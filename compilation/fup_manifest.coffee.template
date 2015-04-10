@@ -13,6 +13,7 @@ _.extend ledger.fup.versions,
       Os: <%- @manifest.current_version.os %>
       Reloader: <%- @manifest.current_version.reloader %>
       Beta: <%- @manifest.current_version.beta %>
+      Overwrite: <%= @manifest.current_version.overwrite is yes %>
       <% if @manifest.current_version.whats_new?: %>WhatsNew: '<%- @manifest.current_version.whats_new %>'<% end %>
 
 

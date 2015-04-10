@@ -13,6 +13,7 @@
         '../libs/jquery.selectric.min'
         '../libs/qrcode.min'
         '../libs/jquery.suggest'
+        '../libs/cryptojs.min'
         '../public/tooltipster/js/jquery.tooltipster.min'
         '../libs/lw-api-js/lib/bitcoinjs-min'
         '../libs/lw-api-js/lib/util'
@@ -52,6 +53,7 @@
         '../libs/BigInt'
         '../libs/sha256'
         '../libs/checkBitcoinAddress'
+        '../libs/bitcoinUtils'
         '../libs/lru'
         '../libs/moment.min'
         '../libs/lokijs.min'
@@ -68,11 +70,13 @@
         ## Application configuration
         'configuration'
 
+        ## Logger
+        'utils/logger'
+
         ## Routes
         'routes'
 
         ## Utils
-        'utils/log'
         'utils/string'
         'utils/number'
         'utils/array'
@@ -98,6 +102,7 @@
         'utils/amount'
         'utils/progressbars'
         'utils/keycard'
+        'utils/promise_queue'
 
         ## Crypto
         'utils/crypto/aes'
@@ -108,6 +113,7 @@
         'utils/bitcoin/bitcoin'
         'utils/bitcoin/bip39_wordlist'
         'utils/bitcoin/bip39'
+        'utils/bitcoin/bitid'
 
         ## Storage
         'utils/storage/store'
@@ -117,19 +123,18 @@
         'utils/storage/object_store'
         'utils/storage/storage'
 
-        ## Logger
-        'utils/logger'
-
         ## Data synchronization
 
         ## Errors
         'base/errors'
-        'utils/http_error'
 
         ## Managers
         'managers/schemes_manager'
         'managers/permissions_manager'
         'managers/system_manager'
+
+        ## Apps
+        'utils/apps/coinkite'
 
         ## Rest clients
         'restclients/authentication'
@@ -157,6 +162,7 @@
         'wallet/cache'
         'wallet/extended_public_key'
         'wallet/sweep_private_key'
+        'wallet/wallet_setup_consistency_checker'
 
         'utils/database/database'
         'base/base_application'
@@ -227,6 +233,13 @@
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'
 
+        # BitID
+        'controllers/wallet/bitid/wallet_bitid_index_dialog_view_controller'
+        'controllers/wallet/bitid/wallet_bitid_authenticating_dialog_view_controller'
+
+        # Settings
+        'controllers/wallet/settings/wallet_settings_hardware_dialog_view_controller'
+
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
         'controllers/onboarding/onboarding_navigation_controller'
@@ -239,6 +252,8 @@
         'controllers/onboarding/device/onboarding_device_error_view_controller'
         'controllers/onboarding/device/onboarding_device_connecting_view_controller'
         'controllers/onboarding/device/onboarding_device_update_view_controller'
+        'controllers/onboarding/device/onboarding_device_unsupported_view_controller'
+        'controllers/onboarding/device/onboarding_device_failed_view_controller'
 
         # Management
         'controllers/onboarding/management/onboarding_management_security_view_controller'
@@ -289,4 +304,18 @@
         'controllers/update/update_cardcheck_view_controller'
         'controllers/update/update_error_view_controller'
 
-      ]
+        ## API
+        'api'
+
+        ## Coinkite
+        'controllers/apps/coinkite/apps_coinkite_navigation_controller'
+        'controllers/apps/coinkite/dashboard/apps_coinkite_dashboard_index_view_controller'
+        'controllers/apps/coinkite/settings/apps_coinkite_settings_index_dialog_view_controller'
+        'controllers/apps/coinkite/keygen/apps_coinkite_keygen_processing_dialog_view_controller'
+        'controllers/apps/coinkite/keygen/apps_coinkite_keygen_show_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_index_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_fetching_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_show_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_signing_dialog_view_controller'
+
+    ]

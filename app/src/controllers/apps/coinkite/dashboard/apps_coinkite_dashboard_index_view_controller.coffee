@@ -1,0 +1,1 @@
+class @AppsCoinkiteDashboardIndexViewController extends @ViewController

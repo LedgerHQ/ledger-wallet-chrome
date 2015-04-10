@@ -6,5 +6,5 @@ _.extend ledger.dongle,
 
   # @return Return current unblocked dongle or throw error if dongle is not plugged or not unblocked.
   unlocked: () ->
-    ledger.throw(ledger.errors.DongleLocked) unless @isPluggedAndUnlocked()
+    ledger.errors.throw(ledger.errors.DongleLocked) unless @isPluggedAndUnlocked()
     return ledger.app.dongle

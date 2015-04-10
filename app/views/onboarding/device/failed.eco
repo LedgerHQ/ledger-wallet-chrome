@@ -1,0 +1,13 @@
+<div id="content-container">
+  <div class="logo-container">
+    <img src="../../assets/images/onboarding/large_logo.png" width="256" height="156">
+  </div>
+  <div class="greyed-container">
+    <img src="../../assets/images/common/large_fail.png" width="50" height="50" />
+    <div class="black-indication"><%= t 'onboarding.device.failed.unexpected_error' %></div>
+    <div class="medium-indication"><%= t 'onboarding.device.failed.unplug' %></div>
+    <div class="actions-container">
+      <a class="cancel-rounded-button" href="#updateNow"><%= t 'common.update' %></a>
+    </div>
+  </div>
+</div>

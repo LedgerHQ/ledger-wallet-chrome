@@ -20,7 +20,7 @@ _.extend ledger.errors,
   DongleLocked: 204
   BlankDongle: 205
   DongleNotCertified: 206
-  UnableToGetBitIdAddress: 207
+  CommunicationError: 207
 
   # Wallet errors
   NotEnoughFunds: 300
@@ -74,4 +74,13 @@ _.extend ledger.errors,
     self._i18nId = -> "common.errors.#{_.underscore(@name)}"
     return self
 
-  throw: (code, msg) => throw @new(code, msg)
+  throw: (code, msg) -> throw @new(code, msg)
+
+  newHttp: (xhr) ->
+    self = @new(ledger.errors.NetworkError, xhr.statusText)
+    self._xhr = xhr
+    self.getXmlHttpRequest = -> @_xhr
+    self.getStatusCode = -> @getXmlHttpRequest().status
+    self.getStatusText = -> @getXmlHttpRequest().statusText
+    self.isDueToNoInternetConnectivity = -> @getStatusCode() is 0
+    return self

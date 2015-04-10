@@ -154,7 +154,7 @@ _.extend @ledger.m2fa,
     [client, promise] = @validateTx(tx)
 
   _nextPairingId: () -> 
-    # ledger.dongle.unlocked().randomBitIdAddress()
+    # ledger.bitcoin.bitid.randomBitIdAddress()
     @_randomPairingId()
 
   # @return a random 16 bytes pairingId + 1 checksum byte hex encoded.

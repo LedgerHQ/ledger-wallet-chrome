@@ -24,6 +24,7 @@
       font-size: @font-size-medium;
       font-weight: @font-weight-light;
       letter-spacing: -0.2px;
+      color: @color-dark-grey;
     }
     a.medium-indication {
       color: @color-dark-grey;
@@ -49,10 +50,6 @@
         .black-title;
         font-weight: @font-weight-semibold;
       }
-    }
-
-    .small-indication {
-      letter-spacing: -0.3px;
     }
 
     &.detailed {
@@ -93,10 +90,8 @@
   @import "management";
 }
 
-
-
 @media print {
-  #content-container { 
+  #content-container {
     height: 900px;
     .navigation-container, .action-bar {
       display: none;
