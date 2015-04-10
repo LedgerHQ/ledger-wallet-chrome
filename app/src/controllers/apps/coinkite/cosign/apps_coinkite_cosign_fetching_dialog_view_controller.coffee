@@ -16,17 +16,22 @@ class @AppsCoinkiteCosignFetchingDialogViewController extends @DialogViewControl
               dialog.show()          
           else
             setTimeout ( =>
-              ck.getCosigner data, (cosigner) =>
+              ck.getCosigner data, (cosigner, signed) =>
                 if cosigner?
-                  ck.getCosignData request, cosigner, (data, error) =>
-                    if error?
-                      @dismiss =>
-                        dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("apps.coinkite.cosign.errors.coinkite_api"), subtitle: error)
-                        dialog.show()
-                    else
-                      @dismiss =>
-                        dialog = new AppsCoinkiteCosignShowDialogViewController(request: data, ck: ck)
-                        dialog.show()
+                  if signed
+                    @dismiss =>
+                      dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("apps.coinkite.cosign.signing.success"), subtitle: t("apps.coinkite.cosign.signing.already_signed"))
+                      dialog.show()                    
+                  else
+                    ck.getCosignData request, cosigner, (data, error) =>
+                      if error?
+                        @dismiss =>
+                          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("apps.coinkite.cosign.errors.coinkite_api"), subtitle: error)
+                          dialog.show()
+                      else
+                        @dismiss =>
+                          dialog = new AppsCoinkiteCosignShowDialogViewController(request: data, ck: ck)
+                          dialog.show()
                 else
                   @dismiss =>
                     dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("apps.coinkite.cosign.errors.wrong_nano"), subtitle: t("apps.coinkite.cosign.errors.wrong_nano_text"))

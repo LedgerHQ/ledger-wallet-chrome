@@ -459,11 +459,11 @@ apps:
   coinkite:
     top_menu:
       items:
-        settings: "Règlages"
-        coinkite: "Coinkite"
-        key: "Clé"
-        cosign: "Cosign"
-        wallet: "Wallet"
+        settings: "RÉGLAGES"
+        coinkite: "COINKITE"
+        key: "EXPORT CLÉ"
+        cosign: "COSIGNATURE"
+        wallet: "RETOUR"
     dashboard:
       title: "Coinkite cosigning interface"
     settings:
@@ -496,18 +496,18 @@ apps:
         info: "La transaction de cosignature est en cours d'analyse"
       show:
         title: "Transaction à signer"
-        link: "Voir les détails complets de la transaction"
         note: "En confirmant la signature, la transaction va être signée par le Ledger Nano puis envoyée sur le site de Coinkite."
         confirm_signature: "Confirmer la signature"
       signing:
         title: "Signature de la transaction"
         info: "La transaction est en cours de signature"
         success: "Signature réussie"
+        already_signed: "Cette transaction a déjà été signée avec succès par ce Ledger Nano."
       errors:
         wrong_nano: "Transaction invalide"
         wrong_nano_text: "Ce Ledger Nano ne fait pas partie des signataires de cette transaction. Impossible de continuer."
         coinkite_api: "Erreur de l'API Coinkite"
-        invalid_request_ref: "Référence invalide (doit faire 17 cacractères)"
+        invalid_request_ref: "Référence invalide (doit faire 17 caractères)"
         missing_api_key: "Clés API manquantes"
         missing_api_key_text: "Vous devez renseigner votre clé API ainsi que le secret dans les règlages."
         signature_failed: "Erreur dans la signature"

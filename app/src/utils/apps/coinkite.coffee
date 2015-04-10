@@ -49,7 +49,7 @@ class @Coinkite
             @cosigner = cosigner.CK_refnum
           finishedCallback()
         ), (finished) =>
-          callback @cosigner
+          callback @cosigner, data.has_signed_already[@cosigner]
     catch error
       callback @cosigner
 
@@ -93,7 +93,7 @@ class @Coinkite
     tx = data.raw_unsigned_txn
     try
       transaction = Bitcoin.Transaction.deserialize(tx);
-      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, transaction, scripts, @CK_PATH)
+      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, transaction, scripts, @CK_PATH, data.req_keys)
       .then (result) =>
         url = '/v1/co-sign/' + @request + '/' + @cosigner + '/sign'
         @_setAuthHeaders(url)

@@ -24,6 +24,7 @@ common:
   reset: "Reset"
   save: "Save"
   back: "Back"
+  next: "Next"
   yes: "Yes"
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
@@ -453,3 +454,60 @@ wallet:
       pair_a_smartphone: "Pair a smartphone"
       single_paired_device: "%s pairing"
       multiple_paired_devices: "%s pairings"
+
+apps:
+  coinkite:
+    top_menu:
+      items:
+        settings: "SETTINGS"
+        coinkite: "COINKITE"
+        key: "EXPORT KEY"
+        cosign: "COSIGNATURE"
+        wallet: "BACK"
+    dashboard:
+      title: "Coinkite cosigning interface"
+    settings:
+      title: "API credentials to Coinkite"
+      api_key: "API key"
+      api_secret: "API secret"
+      api_key_placeholder: "Enter your API key"
+      api_secret_placeholder: "Enter your API secret"
+      note: "Be sure to activate the <b>cosign</b> permission for this key."
+    keygen:
+      processing:
+        title: "Extended public key"
+        info: "Computing extended public key for Coinkite"
+      show:
+        title: "Extended public key"
+        xpub: "Xpub"
+        signature: "Signature"
+        note: "Use this information to import this Ledger Nano as a key for your Coinkite multisignature wallet."
+      errors:
+        derivation_failed: "Fail to compute extended key. Please contact support."
+    cosign:
+      index:
+        title: "Cosign a transaction"
+        request: "Request"
+        request_placeholder: "Enter reference"
+        note_header: "With this tool you can cosign a multisignature transaction with your Ledger Nano."
+        note_footer: "The request reference is shown on the cosign page (<b>user request</b>)"
+      fetching:
+        title: "Fetching information"
+        info: "The cosignature transaction is being analyzed"
+      show:
+        title: "Transaction to sign"
+        note: "If you confirm the signature, this transaction will be signed by your Ledger Nano and sent to Coinkite."
+        confirm_signature: "Confirm signature"
+      signing:
+        title: "Transaction signing"
+        info: "The transaction is being signed by your Ledger Nano"
+        success: "Success"
+        already_signed: "This transaction has already been signed by this Ledger Nano and processed by Coinkite."
+      errors:
+        wrong_nano: "Invalid transaction"
+        wrong_nano_text: "This Ledger Nano is not a cosigner of this transaction. Impossible to continue."
+        coinkite_api: "Coinkite API error"
+        invalid_request_ref: "Invalid reference (must be 17 characters)"
+        missing_api_key: "Missing API credentials"
+        missing_api_key_text: "You must enter your API credentials in the settings."
+        signature_failed: "Fail to sign transaction"
