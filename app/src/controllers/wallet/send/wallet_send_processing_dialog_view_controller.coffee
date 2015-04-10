@@ -28,9 +28,11 @@ class @WalletSendProcessingDialogViewController extends @DialogViewController
     ledger.api.TransactionsRestClient.instance.postTransaction @params.transaction, (transaction, error) =>
       return if not @isShown()
       @dismiss =>
-        if error?
-          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.network_no_response"))
-          dialog.show()
+        dialog =
+        if error?.isDueToNoInternetConnectivity()
+          new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.network_no_response"))
+        else if error?
+          new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.wrong_transaction_signature"))
         else
-          dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.send.errors.sending_succeeded"), subtitle: t("wallet.send.errors.transaction_completed"))
-          dialog.show()
+          new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.send.errors.sending_succeeded"), subtitle: t("wallet.send.errors.transaction_completed"))
+        dialog.show()
