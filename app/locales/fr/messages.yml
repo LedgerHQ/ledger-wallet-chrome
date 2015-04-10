@@ -82,7 +82,7 @@ onboarding:
     update:
       new_firmware_available: "Une nouvelle mise à jour de la puce de votre Ledger Wallet est disponible (%s)."
       new_1_0_0: "Cette mise à jour ajoute une nouvelle authentification des transactions sortantes sur votre smartphone."
-      new_1_0_1: "Cette mise à jour résoud des bugs critiques dans la bibliothèque de cryptographie."
+      new_1_0_1: "Cette mise à jour ajoute la compatibilité P2SH et corrige des bugs critiques (mais qui n'impactent pas vos bitcoins) dans la bibliothèque crypto."
 
     unsupported:
       not_linked: "Votre portefeuille matériel ne semble pas être lié à une carte de sécurité."
