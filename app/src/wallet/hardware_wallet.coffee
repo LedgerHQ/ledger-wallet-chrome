@@ -129,6 +129,9 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
             callback?(no, {title: 'Wrong PIN', code: ledger.errors.WrongPinCode, error, retryCount: retryNumber})
     @_lwCard.verifyPIN pin
 
+  lock: () ->
+    @_setState(ledger.wallet.States.LOCKED)
+
   setup: (pincode, seed, callback) ->
     throw 'Cannot setup if the wallet is not blank' if @_state isnt ledger.wallet.States.BLANK and @_state isnt ledger.wallet.States.FROZEN
     onSuccess = () =>
@@ -345,12 +348,13 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     unbind = () =>
       for callbackName, params of operation
         for event in params.events
-          @_vents.off event, params.do
+          @_vents.off event, params.handler
 
     for callbackName, params of operation
       for event in params.events
-       do (params) =>
-          @_vents.on event, (ev, data) ->
+        do (params) =>
+          params.handler = (ev, data) ->
             _.defer () ->
-              params.do(data, ev)
+            params.do(data, ev)
+          @_vents.on event, params.handler
     unbind

@@ -27,6 +27,8 @@ require @ledger.imports, ->
       @_currentMode = newMode
       if @isInFirmwareUpdateMode()
         @_releaseWallet(no)
+      else
+        @connectWallet(ledger.app.wallet) if ledger.app.wallet?
       return
 
     ###
@@ -111,7 +113,10 @@ require @ledger.imports, ->
       ledger.tasks.Task.resetAllSingletonTasks()
       ledger.db.contexts.close()
       ledger.db.close()
-      @wallet = null if removeDongle
+      if removeDongle
+        @wallet = null
+      else
+        @wallet?.lock()
       ledger.dialogs.manager.dismissAll(no)
       @router.go '/onboarding/device/plug' if @isInWalletMode()
 
