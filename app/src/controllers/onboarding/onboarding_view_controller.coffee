@@ -2,11 +2,11 @@ class @OnboardingViewController extends @ViewController
 
   view:
     continueButton: '#continue_button'
-    doc: 'document'
 
   onAfterRender: ->
     super
-    do @bindContinue
+    do @unbindWindow
+    do @bindWindow
 
   navigation:
     continueUrl: undefined
@@ -30,15 +30,12 @@ class @OnboardingViewController extends @ViewController
   navigateContinue: ->
     ledger.app.router.go @navigation.continueUrl, @navigationContinueParams()
 
-  bindContinue: ->
-    l("Binding ENTER keypress")
+  unbindWindow: ->
+    $(window).unbind 'keyup', null
+
+  bindWindow: ->
     if @view.continueButton? and @view.continueButton.length == 1
-      l("Found button")
-      window.on 'keyup', (e) ->
-        l(e.keyCode)
-        # if (@value.indexOf('.') != -1) and e.keyCode == 110
-        #   e.preventDefault
-        #   return no
-        # @view.continueButton.click()
-    else
-      l("Button not found")
+      $(window).on 'keyup', (e) =>
+        if(e.keyCode == 13)
+          if(!@view.continueButton.hasClass 'disabled')
+            @view.continueButton.click()
