@@ -34,7 +34,6 @@ permissions:
       -
         vendorId: 9601
         productId: 6151
-
       -
         vendorId: 9601
         productId: 6152

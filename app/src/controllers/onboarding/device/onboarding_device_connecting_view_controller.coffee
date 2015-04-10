@@ -21,6 +21,7 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
     ledger.app.off 'dongle:connected'
     ledger.app.off 'dongle:forged'
     ledger.app.off 'dongle:communication_error'
+    @_stopTimer()
 
   _navigateContinue: ->
     @_stopTimer()
