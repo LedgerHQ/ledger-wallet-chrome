@@ -157,6 +157,7 @@
         'wallet/cache'
         'wallet/extended_public_key'
         'wallet/sweep_private_key'
+        'wallet/wallet_setup_consistency_checker'
 
         'utils/database/database'
         'base/base_application'
