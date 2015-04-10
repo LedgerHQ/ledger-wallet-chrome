@@ -469,8 +469,18 @@ apps:
         wallet: "BACK"
     dashboard:
       title: "Coinkite cosigning interface"
+      compatibility:
+        title: "Compatibility test"
+        info: "Verifying compaibility of your Ledger Nano with P2SH"
+        check: "Before to use our Coinkite multisignature app, please verify that your Ledger Nano is compatible."
+        check_button: "Test my Ledger Nano"
+        success: "Successs!"
+        success_text: "Your Ledger Nano is compatible with multisignature."
+        fail: "Fail!"
+        fail_text: "Your Ledger Nano is not compatible. You must reset it: enter three times in a row a wrong PIN, and restore your seed. Make sure you do have your recovery sheet before doing that, otherwise you will lose your bitcoins!"
+        warning: "WARNING: if the test fails, you'll have to unplug and replug your Nano."
     settings:
-      title: "API credentials to Coinkite"
+      title: "Coinkite API credentials"
       api_key: "API key"
       api_secret: "API secret"
       api_key_placeholder: "Enter your API key"

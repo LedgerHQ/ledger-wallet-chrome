@@ -1,3 +1,6 @@
+<table>
+<tr><td>
+
 <section id="coinkite">
 
   <header>
@@ -27,3 +30,16 @@ in the shared account:</p>
 <a class="action-rounded-button" href="#openCoinkite">GO TO COINKITE</a>
 
 </section>
+
+</td><td>
+
+<section id="test">
+
+<%= t('apps.coinkite.dashboard.compatibility.check') %>
+<p>
+<a class="action-rounded-button" href="/apps/coinkite/dashboard/compatibility"><%= t('apps.coinkite.dashboard.compatibility.check_button') %></a>
+<p>
+<b><%= t('apps.coinkite.dashboard.compatibility.warning') %></b>
+</section>
+
+</td></tr></table>

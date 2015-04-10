@@ -887,7 +887,7 @@ var BTChip = Class.create({
                 return deferred.promise;
 	},
 
-  signP2SHTransaction_async: function(inputs, transaction, scripts, path, req_keys) {
+  signP2SHTransaction_async: function(inputs, transaction, scripts, path) {
     var authorization = new ByteString("", HEX);
     var signatures = [];
     var scriptData;

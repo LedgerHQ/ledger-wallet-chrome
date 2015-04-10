@@ -93,7 +93,7 @@ class @Coinkite
     tx = data.raw_unsigned_txn
     try
       transaction = Bitcoin.Transaction.deserialize(tx);
-      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, transaction, scripts, Coinkite.CK_PATH, data.req_keys)
+      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, transaction, scripts, Coinkite.CK_PATH)
       .then (result) =>
         url = '/v1/co-sign/' + @request + '/' + @cosigner + '/sign'
         @_setAuthHeaders(url)
@@ -108,6 +108,44 @@ class @Coinkite
         callback?(null, error)
     catch error
       callback?(null, error)
+
+  testDongleCompatibility: (callback) ->
+    data = {
+      "input_info": [
+        {
+          "full_sp": "m/0",
+          "out_num": 1,
+          "sp": "0",
+          "txn": "fd11d688a755faa7523c9a42fa54bba32a78db890673a1ba3a63e315914ae8b4"
+        }
+      ],
+      "inputs": [
+        [
+          "0",
+          "214af8788d11cf6e3a8dd2efb00d0c3facb446273dee2cf8023e1fae8b2afcbd"
+        ]
+      ],
+      "raw_unsigned_txn": "0100000001b4e84a9115e3633abaa1730689db782aa3bb54fa429a3c52a7fa55a788d611fd0100000000ffffffff02a0860100000000001976a914069b75ac23920928eda632a20525a027e67d040188ac50c300000000000017a914c70abc77a8bb21997a7a901b7e02d42c0c0bbf558700000000",
+      "redeem_scripts": {
+        "0": {
+          "addr": "3NjjSXDhRtn4yunA7P8DGGTQuyPnbktcs3",
+          "redeem": "522102feec7dd82317846908c20c342a02a8e8c17fb327390ce8d6669ef09a9c85904b210308aaece16e0f99b78e4beb30d8b18652af318428d6d64df26f8089010c7079f452ae"
+        }
+      },
+    }
+    inputs = data.inputs
+    scripts = data.redeem_scripts
+    tx = data.raw_unsigned_txn
+    try
+      transaction = Bitcoin.Transaction.deserialize(tx);
+      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, transaction, scripts, Coinkite.CK_PATH)
+      .then (result) =>
+        callback true
+      .fail (error) =>
+        callback false
+    catch error
+      callback false
+
 
   _setAuthHeaders: (endpoint) ->
     endpoint = endpoint.split('?')[0]

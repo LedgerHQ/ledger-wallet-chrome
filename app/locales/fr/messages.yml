@@ -469,6 +469,16 @@ apps:
         wallet: "RETOUR"
     dashboard:
       title: "Coinkite cosigning interface"
+      compatibility:
+        title: "Test de compatibilité"
+        info: "Vérification de la compatibilité avec P2SH"
+        check: "Avant d'utiliser l'outil de multisignature Coinkite, vérifiez que votre Ledger Nano est bien compatible."
+        check_button: "Tester mon Ledger Nano"
+        success: "Succès!"
+        success_text: "Votre Ledger Nano est compatible avec la cosignature Coinkite"
+        fail: "Echec!"
+        fail_text: "Votre Ledger Nano n'est pas compatible. Vous devez le réinitialiser: entrez trois fois un mauvais PIN puis restaurez votre seed. Assurez vous surtout d'avoir bien votre livret de restauration sinon vous perdez vos bitcoins!"
+        warning: "ATTENTION: si le test est un échec, vous devrez débrancher et rebrancher votre Nano."
     settings:
       title: "Vos accès API à Coinkite"
       api_key: "API key"
