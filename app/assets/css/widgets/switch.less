@@ -16,10 +16,10 @@
   box-sizing: border-box;
   background-color: @color-light-grey;
   cursor: pointer;
-  &.switch-isOn {
+  &-isOn {
     background-color: @color-action-green;
   }
-  &.switch-isAnimated {
+  &-isAnimated {
     transition-duration: 250ms;
   }
 
@@ -31,14 +31,11 @@
     box-shadow: 0px 2px 1px rgba(0,0,0,0.1);
     position: relative;
     left: 0px;
-    &.switch-circle-isAnimated {
-      transition: all 100ms ease;
-    }
-    &.switch-circle-isOn {
+    &-isOn {
       position: relative;
       left: @width-switch-circle;
     }
-    &.switch-circle-isOn-isAnimated {
+    &-isAnimated {
       transition: all 100ms ease-in;
     }
   }
