@@ -438,6 +438,11 @@ wallet:
     errors:
       cancelled: "Identification annulée"
       signature_failed: "Erreur dans la signature. Retirez et réinsérez le Nano."
+    form:
+      title: "Se connecter avec BitID"
+      uri: "URI du service BitID"
+      uri_placeholder: "Entrez l'URI"
+      invalid_uri: "URI invalide"
 
   settings:
     common:

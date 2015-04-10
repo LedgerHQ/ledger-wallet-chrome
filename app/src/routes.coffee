@@ -156,6 +156,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new WalletBitidIndexDialogViewController({ uri: params["?params"]?.uri, silent: params["?params"]?.silent })
     dialog.show()
 
+  route '/wallet/bitid/form', (params) ->
+    dialog = new WalletBitidFormDialogViewController()
+    dialog.show()
+
   ## Coinkite
   route '/apps/coinkite/dashboard/index', (params) ->
     app.navigate COINKITE_LAYOUT, AppsCoinkiteDashboardIndexViewController
