@@ -35,6 +35,10 @@ class @WalletSettingsHardwareDialogViewController extends @DialogViewController
         @_refreshSmartphonesList()
     dialog.show()
 
+  openCoinkite: ->
+    ledger.app.router.go("/apps/coinkite/dashboard/index")
+    @dismiss()
+
   _refreshSmartphonesList: ->
     # get out if firmware does not support mobile second factor
     if ledger.app.wallet.getIntFirmwareVersion() < ledger.wallet.Firmware.V_LW_1_0_0
