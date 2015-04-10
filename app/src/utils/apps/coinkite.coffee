@@ -1,7 +1,7 @@
 class @Coinkite
 
   API_BASE: "https://api.coinkite.com"
-  CK_PATH: "0xb11e'/0xffaa001'"
+  @CK_PATH: "0xb11e'/0xccc0'"
 
   @factory: (callback) ->
     ledger.storage.sync.get "__apps_coinkite_api_key", (r) =>
@@ -20,9 +20,9 @@ class @Coinkite
 
   getExtendedPublickey: (callback) ->
     try
-      ledger.app.wallet.getExtendedPublicKey @CK_PATH, (key) =>
+      ledger.app.wallet.getExtendedPublicKey Coinkite.CK_PATH, (key) =>
         @xpub = key._xpub58
-        ledger.app.wallet.signMessageWithBitId @CK_PATH, "Coinkite", (signature) =>
+        ledger.app.wallet.signMessageWithBitId Coinkite.CK_PATH, "Coinkite", (signature) =>
           callback?({xpub: @xpub, signature: signature}, null)
     catch error
       callback?(null, error)
@@ -41,7 +41,7 @@ class @Coinkite
   getCosigner: (data, callback) ->
     @cosigner = null
     try
-      ledger.app.wallet.getExtendedPublicKey @CK_PATH, (key) =>
+      ledger.app.wallet.getExtendedPublicKey Coinkite.CK_PATH, (key) =>
         xpub = key._xpub58
         async.eachSeries data.cosigners, ((cosigner, finishedCallback) =>
           check = cosigner.xpubkey_check
@@ -81,7 +81,7 @@ class @Coinkite
 
   checkKeys: (check, callback) ->
     try
-      ledger.app.wallet.getExtendedPublicKey @CK_PATH, (key) =>
+      ledger.app.wallet.getExtendedPublicKey Coinkite.CK_PATH, (key) =>
         xpub = key._xpub58
         callback?(xpub.indexOf(check, xpub.length - check.length) > 0)
     catch error
@@ -93,7 +93,7 @@ class @Coinkite
     tx = data.raw_unsigned_txn
     try
       transaction = Bitcoin.Transaction.deserialize(tx);
-      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, transaction, scripts, @CK_PATH, data.req_keys)
+      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, transaction, scripts, Coinkite.CK_PATH, data.req_keys)
       .then (result) =>
         url = '/v1/co-sign/' + @request + '/' + @cosigner + '/sign'
         @_setAuthHeaders(url)

@@ -171,3 +171,7 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/apps/coinkite/cosign/index', (params) ->
     dialog = new AppsCoinkiteCosignIndexDialogViewController()
     dialog.show()
+
+  route '/apps/coinkite/help/index', (params) ->
+    window.open t 'application.support_coinkite_url'
+

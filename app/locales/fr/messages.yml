@@ -3,6 +3,7 @@ application:
   small_description: "Ledger Wallet gère vos comptes Bitcoin de façon efficace et sécurisée."
   support_url: 'http://support.ledgerwallet.com/'
   support_key_not_recognized_url: 'https://ledger.groovehq.com/knowledge_base/categories/troubleshooting-20'
+  support_coinkite_url: 'https://ledger.groovehq.com/knowledge_base/topics/how-to-use-the-coinkite-app'
 
 common:
   bitcoin_acronym: 'BTC'
@@ -482,7 +483,8 @@ apps:
         title: "Clé de signature"
         xpub: "Xpub"
         signature: "Signature"
-        note: "Ces informations vous permettent d'ajouter ce Ledger Nano comme clé de signature sur votre wallet multisignature Coinkite."
+        path: "Chemin de dérivation Coinkite"
+        note: "Ces informations vous permettent d'ajouter ce Ledger Nano comme clé de signature sur votre wallet multisignature Coinkite. Le chemin de dérivation est utile pour restaurer manuellement la clé publique étendue depuis votre seed."
       errors:
         derivation_failed: "Erreur dans le calcul de la clé publique étendue. Contactez le support"
     cosign:
