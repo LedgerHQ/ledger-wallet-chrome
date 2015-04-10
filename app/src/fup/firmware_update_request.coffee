@@ -352,7 +352,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _getVersion: (forceBl, callback) -> @_dongle.getRawFirmwareVersion(@_lastMode is Modes.Bootloader, forceBl, callback)
 
   _failure: (reason) ->
-    @emit "error", cause: new ledger.StandardError(reason)
+    @emit "error", cause: ledger.errors.new(reason)
     @_waitForPowerCycle()
 
   _success: ->
