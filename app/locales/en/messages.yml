@@ -81,6 +81,7 @@ onboarding:
     update:
       new_firmware_available: "A new firmware update is available for your Ledger Wallet (%s)."
       new_1_0_0: "This update adds a new authentication to validate outgoing transactions on your smartphone."
+      new_1_0_1: "This update fixes critical bugs in the cryptography library."
 
     unsupported:
       not_linked: "Your hardware wallet does not seem to be linked to any security card."
