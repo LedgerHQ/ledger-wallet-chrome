@@ -4,12 +4,15 @@ section#settings_hardware_dialog {
   width: @dialog-width-settings;
 
   #firmware_table_container {
-    margin-top: @metrics-medium-padding;
-
+    > .large-table {
+      margin-top: @metrics-medium-padding;
+    }
   }
 
   #smartphones_table_container {
-    margin-top: @metrics-almost-medium-padding;
+    > .large-table {
+      margin-top: @metrics-almost-medium-padding;
+    }
 
     .row {
       > .light-grey-icon-large {
@@ -19,6 +22,12 @@ section#settings_hardware_dialog {
       > .regular-soft-grey-text-small {
         margin-right: @metrics-very-small-padding;
       }
+    }
+  }
+
+  #beta_table_container {
+    > .large-table {
+      margin-top: @metrics-medium-padding;
     }
   }
 }
