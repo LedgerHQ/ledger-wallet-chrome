@@ -89,7 +89,7 @@ describe "Internationalization and Localization -", ->
       .done()
 
 
-
+  # This test can be launch only one time - Need app restart
   describe "Check lang and locale memory and stores values after full initialization", ->
 
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL

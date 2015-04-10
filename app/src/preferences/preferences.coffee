@@ -69,9 +69,9 @@ class ledger.preferences.Preferences
 
   # Set BTC Unit
   setBtcUnit: (value) ->
-    if value isnt 'BTC' and value isnt 'mBTC' and value isnt 'uBTC' and value isnt 'satoshi'
+    if value isnt 'BTC' and value isnt 'mBTC' and value isnt 'bits' and value isnt 'satoshi'
       try
-        throw new Error("'BtcUnit' must be BTC, mBTC, uBTC or satoshi")
+        throw new Error("'BtcUnit' must be BTC, mBTC, bits or satoshi")
       catch e
         console.log(e.name + ": " + e.message)
         return null

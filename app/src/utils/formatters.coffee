@@ -18,7 +18,7 @@ class ledger.formatters
 
 
   ###
-    This generic method formats the input value in satoshi to an other unit (BTC, mBTC, uBTC). You can also specify the number of digits following the decimal point.
+    This generic method formats the input value in satoshi to an other unit (BTC, mBTC, bits). You can also specify the number of digits following the decimal point.
 
     @param [Number] value An input value in satoshi
     @param [String] unit The denomination of the unit
@@ -32,13 +32,11 @@ class ledger.formatters
         unit = 8
       when 'mBTC'
         unit = 5
-      when 'uBTC'
+      when 'bits'
         unit = 2
-      when 'satoshi'
-        unit = 0
       else
         try
-          throw new Error("'BtcUnit' must be BTC, mBTC, uBTC or satoshi")
+          throw new Error("'BtcUnit' must be BTC, mBTC or bits")
         catch e
           console.log(e.name + ": " + e.message)
 
@@ -101,14 +99,14 @@ class ledger.formatters
 
 
   ###
-    This method converts Satoshi to uBTC
+    This method converts Satoshi to bits/uBTC
 
     @param [Number] value An input value in Satoshi
     @param [Integer] precision Fixed number of decimal places (the number of digits following the decimal point)
     @return [String] The formatted value
   ###
   @fromSatoshiToMicroBTC: (value, precision) ->
-    @formatUnit(value, "uBTC", precision)
+    @formatUnit(value, "bits", precision)
 
 
   ###

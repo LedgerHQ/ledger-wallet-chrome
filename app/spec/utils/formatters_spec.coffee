@@ -24,8 +24,6 @@ describe "Unit Formatters -", ->
     expect(res).toBe('0.00001')
     res = formatters.fromSatoshiToBTC(1000)
     expect(res).toBe('0.00001')
-    res = formatters.fromValue(9678978)
-    expect(res).toBe('0.09678978')
 
 
   it "should converts to mBTC", ->
@@ -35,8 +33,8 @@ describe "Unit Formatters -", ->
     expect(res).toBe('0.01')
 
 
-  it "should converts to uBTC", ->
-    res = formatters.formatUnit(1000, 'uBTC')
+  it "should converts to bits/uBTC", ->
+    res = formatters.formatUnit(1000, 'bits')
     expect(res).toBe('10')
     res = formatters.fromSatoshiToMicroBTC(1000)
     expect(res).toBe('10')
@@ -45,6 +43,14 @@ describe "Unit Formatters -", ->
   it "should round correctly", ->
     res = formatters.formatUnit(9678978, 'BTC', 3)
     expect(res).toBe('0.097')
+
+  it "should test fromValue() with default to BTC", ->
+    try
+      ledger.preferences.instance.setBtcUnit('BTC')
+    catch e
+      throw new Error 'App must be initialized ' + e
+    res = formatters.fromValue(9678978)
+    expect(res).toBe('0.09678978')
     res = formatters.fromValue(9678978, 6)
     expect(res).toBe('0.096790')
     res = formatters.fromValue(967897800, -1)
