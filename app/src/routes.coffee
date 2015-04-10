@@ -95,8 +95,8 @@ ledger.router.pluggedWalletRoutesExceptions = [
     app.navigate WALLET_LAYOUT, WalletAccountsShowViewController
 
   # Send
-  route '/wallet/send/index', (params) ->
-    dialog = new WalletSendIndexDialogViewController(params["?params"])
+  route '/wallet/send/index', (params = {}) ->
+    dialog = new WalletSendIndexDialogViewController({ amount: params["?params"]?.amount, address: params["?params"]?.address})
     dialog.show()
 
   # Receive
@@ -152,6 +152,22 @@ ledger.router.pluggedWalletRoutesExceptions = [
     app.navigate UPDATE_LAYOUT, UpdateErrorViewController
 
   # BitID
-  route '/wallet/bitid/index', (params) ->
-    dialog = new WalletBitidIndexDialogViewController(params["?params"])
+  route '/wallet/bitid/index', (params = {}) ->
+    dialog = new WalletBitidIndexDialogViewController({ uri: params["?params"]?.uri, silent: params["?params"]?.silent })
+    dialog.show()
+
+  ## Coinkite
+  route '/apps/coinkite/dashboard/index', (params) ->
+    app.navigate COINKITE_LAYOUT, AppsCoinkiteDashboardIndexViewController
+
+  route '/apps/coinkite/settings/index', (params) ->
+    dialog = new AppsCoinkiteSettingsIndexDialogViewController()
+    dialog.show()
+
+  route '/apps/coinkite/keygen/processing', (params) ->
+    dialog = new AppsCoinkiteKeygenProcessingDialogViewController()
+    dialog.show()
+
+  route '/apps/coinkite/cosign/index', (params) ->
+    dialog = new AppsCoinkiteCosignIndexDialogViewController()
     dialog.show()

@@ -22,6 +22,7 @@ common:
   restore: "Restore"
   later: "Later"
   reset: "Reset"
+  save: "Save"
   back: "Back"
   yes: "Yes"
   no: "No"
@@ -435,6 +436,7 @@ wallet:
     errors:
       cancelled: "Authentication cancelled"
       signature_failed: "Failed to sign the challenge. Remove and reinsert the Nano."
+
   settings:
     common:
       settings: "Settings"

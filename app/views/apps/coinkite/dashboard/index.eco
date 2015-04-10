@@ -1,0 +1,7 @@
+<section id="coinkite">
+
+  <header>
+    <h1><%= t 'apps.coinkite.dashboard.title' %></h1>
+  </header>
+
+</section>

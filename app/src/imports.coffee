@@ -13,6 +13,7 @@
         '../libs/jquery.selectric.min'
         '../libs/qrcode.min'
         '../libs/jquery.suggest'
+        '../libs/cryptojs.min'
         '../public/tooltipster/js/jquery.tooltipster.min'
         '../libs/lw-api-js/lib/bitcoinjs-min'
         '../libs/lw-api-js/lib/util'
@@ -52,6 +53,7 @@
         '../libs/BigInt'
         '../libs/sha256'
         '../libs/checkBitcoinAddress'
+        '../libs/bitcoinUtils'
         '../libs/lru'
         '../libs/moment.min'
         '../libs/lokijs.min'
@@ -130,6 +132,9 @@
         'managers/schemes_manager'
         'managers/permissions_manager'
         'managers/system_manager'
+
+        ## Apps
+        'utils/apps/coinkite'
 
         ## Rest clients
         'restclients/authentication'
@@ -299,4 +304,16 @@
 
         ## API
         'api'
+
+        ## Coinkite
+        'controllers/apps/coinkite/apps_coinkite_navigation_controller'
+        'controllers/apps/coinkite/dashboard/apps_coinkite_dashboard_index_view_controller'
+        'controllers/apps/coinkite/settings/apps_coinkite_settings_index_dialog_view_controller'
+        'controllers/apps/coinkite/keygen/apps_coinkite_keygen_processing_dialog_view_controller'
+        'controllers/apps/coinkite/keygen/apps_coinkite_keygen_show_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_index_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_fetching_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_show_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_signing_dialog_view_controller'
+
     ]

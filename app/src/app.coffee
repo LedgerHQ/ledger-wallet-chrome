@@ -118,6 +118,7 @@ require @ledger.imports, ->
   @WALLET_LAYOUT = 'WalletNavigationController'
   @ONBOARDING_LAYOUT = 'OnboardingNavigationController'
   @UPDATE_LAYOUT = 'UpdateNavigationController'
+  @COINKITE_LAYOUT = 'AppsCoinkiteNavigationController'
 
   Model.commitRelationship()
 
