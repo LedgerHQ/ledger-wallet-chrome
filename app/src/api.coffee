@@ -46,19 +46,6 @@ class @Api
     catch error
       callback_cancel('sign_message', JSON.stringify(error))
 
-  @cosignTransaction: (data) ->
-    try
-      transaction = Bitcoin.Transaction.deserialize(data.transaction);
-      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(data.inputs, transaction, data.scripts, data.path)
-      .then (result) =>
-        @callback_success('cosign_transaction', signatures: result)
-        return
-      .fail (error) =>
-        @callback_cancel('cosign_transaction', JSON.stringify(error))
-        return
-    catch error
-      @callback_cancel('cosign_transaction', JSON.stringify(error))
-
   @bitid: (data) ->
     ledger.app.router.go '/wallet/bitid/index', {uri: data.uri, silent: data.silent}
 
