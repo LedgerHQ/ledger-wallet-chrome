@@ -14,6 +14,7 @@ permissions:
   - "*://ledgerwallet.com/*"
   - "*://*.ledgerwallet.com/*"
   - "*://*.chain.com/v2/notifications/*"
+  - "*://api.coinkite.com/*"
   - "storage"
   - "usb"
   - "hid"
@@ -45,6 +46,7 @@ externally_connectable:
   matches:
     - "*://*.ledgerwallet.com/*"
     - "*://ledgerwallet.com/*"
+    - "http://dev.ledgerwallet.com:3000/api"
 
 commands:
   reload-page:

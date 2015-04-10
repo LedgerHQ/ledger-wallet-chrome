@@ -1,0 +1,34 @@
+<section id="bitid_index_dialog">
+  <header>
+    <h1><%= t 'wallet.bitid.index.title' %></h1>
+  </header>
+  <table class="no-table-head">
+    <tbody>
+      <tr>
+        <td colspan=2>
+          <%= t 'wallet.bitid.index.connect' %>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title"><%= t 'wallet.bitid.index.domain' %></td>
+        <td class="align-right">
+          <div id="bitid_domain"></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title"><%= t 'wallet.bitid.index.address' %></td>
+        <td class="align-right">
+          <div id="bitid_address">
+            <i class="fa fa-spinner fa-spin"></i>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>  
+</section>
+<div id="error_container"></div>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
+  <a class="action-rounded-button" href="#confirm" id="confirm_button"><%= t 'common.signing' %> <i class="fa fa-spinner fa-spin"></i></a>
+</div>

@@ -4,6 +4,10 @@ class @WalletSendMethodDialogViewController extends @DialogViewController
     mobileTableContainer: "#mobile_table_container"
   mobilesGroups: []
 
+  cancel: ->
+    Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
+    @dismiss()
+    
   onAfterRender: ->
     super
     @_refreshMobilesList()

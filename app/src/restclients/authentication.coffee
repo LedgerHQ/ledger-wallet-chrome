@@ -88,12 +88,13 @@ class AuthenticatedHttpClient extends @HttpClient
       @_client.jqAjax type: "GET", url: "bitid/authenticate/#{bitidAddress}", dataType: 'json'
     .fail (jqXHR, statusText, errorThrown) =>
       if deferred.retryNumber-- > 0 then @_performAuthenticate(deferred) else deferred.reject([jqXHR, statusText, errorThrown])
-    .then (data) => CompletionClosure.defer(ledger.app.wallet.signMessageWithBitId, ledger.app.wallet, data['message']).jq()
+    .then (data) => CompletionClosure.defer(ledger.app.wallet.signMessageWithBitId, ledger.app.wallet, "0'/0/0xb11e", data['message']).jq()
     .fail () => deferred.reject([null, "Unable to sign message", error])
     .then (signature) => @_client.jqAjax(type: "POST", url: 'bitid/authenticate', data: {address: bitidAddress, signature: signature}, contentType: 'application/json', dataType: 'json')
     .fail () =>  if deferred.retryNumber-- > 0 then @_performAuthenticate(deferred) else deferred.reject([jqXHR, statusText, errorThrown])
     .then (data) =>
       @_authToken = data['token']
+      ledger.app.emit 'wallet:authenticated'
       deferred.resolve()
 
   getAuthToken: (callback = null) ->

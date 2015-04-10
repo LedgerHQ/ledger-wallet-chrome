@@ -234,8 +234,8 @@ class @ledger.dongle.Dongle extends EventEmitter
 
     l("Setup in progress ... please wait")
     @_btchip.setupNew_async(
-      0x05,
-      BTChip.FEATURE_DETERMINISTIC_SIGNATURE,
+      BTChip.MODE_WALLET,
+      BTChip.FEATURE_DETERMINISTIC_SIGNATURE | BTChip.FEATURE_NO_2FA_P2SH,
       BTChip.VERSION_BITCOIN_MAINNET,
       BTChip.VERSION_BITCOIN_P2SH_MAINNET,
       new ByteString(pin, ASCII),
@@ -319,12 +319,14 @@ class @ledger.dongle.Dongle extends EventEmitter
     @getPublicAddress(path, callback)
 
   ###
-  @overload signMessageWithBitId(message, callback=undefined)
+  @overload signMessageWithBitId(derivationPath, message, callback=undefined)
+    @param [String] message
     @param [String] message
     @param [Function] callback Optional argument
     @return [CompletionClosure]
 
-  @overload signMessageWithBitId(message, subpath=undefined, callback=undefined)
+  @overload signMessageWithBitId(derivationPath, message, subpath=undefined, callback=undefined)
+    @param [String] message
     @param [String] message
     @param [Integer, String] subpath Optional argument
     @param [Function] callback Optional argument
@@ -332,11 +334,11 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   @see signMessage && getBitIdAddress
   ###
-  signMessageWithBitId: (message, subpath=undefined, callback=undefined) ->
+  signMessageWithBitId: (derivationPath, message, subpath=undefined, callback=undefined) ->
     [subpath, callback] = [callback, subpath] if ! callback && typeof subpath == 'function'
     path = ledger.dongle.BitIdRootPath
     path += "/#{subpath}" if subpath?
-    @signMessage(message, path, callback)
+    @signMessage(derivationPath, message, path, callback)
 
   # @param [Function] callback Optional argument
   # @return [CompletionClosure]
