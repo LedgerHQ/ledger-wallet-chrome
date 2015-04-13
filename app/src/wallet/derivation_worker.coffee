@@ -1,6 +1,6 @@
 try
   importScripts(
-      '../utils/log.js'
+      '../utils/logger.js'
       '../../libs/bitcoinjs-min.js'
       '../../libs/lw-api-js/lib/bitcoinjs-min.js'
       'extended_public_key.js'
