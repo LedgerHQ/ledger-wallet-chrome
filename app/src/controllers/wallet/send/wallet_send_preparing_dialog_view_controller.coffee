@@ -2,6 +2,10 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
 
   view:
     contentContainer: '#content_container'
+    
+  cancel: ->
+    Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
+    @dismiss()
 
   onAfterRender: ->
     super
@@ -16,6 +20,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
           when ledger.errors.NetworkError then 'network_no_response'
           when ledger.errors.NotEnoughFunds then 'unsufficient_balance'
         @dismiss =>
+          Api.callback_cancel 'send_payment', t("common.errors." + reason)
           dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors." + reason))
           dialog.show()
       else

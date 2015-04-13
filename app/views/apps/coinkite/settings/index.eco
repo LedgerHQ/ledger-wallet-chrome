@@ -1,0 +1,29 @@
+<section id="coinkite_settings_dialog">
+  <header>
+    <h1><%= t 'apps.coinkite.settings.title' %></h1>
+  </header>
+  <table class="no-table-head">
+    <tbody>
+      <tr>
+        <td class="row-title"><%= t 'apps.coinkite.settings.api_key' %></td>
+        <td class="align-right">
+          <input id="api_key_input" class="text-input" placeholder="<%= t 'apps.coinkite.settings.api_key_placeholder' %>" value=""/>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title"><%= t 'apps.coinkite.settings.api_secret' %></td>
+        <td class="align-right">
+          <input id="api_secret_input" class="text-input" placeholder="<%= t 'apps.coinkite.settings.api_secret_placeholder' %>" value=""/>
+        </td>
+      </tr>
+      <tr class="no-border">
+        <td colspan="2" class="regular-text"><%- t 'apps.coinkite.settings.note' %></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.close' %></a>
+  <a class="action-rounded-button" href="#save" id="save_button"><%= t 'common.save' %></a>
+</div>

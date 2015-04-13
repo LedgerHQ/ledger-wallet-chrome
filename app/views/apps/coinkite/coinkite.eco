@@ -1,0 +1,69 @@
+<div class="main-container">
+  <div id="coinkite_top_menu" class="top-main-menu">
+    <ul class="left">
+      <li id="dashboard-item" class="menu-item selected">
+        <div>
+          <a href="/apps/coinkite/dashboard/index">
+            <img src="../assets/images/apps/coinkite/coinkite_icon.png" />
+            <span><%= t('apps.coinkite.top_menu.items.coinkite') %></span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
+      <li id="key-item" class="menu-item">
+        <div>
+          <a href="/apps/coinkite/keygen/processing">
+            <img src="../assets/images/apps/coinkite/key_icon.png" />
+            <span><%= t('apps.coinkite.top_menu.items.key') %></span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
+      <li id="cosign-item" class="menu-item">
+        <div>
+          <a href="/apps/coinkite/cosign/index">
+            <img src="../assets/images/apps/coinkite/cosign_icon.png" />
+            <span><%= t('apps.coinkite.top_menu.items.cosign') %></span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
+      <li id="help-item" class="menu-item">
+        <div>
+          <a href="/apps/coinkite/help/index">
+            <img src="../assets/images/apps/coinkite/help_icon.png" />
+            <span><%= t('wallet.top_menu.items.help') %></span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
+      <li id="settings-item" class="menu-item">
+        <div>
+          <a href="/apps/coinkite/settings/index">
+            <img src="../assets/images/apps/coinkite/settings_icon.png" />
+            <span><%= t('apps.coinkite.top_menu.items.settings') %></span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
+    </ul>
+    <div class="right">
+      <li id="wallet-item" class="menu-item">
+        <div>
+          <a href="/wallet/accounts/0/show">
+            <img src="../assets/images/apps/coinkite/wallet_icon.png" />
+            <span><%= t('apps.coinkite.top_menu.items.wallet') %></span>
+          </a>
+        </div>
+      </li>
+    </div>
+  </div>
+  <div id="navigation_controller_content" >
+
+  </div>
+</div>

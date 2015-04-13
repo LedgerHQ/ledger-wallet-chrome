@@ -1,5 +1,13 @@
 # Changelog
 
+1.1.3
+=====
+- Embed new firmware 1.0.1
+- Add Coinkite app (beta)
+- Add BitID support
+- Add API support (beta)
+- Bug fixes
+
 1.1.2
 =====
 - Improve QR code scanner

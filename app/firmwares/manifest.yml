@@ -36,4 +36,4 @@ versions:
     whats_new: 'onboarding.device.update.new_1_0_1'
 
 current_version:
-  <<: *LW_1_0_0
+  <<: *LW_1_0_1
