@@ -10,6 +10,7 @@ require @ledger.imports, ->
       @_listenAppEvents()
       @setExecutionMode(@Modes.Wallet)
       @router.go '/'
+      (new WalletSettingsIndexDialogViewController()).show()
 
     ###
       Sets the execution mode of the application. In Wallet mode, the application handles the wallets state by starting services,

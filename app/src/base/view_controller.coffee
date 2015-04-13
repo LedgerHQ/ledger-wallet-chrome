@@ -57,6 +57,10 @@ class @ViewController extends @EventEmitter
       do @onAfterRender
       @emit 'afterRender', {sender: @}
 
+  rerender: ->
+    return if not @renderedSelector?
+    @render @renderedSelector
+
   className: ->
     @constructor.name
 

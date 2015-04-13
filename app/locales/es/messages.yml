@@ -426,6 +426,8 @@ wallet:
       bitcoin: "Bitcoin"
       tools: "Tools"
       display: "Display"
+      apps: "Apps (beta)"
+      version: "Version %s"
 
     hardware:
       firmware: "Firmware"

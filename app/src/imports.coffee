@@ -233,8 +233,12 @@
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'
 
         # Settings
+        'controllers/wallet/settings/base/wallet_settings_section_dialog_view_controller'
+        'controllers/wallet/settings/base/wallet_settings_setting_view_controller'
+        'controllers/wallet/settings/hardware/wallet_settings_hardware_firmware_setting_view_controller'
+        'controllers/wallet/settings/hardware/wallet_settings_hardware_smartphones_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_hardware_section_dialog_view_controller'
         'controllers/wallet/settings/wallet_settings_index_dialog_view_controller'
-        'controllers/wallet/settings/wallet_settings_hardware_dialog_view_controller'
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
