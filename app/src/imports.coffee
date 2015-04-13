@@ -132,6 +132,7 @@
         'managers/permissions_manager'
         'managers/wallets_manager'
         'managers/system_manager'
+        'managers/application_manager'
 
         ## Rest clients
         'restclients/authentication'
