@@ -51,6 +51,7 @@ common:
     deleting_this_paired_smartphone: "En supprimant ce smartphone, vous ne pourrez plus valider les transactions de ce Ledger Wallet.<br />Souhaitez-vous continuer ?"
     going_to_firmware_update: "En passant en mode de mise à jour de la puce, toutes vos activités en cours seront interrompues.<br />Souhaitez-vous continuer ?"
     wrong_transaction_signature: "Une erreur est survenue durant la signature de la transaction. Veuillez contacter le support pour une assistance immédiate."
+    dust_transaction: "Le montant de la transaction doit être au moins de %s."
 
   qrcode:
     scan_qrcode: "Scanner code QR"
