@@ -270,23 +270,6 @@
         'controllers/wallet/pairing/wallet_pairing_progress_dialog_view_controller'
         'controllers/wallet/pairing/wallet_pairing_finalizing_dialog_view_controller'
 
-        # Specs
-        '../spec/jasmine/jasmine'
-        '../spec/jasmine/jasmine-html'
-        '../spec/jasmine/boot'
-
-        '../spec/utils/storage/store_spec'
-        '../spec/utils/storage/chrome_store_spec'
-        '../spec/utils/storage/secure_store_spec'
-        '../spec/restclients/synced_rest_client_spec'
-        '../spec/utils/storage/synced_store_spec'
-        '../spec/utils/bitcoin/bip39_spec'
-
-        '../spec/m2fa/client_spec'
-        '../spec/m2fa/m2fa_spec'
-
-        '../spec/spec_helper'
-
         ## Update controllers
         'controllers/update/update_navigation_controller'
         'controllers/update/update_view_controller'
@@ -316,4 +299,24 @@
         'controllers/apps/coinkite/cosign/apps_coinkite_cosign_show_dialog_view_controller'
         'controllers/apps/coinkite/cosign/apps_coinkite_cosign_signing_dialog_view_controller'
 
-    ]
+        # Specs
+        '../spec/spec_helper'
+      ]
+
+      specs:
+        jasmine: [
+          '../spec/jasmine/jasmine'
+          '../spec/jasmine/jasmine-html'
+          '../spec/jasmine/boot'
+        ]
+        files: [
+          '../spec/utils/storage/store_spec'
+          '../spec/utils/storage/chrome_store_spec'
+          '../spec/utils/storage/secure_store_spec'
+          '../spec/restclients/synced_rest_client_spec'
+          '../spec/utils/storage/synced_store_spec'
+          '../spec/utils/bitcoin/bip39_spec'
+
+          '../spec/m2fa/client_spec'
+          '../spec/m2fa/m2fa_spec'
+        ]
