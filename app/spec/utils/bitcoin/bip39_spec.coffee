@@ -4,7 +4,7 @@ describe 'BIP39', ->
     english: ledger.bitcoin.bip39.wordlist
   vectors = {}
 
-  for language in ['english', 'custom']
+  for language in ['english'] #, 'custom'
     describe language, ->
       beforeAll ->
         @wordlist = wordlists[language]
@@ -12,100 +12,55 @@ describe 'BIP39', ->
         ledger.bitcoin.bip39.wordlist = @wordlist
         ledger.bitcoin.bip39.utils.wordlist = @wordlist
 
-      it "validate mnemonics for #{language}", ->
+      it "validate mnemonics", ->
         for v in @vectors
-          # expect(BIP39.mnemonicIsValid(v[1])).toBe(true)
+          expect(BIP39.legacy.mnemonicIsValid(v[1])).toBe(true) if v[1].split(" ").length == 24
           expect(BIP39.isMnemonicPhraseValid(v[1])).toBe(true)
 
-      xit "generateSeed works for #{language} tests vector", ->
+      it "generateSeed works for #{language} tests vector", ->
         for v in @vectors
-          # expect(BIP39.generateSeed(v[1], 'TREZOR')).toBe(v[2])
+          expect(BIP39.legacy.generateSeed(v[1], 'TREZOR')).toBe(v[2]) if v[1].split(" ").length == 24
           expect(BIP39.mnemonicPhraseToSeed(v[1], 'TREZOR')).toBe(v[2])
 
       it "entropyToMnemonic works for #{language} tests vector", ->
         for v in @vectors
-          # expect(BIP39.entropyToMnemonic(v[0])).toBe(v[1])
-          expect(BIP39.utils.entropyToMnemonicPhrase(v[0])).toBe(v[1])
+          expect(BIP39.legacy.generateMnemonic(v[0])).toBe(v[1]) if v[1].split(" ").length == 24
+          expect(BIP39.entropyToMnemonicPhrase(v[0])).toBe(v[1])
 
-  xdescribe 'mnemonicToSeedHex', ->
-    this.timeout(20000)
+  it "is compatible between old and new implementation", ->
+    allSame = true
+    for i in [0...20]
+      mnemonicPhrase = BIP39.generateMnemonicPhrase()
+      oldSeed = BIP39.legacy.generateSeed(mnemonicPhrase)
+      newSeed = BIP39.mnemonicPhraseToSeed(mnemonicPhrase)
+      allSame = oldSeed == newSeed
+      if ! allSame
+        console.log("Fail for mnemonicPhrase", mnemonicPhrase, "\n", oldSeed, "\n!=\n", newSeed)
+        break
+    expect(allSame).toBe(true)
 
-    vectors.english.forEach (v, i) ->
-      it 'works for tests vector ' + i, ->
-        assert.equal(BIP39.mnemonicToSeedHex(v[1], 'TREZOR'), v[2])
+  it "is compatible between new and old implementation", ->
+    allSame = true
+    for i in [0...20]
+      mnemonicPhrase = BIP39.legacy.generateMnemonic()
+      oldSeed = BIP39.legacy.generateSeed(mnemonicPhrase)
+      newSeed = BIP39.mnemonicPhraseToSeed(mnemonicPhrase)
+      allSame = oldSeed == newSeed
+      if ! allSame
+        console.log("Fail for mnemonicPhrase", mnemonicPhrase, "\n", oldSeed, "\n!=\n", newSeed)
+        break
+    expect(allSame).toBe(true)
 
-  xdescribe 'mnemonicToEntropy', ->
-    vectors.english.forEach (v, i) ->
-      it 'works for tests vector ' + i, ->
-        assert.equal(BIP39.mnemonicToEntropy(v[1]), v[0])
-
-    vectors.custom.forEach (v, i) ->
-      it 'works for custom test vector ' + i, ->
-        assert.equal(BIP39.mnemonicToEntropy(v[1], wordlists.custom), v[0])
-
-  xdescribe 'entropyToMnemonic', ->
-    vectors.english.forEach (v, i) ->
-      it 'works for tests vector ' + i, ->
-        assert.equal(BIP39.entropyToMnemonic(v[0]), v[1])
-
-    vectors.custom.forEach (v, i) ->
-      it 'works for custom test vector ' + i, ->
-        assert.equal(BIP39.entropyToMnemonic(v[0], wordlists.custom), v[1])
-
-  xdescribe 'generateMnemonic', ->
-    vectors.english.forEach (v, i) ->
-      it 'works for tests vector ' + i, sinon.test ->
-        this.mock(crypto).expects('randomBytes')
-          .exactly(1)
-          .onCall(0).returns(new Buffer(v[0], 'hex'))
-
-        assert.equal(BIP39.generateMnemonic(), v[1])
-
-    it 'can vary generated entropy bit length', ->
-      mnemonic = BIP39.generateMnemonic(96)
-      words = mnemonic.split(' ')
-
-      assert.equal(words.length, 9)
-
-    it 'allows a custom RNG to be used', ->
-      rng = (size) ->
-        buffer = new Buffer(size)
-        buffer.fill(4) # guaranteed random
-        return buffer
-
-      mnemonic = BIP39.generateMnemonic(64, rng)
-      assert.equal(mnemonic, 'advice cage absurd amount doctor act')
-
-    it 'adheres to a custom wordlist', ->
-      rng = (size) ->
-        buffer = new Buffer(size)
-        buffer.fill(4) # guaranteed random
-        return buffer
-
-      mnemonic = BIP39.generateMnemonic(64, rng, wordlists.custom)
-      assert.equal(mnemonic, 'adv1c3 cag3 ab5urd am0unt d0ct0r act')
-
-  xdescribe 'validateMnemonic', ->
-    vectors.english.forEach (v, i) ->
-
-      it 'passes check ' + i, ->
-        assert(BIP39.validateMnemonic(v[1]))
-
-    xdescribe 'with a custom wordlist', ->
-      vectors.custom.forEach (v, i) ->
-
-        it 'passes custom check ' + i, ->
-          assert(BIP39.validateMnemonic(v[1], wordlists.custom))
-
+  describe 'validate', ->
     it 'fails for mnemonics of wrong length', ->
-      assert(!BIP39.validateMnemonic('sleep kitten'))
-      assert(!BIP39.validateMnemonic('sleep kitten sleep kitten sleep kitten'))
+      expect(BIP39.isMnemonicPhraseValid('sleep kitten')).toBe(false)
+      expect(BIP39.isMnemonicPhraseValid('sleep kitten sleep kitten sleep kitten')).toBe(false)
 
     it 'fails for mnemonics that contains words not from the word list', ->
-      assert(!BIP39.validateMnemonic("turtle front uncle idea crush write shrug there lottery flower risky shell"))
+      expect(BIP39.isMnemonicPhraseValid("turtle front uncle idea crush write shrug there lottery flower risky shell")).toBe(false)
 
     it 'fails for mnemonics of invalid checksum', ->
-      assert(!BIP39.validateMnemonic('sleep kitten sleep kitten sleep kitten sleep kitten sleep kitten sleep kitten'))
+      expect(BIP39.isMnemonicPhraseValid('sleep kitten sleep kitten sleep kitten sleep kitten sleep kitten sleep kitten')).toBe(false)
 
   xdescribe 'utf8 passwords', ->
     vectors.japanese.forEach (v, i) ->

@@ -12,14 +12,14 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
   initialize: ->
     super
     if @params.wallet_mode == 'create'
-      @params.mnemonic = ledger.bitcoin.bip39.generateMnemonic()
+      @params.mnemonic = ledger.bitcoin.bip39.legacy.generateMnemonic()
 
   navigationContinueParams: ->
     wallet_mode: @params.wallet_mode
     back: @representativeUrl()
     pin: @params.pin
     rootUrl: @params.rootUrl
-    seed: ledger.bitcoin.bip39.generateSeed @params.mnemonic
+    seed: ledger.bitcoin.bip39.legacy.generateSeed @params.mnemonic
 
   onAfterRender: ->
     super
@@ -43,7 +43,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
 
   _generateInputs: ->
     @view.inputs = []
-    for i in [0..ledger.bitcoin.bip39.mnemonicWordsNumber() - 1]
+    for i in [0..ledger.bitcoin.bip39.legacy.mnemonicWordsNumber() - 1]
       div = document.createElement("div")
       div.className = 'seed-word'
       span = document.createElement("span")
@@ -125,7 +125,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       @view.invalidLabel.fadeOut(if animated then 250 else 0)
       @view.continueButton.removeClass 'disabled'
     else
-      if ledger.bitcoin.bip39.numberOfWordsInMnemonic(@params.mnemonic) == ledger.bitcoin.bip39.mnemonicWordsNumber()
+      if ledger.bitcoin.bip39.legacy.numberOfWordsInMnemonic(@params.mnemonic) == ledger.bitcoin.bip39.legacy.mnemonicWordsNumber()
         @view.invalidLabel.fadeIn(if animated then 250 else 0)
       else
         @view.invalidLabel.fadeOut(if animated then 250 else 0)
@@ -141,7 +141,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     mnemonic
 
   _mnemonicIsValid: ->
-    ledger.bitcoin.bip39.mnemonicIsValid(@params.mnemonic)
+    ledger.bitcoin.bip39.legacy.mnemonicIsValid(@params.mnemonic)
 
   _inputIsValid: (input) ->
     text = _.str.trim(input.val()).toLowerCase()
