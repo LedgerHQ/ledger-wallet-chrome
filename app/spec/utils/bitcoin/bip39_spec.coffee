@@ -10,46 +10,18 @@ describe 'BIP39', ->
         @wordlist = wordlists[language]
         @vectors = vectors[language]
         ledger.bitcoin.bip39.wordlist = @wordlist
-        ledger.bitcoin.bip39.utils.wordlist = @wordlist
 
       it "validate mnemonics", ->
         for v in @vectors
-          expect(BIP39.legacy.mnemonicIsValid(v[1])).toBe(true) if v[1].split(" ").length == 24
           expect(BIP39.isMnemonicPhraseValid(v[1])).toBe(true)
 
       it "generateSeed works for #{language} tests vector", ->
         for v in @vectors
-          expect(BIP39.legacy.generateSeed(v[1], 'TREZOR')).toBe(v[2]) if v[1].split(" ").length == 24
-          expect(BIP39.mnemonicPhraseToSeed(v[1], 'TREZOR')).toBe(v[2])
+          expect(BIP39.mnemonicPhraseToSeed(v[1], v[3] || 'TREZOR')).toBe(v[2])
 
       it "entropyToMnemonic works for #{language} tests vector", ->
         for v in @vectors
-          expect(BIP39.legacy.generateMnemonic(v[0])).toBe(v[1]) if v[1].split(" ").length == 24
           expect(BIP39.entropyToMnemonicPhrase(v[0])).toBe(v[1])
-
-  it "is compatible between old and new implementation", ->
-    allSame = true
-    for i in [0...20]
-      mnemonicPhrase = BIP39.generateMnemonicPhrase()
-      oldSeed = BIP39.legacy.generateSeed(mnemonicPhrase)
-      newSeed = BIP39.mnemonicPhraseToSeed(mnemonicPhrase)
-      allSame = oldSeed == newSeed
-      if ! allSame
-        console.log("Fail for mnemonicPhrase", mnemonicPhrase, "\n", oldSeed, "\n!=\n", newSeed)
-        break
-    expect(allSame).toBe(true)
-
-  it "is compatible between new and old implementation", ->
-    allSame = true
-    for i in [0...20]
-      mnemonicPhrase = BIP39.legacy.generateMnemonic()
-      oldSeed = BIP39.legacy.generateSeed(mnemonicPhrase)
-      newSeed = BIP39.mnemonicPhraseToSeed(mnemonicPhrase)
-      allSame = oldSeed == newSeed
-      if ! allSame
-        console.log("Fail for mnemonicPhrase", mnemonicPhrase, "\n", oldSeed, "\n!=\n", newSeed)
-        break
-    expect(allSame).toBe(true)
 
   describe 'validate', ->
     it 'fails for mnemonics of wrong length', ->
@@ -73,6 +45,8 @@ describe 'BIP39', ->
         assert.equal(BIP39.mnemonicToSeedHex(v[1], normalized_password), v[2])
 
   _.extend vectors,
+    # Format : [entropy, mnemonicPhrase, seed, password]
+    # default password is 'TREZOR'
     english: [
       ["00000000000000000000000000000000",
        "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
@@ -145,8 +119,19 @@ describe 'BIP39', ->
        "f84521c777a13b61564234bf8f8b62b3afce27fc4062b51bb5e62bdfecb23864ee6ecf07c1d5a97c0834307c5c852d8ceb88e7c97923c0a3b496bedd4e5f88a9"],
       ["15da872c95a13dd738fbf50e427583ad61f18fd99f628c417a61cf8343c90419",
        "beyond stage sleep clip because twist token leaf atom beauty genius food business side grid unable middle armed observe pair crouch tonight away coconut",
-       "b15509eaa2d09d3efd3e006ef42151b30367dc6e3aa5e44caba3fe4d3e352e65101fbdb86a96776b91946ff06f8eac594dc6ee1d3e82a42dfe1b40fef6bcc3fd"
-      ]
+       "b15509eaa2d09d3efd3e006ef42151b30367dc6e3aa5e44caba3fe4d3e352e65101fbdb86a96776b91946ff06f8eac594dc6ee1d3e82a42dfe1b40fef6bcc3fd"],
+      ["8d4af0c4d87b5d574e3f2c0f1af87d03",
+       "minute fiscal couple rail remind produce decline tortoise audit style butter almost",
+       "db182bf0c30afbef722c20ac0fbd2f4e9e585b46f471e51f4010bfc5e798770c2f0e4650b9d4c81bdce20bdb657696f60aeb864fc1183313b2bc4b20855f80df",
+       "toto"],
+      ["db40c0470a4b1c4ab9e2e360166c5e5682ca3156fd1fd7d2decf949a906e7202",
+       "swap alcohol balcony behind range census travel fragile gas recall bleak public coach board fossil physical style notice recycle circle poverty damp siege drop",
+       "da699a1be47982e30737504976815c1c0281466fa6f406e1115725d808e169767bbdba72961433be6fc3a61b4249f2ef4ab0a37e361571bca5d075ce64a3ea67",
+       "password"],
+      ["db40c0470a4b1c4ab9e2e360166c5e5682ca3156fd1fd7d2decf949a906e7202",
+       "swap alcohol balcony behind range census travel fragile gas recall bleak public coach board fossil physical style notice recycle circle poverty damp siege drop",
+       "82b007a2d959dcff5730203cebbd74cfe9014c335c6d8735bd42c755018d26711a06a6bc60298cbca77d1c61caea60437ce0d3f120a62d588c0ffab50c7b8abf",
+       "toto"],
     ]
     custom: [
       ["00000000000000000000000000000000",

@@ -5,6 +5,7 @@ Bip39 = ledger.bitcoin.bip39
 _.extend ledger.bitcoin.bip39,
 
   ENTROPY_BIT_LENGTH: 256
+  DEFAULT_PHRASE_LENGTH: 24
 
   # @param [String] mnemonicWords Mnemonic words.
   # @return [Array] Mnemonic words in the phrase.
@@ -35,12 +36,13 @@ _.extend ledger.bitcoin.bip39,
     binMnemonic = binEntropy + binChecksum
     throw "Invalid binMnemonic length : #{binMnemonic.length}" if binMnemonic.length % 11 != 0
     mnemonicIndexes = binMnemonic.match(/[01]{11}/g).map (b) -> parseInt(b,2)
-    mnemonicWords = mnemonicIndexes.map (idx) => @utils.wordlist[idx]
+    mnemonicWords = mnemonicIndexes.map (idx) => @wordlist[idx]
     mnemonicWords.join(' ')
 
   # @return [String]
-  generateMnemonicPhrase: () ->
-    @entropyToMnemonicPhrase(@generateEntropy())
+  generateMnemonicPhrase: (phraseLength=@DEFAULT_PHRASE_LENGTH) ->
+    entropyBitLength = phraseLength * 32 / 3
+    @entropyToMnemonicPhrase(@generateEntropy(entropyBitLength))
 
   # @param [String] mnemonicWords Mnemonic words.
   # @return [Array] Mnemonic words in the phrase.
@@ -61,8 +63,6 @@ _.extend ledger.bitcoin.bip39,
 
   utils:
     BITS_IN_INTEGER: 8 * 4
-
-    wordlist: Bip39.wordlist
 
     checkMnemonicPhraseValid: (mnemonicPhrase) ->
       mnemonicWords = @mnemonicWordsFromPhrase(mnemonicPhrase)
@@ -87,7 +87,7 @@ _.extend ledger.bitcoin.bip39,
     # @param [String] mnemonicWord
     # @return [Integer] Index of mnemonicWord in wordlist
     mnemonicWordToIndex: (mnemonicWord) ->
-      @wordlist.indexOf(mnemonicWord)
+      Bip39.wordlist.indexOf(mnemonicWord)
 
     # @param [Array] mnemonicWords
     # @return [Array] Indexes of each mnemonicWord in wordlist
@@ -139,126 +139,3 @@ _.extend ledger.bitcoin.bip39,
 
     _bytesArrayToHexString: (bytesArray) ->
       (_.str.lpad(byte.toString(16), 2, '0') for byte in bytesArray).join('')
-
-  #### Nico Implementation
-  legacy:
-    ENTROPY_BIT_LENGTH: 256
-    BIT_IN_BYTES: 8
-    BYTES_IN_INTEGER: 4
-
-    mnemonicIsValid: (mnemonic) ->
-      numberOfWords = @numberOfWordsInMnemonic(mnemonic)
-      return no if (numberOfWords % 3 != 0) or (numberOfWords != @mnemonicWordsNumber())
-      return no if not @_allWordsInMnemonicAreValid(mnemonic)
-      # convert wordlist to words indexes
-      words = mnemonic.split(' ')
-      wordsIndexes = @_mnemonicArrayToWordsIndexes words
-      # generate binary array from words indexes
-      binaryArray = @_integersArrayToBinaryArray wordsIndexes, 11
-      # extract checksum
-      entropyBitLength = @_nearest32Multiple binaryArray.length
-      extractedBinaryChecksum = @_lastBitsOfBinaryArray binaryArray, entropyBitLength / 32
-      extractedChecksum = @_binaryArrayToInteger extractedBinaryChecksum
-      # compute checksum
-      binaryEntropy = @_firstBitsOfBinaryArray binaryArray, entropyBitLength
-      integersEntropy = @_binaryArrayToIntegersArray binaryEntropy
-      hashedIntegersEntropy = sjcl.hash.sha256.hash integersEntropy
-      hashedEntropyBinaryArray = @_integersArrayToBinaryArray hashedIntegersEntropy
-      computedBinaryChecksum = @_firstBitsOfBinaryArray(hashedEntropyBinaryArray, entropyBitLength / 32)
-      computedChecksum = @_binaryArrayToInteger computedBinaryChecksum
-      # verify checksum
-      return computedChecksum == extractedChecksum
-
-    generateMnemonic: (entropy=Bip39.generateEntropy()) -> Bip39.entropyToMnemonicPhrase(entropy)
-
-    generateSeed: (mnemonic, passphrase = "") ->
-      return undefined if !@mnemonicIsValid mnemonic
-      hmacSHA512 = (key) ->
-        hasher = new sjcl.misc.hmac(key, sjcl.hash.sha512)
-        @encrypt = ->
-          return hasher.encrypt.apply(hasher, arguments)
-        @
-
-      password = mnemonic.normalize('NFKD')
-      salt = "mnemonic" + passphrase.normalize('NFKD')
-      passwordBits = sjcl.codec.utf8String.toBits(password)
-      saltBits = sjcl.codec.utf8String.toBits(salt)
-      result = sjcl.misc.pbkdf2(passwordBits, saltBits, 2048, 512, hmacSHA512)
-      hashHex = sjcl.codec.hex.fromBits(result)
-      return hashHex
-
-    numberOfWordsInMnemonic: (mnemonic) ->
-      return 0 if not mnemonic? or mnemonic.length == 0
-      count = 0
-      words = mnemonic.split ' '
-      for word in words
-        count++ if word? and word.length > 0
-      count
-
-    mnemonicWordsNumber: ->
-      return (@ENTROPY_BIT_LENGTH + @ENTROPY_BIT_LENGTH / 32) / 11
-
-    _allWordsInMnemonicAreValid: (mnemonic) ->
-      return 0 if not mnemonic? or mnemonic.length == 0
-      words = mnemonic.split ' '
-      for word in words
-        return no if Bip39.wordlist.indexOf(word) == -1
-      return yes
-
-    _integersArrayToBinaryArray: (integersArray, integerBitLength = @BYTES_IN_INTEGER * @BIT_IN_BYTES) ->
-      binaryArray = []
-      for integer in integersArray
-        partialBinaryArray = @_integerToBinaryArray integer, integerBitLength
-        @_appendBitsToBinaryArray binaryArray, partialBinaryArray
-      binaryArray
-
-    _integerToBinaryArray: (integer, integerBitLength = @BYTES_IN_INTEGER * @BIT_IN_BYTES) ->
-      binaryArray = []
-      for power in [integerBitLength - 1 .. 0]
-        val = Math.abs ((integer & (1 << power)) >> power)
-        binaryArray.push val
-      binaryArray
-
-    _binaryArrayToInteger: (binaryArray) ->
-      return 0 if binaryArray.length == 0
-      integer = 0
-      multiplier = 1
-      for i in [binaryArray.length - 1 .. 0]
-        if binaryArray[i] == 1
-          integer += multiplier
-        multiplier *= 2
-      integer
-
-    _binaryArrayToIntegersArray: (binaryArray, integerBitLength = @BYTES_IN_INTEGER * @BIT_IN_BYTES) ->
-      integersArray = []
-      workingArray = binaryArray.slice()
-      while workingArray.length > 0
-        integersArray.push @_binaryArrayToInteger(@_firstBitsOfBinaryArray(workingArray, integerBitLength))
-        workingArray.splice 0, integerBitLength
-      integersArray
-
-    _firstBitsOfBinaryArray: (binaryArray, numberOfFirstBits) ->
-      binaryArray.slice 0, numberOfFirstBits
-
-    _lastBitsOfBinaryArray: (binaryArray, numberOfLastBits) ->
-      binaryArray.slice -numberOfLastBits
-
-    _appendBitsToBinaryArray: (binaryArray, bitsToAppend) ->
-      for bit in bitsToAppend
-        binaryArray.push bit
-      binaryArray
-
-    _mnemonicArrayToWordsIndexes: (mnemonicArray) ->
-      indexes = []
-      for word in mnemonicArray
-        indexes.push Bip39.wordlist.indexOf word
-      indexes
-
-    _nearest32Multiple: (length) ->
-      power = 0
-      while (power + 32) <= length
-        power += 32
-      power
-
-for key, value of Bip39 when _(value).isFunction()
-  Bip39[key] = Bip39[key].bind Bip39
