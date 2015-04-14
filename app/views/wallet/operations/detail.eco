@@ -23,7 +23,7 @@
       </tr>
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.status' %></td>
-        <% if @operation.get('confirmations') < ledger.wallet.transaction.MINIMUM_CONFIRMATIONS: %>
+        <% if @operation.get('confirmations') < ledger.wallet.Transaction.MINIMUM_CONFIRMATIONS: %>
           <td class="align-right regular-grey-text" id="operation_status">
             <%= t 'wallet.operations.detail.unconfirmed' %>
             <span class="regular-grey-text-small">(<%= @operation.get('confirmations') %>)</span>

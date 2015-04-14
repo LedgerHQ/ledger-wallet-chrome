@@ -26,6 +26,7 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
   _navigateContinue: ->
     @_stopTimer()
     ledger.app.dongle.getState (state) =>
+      l 'log', arguments
       if state == ledger.dongle.States.LOCKED
         ledger.app.router.go '/onboarding/device/pin'
       else

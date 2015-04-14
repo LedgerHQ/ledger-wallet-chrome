@@ -12,8 +12,8 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   constructor: ->
     @_navigationController = null
-    @donglesManager = new ledger.dongle.Manager()
-    #@donglesManager = new ledger.dongle.MockDongleManager()
+    #@donglesManager = new ledger.dongle.Manager()
+    @donglesManager = new ledger.dongle.MockDongleManager()
     @router = new Router(@)
     @_dongleAttestationLock = off
     ledger.dialogs.manager.initialize($('#dialogs_container'))
@@ -102,6 +102,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   performDongleAttestation: ->
     return if @_dongleAttestationLock is on
     @_dongleAttestationLock = on
+    l @dongle
     @dongle?.isCertified (dongle, error) =>
       @_dongleAttestationLock = off
       (Try => @onDongleCertificationDone(dongle, error)).printError()

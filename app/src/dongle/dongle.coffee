@@ -182,9 +182,13 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
   # isCertified: (callback=undefined) -> @_checkCertification(Attestation, callback)
-  isCertified: (callback=undefined) -> @_checkCertification(Attestation, callback)
+  isCertified: (callback=undefined) ->
+    l @_checkCertification(Attestation, callback)
+    @_checkCertification(Attestation, callback)
 
-  isBetaCertified: (callback=undefined) -> @_checkCertification(BetaAttestation, callback)
+  isBetaCertified: (callback=undefined) ->
+    l @_checkCertification(BetaAttestation, callback)
+    @_checkCertification(BetaAttestation, callback)
 
   _checkCertification: (Attestation, callback) ->
     _btchipQueue.enqueue "checkCertification", =>
@@ -328,8 +332,8 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
   getPublicAddress: (path, callback=undefined) ->
-    l path
-    l new Error().stack
+    #l path
+    #l new Error().stack
     Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
     _btchipQueue.enqueue "getPublicAddress", =>
       d = ledger.defer(callback)
@@ -519,7 +523,11 @@ class @ledger.dongle.Dongle extends EventEmitter
     pubKey = bitcoin.compressPublicKey(pubKey)
     for i in [0...4]
       recoveredKey = bitcoin.recoverPublicKey(signature, hash, i)
+      l recoveredKey
+
       recoveredKey = bitcoin.compressPublicKey(recoveredKey)
+      l recoveredKey
+
       if recoveredKey.equals(pubKey)
         splitSignature = bitcoin.splitAsn1Signature(signature)
         sig = new ByteString(Convert.toHexByte(i + 27 + 4), HEX).concat(splitSignature[0]).concat(splitSignature[1])
