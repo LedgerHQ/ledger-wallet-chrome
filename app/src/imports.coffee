@@ -281,8 +281,8 @@
         '../spec/restclients/synced_rest_client_spec'
         '../spec/utils/storage/synced_store_spec'
         '../spec/utils/bitcoin/bip39_spec'
-        '../spec/utils/dongle/mock_dongle_manager_spec'
-        '../spec/utils/dongle/mock_dongle_spec'
+        '../spec/utils/dongle/mock_dongle_manager'
+        '../spec/utils/dongle/mock_dongle'
 
         '../spec/m2fa/client_spec'
         '../spec/m2fa/m2fa_spec'

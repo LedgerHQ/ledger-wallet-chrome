@@ -183,11 +183,9 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @return [Q.Promise]
   # isCertified: (callback=undefined) -> @_checkCertification(Attestation, callback)
   isCertified: (callback=undefined) ->
-    l @_checkCertification(Attestation, callback)
     @_checkCertification(Attestation, callback)
 
   isBetaCertified: (callback=undefined) ->
-    l @_checkCertification(BetaAttestation, callback)
     @_checkCertification(BetaAttestation, callback)
 
   _checkCertification: (Attestation, callback) ->
@@ -437,6 +435,18 @@ class @ledger.dongle.Dongle extends EventEmitter
   @return [Q.Promise] Resolve with resumeData
   ###
   createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
+    l inputs
+    l associatedKeysets
+    l changePath
+    l recipientAddress
+    l amount
+    l fees
+    l lockTime
+    l sighashType
+    l authorization
+    l resumeData
+
+
     if resumeData?
       resumeData = _.clone(resumeData)
       resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)
@@ -453,6 +463,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         authorization && new ByteString(authorization, HEX),
         resumeData
       ).then (result) ->
+        l result
         switch typeof result
           when 'object'
             result.scriptData = result.scriptData.toString(HEX)
@@ -523,11 +534,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     pubKey = bitcoin.compressPublicKey(pubKey)
     for i in [0...4]
       recoveredKey = bitcoin.recoverPublicKey(signature, hash, i)
-      l recoveredKey
-
       recoveredKey = bitcoin.compressPublicKey(recoveredKey)
-      l recoveredKey
-
       if recoveredKey.equals(pubKey)
         splitSignature = bitcoin.splitAsn1Signature(signature)
         sig = new ByteString(Convert.toHexByte(i + 27 + 4), HEX).concat(splitSignature[0]).concat(splitSignature[1])

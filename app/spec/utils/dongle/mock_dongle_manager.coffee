@@ -8,15 +8,11 @@ class ledger.dongle.MockDongleManager extends EventEmitter
 
   # Start observing if dongles are plugged in or unnplugged
   start: () ->
-    #return if @_running
     l 'start'
-    #@_running = yes
-    #@_interval = setInterval @_checkIfDongleIsPluggedIn.bind(@), 200
 
   # Stop observing dongles state
   stop: () ->
     l 'stop'
-    #clearInterval @_interval
 
   # Create Dongle, observe dongle state and emit corresponding events
   createDongle: (pin, seed) ->
@@ -33,7 +29,7 @@ class ledger.dongle.MockDongleManager extends EventEmitter
       @_dongles.pop()
       @emit 'disconnected', @dongleInstance
 
-
+  # Simulates Remove/Put the dongle
   powerCycle: (delay) ->
     @emit 'disconnected', @dongleInstance
     setTimeout =>
@@ -42,7 +38,7 @@ class ledger.dongle.MockDongleManager extends EventEmitter
     , delay
 
 
-# Get the list of dongles
+  # Get the list of dongles
   # @return [Array] the list of dongles
   dongles: () ->
     @_dongles

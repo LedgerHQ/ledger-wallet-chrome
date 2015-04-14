@@ -65,10 +65,13 @@ class ledger.wallet.Transaction
   constructor: (@dongle, @amount, @fees, @recipientAddress, @inputs, @changePath) ->
     @_btInputs = []
     @_btcAssociatedKeyPath = []
+    l inputs
     for input in inputs
       splitTransaction = @dongle.splitTransaction(input)
       @_btInputs.push [splitTransaction, input.output_index]
       @_btcAssociatedKeyPath.push input.paths[0]
+
+  l @_btInputs
 
   # @return [Boolean]
   isValidated: () -> @_isValidated
