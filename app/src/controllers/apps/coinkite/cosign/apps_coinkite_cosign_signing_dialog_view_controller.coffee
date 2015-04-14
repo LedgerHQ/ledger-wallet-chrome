@@ -13,5 +13,5 @@ class @AppsCoinkiteCosignSigningDialogViewController extends @DialogViewControll
           dialog.show()          
       else
         @dismiss =>
-          dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("apps.coinkite.cosign.signing.success"), subtitle: data)
+          dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("apps.coinkite.cosign.signing.success"), subtitle: data.message)
           dialog.show()

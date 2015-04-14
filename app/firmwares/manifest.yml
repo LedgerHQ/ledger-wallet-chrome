@@ -6,6 +6,12 @@ versions:
     reloader: 0.1.33.0
     beta: false
 
+  HW_1_4_14: &HW_1_4_14
+    bootloader: 0.1.3.16
+    os: 0.1.4.14
+    reloader: 0.1.33.0
+    beta: false
+
   LW_1_0_0B: &LW_1_0_0B
      bootloader: 0.1.3.16
      os: 1.1.0.0
@@ -21,6 +27,13 @@ versions:
     overwrite: false
     whats_new: 'onboarding.device.update.new_1_0_0'
 
+  LW_1_0_1: &LW_1_0_1
+    bootloader: 0.1.3.16
+    os: 1.1.0.1
+    reloader: 0.1.33.0
+    beta: false
+    overwrite: false
+    whats_new: 'onboarding.device.update.new_1_0_1'
 
 current_version:
-  <<: *LW_1_0_0
+  <<: *LW_1_0_1

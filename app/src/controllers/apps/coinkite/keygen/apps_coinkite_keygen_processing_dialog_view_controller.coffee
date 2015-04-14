@@ -10,7 +10,7 @@ class @AppsCoinkiteKeygenProcessingDialogViewController extends @DialogViewContr
     ck.getExtendedPublickey (result, error) =>
       if error?
         @dismiss =>
-          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("apps.coinkite.keygen.errors.derivation_failed"), subtitle: t("common.errors." + error))
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("apps.coinkite.keygen.errors.derivation_failed"), error)
           dialog.show()
       else
         @getDialog().push new AppsCoinkiteKeygenShowDialogViewController(xpub: result.xpub, signature: result.signature)

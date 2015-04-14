@@ -4,17 +4,17 @@
     <a class="uppercase-action" href="#pairSmartphone"><i class="fa fa-plus"></i><%= t 'wallet.settings.hardware.pair_a_smartphone' %></a>
   </div>
   <% for smartphonesGroup, i in @smartphonesGroups: %>
-      <div class="row <% if i == @smartphonesGroups.length - 1: %><%= "bottom" %><% else: %><%= "middle" %><% end %>">
-        <div class="light-grey-icon-large"><i class="fa fa-mobile"></i></div>
-        <div class="regular-text-small stretchable"><%= smartphonesGroup[0].name %></div>
-        <div class="regular-soft-grey-text-small">
-          <% if smartphonesGroup.length > 1: %>
-              <%= _.str.sprintf(t('wallet.settings.hardware.multiple_paired_devices'), smartphonesGroup.length) %>
-          <% else: %>
-              <%= _.str.sprintf(t('wallet.settings.hardware.single_paired_device'), smartphonesGroup.length) %>
-          <% end %>
-        </div>
-        <a class="light-grey-icon-medium" href="#removeSmartphoneGroup(index=<%= i %>)"><i class="fa fa-trash"></i></a>
-      </div>
+  <div class="row <% if i == @smartphonesGroups.length - 1: %><%= "bottom" %><% else: %><%= "middle" %><% end %>">
+    <div class="light-grey-icon-large"><i class="fa fa-mobile"></i></div>
+    <div class="regular-text-small stretchable"><%= smartphonesGroup[0].name %></div>
+    <div class="regular-grey-text-small">
+      <% if smartphonesGroup.length > 1: %>
+          <%= _.str.sprintf(t('wallet.settings.hardware.multiple_paired_devices'), smartphonesGroup.length) %>
+      <% else: %>
+          <%= _.str.sprintf(t('wallet.settings.hardware.single_paired_device'), smartphonesGroup.length) %>
+      <% end %>
+    </div>
+    <a class="light-grey-icon-medium" href="#removeSmartphoneGroup(index=<%= i %>)"><i class="fa fa-trash"></i></a>
+  </div>
   <% end %>
 </div>

@@ -1,0 +1,13 @@
+<section id="coinkite_dashboard_compatibility_dialog">
+  <header>
+    <h1><%= t 'apps.coinkite.dashboard.compatibility.title' %></h1>
+  </header>
+  <div id="content_container">
+    <div class="regular-text"><%= t 'apps.coinkite.dashboard.compatibility.info' %></div>
+    <div class="regular-grey-text-small"><%= t 'common.may_take_a_while' %></div>
+  </div>
+</section>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
+</div>

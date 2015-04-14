@@ -28,6 +28,8 @@ class ledger.wallet.Transaction
   @MINIMUM_CONFIRMATIONS: 1
   #
   @MINIMUM_OUTPUT_VALUE: Amount.fromSatoshi(5430)
+  #
+  @_logger: -> ledger.utils.Logger.getLoggerByTag("Transaction")
 
   # @property [ledger.Amount]
   amount: undefined
@@ -97,7 +99,7 @@ class ledger.wallet.Transaction
 
   getValidationDetails: () ->
     indexes = []
-    if @_validationMode is ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN
+    if @_validationMode is ledger.wallet.Transaction.ValidationModes.SECURE_SCREEN
       numberOfCharacters = parseInt(@_out.indexesKeyCard.substring(0, 2), 16)
       indexesKeyCard = @_out.indexesKeyCard.substring(2, numberOfCharacters * 2 + 2)
     else

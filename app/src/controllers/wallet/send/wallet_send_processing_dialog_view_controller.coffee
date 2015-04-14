@@ -31,9 +31,12 @@ class @WalletSendProcessingDialogViewController extends @DialogViewController
       @dismiss =>
         dialog =
         if error?.isDueToNoInternetConnectivity()
+          Api.callback_error 'send_payment', t("common.errors.network_no_response")
           new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.network_no_response"))
         else if error?
+          Api.callback_error 'send_payment', t("common.errors.wrong_transaction_signature")
           new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.wrong_transaction_signature"))
         else
+          Api.callback_success 'send_payment', transaction: transaction.serialize()
           new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.send.errors.sending_succeeded"), subtitle: t("wallet.send.errors.transaction_completed"))
         dialog.show()

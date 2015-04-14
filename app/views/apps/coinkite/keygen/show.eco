@@ -20,6 +20,14 @@
           <textarea id="signature_input" class="textarea-input" rows="2" cols="60"></textarea>
         </td>
       </tr>
+      <tr>
+        <td class="row-title"><%= t 'apps.coinkite.keygen.show.path' %></td>
+      </tr>
+      <tr>
+        <td id="path">
+          <%= Coinkite.CK_PATH %>
+        </td>
+      </tr>
       <tr class="no-border">
         <td><%= t 'apps.coinkite.keygen.show.note' %></td>
       </tr>

@@ -1,7 +1,45 @@
+<table>
+<tr><td>
+
 <section id="coinkite">
 
   <header>
-    <h1><%= t 'apps.coinkite.dashboard.title' %></h1>
+    <h1>COINKITE MULTISIGNATURE ACCOUNT MANAGEMENT [BETA]</h1>
   </header>
 
+<p>Coinkite manage and secure "shared" accounts using bitcoin's multi-signature (multisig) and P2SH technology.</p>
+<p>There can be up to 15 signers, who each hold a unique key (a BIP32 extended key).
+When the account is created, you choose how many of those signatures are required to
+approve a withdrawal. All combinations are supported:</p>
+<ul>
+<li><em>2-of-3</em>: Two people must approve, and one extra backup key in cases of accidents.</li>
+<li><em>3-of-3</em>: Really lock up your funds with three hard to steal keys.</li>
+<li>... and so on, up to ...</li>
+<li><em>1-of-15</em>: Anyone on the committee of 15 can spend the funds.</li>
+<li><em>15-of-15</em>: Funds can only be removed with all 15 signatures!</li>
+</ul>
+<p>Coinkite supports a number of options for how and where to store each private key involved
+in the shared account:</p>
+<ul>
+<li>Securely in Coinkite's HSM, linked to your Coinkite account password.</li>
+<li>Encrypted but in Coinkite's HSM. A unique password protects your key.</li>
+<li>Securely managed by your <strong>Ledger Nano</strong>.</li>
+</ul>
+<p>To get the benefits of using a multisignature account, you must sign-up on Coinkite</p>
+<p>
+<a class="action-rounded-button" href="#openCoinkite">GO TO COINKITE</a>
+
 </section>
+
+</td><td>
+
+<section id="test">
+
+<%= t('apps.coinkite.dashboard.compatibility.check') %>
+<p>
+<a class="action-rounded-button" href="/apps/coinkite/dashboard/compatibility"><%= t('apps.coinkite.dashboard.compatibility.check_button') %></a>
+<p>
+<b><%= t('apps.coinkite.dashboard.compatibility.warning') %></b>
+</section>
+
+</td></tr></table>
