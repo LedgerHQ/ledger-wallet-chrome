@@ -183,7 +183,13 @@ class ledger.dongle.MockDongle extends EventEmitter
 
         ###
         ###
-        tx = new bitcoin.Transaction()
+        txb = new bitcoin.TransactionBuilder()
+
+        inputs.forEach (input, index) ->
+          input.signs.forEach (sign) ->
+            keyPair = ECPair.fromWIF(sign.keyPair)
+            txb.sign(index, keyPair, redeemScript, sign.hashType)
+
 
         # Add the input (who is paying) of the form [previous transaction hash, index of the output to use]
         tx.addInput("aa94ab02c182214f090e99a0d57021caffd0f195a81c24602b1028b130b63e31", 0)
