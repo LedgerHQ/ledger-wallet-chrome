@@ -16,8 +16,10 @@ class @Api
         @sendPayment(data)
       when 'sign_message'
         @signMessage(data)
-      when 'cosign_transaction'
-        @cosignTransaction(data)
+      when 'sign_p2sh'
+        @signP2SH(data)
+      when 'get_xpubkey'
+        @getXPubKey(data)
 
   @hasSession: (data) ->
     chrome.runtime.sendMessage {
@@ -45,6 +47,21 @@ class @Api
         return
     catch error
       callback_cancel('sign_message', JSON.stringify(error))
+
+  @signP2SH: (data) ->
+    try
+      ledger.app.wallet._lwCard.signP2SHTransaction_async data.inputs, data.scripts, 1, data.output, data.paths
+      .then (result) =>
+        @callback_success('sign_p2sh', signatures: result)
+        return
+      .fail (error) =>
+        @callback_cancel('sign_p2sh', JSON.stringify(error))
+        return
+    catch error
+      callback_cancel('sign_p2sh', JSON.stringify(error))
+
+  @getXPubKey: (data) ->
+    ledger.app.router.go '/wallet/xpubkey/index', {path: data.path}
 
   @bitid: (data) ->
     ledger.app.router.go '/wallet/bitid/index', {uri: data.uri, silent: data.silent}

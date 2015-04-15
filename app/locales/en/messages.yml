@@ -445,6 +445,19 @@ wallet:
       uri_placeholder: "Enter the URI"
       invalid_uri: "URI is invalid"
 
+  xpubkey:
+    index:
+      title: "Extended public key export"
+      info: "Export the extended publick key corresponding to the following path:"
+      path: "Derivation path"
+    processing:
+      title: "Extended public key"
+      info: "Computing extended public key"
+    errors:
+      cancelled: "Export request cancelled"
+      derivation_failed: "Failed to compute the xpubkey"
+      derivation_successfull: "Export successfull"
+
   settings:
     common:
       settings: "Settings"

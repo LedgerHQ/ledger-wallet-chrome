@@ -503,7 +503,66 @@ var BTChip = Class.create({
                 return deferred.promise;
 	},
 
-  startP2SHUntrustedHashTransactionInput_async: function(newTransaction, transaction, redeemScript, currentIndex) {
+  startP2SHUntrustedHashTransactionInput_async: function(newTransaction, version, inputs, redeemScript, currentIndex) {
+    var currentObject = this;
+    var data = version.concat(currentObject.createVarint(inputs.length));
+    var deferred = Q.defer();
+    currentObject.startUntrustedHashTransactionInputRaw_async(newTransaction, true, data).then(function (result) {
+      var i = 0;
+      async.eachSeries(
+        inputs,
+        function (input, finishedCallback) {
+          data = new ByteString(Convert.toHexByte(0x00), GP.HEX);
+          var txhash = currentObject.reverseBytestring(inputs[i][0]);
+          var outpoint = currentObject.reverseBytestring(inputs[i][1]);
+          console.log("txhash " + txhash.toString(GP.HEX));
+          console.log("outpoint " + outpoint.toString(GP.HEX));
+          data = data.concat(txhash).concat(outpoint);
+          if (i == currentIndex) {
+            script = redeemScript;
+          } else {
+            script = "";
+          }
+          console.log("script " + script);
+          data = data.concat(currentObject.createVarint(script.length));
+          if (script.length == 0) {
+            data = data.concat(new ByteString("FFFFFFFF", GP.HEX)); // TODO: unusual sequence
+          }
+          currentObject.startUntrustedHashTransactionInputRaw_async(true, false, data).then(function (result) {
+            var offset = 0;
+            var blocks = [];
+            while (offset != script.length) {
+              var blockSize = (script.length - offset > 255 ? 255 : script.length - offset);
+              block = script.bytes(offset, blockSize);
+              if (offset + blockSize == script.length) {
+                block = block.concat(new ByteString("FFFFFFFF", GP.HEX)); // TODO: unusual sequence
+              }
+              blocks.push(block);
+              offset += blockSize;
+            }
+            async.eachSeries(
+              blocks,
+              function(block, blockFinishedCallback) {
+                currentObject.startUntrustedHashTransactionInputRaw_async(true, false, block).then(function (result) {
+                  blockFinishedCallback();
+                }).fail(function (err) { finishedCallback(); });
+              },
+              function(finished) {
+                i++;
+                finishedCallback();
+              }
+            );
+          }).fail(function (err) { finishedCallback(); });
+        },
+        function (finished) {
+          deferred.resolve(finished);
+        }
+      );
+    }).fail(function (err) { deferred.reject(err); });
+    return deferred.promise;
+  },
+
+  CK__startP2SHUntrustedHashTransactionInput_async: function(newTransaction, transaction, redeemScript, currentIndex) {
     var currentObject = this;
     var version_hex = new ByteString(Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(transaction.version), 4)), HEX);
     var data = version_hex.concat(currentObject.createVarint(transaction['ins'].length));
@@ -564,7 +623,39 @@ var BTChip = Class.create({
     return this.card.sendApdu_async(0xe0, 0x4a, (lastRound ? 0x80 : 0x00), 0x00, transactionData, [0x9000]);
   },
 
-  untrustedHashTransactionInputFinalizeFull_async: function(transaction) {
+  untrustedHashTransactionInputFinalizeFull_async: function(numOutputs, output) {
+    var currentObject = this;
+    var data = currentObject.createVarint(numOutputs);    
+    var deferred = Q.defer();
+    return currentObject.untrustedHashTransactionInputFinalizeFullRaw_async(false, data).then(function (result) {
+      var data = output;
+      console.log("Using output " + output.toString(GP.HEX));
+      var internalPromise = Q.defer();
+      var outputsBlocks = [];
+      var offset = 0;
+      while (offset != data.length) {
+        var blockSize = (data.length - offset > 255 ? 255 : data.length - offset);
+        outputsBlocks.push(data.bytes(offset, blockSize));
+        offset += blockSize;
+      }
+      var i = 0;
+      async.eachSeries(
+        outputsBlocks,
+        function(outputsBlock, finishedCallback) {
+          currentObject.untrustedHashTransactionInputFinalizeFullRaw_async(i == outputsBlocks.length-1, outputsBlock).then(function (result) {
+            i += 1;
+            finishedCallback();
+          }).fail(function (err) { internalPromise.reject(err); });
+        },
+        function(finished) {
+          internalPromise.resolve();
+        }
+      );
+      return internalPromise.promise;
+    });
+  },
+
+  CK__untrustedHashTransactionInputFinalizeFull_async: function(transaction) {
     var currentObject = this;
     var data = currentObject.createVarint(transaction['outs'].length);
     var deferred = Q.defer();
@@ -887,7 +978,44 @@ var BTChip = Class.create({
                 return deferred.promise;
 	},
 
-  signP2SHTransaction_async: function(inputs, transaction, scripts, path) {
+  // Inputs : [ [ prevout tx hash (ByteString, regular order), prevout index (ByteString, big endian)] ]
+  // Scripts : [ redeem scripts ] for each input
+  // Output : the full output script
+  // Paths : [ key path ] for each associated input
+  signP2SHTransaction_async: function(inputs, scripts, numOutputs, output, paths) {
+    var authorization = new ByteString("", GP.HEX);
+    var signatures = [];
+    var scriptData;
+    var defaultVersion = new ByteString("01000000", GP.HEX);
+    var lockTime = BTChip.DEFAULT_LOCKTIME;
+    var sigHashType = BTChip.SIGHASH_ALL;
+    var currentObject = this;
+    var deferred = Q.defer();
+    var firstRun = true;
+
+    var currentIndex = 0
+    async.eachSeries(
+      inputs,
+      function(input, finishedCallback) {
+        currentObject.startP2SHUntrustedHashTransactionInput_async(firstRun, defaultVersion, inputs, scripts[currentIndex], currentIndex).then(function (result) {
+          currentObject.untrustedHashTransactionInputFinalizeFull_async(numOutputs, output).then(function (result) {
+            currentObject.signTransaction_async(paths[currentIndex], authorization, lockTime, sigHashType).then(function (result) {               
+              signatures.push(result);
+              firstRun = false;
+              currentIndex++;
+              finishedCallback();
+            }).fail(function(err){deferred.reject(err);});
+          }).fail(function(err){deferred.reject(err);});
+        }).fail(function(err){deferred.reject(err);});
+      },
+      function (finished) {
+        deferred.resolve(signatures);
+      }
+    );
+    return deferred.promise;
+  },
+
+  CK__signP2SHTransaction_async: function(inputs, transaction, scripts, path) {
     var authorization = new ByteString("", HEX);
     var signatures = [];
     var scriptData;
@@ -902,8 +1030,8 @@ var BTChip = Class.create({
       inputs,
       function(input, finishedCallback) {
         var script = new ByteString(scripts[input[0]].redeem, HEX);
-        currentObject.startP2SHUntrustedHashTransactionInput_async(firstRun, transaction, script, currentIndex).then(function (result) {
-          currentObject.untrustedHashTransactionInputFinalizeFull_async(transaction).then(function (result) {
+        currentObject.CK__startP2SHUntrustedHashTransactionInput_async(firstRun, transaction, script, currentIndex).then(function (result) {
+          currentObject.CK__untrustedHashTransactionInputFinalizeFull_async(transaction).then(function (result) {
             currentObject.signTransaction_async(path + "/" + input[0], authorization, lockTime, sigHashType).then(function (result) {
               signatures.push([result.toString(), input[1], input[0]]);
               firstRun = false;
@@ -918,6 +1046,38 @@ var BTChip = Class.create({
       }
     );
     return deferred.promise;
+  },
+
+  formatP2SHInputScript: function(redeemScript, signatures) {
+    var OP_0 = 0x00;
+    var OP_1_BEFORE = 0x50;
+    var OP_PUSHDATA1 = 0x4c;  
+    var OP_PUSHDATA2 = 0x4d;
+    var m = redeemScript.byteAt(0) - OP_1_BEFORE;
+    console.log("m " + m);
+    var result = new ByteString("00", GP.HEX); // start with OP_0
+    for (var i=0; i<m; i++) {
+      if (i < signatures.length) {
+        result = result.concat(new ByteString(Convert.toHexByte(signatures[i].length), GP.HEX)).concat(signatures[i]);
+      }
+      else {
+        result = result.concat(new ByteString("00", GP.HEX));
+      }
+    }
+    if (redeemScript.length > 255) {
+        result = result.concat(new ByteString(Convert.toHexByte(OP_PUSHDATA2) + 
+          Convert.toHexByte(redeemScript.length & 0xff) + Convert.toHexByte((redeemScript.length >> 8) & 0xff), GP.HEX));
+    }
+    else
+    if (redeemScript.length >= OP_PUSHDATA1) {
+        result = result.concat(new ByteString(Convert.toHexByte(OP_PUSHDATA1) + 
+          Convert.toHexByte(redeemScript.length), GP.HEX));
+    }
+    else {
+        result = result.concat(new ByteString(Convert.toHexByte(redeemScript.length), GP.HEX));
+    }
+    result = result.concat(redeemScript);
+    return result;
   },
 
 	serializeTransaction: function(transaction) {

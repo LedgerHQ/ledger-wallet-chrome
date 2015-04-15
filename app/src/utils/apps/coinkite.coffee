@@ -93,7 +93,7 @@ class @Coinkite
     tx = data.raw_unsigned_txn
     try
       transaction = Bitcoin.Transaction.deserialize(tx);
-      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, transaction, scripts, Coinkite.CK_PATH)
+      ledger.app.wallet._lwCard.dongle.CK__signP2SHTransaction_async(inputs, transaction, scripts, Coinkite.CK_PATH)
       .then (result) =>
         url = '/v1/co-sign/' + @request + '/' + @cosigner + '/sign'
         @_setAuthHeaders(url)

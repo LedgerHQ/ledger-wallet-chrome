@@ -160,6 +160,11 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new WalletBitidFormDialogViewController()
     dialog.show()
 
+  # XPubKey
+  route '/wallet/xpubkey/index', (params = {}) ->
+    dialog = new WalletXpubkeyIndexDialogViewController({ path: params["?params"]?.path })
+    dialog.show()
+
   ## Coinkite
   route '/apps/coinkite/dashboard/index', (params) ->
     app.navigate COINKITE_LAYOUT, AppsCoinkiteDashboardIndexViewController

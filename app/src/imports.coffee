@@ -242,6 +242,10 @@
         'controllers/wallet/bitid/wallet_bitid_authenticating_dialog_view_controller'
         'controllers/wallet/bitid/wallet_bitid_form_dialog_view_controller'
 
+        # XPubKey
+        'controllers/wallet/xpubkey/wallet_xpubkey_index_dialog_view_controller'
+        'controllers/wallet/xpubkey/wallet_xpubkey_processing_dialog_view_controller'
+
         # Settings
         'controllers/wallet/settings/wallet_settings_hardware_dialog_view_controller'
 
