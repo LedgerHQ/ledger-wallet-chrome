@@ -512,21 +512,18 @@ var BTChip = Class.create({
       async.eachSeries(
         inputs,
         function (input, finishedCallback) {
-          data = new ByteString(Convert.toHexByte(0x00), GP.HEX);
-          var txhash = currentObject.reverseBytestring(inputs[i][0]);
-          var outpoint = currentObject.reverseBytestring(inputs[i][1]);
-          console.log("txhash " + txhash.toString(GP.HEX));
-          console.log("outpoint " + outpoint.toString(GP.HEX));
+          data = new ByteString(Convert.toHexByte(0x00), HEX);
+          var txhash = currentObject.reverseBytestring(new ByteString(input[0], HEX));
+          var outpoint = currentObject.reverseBytestring(new ByteString(input[1], HEX));
           data = data.concat(txhash).concat(outpoint);
           if (i == currentIndex) {
-            script = redeemScript;
+            script = new ByteString(redeemScript, HEX);
           } else {
             script = "";
           }
-          console.log("script " + script);
           data = data.concat(currentObject.createVarint(script.length));
           if (script.length == 0) {
-            data = data.concat(new ByteString("FFFFFFFF", GP.HEX)); // TODO: unusual sequence
+            data = data.concat(new ByteString("FFFFFFFF", HEX)); // TODO: unusual sequence
           }
           currentObject.startUntrustedHashTransactionInputRaw_async(true, false, data).then(function (result) {
             var offset = 0;
@@ -535,7 +532,7 @@ var BTChip = Class.create({
               var blockSize = (script.length - offset > 255 ? 255 : script.length - offset);
               block = script.bytes(offset, blockSize);
               if (offset + blockSize == script.length) {
-                block = block.concat(new ByteString("FFFFFFFF", GP.HEX)); // TODO: unusual sequence
+                block = block.concat(new ByteString("FFFFFFFF", HEX)); // TODO: unusual sequence
               }
               blocks.push(block);
               offset += blockSize;
@@ -628,8 +625,7 @@ var BTChip = Class.create({
     var data = currentObject.createVarint(numOutputs);    
     var deferred = Q.defer();
     return currentObject.untrustedHashTransactionInputFinalizeFullRaw_async(false, data).then(function (result) {
-      var data = output;
-      console.log("Using output " + output.toString(GP.HEX));
+      var data = new ByteString(output, HEX);
       var internalPromise = Q.defer();
       var outputsBlocks = [];
       var offset = 0;
@@ -983,16 +979,15 @@ var BTChip = Class.create({
   // Output : the full output script
   // Paths : [ key path ] for each associated input
   signP2SHTransaction_async: function(inputs, scripts, numOutputs, output, paths) {
-    var authorization = new ByteString("", GP.HEX);
+    var authorization = new ByteString("", HEX);
     var signatures = [];
     var scriptData;
-    var defaultVersion = new ByteString("01000000", GP.HEX);
+    var defaultVersion = new ByteString("01000000", HEX);
     var lockTime = BTChip.DEFAULT_LOCKTIME;
     var sigHashType = BTChip.SIGHASH_ALL;
     var currentObject = this;
     var deferred = Q.defer();
     var firstRun = true;
-
     var currentIndex = 0
     async.eachSeries(
       inputs,
@@ -1000,7 +995,7 @@ var BTChip = Class.create({
         currentObject.startP2SHUntrustedHashTransactionInput_async(firstRun, defaultVersion, inputs, scripts[currentIndex], currentIndex).then(function (result) {
           currentObject.untrustedHashTransactionInputFinalizeFull_async(numOutputs, output).then(function (result) {
             currentObject.signTransaction_async(paths[currentIndex], authorization, lockTime, sigHashType).then(function (result) {               
-              signatures.push(result);
+              signatures.push(result.toString(HEX));
               firstRun = false;
               currentIndex++;
               finishedCallback();
@@ -1054,27 +1049,26 @@ var BTChip = Class.create({
     var OP_PUSHDATA1 = 0x4c;  
     var OP_PUSHDATA2 = 0x4d;
     var m = redeemScript.byteAt(0) - OP_1_BEFORE;
-    console.log("m " + m);
-    var result = new ByteString("00", GP.HEX); // start with OP_0
+    var result = new ByteString("00", HEX); // start with OP_0
     for (var i=0; i<m; i++) {
       if (i < signatures.length) {
-        result = result.concat(new ByteString(Convert.toHexByte(signatures[i].length), GP.HEX)).concat(signatures[i]);
+        result = result.concat(new ByteString(Convert.toHexByte(signatures[i].length), HEX)).concat(signatures[i]);
       }
       else {
-        result = result.concat(new ByteString("00", GP.HEX));
+        result = result.concat(new ByteString("00", HEX));
       }
     }
     if (redeemScript.length > 255) {
         result = result.concat(new ByteString(Convert.toHexByte(OP_PUSHDATA2) + 
-          Convert.toHexByte(redeemScript.length & 0xff) + Convert.toHexByte((redeemScript.length >> 8) & 0xff), GP.HEX));
+          Convert.toHexByte(redeemScript.length & 0xff) + Convert.toHexByte((redeemScript.length >> 8) & 0xff), HEX));
     }
     else
     if (redeemScript.length >= OP_PUSHDATA1) {
         result = result.concat(new ByteString(Convert.toHexByte(OP_PUSHDATA1) + 
-          Convert.toHexByte(redeemScript.length), GP.HEX));
+          Convert.toHexByte(redeemScript.length), HEX));
     }
     else {
-        result = result.concat(new ByteString(Convert.toHexByte(redeemScript.length), GP.HEX));
+        result = result.concat(new ByteString(Convert.toHexByte(redeemScript.length), HEX));
     }
     result = result.concat(redeemScript);
     return result;

@@ -246,6 +246,10 @@
         'controllers/wallet/xpubkey/wallet_xpubkey_index_dialog_view_controller'
         'controllers/wallet/xpubkey/wallet_xpubkey_processing_dialog_view_controller'
 
+        # P2SH
+        'controllers/wallet/p2sh/wallet_p2sh_index_dialog_view_controller'
+        'controllers/wallet/p2sh/wallet_p2sh_signing_dialog_view_controller'
+
         # Settings
         'controllers/wallet/settings/wallet_settings_hardware_dialog_view_controller'
 

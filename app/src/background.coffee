@@ -49,20 +49,21 @@ chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse) =>
       }
       if chrome.app.window.get("main_window")?
         chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
-    when 'sign_p2sh'
-      payload = {
-        command: 'sign_p2sh',
-        inputs: data.inputs,
-        scripts: data.scripts,
-        output: data.output,
-        paths: data.paths
-      }
-      if chrome.app.window.get("main_window")?
-        chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
     when 'get_xpubkey'
       payload = {
         command: 'get_xpubkey',
         path: data.path
+      }
+      if chrome.app.window.get("main_window")?
+        chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
+    when 'sign_p2sh'
+      payload = {
+        command: 'sign_p2sh',
+        inputs: data.inputs, 
+        scripts: data.scripts, 
+        outputs_number: data.outputs_number, 
+        outputs_script: data.outputs_script, 
+        paths: data.paths
       }
       if chrome.app.window.get("main_window")?
         chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"

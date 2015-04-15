@@ -49,16 +49,7 @@ class @Api
       callback_cancel('sign_message', JSON.stringify(error))
 
   @signP2SH: (data) ->
-    try
-      ledger.app.wallet._lwCard.signP2SHTransaction_async data.inputs, data.scripts, 1, data.output, data.paths
-      .then (result) =>
-        @callback_success('sign_p2sh', signatures: result)
-        return
-      .fail (error) =>
-        @callback_cancel('sign_p2sh', JSON.stringify(error))
-        return
-    catch error
-      callback_cancel('sign_p2sh', JSON.stringify(error))
+    ledger.app.router.go '/wallet/p2sh/index', {inputs: data.inputs, scripts: data.scripts, outputs_number: data.outputs_number, outputs_script: data.outputs_script, paths: data.paths}
 
   @getXPubKey: (data) ->
     ledger.app.router.go '/wallet/xpubkey/index', {path: data.path}

@@ -10,7 +10,7 @@ class @WalletXpubkeyProcessingDialogViewController extends @DialogViewController
       if error?
         Api.callback_cancel('get_xpubkey', t("wallet.xpubkey.errors.derivation_failed"))
         @dismiss =>
-          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.xpubkey.errors.derivation_failed"), error)
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.xpubkey.errors.derivation_failed"), subtitle: error)
           dialog.show()
       else
         xpubkey = key._xpub58

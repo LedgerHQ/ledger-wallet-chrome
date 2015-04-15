@@ -458,6 +458,18 @@ wallet:
       derivation_failed: "Failed to compute the xpubkey"
       derivation_successfull: "Export successfull"
 
+  p2sh:
+    index:
+      title: "Signature request"
+      info: "Do you want to proceed with the signature?"
+    signing:
+      title: "Transaction signing"
+      info: "The transaction is being signed by your Ledger Nano"
+    errors:
+      cancelled: "Signature request declined"
+      signature_failed: "Failed to sign the transaction"
+      signature_successfull: "Signature successfull"
+
   settings:
     common:
       settings: "Settings"
