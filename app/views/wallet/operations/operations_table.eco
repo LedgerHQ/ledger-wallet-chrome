@@ -25,7 +25,7 @@
         <% end %>
       <% end %>
     </td>
-    <td class="fit-content regular-grey-text-small"><%= if operation.get('confirmations') < ledger.wallet.transaction.MINIMUM_CONFIRMATIONS then t('wallet.accounts.show.operations.unconfirmed').toLowerCase() %></td>
+    <td class="fit-content regular-grey-text-small"><%= if operation.get('confirmations') < ledger.wallet.Transaction.MINIMUM_CONFIRMATIONS then t('wallet.accounts.show.operations.unconfirmed').toLowerCase() %></td>
     <% if operation.get('type') == 'reception': %>
       <td class="fit-content align-right padding-right-medium regular-valid-text">+<%= ledger.formatters.bitcoin.fromValue(operation.get('total_value')) %> BTC</td>
     <% else: %>

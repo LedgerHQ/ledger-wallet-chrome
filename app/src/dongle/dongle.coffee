@@ -270,7 +270,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       d.promise
 
   lock: () ->
-    @_setState(ledger.wallet.States.LOCKED)
+    @_setState(States.LOCKED)
 
   ###
   @overload setup(pin, callback)
