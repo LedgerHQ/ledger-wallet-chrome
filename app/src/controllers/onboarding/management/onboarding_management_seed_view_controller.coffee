@@ -127,7 +127,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       @view.invalidLabel.fadeOut(if animated then 250 else 0)
       @view.continueButton.removeClass 'disabled'
     else
-      if Bip39.mnemonicPhraseWordsLength(@params.mnemonicPhrase) == Bip39.DEFAULT_PHRASE_LENGTH
+      if Bip39.utils.mnemonicPhraseWordsLength(@params.mnemonicPhrase) == Bip39.DEFAULT_PHRASE_LENGTH
         @view.invalidLabel.fadeIn(if animated then 250 else 0)
       else
         @view.invalidLabel.fadeOut(if animated then 250 else 0)

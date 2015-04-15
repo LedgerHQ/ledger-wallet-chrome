@@ -81,7 +81,7 @@ _.extend ledger.bitcoin.bip39,
     # Do not check if mnemonic words are valids.
     # @param [String] mnemonicPhrase A mnemonic phrase.
     # @return [Array] Mnemonic words in the phrase.
-    mnemonicWordsFromPhrase: (mnemonicPhrase) ->
+    mnemonicWordsFromPhrase: (mnemonicPhrase="") ->
       mnemonicPhrase.trim().split(/\ /)
 
     # @param [String] mnemonicWord
@@ -116,7 +116,7 @@ _.extend ledger.bitcoin.bip39,
     # @param [String] mnemonicPhrase A mnemonic phrase.
     # @return [Integer] The number of mnemonic word in the phrase.
     mnemonicPhraseWordsLength: (mnemonicPhrase) ->
-      @mnemonicWordsFromPhrase().length
+      @mnemonicWordsFromPhrase(mnemonicPhrase).length
 
     # @param [String] mnemonicWord A mnemonic word.
     # @return [Boolean] Return true if mnemonic word is in wordlist
