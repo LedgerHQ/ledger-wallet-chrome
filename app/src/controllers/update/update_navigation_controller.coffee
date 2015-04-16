@@ -40,13 +40,15 @@ class @UpdateNavigationController extends @NavigationController
     if @topViewController().shouldEnablePreviousButton() then @view.previousButton.removeClass 'disabled' else @view.previousButton.addClass 'disabled'
 
   _onPlugDongle: ->
+    @_currentError = null
     ledger.app.router.go '/update/plug'
 
   _onErasingDongle: ->
     ledger.app.router.go '/update/erasing'
 
   _onDongleNeedPowerCycle: ->
-    ledger.app.router.go '/update/unplug'
+    unless @_currentError?
+      ledger.app.router.go '/update/unplug'
 
   _onReloadingBootloaderFromOs: ->
     ledger.app.router.go '/update/updating'
@@ -58,6 +60,7 @@ class @UpdateNavigationController extends @NavigationController
     ledger.app.router.go '/update/done'
 
   _onError: (error) ->
+    @_currentError = error
     ledger.app.router.go '/update/error', {errorCode: error.code}
 
   _onStateChanged: (newState, oldState) ->
