@@ -5,4 +5,4 @@ class @WalletSettingsSettingViewController extends ViewController
   identifier: () ->
     @className().replace 'SettingViewController', ''
 
-  setControllerStylesheet: () ->
+  stylesheetIdentifier: -> null

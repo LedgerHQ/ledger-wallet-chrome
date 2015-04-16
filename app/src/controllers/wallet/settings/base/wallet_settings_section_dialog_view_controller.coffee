@@ -2,13 +2,33 @@ class @WalletSettingsSectionDialogViewController extends DialogViewController
 
   settingViewControllersClasses: [] # [FirstViewControllerClass, AnotherViewControllerClass, ...]
   _settingViewControllersInstances: {} # {FirstViewControllerClass: instance}
+  _childrenRenderCount = 0
 
-  onAfterRender: ->
-    super
-    @_reloadSettingViewControllers()
+  render: (selector) ->
+    # before render
+    @renderedSelector = selector
+    do @onBeforeRender
+    @emit 'beforeRender', {sender: @}
+
+    # render self
+    render @viewPath(), @, (html) =>
+      mainNode = $(html)
+
+      # render children
+      @once 'children:rendered', =>
+        # set css
+        @setControllerStylesheet =>
+          # insert in dom
+          selector.empty().append mainNode
+
+          # after render
+          @_isRendered = yes
+          do @onAfterRender
+          @emit 'afterRender', {sender: @}
+      @_reloadSettingViewControllers(mainNode)
 
   openOtherSettings: ->
-    @getDialog().push (new WalletSettingsIndexDialogViewController())
+    @getDialog().pop()
 
   identifier: () ->
     @className().replace 'SectionDialogViewController', ''
@@ -25,12 +45,14 @@ class @WalletSettingsSectionDialogViewController extends DialogViewController
 
   _killSettingViewControllers: ->
     for key, value of @_settingViewControllersInstances
+      value.parentViewController = undefined
       value.onDetach()
     @_settingViewControllersInstances = {}
 
-  _reloadSettingViewControllers: ->
+  _reloadSettingViewControllers: (mainNode) ->
     # clear existing instances
     @_killSettingViewControllers()
+    @_childrenRenderCount = 0
 
     # loop through classes
     for className in @settingViewControllersClasses
@@ -40,12 +62,19 @@ class @WalletSettingsSectionDialogViewController extends DialogViewController
       instance = new className
 
       # get render node
-      renderNode = @select instance.renderSelector
+      renderNode = mainNode.find instance.renderSelector
       continue if not renderNode?
 
       # retain instance
       @_settingViewControllersInstances[className] = instance
+      instance.parentViewController = @
       instance.onAttach()
 
       # render view controller
       instance.render(renderNode)
+      instance.once 'afterRender', @_childrenRenderCallback.bind(@)
+
+  _childrenRenderCallback: ->
+    @_childrenRenderCount++
+    if @_childrenRenderCount >= @settingViewControllersClasses.length
+      @emit 'children:rendered'
