@@ -355,6 +355,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _failure: (reason) ->
     @emit "error", cause: new ledger.StandardError(reason)
     @_waitForPowerCycle()
+    return
 
   _success: ->
     @_setCurrentState(States.Done)
@@ -424,6 +425,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     try
      @_getCard().exchange_async(new ByteString(adpus[offset], HEX))
       .then =>
+        throw "toto" if _.random(0, 1<<31) % 2 == 0
         if ignoreSW or @_getCard().SW == 0x9000
           if @_exchangeNeedsExtraTimeout
             deferred = Q.defer()
