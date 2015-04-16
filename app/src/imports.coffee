@@ -244,12 +244,19 @@
         'controllers/wallet/bitid/wallet_bitid_form_dialog_view_controller'
 
         # Settings
+        # - Base
+        'controllers/wallet/settings/wallet_settings_index_dialog_view_controller'
         'controllers/wallet/settings/base/wallet_settings_section_dialog_view_controller'
         'controllers/wallet/settings/base/wallet_settings_setting_view_controller'
+
+        # - Hardware
         'controllers/wallet/settings/hardware/wallet_settings_hardware_firmware_setting_view_controller'
         'controllers/wallet/settings/hardware/wallet_settings_hardware_smartphones_setting_view_controller'
         'controllers/wallet/settings/wallet_settings_hardware_section_dialog_view_controller'
-        'controllers/wallet/settings/wallet_settings_index_dialog_view_controller'
+
+        # - Apps
+        'controllers/wallet/settings/apps/wallet_settings_apps_list_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_apps_section_dialog_view_controller'
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'

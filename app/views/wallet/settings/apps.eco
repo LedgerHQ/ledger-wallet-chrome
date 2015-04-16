@@ -1,9 +1,8 @@
-<section id="settings_hardware_dialog">
+<section id="settings_apps_dialog">
   <header>
-    <h1><%= t 'wallet.settings.common.hardware' %></h1>
+    <h1><%= t 'wallet.settings.common.apps' %></h1>
   </header>
-  <div id="firmware_table_container"></div>
-  <div id="smartphones_table_container"></div>
+  <div id="list_table_container"></div>
 </section>
 <div class="dialog-actions-bar">
   <a class="uppercase-action" href="#openOtherSettings"><%= t 'wallet.settings.common.other_settings' %></a>

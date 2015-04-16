@@ -1,0 +1,13 @@
+<div class="large-table">
+  <div class="header top">
+    <div class="uppercase-section-column">BETA APPS</div>
+  </div>
+  <a class="row middle" href="#openBitID">
+    <div class="regular-text-small stretchable">BitID</div>
+    <div class="regular-grey-text"><i class="fa fa-angle-right"></i></div>
+  </a>
+  <a class="row bottom" href="#openCoinkite">
+    <div class="regular-text-small stretchable">Coinkite</div>
+    <div class="regular-grey-text"><i class="fa fa-angle-right"></i></div>
+  </a>
+</div>
