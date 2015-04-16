@@ -88,17 +88,28 @@ class @Coinkite
       callback?(false, error)
 
   cosignTransaction: (data, callback) ->
-    inputs = data.inputs
-    scripts = data.redeem_scripts
-    tx = data.raw_unsigned_txn
     try
-      transaction = Bitcoin.Transaction.deserialize(tx);
-      ledger.app.wallet._lwCard.dongle.CK__signP2SHTransaction_async(inputs, transaction, scripts, Coinkite.CK_PATH)
+      transaction = Bitcoin.Transaction.deserialize(data.raw_unsigned_txn);
+      outputs_number = transaction['outs'].length
+      outputs_script = ledger.app.wallet._lwCard.dongle.formatP2SHOutputScript(transaction)
+      inputs = []
+      paths = []
+      scripts = []
+      for input in data.input_info
+        paths.push(Coinkite.CK_PATH + "/" + input.sp)
+        inputs.push([input.txn, Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(input.out_num), 4).reverse())])
+        scripts.push(data.redeem_scripts[input.sp].redeem)
+      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, scripts, outputs_number, outputs_script, paths)
       .then (result) =>
+        signatures = []
+        index = 0
+        for input in data.inputs
+          signatures.push([result[index], input[1], input[0]])
+          index++
         url = '/v1/co-sign/' + @request + '/' + @cosigner + '/sign'
         @_setAuthHeaders(url)
         @httpClient
-          .do type: 'PUT', url: url, dataType: 'json', contentType: 'application/json', data: { signatures: result }
+          .do type: 'PUT', url: url, dataType: 'json', contentType: 'application/json', data: { signatures: signatures }
           .then (data, statusText, jqXHR) =>
             callback?(data, null)
           .fail (error, statusText) =>
@@ -110,6 +121,12 @@ class @Coinkite
       callback?(null, error)
 
   testDongleCompatibility: (callback) ->
+    transaction = Bitcoin.Transaction.deserialize("0100000001b4e84a9115e3633abaa1730689db782aa3bb54fa429a3c52a7fa55a788d611fd0100000000ffffffff02a0860100000000001976a914069b75ac23920928eda632a20525a027e67d040188ac50c300000000000017a914c70abc77a8bb21997a7a901b7e02d42c0c0bbf558700000000");
+    inputs = [ ["214af8788d11cf6e3a8dd2efb00d0c3facb446273dee2cf8023e1fae8b2afcbd", "00000000"] ]
+    scripts = [ "522102feec7dd82317846908c20c342a02a8e8c17fb327390ce8d6669ef09a9c85904b210308aaece16e0f99b78e4beb30d8b18652af318428d6d64df26f8089010c7079f452ae" ]
+    outputs_number = transaction['outs'].length
+    outputs_script = ledger.app.wallet._lwCard.dongle.formatP2SHOutputScript(transaction)
+    paths = [ Coinkite.CK_PATH + "/0" ]
     data = {
       "input_info": [
         {
@@ -133,19 +150,14 @@ class @Coinkite
         }
       },
     }
-    inputs = data.inputs
-    scripts = data.redeem_scripts
-    tx = data.raw_unsigned_txn
     try
-      transaction = Bitcoin.Transaction.deserialize(tx);
-      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, transaction, scripts, Coinkite.CK_PATH)
+      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, scripts, outputs_number, outputs_script, paths)
       .then (result) =>
         callback true
       .fail (error) =>
         callback false
     catch error
       callback false
-
 
   _setAuthHeaders: (endpoint) ->
     endpoint = endpoint.split('?')[0]
