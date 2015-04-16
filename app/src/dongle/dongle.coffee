@@ -57,6 +57,8 @@ Signals :
   @emit state:error(args...)
 ###
 class @ledger.dongle.Dongle extends EventEmitter
+  Dongle = @
+  @_logger: ledger.utils.Logger.getLoggerByTag("Dongle")
 
   # @property
   id: undefined
@@ -80,15 +82,15 @@ class @ledger.dongle.Dongle extends EventEmitter
   _pin = undefined
 
   # @private @property [ledger.utils.PromiseQueue] Enqueue btchip calls to prevent multiple call to interfer
-  _btchipQueue = new ledger.utils.PromiseQueue()
+  _btchipQueue = undefined
 
   constructor: (card) ->
     super
     @id = card.deviceId
     @deviceId = card.deviceId
     @productId = card.productId
+    _btchipQueue = new ledger.utils.PromiseQueue("Dongle##{@id}")
     @_btchip = new BTChip(card)
-
     unless @isInBootloaderMode()
       @_recoverFirmwareVersion().then( =>
         @_recoverOperationMode()
@@ -181,7 +183,6 @@ class @ledger.dongle.Dongle extends EventEmitter
   # Verify that dongle firmware is "official".
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
-  # isCertified: (callback=undefined) -> @_checkCertification(Attestation, callback)
   isCertified: (callback=undefined) -> @_checkCertification(Attestation, callback)
 
   isBetaCertified: (callback=undefined) -> @_checkCertification(BetaAttestation, callback)
@@ -439,7 +440,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)
       resumeData.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in resumeData.trustedInputs)
       resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
-    _btchipQueue.enqueue "confirmSecureScreen", =>
+    _btchipQueue.enqueue "createPaymentTransaction", =>
       @_btchip.createPaymentTransaction_async(
         inputs, associatedKeysets, changePath,
         new ByteString(recipientAddress, ASCII),
@@ -449,17 +450,17 @@ class @ledger.dongle.Dongle extends EventEmitter
         sighashType && new ByteString(Convert.toHexInt(sighashType), HEX),
         authorization && new ByteString(authorization, HEX),
         resumeData
-      ).then (result) ->
-        switch typeof result
-          when 'object'
-            result.scriptData = result.scriptData.toString(HEX)
-            result.trustedInputs = (trustedInput.toString(HEX) for trustedInput in result.trustedInputs)
-            result.publicKeys = (publicKey.toString(HEX) for publicKey in result.publicKeys)
-            result.authorizationPaired = result.authorizationPaired.toString(HEX) if result.authorizationPaired?
-            result.authorizationReference = result.authorizationReference.toString(HEX) if result.authorizationReference?
-          when 'string'
-            result = result.toString(HEX)
+      ).then( (result) ->
+        if result instanceof ByteString
+          result = result.toString(HEX)
+        else
+          result.scriptData = result.scriptData.toString(HEX)
+          result.trustedInputs = (trustedInput.toString(HEX) for trustedInput in result.trustedInputs)
+          result.publicKeys = (publicKey.toString(HEX) for publicKey in result.publicKeys)
+          result.authorizationPaired = result.authorizationPaired.toString(HEX) if result.authorizationPaired?
+          result.authorizationReference = result.authorizationReference.toString(HEX) if result.authorizationReference?
         return result
+      )
 
   ###
   @return [Q.Promise]
