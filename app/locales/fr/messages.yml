@@ -250,6 +250,8 @@ update:
   error:
     update_failed: "Mise à jour échouée"
     error_updated: "Une erreur est survenue pendant la mise à jour de votre Ledger Wallet (code: %s)."
+    plug_back: "Débranchez puis rebrancher votre portefeuille, puis réessayez."
+    problem_persists: "Si le problème persiste, merci de visiter notre centre d'aide sur support.ledgerwallet.com."
 
 wallet:
   defaults:
