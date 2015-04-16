@@ -28,6 +28,6 @@
 <div class="dialog-actions-bar">
   <a id="open_scanner_button" class="cancel-rounded-button"><i class="fa fa-camera"></i></a>
   <div class="left-spacer"></div>
-  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
+  <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
   <a class="action-rounded-button" href="#send" id="send_button"><%= t 'common.send' %></a>
 </div>

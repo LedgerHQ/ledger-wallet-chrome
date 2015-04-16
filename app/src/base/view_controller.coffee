@@ -70,6 +70,8 @@ class @ViewController extends @EventEmitter
   assetPath: () ->
     finalName = ''
     segments = _.string.underscored(@identifier()).split('_')
+    console.log @identifier()
+    console.log segments
     for segment in segments
       finalName += '/' + segment
     finalName

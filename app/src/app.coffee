@@ -7,7 +7,9 @@ require @ledger.imports, ->
       FirmwareUpdate: "FirmwareUpdate"
 
     onStart: ->
+      Api.init()
       @_listenAppEvents()
+      addEventListener "message", Api.listener.bind(Api), false
       @setExecutionMode(@Modes.Wallet)
       @router.go '/'
       (new WalletSettingsIndexDialogViewController()).show()
@@ -122,6 +124,7 @@ require @ledger.imports, ->
   @WALLET_LAYOUT = 'WalletNavigationController'
   @ONBOARDING_LAYOUT = 'OnboardingNavigationController'
   @UPDATE_LAYOUT = 'UpdateNavigationController'
+  @COINKITE_LAYOUT = 'AppsCoinkiteNavigationController'
 
   Model.commitRelationship()
 

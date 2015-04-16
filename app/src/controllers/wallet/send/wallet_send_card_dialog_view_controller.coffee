@@ -10,6 +10,10 @@ class @WalletSendCardDialogViewController extends @DialogViewController
     tinyPincode: undefined
   _validationDetails: undefined
 
+  cancel: ->
+    Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
+    @dismiss()
+    
   onAfterRender: ->
     super
     @_setupUI()

@@ -47,6 +47,7 @@ common:
     deleting_this_paired_smartphone: "By deleting this smartphone, you will no longer be able to manually validate transactions of this Ledger Wallet.<br />Do you want to continue?"
     going_to_firmware_update: "By switching to firmware update mode, all your pending activites will be interrupted.<br />Do you want to continue ?"
     wrong_transaction_signature: "The transaction has not been signed correctly due to hardware fault. Please contact the support for immediate assistance."
+    dust_transaction: "The transaction amount must be at least %s."
 
   qrcode:
     scan_qrcode: "Scan QR code"
