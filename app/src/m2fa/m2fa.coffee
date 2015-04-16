@@ -170,45 +170,40 @@ _.extend @ledger.m2fa,
   _onIdentify: (client, pubKey, d) ->
     d.notify("pubKeyReceived", pubKey)
     l("%c[_onIdentify] pubKeyReceived", "color: #4444cc", pubKey)
-    try
-      ledger.dongle.unlocked().initiateSecureScreen(pubKey).then((challenge) ->
-        l("%c[_onIdentify] challenge received:", "color: #4444cc", challenge)
-        d.notify("sendChallenge", challenge)
-        client.sendChallenge(challenge)
-      ).fail( (err) =>
-        e(err)
-        d.reject('initiateFailure')
-        client.stopIfNeccessary()
-      ).done()
-    catch err
-      e(err)
-      d.reject(err)
+    ledger.app.dongle.initiateSecureScreen(pubKey).then((challenge) ->
+      l("%c[_onIdentify] challenge received:", "color: #4444cc", challenge)
+      d.notify("sendChallenge", challenge)
+      client.sendChallenge(challenge)
+    ).fail( (err) =>
+      e("initiateSecureScreen failure:", err)
+      d.reject('initiateFailure')
       client.stopIfNeccessary()
+    ).done()
 
   _onChallenge: (client, data, d) ->
     screenData = _.clone(client.lastIdentifyData)
     d.notify("challengeReceived")
     l("%c[_onChallenge] challengeReceived", "color: #4444cc", data)
-    try
-      ledger.dongle.unlocked().confirmSecureScreen(data).then( =>
-        l("%c[_onChallenge] SUCCESS !!!", "color: #00ff00", data )
-        client.confirmPairing()
-        d.notify("secureScreenConfirmed")
-        client.pairedDongleName.onComplete (name, err) =>
+    ledger.app.dongle.confirmSecureScreen(data).then( =>
+      l("%c[_onChallenge] SUCCESS !!!", "color: #00ff00", data )
+      client.confirmPairing()
+      d.notify("secureScreenConfirmed")
+      console.log(client.pairedDongleName)
+      client.pairedDongleName.onComplete (name, err) =>
+        try
+          console.log("client.pairedDongleName.completed with", name, err)
           return d.reject('cancel') if err?
           screenData['name'] = name
           d.resolve @saveSecureScreen(client.pairingId, screenData)
-      ).fail( (e) =>
-        l("%c[_onChallenge] >>>  FAILURE  <<<", "color: #ff0000", e)
-        client.rejectPairing()
-        d.reject('invalidChallenge')
-      ).finally(=>
-        client.stopIfNeccessary()
-      ).done()
-    catch err
-      e(err)
-      d.reject(err)
+        catch er
+          console.error(er)
+    ).fail( (e) =>
+      l("%c[_onChallenge] >>>  FAILURE  <<<", "color: #ff0000", e)
+      client.rejectPairing()
+      d.reject('invalidChallenge')
+    ).finally(=>
       client.stopIfNeccessary()
+    ).done()
 
   _onDisconnect: (client, data, d) ->
     d.notify "secureScreenDisconnect"

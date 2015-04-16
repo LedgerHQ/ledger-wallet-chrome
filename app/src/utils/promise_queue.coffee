@@ -37,7 +37,7 @@ queue.enqueue ->
 class @ledger.utils.PromiseQueue extends @EventEmitter
   PromiseQueue = @
 
-  @TIMOUT_DELAY: 10 * 1000 # 20s
+  @TIMOUT_DELAY: 60 * 1000 # 60s
 
   constructor: (@name) ->
     @brakName = "[#{@name}]" if @name

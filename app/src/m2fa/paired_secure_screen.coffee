@@ -42,22 +42,21 @@ class ledger.m2fa.PairedSecureScreen
 
   removeFromSyncedStore: -> @removeFromStore(ledger.storage.sync)
 
-  @fromStore: (id, store, callback = _.noop) ->
-    d = ledger.defer()
-    d.onComplete callback
+  @fromStore: (id, store, callback=undefined) ->
+    d = ledger.defer(callback)
     store.get "__m2fa_#{id}", (objects) ->
-      result = if objects.length > 0 then new @(objects[0]) else null
-      error = if objects.length is 0 then ledger.errors.NotFound else null
-      d.complete(result, error)
+      if objects.length > 0
+        d.resolve(new @(objects[0]))
+      else
+        d.reject(ledger.errors.NotFound)
     d.promise
 
-  @fromSyncedStore: (id, callback = _.noop) -> @fromStore(id, ledger.storage.sync, callback)
+  @fromSyncedStore: (id, callback=undefined) -> @fromStore(id, ledger.storage.sync, callback)
 
   @create: (id, data) -> new @(id: id, name: data['name'], created_at: new Date().getTime(), uuid: data['uuid'], platform: data['platform'], version: VERSION)
 
-  @getAllFromStore: (store, callback = _.noop) ->
-    d = ledger.defer()
-    d.onComplete callback
+  @getAllFromStore: (store, callback=undefined) ->
+    d = ledger.defer(callback)
     store.keys (keys) =>
       keys = _.filter(keys, (key) -> key.match(/^__m2fa_/))
       return d.resolve([]) if keys.length is 0
@@ -66,57 +65,50 @@ class ledger.m2fa.PairedSecureScreen
         d.resolve(screens)
     d.promise
 
-  @getAllFromSyncedStore: (callback = _.noop) -> @getAllFromStore(ledger.storage.sync, callback)
+  @getAllFromSyncedStore: (callback=undefined) -> @getAllFromStore(ledger.storage.sync, callback)
 
-  @getMostRecentFromStore: (store, callback = _.noop) ->
-    d = ledger.defer(callback)
-    @getAllFromStore store, (screens) ->
-      return d.rejectWithError(ledger.errors.NotFound) if screens.length is 0
-      d.resolve(_(screens).max (screen) -> screen.createdAt.getTime())
-    d.promise
+  @getMostRecentFromStore: (store, callback=undefined) ->
+    defer = ledger.defer(callback)
+    p = @getAllFromStore(store).then (screens) ->
+      throw ledger.errors.new(ledger.errors.NotFound) if screens.length is 0
+      _(screens).max (screen) -> screen.createdAt.getTime()
+    defer.resolve(p).promise
 
-  @getMostRecentFromSyncedStore: (callback = _.noop) -> @getMostRecentFromStore(ledger.storage.sync, callback)
+  @getMostRecentFromSyncedStore: (callback=undefined) -> @getMostRecentFromStore(ledger.storage.sync, callback)
 
-  @getByNameFromStore: (store, name, callback = _.noop) ->
-    d = ledger.defer(callback)
-    @getAllFromStore store, (result, error) ->
-      return d.reject(error) if error?
-      d.resolve(_(result).where(name: name)[0])
-    d.promise
+  @getByNameFromStore: (store, name, callback=undefined) ->
+    defer = ledger.defer(callback)
+    p = @getAllFromStore(store).then (results) -> _(results).where(name: name)[0] || null
+    defer.resolve(p).promise
 
-  @getByNameFromSyncedStore: (name, callback = _.noop) -> @getByNameFromStore(ledger.storage.sync, name, callback)
+  @getByNameFromSyncedStore: (name, callback=undefined) -> @getByNameFromStore(ledger.storage.sync, name, callback)
 
-  @getAllGroupedByPropertyFromStore: (store, property, callback = _.noop) ->
-    d = ledger.defer(callback)
-    @getAllFromStore store, (screens, error) ->
-      return d.reject(error) if error?
-      groups = _.groupBy screens, (s) -> s[property]
-      d.resolve(groups)
-    d.promise
+  @getAllGroupedByPropertyFromStore: (store, property, callback=undefined) ->
+    defer = ledger.defer(callback)
+    p = @getAllFromStore(store).then (screens) -> _.groupBy screens, (s) -> s[property]
+    defer.resolve(p).promise
 
-  @getAllGroupedByPropertyFromSyncedStore: (property, callback = _.noop) -> @getAllGroupedByPropertyFromStore(ledger.storage.sync, property, callback)
+  @getAllGroupedByPropertyFromSyncedStore: (property, callback=undefined) -> @getAllGroupedByPropertyFromStore(ledger.storage.sync, property, callback)
 
-  @getAllGroupedByUuidFromStore: (store, callback = _.noop) -> @getAllGroupedByPropertyFromStore(store, 'uuid', callback)
+  @getAllGroupedByUuidFromStore: (store, callback=undefined) -> @getAllGroupedByPropertyFromStore(store, 'uuid', callback)
 
-  @getAllGroupedByUuidFromSyncedStore: (callback = _.noop) -> @getAllGroupedByUuidFromStore(ledger.storage.sync, callback)
+  @getAllGroupedByUuidFromSyncedStore: (callback=undefined) -> @getAllGroupedByUuidFromStore(ledger.storage.sync, callback)
 
-  @getScreensByUuidFromStore: (store, uuid, callback = _.noop) ->
-    d = ledger.defer(callback)
-    @getAllFromStore store, (result, error) ->
-      return d.reject(error) if error?
-      d.resolve(_(result).where(uuid: uuid))
-    d.promise
+  @getScreensByUuidFromStore: (store, uuid, callback=undefined) ->
+    defer = ledger.defer(callback)
+    p = @getAllFromStore(store).then (results) -> _(results).where(uuid: uuid)
+    defer.resolve(p).promise
 
-  @getScreensByUuidFromSyncedStore: (uuid, callback = _.noop) -> @getScreensByUuidFromStore(ledger.storage.sync, uuid, callback)
+  @getScreensByUuidFromSyncedStore: (uuid, callback=undefined) -> @getScreensByUuidFromStore(ledger.storage.sync, uuid, callback)
 
-  @removePairedSecureScreensFromStore: (store, screens, callback = _.noop) ->
+  @removePairedSecureScreensFromStore: (store, screens, callback=undefined) ->
     store.remove ("__m2fa_#{screen.id}" for screen in screens), callback
 
   @removePairedSecureScreensFromSyncedStore: (screens, callback) -> @removePairedSecureScreensFromStore(ledger.storage.sync, screens, callback)
 
-  @removePairedSecureScreensByUuidFromStore: (store, uuid, callback = _.noop) ->
-    @getScreensByUuidFromStore store, uuid, (screens, error) =>
-      return callback(null, error) if error?
-      @removePairedSecureScreensFromStore(store, screens, callback)
+  @removePairedSecureScreensByUuidFromStore: (store, uuid, callback=undefined) ->
+    @getScreensByUuidFromStore(store, uuid)
+    .catch (error) -> callback?(false, error); throw error
+    .then (screens) => @removePairedSecureScreensFromStore(store, screens, callback)
 
-  @removePairedSecureScreensByUuidFromSyncedStore: (uuid, callback = _.noop) -> @removePairedSecureScreensByUuidFromStore(ledger.storage.sync, uuid, callback)
+  @removePairedSecureScreensByUuidFromSyncedStore: (uuid, callback=undefined) -> @removePairedSecureScreensByUuidFromStore(ledger.storage.sync, uuid, callback)

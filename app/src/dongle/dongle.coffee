@@ -382,30 +382,36 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [Q.Promise] Resolve with a 32 bytes length pairing blob hex encoded.
   initiateSecureScreen: (pubKey, callback=undefined) ->
-    Errors.throw(Errors.DongleLocked) if @state != States.UNLOCKED
-    Errors.throw(Errors.InvalidArgument, "Invalid pubKey : #{pubKey}") unless pubKey.match(/^[0-9A-Fa-f]{130}$/)
     _btchipQueue.enqueue "initiateSecureScreen", =>
       d = ledger.defer(callback)
-      # 19.3. SETUP SECURE SCREEN
-      @_sendApdu(new ByteString("E0"+"12"+"01"+"00"+"41"+pubKey, HEX), [0x9000])
-      .then( (d) -> d.resolve(d.toString()) )
-      .fail( (error) -> d.reject(error) )
-      .done()
+      if @state != States.UNLOCKED
+        d.rejectWithError(Errors.DongleLocked)
+      else if ! pubKey.match(/^[0-9A-Fa-f]{130}$/)?
+        d.rejectWithError(Errors.InvalidArgument, "Invalid pubKey : #{pubKey}")
+      else
+        # 19.3. SETUP SECURE SCREEN
+        @_sendApdu(new ByteString("E0"+"12"+"01"+"00"+"41"+pubKey, HEX), [0x9000])
+        .then (c) -> d.resolve(c.toString())
+        .fail (error) -> d.reject(error)
+        .done()
       d.promise
 
   # @param [String] resp challenge response, hex encoded.
   # @param [Function] callback Optional argument
   # @return [Q.Promise] Resolve if pairing is successful.
   confirmSecureScreen: (resp, callback=undefined) ->
-    Errors.throw(Errors.DongleLocked) if @state != States.UNLOCKED
-    Errors.throw(Errors.InvalidArgument, "Invalid challenge resp : #{resp}") unless resp.match(/^[0-9A-Fa-f]{32}$/)
     _btchipQueue.enqueue "confirmSecureScreen", =>
       d = ledger.defer(callback)
-      # 19.3. SETUP SECURE SCREEN
-      @_sendApdu(new ByteString("E0"+"12"+"02"+"00"+"10"+resp, HEX), [0x9000])
-      .then( () -> d.resolve() )
-      .fail( (error) -> d.reject(error) )
-      .done()
+      if @state != States.UNLOCKED
+        d.rejectWithError(Errors.DongleLocked)
+      else if ! resp.match(/^[0-9A-Fa-f]{32}$/)?
+        d.rejectWithError(Errors.InvalidArgument, "Invalid challenge resp : #{resp}")
+      else
+        # 19.3. SETUP SECURE SCREEN
+        @_sendApdu(new ByteString("E0"+"12"+"02"+"00"+"10"+resp, HEX), [0x9000])
+        .then () -> d.resolve()
+        .fail (error) -> d.reject(error)
+        .done()
       d.promise
 
   # @param [String] path

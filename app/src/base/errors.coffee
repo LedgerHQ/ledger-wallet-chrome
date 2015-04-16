@@ -40,6 +40,10 @@ _.extend ledger.errors,
   ErrorDueToCardPersonalization: 408
   HigherVersion: 409
 
+  # M2FA errors
+  TransactionCancelled: "secure_screen_cancelled_transaction"
+  InvalidResult: "secure_screen_invalid_pin"
+
   DefaultMessages:
     0: "StandardError"
 
