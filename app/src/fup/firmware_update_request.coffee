@@ -162,7 +162,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_eventHandler.push [dongle, 'state:disconnected', handler]
       @_handleCurrentState()
       d.resolve(dongle)
-
     [dongle] = ledger.app.donglesManager.getConnectedDongles()
     try
       unless dongle?
@@ -194,11 +193,11 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       d.resolve()
     d.promise
 
-  _waitForPowerCycle: (callback = undefined, silent = no) -> @_waitForDisconnectDongle(null, silent).then(=> @_waitForConnectedDongle(callback, silent).promise())
+  _waitForPowerCycle: (callback = undefined, silent = no) -> @_waitForDisconnectDongle(null, silent).then(=> @_waitForConnectedDongle(callback, silent))
 
   _handleCurrentState: () ->
     # If there is no dongle wait for one
-    (return @_waitForConnectedDongle()) unless @_dongle?
+    return @_waitForConnectedDongle() unless @_dongle?
 
     # Otherwise handle the current by calling the right method depending on the last mode and the state
     if @_lastMode is Modes.Os
@@ -302,6 +301,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           when 0x6faa then @_failure(Errors.ErrorDueToCardPersonalization)
           else @_failure(Errors.CommunicationError)
         @_waitForDisconnectDongle()
+    .fail (err) ->
+      console.error(err)
 
   _processInitStageBootloader: ->
     @_lastVersion = null
@@ -399,11 +400,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _waitForUserApproval: (approvalName) ->
     if _.contains(@_approvedStates, approvalName)
-      deferred = Q.defer()
-      deferred.resolve()
-      deferred.promise
+      Q()
     else
-      @_setIsNeedingUserApproval  yes
+      @_setIsNeedingUserApproval yes
       @_deferredApproval.promise.then => @_approvedStates.push approvalName
 
   _removeUserApproval: (approvalName) ->
@@ -427,7 +426,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           if @_exchangeNeedsExtraTimeout
             deferred = Q.defer()
             _.delay (=> deferred.resolve(@_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1))), ExchangeTimeout
-            deferred.promise()
+            deferred.promise
           else
             @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
         else
