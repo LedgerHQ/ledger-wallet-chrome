@@ -447,6 +447,31 @@ wallet:
       uri_placeholder: "Entrez l'URI"
       invalid_uri: "URI invalide"
 
+ xpubkey:
+    index:
+      title: "Export de clé publique étendue"
+      info: "Autoriser l'export de la clé publique étendue correspondant au chemin de dérivation suivant:"
+      path: "Chemin de dérivation"
+    processing:
+      title: "Clé publique étendue"
+      info: "Calcul de la clé publique étendue"
+    errors:
+      cancelled: "Export non autorisé"
+      derivation_failed: "Erreur dans le calcul de la xpubkey"
+      derivation_successfull: "Clé exportée avec succès"
+
+  p2sh:
+    index:
+      title: "Demande de signature"
+      info: "Souhaitez-vous autoriser la demande de signature?"
+    signing:
+      title: "Signature"
+      info: "Le signature de la transaction par votre Ledger Nano est en cours"
+    errors:
+      cancelled: "Demande de signature refusée"
+      signature_failed: "Erreur dans la signature"
+      signature_successfull: "Signature effectuée avec succès"
+
   settings:
     common:
       settings: "Réglages"
