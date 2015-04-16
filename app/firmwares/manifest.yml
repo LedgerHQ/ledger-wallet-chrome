@@ -32,7 +32,7 @@ versions:
     os: 1.1.0.1
     reloader: 0.1.33.0
     beta: false
-    overwrite: false
+    overwrite: true
     whats_new: 'onboarding.device.update.new_1_0_1'
 
 current_version:

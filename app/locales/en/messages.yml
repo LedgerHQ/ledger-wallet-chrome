@@ -250,6 +250,8 @@ update:
   error:
     update_failed: "Update failed"
     error_updated: "An error occurred while updating your Ledger Wallet (code: %s)."
+    plug_back: "Please unplug and plug back your wallet, then try again."
+    problem_persists: "If the problem persists, visit our help center at support.ledgerwallet.com."
 
 wallet:
   defaults:
