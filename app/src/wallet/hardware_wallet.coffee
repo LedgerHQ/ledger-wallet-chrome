@@ -130,7 +130,8 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     @_lwCard.verifyPIN pin
 
   lock: () ->
-    @_setState(ledger.wallet.States.LOCKED)
+    if @_currentState isnt ledger.wallet.States.BLANK and @_currentState isnt ledger.wallet.States.FROZEN and @_currentState?
+      @_setState(ledger.wallet.States.LOCKED)
 
   setup: (pincode, seed, callback) ->
     throw 'Cannot setup if the wallet is not blank' if @_state isnt ledger.wallet.States.BLANK and @_state isnt ledger.wallet.States.FROZEN

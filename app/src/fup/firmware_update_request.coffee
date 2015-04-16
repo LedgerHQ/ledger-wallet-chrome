@@ -68,6 +68,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_isWaitForDongleSilent = no
     @_isCancelled = no
     @_eventHandler = []
+    @_logger = ledger.utils.Logger.getLoggerByTag('FirmwareUpdateRequest')
 
   ###
     Stops all current tasks and listened events.
@@ -200,6 +201,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _handleCurrentState: () ->
     # If there is no dongle wait for one
     (return @_waitForConnectedDongle()) unless @_wallet?
+    @_logger.info("Handle current state", lastMode: @_lastMode, currentState: @_currentState)
 
     # Otherwise handle the current by calling the right method depending on the last mode and the state
     if @_lastMode is Modes.Os
@@ -218,6 +220,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         else @_failure(Errors.InconsistentState)
 
   _processInitStageOs: ->
+    @_logger.info("Process init stage OS")
     @_wallet.getState (state) =>
       if state isnt ledger.wallet.States.BLANK and state isnt ledger.wallet.States.FROZEN
         @_setCurrentState(States.Erasing)
@@ -425,7 +428,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     try
      @_getCard().exchange_async(new ByteString(adpus[offset], HEX))
       .then =>
-        throw "toto" if _.random(0, 1<<31) % 2 == 0
         if ignoreSW or @_getCard().SW == 0x9000
           if @_exchangeNeedsExtraTimeout
             deferred = Q.defer()
