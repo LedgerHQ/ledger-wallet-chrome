@@ -20,6 +20,8 @@ class @Api
         @signP2SH(data)
       when 'get_xpubkey'
         @getXPubKey(data)
+      when 'coinkite_get_xpubkey'
+        @coinkiteGetXPubKey(data)
 
   @hasSession: (data) ->
     chrome.runtime.sendMessage {
@@ -56,6 +58,9 @@ class @Api
 
   @bitid: (data) ->
     ledger.app.router.go '/wallet/bitid/index', {uri: data.uri, silent: data.silent}
+
+  @coinkiteGetXPubKey: (data) ->
+    ledger.app.router.go '/apps/coinkite/keygen/index', {index: data.index}
 
   @callback_cancel: (command, message) ->
     chrome.runtime.sendMessage 

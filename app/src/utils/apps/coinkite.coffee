@@ -18,12 +18,15 @@ class @Coinkite
     @secret = secret
     @httpClient = new HttpClient(@API_BASE)
 
-  getExtendedPublickey: (callback) ->
+  getExtendedPublickey: (index, callback) ->
+    path = Coinkite.CK_PATH
+    if index
+      path = path + "/" + index
     try
-      ledger.app.wallet.getExtendedPublicKey Coinkite.CK_PATH, (key) =>
+      ledger.app.wallet.getExtendedPublicKey path, (key) =>
         @xpub = key._xpub58
-        ledger.app.wallet.signMessageWithBitId Coinkite.CK_PATH, "Coinkite", (signature) =>
-          callback?({xpub: @xpub, signature: signature}, null)
+        ledger.app.wallet.signMessageWithBitId path, "Coinkite", (signature) =>
+          callback?({xpub: @xpub, signature: signature, path: path}, null)
     catch error
       callback?(null, error)
 

@@ -447,7 +447,7 @@ wallet:
       uri_placeholder: "Entrez l'URI"
       invalid_uri: "URI invalide"
 
- xpubkey:
+  xpubkey:
     index:
       title: "Export de clé publique étendue"
       info: "Autoriser l'export de la clé publique étendue correspondant au chemin de dérivation suivant:"
@@ -520,6 +520,9 @@ apps:
       api_secret_placeholder: "Entrez le secret"
       note: "Attention à bien activer la permission <b>cosign</b> sur cette clé API."
     keygen:
+      index:
+        title: "Export de clé publique étendue"
+        info: "Souhaitez-vous donner à Coinkite une clé publique étendue? Cela ajoutera ce Nano en tant que clé de signature pour le wallet que vous êtes en train de créer."
       processing:
         title: "Clé de signature"
         info: "Dérivation de la clé publique étendue pour Coinkite"

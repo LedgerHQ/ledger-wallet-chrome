@@ -520,6 +520,9 @@ apps:
       api_secret_placeholder: "Enter your API secret"
       note: "Be sure to activate the <b>cosign</b> permission for this key."
     keygen:
+      index:
+        title: "Extended public key export"
+        info: "Do you wish to export to Coinkite an extended public key? It will add the Nano as a signing device for the vault you are creating."
       processing:
         title: "Extended public key"
         info: "Computing extended public key for Coinkite"

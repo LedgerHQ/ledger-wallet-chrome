@@ -323,6 +323,7 @@
         'controllers/apps/coinkite/dashboard/apps_coinkite_dashboard_index_view_controller'
         'controllers/apps/coinkite/dashboard/apps_coinkite_dashboard_compatibility_view_controller'
         'controllers/apps/coinkite/settings/apps_coinkite_settings_index_dialog_view_controller'
+        'controllers/apps/coinkite/keygen/apps_coinkite_keygen_index_dialog_view_controller'
         'controllers/apps/coinkite/keygen/apps_coinkite_keygen_processing_dialog_view_controller'
         'controllers/apps/coinkite/keygen/apps_coinkite_keygen_show_dialog_view_controller'
         'controllers/apps/coinkite/cosign/apps_coinkite_cosign_index_dialog_view_controller'

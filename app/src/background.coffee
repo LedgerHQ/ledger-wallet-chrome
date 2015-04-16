@@ -67,6 +67,13 @@ chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse) =>
       }
       if chrome.app.window.get("main_window")?
         chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
+    when 'coinkite_get_xpubkey'
+      payload = {
+        command: 'coinkite_get_xpubkey',
+        index: data.index
+      }
+      if chrome.app.window.get("main_window")?
+        chrome.app.window.get("main_window").contentWindow.postMessage payload, "*"
   return true
 
 chrome.runtime.onMessage.addListener (request, sender, sendResponse) =>

@@ -178,6 +178,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new AppsCoinkiteSettingsIndexDialogViewController()
     dialog.show()
 
+  route '/apps/coinkite/keygen/index', (params) ->
+    dialog = new AppsCoinkiteKeygenIndexDialogViewController({ index: params["?params"]?.index })
+    dialog.show()
+
   route '/apps/coinkite/keygen/processing', (params) ->
     dialog = new AppsCoinkiteKeygenProcessingDialogViewController()
     dialog.show()
