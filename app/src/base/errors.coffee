@@ -39,6 +39,9 @@ _.extend ledger.errors,
   ErrorDueToCardPersonalization: 408
   HigherVersion: 409
 
+  # I/O Errors
+  WriteError: 500
+
   create: (code, title, error) -> code: code, title: title, error: error
   throw: (code, message) -> throw new ledger.StandardError(code, message)
 
