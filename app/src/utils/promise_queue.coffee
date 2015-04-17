@@ -35,7 +35,12 @@ queue.enqueue ->
   Q()
 ###
 class @ledger.utils.PromiseQueue extends @EventEmitter
-  constructor: ->
+  PromiseQueue = @
+
+  @TIMOUT_DELAY: 60 * 1000 # 60s
+
+  constructor: (@name) ->
+    @brakName = "[#{@name}]" if @name
     @_taskRunning = false
     @_queue = []
 
@@ -58,14 +63,21 @@ class @ledger.utils.PromiseQueue extends @EventEmitter
     taskWrapper = =>
       @emit 'task:starting', taskId
       try
-        promise = task()
-        defer.resolve(promise)
+        # TODO: use defer.promise.isFilfilled instead of done, but fail randomly sometimes.
+        done = false
+        task().then( (args...) -> defer.resolve(args...)
+        ).catch( (args...) -> defer.reject(args...)
+        ).done()
+        setTimeout (=>
+          @_timeout(taskId, defer) unless done
+        ), PromiseQueue.TIMOUT_DELAY
       catch err
+        console.error("PromiseQueue#{@brakName} Fail to exec task #{taskId} :", err)
         defer.reject(err)
       defer.promise.finally =>
+        done = true
         @emit 'task:done', taskId
         @_taskDone()
-      promise.done()
     if @_taskRunning
       @_queue.push([taskId, taskWrapper])
       @emit 'queue:pushed', taskId
@@ -82,3 +94,14 @@ class @ledger.utils.PromiseQueue extends @EventEmitter
     else
       @_taskRunning = false
       @emit 'queue:empty'
+
+  _timeout: (taskId, defer) ->
+    return if defer.promise.isFulfilled()
+    if @_queue.length > 0
+      console.warn("PromiseQueue#{@brakName} Timeout for task #{taskId}. Call next task.")
+      setTimeout (=> @_timeout(taskId, defer)), PromiseQueue.TIMOUT_DELAY
+      @_taskDone()
+    else
+      msg = "PromiseQueue#{@brakName} Timeout for task #{taskId}. No task to call."
+      console.error(msg)
+      defer.rejectWithError(ledger.errors.TimeoutError, msg)

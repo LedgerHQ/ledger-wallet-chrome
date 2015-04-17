@@ -503,7 +503,7 @@ var BTChip = Class.create({
                 return deferred.promise;
 	},
 
-  startP2SHUntrustedHashTransactionInput_async: function(newTransaction, transaction, redeemScript) {
+  startP2SHUntrustedHashTransactionInput_async: function(newTransaction, transaction, redeemScript, currentIndex) {
     var currentObject = this;
     var version_hex = new ByteString(Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(transaction.version), 4)), HEX);
     var data = version_hex.concat(currentObject.createVarint(transaction['ins'].length));
@@ -513,19 +513,44 @@ var BTChip = Class.create({
       async.eachSeries(
         transaction['ins'],
         function (input, finishedCallback) {
-          console.log(input);
           data = new ByteString(Convert.toHexByte(0x00), HEX);
           var txhash = Bitcoin.convert.bytesToHex(Bitcoin.convert.hexToBytes(input.outpoint.hash).reverse());
           var outpoint = Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(input.outpoint.index), 4));
           data = data.concat(new ByteString(txhash, HEX)).concat(new ByteString(outpoint, HEX));
-          data = data.concat(currentObject.createVarint(redeemScript.length));
-          currentObject.startUntrustedHashTransactionInputRaw_async(newTransaction, false, data).then(function (result) {
-            data = redeemScript.concat(new ByteString("FFFFFFFF", HEX));
-            currentObject.startUntrustedHashTransactionInputRaw_async(newTransaction, false, data).then(function (result) {
-              i++;
-              finishedCallback();                            
-            }).fail(function (err) { deferred.reject(err); });
-          }).fail(function (err) { deferred.reject(err); });
+          if (i == currentIndex) {
+            script = redeemScript;
+          } else {
+            script = "";
+          }
+          data = data.concat(currentObject.createVarint(script.length));
+          if (script.length == 0) {
+            data = data.concat(new ByteString("FFFFFFFF", HEX));
+          }
+          currentObject.startUntrustedHashTransactionInputRaw_async(true, false, data).then(function (result) {
+            var offset = 0;
+            var blocks = [];
+            while (offset != script.length) {
+              var blockSize = (script.length - offset > 255 ? 255 : script.length - offset);
+              block = script.bytes(offset, blockSize);
+              if (offset + blockSize == script.length) {
+                block = block.concat(new ByteString("FFFFFFFF", HEX));
+              }
+              blocks.push(block);
+              offset += blockSize;
+            }
+            async.eachSeries(
+              blocks,
+              function(block, blockFinishedCallback) {
+                currentObject.startUntrustedHashTransactionInputRaw_async(true, false, block).then(function (result) {
+                  blockFinishedCallback();
+                }).fail(function (err) { finishedCallback(); });
+              },
+              function(finished) {
+                i++;
+                finishedCallback();
+              }
+            );
+          }).fail(function (err) { finishedCallback(); });
         },
         function (finished) {
           deferred.resolve(finished);
@@ -872,15 +897,17 @@ var BTChip = Class.create({
     var deferred = Q.defer();
     var firstRun = true;
 
+    var currentIndex = 0
     async.eachSeries(
       inputs,
       function(input, finishedCallback) {
         var script = new ByteString(scripts[input[0]].redeem, HEX);
-        currentObject.startP2SHUntrustedHashTransactionInput_async(firstRun, transaction, script).then(function (result) {
+        currentObject.startP2SHUntrustedHashTransactionInput_async(firstRun, transaction, script, currentIndex).then(function (result) {
           currentObject.untrustedHashTransactionInputFinalizeFull_async(transaction).then(function (result) {
             currentObject.signTransaction_async(path + "/" + input[0], authorization, lockTime, sigHashType).then(function (result) {
               signatures.push([result.toString(), input[1], input[0]]);
               firstRun = false;
+              currentIndex++;
               finishedCallback();
             }).fail(function(err){deferred.reject(err);});
           }).fail(function(err){deferred.reject(err);});

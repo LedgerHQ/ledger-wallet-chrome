@@ -236,6 +236,7 @@
         # BitID
         'controllers/wallet/bitid/wallet_bitid_index_dialog_view_controller'
         'controllers/wallet/bitid/wallet_bitid_authenticating_dialog_view_controller'
+        'controllers/wallet/bitid/wallet_bitid_form_dialog_view_controller'
 
         # Settings
         'controllers/wallet/settings/wallet_settings_hardware_dialog_view_controller'
@@ -310,6 +311,7 @@
         ## Coinkite
         'controllers/apps/coinkite/apps_coinkite_navigation_controller'
         'controllers/apps/coinkite/dashboard/apps_coinkite_dashboard_index_view_controller'
+        'controllers/apps/coinkite/dashboard/apps_coinkite_dashboard_compatibility_view_controller'
         'controllers/apps/coinkite/settings/apps_coinkite_settings_index_dialog_view_controller'
         'controllers/apps/coinkite/keygen/apps_coinkite_keygen_processing_dialog_view_controller'
         'controllers/apps/coinkite/keygen/apps_coinkite_keygen_show_dialog_view_controller'
@@ -318,4 +320,24 @@
         'controllers/apps/coinkite/cosign/apps_coinkite_cosign_show_dialog_view_controller'
         'controllers/apps/coinkite/cosign/apps_coinkite_cosign_signing_dialog_view_controller'
 
-    ]
+        # Specs
+        '../spec/spec_helper'
+      ]
+
+      specs:
+        jasmine: [
+          '../spec/jasmine/jasmine'
+          '../spec/jasmine/jasmine-html'
+          '../spec/jasmine/boot'
+        ]
+        files: [
+          '../spec/utils/storage/store_spec'
+          '../spec/utils/storage/chrome_store_spec'
+          '../spec/utils/storage/secure_store_spec'
+          '../spec/restclients/synced_rest_client_spec'
+          '../spec/utils/storage/synced_store_spec'
+          '../spec/utils/bitcoin/bip39_spec'
+
+          '../spec/m2fa/client_spec'
+          '../spec/m2fa/m2fa_spec'
+        ]

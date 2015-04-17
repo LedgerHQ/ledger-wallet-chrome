@@ -48,6 +48,7 @@ common:
     deleting_this_paired_smartphone: "By deleting this smartphone, you will no longer be able to manually validate transactions of this Ledger Wallet.<br />Do you want to continue?"
     going_to_firmware_update: "By switching to firmware update mode, all your pending activites will be interrupted.<br />Do you want to continue ?"
     wrong_transaction_signature: "The transaction has not been signed correctly due to hardware fault. Please contact the support for immediate assistance."
+    dust_transaction: "The transaction amount must be at least %s."
 
   qrcode:
     scan_qrcode: "Scan QR code"
@@ -79,6 +80,7 @@ onboarding:
     update:
       new_firmware_available: "A new firmware update is available for your Ledger Wallet (%s)."
       new_1_0_0: "This update adds a new authentication to validate outgoing transactions on your smartphone."
+      new_1_0_1: "This update fixes critical bugs in the cryptography library."
 
     unsupported:
       not_linked: "Your hardware wallet does not seem to be linked to any security card."

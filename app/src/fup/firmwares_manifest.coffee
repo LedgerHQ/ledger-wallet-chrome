@@ -10,11 +10,11 @@ _.extend ledger.fup.versions,
   Nano:
     CurrentVersion:
       Bootloader: [0x00, (1 << 16) + (3 << 8) + (16)]
-      Os: [0x20, (1 << 16) + (0 << 8) + (0)]
+      Os: [0x20, (1 << 16) + (0 << 8) + (1)]
       Reloader: [0x00, (1 << 16) + (33 << 8) + (0)]
       Beta: false
       Overwrite: false
-      WhatsNew: 'onboarding.device.update.new_1_0_0'
+      WhatsNew: 'onboarding.device.update.new_1_0_1'
 
 
 ledger.fup.updates ?= {}
@@ -37,6 +37,7 @@ ledger.fup.setupUpdates = ->
       BL_RELOADER_01413
       BL_RELOADER_01414
       BL_RELOADER_1100
+      BL_RELOADER_1101
       
     ]
 
@@ -54,6 +55,7 @@ ledger.fup.setupUpdates = ->
       BL_LOADER_01413
       BL_LOADER_01414
       BL_LOADER_1100
+      BL_LOADER_1101
       
     ]
 
@@ -71,6 +73,7 @@ ledger.fup.setupUpdates = ->
       LOADER_01413
       LOADER_01414
       LOADER_1100
+      LOADER_1101
       
     ]
 
@@ -89,6 +92,7 @@ ledger.fup.setupUpdates = ->
       [[0x00, (1 << 16) + (4 << 8) + (13)], RELOADER_01413]
       [[0x00, (1 << 16) + (4 << 8) + (14)], RELOADER_01414]
       [[0x20, (1 << 16) + (0 << 8) + (0)], RELOADER_1100]
+      [[0x20, (1 << 16) + (0 << 8) + (1)], RELOADER_1101]
       
     ]
 
@@ -100,6 +104,7 @@ ledger.fup.setupUpdates = ->
         [[0x00, (1 << 16) + (4 << 8) + (13)], INIT_01413]
         [[0x00, (1 << 16) + (4 << 8) + (14)], INIT_01414]
         [[0x20, (1 << 16) + (0 << 8) + (0)], INIT_LW_1100]
+        [[0x20, (1 << 16) + (0 << 8) + (1)], INIT_LW_1101]
         
     ]
 
@@ -117,6 +122,7 @@ ledger.fup.clearUpdates = ->
   window.BL_RELOADER_01413 = undefined
   window.BL_RELOADER_01414 = undefined
   window.BL_RELOADER_1100 = undefined
+  window.BL_RELOADER_1101 = undefined
   
   window.BL_LOADER_0143 = undefined
   window.BL_LOADER_0144 = undefined
@@ -130,6 +136,7 @@ ledger.fup.clearUpdates = ->
   window.BL_LOADER_01413 = undefined
   window.BL_LOADER_01414 = undefined
   window.BL_LOADER_1100 = undefined
+  window.BL_LOADER_1101 = undefined
   
   window.LOADER_0143 = undefined
   window.LOADER_0144 = undefined
@@ -143,6 +150,7 @@ ledger.fup.clearUpdates = ->
   window.LOADER_01413 = undefined
   window.LOADER_01414 = undefined
   window.LOADER_1100 = undefined
+  window.LOADER_1101 = undefined
   
   window.RELOADER_0143 = undefined
   window.RELOADER_0144 = undefined
@@ -157,6 +165,7 @@ ledger.fup.clearUpdates = ->
   window.RELOADER_01413 = undefined
   window.RELOADER_01414 = undefined
   window.RELOADER_1100 = undefined
+  window.RELOADER_1101 = undefined
   
   window.INIT_01410 = undefined
   window.INIT_01411 = undefined
@@ -164,6 +173,7 @@ ledger.fup.clearUpdates = ->
   window.INIT_01413 = undefined
   window.INIT_01414 = undefined
   window.INIT_LW_1100 = undefined
+  window.INIT_LW_1101 = undefined
   
 
 ledger.fup.imports = [
@@ -174,6 +184,7 @@ ledger.fup.imports = [
    '../firmwares/btchipfirmware-init-01413'
    '../firmwares/btchipfirmware-init-01414'
    '../firmwares/btchipfirmware-init-1100'
+   '../firmwares/btchipfirmware-init-1101'
    '../firmwares/btchipfirmware-loader-01410'
    '../firmwares/btchipfirmware-loader-01411'
    '../firmwares/btchipfirmware-loader-01412'
@@ -186,6 +197,7 @@ ledger.fup.imports = [
    '../firmwares/btchipfirmware-loader-0148'
    '../firmwares/btchipfirmware-loader-0149'
    '../firmwares/btchipfirmware-loader-1100'
+   '../firmwares/btchipfirmware-loader-1101'
    '../firmwares/btchipfirmware-loader-from-loader-01410'
    '../firmwares/btchipfirmware-loader-from-loader-01411'
    '../firmwares/btchipfirmware-loader-from-loader-01412'
@@ -198,6 +210,7 @@ ledger.fup.imports = [
    '../firmwares/btchipfirmware-loader-from-loader-0148'
    '../firmwares/btchipfirmware-loader-from-loader-0149'
    '../firmwares/btchipfirmware-loader-from-loader-1100'
+   '../firmwares/btchipfirmware-loader-from-loader-1101'
    '../firmwares/btchipfirmware-reloader-01410'
    '../firmwares/btchipfirmware-reloader-01411'
    '../firmwares/btchipfirmware-reloader-01412'
@@ -211,6 +224,7 @@ ledger.fup.imports = [
    '../firmwares/btchipfirmware-reloader-0148'
    '../firmwares/btchipfirmware-reloader-0149'
    '../firmwares/btchipfirmware-reloader-1100'
+   '../firmwares/btchipfirmware-reloader-1101'
    '../firmwares/btchipfirmware-reloader-from-loader-01410'
    '../firmwares/btchipfirmware-reloader-from-loader-01411'
    '../firmwares/btchipfirmware-reloader-from-loader-01412'
@@ -223,5 +237,6 @@ ledger.fup.imports = [
    '../firmwares/btchipfirmware-reloader-from-loader-0148'
    '../firmwares/btchipfirmware-reloader-from-loader-0149'
    '../firmwares/btchipfirmware-reloader-from-loader-1100'
+   '../firmwares/btchipfirmware-reloader-from-loader-1101'
    
 ]

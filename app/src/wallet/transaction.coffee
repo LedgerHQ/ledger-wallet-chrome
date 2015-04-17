@@ -28,6 +28,8 @@ class ledger.wallet.Transaction
   @MINIMUM_CONFIRMATIONS: 1
   #
   @MINIMUM_OUTPUT_VALUE: Amount.fromSatoshi(5430)
+  #
+  @_logger: -> ledger.utils.Logger.getLoggerByTag("Transaction")
 
   # @property [ledger.Amount]
   amount: undefined
@@ -55,8 +57,8 @@ class ledger.wallet.Transaction
   _btInputs: undefined
   # @property [Array<Object>]
   _btcAssociatedKeyPath: undefined
-  # @property [Object]
-  _transaction: undefined
+  # @property [String] hex encoded
+  _signedRawTransaction: undefined
 
   # @param [ledger.dongle.Dongle] dongle
   # @param [ledger.Amount] amount
@@ -77,7 +79,7 @@ class ledger.wallet.Transaction
   isValidated: () -> @_isValidated
 
   # @return [String]
-  getSignedTransaction: () -> @_transaction
+  getSignedTransaction: () -> @_signedRawTransaction
 
   # @return [Integer]
   getValidationMode: () -> @_validationMode
@@ -92,84 +94,11 @@ class ledger.wallet.Transaction
   setHash: (hash) -> @hash = hash
 
   serialize: ->
-    amount: @amount.toNumber(),
+    amount: @amount.toSatoshiNumber(),
     address: @receiverAddress,
-    fee: @fees.toNumber(),
+    fee: @fees.toSatoshiNumber(),
     hash: @hash,
     raw: @getSignedTransaction()
-
-  getValidationDetails: () ->
-    indexes = []
-    if @_validationMode is ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN
-      numberOfCharacters = parseInt(@_out.indexesKeyCard.substring(0, 2), 16)
-      indexesKeyCard = @_out.indexesKeyCard.substring(2, numberOfCharacters * 2 + 2)
-    else
-      indexesKeyCard = @_out.indexesKeyCard
-    amount = ''
-    if ledger.app.dongle.getIntFirmwareVersion() < ledger.dongle.Firmware.V1_4_13
-      stringifiedAmount = @amount.toString()
-      stringifiedAmount = _.str.lpad(stringifiedAmount, 9, '0')
-      decimalPart = stringifiedAmount.substr(stringifiedAmount.length - 8)
-      integerPart = stringifiedAmount.substr(0, stringifiedAmount.length - 8)
-      firstAmountValidationIndex = integerPart.length - 1
-      lastAmountValidationIndex = firstAmountValidationIndex
-      if decimalPart isnt "00000000"
-        lastAmountValidationIndex += 3
-
-    while indexesKeyCard.length >= 2
-      index = indexesKeyCard.substring(0, 2)
-      indexesKeyCard = indexesKeyCard.substring(2)
-      indexes.push parseInt(index, 16)
-
-  # @param [Array<Object>] inputs
-  # @param [String] changePath
-  # @param [Function] callback
-  # @return [Q.Promise]
-  prepare: (callback=undefined) ->
-    if not @amount? or not @fees? or not @recipientAddress?
-      Errors.throw('Transaction must me initialized before preparation')
-    d = ledger.defer(callback)
-    @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
-    .then (@_resumeData) =>
-      @_validationMode = @_resumeData.authorizationRequired
-      @authorizationPaired = @_resumeData.authorizationPaired
-      d.resolve()
-    .fail (error) =>
-      d.rejectWithError(Errors.SignatureError)
-    .done()
-    d.promise
-  
-  # @param [String] validationKey 4 chars ASCII encoded
-  # @param [Function] callback
-  # @return [Q.Promise]
-  validateWithPinCode: (validationPinCode, callback=undefined) -> @_validate(validationPinCode, callback)
-
-  # @param [String] validationKey 4 chars ASCII encoded
-  # @param [Function] callback
-  # @return [Q.Promise]
-  validateWithKeycard: (validationKey, callback = null) -> @_validate(("0#{char}" for char in validationKey).join(''), callback)
-
-  # @param [String] validationKey 4 chars ASCII encoded
-  # @param [Function] callback
-  # @return [Q.Promise]
-  _validate: (validationKey, callback=undefined) ->
-    if not @_resumeData? or not @_validationMode?
-      Errors.throw('Transaction must me prepared before validation')
-    d = ledger.defer(callback)
-    @dongle.createPaymentTransaction(
-      @_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees,
-      undefined, # Default lockTime
-      undefined, # Default sigHash
-      validationKey,
-      resumeData
-    )
-    .then (@_transaction) =>
-      @_isValidated = yes
-      _.defer => d.resolve()
-    .fail (error) =>
-      _.defer => d.rejectWithError(Errors.SignatureError, error)
-    .done()
-    d.promise
 
   # Retrieve information that need to be confirmed by the user.
   # @return [Object]
@@ -187,12 +116,15 @@ class ledger.wallet.Transaction
       validationMode: @_validationMode
       recipientsAddress:
         text: @recipientAddress
-        indexes: @_resumeData.indexesKeyCard.match(/../g)
-      validationCharacters: (@recipientAddress[index] for index in @_resumeData.indexesKeyCard.match(/../g))
+        indexes: (parseInt(i,16) for i in @_resumeData.indexesKeyCard.match(/../g))
       needsAmountValidation: false
+    if @_validationMode is ledger.wallet.Transaction.ValidationModes.SECURE_SCREEN
+      length = details.recipientsAddress.indexes.shift()
+      details.recipientsAddress.indexes = details.recipientsAddress.indexes.slice(0, length)
+    details.validationCharacters = (@recipientAddress[idx] for idx in details.recipientsAddress.indexes)
 
     # ~> 1.4.13 need validation on amount
-    if @dongle.getIntFirmwareVersion() < @dongle.Firmware.V1_4_13
+    if @dongle.getIntFirmwareVersion() < ledger.dongle.Firmware.V1_4_13
       stringifiedAmount = @amount.toString()
       stringifiedAmount = _.str.lpad(stringifiedAmount, 9, '0')
       # Split amount in integer and decimal parts
@@ -213,6 +145,55 @@ class ledger.wallet.Transaction
       details.needsAmountValidation = true
 
     return details
+
+  # @param [Array<Object>] inputs
+  # @param [String] changePath
+  # @param [Function] callback
+  # @return [Q.Promise]
+  prepare: (callback=undefined) ->
+    if not @amount? or not @fees? or not @recipientAddress?
+      Errors.throw('Transaction must me initialized before preparation')
+    d = ledger.defer(callback)
+    @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
+    .then (@_resumeData) =>
+      @_validationMode = @_resumeData.authorizationRequired
+      @authorizationPaired = @_resumeData.authorizationPaired
+      d.resolve(@)
+    .fail (error) =>
+      d.rejectWithError(Errors.SignatureError)
+    .done()
+    d.promise
+
+  # @param [String] validationKey 4 chars ASCII encoded
+  # @param [Function] callback
+  # @return [Q.Promise]
+  validateWithPinCode: (validationPinCode, callback=undefined) -> @_validate((char.charCodeAt(0).toString(16) for char in validationPinCode).join(''), callback)
+
+  # @param [String] validationKey 4 chars ASCII encoded
+  # @param [Function] callback
+  # @return [Q.Promise]
+  validateWithKeycard: (validationKey, callback=undefined) -> @_validate(("0#{char}" for char in validationKey).join(''), callback)
+
+  # @param [String] validationKey 4 bytes hex encoded
+  # @param [Function] callback
+  # @return [Q.Promise]
+  _validate: (validationKey, callback=undefined) ->
+    if not @_resumeData? or not @_validationMode?
+      Errors.throw('Transaction must me prepared before validation')
+    d = ledger.defer(callback)
+    @dongle.createPaymentTransaction(
+      @_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees,
+      undefined, # Default lockTime
+      undefined, # Default sigHash
+      validationKey,
+      @_resumeData
+    ).then( (@_signedRawTransaction) =>
+      @_isValidated = yes
+      _.defer => d.resolve(@)
+    ).catch( (error) =>
+      _.defer => d.rejectWithError(Errors.SignatureError, error)
+    ).done()
+    d.promise
 
   ###
   Creates a new transaction asynchronously. The created transaction will only be initialized (i.e. it will only retrieve
@@ -253,9 +234,25 @@ class ledger.wallet.Transaction
 
           if collectedAmount.gte(requiredAmount)
             changeAmount = collectedAmount.subtract(requiredAmount)
-            fees = fees.add(changeAmount) if changeAmount.lte(5400)
+            fees = fees.add(changeAmount) if changeAmount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
             # We have reached our required amount. It's time to prepare the transaction
-            transaction = new Transaction(ledger.app.dongle, amount, fees, recipientAddress, finalOutputs, changePath)
+            transaction = new Transaction(ledger.app.dongle, amount, fees, address, finalOutputs, changePath)
+            d.resolve(transaction)
+          else if hasNext is true
+            # Continue to collect funds
+            done()
+          else if hadNetworkFailure
+            d.rejectWithError(Errors.NetworkError)
+          else
+            output.raw = rawTransaction
+            finalOutputs.push(output)
+            collectedAmount = collectedAmount.add(Amount.fromSatoshi(output.value))
+
+          if collectedAmount.gte(requiredAmount)
+            changeAmount = collectedAmount.subtract(requiredAmount)
+            fees = fees.add(changeAmount) if changeAmount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+            # We have reached our required amount. It's time to prepare the transaction
+            transaction = new Transaction(ledger.app.dongle, amount, fees, address, finalOutputs, changePath)
             d.resolve(transaction)
           else if hasNext is true
             # Continue to collect funds

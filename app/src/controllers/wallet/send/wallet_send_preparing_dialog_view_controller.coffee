@@ -11,19 +11,23 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
     account = Account.find(index: 0).first()
-
-    # fetch amount
     amount = ledger.Amount.fromBtc(@params.amount)
-    fee = ledger.wallet.Transaction.DEFAULT_FEES
-    ledger.wallet.Transaction.createAndPrepare amount, fee, @params.address, account, account, (transaction, error) =>
+    fees = ledger.wallet.Transaction.DEFAULT_FEES
+    account.createTransaction amount: amount, fees: fees, address: @params.address, (transaction, error) =>
       return if not @isShown()
       if error?
+        console.error(error)
         reason = switch error.code
           when ledger.errors.NetworkError then 'network_no_response'
           when ledger.errors.NotEnoughFunds then 'unsufficient_balance'
+          when ledger.errors.DustTransaction then 'dust_transaction'
         @dismiss =>
-          Api.callback_cancel 'send_payment', t("common.errors." + reason)
-          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors." + reason))
+          errorMessage = switch reason
+            when 'dust_transaction' then _.str.sprintf(t("common.errors." + reason), "0.00005430 BTC") # TODO: Use formatters
+            when undefined then error.message
+            else t("common.errors." + reason)
+          Api.callback_cancel 'send_payment', errorMessage
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: errorMessage)
           dialog.show()
       else
         @_routeToNextDialog(transaction)

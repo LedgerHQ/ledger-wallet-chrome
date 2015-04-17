@@ -31,6 +31,16 @@
           <div class="selector" />
         </div>
       </li>
+      <li id="help-item" class="menu-item">
+        <div>
+          <a href="/apps/coinkite/help/index">
+            <img src="../assets/images/apps/coinkite/help_icon.png" />
+            <span><%= t('wallet.top_menu.items.help') %></span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
       <li id="settings-item" class="menu-item">
         <div>
           <a href="/apps/coinkite/settings/index">

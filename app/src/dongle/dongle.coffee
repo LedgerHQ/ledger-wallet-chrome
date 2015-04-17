@@ -57,6 +57,8 @@ Signals :
   @emit state:error(args...)
 ###
 class @ledger.dongle.Dongle extends EventEmitter
+  Dongle = @
+  @_logger: ledger.utils.Logger.getLoggerByTag("Dongle")
 
   # @property
   id: undefined
@@ -80,15 +82,15 @@ class @ledger.dongle.Dongle extends EventEmitter
   _pin = undefined
 
   # @private @property [ledger.utils.PromiseQueue] Enqueue btchip calls to prevent multiple call to interfer
-  _btchipQueue = new ledger.utils.PromiseQueue()
+  _btchipQueue = undefined
 
   constructor: (card) ->
     super
     @id = card.deviceId
     @deviceId = card.deviceId
     @productId = card.productId
+    _btchipQueue = new ledger.utils.PromiseQueue("Dongle##{@id}")
     @_btchip = new BTChip(card)
-
     unless @isInBootloaderMode()
       @_recoverFirmwareVersion().then( =>
         @_recoverOperationMode()
@@ -181,9 +183,7 @@ class @ledger.dongle.Dongle extends EventEmitter
   # Verify that dongle firmware is "official".
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
-  # isCertified: (callback=undefined) -> @_checkCertification(Attestation, callback)
-  isCertified: (callback=undefined) ->
-    @_checkCertification(Attestation, callback)
+  isCertified: (callback=undefined) -> @_checkCertification(Attestation, callback)
 
   isBetaCertified: (callback=undefined) ->
     @_checkCertification(BetaAttestation, callback)
@@ -270,6 +270,9 @@ class @ledger.dongle.Dongle extends EventEmitter
         console.error("Fail to unlockWithPinCode 1 :", error)
       .done()
       d.promise
+
+  lock: () ->
+    @_setState(States.LOCKED)
 
   ###
   @overload setup(pin, callback)
@@ -382,30 +385,36 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [Q.Promise] Resolve with a 32 bytes length pairing blob hex encoded.
   initiateSecureScreen: (pubKey, callback=undefined) ->
-    Errors.throw(Errors.DongleLocked) if @state != States.UNLOCKED
-    Errors.throw(Errors.InvalidArgument, "Invalid pubKey : #{pubKey}") unless pubKey.match(/^[0-9A-Fa-f]{130}$/)
     _btchipQueue.enqueue "initiateSecureScreen", =>
       d = ledger.defer(callback)
-      # 19.3. SETUP SECURE SCREEN
-      @_sendApdu(new ByteString("E0"+"12"+"01"+"00"+"41"+pubKey, HEX), [0x9000])
-      .then( (d) -> d.resolve(d.toString()) )
-      .fail( (error) -> d.reject(error) )
-      .done()
+      if @state != States.UNLOCKED
+        d.rejectWithError(Errors.DongleLocked)
+      else if ! pubKey.match(/^[0-9A-Fa-f]{130}$/)?
+        d.rejectWithError(Errors.InvalidArgument, "Invalid pubKey : #{pubKey}")
+      else
+        # 19.3. SETUP SECURE SCREEN
+        @_sendApdu(new ByteString("E0"+"12"+"01"+"00"+"41"+pubKey, HEX), [0x9000])
+        .then (c) -> d.resolve(c.toString())
+        .fail (error) -> d.reject(error)
+        .done()
       d.promise
 
   # @param [String] resp challenge response, hex encoded.
   # @param [Function] callback Optional argument
   # @return [Q.Promise] Resolve if pairing is successful.
   confirmSecureScreen: (resp, callback=undefined) ->
-    Errors.throw(Errors.DongleLocked) if @state != States.UNLOCKED
-    Errors.throw(Errors.InvalidArgument, "Invalid challenge resp : #{resp}") unless resp.match(/^[0-9A-Fa-f]{32}$/)
     _btchipQueue.enqueue "confirmSecureScreen", =>
       d = ledger.defer(callback)
-      # 19.3. SETUP SECURE SCREEN
-      @_sendApdu(new ByteString("E0"+"12"+"02"+"00"+"10"+resp, HEX), [0x9000])
-      .then( () -> d.resolve() )
-      .fail( (error) -> d.reject(error) )
-      .done()
+      if @state != States.UNLOCKED
+        d.rejectWithError(Errors.DongleLocked)
+      else if ! resp.match(/^[0-9A-Fa-f]{32}$/)?
+        d.rejectWithError(Errors.InvalidArgument, "Invalid challenge resp : #{resp}")
+      else
+        # 19.3. SETUP SECURE SCREEN
+        @_sendApdu(new ByteString("E0"+"12"+"02"+"00"+"10"+resp, HEX), [0x9000])
+        .then () -> d.resolve()
+        .fail (error) -> d.reject(error)
+        .done()
       d.promise
 
   # @param [String] path
@@ -452,7 +461,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)
       resumeData.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in resumeData.trustedInputs)
       resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
-    _btchipQueue.enqueue "confirmSecureScreen", =>
+    _btchipQueue.enqueue "createPaymentTransaction", =>
       @_btchip.createPaymentTransaction_async(
         inputs, associatedKeysets, changePath,
         new ByteString(recipientAddress, ASCII),
@@ -462,18 +471,17 @@ class @ledger.dongle.Dongle extends EventEmitter
         sighashType && new ByteString(Convert.toHexInt(sighashType), HEX),
         authorization && new ByteString(authorization, HEX),
         resumeData
-      ).then (result) ->
-        l result
-        switch typeof result
-          when 'object'
-            result.scriptData = result.scriptData.toString(HEX)
-            result.trustedInputs = (trustedInput.toString(HEX) for trustedInput in result.trustedInputs)
-            result.publicKeys = (publicKey.toString(HEX) for publicKey in result.publicKeys)
-            result.authorizationPaired = result.authorizationPaired.toString(HEX) if result.authorizationPaired?
-            result.authorizationReference = result.authorizationReference.toString(HEX) if result.authorizationReference?
-          when 'string'
-            result = result.toString(HEX)
+      ).then( (result) ->
+        if result instanceof ByteString
+          result = result.toString(HEX)
+        else
+          result.scriptData = result.scriptData.toString(HEX)
+          result.trustedInputs = (trustedInput.toString(HEX) for trustedInput in result.trustedInputs)
+          result.publicKeys = (publicKey.toString(HEX) for publicKey in result.publicKeys)
+          result.authorizationPaired = result.authorizationPaired.toString(HEX) if result.authorizationPaired?
+          result.authorizationReference = result.authorizationReference.toString(HEX) if result.authorizationReference?
         return result
+      )
 
   ###
   @return [Q.Promise]

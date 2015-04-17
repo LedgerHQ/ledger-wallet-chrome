@@ -3,6 +3,7 @@ application:
   small_description: "Ledger Wallet gère vos comptes Bitcoin de façon efficace et sécurisée."
   support_url: 'http://support.ledgerwallet.com/'
   support_key_not_recognized_url: 'https://ledger.groovehq.com/knowledge_base/categories/troubleshooting-20'
+  support_coinkite_url: 'https://ledger.groovehq.com/knowledge_base/topics/how-to-use-the-coinkite-app'
 
 common:
   bitcoin_acronym: 'BTC'
@@ -51,6 +52,7 @@ common:
     deleting_this_paired_smartphone: "En supprimant ce smartphone, vous ne pourrez plus valider les transactions de ce Ledger Wallet.<br />Souhaitez-vous continuer ?"
     going_to_firmware_update: "En passant en mode de mise à jour de la puce, toutes vos activités en cours seront interrompues.<br />Souhaitez-vous continuer ?"
     wrong_transaction_signature: "Une erreur est survenue durant la signature de la transaction. Veuillez contacter le support pour une assistance immédiate."
+    dust_transaction: "Le montant de la transaction doit être au moins de %s."
 
   qrcode:
     scan_qrcode: "Scanner code QR"
@@ -82,6 +84,7 @@ onboarding:
     update:
       new_firmware_available: "Une nouvelle mise à jour de la puce de votre Ledger Wallet est disponible (%s)."
       new_1_0_0: "Cette mise à jour ajoute une nouvelle authentification des transactions sortantes sur votre smartphone."
+      new_1_0_1: "Cette mise à jour ajoute la compatibilité P2SH et corrige des bugs critiques (mais qui n'impactent pas vos bitcoins) dans la bibliothèque crypto."
 
     unsupported:
       not_linked: "Votre portefeuille matériel ne semble pas être lié à une carte de sécurité."
@@ -437,6 +440,11 @@ wallet:
     errors:
       cancelled: "Identification annulée"
       signature_failed: "Erreur dans la signature. Retirez et réinsérez le Nano."
+    form:
+      title: "Se connecter avec BitID"
+      uri: "URI du service BitID"
+      uri_placeholder: "Entrez l'URI"
+      invalid_uri: "URI invalide"
 
   settings:
     common:
@@ -461,13 +469,23 @@ apps:
   coinkite:
     top_menu:
       items:
-        settings: "Règlages"
-        coinkite: "Coinkite"
-        key: "Clé"
-        cosign: "Cosign"
-        wallet: "Wallet"
+        settings: "RÉGLAGES"
+        coinkite: "COINKITE"
+        key: "EXPORT CLÉ"
+        cosign: "COSIGNATURE"
+        wallet: "RETOUR"
     dashboard:
       title: "Coinkite cosigning interface"
+      compatibility:
+        title: "Test de compatibilité"
+        info: "Vérification de la compatibilité avec P2SH"
+        check: "Avant d'utiliser l'outil de multisignature Coinkite, vérifiez que votre Ledger Nano est bien compatible."
+        check_button: "Tester mon Ledger Nano"
+        success: "Succès!"
+        success_text: "Votre Ledger Nano est compatible avec la cosignature Coinkite"
+        fail: "Echec!"
+        fail_text: "Votre Ledger Nano n'est pas compatible. Vous devez le réinitialiser: entrez trois fois un mauvais PIN puis restaurez votre seed. Assurez vous surtout d'avoir bien votre livret de restauration sinon vous perdez vos bitcoins!"
+        warning: "ATTENTION: si le test est un échec, vous devrez débrancher et rebrancher votre Nano."
     settings:
       title: "Vos accès API à Coinkite"
       api_key: "API key"
@@ -483,7 +501,8 @@ apps:
         title: "Clé de signature"
         xpub: "Xpub"
         signature: "Signature"
-        note: "Ces informations vous permettent d'ajouter ce Ledger Nano comme clé de signature sur votre wallet multisignature Coinkite."
+        path: "Chemin de dérivation Coinkite"
+        note: "Ces informations vous permettent d'ajouter ce Ledger Nano comme clé de signature sur votre wallet multisignature Coinkite. Le chemin de dérivation est utile pour restaurer manuellement la clé publique étendue depuis votre seed."
       errors:
         derivation_failed: "Erreur dans le calcul de la clé publique étendue. Contactez le support"
     cosign:
@@ -498,18 +517,18 @@ apps:
         info: "La transaction de cosignature est en cours d'analyse"
       show:
         title: "Transaction à signer"
-        link: "Voir les détails complets de la transaction"
         note: "En confirmant la signature, la transaction va être signée par le Ledger Nano puis envoyée sur le site de Coinkite."
         confirm_signature: "Confirmer la signature"
       signing:
         title: "Signature de la transaction"
         info: "La transaction est en cours de signature"
         success: "Signature réussie"
+        already_signed: "Cette transaction a déjà été signée avec succès par ce Ledger Nano."
       errors:
         wrong_nano: "Transaction invalide"
         wrong_nano_text: "Ce Ledger Nano ne fait pas partie des signataires de cette transaction. Impossible de continuer."
         coinkite_api: "Erreur de l'API Coinkite"
-        invalid_request_ref: "Référence invalide (doit faire 17 cacractères)"
+        invalid_request_ref: "Référence invalide (doit faire 17 caractères)"
         missing_api_key: "Clés API manquantes"
         missing_api_key_text: "Vous devez renseigner votre clé API ainsi que le secret dans les règlages."
         signature_failed: "Erreur dans la signature"

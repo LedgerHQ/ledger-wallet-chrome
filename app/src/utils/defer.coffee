@@ -9,15 +9,15 @@
     defer = Q.defer(arg, args...)
 
   # Prototype
-  defer.rejectWithError = (args...) -> ledger.errors.new(args...)
-  defer.onFulfilled = (callback) ->
-    @promise
-    .then (result) -> callback(if result != undefined then result else true)
-    .fail (reason) -> callback(false, reason)
+  defer.rejectWithError = (args...) -> @reject(ledger.errors.new(args...))
   defer.oldResolve = defer.resolve
   defer.oldReject = defer.reject
   defer.resolve = (args...) -> @oldResolve(args...); return @
   defer.reject = (args...) -> @oldReject(args...); return @
+  defer.promise.onFulfilled = (callback) ->
+    @then( (result) -> callback(if result != undefined then result else true)
+    ).catch( (reason) -> callback(false, reason)
+    ).done()
 
   # CompletionClosure legacy
   defer.complete = (value, error) ->
@@ -25,8 +25,9 @@
       @reject(error)
     else
       @resolve(value)
-  defer.onComplete = defer.onFulfilled
+  defer.promise.onComplete = defer.promise.onFulfilled
+  defer.onComplete = (args...) -> @promise.onComplete(args...)
 
-  defer.onFulfilled(callback) if isCallback
+  defer.promise.onFulfilled(callback) if isCallback
 
   return defer

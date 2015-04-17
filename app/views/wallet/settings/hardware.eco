@@ -10,11 +10,26 @@
       </div>
       <div class="row bottom">
         <div class="regular-text-small stretchable" id="current_version_text"><%= t 'common.checking' %></div>
-        <div class="regular-soft-grey-text-small" id="update_availability_text"></div>
+        <div class="regular-grey-text-small" id="update_availability_text"></div>
       </div>
     </div>
   </div>
   <div id="smartphones_table_container"></div>
+  <div id="beta_table_container">
+    <div class="large-table">
+      <div class="header top">
+        <div class="uppercase-section-column">BETA APPS</div>
+      </div>
+      <a class="row middle" href="#openBitID">
+        <div class="regular-text-small stretchable">BitID</div>
+        <div class="regular-grey-text"><i class="fa fa-angle-right"></i></div>
+      </a>
+      <a class="row bottom" href="#openCoinkite">
+        <div class="regular-text-small stretchable">Coinkite</div>
+        <div class="regular-grey-text"><i class="fa fa-angle-right"></i></div>
+      </a>
+    </div>
+  </div>
 </section>
 <div class="dialog-actions-bar">
   <div class="left-spacer"></div>

@@ -35,7 +35,18 @@ class @WalletSettingsHardwareDialogViewController extends @DialogViewController
         @_refreshSmartphonesList()
     dialog.show()
 
+  openCoinkite: ->
+    ledger.app.router.go("/apps/coinkite/dashboard/index")
+    @dismiss()
+
+  openBitID: ->
+    ledger.app.router.go("/wallet/bitid/form")
+    @dismiss()
+
   _refreshSmartphonesList: ->
+    # get out if firmware does not support mobile second factor
+    if ledger.app.dongle.getIntFirmwareVersion() < ledger.dongle.Firmware.V_LW_1_0_0
+      return
     ledger.m2fa.PairedSecureScreen.getAllGroupedByUuidFromSyncedStore (smartphonesGroups, error) =>
       return if error? or not smartphonesGroups?
       smartphonesGroups = _.sortBy _.values(_.omit(smartphonesGroups, undefined)), (item) -> item[0]?.name

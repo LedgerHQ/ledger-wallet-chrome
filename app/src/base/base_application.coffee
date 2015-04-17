@@ -157,23 +157,26 @@ class ledger.base.application.BaseApplication extends @EventEmitter
       DongleLogger().info('Connecting', device.deviceId)
       (Try => @onConnectingDongle(device)).printError()
     @donglesManager.on 'connected', (event, dongle) =>
-      @dongle = dongle
-      @_dongleAttestationLock = off
-      DongleLogger().info("Connected", dongle.id)
-      dongle.once 'state:disconnected', =>
-        DongleLogger().info('Disconnected', dongle.id)
-        @dongle = null
-        _.defer => (Try => @onDongleIsDisconnected(dongle)).printError()
-      dongle.once 'state:error', =>
-        (Try => @onDongleNeedsUnplug(dongle)).printError()
-      dongle.once 'state:unlocked', =>
-        DongleLogger().info('Dongle unlocked', dongle.id)
-        (Try => @onDongleIsUnlocked(dongle)).printError()
+      @connectDongle(dongle)
 
-      (Try => @onDongleConnected(dongle)).printError()
-      if dongle.isInBootloaderMode()
-        DongleLogger().info('Dongle is Bootloader mode', dongle.id)
-        (Try => @onDongleIsInBootloaderMode(dongle)).printError()
+  connectDongle: (dongle) ->
+    @dongle = dongle
+    @_dongleAttestationLock = off
+    DongleLogger().info("Connected", dongle.id)
+    dongle.once 'state:disconnected', =>
+      DongleLogger().info('Disconnected', dongle.id)
+      @dongle = null
+      _.defer => (Try => @onDongleIsDisconnected(dongle)).printError()
+    dongle.once 'state:error', =>
+      (Try => @onDongleNeedsUnplug(dongle)).printError()
+    dongle.once 'state:unlocked', =>
+      DongleLogger().info('Dongle unlocked', dongle.id)
+      (Try => @onDongleIsUnlocked(dongle)).printError()
+    (Try => @onDongleConnected(dongle)).printError()
+    if dongle.isInBootloaderMode()
+      DongleLogger().info('Dongle is Bootloader mode', dongle.id)
+      (Try => @onDongleIsInBootloaderMode(dongle)).printError()
+
 
   onConnectingDongle: (device) ->
 
