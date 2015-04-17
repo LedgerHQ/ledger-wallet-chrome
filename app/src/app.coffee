@@ -8,6 +8,7 @@ require @ledger.imports, ->
 
     onStart: ->
       Api.init()
+      ledger.utils.Logger.updateGlobalLoggersLevel()
       @_listenAppEvents()
       addEventListener "message", Api.listener.bind(Api), false
       ledger.i18n.init =>
@@ -81,6 +82,7 @@ require @ledger.imports, ->
           ledger.db.contexts.open()
           Wallet.initializeWallet =>
             ledger.preferences.init =>
+              ledger.utils.Logger.updateGlobalLoggersLevel()
               @emit 'wallet:initialized'
               _.defer =>
                 Wallet.instance.retrieveAccountsBalances()
@@ -113,6 +115,7 @@ require @ledger.imports, ->
 
     _releaseWallet: (removeDongle = yes) ->
       @emit 'dongle:disconnected'
+      ledger.utils.Logger.updateGlobalLoggersLevel()
       Wallet.releaseWallet()
       ledger.wallet.release(@wallet)
       ledger.tasks.Task.stopAllRunningTasks()

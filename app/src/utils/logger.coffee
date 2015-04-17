@@ -44,10 +44,18 @@ class @ledger.utils.Logger
     @_loggers[tag] ?= new @(tag)
 
   # Set all loggers level
-  @setGlobalLoggersLevel: (level) -> logger.setLevel(level) for logger in @_loggers when logger.useGlobalsetting
+  @_setGlobalLoggersLevel: (level) -> logger.setLevel(level) for name, logger of @_loggers when logger.useGlobalSettings
 
-  getGlobalLoggersLevel: ->
 
+  @getGlobalLoggersLevel: ->
+    if ledger.preferences?.instance?
+      if ledger.preferences.instance.getLogState() then ledger.config.defaultLoggingLevel.Connected.Enabled else ledger.config.defaultLoggingLevel.Connected.Disabled
+    else if ledger.config?.defaultLoggingLevel?
+      if ledger.config.enableLogging then ledger.config.defaultLoggingLevel.Disconnected.Enabled else ledger.config.defaultLoggingLevel.Disconnected.Disabled
+    else
+      Levels.NONE
+
+  @updateGlobalLoggersLevel: -> @_setGlobalLoggersLevel(@getGlobalLoggersLevel())
 
 #################################
 # Instance methods
@@ -55,7 +63,7 @@ class @ledger.utils.Logger
 
   # Logger's constructor
   # @param [String, Number, Boolean] level of the Logger
-  constructor: (tag, @level=ledger.config?.defaultLoggingLevel, @useGlobalsetting = yes) ->
+  constructor: (tag, @level = ledger.utils.Logger.getGlobalLoggersLevel(), @useGlobalSettings = yes) ->
     @_tag = tag
     @level = Levels[@level] if typeof @level == "string"
     @level = Levels.ALL if @level is true
