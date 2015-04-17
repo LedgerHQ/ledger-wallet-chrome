@@ -1,0 +1,36 @@
+@import (reference) "../constants";
+@import (reference) "../common";
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  .small-select > select {padding-right:25px !important;}
+}
+
+.small-select {
+  cursor: pointer;
+  position:relative;
+  display: block;
+  //float: left;
+
+  & > select {
+    //float: left;
+    .regular-grey-text-small;
+    padding:3px;
+    margin: 0;
+    border:none;
+    outline:none;
+    display: inline-block;
+    -webkit-appearance:none;
+    appearance:none;
+    cursor:pointer;
+  }
+
+  &:after {
+    font-family: FontAwesome;
+    content:'\f107';
+    color: @color-dark-grey;
+    right:8px; top:2px;
+    padding:0 0 2px;
+    position:absolute;
+    pointer-events:none;
+  }
+}

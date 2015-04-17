@@ -300,6 +300,9 @@
         'controllers/wallet/pairing/wallet_pairing_progress_dialog_view_controller'
         'controllers/wallet/pairing/wallet_pairing_finalizing_dialog_view_controller'
 
+        # Widgets
+        'widgets/switch'
+
         # Specs
         '../spec/jasmine/jasmine'
         '../spec/jasmine/jasmine-html'
