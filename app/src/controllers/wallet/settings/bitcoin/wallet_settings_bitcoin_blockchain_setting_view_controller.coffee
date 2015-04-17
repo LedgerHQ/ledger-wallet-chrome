@@ -1,0 +1,3 @@
+class @WalletSettingsBitcoinBlockchainSettingViewController extends WalletSettingsSettingViewController
+
+  renderSelector: "#blockchain_table_container"

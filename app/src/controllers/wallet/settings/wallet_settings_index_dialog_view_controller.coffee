@@ -8,3 +8,6 @@ class @WalletSettingsIndexDialogViewController extends DialogViewController
 
   openDisplay: ->
     @getDialog().push new WalletSettingsDisplaySectionDialogViewController()
+
+  openBitcoin: ->
+    @getDialog().push new WalletSettingsBitcoinSectionDialogViewController()

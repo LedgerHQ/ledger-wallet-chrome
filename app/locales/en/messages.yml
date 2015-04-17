@@ -26,6 +26,7 @@ common:
   save: "Save"
   back: "Back"
   next: "Next"
+  test: "Test"
   yes: "Yes"
   no: "No"
   may_take_a_while: "Please wait, this operation may take a few moments."
@@ -62,6 +63,11 @@ common:
     BTC: "BTC"
     mBTC: "mBTC"
     bits: "bits"
+
+  fees:
+    normal: "%s (normal)"
+    fast: "%s (fast confirmation)"
+    slow: "%s (slow confirmation)"
 
 onboarding:
   device:
@@ -481,6 +487,14 @@ wallet:
       language_and_region: "Language & region"
       interface_language: "Interface language"
       region: "Region"
+
+    bitcoin:
+      confirmations_to_spend: "Confirmations to spend"
+      required_confirmations: "Required confirmations"
+      transaction_fees: "Transaction fees"
+      default_value: "Default fees"
+      blockchain_explorer: "Blockchain explorer"
+      default_explorer: "Default explorer"
 
 apps:
   coinkite:

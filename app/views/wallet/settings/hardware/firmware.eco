@@ -5,6 +5,6 @@
   </div>
   <div class="row bottom">
     <div class="regular-text-small stretchable" id="current_version_text"><%= t 'common.checking' %></div>
-    <div class="regular-soft-grey-text-small" id="update_availability_text"></div>
+    <div class="regular-grey-text-small" id="update_availability_text"></div>
   </div>
 </div>

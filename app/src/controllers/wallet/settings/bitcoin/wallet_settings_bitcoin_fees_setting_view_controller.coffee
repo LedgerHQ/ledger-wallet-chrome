@@ -1,0 +1,3 @@
+class @WalletSettingsBitcoinFeesSettingViewController extends WalletSettingsSettingViewController
+
+  renderSelector: "#fees_table_container"

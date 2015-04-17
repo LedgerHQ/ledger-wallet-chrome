@@ -264,6 +264,12 @@
         'controllers/wallet/settings/display/wallet_settings_display_language_setting_view_controller'
         'controllers/wallet/settings/wallet_settings_display_section_dialog_view_controller'
 
+        # - Bitcoin
+        'controllers/wallet/settings/bitcoin/wallet_settings_bitcoin_confirmations_setting_view_controller'
+        'controllers/wallet/settings/bitcoin/wallet_settings_bitcoin_fees_setting_view_controller'
+        'controllers/wallet/settings/bitcoin/wallet_settings_bitcoin_blockchain_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_bitcoin_section_dialog_view_controller'
+
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
         'controllers/onboarding/onboarding_navigation_controller'

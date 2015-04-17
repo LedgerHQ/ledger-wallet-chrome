@@ -1,0 +1,3 @@
+class @WalletSettingsBitcoinConfirmationsSettingViewController extends WalletSettingsSettingViewController
+
+  renderSelector: "#confirmations_table_container"
