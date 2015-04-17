@@ -8,7 +8,7 @@
         <td class="row-title"><%= t 'wallet.operations.detail.amount' %></td>
         <% if @operation.get('type') == 'reception': %>
           <td class="align-right" id="operation_amount">
-            <span class="regular-valid-text">+<%= ledger.formatters.fromValue(@operation.get('total_value')) %> BTC</span>
+            <span class="regular-valid-text">+<%= ledger.formatters.formatValue(@operation.get('total_value')) %> BTC</span>
           </td>
           <% else: %>
           <td class="align-right" id="operation_amount">
@@ -37,7 +37,7 @@
       </tr>
       <tr>
         <td class="row-title top-aligned"><%= t 'wallet.operations.detail.sender' %></td>
-        <td class="align-right regular-text" id="operation_inputs
+        <td class="align-right regular-text" id="operation_inputs">
           <% for input in @operation.get('senders'): %>
           <%= input %><br />
           <% end %>

@@ -29,6 +29,7 @@ class ledger.preferences.Preferences
     currency: 'USD'
     miningFee: '10000'
     blockchainExplorer: 'https://blockchain.info/'
+    currencyEquivalentIsActive: true
     logState: true
 
   ###
@@ -95,6 +96,16 @@ class ledger.preferences.Preferences
       throw new Error 'You must initialized your wallet'
 
 
+  # Get state of fiat currency equivalent functionality - true/false
+  getCurrencyActive: (state=yes) ->
+    @prefs.currencyEquivalentIsActive
+
+
+  # Set fiat currency equivalent functionality to active
+  setCurrencyActive: (state=yes) ->
+    @prefs.currencyEquivalentIsActive = state
+
+
   # Get Mining Fee
   getMiningFee: () ->
     @prefs.miningFee
@@ -131,3 +142,6 @@ class ledger.preferences.Preferences
     if typeof value is 'boolean'
       throw new Error 'Log state must be a boolean'
     @prefs.logState = value
+
+
+

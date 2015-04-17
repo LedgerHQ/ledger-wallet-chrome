@@ -77,6 +77,31 @@ class ledger.formatters
 
 
   ###
+    This method formats the amount and add symbol
+  ###
+  @formatValue: (value, precision) ->
+    num = @formatUnit(value, ledger.preferences.instance.getBtcUnit(), precision)
+    if @symbolIsFirst()
+      return @getUnitSymbol() + ' ' + num
+    else
+      return num + ' ' + @getUnitSymbol()
+
+
+  ###
+    Symbol order
+  ###
+  @symbolIsFirst: ->
+    isNaN parseInt(ledger.i18n.formatAmount(0, 'BTC').charAt(0))
+
+
+  ###
+    Add unit symbol
+  ###
+  @getUnitSymbol: ->
+    ledger.preferences.instance.getBtcUnit()
+
+
+  ###
     This method converts Satoshi to BTC
 
     @param [Number] value An input value in satoshi
