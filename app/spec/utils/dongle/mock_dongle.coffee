@@ -181,33 +181,55 @@ class ledger.dongle.MockDongle extends EventEmitter
           when 'string'
             result = result.toString(HEX)
 
-        ###
-        ###
+
+        # Mock
         txb = new bitcoin.TransactionBuilder()
 
-        inputs.forEach (input, index) ->
-          input.signs.forEach (sign) ->
-            keyPair = ECPair.fromWIF(sign.keyPair)
-            txb.sign(index, keyPair, redeemScript, sign.hashType)
+        rawTxs = for input in @_btInputs
+          [splittedTx, outputIndex] = input
+          rawTxBuffer = splittedTx.version
+          rawTxBuffer = rawTxBuffer.concat(new ByteString(Convert.toHexByte(splittedTx.inputs.length), HEX))
+          for input in splittedTx.inputs
+            rawTxBuffer = rawTxBuffer.concat(input.prevout).concat(new ByteString(Convert.toHexByte(input.script.length), HEX)).concat(input.script).concat(input.sequence)
+          rawTxBuffer = rawTxBuffer.concat(new ByteString(Convert.toHexByte(splittedTx.outputs.length), HEX))
+          for output in splittedTx.outputs
+            rawTxBuffer = rawTxBuffer.concat(output.amount).concat(new ByteString(Convert.toHexByte(output.script.length), HEX)).concat(output.script)
+          rawTxBuffer = rawTxBuffer.concat(splittedTx.locktime)
+          [rawTxBuffer, outputIndex]
+
+        values = []
+        balance = Bitcoin.BigInteger.valueOf(0)
+
+        for [rawTx, outputIndex] in rawTxs
+          tx = bitcoin.Transaction.fromHex(rawTx.toString())
+          txb.addInput(tx, outputIndex)
+          values.push(tx.outs[outputIndex].value)
+        for val, i in values
+          balance = balance.add Bitcoin.BigInteger.valueOf(val)
+
+        change = (balance.toString() - @fees) - @amount.toString()
+
+        l balance.toString()
+        l @amount
+        l @fees
+
+        # Get Hash from base58
+        arr = ledger.crypto.Base58.decode(@recipientAddress)
+        buffer = JSUCrypt.utils.byteArrayToHexStr(arr)
+        x = new ByteString(buffer, HEX)
+        pubKeyHash = x.bytes(0, x.length - 4).bytes(1) # remove network 1, remove checksum 4
+        l pubKeyHash
+
+        scriptPubKeyStart = Convert.toHexByte(bitcoin.opcodes.OP_DUP) + Convert.toHexByte(bitcoin.opcodes.OP_HASH160) + 14
+        scriptPubKeyEnd = Convert.toHexByte(bitcoin.opcodes.OP_EQUALVERIFY) + Convert.toHexByte(bitcoin.opcodes.OP_CHECKSIG)
+        scriptPubKey = bitcoin.Script.fromHex(scriptPubKeyStart + pubKeyHash.toString() + scriptPubKeyEnd)
+
+        txb.addOutput(scriptPubKey, @amount.toNumber()) # recipient addr
+        txb.addOutput(scriptPubKey, change) # change addr
 
 
-        # Add the input (who is paying) of the form [previous transaction hash, index of the output to use]
-        tx.addInput("aa94ab02c182214f090e99a0d57021caffd0f195a81c24602b1028b130b63e31", 0)
-
-        # Add the output (who to pay to) of the form [payee's address, amount in satoshis]
-        tx.addOutput(@bitcoinAddress, amount.toSatoshiNumber())
-
-        # Initialize a private key using WIF
-        key = bitcoin.ECKey.fromWIF("L1uyy5qTuGrVXrmrsvHWHgVzW9kKdrp27wBC7Vs6nZDTF2BRUVwy")
-
-        # Sign the first input with the new key
-        tx.sign(0, key)
-
-        # Print transaction serialized as hex
-        console.log(tx.toHex())
-        # => 0100000001313eb630b128102b60241ca895f1d0ffca21 ...
-        ###
-        ###
+        #for input, index in tx.ins
+        #txb.sign(index, tx.ins[index].script.toHex())
 
 
         return result
