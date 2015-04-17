@@ -1,3 +1,5 @@
+# ledger.app.donglesManager.createDongle('0000', 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+
 States =
 # Dongle juste created, not initialized.
   UNDEFINED: undefined
@@ -135,6 +137,11 @@ class ledger.dongle.MockDongle extends EventEmitter
     d.promise
 
 
+  # @return [Q.Promise]
+  isFirmwareUpdateAvailable: (callback=undefined) -> ledger.defer(callback).resolve(true).promise
+
+
+
   ###
   @param [Array<Object>] inputs
   @param [Array] associatedKeysets
@@ -158,81 +165,59 @@ class ledger.dongle.MockDongle extends EventEmitter
       resumeData.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in resumeData.trustedInputs)
       resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
 
-    _btchipQueue.enqueue "confirmSecureScreen", =>
-      @_btchip.createPaymentTransaction_async(
-        inputs, associatedKeysets, changePath,
-        new ByteString(recipientAddress, ASCII),
-        amount.toByteString(),
-        fees.toByteString(),
-        lockTime && new ByteString(Convert.toHexInt(lockTime), HEX),
-        sighashType && new ByteString(Convert.toHexInt(sighashType), HEX),
-        authorization && new ByteString(authorization, HEX),
-        resumeData
-      ).then (result) ->
-        l result
-        switch typeof result
-          when 'object'
-            result.scriptData = result.scriptData.toString(HEX)
-            result.trustedInputs = (trustedInput.toString(HEX) for trustedInput in result.trustedInputs)
-            # "03b6baa018cf705f0f58e1089106972f3d5287a98594cac2b1befc4f32c770443a,02439f792dc1cb17263eabe5f3aa4d5c2f6ef1eac866761a93d1786a893fd854b1"
-            result.publicKeys = (publicKey.toString(HEX) for publicKey in result.publicKeys)
-            result.authorizationPaired = result.authorizationPaired.toString(HEX) if result.authorizationPaired?
-            result.authorizationReference = result.authorizationReference.toString(HEX) if result.authorizationReference?
-          when 'string'
-            result = result.toString(HEX)
+
+    # Mock
+    txb = new bitcoin.TransactionBuilder()
+
+    rawTxs = for input in @_btInputs
+      [splittedTx, outputIndex] = input
+      rawTxBuffer = splittedTx.version
+      rawTxBuffer = rawTxBuffer.concat(new ByteString(Convert.toHexByte(splittedTx.inputs.length), HEX))
+      for input in splittedTx.inputs
+        rawTxBuffer = rawTxBuffer.concat(input.prevout).concat(new ByteString(Convert.toHexByte(input.script.length), HEX)).concat(input.script).concat(input.sequence)
+      rawTxBuffer = rawTxBuffer.concat(new ByteString(Convert.toHexByte(splittedTx.outputs.length), HEX))
+      for output in splittedTx.outputs
+        rawTxBuffer = rawTxBuffer.concat(output.amount).concat(new ByteString(Convert.toHexByte(output.script.length), HEX)).concat(output.script)
+      rawTxBuffer = rawTxBuffer.concat(splittedTx.locktime)
+      [rawTxBuffer, outputIndex]
+
+    values = []
+    balance = Bitcoin.BigInteger.valueOf(0)
+
+    for [rawTx, outputIndex] in rawTxs
+      tx = bitcoin.Transaction.fromHex(rawTx.toString())
+      txb.addInput(tx, outputIndex)
+      values.push(tx.outs[outputIndex].value)
+    for val, i in values
+      balance = balance.add Bitcoin.BigInteger.valueOf(val)
+
+    change = (balance.toString() - @fees) - @amount.toString()
+
+    l balance.toString()
+    l @amount
+    l @fees
+
+    # Get Hash from base58
+    arr = ledger.crypto.Base58.decode(@recipientAddress)
+    buffer = JSUCrypt.utils.byteArrayToHexStr(arr)
+    x = new ByteString(buffer, HEX)
+    pubKeyHash = x.bytes(0, x.length - 4).bytes(1) # remove network 1, remove checksum 4
+    l pubKeyHash
+
+    scriptPubKeyStart = Convert.toHexByte(bitcoin.opcodes.OP_DUP) + Convert.toHexByte(bitcoin.opcodes.OP_HASH160) + 14
+    scriptPubKeyEnd = Convert.toHexByte(bitcoin.opcodes.OP_EQUALVERIFY) + Convert.toHexByte(bitcoin.opcodes.OP_CHECKSIG)
+    scriptPubKey = bitcoin.Script.fromHex(scriptPubKeyStart + pubKeyHash.toString() + scriptPubKeyEnd)
+
+    txb.addOutput(scriptPubKey, @amount.toNumber()) # recipient addr
+    txb.addOutput(scriptPubKey, change) # change addr
 
 
-        # Mock
-        txb = new bitcoin.TransactionBuilder()
+    node = @_getNodeFromPath(associatedKeysets)
+    l node
 
-        rawTxs = for input in @_btInputs
-          [splittedTx, outputIndex] = input
-          rawTxBuffer = splittedTx.version
-          rawTxBuffer = rawTxBuffer.concat(new ByteString(Convert.toHexByte(splittedTx.inputs.length), HEX))
-          for input in splittedTx.inputs
-            rawTxBuffer = rawTxBuffer.concat(input.prevout).concat(new ByteString(Convert.toHexByte(input.script.length), HEX)).concat(input.script).concat(input.sequence)
-          rawTxBuffer = rawTxBuffer.concat(new ByteString(Convert.toHexByte(splittedTx.outputs.length), HEX))
-          for output in splittedTx.outputs
-            rawTxBuffer = rawTxBuffer.concat(output.amount).concat(new ByteString(Convert.toHexByte(output.script.length), HEX)).concat(output.script)
-          rawTxBuffer = rawTxBuffer.concat(splittedTx.locktime)
-          [rawTxBuffer, outputIndex]
-
-        values = []
-        balance = Bitcoin.BigInteger.valueOf(0)
-
-        for [rawTx, outputIndex] in rawTxs
-          tx = bitcoin.Transaction.fromHex(rawTx.toString())
-          txb.addInput(tx, outputIndex)
-          values.push(tx.outs[outputIndex].value)
-        for val, i in values
-          balance = balance.add Bitcoin.BigInteger.valueOf(val)
-
-        change = (balance.toString() - @fees) - @amount.toString()
-
-        l balance.toString()
-        l @amount
-        l @fees
-
-        # Get Hash from base58
-        arr = ledger.crypto.Base58.decode(@recipientAddress)
-        buffer = JSUCrypt.utils.byteArrayToHexStr(arr)
-        x = new ByteString(buffer, HEX)
-        pubKeyHash = x.bytes(0, x.length - 4).bytes(1) # remove network 1, remove checksum 4
-        l pubKeyHash
-
-        scriptPubKeyStart = Convert.toHexByte(bitcoin.opcodes.OP_DUP) + Convert.toHexByte(bitcoin.opcodes.OP_HASH160) + 14
-        scriptPubKeyEnd = Convert.toHexByte(bitcoin.opcodes.OP_EQUALVERIFY) + Convert.toHexByte(bitcoin.opcodes.OP_CHECKSIG)
-        scriptPubKey = bitcoin.Script.fromHex(scriptPubKeyStart + pubKeyHash.toString() + scriptPubKeyEnd)
-
-        txb.addOutput(scriptPubKey, @amount.toNumber()) # recipient addr
-        txb.addOutput(scriptPubKey, change) # change addr
-
-
-        #for input, index in tx.ins
-        #txb.sign(index, tx.ins[index].script.toHex())
-
-
-        return result
+    #for input, index in tx.ins
+      #txb.sign(index, node)
+    return result
 
 
   splitTransaction: (input) ->

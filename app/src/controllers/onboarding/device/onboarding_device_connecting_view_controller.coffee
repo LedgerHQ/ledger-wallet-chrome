@@ -25,16 +25,9 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
 
   _navigateContinue: ->
     @_stopTimer()
-<<<<<<< HEAD
-    ledger.app.dongle.getState (state) =>
-      l 'log', arguments
-      if state == ledger.dongle.States.LOCKED
-        ledger.app.router.go '/onboarding/device/pin'
-=======
     ledger.app.dongle?.isFirmwareUpdateAvailable (isAvailable) =>
       if isAvailable
         ledger.app.router.go '/onboarding/device/update'
->>>>>>> dongle
       else
         ledger.app.dongle.getState (state) =>
           if state == ledger.dongle.States.LOCKED

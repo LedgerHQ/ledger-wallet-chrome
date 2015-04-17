@@ -23,7 +23,7 @@ class ledger.wallet.Transaction
   #
   @ValidationModes: ValidationModes
   #
-  @DEFAULT_FEES: Amount.fromBits(50)
+  @DEFAULT_FEES: Amount.fromBits(100)
   #
   @MINIMUM_CONFIRMATIONS: 1
   #
@@ -67,13 +67,10 @@ class ledger.wallet.Transaction
   constructor: (@dongle, @amount, @fees, @recipientAddress, @inputs, @changePath) ->
     @_btInputs = []
     @_btcAssociatedKeyPath = []
-    l inputs
     for input in inputs
       splitTransaction = @dongle.splitTransaction(input)
       @_btInputs.push [splitTransaction, input.output_index]
       @_btcAssociatedKeyPath.push input.paths[0]
-
-  l @_btInputs
 
   # @return [Boolean]
   isValidated: () -> @_isValidated
@@ -151,6 +148,71 @@ class ledger.wallet.Transaction
   # @param [Function] callback
   # @return [Q.Promise]
   prepare: (callback=undefined) ->
+
+    # Mock
+    txb = new bitcoin.TransactionBuilder()
+
+    rawTxs = for input in @_btInputs
+      [splittedTx, outputIndex] = input
+      rawTxBuffer = splittedTx.version
+      rawTxBuffer = rawTxBuffer.concat(new ByteString(Convert.toHexByte(splittedTx.inputs.length), HEX))
+      for input in splittedTx.inputs
+        rawTxBuffer = rawTxBuffer.concat(input.prevout).concat(new ByteString(Convert.toHexByte(input.script.length), HEX)).concat(input.script).concat(input.sequence)
+      rawTxBuffer = rawTxBuffer.concat(new ByteString(Convert.toHexByte(splittedTx.outputs.length), HEX))
+      for output in splittedTx.outputs
+        rawTxBuffer = rawTxBuffer.concat(output.amount).concat(new ByteString(Convert.toHexByte(output.script.length), HEX)).concat(output.script)
+      rawTxBuffer = rawTxBuffer.concat(splittedTx.locktime)
+      [rawTxBuffer, outputIndex]
+
+    values = []
+    balance = Bitcoin.BigInteger.valueOf(0)
+
+    for [rawTx, outputIndex] in rawTxs
+      tx = bitcoin.Transaction.fromHex(rawTx.toString())
+      txb.addInput(tx, outputIndex)
+      values.push(tx.outs[outputIndex].value)
+    for val, i in values
+      balance = balance.add Bitcoin.BigInteger.valueOf(val)
+
+    change = (balance.toString() - @fees.toSatoshiNumber()) - @amount.toSatoshiNumber()
+
+    l balance
+    l @amount
+    l @fees
+
+    # Get Hash from base58
+    arr = ledger.crypto.Base58.decode(@recipientAddress)
+    buffer = JSUCrypt.utils.byteArrayToHexStr(arr)
+    x = new ByteString(buffer, HEX)
+    pubKeyHash = x.bytes(0, x.length - 4).bytes(1) # remove network 1, remove checksum 4
+    l pubKeyHash
+
+    scriptPubKeyStart = Convert.toHexByte(bitcoin.opcodes.OP_DUP) + Convert.toHexByte(bitcoin.opcodes.OP_HASH160) + 14
+    scriptPubKeyEnd = Convert.toHexByte(bitcoin.opcodes.OP_EQUALVERIFY) + Convert.toHexByte(bitcoin.opcodes.OP_CHECKSIG)
+    scriptPubKey = bitcoin.Script.fromHex(scriptPubKeyStart + pubKeyHash.toString() + scriptPubKeyEnd)
+
+    l change
+
+    #txb.addOutput(scriptPubKey, @amount.toNumber()) # recipient addr
+    txb.addOutput(scriptPubKey, @amount.toSatoshiNumber()) # recipient addr
+    txb.addOutput(scriptPubKey, change) # change addr
+
+
+    ###
+    path = path.split('/')
+    node = @_masterNode
+    for item in path
+      [index, hardened] = item.split "'"
+      node  = if hardened? then node.deriveHardened parseInt(index) else node = node.derive index
+    node = @_getNodeFromPath(associatedKeysets)
+    ###
+
+    for input, index in tx.ins
+      l tx
+      txb.sign(index, tx.ins[index].script.toHex())
+
+
+
     if not @amount? or not @fees? or not @recipientAddress?
       Errors.throw('Transaction must me initialized before preparation')
     d = ledger.defer(callback)
