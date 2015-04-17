@@ -156,7 +156,7 @@ tasks =
     .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/_locales"
 
   buildLangFile: () ->
-    gulp.src 'app/locales/**/*.yml'
+    gulp.src 'app/locales/**/!(es)/*.yml'
     .pipe plumber()
     .pipe yaml()
     .pipe buildLangFilePlugin()

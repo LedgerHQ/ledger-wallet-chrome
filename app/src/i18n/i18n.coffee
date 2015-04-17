@@ -326,7 +326,12 @@ class ledger.i18n
     if tag?
       if tag.length > 2
         throw new Error 'Tag language must be two characters. Use ledger.i18n.setLocale() if you want to set the region'
-      @favLang.memoryValue = tag
+      # Check if it is a supported language
+      if tag in Object.keys(@Languages)
+        @favLang.memoryValue = tag
+      else
+        @favLang.memoryValue = 'en'
+        throw new Error 'Language not yet supported! English set as default.'
     @chromeStore.set({i18n_favLang: tag})
     if ledger.storage.sync?
       #l 'set tag to sync store'
