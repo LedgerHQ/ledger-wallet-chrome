@@ -13,6 +13,9 @@ _.extend @ledger.config,
     pullThrottleDelay: 1000
     pushDebounceDelay: 1000
   enableLogging: yes
+  defaultLoggingLevel:
+    Connected: ledger.utils.Logger.Levels.ALL
+    Disconnected: ledger.utils.Logger.Levels.ALL
 
 Q.longStackSupport = true
 

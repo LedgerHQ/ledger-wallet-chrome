@@ -13,5 +13,8 @@ _.extend @ledger.config,
     pullThrottleDelay: 1000
     pushDebounceDelay: 1000
   enableLogging: no
+  defaultLoggingLevel:
+    Connected: ledger.utils.Logger.Levels.NONE
+    Disconnected: ledger.utils.Logger.Levels.ALL
 
 @configureApplication = (app) ->
