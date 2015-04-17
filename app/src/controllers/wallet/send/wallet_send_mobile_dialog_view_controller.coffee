@@ -3,6 +3,10 @@ class @WalletSendMobileDialogViewController extends @DialogViewController
   view:
     mobileName: "#mobile_name"
 
+  cancel: ->
+    Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
+    @dismiss()
+    
   onAfterRender: ->
     super
     ## request validation
@@ -11,6 +15,7 @@ class @WalletSendMobileDialogViewController extends @DialogViewController
       if error?
         @_request = null
         @dismiss =>
+          Api.callback_cancel 'send_payment', t("common.errors." + error)
           dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors." + error))
           dialog.show()
       else

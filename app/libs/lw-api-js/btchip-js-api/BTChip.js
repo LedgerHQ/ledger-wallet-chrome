@@ -503,6 +503,106 @@ var BTChip = Class.create({
                 return deferred.promise;
 	},
 
+  startP2SHUntrustedHashTransactionInput_async: function(newTransaction, transaction, redeemScript, currentIndex) {
+    var currentObject = this;
+    var version_hex = new ByteString(Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(transaction.version), 4)), HEX);
+    var data = version_hex.concat(currentObject.createVarint(transaction['ins'].length));
+    var deferred = Q.defer();
+    currentObject.startUntrustedHashTransactionInputRaw_async(newTransaction, true, data).then(function (result) {
+      var i = 0;
+      async.eachSeries(
+        transaction['ins'],
+        function (input, finishedCallback) {
+          data = new ByteString(Convert.toHexByte(0x00), HEX);
+          var txhash = Bitcoin.convert.bytesToHex(Bitcoin.convert.hexToBytes(input.outpoint.hash).reverse());
+          var outpoint = Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(input.outpoint.index), 4));
+          data = data.concat(new ByteString(txhash, HEX)).concat(new ByteString(outpoint, HEX));
+          if (i == currentIndex) {
+            script = redeemScript;
+          } else {
+            script = "";
+          }
+          data = data.concat(currentObject.createVarint(script.length));
+          if (script.length == 0) {
+            data = data.concat(new ByteString("FFFFFFFF", HEX));
+          }
+          currentObject.startUntrustedHashTransactionInputRaw_async(true, false, data).then(function (result) {
+            var offset = 0;
+            var blocks = [];
+            while (offset != script.length) {
+              var blockSize = (script.length - offset > 255 ? 255 : script.length - offset);
+              block = script.bytes(offset, blockSize);
+              if (offset + blockSize == script.length) {
+                block = block.concat(new ByteString("FFFFFFFF", HEX));
+              }
+              blocks.push(block);
+              offset += blockSize;
+            }
+            async.eachSeries(
+              blocks,
+              function(block, blockFinishedCallback) {
+                currentObject.startUntrustedHashTransactionInputRaw_async(true, false, block).then(function (result) {
+                  blockFinishedCallback();
+                }).fail(function (err) { finishedCallback(); });
+              },
+              function(finished) {
+                i++;
+                finishedCallback();
+              }
+            );
+          }).fail(function (err) { finishedCallback(); });
+        },
+        function (finished) {
+          deferred.resolve(finished);
+        }
+      );
+    }).fail(function (err) { deferred.reject(err); });
+    return deferred.promise;
+  },
+
+  untrustedHashTransactionInputFinalizeFullRaw_async: function(lastRound, transactionData) {
+    return this.card.sendApdu_async(0xe0, 0x4a, (lastRound ? 0x80 : 0x00), 0x00, transactionData, [0x9000]);
+  },
+
+  untrustedHashTransactionInputFinalizeFull_async: function(transaction) {
+    var currentObject = this;
+    var data = currentObject.createVarint(transaction['outs'].length);
+    var deferred = Q.defer();
+    return currentObject.untrustedHashTransactionInputFinalizeFullRaw_async(false, data).then(function (result) {
+      var data = new ByteString('', HEX);
+      transaction.outs.forEach(
+        function(txout) {
+          data = data.concat(new ByteString(Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(txout.value, 8)), HEX));
+          var scriptBytes = txout.script.buffer;
+          data = data.concat(currentObject.createVarint(scriptBytes.length))
+          data = data.concat(new ByteString(Bitcoin.convert.bytesToHex(scriptBytes), HEX));       
+        }
+      );
+      var internalPromise = Q.defer();
+      var outputsBlocks = [];
+      var offset = 0;
+      while (offset != data.length) {
+        var blockSize = (data.length - offset > 255 ? 255 : data.length - offset);
+        outputsBlocks.push(data.bytes(offset, blockSize));
+        offset += blockSize;
+      }
+      var i = 0;
+      async.eachSeries(
+        outputsBlocks,
+        function(outputsBlock, finishedCallback) {
+          currentObject.untrustedHashTransactionInputFinalizeFullRaw_async(i == outputsBlocks.length-1, outputsBlock).then(function (result) {
+            i += 1;
+            finishedCallback();
+          }).fail(function (err) { internalPromise.reject(err); });
+        },
+        function(finished) {
+          internalPromise.resolve();
+        }
+      );
+      return internalPromise.promise;
+    });
+  },
+
 	hashOutputInternal_async: function(outputType, path, outputAddress, amount, fees) {
 		if (typeof changeKey == "undefined") {
 			changeKey = new ByteString("", HEX);
@@ -787,6 +887,39 @@ var BTChip = Class.create({
                 return deferred.promise;
 	},
 
+  signP2SHTransaction_async: function(inputs, transaction, scripts, path) {
+    var authorization = new ByteString("", HEX);
+    var signatures = [];
+    var scriptData;
+    var lockTime = BTChip.DEFAULT_LOCKTIME;
+    var sigHashType = BTChip.SIGHASH_ALL;
+    var currentObject = this;
+    var deferred = Q.defer();
+    var firstRun = true;
+
+    var currentIndex = 0
+    async.eachSeries(
+      inputs,
+      function(input, finishedCallback) {
+        var script = new ByteString(scripts[input[0]].redeem, HEX);
+        currentObject.startP2SHUntrustedHashTransactionInput_async(firstRun, transaction, script, currentIndex).then(function (result) {
+          currentObject.untrustedHashTransactionInputFinalizeFull_async(transaction).then(function (result) {
+            currentObject.signTransaction_async(path + "/" + input[0], authorization, lockTime, sigHashType).then(function (result) {
+              signatures.push([result.toString(), input[1], input[0]]);
+              firstRun = false;
+              currentIndex++;
+              finishedCallback();
+            }).fail(function(err){deferred.reject(err);});
+          }).fail(function(err){deferred.reject(err);});
+        }).fail(function(err){deferred.reject(err);});
+      },
+      function (finished) {
+        deferred.resolve(signatures);
+      }
+    );
+    return deferred.promise;
+  },
+
 	serializeTransaction: function(transaction) {
 		var data = transaction['version'].concat(this.createVarint(transaction['inputs'].length));
 		for (var i=0; i<transaction['inputs'].length; i++) {
@@ -909,6 +1042,7 @@ BTChip.FLAG_RFC6979 = 0x80;
 BTChip.FEATURE_UNCOMPRESSED_KEYS = 0x01;
 BTChip.FEATURE_DETERMINISTIC_SIGNATURE = 0x02;
 BTChip.FEATURE_FREE_SIGHASHTYPE = 0x04;
+BTChip.FEATURE_NO_2FA_P2SH = 0x08;
 
 BTChip.VERSION_BITCOIN_MAINNET = 0;
 BTChip.VERSION_BITCOIN_P2SH_MAINNET = 5;
@@ -930,4 +1064,3 @@ BTChip.EXTERNAL_CHAIN = 1;
 BTChip.INTERNAL_CHAIN = 2;
 
 BTChip.DEFAULT_LOCKTIME = new ByteString("00000000", HEX);
-

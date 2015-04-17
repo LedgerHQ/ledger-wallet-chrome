@@ -1,0 +1,27 @@
+<section id="coinkite_cosign_index_dialog">
+  <header>
+    <h1><%= t 'apps.coinkite.cosign.index.title' %></h1>
+  </header>
+  <table class="no-table-head">
+    <tbody>
+      <tr class="no-border">
+        <td colspan="2" class="regular-text"><%- t 'apps.coinkite.cosign.index.note_header' %></td>
+      </tr>
+      <tr class="padding20"> 
+        <td class="row-title"><%= t 'apps.coinkite.cosign.index.request' %></td>
+        <td class="align-right">
+          <input id="request_input" class="text-input" placeholder="<%= t 'apps.coinkite.cosign.index.request_placeholder' %>" value=""/>
+        </td>
+      </tr>
+      <tr class="no-border padding50">
+        <td colspan="2" class="regular-text"><%- t 'apps.coinkite.cosign.index.note_footer' %></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+<div id="error_container"></div>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
+  <a class="action-rounded-button" href="#next"><%= t 'common.next' %></a>
+</div>

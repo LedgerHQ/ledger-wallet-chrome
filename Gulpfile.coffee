@@ -148,7 +148,7 @@ tasks =
     .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/"
 
   translate: () ->
-    gulp.src 'app/locales/**/*.yml'
+    gulp.src 'app/locales/**/!(es)/*.yml'
     .pipe plumber()
     .pipe changed "#{COMPILATION_MODE.BuildDir}/_locales"
     .pipe yaml()
@@ -240,7 +240,7 @@ tasks =
       tasks.promisify(tasks.finalize()).then ->
         if COMPILATION_MODE is DEBUG_MODE then promise.resolve()
         else
-          Q.all([tasks.promisify(tasks.minify()), tasks.promisify(tasks.uglify())]).then(promise.resolve)
+          Q.all([tasks.promisify(tasks.minify())]).then(promise.resolve)
 
   createFupManifest: () ->
     getVersionFromDotNotation =  (dotNotation) -> dotNotation.replace(/\./g, '')

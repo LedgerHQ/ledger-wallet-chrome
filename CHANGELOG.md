@@ -1,5 +1,26 @@
 # Changelog
 
+1.1.3
+=====
+- Embed new firmware 1.0.1
+- Add Coinkite app (beta)
+- Add BitID support
+- Add API support (beta)
+- Bug fixes
+
+1.1.2
+=====
+- Improve QR code scanner
+- Improve app update detection
+- Add settings section
+- Add shortcut to go to firmware update mode
+
+1.1.1
+=====
+- Fix attestation freeze
+- UI improvements
+- Add update flow security card check
+
 1.1.0
 =====
 - Add mobile second factor authentication for validating transactions

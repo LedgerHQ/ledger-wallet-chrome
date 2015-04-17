@@ -1,0 +1,40 @@
+<section id="coinkite_keygen_show_dialog">
+  <header>
+    <h1><%= t 'apps.coinkite.keygen.show.title' %></h1>
+  </header>
+  <table class="no-table-head">
+    <tbody>
+      <tr>
+        <td class="row-title"><%= t 'apps.coinkite.keygen.show.xpub' %></td>
+      </tr>
+      <tr>
+        <td>
+          <textarea id="xpub_input" class="textarea-input" rows="2" cols="60"></textarea>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title"><%= t 'apps.coinkite.keygen.show.signature' %></td>
+      </tr>
+      <tr>
+        <td>
+          <textarea id="signature_input" class="textarea-input" rows="2" cols="60"></textarea>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title"><%= t 'apps.coinkite.keygen.show.path' %></td>
+      </tr>
+      <tr>
+        <td id="path">
+          <%= Coinkite.CK_PATH %>
+        </td>
+      </tr>
+      <tr class="no-border">
+        <td><%= t 'apps.coinkite.keygen.show.note' %></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.close' %></a>
+</div>

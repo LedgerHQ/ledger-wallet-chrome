@@ -6,7 +6,8 @@ GlobalContext = @
 
 class ledger.wallet.ExtendedPublicKey
 
-  constructor: (wallet, derivationPath) ->
+  constructor: (wallet, derivationPath, enableCache = yes) ->
+    @_enableCache = enableCache
     @_derivationPath = derivationPath
     if derivationPath[derivationPath.length - 1] isnt '/'
       @_derivationPath += '/'
@@ -100,9 +101,13 @@ class ledger.wallet.ExtendedPublicKey
     address
 
   _insertPublicAddressInCache: (partialPath, publicAddress) ->
+    return unless @_enableCache
     completePath = @_derivationPath + partialPath
     ledger.wallet?.HDWallet?.instance?.cache?.set [[completePath, publicAddress]]
 
   _getPublicAddressFromCache: (partialPath) ->
+    return unless @_enableCache
     completePath = @_derivationPath + partialPath
     ledger.wallet?.HDWallet?.instance?.cache?.get completePath
+
+  toString: -> @_xpub58

@@ -3,6 +3,8 @@
 ledger.base ?= {}
 ledger.base.application ?= {}
 
+DongleLogger = -> ledger.utils.Logger.getLoggerByTag('AppDongle')
+
 ###
   Base class for the main application class. This class holds the non-specific part of the application (i.e. click dispatching, application lifecycle)
 ###
@@ -22,6 +24,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   ###
   start: ->
     configureApplication @
+    @_listenCommands()
     @_listenClickEvents()
     @_listenWalletEvents()
     @_listenDongleEvents()
@@ -104,7 +107,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     return if @_dongleAttestationLock is on
     @_dongleAttestationLock = on
     @wallet?.isDongleCertified (dongle, error) =>
-      (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
+      (Try => @onDongleCertificationDone(dongle, error)).printError()
       @_dongleAttestationLock = off
     return
 
@@ -116,6 +119,13 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @return [jQuery.Element] The jQuery element of the controllers container
   ###
   _navigationControllerSelector: -> $('#controllers_container')
+
+  _listenCommands: ->
+    chrome.commands.onCommand.addListener (command) =>
+      switch command
+        when 'reload-page' then do @reloadUi
+        when 'reload-application' then do @reload
+        when 'update-firmware' then do @onCommandFirmwareUpdate
 
   ###
     Catches click on links and dispatch them if possible to the router.
@@ -148,24 +158,32 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   _listenWalletEvents: () ->
     # Wallet management & wallet events re-dispatching
-    @walletsManager.on 'connecting', (event, card) => (Try => @onConnectingDongle(card)).printError()
+    @walletsManager.on 'connecting', (event, card) =>
+      DongleLogger().info('Connecting', card.id)
+      (Try => @onConnectingDongle(card)).printError()
     @walletsManager.on 'connected', (event, wallet) =>
-      @wallet = wallet
-      @_dongleAttestationLock = off
-      wallet.once 'disconnected', =>
-        _.defer => (Try => @onDongleIsDisconnected(wallet)).printError()
-        @wallet = null
-      wallet.once 'unplugged', =>
-        (Try => @onDongleNeedsUnplug(wallet)).printError()
-      wallet.once 'state:unlocked', =>
-        (Try => @onDongleIsUnlocked(wallet)).printError()
-      (Try => @onDongleConnected(wallet)).printError()
-      if wallet.isInBootloaderMode()
-        (Try => @onDongleIsInBootloaderMode(wallet)).printError()
+      @connectWallet(wallet)
 
-
+  connectWallet: (wallet) ->
+    @wallet = wallet
+    @_dongleAttestationLock = off
+    DongleLogger().info("Connected", wallet.id)
+    wallet.once 'disconnected', =>
+      DongleLogger().info('Disconnected', wallet.id)
+      _.defer => (Try => @onDongleIsDisconnected(wallet)).printError()
+      @wallet = null
+    wallet.once 'unplugged', =>
+      (Try => @onDongleNeedsUnplug(wallet)).printError()
+    wallet.once 'state:unlocked', =>
+      DongleLogger().info('Dongle unlocked', wallet.id)
+      (Try => @onDongleIsUnlocked(wallet)).printError()
+    (Try => @onDongleConnected(wallet)).printError()
+    if wallet.isInBootloaderMode()
+      DongleLogger().info('Dongle is Bootloader mode', wallet.id)
+      (Try => @onDongleIsInBootloaderMode(wallet)).printError()
 
   _listenDongleEvents: () ->
+    return
     # Dongle management & dongle events re-dispatching
     @donglesManager.on 'connected', (event, dongle) =>
       @dongle = dongle
@@ -188,6 +206,8 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   onDongleIsDisconnected: (dongle) ->
 
-  onDongleCertificationDone: (dongle, isCertified) ->
+  onDongleCertificationDone: (dongle, error) ->
 
   onDongleIsInBootloaderMode: (dongle) ->
+
+  onCommandFirmwareUpdate: ->

@@ -129,6 +129,10 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
             callback?(no, {title: 'Wrong PIN', code: ledger.errors.WrongPinCode, error, retryCount: retryNumber})
     @_lwCard.verifyPIN pin
 
+  lock: () ->
+    if @_currentState isnt ledger.wallet.States.BLANK and @_currentState isnt ledger.wallet.States.FROZEN and @_currentState?
+      @_setState(ledger.wallet.States.LOCKED)
+
   setup: (pincode, seed, callback) ->
     throw 'Cannot setup if the wallet is not blank' if @_state isnt ledger.wallet.States.BLANK and @_state isnt ledger.wallet.States.FROZEN
     onSuccess = () =>
@@ -153,14 +157,14 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   getBitIdAddress: (callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
-    @_lwCard.getBitIDAddress()
+    @_lwCard.getBitIDAddress("0'/0/0xb11e")
     .then (data) =>
       @_bitIdData = data
       callback?(@_bitIdData.bitcoinAddress.value)
     .fail (error) => callback?(null, error)
     return
 
-  signMessageWithBitId: (message, callback) ->
+  signMessageWithBitId: (derivationPath, message, callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
 
     onSuccess = (e, data) =>
@@ -178,7 +182,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       @_vents.off 'LW.getMessageSignature:error', onFailure
     @_vents.on 'LW.getMessageSignature', onSuccess
     @_vents.on 'LW.getMessageSignature:error', onFailure
-    @_lwCard.getMessageSignature(message)
+    @_lwCard.getMessageSignature(derivationPath, message)
 
   getPublicAddress: (derivationPath, callback) ->
     throw 'Cannot get a public while the key is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
@@ -239,9 +243,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
         completion.failure(new ledger.StandardError(ledger.errors.DongleNotCertified))
       return
     .fail (err) =>
-      e err
-      error = new ledger.StandardError(Errors.SignatureError, err)
-      #completion.failure(error)
+      completion.failure(new ledger.StandardError(ledger.errors.CommunicationError, err))
       return
     .done()
     completion.readonly()
@@ -347,12 +349,13 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     unbind = () =>
       for callbackName, params of operation
         for event in params.events
-          @_vents.off event, params.do
+          @_vents.off event, params.handler
 
     for callbackName, params of operation
       for event in params.events
-       do (params) =>
-          @_vents.on event, (ev, data) ->
+        do (params) =>
+          params.handler = (ev, data) ->
             _.defer () ->
-              params.do(data, ev)
+            params.do(data, ev)
+          @_vents.on event, params.handler
     unbind

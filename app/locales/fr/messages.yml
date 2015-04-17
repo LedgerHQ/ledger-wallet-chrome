@@ -5,6 +5,8 @@ application:
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet gère vos comptes Bitcoin de façon efficace et sécurisée."
   support_url: 'http://support.ledgerwallet.com/'
+  support_key_not_recognized_url: 'https://ledger.groovehq.com/knowledge_base/categories/troubleshooting-20'
+  support_coinkite_url: 'https://ledger.groovehq.com/knowledge_base/topics/how-to-use-the-coinkite-app'
 
 common:
   bitcoin_acronym: 'BTC'
@@ -25,10 +27,16 @@ common:
   update: "Mettre à jour"
   restore: "Restaurer"
   later: "Plus tard"
+  reset: "Réinitialiser"
+  save: "Enregistrer"
+  back: "Retour"
+  next: "Suivant"
   yes: "Oui"
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
   get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
+  signing: "Signature..."
+  checking: "Vérification..."
 
   keycard:
     uppercase_letters: "Majuscules"
@@ -45,6 +53,10 @@ common:
     unable_to_validate: "Impossible de valider la transaction."
     secure_screen_cancelled_transaction: "Le smartphone a annulé la transaction."
     secure_screen_invalid_pin: "Le smartphone a retourné un mauvais code pin."
+    deleting_this_paired_smartphone: "En supprimant ce smartphone, vous ne pourrez plus valider les transactions de ce Ledger Wallet.<br />Souhaitez-vous continuer ?"
+    going_to_firmware_update: "En passant en mode de mise à jour de la puce, toutes vos activités en cours seront interrompues.<br />Souhaitez-vous continuer ?"
+    wrong_transaction_signature: "Une erreur est survenue durant la signature de la transaction. Veuillez contacter le support pour une assistance immédiate."
+    dust_transaction: "Le montant de la transaction doit être au moins de %s."
 
   qrcode:
     scan_qrcode: "Scanner code QR"
@@ -76,6 +88,15 @@ onboarding:
     update:
       new_firmware_available: "Une nouvelle mise à jour de la puce de votre Ledger Wallet est disponible (%s)."
       new_1_0_0: "Cette mise à jour ajoute une nouvelle authentification des transactions sortantes sur votre smartphone."
+      new_1_0_1: "Cette mise à jour ajoute la compatibilité P2SH et corrige des bugs critiques (mais qui n'impactent pas vos bitcoins) dans la bibliothèque crypto."
+
+    unsupported:
+      not_linked: "Votre portefeuille matériel ne semble pas être lié à une carte de sécurité."
+      please_update: "Pour utiliser ou générer un carte, veuillez mettre à jour la puce de votre portefeuille."
+
+    failed:
+      unexpected_error: "Une erreur est survenue pendant la communication avec votre portefeuille."
+      unplug: "Débranchez votre Ledger Wallet et réessayez. Si l'erreur persiste, une mise à jour de la puce peut-être nécessaire."
 
     errors:
       frozen:
@@ -88,14 +109,10 @@ onboarding:
         tries_left: "Il vous reste %s essai(s) avant de bloquer votre portefeuille."
         unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder vos comptes et bitcoins."
 
-      unsupported:
-        device_unsupported: "Portefeuille non pris en charge"
-        unsuported_kind: "Ce type de portefeuille n’est pas pris en charge par l’application Ledger Wallet."
-        get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
-
       forged:
-        device_forged: "Ce Ledger Wallet n'est pas authentique"
+        device_forged: "Ce Ledger Nano n'est pas authentique, ou la mise à jour du firmware a échoué"
         forbidden_access: "Pour des raisons de sécurité, vous n'êtes pas autorisé à utiliser cette application."
+        get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
 
   management:
     back: "RETOUR"
@@ -106,7 +123,6 @@ onboarding:
     create_my_wallet: "Créer mon portefeuille"
     recover_my_wallet: "Restaurer mon portefeuille"
     cancel_wallet_configuration: "Souhaitez-vous annuler la configuration de votre Ledger Wallet ?"
-    wallet_not_affected: "Aucune modification ne sera apportée à votre portefeuille."
 
     security:
       security_informations: "Informations de <b>sécurité</b>"
@@ -200,7 +216,7 @@ update:
     remove_your_wallet: "Retirez votre Ledger Wallet du port USB."
 
   seed:
-    security_card_qrcode: "Carte de sécurité"
+    security_card_qrcode: "Code QR de la carte de sécurité"
     enter_characters: "Scannez le code QR (ou saisissez les 32 caractères) de votre carte de sécurité :"
     on_the_left: "Il est situé sur la page de gauche de votre livret de restauration."
 
@@ -226,17 +242,21 @@ update:
 
   linux:
     linux_users: "Utilisateurs Linux"
-    follow_instructions: "Suivez ces instructions pour assurer que votre Ledger Wallet soit reconnu une fois mis à jour :"
-    first: "1. Premièrement, ouvrez votre terminal et éditez ce fichier (permissions root requises):"
-    fc: "sudo vi /etc/udev/rules.d/20-hw1.rules"
-    second: "2. Ajoutez cette ligne:"
-    sc: "SUBSYSTEMS==\"usb\", ATTRS{idVendor}==\"2581\", ATTRS{idProduct}==\"3b7c\", MODE=\"0660\", GROUP=\"plugdev\""
-    third: "3. Enfin, fermer le fichier et exécutez cette commande (permissions root requises):"
-    tc: "sudo udevadm control --reload-rules"
+    follow_instructions: "Votre Ledger Wallet a besoin d'être ajouté à la liste des périphériques USB connus."
+    first: "Ouvrez votre terminal et exécutez cette commande (permissions root requises):"
+    fc: "wget -q -O - https://www.ledgerwallet.com/support/add_udev_rules.sh | sudo bash"
+    second: "Cette commande téléchargera automatiquement un script qui ajoutera une nouvelle règle udev nécessaire pour que votre Ledger Wallet soit reconnu par Linux une fois mis à jour."
+
+  cardcheck:
+      security_card_check: "Vérification de la carte de sécurité"
+      make_sure: "Merci de vous assurer que ces valeurs sont correctes sur votre carte de sécurité:"
+      four_characters: "Ne cliquez pas sur CONTINUER si les 4 caractères ne correspondent pas à ceux de votre carte."
 
   error:
     update_failed: "Mise à jour échouée"
     error_updated: "Une erreur est survenue pendant la mise à jour de votre Ledger Wallet (code: %s)."
+    plug_back: "Débranchez puis rebrancher votre portefeuille, puis réessayez."
+    problem_persists: "Si le problème persiste, merci de visiter notre centre d'aide sur support.ledgerwallet.com."
 
 wallet:
   defaults:
@@ -262,6 +282,7 @@ wallet:
       signout: 'VERROUILLER'
       help: 'AIDE'
       account: 'COMPTE'
+      settings: "RÉGLAGES"
 
   dashboard:
     index:
@@ -375,6 +396,7 @@ wallet:
       sending_failed: "Envoi échoué"
       sending_succeeded: "Envoi terminé"
       transaction_completed: "La transaction a bien été effectuée."
+      cancelled: "Paiement annulé"
 
   pairing:
     common:
@@ -383,10 +405,10 @@ wallet:
     errors:
       pairing_failed: "Association échouée"
       pairing_succeeded: "Association réussie"
-      dongle_is_now_paired: "Votre Ledger Wallet est maintenant associé<br />avec votre smartphone \"%s\"."
+      dongle_is_now_paired: "Votre Ledger Wallet est maintenant associé avec votre smartphone \"%s\"."
       inconsistent_state: "Quelque chose ne s'est pas bien déroulé (état inconsistant)."
       client_cancelled: "L'application mobile a annulé la procédure d'association."
-      dongle_needs_power_cycle: "Votre Ledger Wallet nécessite d'être débranché puis rebranché<br />pour associer un nouveau smartphone."
+      dongle_needs_power_cycle: "Votre Ledger Wallet nécessite d'être débranché puis rebranché pour associer un nouveau smartphone."
       invalid_challenge_response: "Le code de validation de la carte de sécurité est incorrect."
       dongle_cancelled: "Votre Ledger Wallet a annulé la procédure d'association."
       unknown: "Une erreur inconnue est survenue."
@@ -408,3 +430,111 @@ wallet:
       default_name: "Mon smartphone"
       name_already_used_by_paired_device: "Ce nom est déjà utilisé par un autre smartphone."
       please_enter_a_name: "Veuillez entrer un nom pour ce smartphone."
+
+  bitid:
+    index:
+      title: "Se connecter avec BitID"
+      domain: "Domaine"
+      address: "Addresse"
+      connect: "Souhaitez-vous vous identifier sur le service suivant ?"
+    auth:
+      authenticating: "Identification"
+      login: "Connection en cours"
+      succeeded: "Identification réussie"
+      completed: "Vous avez été connecté sur le service"
+      failed: "Identification échouée"
+    errors:
+      cancelled: "Identification annulée"
+      signature_failed: "Erreur dans la signature. Retirez et réinsérez le Nano."
+    form:
+      title: "Se connecter avec BitID"
+      uri: "URI du service BitID"
+      uri_placeholder: "Entrez l'URI"
+      invalid_uri: "URI invalide"
+
+  settings:
+    common:
+      settings: "Réglages"
+      other_settings: "Autres réglages"
+      hardware: "Matériel"
+      bitcoin: "Bitcoin"
+      tools: "Outils"
+      display: "Affichage"
+
+    hardware:
+      firmware: "Logiciel de la puce"
+      paired_smartphones: "Smartphones associés"
+      flash_firmware: "Flasher la puce"
+      no_update_available: "Aucune mise à jour disponible"
+      update_available: "%s disponible!"
+      pair_a_smartphone: "Associer un smartphone"
+      single_paired_device: "%s association"
+      multiple_paired_devices: "%s associations"
+
+apps:
+  coinkite:
+    top_menu:
+      items:
+        settings: "RÉGLAGES"
+        coinkite: "COINKITE"
+        key: "EXPORT CLÉ"
+        cosign: "COSIGNATURE"
+        wallet: "RETOUR"
+    dashboard:
+      title: "Coinkite cosigning interface"
+      compatibility:
+        title: "Test de compatibilité"
+        info: "Vérification de la compatibilité avec P2SH"
+        check: "Avant d'utiliser l'outil de multisignature Coinkite, vérifiez que votre Ledger Nano est bien compatible."
+        check_button: "Tester mon Ledger Nano"
+        success: "Succès!"
+        success_text: "Votre Ledger Nano est compatible avec la cosignature Coinkite"
+        fail: "Echec!"
+        fail_text: "Votre Ledger Nano n'est pas compatible. Vous devez le réinitialiser: entrez trois fois un mauvais PIN puis restaurez votre seed. Assurez vous surtout d'avoir bien votre livret de restauration sinon vous perdez vos bitcoins!"
+        warning: "ATTENTION: si le test est un échec, vous devrez débrancher et rebrancher votre Nano."
+    settings:
+      title: "Vos accès API à Coinkite"
+      api_key: "API key"
+      api_secret: "API secret"
+      api_key_placeholder: "Entrez votre clé API"
+      api_secret_placeholder: "Entrez le secret"
+      note: "Attention à bien activer la permission <b>cosign</b> sur cette clé API."
+    keygen:
+      processing:
+        title: "Clé de signature"
+        info: "Dérivation de la clé publique étendue pour Coinkite"
+      show:
+        title: "Clé de signature"
+        xpub: "Xpub"
+        signature: "Signature"
+        path: "Chemin de dérivation Coinkite"
+        note: "Ces informations vous permettent d'ajouter ce Ledger Nano comme clé de signature sur votre wallet multisignature Coinkite. Le chemin de dérivation est utile pour restaurer manuellement la clé publique étendue depuis votre seed."
+      errors:
+        derivation_failed: "Erreur dans le calcul de la clé publique étendue. Contactez le support"
+    cosign:
+      index:
+        title: "Cosigner une transaction"
+        request: "Request"
+        request_placeholder: "Entrez la référence"
+        note_header: "Cet outil vous permet de signer une transaction multisignature avec votre Ledger Wallet"
+        note_footer: "La référence request est indiquée sur la page de cosignature (<b>user request</b>)"
+      fetching:
+        title: "Récupération des informations"
+        info: "La transaction de cosignature est en cours d'analyse"
+      show:
+        title: "Transaction à signer"
+        note: "En confirmant la signature, la transaction va être signée par le Ledger Nano puis envoyée sur le site de Coinkite."
+        confirm_signature: "Confirmer la signature"
+      signing:
+        title: "Signature de la transaction"
+        info: "La transaction est en cours de signature"
+        success: "Signature réussie"
+        already_signed: "Cette transaction a déjà été signée avec succès par ce Ledger Nano."
+      errors:
+        wrong_nano: "Transaction invalide"
+        wrong_nano_text: "Ce Ledger Nano ne fait pas partie des signataires de cette transaction. Impossible de continuer."
+        coinkite_api: "Erreur de l'API Coinkite"
+        invalid_request_ref: "Référence invalide (doit faire 17 caractères)"
+        missing_api_key: "Clés API manquantes"
+        missing_api_key_text: "Vous devez renseigner votre clé API ainsi que le secret dans les règlages."
+        signature_failed: "Erreur dans la signature"

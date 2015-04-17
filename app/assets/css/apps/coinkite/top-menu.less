@@ -1,0 +1,190 @@
+@import (reference) "../../constants";
+
+@coinkite-images-url: '@{images-url}/apps/coinkite';
+
+.top-main-menu {
+  display: flex;
+  width: 100%;
+  height: 95px;
+  background-color: @color-night-blue;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  > .left {
+    display: flex;
+    flex-grow: 1;
+    align-items: stretch;
+    padding: 0 @metrics-medium-padding;
+
+    #settings-item {
+      margin-left: auto;
+      margin-right: 0;
+    }
+
+    .menu-item {
+      color: @color-white;
+      margin-right: @metrics-large-padding;
+      display: flex;
+      padding-top: 24px;
+
+      &.selected {
+        > div {
+          > a {
+            opacity: 0.75;
+          }
+
+          .selector {
+            background-color: @color-invalid-red;
+          }
+        }
+      }
+
+      > div {
+        display: flex;
+        flex-direction: column;
+
+        > a {
+          font-size: @font-size-large;
+          text-decoration: none;
+          color: @color-white;
+          align-self: flex-start;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          letter-spacing: -0.5px;
+          font-weight: @font-weight-regular;
+          opacity: 0.3;
+          transition: opacity @animation-short-duration @animation-default-timing-function;
+
+          &:hover {
+            opacity: 0.75;
+          }
+
+          img {
+            width: 24px;
+            height: 24px;
+          }
+
+          span {
+            margin-top: @metrics-very-small-padding;
+          }
+
+          .icon-spacer {
+            height: 24px;
+          }
+
+          .text-spacer {
+            height: 10px;
+          }
+        }
+        .selector {
+          position: relative;
+          width: 100%;
+          height: 5px;
+        }
+
+        .spacer {
+          flex-grow: 1;
+        }
+      }
+    }
+
+    .right {
+      margin-left: auto;
+      margin-right: @metrics-medium-padding;
+    }
+
+  }
+
+  > .right {
+    display: flex;
+    align-items: center;
+    background-color: @color-dark-grey-blue;
+    padding: 0 @metrics-medium-padding;
+    color: @color-white;
+
+    .settings-icon {
+      margin-left: @metrics-medium-padding;
+
+      img {
+        width: 24px;
+        height: 24px;
+      }
+      opacity: 0.3;
+      transition: opacity @animation-short-duration ease-in-out;
+
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+
+    .menu-item {
+      color: @color-white;
+      display: flex;
+      margin-right: @metrics-small-padding;
+      margin-left: @metrics-small-padding;
+
+      &.selected {
+        > div {
+          > a {
+            opacity: 0.75;
+          }
+
+          .selector {
+            background-color: @color-invalid-red;
+          }
+        }
+      }
+
+      > div {
+        display: flex;
+        flex-direction: column;
+
+        > a {
+          font-size: @font-size-large;
+          text-decoration: none;
+          color: @color-white;
+          align-self: flex-start;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          letter-spacing: -0.5px;
+          font-weight: @font-weight-regular;
+          opacity: 0.3;
+          transition: opacity @animation-short-duration @animation-default-timing-function;
+
+          &:hover {
+            opacity: 0.75;
+          }
+
+          img {
+            width: 24px;
+            height: 24px;
+          }
+
+          span {
+            margin-top: @metrics-very-small-padding;
+          }
+
+          .icon-spacer {
+            height: 24px;
+          }
+
+          .text-spacer {
+            height: 10px;
+          }
+        }
+        .selector {
+          position: relative;
+          width: 100%;
+          height: 5px;
+        }
+
+        .spacer {
+          flex-grow: 1;
+        }
+      }
+    }
+  }
+
+}

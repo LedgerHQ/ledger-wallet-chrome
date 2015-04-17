@@ -3,6 +3,10 @@ class @WalletSendValidatingDialogViewController extends @DialogViewController
   view:
     contentContainer: '#content_container'
 
+  cancel: ->
+    Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
+    @dismiss()
+
   onAfterRender: ->
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
@@ -13,6 +17,7 @@ class @WalletSendValidatingDialogViewController extends @DialogViewController
           when ledger.errors.SignatureError then 'unable_to_validate'
           when ledger.errors.UnknownError then 'unknown'
         @dismiss =>
+          Api.callback_cancel 'send_payment', t("common.errors." + reason)
           dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors." + reason))
           dialog.show()
       else if @params.validationMode is 'card'
