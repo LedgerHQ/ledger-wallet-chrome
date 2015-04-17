@@ -1,4 +1,5 @@
 ledger.widgets ?= {}
+
 ###
   Switch
 ###
@@ -6,40 +7,28 @@ class ledger.widgets.Switch extends EventEmitter
 
   # @param The node on which the switch will be appended to
   constructor: (node) ->
-    @_switchEl = $('<div class="switch"><div class="switch-circle"></div></div>')
+    @_switchEl = $('<div class="switch"><div class="circle"></div></div>')
     @_switchEl.appendTo(node)
     @_switchEl.click =>
-      if @isOn()
-        @setOn(no)
-      else
-        @setOn(yes)
+      @setOn(!@isOn())
+      @emit (if @isOn() then "isOn" else "isOff")
 
   ###
     Set switch state
     @param [Boolean] state The state of the switch
     @param [Boolean] isAnimated If the switch must be animated
   ###
-  setOn: (state, isAnimated=true) ->
-    if state is on
-      @emit 'switch:on'
-      @_switchEl.addClass('switch-isOn')
-      $(@_switchEl.children()[0]).addClass('switch-circle-isOn')
-    else
-      @emit 'switch:off'
-      @_switchEl.removeClass('switch-isOn')
-      $(@_switchEl.children()[0]).removeClass('switch-circle-isOn')
-
+  setOn: (state, isAnimated = true) ->
     if isAnimated
-      @_switchEl.addClass('switch-isAnimated')
-      $(@_switchEl.children()[0]).addClass('switch-circle-isAnimated')
+      @_switchEl.addClass('animated')
     else
-      l '(false, false)'
-      @_switchEl.removeClass('switch-isAnimated')
-      $(@_switchEl.children()[0]).removeClass('switch-circle-isAnimated')
-    undefined
+      @_switchEl.removeClass('animated')
 
+    if state is on
+      @_switchEl.addClass('on')
+    else
+      @_switchEl.removeClass('on')
+    state
 
-# Get switch state
-  isOn: ->
-    @_switchEl.hasClass('switch-isOn')
-
+  # Get switch state
+  isOn: -> @_switchEl.hasClass('on')

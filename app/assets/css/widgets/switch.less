@@ -2,7 +2,6 @@
 
 // Switch - Off by default
 .switch {
-
   // Variables
   @width-switch: 32px;
   @height-switch: 18px;
@@ -16,29 +15,31 @@
   box-sizing: border-box;
   background-color: @color-light-grey;
   cursor: pointer;
-  &-isOn {
-    background-color: @color-action-green;
-  }
-  &-isAnimated {
-    transition-duration: 250ms;
-  }
 
-  >.switch-circle {
+  > .circle {
     width: @width-switch-circle;
     height: @height-switch-circle;
-    border-radius: @width-switch-circle/2;
+    border-radius: @width-switch-circle / 2;
     background-color: @color-white;
-    box-shadow: 0px 2px 1px rgba(0,0,0,0.1);
+    box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.1);
     position: relative;
     left: 0px;
-    &-isOn {
+  }
+
+  &.on {
+    background-color: @color-action-green;
+
+    & > .circle {
       position: relative;
       left: @width-switch-circle;
     }
-    &-isAnimated {
-      transition: all 100ms ease-in;
+  }
+
+  &.animated {
+    transition: background-color @animation-very-short-duration ease-in;
+
+    & > .circle {
+      transition: all @animation-very-short-duration ease-in;
     }
   }
 }
-
-
