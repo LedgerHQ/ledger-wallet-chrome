@@ -96,7 +96,12 @@ class ledger.preferences.Preferences
       throw new Error 'You must initialized your wallet'
 
 
-  # Set fiat currency equivalent functionality
+  # Get state of fiat currency equivalent functionality - true/false
+  getCurrencyActive: (state=yes) ->
+    @prefs.currencyEquivalentIsActive
+
+
+  # Set fiat currency equivalent functionality to active
   setCurrencyActive: (state=yes) ->
     @prefs.currencyEquivalentIsActive = state
 

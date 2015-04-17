@@ -603,4 +603,11 @@ class ledger.i18n
     moment(time).format @t 'common.time_format'
 
 
+  @getAllLocales: ->
+    locales = {}
+    $.getJSON '../src/i18n/regions.json', (data) ->
+      locales = data
+    locales
+
+
 @t = ledger.i18n.t
