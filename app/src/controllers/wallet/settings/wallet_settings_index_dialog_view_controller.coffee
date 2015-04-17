@@ -5,3 +5,6 @@ class @WalletSettingsIndexDialogViewController extends DialogViewController
 
   openApps: ->
     @getDialog().push new WalletSettingsAppsSectionDialogViewController()
+
+  openDisplay: ->
+    @getDialog().push new WalletSettingsDisplaySectionDialogViewController()

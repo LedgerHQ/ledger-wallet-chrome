@@ -1,0 +1,3 @@
+class @WalletSettingsDisplayCurrencySettingViewController extends WalletSettingsSettingViewController
+
+  renderSelector: "#currency_table_container"

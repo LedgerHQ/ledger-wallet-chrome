@@ -258,6 +258,12 @@
         'controllers/wallet/settings/apps/wallet_settings_apps_list_setting_view_controller'
         'controllers/wallet/settings/wallet_settings_apps_section_dialog_view_controller'
 
+        # - Display
+        'controllers/wallet/settings/display/wallet_settings_display_units_setting_view_controller'
+        'controllers/wallet/settings/display/wallet_settings_display_currency_setting_view_controller'
+        'controllers/wallet/settings/display/wallet_settings_display_language_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_display_section_dialog_view_controller'
+
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
         'controllers/onboarding/onboarding_navigation_controller'

@@ -1,0 +1,13 @@
+<div class="large-table">
+  <div class="header top">
+    <div class="uppercase-section-column"><%= t 'wallet.settings.display.language_and_region' %></div>
+  </div>
+  <div class="row middle">
+    <div class="regular-text-small stretchable"><%= t 'wallet.settings.display.interface_language' %></div>
+    <div class="regular-grey-text">test</div>
+  </div>
+  <div class="row bottom">
+    <div class="regular-text-small stretchable"><%= t 'wallet.settings.display.region' %></div>
+    <div class="regular-grey-text">test</div>
+  </div>
+</div>

@@ -1,0 +1,3 @@
+class @WalletSettingsDisplayLanguageSettingViewController extends WalletSettingsSettingViewController
+
+  renderSelector: "#language_table_container"

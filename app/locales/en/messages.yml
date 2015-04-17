@@ -58,6 +58,11 @@ common:
     present: "Present the QR code in front of the webcam."
     nowebcam: "No webcam is detected on your computer."
 
+  units:
+    BTC: "BTC"
+    mBTC: "mBTC"
+    bits: "bits"
+
 onboarding:
   device:
     plug:
@@ -468,6 +473,15 @@ wallet:
       single_paired_device: "%s pairing"
       multiple_paired_devices: "%s pairings"
 
+    display:
+      units: "Units"
+      bitcoin_unit: "Bitcoin unit"
+      show_currency: "Show currency"
+      exchange_rate: "Exchange rate"
+      language_and_region: "Language & region"
+      interface_language: "Interface language"
+      region: "Region"
+
 apps:
   coinkite:
     top_menu:
@@ -477,6 +491,7 @@ apps:
         key: "EXPORT KEY"
         cosign: "COSIGNATURE"
         wallet: "BACK"
+
     dashboard:
       title: "Coinkite cosigning interface"
       compatibility:
@@ -489,6 +504,7 @@ apps:
         fail: "Fail!"
         fail_text: "Your Ledger Nano is not compatible. You must reset it: enter three times in a row a wrong PIN, and restore your seed. Make sure you do have your recovery sheet before doing that, otherwise you will lose your bitcoins!"
         warning: "WARNING: if the test fails, you'll have to unplug and replug your Nano."
+
     settings:
       title: "Coinkite API credentials"
       api_key: "API key"
@@ -496,6 +512,7 @@ apps:
       api_key_placeholder: "Enter your API key"
       api_secret_placeholder: "Enter your API secret"
       note: "Be sure to activate the <b>cosign</b> permission for this key."
+
     keygen:
       processing:
         title: "Extended public key"
@@ -508,6 +525,7 @@ apps:
         path: "Coinkite derivation path"
       errors:
         derivation_failed: "Fail to compute extended key. Please contact support."
+
     cosign:
       index:
         title: "Cosign a transaction"
