@@ -1,3 +1,6 @@
+language:
+  name: "english"
+
 application:
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet manages your Bitcoin accounts efficiently and securely."
@@ -8,7 +11,9 @@ application:
 common:
   bitcoin_acronym: 'BTC'
   default_account_name: "My account"
-  date_format: 'MM/DD/YYYY at HH:mm'
+  date_time_format: 'L [at] LT'
+  date_format: 'L'
+  time_format: 'LT'
   close: "Close"
   cancel: "Cancel"
   print: "Print"

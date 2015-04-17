@@ -10,8 +10,10 @@ require @ledger.imports, ->
       Api.init()
       @_listenAppEvents()
       addEventListener "message", Api.listener.bind(Api), false
-      @setExecutionMode(@Modes.Wallet)
-      @router.go '/'
+      ledger.i18n.init =>
+        @setExecutionMode(@Modes.Wallet)
+        @router.go('/')
+
 
     ###
       Sets the execution mode of the application. In Wallet mode, the application handles the wallets state by starting services,
@@ -49,7 +51,10 @@ require @ledger.imports, ->
       @emit 'dongle:connecting', card if @isInWalletMode() and !card.isInBootloaderMode
 
     onDongleConnected: (wallet) ->
-      @performDongleAttestation() if @isInWalletMode() and not wallet.isInBootloaderMode()
+      if @isInWalletMode() and not wallet.isInBootloaderMode()
+        @performDongleAttestation()
+        ledger.tasks.TickerTask.instance.start()
+
 
     onDongleCertificationDone: (wallet, error) ->
       return unless @isInWalletMode()
@@ -75,12 +80,13 @@ require @ledger.imports, ->
         ledger.db.init =>
           ledger.db.contexts.open()
           Wallet.initializeWallet =>
-            @emit 'wallet:initialized'
-            _.defer =>
-              Wallet.instance.retrieveAccountsBalances()
-              ledger.tasks.TransactionObserverTask.instance.start()
-              ledger.tasks.OperationsSynchronizationTask.instance.start()
-              ledger.tasks.OperationsConsumptionTask.instance.start()
+            ledger.preferences.init =>
+              @emit 'wallet:initialized'
+              _.defer =>
+                Wallet.instance.retrieveAccountsBalances()
+                ledger.tasks.TransactionObserverTask.instance.start()
+                ledger.tasks.OperationsSynchronizationTask.instance.start()
+                ledger.tasks.OperationsConsumptionTask.instance.start()
 
     onDongleIsDisconnected: (wallet) ->
       @emit 'dongle:disconnected'
