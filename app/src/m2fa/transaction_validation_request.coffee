@@ -11,7 +11,7 @@ Errors = ledger.errors
 class @ledger.m2fa.TransactionValidationRequest extends @EventEmitter
 
   constructor: (clients, promise) ->
-    @_defer = ledger.defer(=> @_onComplete?())
+    @_defer = ledger.defer (args...) => @_onComplete?(args...)
     @_clients = clients
     promise
     .progress (progress) =>

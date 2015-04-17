@@ -57,8 +57,8 @@ class ledger.wallet.Transaction
   _btInputs: undefined
   # @property [Array<Object>]
   _btcAssociatedKeyPath: undefined
-  # @property [Object]
-  _transaction: undefined
+  # @property [String] hex encoded
+  _signedRawTransaction: undefined
 
   # @param [ledger.dongle.Dongle] dongle
   # @param [ledger.Amount] amount
@@ -76,7 +76,7 @@ class ledger.wallet.Transaction
   isValidated: () -> @_isValidated
 
   # @return [String]
-  getSignedTransaction: () -> @_transaction
+  getSignedTransaction: () -> @_signedRawTransaction
 
   # @return [Integer]
   getValidationMode: () -> @_validationMode
@@ -164,14 +164,14 @@ class ledger.wallet.Transaction
   # @param [String] validationKey 4 chars ASCII encoded
   # @param [Function] callback
   # @return [Q.Promise]
-  validateWithPinCode: (validationPinCode, callback=undefined) -> @_validate(validationPinCode, callback)
+  validateWithPinCode: (validationPinCode, callback=undefined) -> @_validate((char.charCodeAt(0).toString(16) for char in validationPinCode).join(''), callback)
 
   # @param [String] validationKey 4 chars ASCII encoded
   # @param [Function] callback
   # @return [Q.Promise]
   validateWithKeycard: (validationKey, callback=undefined) -> @_validate(("0#{char}" for char in validationKey).join(''), callback)
 
-  # @param [String] validationKey 4 chars ASCII encoded
+  # @param [String] validationKey 4 bytes hex encoded
   # @param [Function] callback
   # @return [Q.Promise]
   _validate: (validationKey, callback=undefined) ->
@@ -184,7 +184,7 @@ class ledger.wallet.Transaction
       undefined, # Default sigHash
       validationKey,
       @_resumeData
-    ).then( (@_transaction) =>
+    ).then( (@_signedRawTransaction) =>
       @_isValidated = yes
       _.defer => d.resolve(@)
     ).catch( (error) =>
