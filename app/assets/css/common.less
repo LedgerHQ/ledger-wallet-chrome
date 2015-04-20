@@ -133,41 +133,6 @@ section {
   }
 }
 
-// buttons
-.rounded-button(@color) {
-  font-size: @font-size-large;
-  text-transform: uppercase;
-  border-radius: @border-radius-default-value;
-  padding: 9px 14px;
-  color: @color-white;
-  background-color: @color;
-  display: inline-block;
-  letter-spacing: -0.5px;
-
-  a& {
-    text-decoration: none;
-
-    &:hover {
-      background-color: darken(@color, @color-default-darken-value);
-      cursor: pointer;
-    }
-  }
-
-  &.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-  }
-}
-.action-rounded-button {
-  .rounded-button(@color-action-green);
-}
-.cancel-rounded-button {
-  .rounded-button(@color-light-grey);
-}
-.important-rounded-button {
-  .rounded-button(@color-invalid-red);
-}
-
 // texts
 .uppercase-action {
   font-size: @font-size-very-small;

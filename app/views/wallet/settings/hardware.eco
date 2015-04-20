@@ -1,37 +1,12 @@
 <section id="settings_hardware_dialog">
   <header>
-    <h1><%= t 'wallet.settings.common.settings' %></h1>
+    <h1><%= t 'wallet.settings.common.hardware' %></h1>
   </header>
-  <div id="firmware_table_container">
-    <div class="large-table">
-      <div class="header top">
-        <div class="uppercase-section-column stretchable"><%= t 'wallet.settings.hardware.firmware' %></div>
-        <a class="uppercase-action" href="#flashFirmware"><i class="fa fa-flash"></i><%= t 'wallet.settings.hardware.flash_firmware' %></a>
-      </div>
-      <div class="row bottom">
-        <div class="regular-text-small stretchable" id="current_version_text"><%= t 'common.checking' %></div>
-        <div class="regular-grey-text-small" id="update_availability_text"></div>
-      </div>
-    </div>
-  </div>
+  <div id="firmware_table_container"></div>
   <div id="smartphones_table_container"></div>
-  <div id="beta_table_container">
-    <div class="large-table">
-      <div class="header top">
-        <div class="uppercase-section-column">BETA APPS</div>
-      </div>
-      <a class="row middle" href="#openBitID">
-        <div class="regular-text-small stretchable">BitID</div>
-        <div class="regular-grey-text"><i class="fa fa-angle-right"></i></div>
-      </a>
-      <a class="row bottom" href="#openCoinkite">
-        <div class="regular-text-small stretchable">Coinkite</div>
-        <div class="regular-grey-text"><i class="fa fa-angle-right"></i></div>
-      </a>
-    </div>
-  </div>
 </section>
 <div class="dialog-actions-bar">
+  <a class="uppercase-action" href="#openOtherSettings"><%= t 'wallet.settings.common.other_settings' %></a>
   <div class="left-spacer"></div>
   <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.close' %></a>
 </div>

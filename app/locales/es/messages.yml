@@ -1,4 +1,7 @@
-﻿application:
+﻿language:
+  name: "Español"
+
+application:
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet gestiona sus cuentas Bitcoin de manera eficiente y segura."
   support_url: 'http://support.ledgerwallet.com/'
@@ -7,7 +10,9 @@
 common:
   bitcoin_acronym: 'BTC'
   default_account_name: "Mi cuenta"
-  date_format: 'DD/MM/YYYY à HH:mm'
+  date_time_format: 'L [a las] LT'
+  date_format: 'L'
+  time_format: 'LT'
   close: "Close"
   cancel: "Cancel"
   print: "Print"
@@ -427,6 +432,8 @@ wallet:
       bitcoin: "Bitcoin"
       tools: "Tools"
       display: "Display"
+      apps: "Apps (beta)"
+      version: "Version %s"
 
     hardware:
       firmware: "Firmware"

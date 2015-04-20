@@ -11,6 +11,7 @@ _.extend ledger.errors,
   NetworkError: 103
   AuthenticationFailed: 104
   InconsistentState: 105
+  OperationCanceledError: 106
 
   # Dongle errors
   NotSupportedDongle: 200
@@ -38,6 +39,10 @@ _.extend ledger.errors,
   ErrorDongleMayHaveASeed: 407
   ErrorDueToCardPersonalization: 408
   HigherVersion: 409
+
+  # I/O Errors
+  WriteError: 500
+
 
   create: (code, title, error) -> code: code, title: title, error: error
   throw: (code, message) -> throw new ledger.StandardError(code, message)

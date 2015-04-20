@@ -7,7 +7,7 @@
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.amount' %></td>
         <td class="align-right" id="operation_amount">
-          <span class="regular-text"><%= ledger.formatters.bitcoin.fromValue(@amount) %> BTC</span>
+          <span class="regular-text"><%= ledger.formatters.bitcoin.formatValue(@amount) %></span>
         </td>
       </tr>
       <tr>

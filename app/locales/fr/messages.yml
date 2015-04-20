@@ -1,3 +1,6 @@
+language:
+  name: "Français"
+
 application:
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet gère vos comptes Bitcoin de façon efficace et sécurisée."
@@ -8,7 +11,9 @@ application:
 common:
   bitcoin_acronym: 'BTC'
   default_account_name: "Mon compte"
-  date_format: 'DD/MM/YYYY à HH:mm'
+  date_time_format: 'L [à] LT'
+  date_format: 'L'
+  time_format: 'LT'
   close: "Fermer"
   cancel: "Annuler"
   print: "Imprimer"
@@ -26,6 +31,7 @@ common:
   save: "Enregistrer"
   back: "Retour"
   next: "Suivant"
+  test: "Test"
   yes: "Oui"
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
@@ -57,6 +63,11 @@ common:
     scan_qrcode: "Scanner code QR"
     present: "Présentez le code QR devant la webcam."
     nowebcam: "Aucune webcam n'est détectée sur votre ordinateur."
+
+  fees:
+    normal: "%s (normal)"
+    fast: "%s (confirmation rapide)"
+    slow: "%s (confirmation lente)"
 
 onboarding:
   device:
@@ -480,6 +491,8 @@ wallet:
       bitcoin: "Bitcoin"
       tools: "Outils"
       display: "Affichage"
+      apps: "Apps (beta)"
+      version: "Version %s"
 
     hardware:
       firmware: "Logiciel de la puce"
@@ -491,6 +504,23 @@ wallet:
       single_paired_device: "%s association"
       multiple_paired_devices: "%s associations"
 
+    display:
+      units: "Unités"
+      bitcoin_unit: "Unité Bitcoin"
+      show_currency: "Afficher la devise"
+      exchange_rate: "Taux d'échange"
+      language_and_region: "Langue & région"
+      interface_language: "Langue de l'interface"
+      region: "Région"
+
+    bitcoin:
+      confirmations_to_spend: "Confirmations pour dépenser"
+      required_confirmations: "Confirmations requises"
+      transaction_fees: "Frais de transactions"
+      default_value: "Frais par défaut"
+      blockchain_explorer: "Explorer de Blockchain"
+      default_explorer: "Explorateur par défaut"
+
 apps:
   coinkite:
     top_menu:
@@ -500,6 +530,7 @@ apps:
         key: "EXPORT CLÉ"
         cosign: "COSIGNATURE"
         wallet: "RETOUR"
+
     dashboard:
       title: "Coinkite cosigning interface"
       compatibility:
@@ -512,6 +543,7 @@ apps:
         fail: "Echec!"
         fail_text: "Votre Ledger Nano n'est pas compatible. Vous devez le réinitialiser: entrez trois fois un mauvais PIN puis restaurez votre seed. Assurez vous surtout d'avoir bien votre livret de restauration sinon vous perdez vos bitcoins!"
         warning: "ATTENTION: si le test est un échec, vous devrez débrancher et rebrancher votre Nano."
+
     settings:
       title: "Vos accès API à Coinkite"
       api_key: "API key"
@@ -519,6 +551,7 @@ apps:
       api_key_placeholder: "Entrez votre clé API"
       api_secret_placeholder: "Entrez le secret"
       note: "Attention à bien activer la permission <b>cosign</b> sur cette clé API."
+
     keygen:
       index:
         title: "Export de clé publique étendue"
@@ -534,6 +567,7 @@ apps:
         note: "Ces informations vous permettent d'ajouter ce Ledger Nano comme clé de signature sur votre wallet multisignature Coinkite. Le chemin de dérivation est utile pour restaurer manuellement la clé publique étendue depuis votre seed."
       errors:
         derivation_failed: "Erreur dans le calcul de la clé publique étendue. Contactez le support"
+
     cosign:
       index:
         title: "Cosigner une transaction"
