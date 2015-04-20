@@ -444,18 +444,6 @@ class @ledger.dongle.Dongle extends EventEmitter
   @return [Q.Promise] Resolve with resumeData
   ###
   createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
-    l inputs
-    l associatedKeysets
-    l changePath
-    l recipientAddress
-    l amount
-    l fees
-    l lockTime
-    l sighashType
-    l authorization
-    l resumeData
-
-
     if resumeData?
       resumeData = _.clone(resumeData)
       resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)

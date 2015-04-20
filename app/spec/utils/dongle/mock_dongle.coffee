@@ -1,4 +1,3 @@
-# ledger.app.donglesManager.createDongle('0000', 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
 
 States =
 # Dongle juste created, not initialized.
@@ -28,7 +27,7 @@ class ledger.dongle.MockDongle extends EventEmitter
     @_isInBootloaderMode = isInBootloaderMode
     @state = States.UNDEFINED
     @_setState(States.BLANK)
-    @_setup(pin, seed) if pin? and seed?
+    @_setup(pin, seed, yes) if pin? and seed?
 
 
 
@@ -41,6 +40,11 @@ class ledger.dongle.MockDongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
   getState: (callback=undefined) -> ledger.defer(callback).resolve(@state).promise
+
+
+  # @return [Integer] Firmware version, 0x20010000010f for example.
+  getIntFirmwareVersion: ->
+    parseInt(0x0001040d0146.toString(HEX), 16)
 
 
   # @param [String] pin ASCII encoded
@@ -57,20 +61,8 @@ class ledger.dongle.MockDongle extends EventEmitter
     d.promise
 
 
-  setup: (pin, restoreSeed, callback=undefined) =>
-    d = ledger.defer(callback)
-    Errors.throw(Errors.DongleNotBlank) if @state isnt States.BLANK
-    [restoreSeed, callback] = [callback, restoreSeed] if ! callback && typeof restoreSeed == 'function'
-    Throw new Error('Setup need a seed') if not restoreSeed?
-    @_pin = pin
-    @_masterNode = bitcoin.HDNode.fromSeedHex(restoreSeed)
-    # Validate seed
-    if restoreSeed?
-      bytesSeed = new ByteString(restoreSeed, HEX)
-      if bytesSeed.length != 64
-        e('Invalid seed :', restoreSeed)
-    d.resolve()
-    return d.promise
+  setup: (pin, restoreSeed, callback=undefined) ->
+    @_setup(pin, restoreSeed, no, callback)
 
 
   # @param [String] path
@@ -80,8 +72,8 @@ class ledger.dongle.MockDongle extends EventEmitter
     d = ledger.defer(callback)
     Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
     res = @getPublicAddressSync(path)
-    ledger.wallet.HDWallet.instance?.cache?.set [[path, res]]
-    _.defer => d.resolve(res)
+    ledger.wallet.HDWallet.instance?.cache?.set [[path, res.bitcoinAddress.value]]
+    _.defer -> d.resolve(res)
     return d.promise
 
 
@@ -125,20 +117,20 @@ class ledger.dongle.MockDongle extends EventEmitter
     d.promise
 
 
-  isCertified: (callback=undefined) =>
+  isCertified: (callback=undefined) ->
     d = ledger.defer(callback)
     d.resolve(@)
     d.promise
 
 
-  isBetaCertified: (callback=undefined) =>
+  isBetaCertified: (callback=undefined) ->
     d = ledger.defer(callback)
     d.resolve(@)
     d.promise
 
 
   # @return [Q.Promise]
-  isFirmwareUpdateAvailable: (callback=undefined) -> ledger.defer(callback).resolve(true).promise
+  isFirmwareUpdateAvailable: (callback=undefined) -> ledger.defer(callback).resolve(false).promise
 
 
 
@@ -159,6 +151,7 @@ class ledger.dongle.MockDongle extends EventEmitter
   # ledger.wallet.Transaction(ledger.dongle.Dongle(), 6000, 10, 'dedrtftyugyihujik', ['de','de'] )
 
   createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
+    d = ledger.defer()
     if resumeData?
       resumeData = _.clone(resumeData)
       resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)
@@ -166,10 +159,9 @@ class ledger.dongle.MockDongle extends EventEmitter
       resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
 
 
-    # Mock
     txb = new bitcoin.TransactionBuilder()
 
-    rawTxs = for input in @_btInputs
+    rawTxs = for input in inputs
       [splittedTx, outputIndex] = input
       rawTxBuffer = splittedTx.version
       rawTxBuffer = rawTxBuffer.concat(new ByteString(Convert.toHexByte(splittedTx.inputs.length), HEX))
@@ -191,33 +183,64 @@ class ledger.dongle.MockDongle extends EventEmitter
     for val, i in values
       balance = balance.add Bitcoin.BigInteger.valueOf(val)
 
-    change = (balance.toString() - @fees) - @amount.toString()
+    l balance
+    l amount
+    l fees
 
-    l balance.toString()
-    l @amount
-    l @fees
+    change = (balance.toString() - fees.toSatoshiNumber()) - amount.toSatoshiNumber()
+
+    l change
+
 
     # Get Hash from base58
-    arr = ledger.crypto.Base58.decode(@recipientAddress)
+    arr = ledger.crypto.Base58.decode(recipientAddress)
     buffer = JSUCrypt.utils.byteArrayToHexStr(arr)
     x = new ByteString(buffer, HEX)
     pubKeyHash = x.bytes(0, x.length - 4).bytes(1) # remove network 1, remove checksum 4
-    l pubKeyHash
+    #l pubKeyHash
+
+    l recipientAddress
 
     scriptPubKeyStart = Convert.toHexByte(bitcoin.opcodes.OP_DUP) + Convert.toHexByte(bitcoin.opcodes.OP_HASH160) + 14
     scriptPubKeyEnd = Convert.toHexByte(bitcoin.opcodes.OP_EQUALVERIFY) + Convert.toHexByte(bitcoin.opcodes.OP_CHECKSIG)
     scriptPubKey = bitcoin.Script.fromHex(scriptPubKeyStart + pubKeyHash.toString() + scriptPubKeyEnd)
 
-    txb.addOutput(scriptPubKey, @amount.toNumber()) # recipient addr
+    #txb.addOutput(scriptPubKey, @amount.toSatoshiNumber()) # recipient addr
+    txb.addOutput(scriptPubKey, amount.toSatoshiNumber()) # recipient addr
     txb.addOutput(scriptPubKey, change) # change addr
 
-
-    node = @_getNodeFromPath(associatedKeysets)
+    node = @_getNodeFromPath(associatedKeysets[0])
     l node
 
-    #for input, index in tx.ins
-      #txb.sign(index, node)
-    return result
+    l rawTxs
+
+    for Tx, index in rawTxs
+      txb.sign(index, node.privKey)
+
+    keycard = ledger.keycard.generateKeycardFromSeed('ffffffffffffffffffffffffffffffff')
+
+    #recipientAddress = "1lcETXhY4G3VXv1Qiiov8PXsRK7K9yB6o9"
+    #sha256
+
+    i = 0
+    positiveRes = 0
+    chars = []
+    while positiveRes < 4
+      l recipientAddress.charAt(i)
+      l Object.keys keycard
+      l recipientAddress.charAt(i) in Object.keys keycard
+      if recipientAddress.charAt(i) in Object.keys keycard
+        chars.push(recipientAddress.charAt(i))
+        #l 'positiveRes', positiveRes
+        positiveRes++
+      #l 'i', i
+      i++
+
+    l chars
+
+    #return result
+    d.resolve()
+    d.promise
 
 
   splitTransaction: (input) ->
@@ -231,21 +254,21 @@ class ledger.dongle.MockDongle extends EventEmitter
     @emit 'state:changed', @state
 
 
-  _setup: (pin, restoreSeed, callback=undefined) =>
+  _setup: (pin, restoreSeed, isPowerCycle,  callback=undefined) ->
     d = ledger.defer(callback)
     Errors.throw(Errors.DongleNotBlank) if @state isnt States.BLANK
     [restoreSeed, callback] = [callback, restoreSeed] if ! callback && typeof restoreSeed == 'function'
     Throw new Error('Setup need a seed') if not restoreSeed?
     @_pin = pin
+    #l @_masterNode
     @_masterNode = bitcoin.HDNode.fromSeedHex(restoreSeed)
+    #l @_masterNode
     # Validate seed
     if restoreSeed?
       bytesSeed = new ByteString(restoreSeed, HEX)
       if bytesSeed.length != 64
         e('Invalid seed :', restoreSeed)
-    @_setState(States.DISCONNECTED)
-    ledger.app.donglesManager.powerCycle(1000)
-    @_setState(States.LOCKED)
+    _.defer => @_setState(if isPowerCycle then States.LOCKED else States.DISCONNECTED)
     d.resolve()
     return d.promise
 
@@ -253,6 +276,7 @@ class ledger.dongle.MockDongle extends EventEmitter
   _getNodeFromPath: (path) ->
     path = path.split('/')
     node = @_masterNode
+    #l @_masterNode
     for item in path
       [index, hardened] = item.split "'"
       node  = if hardened? then node.deriveHardened parseInt(index) else node = node.derive index
