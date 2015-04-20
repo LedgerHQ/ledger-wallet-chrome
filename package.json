@@ -26,7 +26,7 @@
     "q": "1.1.2",
     "archiver": "latest",
     "gulp-rename": "1.2.0",
-    "crx": "2.0.0",
+    "crx": "3.0.2",
     "node-rsa": "0.2.13"
   },
   "devDependencies": {
