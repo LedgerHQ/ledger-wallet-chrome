@@ -100,6 +100,7 @@
         'utils/amount'
         'utils/progressbars'
         'utils/keycard'
+        'utils/csv_exporter'
 
         ## Crypto
         'utils/crypto/aes'

@@ -21,29 +21,46 @@ class ledger.utils.CsvExporter
     @param [Array<Object>] content An array of object used as content.
   ###
   setContent: (content) ->
+    for line, index  in content
+      @setHeaderLine(_.keys(line)) if index is 0
+      @pushLine(_.values(line))
 
   ###
     Pushes a line in the file content
 
     @param [Array[Any]] line A line
   ###
-  pushLine: (line) ->
+  pushLine: (line) -> (@_lines ||= []).push line.join ','
 
   ###
     Sets the header line of the file content
   ###
-  setHeaderLine: () ->
+  setHeaderLine: (line) -> @_headerLine = line.join ','
 
-  save: (callback = undefined ) ->
+  save: (callback = undefined) ->
     completion = new CompletionClosure(callback)
     chrome.fileSystem.chooseEntry
       type: 'saveFile'
       suggestedName: "#{@_defaultFileName}.csv"
-      accepts: ['text/csv', '*.csv']
-      acceptsAllTypes: no
-      acceptsMultiple:no
-    , (entry) -> entry.createWriter (writer) ->
-        writer.onerror = -> completion.failure(new ledger.StandardError(ledger.errors.WriteError))
-        writer.onwriteend = -> completion.success(this)
-        writer.write # TODO: Blob
+      accepts: [{mimeTypes: ['text/csv']}]
+    , (entry) =>
+      if !entry? or entry.length is 0
+        chrome.runtime.lastError
+        completion.failure(new ledger.StandardError(ledger.errors.OperationCanceledError))
+      else
+        entry.createWriter (writer) =>
+          try
+            writer.onerror = =>
+              chrome.runtime.lastError
+              completion.failure(new ledger.StandardError(ledger.errors.WriteError))
+            writer.onwriteend = -> completion.success(this)
+            fileContent = (if @_headerLine? then [@_headerLine].concat(@_lines) else @_lines).join("\n")
+            writer.write new Blob([fileContent], type: "text/csv")
+          catch er
+            chrome.runtime.lastError
+            completion.failure(new ledger.StandardError(ledger.errors.WriteError))
+        , =>
+          chrome.runtime.lastError
+          completion.failure(new ledger.StandardError(ledger.errors.WriteError))
+
     completion.readonly()

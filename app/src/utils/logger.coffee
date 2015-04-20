@@ -182,7 +182,7 @@ class @ledger.utils.Logger
   @return String
   ###
   _header: (level, date) ->
-    _.str.sprintf('[%s][%s]', @_timestamp(date), @levelName(level))
+    _.str.sprintf('[%s][%s][%s]', @_timestamp(date), @levelName(level), @_tag)
 
   ###
   @param [Date] date
