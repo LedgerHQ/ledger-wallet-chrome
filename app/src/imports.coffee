@@ -55,7 +55,7 @@
         '../libs/checkBitcoinAddress'
         '../libs/bitcoinUtils'
         '../libs/lru'
-        '../libs/moment.min'
+        '../libs/moment'
         '../libs/lokijs.min'
         '../libs/bitcoinjs-min'
         '../libs/zbarqrcode'
@@ -86,13 +86,13 @@
         'utils/url'
         'utils/easing'
         'utils/router'
-        'utils/i18n'
         'utils/jquery'
         'utils/spinners'
         'utils/pin_codes'
         'utils/qr_codes'
         'utils/lru'
         'utils/formatters'
+        'utils/converters'
         'utils/stream'
         'utils/completion_closure'
         'utils/try'
@@ -148,6 +148,7 @@
         'restclients/balance_restclient'
         'restclients/sync_rest_client'
         'restclients/m2fa_restclient'
+        'restclients/currencies_restclient'
 
         ## Tasks
         'tasks/task'
@@ -157,6 +158,7 @@
         'tasks/operations_synchronization_task'
         'tasks/operations_consumption_task'
         'tasks/address_derivation_task'
+        'tasks/ticker_task'
 
         ## Wallet
         'wallet/hardware_wallet'
@@ -300,24 +302,33 @@
         'controllers/wallet/pairing/wallet_pairing_progress_dialog_view_controller'
         'controllers/wallet/pairing/wallet_pairing_finalizing_dialog_view_controller'
 
-        # Widgets
+        ## Widgets
         'widgets/switch'
         'widgets/segmented_control'
 
-        # Specs
+        ## i18n
+        'i18n/i18n'
+        'i18n/i18n_languages'
+
+        ## Preferences
+        'preferences/preferences'
+
+        ## Specs
         '../spec/jasmine/jasmine'
         '../spec/jasmine/jasmine-html'
         '../spec/jasmine/boot'
-
+        '../spec/i18n/i18n_spec'
         '../spec/utils/storage/store_spec'
         '../spec/utils/storage/chrome_store_spec'
         '../spec/utils/storage/secure_store_spec'
-        '../spec/restclients/synced_rest_client_spec'
+        #'../spec/restclients/synced_rest_client_spec'
         '../spec/utils/storage/synced_store_spec'
         '../spec/utils/bitcoin/bip39_spec'
+        '../spec/utils/formatters_spec'
+        '../spec/utils/converters_spec'
 
-        '../spec/m2fa/client_spec'
-        '../spec/m2fa/m2fa_spec'
+        #'../spec/m2fa/client_spec'
+        #'../spec/m2fa/m2fa_spec'
 
         '../spec/spec_helper'
 

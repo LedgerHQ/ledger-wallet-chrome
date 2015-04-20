@@ -8,7 +8,7 @@
         <td class="row-title optional"><%= t 'wallet.receive.index.amount' %></td>
         <td class="align-right">
           <input id="amount_input" class="large-text-input optional" placeholder="<%= t 'wallet.receive.index.amount_placeholder' %>"/>
-          <label class="large-text-input optional">BTC</label>
+          <label class="large-text-input optional"><%= ledger.formatters.getUnitSymbol() %></label>
         </td>
       </tr>
       <tr class="no-border">

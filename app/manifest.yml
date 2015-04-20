@@ -18,6 +18,8 @@ permissions:
   - "storage"
   - "usb"
   - "hid"
+  - fileSystem:
+    - "write"
   -
     usbDevices:
       -
