@@ -74,5 +74,35 @@
     > #indication_label, > #invalid_label {
       margin-top: @metrics-medium-padding;
     }
+
+    > #password_container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: @metrics-medium-padding;
+      border: 1px solid @color-light-grey;
+      border-radius: @border-radius-default-value;
+      padding: 3px 8px;
+      margin-right: 8px;
+      background-color: @color-white;
+      
+      > input {
+        background: transparent;
+        outline: none;
+        border: 0;
+        font-size: inherit;
+        font-family: inherit;
+        letter-spacing: inherit;
+        width: 80px;
+        height: 18px;
+        color: @color-grey-blue;
+        position: relative;
+        z-index: 10;
+
+        &[readonly] {
+          -webkit-user-select: none;
+        }
+      }
+    }
   }
 }

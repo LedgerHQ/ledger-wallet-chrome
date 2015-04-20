@@ -6,6 +6,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     seedContainer: '#seed_container'
     invalidLabel: '#invalid_label'
     indicationLabel: '#indication_label'
+    passwordInput: '#password_input'
     continueButton: '#continue_button'
     actionsContainer: "#actions_container"
   navigation:
@@ -21,7 +22,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     back: @representativeUrl()
     pin: @params.pin
     rootUrl: @params.rootUrl
-    seed: Bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
+    seed: Bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase, @view.passwordInput.val())
 
   onAfterRender: ->
     super
