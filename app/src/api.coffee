@@ -54,7 +54,7 @@ class @Api
 
   @signP2SH: (data) ->
     chrome.app.window.current().show()
-    ledger.app.router.go '/wallet/p2sh/index', {inputs: data.inputs, scripts: data.scripts, outputs_number: data.outputs_number, outputs_script: data.outputs_script, paths: data.paths}
+    ledger.app.router.go '/wallet/p2sh/index', {inputs: JSON.stringify(data.inputs), scripts: JSON.stringify(data.scripts), outputs_number: data.outputs_number, outputs_script: data.outputs_script, paths: JSON.stringify(data.paths)}
 
   @getXPubKey: (data) ->
     chrome.app.window.current().show()
