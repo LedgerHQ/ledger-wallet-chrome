@@ -23,14 +23,13 @@ ledger.preferences.init = (cb) ->
 class ledger.preferences.Preferences
 
   prefs:
-    #language: undefined
-    #locale: undefined
-    btcUnit: 'BTC'
+    btcUnit: ledger.preferences.defaults.Display.units.bitcoin.symbol
     currency: 'USD'
-    miningFee: '10000'
-    blockchainExplorer: 'https://blockchain.info/'
-    currencyEquivalentIsActive: true
+    miningFee: ledger.preferences.defaults.Bitcoin.fees.normal.value
+    blockchainExplorer: ledger.preferences.defaults.Bitcoin.explorers.blockchain.name
+    currencyEquivalentIsActive: false
     logState: true
+    confirmationsCount: ledger.preferences.defaults.Bitcoin.confirmations.one
 
   ###
     Get Language
@@ -71,16 +70,12 @@ class ledger.preferences.Preferences
   # Set BTC Unit
   setBtcUnit: (value) ->
     if value isnt 'BTC' and value isnt 'mBTC' and value isnt 'bits' and value isnt 'satoshi'
-      try
-        throw new Error("'BtcUnit' must be BTC, mBTC, bits or satoshi")
-      catch e
-        console.log(e.name + ": " + e.message)
-        return null
+      throw new Error("'BtcUnit' must be BTC, mBTC, bits or satoshi")
     if ledger.storage.sync?
       ledger.storage.sync.set({__preferences_btcUnit: value})
       @prefs.btcUnit = value
     else
-      throw new Error 'You must initialized your wallet'
+      throw new Error 'You must initialize your wallet'
 
 
   # Get Fiat currency equivalent
@@ -93,16 +88,16 @@ class ledger.preferences.Preferences
       ledger.storage.sync.set({__preferences_currency: value})
       @prefs.currency = value
     else
-      throw new Error 'You must initialized your wallet'
+      throw new Error 'You must initialize your wallet'
 
 
   # Get state of fiat currency equivalent functionality - true/false
-  getCurrencyActive: (state=yes) ->
+  getCurrencyActive: ->
     @prefs.currencyEquivalentIsActive
 
 
   # Set fiat currency equivalent functionality to active
-  setCurrencyActive: (state=yes) ->
+  setCurrencyActive: (state = yes) ->
     @prefs.currencyEquivalentIsActive = state
 
 
@@ -116,7 +111,7 @@ class ledger.preferences.Preferences
       ledger.storage.sync.set({__preferences_miningFee: value})
       @prefs.miningFee = value
     else
-      throw new Error 'You must initialized your wallet'
+      throw new Error 'You must initialize your wallet'
 
 
   # Get Blockchain explorer
@@ -129,8 +124,19 @@ class ledger.preferences.Preferences
       ledger.storage.sync.set({__preferences_blockchainExplorer: value})
       @prefs.blockchainExplorer = value
     else
-      throw new Error 'You must initialized your wallet'
+      throw new Error 'You must initialize your wallet'
 
+  # Get confirmations count
+  getConfirmationsCount:  ->
+    @prefs.confirmationsCount
+
+  # Set confirmations count
+  setConfirmationsCount: (value) ->
+    if ledger.storage.sync?
+      ledger.storage.sync.set({__preferences_confirmationsCount: value})
+      @prefs.confirmationsCount = value
+    else
+      throw new Error 'You must initialize your wallet'
 
   ###
     If Logs must be visible todo
@@ -142,6 +148,3 @@ class ledger.preferences.Preferences
     if typeof value is 'boolean'
       throw new Error 'Log state must be a boolean'
     @prefs.logState = value
-
-
-
