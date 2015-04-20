@@ -1,6 +1,7 @@
 class @Coinkite
 
   API_BASE: "https://api.coinkite.com"
+  CK_SIGNING_ADDRESS: "1GPWzXfpN9ht3g7KsSu8eTB92Na5Wpmu7g"
   @CK_PATH: "0xb11e'/0xccc0'"
 
   @factory: (callback) ->
@@ -19,9 +20,7 @@ class @Coinkite
     @httpClient = new HttpClient(@API_BASE)
 
   getExtendedPublickey: (index, callback) ->
-    path = Coinkite.CK_PATH
-    if index
-      path = path + "/" + index
+    path = _buildPath(index)
     try
       ledger.app.wallet.getExtendedPublicKey path, (key) =>
         @xpub = key._xpub58
@@ -90,7 +89,7 @@ class @Coinkite
     catch error
       callback?(false, error)
 
-  cosignTransaction: (data, callback) ->
+  cosignRequest: (data, post, callback) ->
     try
       transaction = Bitcoin.Transaction.deserialize(data.raw_unsigned_txn);
       outputs_number = transaction['outs'].length
@@ -109,19 +108,62 @@ class @Coinkite
         for input in data.inputs
           signatures.push([result[index], input[1], input[0]])
           index++
-        url = '/v1/co-sign/' + @request + '/' + @cosigner + '/sign'
-        @_setAuthHeaders(url)
-        @httpClient
-          .do type: 'PUT', url: url, dataType: 'json', contentType: 'application/json', data: { signatures: signatures }
-          .then (data, statusText, jqXHR) =>
-            callback?(data, null)
-          .fail (error, statusText) =>
-            callback?(null, error.responseJSON.message + ' ' + error.responseJSON.help_msg)
-          .done()        
+        if post
+          url = '/v1/co-sign/' + @request + '/' + @cosigner + '/sign'
+          @_setAuthHeaders(url)
+          @httpClient
+            .do type: 'PUT', url: url, dataType: 'json', contentType: 'application/json', data: { signatures: signatures }
+            .then (data, statusText, jqXHR) =>
+              callback?(data, null)
+            .fail (error, statusText) =>
+              callback?(null, error.responseJSON.message + ' ' + error.responseJSON.help_msg)
+            .done()
+        else
+          callback?(signatures, null)
       .fail (error) =>
         callback?(null, error)
     catch error
       callback?(null, error)
+
+  getRequestFromJSON: (data) ->
+    $.extend { api: true }, JSON.parse(data.contents)
+
+  buildSignedJSON: (request, callback) ->
+    @cosignRequest request, false, (result, error) =>
+      if error?
+        return callback?(null, error)
+      try
+        path = @_buildPath(request.index)
+        rv = 
+          cosigner: request.cosigner, 
+          request: request.request,
+          signatures: result
+        body = 
+          _humans: "This transaction has been signed by a Ledger Wallet Nano",
+          content: JSON.stringify(rv)
+        ledger.app.wallet.getPublicAddress path, (key, error) =>
+          if error?
+            return callback?(null, error)
+          else
+            body.signed_by = key.bitcoinAddress.value
+            ledger.app.wallet.signMessageWithBitId path, sha256_digest(body.content), (signature) =>
+              body.signature_sha256 = signature
+              callback?(JSON.stringify(body), null)
+      catch error
+        callback?(null, error)
+
+  postSignedJSON: (json, callback) =>
+    httpClient = new HttpClient("https://coinkite.com")
+    httpClient
+      .do type: 'PUT', url: '/co-sign/done-signature', contentType: 'text/plain', data: json
+      .then (data, statusText, jqXHR) =>
+        callback?(data, null)
+      .fail (error, statusText) =>
+        if error.responseJSON?
+          callback?(null, error.responseJSON.message)
+        else
+          callback?(null, error.statusText)
+      .done()
 
   testDongleCompatibility: (callback) ->
     transaction = Bitcoin.Transaction.deserialize("0100000001b4e84a9115e3633abaa1730689db782aa3bb54fa429a3c52a7fa55a788d611fd0100000000ffffffff02a0860100000000001976a914069b75ac23920928eda632a20525a027e67d040188ac50c300000000000017a914c70abc77a8bb21997a7a901b7e02d42c0c0bbf558700000000");
@@ -161,6 +203,12 @@ class @Coinkite
         callback false
     catch error
       callback false
+
+  _buildPath: (index) ->
+    path = Coinkite.CK_PATH
+    if index
+      path = path + "/" + index
+    return path
 
   _setAuthHeaders: (endpoint) ->
     endpoint = endpoint.split('?')[0]

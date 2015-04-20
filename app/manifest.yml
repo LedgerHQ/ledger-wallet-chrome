@@ -16,6 +16,7 @@ permissions:
   - "*://*.ledgerwallet.com/*"
   - "*://*.chain.com/v2/notifications/*"
   - "*://api.coinkite.com/*"
+  - "*://coinkite.com/*"
   - "storage"
   - "usb"
   - "hid"

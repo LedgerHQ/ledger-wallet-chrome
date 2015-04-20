@@ -190,6 +190,13 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new AppsCoinkiteCosignIndexDialogViewController()
     dialog.show()
 
+  route '/apps/coinkite/cosign/show', (params) ->
+    console.log "router"
+    console.log params["?params"]
+    console.log params["?params"]?.json
+    dialog = new AppsCoinkiteCosignShowDialogViewController({ json: params["?params"]?.json })
+    dialog.show()
+
   route '/apps/coinkite/dashboard/compatibility', (params) ->
     dialog = new AppsCoinkiteDashboardCompatibilityDialogViewController()
     dialog.show()

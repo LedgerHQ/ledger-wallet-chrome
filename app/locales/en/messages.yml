@@ -552,6 +552,7 @@ apps:
         title: "Transaction signing"
         info: "The transaction is being signed by your Ledger Nano"
         success: "Success"
+        success_info: "The transaction has been successfully signed and sent to Coinkite server."
         already_signed: "This transaction has already been signed by this Ledger Nano and processed by Coinkite."
       errors:
         wrong_nano: "Invalid transaction"
@@ -561,3 +562,4 @@ apps:
         missing_api_key: "Missing API credentials"
         missing_api_key_text: "You must enter your API credentials in the settings."
         signature_failed: "Fail to sign transaction"
+        request_cancelled: "The signature request has been cancelled by the user."

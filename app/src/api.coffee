@@ -22,6 +22,8 @@ class @Api
         @getXPubKey(data)
       when 'coinkite_get_xpubkey'
         @coinkiteGetXPubKey(data)
+      when 'coinkite_sign_json'
+        @coinkiteSignJSON(data)
 
   @hasSession: (data) ->
     chrome.runtime.sendMessage {
@@ -51,16 +53,24 @@ class @Api
       callback_cancel('sign_message', JSON.stringify(error))
 
   @signP2SH: (data) ->
+    chrome.app.window.current().show()
     ledger.app.router.go '/wallet/p2sh/index', {inputs: data.inputs, scripts: data.scripts, outputs_number: data.outputs_number, outputs_script: data.outputs_script, paths: data.paths}
 
   @getXPubKey: (data) ->
+    chrome.app.window.current().show()
     ledger.app.router.go '/wallet/xpubkey/index', {path: data.path}
 
   @bitid: (data) ->
+    chrome.app.window.current().show()
     ledger.app.router.go '/wallet/bitid/index', {uri: data.uri, silent: data.silent}
 
   @coinkiteGetXPubKey: (data) ->
+    chrome.app.window.current().show()
     ledger.app.router.go '/apps/coinkite/keygen/index', {index: data.index}
+
+  @coinkiteSignJSON: (data) ->
+    chrome.app.window.current().show()
+    ledger.app.router.go '/apps/coinkite/cosign/show', {json: JSON.stringify(data.json)}
 
   @callback_cancel: (command, message) ->
     chrome.runtime.sendMessage 
