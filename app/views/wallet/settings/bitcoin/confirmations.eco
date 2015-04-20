@@ -4,6 +4,6 @@
   </div>
   <div class="row bottom">
     <div class="regular-text-small stretchable"><%= t 'wallet.settings.bitcoin.required_confirmations' %></div>
-    <div class="regular-grey-text">test</div>
+    <div id="segmented_control_container"></div>
   </div>
 </div>

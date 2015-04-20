@@ -4,10 +4,18 @@
   </div>
   <div class="row middle">
     <div class="regular-text-small stretchable"><%= t 'wallet.settings.display.interface_language' %></div>
-    <div class="regular-grey-text">test</div>
+    <div class="small-grey-select">
+      <select id="language_select" dir="rtl">
+        <option>Salut</option>
+      </select>
+    </div>
   </div>
   <div class="row bottom">
     <div class="regular-text-small stretchable"><%= t 'wallet.settings.display.region' %></div>
-    <div class="regular-grey-text">test</div>
+    <div class="small-grey-select">
+      <select id="region_select" dir="rtl">
+        <option>Salut</option>
+      </select>
+    </div>
   </div>
 </div>

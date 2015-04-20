@@ -302,6 +302,7 @@
 
         # Widgets
         'widgets/switch'
+        'widgets/segmented_control'
 
         # Specs
         '../spec/jasmine/jasmine'
