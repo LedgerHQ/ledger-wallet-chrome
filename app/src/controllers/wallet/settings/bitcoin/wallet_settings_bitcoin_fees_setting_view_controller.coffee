@@ -6,7 +6,7 @@ class @WalletSettingsBitcoinFeesSettingViewController extends WalletSettingsSett
 
   onAfterRender: ->
     super
-    for id in _.sortBy(_.keys(ledger.preferences.defaults.Bitcoin.fees), (id) -> ledger.preferences.defaults.Bitcoin.fees[id].value)
+    for id in _.keys(ledger.preferences.defaults.Bitcoin.fees)
       fee = ledger.preferences.defaults.Bitcoin.fees[id]
       text = _.str.sprintf(t(fee.localization), ledger.formatters.formatValue(fee.value))
       node = $("<option></option>").text(text).attr('value', fee.value)
