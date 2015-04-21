@@ -820,6 +820,7 @@ var BTChip = Class.create({
                                 }
                                 // finished with this iteration
                                 i++;
+                                deferred.notify(i / inputs.length);
                                 finishedCallback();
                               }).fail(function(err){deferred.reject(err);});
                             }).fail(function(err){deferred.reject(err);});
