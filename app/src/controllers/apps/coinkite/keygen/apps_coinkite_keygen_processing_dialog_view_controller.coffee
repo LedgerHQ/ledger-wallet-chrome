@@ -9,7 +9,7 @@ class @AppsCoinkiteKeygenProcessingDialogViewController extends @DialogViewContr
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
     ck = new Coinkite()
-    ck.getExtendedPublickey @params.index, (result, error) =>
+    ck.getExtendedPublicKey @params.index, (result, error) =>
       return if not @isShown()
       if error?
         @dismiss =>

@@ -19,7 +19,7 @@ class @Coinkite
     @secret = secret
     @httpClient = new HttpClient(@API_BASE)
 
-  getExtendedPublickey: (index, callback) ->
+  getExtendedPublicKey: (index, callback) ->
     path = @_buildPath(index)
     try
       ledger.app.wallet.getExtendedPublicKey path, (key) =>
@@ -81,14 +81,6 @@ class @Coinkite
         callback?(null, error.responseJSON.message + ' ' + error.responseJSON.help_msg)
       .done()
 
-  checkKeys: (check, callback) ->
-    try
-      ledger.app.wallet.getExtendedPublicKey Coinkite.CK_PATH, (key) =>
-        xpub = key._xpub58
-        callback?(xpub.indexOf(check, xpub.length - check.length) > 0)
-    catch error
-      callback?(false, error)
-
   cosignRequest: (data, post, callback) ->
     try
       transaction = Bitcoin.Transaction.deserialize(data.raw_unsigned_txn);
@@ -132,28 +124,32 @@ class @Coinkite
       $.extend { api: true }, data
 
   buildSignedJSON: (request, callback) ->
-    @cosignRequest request, false, (result, error) =>
-      if error?
-        return callback?(null, error)
-      try
-        path = @_buildPath(request.ledger_key?.subkey_index)
-        rv = 
-          cosigner: request.cosigner, 
-          request: request.request,
-          signatures: result
-        body = 
-          _humans: "This transaction has been signed by a Ledger Wallet Nano",
-          content: JSON.stringify(rv)
-        ledger.app.wallet.getPublicAddress path, (key, error) =>
-          if error?
-            return callback?(null, error)
-          else
-            body.signed_by = key.bitcoinAddress.value
-            ledger.app.wallet.signMessageWithBitId path, sha256_digest(body.content), (signature) =>
-              body.signature_sha256 = signature
-              callback?(JSON.stringify(body), null)
-      catch error
-        callback?(null, error)
+    try
+      @verifyExtendedPublicKey request, (result, error) =>
+        if result
+          @cosignRequest request, false, (result, error) =>
+            if error?
+              return callback?(null, error)
+            path = @_buildPath(request.ledger_key?.subkey_index)
+            rv = 
+              cosigner: request.cosigner, 
+              request: request.request,
+              signatures: result
+            body = 
+              _humans: "This transaction has been signed by a Ledger Wallet Nano",
+              content: JSON.stringify(rv)
+            ledger.app.wallet.getPublicAddress path, (key, error) =>
+              if error?
+                return callback?(null, error)
+              else
+                body.signed_by = key.bitcoinAddress.value
+                ledger.app.wallet.signMessageWithBitId path, sha256_digest(body.content), (signature) =>
+                  body.signature_sha256 = signature
+                  callback?(JSON.stringify(body), null)
+        else
+          callback?(null, t("apps.coinkite.cosign.errors.wrong_nano_text"))
+    catch error
+      callback?(null, error)
 
   postSignedJSON: (json, callback) =>
     httpClient = new HttpClient("https://coinkite.com")
@@ -167,6 +163,12 @@ class @Coinkite
         else
           callback?(null, error.statusText)
       .done()
+
+  verifyExtendedPublicKey: (request, callback) ->
+    check = request.xpubkey_check
+    ledger.app.wallet.getExtendedPublicKey @_buildPath(request.ledger_key?.subkey_index), (key) =>
+      xpub = key._xpub58
+      callback?(xpub.indexOf(check, xpub.length - check.length) > 0)
 
   testDongleCompatibility: (callback) ->
     transaction = Bitcoin.Transaction.deserialize("0100000001b4e84a9115e3633abaa1730689db782aa3bb54fa429a3c52a7fa55a788d611fd0100000000ffffffff02a0860100000000001976a914069b75ac23920928eda632a20525a027e67d040188ac50c300000000000017a914c70abc77a8bb21997a7a901b7e02d42c0c0bbf558700000000");
