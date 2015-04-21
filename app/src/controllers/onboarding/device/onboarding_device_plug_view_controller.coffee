@@ -10,6 +10,7 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
 
   onAfterRender: ->
     super
+    $("#clickMofo").click => @testSave()
     if @params.animateIntro is true
       do @_animateIntro
     else
@@ -43,10 +44,7 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
     ledger.app.router.go '/onboarding/device/connecting'
 
   testSave: ->
-    l 'YO'
-    csv = new ledger.utils.CsvExporter("toto")
-    csv.setContent [{toto: 1, titi: 2}, {toto: 1, titi: 2}, {toto: 1, titi: 2}, {toto: 1, titi: 2},{toto: 1, titi: 2}]
-    csv.save()
+    ledger.utils.Logger.downloadLogsWithLink()
 
   _listenEvents: ->
     if ledger.app.wallet? and !ledger.app.wallet.isInBootloaderMode()

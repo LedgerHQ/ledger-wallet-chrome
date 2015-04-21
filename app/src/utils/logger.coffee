@@ -33,10 +33,25 @@ class @ledger.utils.Logger
 #################################
   
   # @return [Q.Promise]
-  @logs: (cb) ->
+  @logs: (cb) -> @_getLogs(@store())
+
+  @publicLogs: (cb) -> @_getLogs(@_store ?= new ledger.storage.ChromeStore("logs"), cb)
+
+  @privateLogs: (cb) ->
+    return cb?([]) unless ledger.storage.logs?
+    @_getLogs(ledger.storage.logs, cb)
+
+  @_getLogs: (store, cb) ->
     closure = new CompletionClosure(cb)
-    @store()?.keys (keys) =>
-      @store().get keys, (items) => closure.success(_.values(items))
+    store.keys (keys) =>
+      l keys
+      store.get keys, (items) =>
+        l items
+        try
+          closure.success(_.values(items))
+          l 'item'
+        catch er
+          e er
     closure.readonly()
 
   # @return [legder.utils.Logger]
@@ -45,7 +60,6 @@ class @ledger.utils.Logger
 
   # Set all loggers level
   @_setGlobalLoggersLevel: (level) -> logger.setLevel(level) for name, logger of @_loggers when logger.useGlobalSettings
-
 
   @getGlobalLoggersLevel: ->
     if ledger.preferences?.instance?
@@ -56,6 +70,30 @@ class @ledger.utils.Logger
       Levels.NONE
 
   @updateGlobalLoggersLevel: -> @_setGlobalLoggersLevel(@getGlobalLoggersLevel())
+
+  @exportLogsToCsv: (callback = undefined) ->
+    now = new Date()
+    csv = new ledger.utils.CsvExporter("ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}")
+    @publicLogs (publicLogs) =>
+      @privateLogs (privateLogs) =>
+        csv.setContent (publicLogs || []).concat(privateLogs || [])
+        csv.save(callback)
+
+  @exportLogsWithLink: (callback) ->
+    now = new Date()
+    suggestedName = "ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
+    csv = new ledger.utils.CsvExporter(suggestedName)
+    @publicLogs (publicLogs) =>
+      @privateLogs (privateLogs) =>
+        csv.setContent (publicLogs || []).concat(privateLogs || [])
+        callback?(name: suggestedName, url: csv.url())
+
+  @downloadLogsWithLink: ->
+    @exportLogsWithLink (data) ->
+      pom = document.createElement('a')
+      pom.href = data.url
+      pom.setAttribute('download', data.name)
+      pom.click()
 
 #################################
 # Instance methods
@@ -152,7 +190,7 @@ class @ledger.utils.Logger
   _storeLog: (msg, msgType) ->
       now = new Date()
       log = {}
-      log[now.getTime()] = date: now.toUTCString(), type: msgType, msg: msg, tag: @_tag
+      log[now.getTime()] = date: now.toUTCString(), type: msgType,  tag: @_tag, msg: msg
       @clear()
       @store()?.set(log)
 

@@ -39,6 +39,12 @@ class ledger.utils.CsvExporter
 
   save: (callback = undefined) ->
     completion = new CompletionClosure(callback)
+    @_performSave(completion)
+    completion
+
+    completion.readonly()
+
+  _performSave: (completion) ->
     chrome.fileSystem.chooseEntry
       type: 'saveFile'
       suggestedName: "#{@_defaultFileName}.csv"
@@ -63,4 +69,7 @@ class ledger.utils.CsvExporter
           chrome.runtime.lastError
           completion.failure(new ledger.StandardError(ledger.errors.WriteError))
 
-    completion.readonly()
+  url: ->
+    fileContent = (if @_headerLine? then [@_headerLine].concat(@_lines) else @_lines).join("\n")
+    blob = new Blob([fileContent], type: 'text/csv;charset=utf8;')
+    URL.createObjectURL(blob)
