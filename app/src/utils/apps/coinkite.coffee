@@ -98,7 +98,7 @@ class @Coinkite
       paths = []
       scripts = []
       for input in data.input_info
-        paths.push(Coinkite.CK_PATH + "/" + input.sp)
+        paths.push(@_buildPath(data.ledger_key?.subkey_index) + "/" + input.sp)
         inputs.push([input.txn, Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(input.out_num), 4).reverse())])
         scripts.push(data.redeem_scripts[input.sp].redeem)
       ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, scripts, outputs_number, outputs_script, paths)
