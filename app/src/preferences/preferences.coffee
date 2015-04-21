@@ -151,3 +151,6 @@ class ledger.preferences.Preferences
 
   getAllBitcoinUnits: ->
     _.map(_.values(ledger.preferences.defaults.Display.units), (unit) -> unit.symbol)
+
+  getBlockchainExplorerAddress: ->
+    return ledger.preferences.defaults.Bitcoin.explorers[@getBlockchainExplorer()].address

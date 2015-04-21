@@ -5,5 +5,5 @@ class @WalletOperationsDetailDialogViewController extends DialogViewController
     super
 
   openBlockchain: ->
-    exploreURL = ledger.preferences.defaults.Bitcoin.explorers[ledger.preferences.instance.getBlockchainExplorer()].address
+    exploreURL = ledger.preferences.instance.getBlockchainExplorerAddress()
     window.open _.str.sprintf(exploreURL, @operation.get('hash'))
