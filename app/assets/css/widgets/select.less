@@ -12,6 +12,7 @@
 
   > select {
     .regular-grey-text-small;
+    direction: rtl;
     padding: 0;
     margin: 0;
     border: none;
@@ -21,6 +22,10 @@
     appearance: none;
     cursor: pointer;
     background-color: transparent;
+
+    > option {
+      direction: ltr;
+    }
   }
 
   &:after {

@@ -69,8 +69,6 @@ class ledger.preferences.Preferences
 
   # Set BTC Unit
   setBtcUnit: (value) ->
-    if value isnt 'BTC' and value isnt 'mBTC' and value isnt 'bits' and value isnt 'satoshi'
-      throw new Error("'BtcUnit' must be BTC, mBTC, bits or satoshi")
     if ledger.storage.sync?
       ledger.storage.sync.set({__preferences_btcUnit: value})
       @prefs.btcUnit = value
@@ -148,3 +146,6 @@ class ledger.preferences.Preferences
     if typeof value is 'boolean'
       throw new Error 'Log state must be a boolean'
     @prefs.logState = value
+
+  getAllBitcoinUnits: ->
+    _.map(_.values(ledger.preferences.defaults.Display.units), (unit) -> unit.symbol)
