@@ -2,7 +2,7 @@ class @Api
 
   @init: ->
     @_has_session = false
-    ledger.app.on 'dongle:unlocked', ->
+    ledger.app.on 'wallet:authenticated', ->
       Api._has_session = true
     ledger.app.on 'dongle:disconnected', ->
       Api._has_session = false

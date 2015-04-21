@@ -38,7 +38,7 @@ class @AppsCoinkiteCosignSigningDialogViewController extends @DialogViewControll
                   dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("apps.coinkite.cosign.errors.signature_failed"), subtitle: data)
                 dialog.show()       
     else
-      @params.ck.cosignTransaction @params.request, (data, error) =>
+      @params.ck.cosignRequest @params.request, (data, error) =>
         if error?
           @dismiss =>
             dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("apps.coinkite.cosign.errors.signature_failed"), subtitle: error)

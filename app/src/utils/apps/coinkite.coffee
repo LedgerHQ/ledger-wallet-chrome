@@ -126,14 +126,17 @@ class @Coinkite
       callback?(null, error)
 
   getRequestFromJSON: (data) ->
-    $.extend { api: true }, JSON.parse(data.contents)
+    if data.contents?
+      $.extend { api: true }, JSON.parse(data.contents)
+    else
+      $.extend { api: true }, data
 
   buildSignedJSON: (request, callback) ->
     @cosignRequest request, false, (result, error) =>
       if error?
         return callback?(null, error)
       try
-        path = @_buildPath(request.index)
+        path = @_buildPath(request.ledger_key?.subkey_index)
         rv = 
           cosigner: request.cosigner, 
           request: request.request,
