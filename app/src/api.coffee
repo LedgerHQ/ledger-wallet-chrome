@@ -6,7 +6,6 @@ class @Api
       Api._has_session = true
     ledger.app.on 'dongle:disconnected', ->
       Api._has_session = false
-      @hasSession()
 
   @listener: (event) ->
     data = event.data
