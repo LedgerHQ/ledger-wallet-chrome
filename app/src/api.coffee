@@ -2,8 +2,11 @@ class @Api
 
   @init: ->
     @_has_session = false
-    ledger.app.on 'wallet:authenticated', ->
+    ledger.app.on 'dongle:unlocked', ->
       Api._has_session = true
+    ledger.app.on 'dongle:disconnected', ->
+      Api._has_session = false
+      @hasSession()
 
   @listener: (event) ->
     data = event.data

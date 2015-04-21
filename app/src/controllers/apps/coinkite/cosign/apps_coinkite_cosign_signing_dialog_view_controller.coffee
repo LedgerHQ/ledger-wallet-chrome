@@ -1,13 +1,21 @@
 class @AppsCoinkiteCosignSigningDialogViewController extends @DialogViewController
 
+  cancellable: no
+
   view:
     contentContainer: '#content_container'
+
+  cancel: ->
+    @dismiss =>
+      if @params.request.api
+        Api.callback_cancel 'coinkite_sign_json', t("apps.coinkite.cosign.errors.request_cancelled")
     
   onAfterRender: ->
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
     if @params.request.api
       json = @params.ck.buildSignedJSON @params.request, (data, error) =>
+        return if not @isShown()
         if error?
           Api.callback_cancel 'coinkite_sign_json', error
           @dismiss =>

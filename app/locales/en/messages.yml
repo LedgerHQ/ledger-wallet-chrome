@@ -567,6 +567,7 @@ apps:
         path: "Coinkite derivation path"
       errors:
         derivation_failed: "Fail to compute extended key. Please contact support."
+        cancelled: "The request has been cancelled by the user."
 
     cosign:
       index:

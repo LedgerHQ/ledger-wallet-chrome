@@ -20,7 +20,7 @@ class @Coinkite
     @httpClient = new HttpClient(@API_BASE)
 
   getExtendedPublickey: (index, callback) ->
-    path = _buildPath(index)
+    path = @_buildPath(index)
     try
       ledger.app.wallet.getExtendedPublicKey path, (key) =>
         @xpub = key._xpub58

@@ -1,5 +1,7 @@
 class @AppsCoinkiteCosignShowDialogViewController extends DialogViewController
 
+  cancellable: no
+
   show: ->
     if @params.json?
       @params.ck = new Coinkite()

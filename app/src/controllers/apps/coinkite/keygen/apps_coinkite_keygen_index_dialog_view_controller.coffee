@@ -1,5 +1,7 @@
 class @AppsCoinkiteKeygenIndexDialogViewController extends DialogViewController
 
+  cancellable: no
+
   view:
     derivationPath: '#derivation_path'
 
@@ -8,7 +10,7 @@ class @AppsCoinkiteKeygenIndexDialogViewController extends DialogViewController
     chrome.app.window.current().show()
 
   cancel: ->
-    Api.callback_cancel 'coinkite_get_xpubkey', t('apps.coinkite.keygen.errors.cancelled')
+    Api.callback_cancel 'coinkite_get_xpubkey', t("apps.coinkite.keygen.errors.cancelled")
     @dismiss()
 
   confirm: ->

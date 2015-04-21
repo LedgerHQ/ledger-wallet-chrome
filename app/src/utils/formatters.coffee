@@ -73,14 +73,15 @@ class ledger.formatters
     @return [String] The formatted value
   ###
   @fromValue: (value, precision) ->
-    @formatUnit(value, ledger.preferences.instance.getBtcUnit(), precision)
+    @formatUnit(value, @_getBtcUnit(), precision)
 
 
   ###
     This method formats the amount and add symbol
   ###
   @formatValue: (value, precision) ->
-    num = @formatUnit(value, ledger.preferences.instance.getBtcUnit(), precision)
+
+    num = @formatUnit(value, @_getBtcUnit(), precision)
     if @symbolIsFirst()
       return @getUnitSymbol() + ' ' + num
     else
@@ -98,7 +99,7 @@ class ledger.formatters
     Add unit symbol
   ###
   @getUnitSymbol: ->
-    ledger.preferences.instance.getBtcUnit()
+    @_getBtcUnit()
 
 
   ###
@@ -175,3 +176,16 @@ class ledger.formatters
     value = value * Math.pow(10, 2)
     # to string
     value = value.toString()
+
+
+  ###
+    This private method defaults to BTC when preferences are not yet ready
+    (API calls don't wait for the wallet to be fully initialized)
+
+    @return [String] The BTC formatting unit
+  ###
+  @_getBtcUnit: ->
+    if ledger.preferences.instance?
+      ledger.preferences.instance.getBtcUnit()
+    else
+      'BTC'

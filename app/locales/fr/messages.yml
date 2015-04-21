@@ -567,6 +567,7 @@ apps:
         note: "Ces informations vous permettent d'ajouter ce Ledger Nano comme clé de signature sur votre wallet multisignature Coinkite. Le chemin de dérivation est utile pour restaurer manuellement la clé publique étendue depuis votre seed."
       errors:
         derivation_failed: "Erreur dans le calcul de la clé publique étendue. Contactez le support"
+        cancelled: "La demande d'export a été annulée par l'utilisateur."
 
     cosign:
       index:
