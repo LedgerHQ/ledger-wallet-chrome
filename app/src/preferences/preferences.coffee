@@ -93,11 +93,13 @@ class ledger.preferences.Preferences
   getCurrencyActive: ->
     @prefs.currencyEquivalentIsActive
 
-
   # Set fiat currency equivalent functionality to active
   setCurrencyActive: (state = yes) ->
-    @prefs.currencyEquivalentIsActive = state
-
+    if ledger.storage.sync?
+      ledger.storage.sync.set({__preferences_currencyEquivalentIsActive: state})
+      @prefs.currencyEquivalentIsActive = state
+    else
+      throw new Error 'You must initialize your wallet'
 
   # Get Mining Fee
   getMiningFee: () ->
