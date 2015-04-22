@@ -158,3 +158,6 @@ class ledger.preferences.Preferences
 
   getBlockchainExplorerAddress: ->
     return ledger.preferences.defaults.Bitcoin.explorers[@getBlockchainExplorer()].address
+
+  isConfirmationCountReached: (count) ->
+    return count >= @getConfirmationsCount()

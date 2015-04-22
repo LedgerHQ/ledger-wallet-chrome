@@ -22,9 +22,6 @@ class ledger.dongle.Transaction
   @ValidationModes: ValidationModes
   #
   @DEFAULT_FEES: Amount.fromBtc(0.00005)
-  #
-  @MINIMUM_CONFIRMATIONS: 1
-
   # @property [ledger.Amount]
   amount: undefined
   # @property [ledger.Amount]
