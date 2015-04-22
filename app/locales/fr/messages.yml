@@ -482,7 +482,7 @@ wallet:
     display:
       units: "Unités"
       bitcoin_unit: "Unité Bitcoin"
-      show_currency: "Afficher la devise"
+      show_currency: "Afficher la contre-valeur"
       exchange_rate: "Taux d'échange"
       language_and_region: "Langue & région"
       interface_language: "Langue de l'interface"
