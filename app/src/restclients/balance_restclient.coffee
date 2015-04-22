@@ -16,7 +16,7 @@ class ledger.api.BalanceRestClient extends ledger.api.RestClient
               accountBalance.total += parseInt(addressBalance.total.balance)
               accountBalance.confirmed += parseInt(addressBalance.confirmed.balance) if parseInt(addressBalance.confirmed.balance) <= parseInt(addressBalance.total.balance)
             unless hasNext
-              accountBalance.unconfirmed = accountBalance.total - accountBalance.confirmed
+              accountBalance.unconfirmed = accountBalance.total - accountBalance.confirmed if ledger.wallet.HDWallet.instance?.cache?.getDerivationPath(accountBalance.address)?.match(/44'\/0'\/[0-9]+'\/0\//)
               callback?(accountBalance)
             do done
           onFailure: @networkErrorCallback(callback)

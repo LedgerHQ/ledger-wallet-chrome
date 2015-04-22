@@ -71,7 +71,7 @@ class @ledger.utils.Logger
     csv = new ledger.utils.CsvExporter("ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}")
     @publicLogs (publicLogs) =>
       @privateLogs (privateLogs) =>
-        csv.setContent (publicLogs || []).concat(privateLogs || [])
+        csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
         csv.save(callback)
 
   @exportLogsWithLink: (callback) ->
@@ -80,7 +80,7 @@ class @ledger.utils.Logger
     csv = new ledger.utils.CsvExporter(suggestedName)
     @publicLogs (publicLogs) =>
       @privateLogs (privateLogs) =>
-        csv.setContent (publicLogs || []).concat(privateLogs || [])
+        csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
         callback?(name: suggestedName, url: csv.url())
 
   @downloadLogsWithLink: ->
@@ -108,7 +108,6 @@ class @ledger.utils.Logger
       for log in logs
         for key, entry of log
           data[key] = entry
-      l "Insert", data
       stream._store.set data
       # Clear old
       @_clear(stream.store)
@@ -126,7 +125,7 @@ class @ledger.utils.Logger
     @_tag = tag
     @level = Levels[@level] if typeof @level == "string"
     @level = Levels.ALL if @level is true
-    @level = Levels.None if @level is false
+    @level = Levels.NONE if @level is false
     @constructor._loggers[tag] = this
 
   #################################
