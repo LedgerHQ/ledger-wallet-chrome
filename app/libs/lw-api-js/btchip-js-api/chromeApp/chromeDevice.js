@@ -19,10 +19,15 @@ limitations under the License.
 if (typeof chromeDevice == "undefined") {
 
 var DEBUG = false;
+var logger = null;
+
 function debug(message) {
   if (DEBUG) {
-    console.log(message);
+    //console.log(message);
   }
+  if (logger == null)
+    logger = new ledger.utils.ApduLogger("APDU");
+  logger.trace(message)
 }
 
 function dump(array) {

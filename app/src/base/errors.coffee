@@ -12,7 +12,8 @@ _.extend ledger.errors,
   AuthenticationFailed: 104
   InconsistentState: 105
   OperationCanceledError: 106
-  TimeoutError: 107
+  PermissionDenied: 107
+  TimeoutError: 108
 
   # Dongle errors
   NotSupportedDongle: 200

@@ -39,6 +39,10 @@ class ledger.utils.CsvExporter
 
   save: (callback = undefined) ->
     deferred = ledger.defer(callback)
+    @_performSave(deferred)
+    deferred.promise
+
+  _performSave: (deferred) ->
     chrome.fileSystem.chooseEntry
       type: 'saveFile'
       suggestedName: "#{@_defaultFileName}.csv"
@@ -63,4 +67,7 @@ class ledger.utils.CsvExporter
           chrome.runtime.lastError
           deferred.rejectWithError(ledger.errors.WriteError)
 
-    deferred.promise
+  url: ->
+    fileContent = (if @_headerLine? then [@_headerLine].concat(@_lines) else @_lines).join("\n")
+    blob = new Blob([fileContent], type: 'text/csv;charset=utf8;')
+    URL.createObjectURL(blob)

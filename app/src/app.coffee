@@ -91,6 +91,7 @@ require @ledger.imports, ->
 
     onDongleIsDisconnected: (dongle) ->
       @emit 'dongle:disconnected'
+      ledger.utils.Logger.setPrivateModeEnabled off
       return unless @isInWalletMode()
       @_releaseWallet()
 
