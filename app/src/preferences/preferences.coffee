@@ -26,7 +26,7 @@ class ledger.preferences.Preferences
     btcUnit: ledger.preferences.defaults.Display.units.bitcoin.symbol
     currency: 'USD'
     miningFee: ledger.preferences.defaults.Bitcoin.fees.normal.value
-    blockchainExplorer: ledger.preferences.defaults.Bitcoin.explorers.blockchain.name
+    blockchainExplorer: _.keys(ledger.preferences.defaults.Bitcoin.explorers)[0]
     currencyEquivalentIsActive: false
     logState: true
     confirmationsCount: ledger.preferences.defaults.Bitcoin.confirmations.one
