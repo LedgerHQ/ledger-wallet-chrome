@@ -32,7 +32,7 @@ class @Router extends @EventEmitter
       paramsIndex = loggableUrl.indexOf '?'
       loggableUrl = loggableUrl.substr(0, paramsIndex) if paramsIndex isnt -1
       @_logger.info("Routing to [#{loggableUrl}]")
-      if ledger.app.wallet? or ledger.router.pluggedWalletRoutesExceptions.indexOf(path) != -1 or (ledger.router.ignorePluggedWalletForRouting? and ledger.router.ignorePluggedWalletForRouting == yes)
+      if ledger.app.dongle? or ledger.router.pluggedWalletRoutesExceptions.indexOf(path) != -1 or (ledger.router.ignorePluggedWalletForRouting? and ledger.router.ignorePluggedWalletForRouting == yes)
         url = ledger.url.createUrlWithParams(url, params)
         @_router.parse(url)
     , 0)

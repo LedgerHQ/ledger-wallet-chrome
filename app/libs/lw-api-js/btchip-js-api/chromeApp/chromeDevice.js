@@ -26,7 +26,7 @@ function debug(message) {
     //console.log(message);
   }
   if (logger == null)
-    logger = new ledger.utils.ApduLogger("APDU");
+    logger = new ledger.utils.ApduLogger("APDU", DEBUG);
   logger.trace(message)
 }
 
