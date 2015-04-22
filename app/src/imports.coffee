@@ -72,6 +72,7 @@
 
         ## Logger
         'utils/logger'
+        'utils/apdu_logger'
 
         ## Routes
         'routes'

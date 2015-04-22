@@ -38,6 +38,8 @@ BitIdRootPath = "0'/0/0xb11e"
 
 Errors = @ledger.errors
 
+$log = -> ledger.utils.Logger.getLoggerByTag("Dongle")
+
 # Populate dongle namespace.
 @ledger.dongle ?= {}
 _.extend @ledger.dongle,
@@ -58,7 +60,6 @@ Signals :
 ###
 class @ledger.dongle.Dongle extends EventEmitter
   Dongle = @
-  @_logger: ledger.utils.Logger.getLoggerByTag("Dongle")
 
   # @property
   id: undefined

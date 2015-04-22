@@ -7,10 +7,23 @@ class @WalletSettingsBitcoinConfirmationsSettingViewController extends WalletSet
   onAfterRender: ->
     super
     @view.segmentedControl = new ledger.widgets.SegmentedControl(@view.segmentedControlContainer, ledger.widgets.SegmentedControl.Styles.Small)
-    @view.segmentedControl.on 'selection', (event, data) => @_handleSegmentedControlClick(data.index)
-    for id in _.keys(ledger.preferences.defaults.Bitcoin.confirmations)
-      @view.segmentedControl.addAction ledger.preferences.defaults.Bitcoin.confirmations[id]
+    @_updateConfirmations()
+    @_listenEvents()
 
-  _handleSegmentedControlClick: (index) ->
-    confirmations = _.keys(ledger.preferences.defaults.Bitcoin.confirmations)
-    l ledger.preferences.defaults.Bitcoin.confirmations[confirmations[index]]
+  _updateConfirmations: ->
+    # add all confirmations
+    indexToSelect = -1
+    @view.segmentedControl.removeAllActions()
+    for id, index in _.keys(ledger.preferences.defaults.Bitcoin.confirmations)
+      @view.segmentedControl.addAction ledger.preferences.defaults.Bitcoin.confirmations[id]
+      if ledger.preferences.defaults.Bitcoin.confirmations[id] == ledger.preferences.instance.getConfirmationsCount()
+        indexToSelect = index
+
+    # select current option
+    @view.segmentedControl.setSelectedIndex(indexToSelect) if indexToSelect != -1
+
+  _listenEvents: ->
+    @view.segmentedControl.on 'selection', (event, data) =>
+      confirmations = _.keys(ledger.preferences.defaults.Bitcoin.confirmations)
+      count = ledger.preferences.defaults.Bitcoin.confirmations[confirmations[data.index]]
+      ledger.preferences.instance.setConfirmationsCount(count)

@@ -11,9 +11,10 @@ DongleLogger = -> ledger.utils.Logger.getLoggerByTag('AppDongle')
 class ledger.base.application.BaseApplication extends @EventEmitter
 
   constructor: ->
+    configureApplication @
     @_navigationController = null
-    #@donglesManager = new ledger.dongle.Manager()
-    @donglesManager = new ledger.dongle.MockDongleManager()
+    @donglesManager = new ledger.dongle.Manager()
+    #@donglesManager = new ledger.dongle.MockDongleManager()
     @router = new Router(@)
     @_dongleAttestationLock = off
     ledger.dialogs.manager.initialize($('#dialogs_container'))
@@ -22,7 +23,6 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     Starts the application by configuring the application environment, starting services and rendering view controllers
   ###
   start: ->
-    configureApplication @
     @_listenCommands()
     @_listenClickEvents()
     @_listenDongleEvents()

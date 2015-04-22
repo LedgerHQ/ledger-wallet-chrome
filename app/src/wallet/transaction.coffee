@@ -7,6 +7,8 @@ Errors = @ledger.errors
 
 Amount = ledger.Amount
 
+$log = -> ledger.utils.Logger.getLoggerByTag("Transaction")
+
 @ledger.wallet ?= {}
 
 ###
@@ -28,8 +30,6 @@ class ledger.wallet.Transaction
   @MINIMUM_CONFIRMATIONS: 1
   #
   @MINIMUM_OUTPUT_VALUE: Amount.fromSatoshi(5430)
-  #
-  @_logger: -> ledger.utils.Logger.getLoggerByTag("Transaction")
 
   # @property [ledger.Amount]
   amount: undefined
@@ -109,6 +109,7 @@ class ledger.wallet.Transaction
   #   @option [String] validationCharacters
   #   @option [Boolean] needsAmountValidation
   getValidationDetails: ->
+    l @_resumeData
     details =
       validationMode: @_validationMode
       recipientsAddress:
@@ -185,9 +186,11 @@ class ledger.wallet.Transaction
       validationKey,
       @_resumeData
     ).then( (@_signedRawTransaction) =>
+      l @_signedRawTransaction
       @_isValidated = yes
       _.defer => d.resolve(@)
     ).catch( (error) =>
+      l 'CATCHHH'
       _.defer => d.rejectWithError(Errors.SignatureError, error)
     ).done()
     d.promise

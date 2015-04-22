@@ -28,9 +28,11 @@ class @Router extends @EventEmitter
   go: (url, params) ->
     setTimeout( =>
       path = url.parseAsUrl().pathname
-      l 'Logging', @_logger
-      @_logger.info("Routing to [#{url}]")
-      if ledger.app.dongle? or ledger.router.pluggedWalletRoutesExceptions.indexOf(path) != -1 or (ledger.router.ignorePluggedWalletForRouting? and ledger.router.ignorePluggedWalletForRouting == yes)
+      loggableUrl = url
+      paramsIndex = loggableUrl.indexOf '?'
+      loggableUrl = loggableUrl.substr(0, paramsIndex) if paramsIndex isnt -1
+      @_logger.info("Routing to [#{loggableUrl}]")
+      if ledger.app.wallet? or ledger.router.pluggedWalletRoutesExceptions.indexOf(path) != -1 or (ledger.router.ignorePluggedWalletForRouting? and ledger.router.ignorePluggedWalletForRouting == yes)
         url = ledger.url.createUrlWithParams(url, params)
         @_router.parse(url)
     , 0)

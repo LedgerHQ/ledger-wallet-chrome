@@ -1,5 +1,4 @@
 <div id="content-container">
-    <button data-href="#testSave">Click</button>
     <div class="logo-container">
         <img src="../../assets/images/onboarding/large_logo.png" width="256" height="156">
     </div>

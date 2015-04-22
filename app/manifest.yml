@@ -18,8 +18,6 @@ permissions:
   - "storage"
   - "usb"
   - "hid"
-  - fileSystem:
-    - "write"
   -
     usbDevices:
       -
@@ -43,6 +41,8 @@ permissions:
 
 optional_permissions:
   - "videoCapture"
+  - fileSystem:
+    - "write"
 
 externally_connectable:
   matches:

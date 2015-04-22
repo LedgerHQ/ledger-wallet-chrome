@@ -10,7 +10,7 @@ class ledger.widgets.Switch extends EventEmitter
     @_switchEl = $('<div class="switch"><div class="circle"></div></div>')
     @_switchEl.appendTo(node)
     @_switchEl.click =>
-      @setOn(!@isOn())
+      @setOn(!@isOn(), true)
       @emit (if @isOn() then "isOn" else "isOff")
 
   ###
@@ -18,7 +18,7 @@ class ledger.widgets.Switch extends EventEmitter
     @param [Boolean] state The state of the switch
     @param [Boolean] isAnimated If the switch must be animated
   ###
-  setOn: (state, isAnimated = true) ->
+  setOn: (state, isAnimated = false) ->
     if isAnimated
       @_switchEl.addClass('animated')
     else
