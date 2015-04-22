@@ -23,7 +23,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
           when ledger.errors.DustTransaction then 'dust_transaction'
         @dismiss =>
           errorMessage = switch reason
-            when 'dust_transaction' then _.str.sprintf(t("common.errors." + reason), "0.00005430 BTC") # TODO: Use formatters
+            when 'dust_transaction' then _.str.sprintf(t("common.errors." + reason), ledger.formatters.formatValue(ledger.wallet.transaction.MINIMUM_OUTPUT_VALUE))
             when undefined then error.message
             else t("common.errors." + reason)
           Api.callback_cancel 'send_payment', errorMessage

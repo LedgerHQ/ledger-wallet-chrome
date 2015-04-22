@@ -34,7 +34,7 @@ class @WalletReceiveIndexDialogViewController extends DialogViewController
   _listenEvents: ->
     @view.amountInput.on 'keydown', (e) =>
       _.defer =>
-        @params.amount = @view.amountInput.val()
+        @params.amount = ledger.formatters.fromSatoshiToBTC(ledger.formatters.fromValueToSatoshi(@view.amountInput.val()))
         @_refreshQrCode()
 
   _refreshQrCode: () ->
