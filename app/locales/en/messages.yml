@@ -1,5 +1,5 @@
 language:
-  name: "english"
+  name: "English"
 
 application:
   name: 'Ledger Wallet'
@@ -63,11 +63,6 @@ common:
     scan_qrcode: "Scan QR code"
     present: "Present the QR code in front of the webcam."
     nowebcam: "No webcam is detected on your computer."
-
-  units:
-    BTC: "BTC"
-    mBTC: "mBTC"
-    bits: "bits"
 
   fees:
     normal: "%s (normal)"

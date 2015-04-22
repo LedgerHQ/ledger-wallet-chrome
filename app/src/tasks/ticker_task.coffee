@@ -3,18 +3,21 @@
 ###
 class CurrencyCache
 
-  _cache = {}
-  chromeStore = new ledger.storage.ChromeStore('ticker')
+  _cache: {}
+  _chromeStore: new ledger.storage.ChromeStore('ticker')
   #chromeStore.get 'ticker_cache', (r) =>
   # _cache = r.ticker_cache?
 
 
   get: () ->
-    return _cache
+    return @_cache
 
   set: (currencies) ->
-    _cache = currencies
-    chromeStore.set {ticker_cache: currencies}
+    @_cache = currencies
+    @_chromeStore.set {ticker_cache: currencies}
+
+  isCacheEmpty: () ->
+    _.isEmpty(@_cache)
 
 
 ###
@@ -41,9 +44,17 @@ class ledger.tasks.TickerTask extends ledger.tasks.Task
     return unless @isRunning()
     @_currenciesRestClient.getAllCurrencies (currencies) =>
       @_cache.set(currencies)
-      #10 minutes * 60 seconds * 1000 milliseconds = 600000ms
-      setTimeout((() => @updateTicker()), 600000)
+      #5 minutes * 60 seconds * 1000 milliseconds = 600000ms
+      setTimeout((() => @updateTicker()), 300000)
+      @emit 'updated', @_cache.get()
       #l @_cache.get()
 
   getCache: () ->
     @_cache.get()
+
+  getCacheAsync: (callback=undefined) ->
+    if @_cache.isCacheEmpty()
+      @once 'updated', (event, data) => callback?(data)
+      @updateTicker()
+    else
+      callback?(@_cache.get())

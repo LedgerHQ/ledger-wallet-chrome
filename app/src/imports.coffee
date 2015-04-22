@@ -313,6 +313,7 @@
         'i18n/i18n_languages'
 
         ## Preferences
+        'preferences/defaults'
         'preferences/preferences'
 
         ## Specs

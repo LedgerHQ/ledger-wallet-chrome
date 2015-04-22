@@ -11,11 +11,7 @@ class ledger.formatters
     @throw [Object] error Throw an error when user try to instantiates the class
   ###
   constructor: ->
-    try
-      throw new Error('This class cannot be instantiated')
-    catch e
-      console.log(e.name + ": " + e.message)
-
+    throw new Error('This class cannot be instantiated')
 
   ###
     This generic method formats the input value in satoshi to an other unit (BTC, mBTC, bits). You can also specify the number of digits following the decimal point.
@@ -27,18 +23,13 @@ class ledger.formatters
   ###
   @formatUnit: (value, unit, precision = -1) ->
     return if not value? or not unit?
-    switch unit
-      when 'BTC'
-        unit = 8
-      when 'mBTC'
-        unit = 5
-      when 'bits'
-        unit = 2
-      else
-        try
-          throw new Error("'BtcUnit' must be BTC, mBTC or bits")
-        catch e
-          console.log(e.name + ": " + e.message)
+    found = no
+    for k, v of ledger.preferences.defaults.Display.units
+      if v.symbol == unit
+        unit = v.unit
+        found = yes
+        break
+    throw new Error("unit must be in " + _.reduce(ledger.preferences.instance.getAllBitcoinUnits(), (cumul, unit) -> return cumul + ', ' + unit), '') if found == no
 
     integerPart = new Bitcoin.BigInteger(value.toString())
     .divide Bitcoin.BigInteger.valueOf(10).pow(unit)
@@ -55,7 +46,6 @@ class ledger.formatters
       else
         d = fractionalPart.length - precision
         fractionalPart = parseFloat(fractionalPart) / Math.pow(10, d)
-
         fractionalPart = _.str.lpad(Math.ceil(fractionalPart).toString(), precision, '0')
 
     value = integerPart + '.' + fractionalPart
@@ -91,7 +81,7 @@ class ledger.formatters
     Symbol order
   ###
   @symbolIsFirst: ->
-    isNaN parseInt(ledger.i18n.formatAmount(0, 'BTC').charAt(0))
+    isNaN parseInt(ledger.i18n.formatAmount(0, ledger.preferences.defaults.Display.units.bitcoin.symbol).charAt(0))
 
 
   ###
@@ -109,7 +99,7 @@ class ledger.formatters
     @return [String] The formatted value
   ###
   @fromSatoshiToBTC: (value, precision) ->
-    @formatUnit(value, "BTC", precision)
+    @formatUnit(value, ledger.preferences.defaults.Display.units.bitcoin.symbol, precision)
 
 
   ###
@@ -120,7 +110,7 @@ class ledger.formatters
     @return [String] The formatted value
   ###
   @fromSatoshiToMilliBTC: (value, precision) ->
-    @formatUnit(value, "mBTC", precision)
+    @formatUnit(value, ledger.preferences.defaults.Display.units.milibitcoin.symbol, precision)
 
 
   ###
@@ -131,7 +121,7 @@ class ledger.formatters
     @return [String] The formatted value
   ###
   @fromSatoshiToMicroBTC: (value, precision) ->
-    @formatUnit(value, "bits", precision)
+    @formatUnit(value, ledger.preferences.defaults.Display.units.microbitcoin.symbol, precision)
 
 
   ###
@@ -146,7 +136,7 @@ class ledger.formatters
   ###
   @fromBtcToSatoshi: (value) ->
     return if not value?
-    value = value * Math.pow(10, 8)
+    value = value * Math.pow(10, ledger.preferences.defaults.Display.units.bitcoin.unit)
     # to string
     value = value.toString()
 
@@ -159,7 +149,7 @@ class ledger.formatters
   ###
   @fromMilliBtcToSatoshi: (value) ->
     return if not value?
-    value = value * Math.pow(10, 5)
+    value = value * Math.pow(10, ledger.preferences.defaults.Display.units.milibitcoin.unit)
     # to string
     value = value.toString()
 
@@ -172,6 +162,6 @@ class ledger.formatters
   ###
   @fromMicroBtcToSatoshi: (value) ->
     return if not value?
-    value = value * Math.pow(10, 2)
+    value = value * Math.pow(10, ledger.preferences.defaults.Display.units.microbitcoin.unit)
     # to string
     value = value.toString()
