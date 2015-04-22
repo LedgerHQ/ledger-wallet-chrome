@@ -68,6 +68,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_isWaitForDongleSilent = no
     @_isCancelled = no
     @_eventHandler = []
+    @_logger = ledger.utils.Logger.getLoggerByTag('FirmwareUpdateRequest')
 
   ###
     Stops all current tasks and listened events.
@@ -198,6 +199,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _handleCurrentState: () ->
     # If there is no dongle wait for one
     return @_waitForConnectedDongle() unless @_dongle?
+    @_logger.info("Handle current state", lastMode: @_lastMode, currentState: @_currentState)
 
     # Otherwise handle the current by calling the right method depending on the last mode and the state
     if @_lastMode is Modes.Os
@@ -216,6 +218,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         else @_failure(Errors.InconsistentState)
 
   _processInitStageOs: ->
+    @_logger.info("Process init stage OS")
     @_dongle.getState (state) =>
       if state isnt ledger.dongle.States.BLANK and state isnt ledger.dongle.States.FROZEN
         @_setCurrentState(States.Erasing)
@@ -355,6 +358,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _failure: (reason) ->
     @emit "error", cause: ledger.errors.new(reason)
     @_waitForPowerCycle()
+    return
 
   _success: ->
     @_setCurrentState(States.Done)

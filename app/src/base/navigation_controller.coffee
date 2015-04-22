@@ -43,27 +43,23 @@ class @NavigationController extends @ViewController
     @assetPath() + @assetPath()
 
   render: (selector) ->
-    @setControllerStylesheet()
     @renderedSelector = selector
     do @onBeforeRender
     @emit 'beforeRender', @
-    do selector.empty
     render @viewPath(), @, (html) =>
-      selector.empty()
-      selector.html(html)
-      do @renderChild
-      do @onAfterRender
-      @emit 'afterRender', @
+      @setControllerStylesheet =>
+        selector.html(html)
+        do @renderChild
+        do @onAfterRender
+        @emit 'afterRender', @
 
   topViewController: ->
     @viewControllers[@viewControllers.length - 1]
 
-  setControllerStylesheet: () ->
-    $("link[id='navigation_controller_style']").attr('href', '../assets/css/' + @cssPath() + '.css?' + (new Date()).getTime())
+  stylesheetIdentifier: -> "navigation_controller_style"
 
   renderChild: ->
     return if @viewControllers.length == 0 || !@renderedSelector?
-    do $('#' + @childViewControllerContentId).empty
     @topViewController().render($('#' + @childViewControllerContentId))
 
   # @override ViewController.handleAction

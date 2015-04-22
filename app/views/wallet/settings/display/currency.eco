@@ -1,0 +1,12 @@
+<div class="large-table">
+  <div class="header top">
+    <div class="uppercase-section-column stretchable"><%= t 'wallet.settings.display.show_currency' %></div>
+    <div id="switch_container"></div>
+  </div>
+  <div class="row bottom" id="exchange_rate_row">
+    <div class="regular-text-small stretchable"><%= t 'wallet.settings.display.exchange_rate' %></div>
+    <div class="small-grey-select">
+      <select id="currencies_select"></select>
+    </div>
+  </div>
+</div>

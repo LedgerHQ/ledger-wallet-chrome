@@ -21,3 +21,11 @@ _.extend @ledger.config,
 Q.longStackSupport = true
 
 @configureApplication = (app) ->
+  _.extend @ledger.config,
+    defaultLoggingLevel:
+      Connected:
+        Enabled: ledger.utils.Logger.Levels.ALL
+        Disabled: ledger.utils.Logger.Levels.ALL
+      Disconnected:
+        Enabled: ledger.utils.Logger.Levels.ALL
+        Disabled: ledger.utils.Logger.Levels.ALL

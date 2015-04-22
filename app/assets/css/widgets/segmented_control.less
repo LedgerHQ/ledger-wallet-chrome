@@ -1,0 +1,44 @@
+@import (reference) "../common";
+@import (reference) "../constants";
+
+.small-segmented-control {
+  display: flex;
+  flex-direction: row;
+
+  > .action {
+    @height: 18px;
+    @normalColor: @color-extra-light-grey;
+    @selectedColor: @color-action-green;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    margin-left: @metrics-extra-small-padding;
+    cursor: pointer;
+    height: @height;
+    min-width: @height;
+    border-radius: @height / 2;
+    .regular-grey-text-small;
+    background-color: @normalColor;
+
+    &:hover {
+      background-color: darken(@normalColor, @color-default-darken-value);
+    }
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &.selected {
+      color: @color-white;
+      background-color: @selectedColor;
+      font-weight: @font-weight-semibold;
+      pointer-events: none;
+    }
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}

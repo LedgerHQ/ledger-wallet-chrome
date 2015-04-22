@@ -1,0 +1,9 @@
+<div class="large-table">
+  <div class="header top">
+    <div class="uppercase-section-column"><%= t 'wallet.settings.display.units' %></div>
+  </div>
+  <div class="row bottom">
+    <div class="regular-text-small stretchable"><%= t 'wallet.settings.display.bitcoin_unit' %></div>
+    <div id="segmented_control_container"></div>
+  </div>
+</div>

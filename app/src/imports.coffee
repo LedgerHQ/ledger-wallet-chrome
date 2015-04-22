@@ -55,7 +55,7 @@
         '../libs/checkBitcoinAddress'
         '../libs/bitcoinUtils'
         '../libs/lru'
-        '../libs/moment.min'
+        '../libs/moment'
         '../libs/lokijs.min'
         '../libs/bitcoinjs-min'
         '../libs/zbarqrcode'
@@ -88,13 +88,13 @@
         'utils/url'
         'utils/easing'
         'utils/router'
-        'utils/i18n'
         'utils/jquery'
         'utils/spinners'
         'utils/pin_codes'
         'utils/qr_codes'
         'utils/lru'
         'utils/formatters'
+        'utils/converters'
         'utils/stream'
         'utils/defer'
         'utils/try'
@@ -103,6 +103,7 @@
         'utils/progressbars'
         'utils/keycard'
         'utils/promise_queue'
+        'utils/csv_exporter'
 
         ## Crypto
         'utils/crypto/aes'
@@ -132,6 +133,7 @@
         'managers/schemes_manager'
         'managers/permissions_manager'
         'managers/system_manager'
+        'managers/application_manager'
 
         ## Apps
         'utils/apps/coinkite'
@@ -144,6 +146,7 @@
         'restclients/balance_restclient'
         'restclients/sync_rest_client'
         'restclients/m2fa_restclient'
+        'restclients/currencies_restclient'
 
         ## Tasks
         'tasks/task'
@@ -153,6 +156,7 @@
         'tasks/operations_synchronization_task'
         'tasks/operations_consumption_task'
         'tasks/address_derivation_task'
+        'tasks/ticker_task'
 
         ## Wallet
         'wallet/utils'
@@ -239,7 +243,31 @@
         'controllers/wallet/bitid/wallet_bitid_form_dialog_view_controller'
 
         # Settings
-        'controllers/wallet/settings/wallet_settings_hardware_dialog_view_controller'
+        # - Base
+        'controllers/wallet/settings/wallet_settings_index_dialog_view_controller'
+        'controllers/wallet/settings/base/wallet_settings_section_dialog_view_controller'
+        'controllers/wallet/settings/base/wallet_settings_setting_view_controller'
+
+        # - Hardware
+        'controllers/wallet/settings/hardware/wallet_settings_hardware_firmware_setting_view_controller'
+        'controllers/wallet/settings/hardware/wallet_settings_hardware_smartphones_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_hardware_section_dialog_view_controller'
+
+        # - Apps
+        'controllers/wallet/settings/apps/wallet_settings_apps_list_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_apps_section_dialog_view_controller'
+
+        # - Display
+        'controllers/wallet/settings/display/wallet_settings_display_units_setting_view_controller'
+        'controllers/wallet/settings/display/wallet_settings_display_currency_setting_view_controller'
+        'controllers/wallet/settings/display/wallet_settings_display_language_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_display_section_dialog_view_controller'
+
+        # - Bitcoin
+        'controllers/wallet/settings/bitcoin/wallet_settings_bitcoin_confirmations_setting_view_controller'
+        'controllers/wallet/settings/bitcoin/wallet_settings_bitcoin_fees_setting_view_controller'
+        'controllers/wallet/settings/bitcoin/wallet_settings_bitcoin_blockchain_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_bitcoin_section_dialog_view_controller'
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
@@ -271,24 +299,17 @@
         'controllers/wallet/pairing/wallet_pairing_progress_dialog_view_controller'
         'controllers/wallet/pairing/wallet_pairing_finalizing_dialog_view_controller'
 
-        # Specs
-        '../spec/jasmine/jasmine'
-        '../spec/jasmine/jasmine-html'
-        '../spec/jasmine/boot'
+        ## Widgets
+        'widgets/switch'
+        'widgets/segmented_control'
 
-        '../spec/utils/storage/store_spec'
-        '../spec/utils/storage/chrome_store_spec'
-        '../spec/utils/storage/secure_store_spec'
-        '../spec/restclients/synced_rest_client_spec'
-        '../spec/utils/storage/synced_store_spec'
-        '../spec/utils/bitcoin/bip39_spec'
-        '../spec/utils/dongle/mock_dongle_manager'
-        '../spec/utils/dongle/mock_dongle'
+        ## i18n
+        'i18n/i18n'
+        'i18n/i18n_languages'
 
-        '../spec/m2fa/client_spec'
-        '../spec/m2fa/m2fa_spec'
-
-        '../spec/spec_helper'
+        ## Preferences
+        'preferences/defaults'
+        'preferences/preferences'
 
         ## Update controllers
         'controllers/update/update_navigation_controller'
@@ -331,12 +352,20 @@
           '../spec/jasmine/boot'
         ]
         files: [
+          '../spec/utils/dongle/mock_dongle_manager'
+          '../spec/utils/dongle/mock_dongle'
+
+          '../spec/i18n/i18n_spec'
+
           '../spec/utils/storage/store_spec'
           '../spec/utils/storage/chrome_store_spec'
           '../spec/utils/storage/secure_store_spec'
-          '../spec/restclients/synced_rest_client_spec'
+          #'../spec/restclients/synced_rest_client_spec'
           '../spec/utils/storage/synced_store_spec'
           '../spec/utils/bitcoin/bip39_spec'
+
+          '../spec/utils/formatters_spec'
+          '../spec/utils/converters_spec'
 
           '../spec/m2fa/client_spec'
           '../spec/m2fa/m2fa_spec'

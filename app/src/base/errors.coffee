@@ -11,7 +11,8 @@ _.extend ledger.errors,
   NetworkError: 103
   AuthenticationFailed: 104
   InconsistentState: 105
-  TimeoutError: 106
+  OperationCanceledError: 106
+  TimeoutError: 107
 
   # Dongle errors
   NotSupportedDongle: 200
@@ -43,6 +44,9 @@ _.extend ledger.errors,
   # M2FA errors
   TransactionCancelled: "secure_screen_cancelled_transaction"
   InvalidResult: "secure_screen_invalid_pin"
+
+  # I/O Errors
+  WriteError: 500
 
   DefaultMessages:
     0: "StandardError"

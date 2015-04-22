@@ -66,6 +66,7 @@ class @ledger.utils.PromiseQueue extends @EventEmitter
         # TODO: use defer.promise.isFilfilled instead of done, but fail randomly sometimes.
         done = false
         task().then( (args...) -> defer.resolve(args...)
+        ).progress( (args...) -> defer.notify(args...)
         ).catch( (args...) -> defer.reject(args...)
         ).done()
         setTimeout (=>
