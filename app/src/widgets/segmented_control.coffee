@@ -23,6 +23,10 @@ class ledger.widgets.SegmentedControl extends EventEmitter
     @_actions.push action
     action
 
+  removeAllActions: ->
+    @_el.empty()
+    @_actions = []
+
   setSelectedIndex: (index) ->
     return if index >= @_actions.length
     if @getSelectedIndex() != -1 then @_actions[@getSelectedIndex()].removeClass 'selected'

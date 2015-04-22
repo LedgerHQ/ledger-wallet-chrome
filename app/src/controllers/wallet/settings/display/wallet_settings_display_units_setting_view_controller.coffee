@@ -6,10 +6,24 @@ class @WalletSettingsDisplayUnitsSettingViewController extends WalletSettingsSet
 
   onAfterRender: ->
     super
+    # add segmented control
     @view.segmentedControl = new ledger.widgets.SegmentedControl(@view.segmentedControlContainer, ledger.widgets.SegmentedControl.Styles.Small)
-    @view.segmentedControl.on 'selection', (event, data) => @_handleSegmentedControlClick(data.index)
-    for id in _.keys(ledger.preferences.defaults.Display.units)
-      @view.segmentedControl.addAction ledger.preferences.defaults.Display.units[id].symbol
+    @_updateUnits()
+    @_listenEvents()
 
-  _handleSegmentedControlClick: (index) ->
-    l ledger.preferences.defaults.Display.units[_.keys(ledger.preferences.defaults.Display.units)[index]].symbol
+  _updateUnits: ->
+    # add options
+    indexToSelect = -1
+    @view.segmentedControl.removeAllActions()
+    for id, index in _.keys(ledger.preferences.defaults.Display.units)
+      @view.segmentedControl.addAction ledger.preferences.defaults.Display.units[id].symbol
+      if ledger.preferences.defaults.Display.units[id].symbol == ledger.preferences.instance.getBtcUnit()
+        indexToSelect = index
+
+    # select current option
+    @view.segmentedControl.setSelectedIndex(indexToSelect) if indexToSelect != -1
+
+  _listenEvents: ->
+    @view.segmentedControl.on 'selection', (event, data) =>
+      symbol = ledger.preferences.defaults.Display.units[_.keys(ledger.preferences.defaults.Display.units)[data.index]].symbol
+      ledger.preferences.instance.setBtcUnit(symbol)

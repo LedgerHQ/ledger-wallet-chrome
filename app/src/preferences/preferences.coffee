@@ -93,11 +93,13 @@ class ledger.preferences.Preferences
   getCurrencyActive: ->
     @prefs.currencyEquivalentIsActive
 
-
   # Set fiat currency equivalent functionality to active
   setCurrencyActive: (state = yes) ->
-    @prefs.currencyEquivalentIsActive = state
-
+    if ledger.storage.sync?
+      ledger.storage.sync.set({__preferences_currencyEquivalentIsActive: state})
+      @prefs.currencyEquivalentIsActive = state
+    else
+      throw new Error 'You must initialize your wallet'
 
   # Get Mining Fee
   getMiningFee: () ->
@@ -137,7 +139,7 @@ class ledger.preferences.Preferences
       throw new Error 'You must initialize your wallet'
 
   ###
-    If Logs must be visible todo
+    If Logs must be visible
   ###
   getLogState: () ->
     @prefs.logState
@@ -145,7 +147,17 @@ class ledger.preferences.Preferences
   setLogState: (value) ->
     if typeof value is 'boolean'
       throw new Error 'Log state must be a boolean'
-    @prefs.logState = value
+    if ledger.storage.sync?
+      ledger.storage.sync.set({__preferences_logState: value})
+      @prefs.logState = value
+    else
+      throw new Error 'You must initialize your wallet'
 
   getAllBitcoinUnits: ->
     _.map(_.values(ledger.preferences.defaults.Display.units), (unit) -> unit.symbol)
+
+  getBlockchainExplorerAddress: ->
+    return ledger.preferences.defaults.Bitcoin.explorers[@getBlockchainExplorer()].address
+
+  isConfirmationCountReached: (count) ->
+    return count >= @getConfirmationsCount()
