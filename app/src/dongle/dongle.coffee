@@ -464,12 +464,14 @@ class @ledger.dongle.Dongle extends EventEmitter
       ).then( (result) ->
         if result instanceof ByteString
           result = result.toString(HEX)
+          l result
         else
           result.scriptData = result.scriptData.toString(HEX)
           result.trustedInputs = (trustedInput.toString(HEX) for trustedInput in result.trustedInputs)
           result.publicKeys = (publicKey.toString(HEX) for publicKey in result.publicKeys)
           result.authorizationPaired = result.authorizationPaired.toString(HEX) if result.authorizationPaired?
           result.authorizationReference = result.authorizationReference.toString(HEX) if result.authorizationReference?
+          l result
         return result
       )
 

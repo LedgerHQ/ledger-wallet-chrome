@@ -147,16 +147,13 @@ class ledger.dongle.MockDongle extends EventEmitter
   @param [Object] resumeData
   @return [Q.Promise] Resolve with resumeData
   ###
-
-  # ledger.wallet.Transaction(ledger.dongle.Dongle(), 6000, 10, 'dedrtftyugyihujik', ['de','de'] )
-
   createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
     d = ledger.defer()
+    result = {}
 
     if _.isEmpty resumeData
-      result = {}
-
       txb = new bitcoin.TransactionBuilder()
+      # Create rawTxs from inputs
       rawTxs = for input in inputs
         [splittedTx, outputIndex] = input
         rawTxBuffer = splittedTx.version
@@ -171,78 +168,80 @@ class ledger.dongle.MockDongle extends EventEmitter
 
       values = []
       balance = Bitcoin.BigInteger.valueOf(0)
+      # Add Input
       for [rawTx, outputIndex] in rawTxs
         tx = bitcoin.Transaction.fromHex(rawTx.toString())
         txb.addInput(tx, outputIndex)
         values.push(tx.outs[outputIndex].value)
+      # Create balance
       for val, i in values
         balance = balance.add Bitcoin.BigInteger.valueOf(val)
 
+      # Create change
       change = (balance.toString() - fees.toSatoshiNumber()) - amount.toSatoshiNumber()
 
-      # Get Hash from base58
-      arr = ledger.crypto.Base58.decode(recipientAddress)
-      buffer = JSUCrypt.utils.byteArrayToHexStr(arr)
-      x = new ByteString(buffer, HEX)
-      pubKeyHash = x.bytes(0, x.length - 4).bytes(1) # remove network 1, remove checksum 4
-
+      # Create scriptPubKey
       scriptPubKeyStart = Convert.toHexByte(bitcoin.opcodes.OP_DUP) + Convert.toHexByte(bitcoin.opcodes.OP_HASH160) + 14
       scriptPubKeyEnd = Convert.toHexByte(bitcoin.opcodes.OP_EQUALVERIFY) + Convert.toHexByte(bitcoin.opcodes.OP_CHECKSIG)
-      scriptPubKey = bitcoin.Script.fromHex(scriptPubKeyStart + pubKeyHash.toString() + scriptPubKeyEnd)
-      txb.addOutput(scriptPubKey, amount.toSatoshiNumber()) # recipient addr
-      txb.addOutput(scriptPubKey, change) # change addr
-      node = @_getNodeFromPath(associatedKeysets[0])
-      for Tx, index in rawTxs
-        txb.sign(index, node.privKey)
+
+      # recipient addr
+      scriptPubKey = bitcoin.Script.fromHex(scriptPubKeyStart + @_getPubKeyHashFromBase58(recipientAddress).toString() + scriptPubKeyEnd)
+      txb.addOutput(scriptPubKey, amount.toSatoshiNumber())
+      # change addr
+      scriptPubKey = bitcoin.Script.fromHex(scriptPubKeyStart + @_getPubKeyHashFromBase58(@_getNodeFromPath(changePath).getAddress().toString()).toString() + scriptPubKeyEnd)
+      txb.addOutput(scriptPubKey, change)
+
+      # Signature
+      for path, index in associatedKeysets
+        txb.sign(index, @_getNodeFromPath(associatedKeysets[index]).privKey)
 
       # Keycard
       keycard = ledger.keycard.generateKeycardFromSeed('dfaeee53c3d280707bbe27720d522ac1')
-      l keycard
       charsQuestion = []
       indexesKeyCard = [] # charQuestion indexes of recipient address
       charsResponse = []
-
       for i in [0..3]
         randomNum = _.random recipientAddress.length - 1
         charsQuestion.push recipientAddress.charAt randomNum
         charsResponse.push keycard[charsQuestion[i]]
         indexesKeyCard.push Convert.toHexByte randomNum
-
-      l 'Indexes', indexesKeyCard
-      l 'Questions', charsQuestion
-      l 'Responses', charsResponse
+      #l 'Indexes', indexesKeyCard
+      #l 'Questions', charsQuestion
+      #l 'Responses', charsResponse
 
       result.indexesKeyCard = indexesKeyCard.join('')
-      #result.authorizationReference = "0" + charsResponse.join('0') #indexesKeyCard.join('')
       result.authorizationReference = indexesKeyCard.join('')
-      result.authorizationRequired = 1
+      result.authorizationRequired = 2
       result.authorizationPaired = undefined
       result.publicKeys = []
       result.publicKeys.push recipientAddress #first addr detail  - en Hex dans array
-      l recipientAddress
 
-      d.resolve(result)
+      result.txb = txb
+      result.charsResponse = "0" + charsResponse.join('0')
 
     else
-      if resumeData?
-        resumeData = _.clone(resumeData)
-        #resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
-        resumeData.publicKeys[0] = Convert.stringToHex publicKey for publicKey in resumeData.publicKeys
+      # Check keycard validity
+      if resumeData.charsResponse isnt authorization
+        throw new Error 'Invalid Keycard !!'
+      # Build raw tx
+      result = resumeData.txb.build().toHex()
 
-
-      l resumeData
-      l authorization
-      d.resolve(resumeData)
-
+    _.delay (-> d.resolve(result)), 1000 # Dirty delay fix, odd but necessary
     d.promise
-
-
-
 
 
   splitTransaction: (input) ->
     bitExt = new BitcoinExternal()
     bitExt.splitTransaction(new ByteString(input.raw, HEX))
+
+
+  # Get PubKeyHash from base58
+  _getPubKeyHashFromBase58: (addr) ->
+    arr = ledger.crypto.Base58.decode(addr)
+    buffer = JSUCrypt.utils.byteArrayToHexStr(arr)
+    x = new ByteString(buffer, HEX)
+    pubKeyHash = x.bytes(0, x.length - 4).bytes(1) # remove network 1 byte at the beginning, remove checksum 4 bytes at the end
+    pubKeyHash
 
 
   _setState: (newState, args...) ->

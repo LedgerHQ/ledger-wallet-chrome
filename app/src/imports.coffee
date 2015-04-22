@@ -344,6 +344,9 @@
 
         # Specs
         '../spec/spec_helper'
+
+        '../spec/utils/dongle/mock_dongle_manager'
+        '../spec/utils/dongle/mock_dongle'
       ]
 
       specs:
@@ -353,9 +356,6 @@
           '../spec/jasmine/boot'
         ]
         files: [
-          '../spec/utils/dongle/mock_dongle_manager'
-          '../spec/utils/dongle/mock_dongle'
-
           '../spec/i18n/i18n_spec'
 
           '../spec/utils/storage/store_spec'
