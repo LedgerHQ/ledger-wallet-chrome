@@ -18,7 +18,7 @@ class @WalletSendProcessingDialogViewController extends @DialogViewController
           reason = switch error.code
             when ledger.errors.SignatureError then 'wrong_keycode'
             when ledger.errors.UnknownError then 'unknown'
-          Api.callback_error 'send_payment', t("common.errors." + reason)
+          Api.callback_cancel 'send_payment', t("common.errors." + reason)
           dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors." + reason))
           dialog.show()
       else

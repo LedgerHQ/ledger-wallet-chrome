@@ -165,3 +165,10 @@ class ledger.formatters
     value = value * Math.pow(10, ledger.preferences.defaults.Display.units.microbitcoin.unit)
     # to string
     value = value.toString()
+
+  @fromValueToSatoshi: (value) ->
+    switch @getUnitSymbol()
+      when ledger.preferences.defaults.Display.units.bitcoin.symbol then return @fromBtcToSatoshi(value)
+      when ledger.preferences.defaults.Display.units.milibitcoin.symbol then return @fromMilliBtcToSatoshi(value)
+      when ledger.preferences.defaults.Display.units.microbitcoin.symbol then return @fromMicroBtcToSatoshi(value)
+    undefined
