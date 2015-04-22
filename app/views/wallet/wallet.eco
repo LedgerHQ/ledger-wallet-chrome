@@ -65,7 +65,5 @@
       </a>
     </div>
   </div>
-  <div id="navigation_controller_content" >
-
-  </div>
+  <div id="navigation_controller_content"></div>
 </div>
