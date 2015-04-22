@@ -10,7 +10,6 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
 
   onAfterRender: ->
     super
-    $("#clickMofo").click => @testSave()
     if @params.animateIntro is true
       do @_animateIntro
     else
@@ -42,9 +41,6 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
 
   navigateContinue: ->
     ledger.app.router.go '/onboarding/device/connecting'
-
-  testSave: ->
-    ledger.utils.Logger.downloadLogsWithLink()
 
   _listenEvents: ->
     if ledger.app.wallet? and !ledger.app.wallet.isInBootloaderMode()
