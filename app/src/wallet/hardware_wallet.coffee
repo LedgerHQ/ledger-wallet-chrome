@@ -110,9 +110,8 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
               # ledger.app.wallet._lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).then(function (){l('done');}).fail(e)
               #.sendApdu_async(0xe0, 0x26, 0x00, 0x00, new ByteString(Convert.toHexByte(operationMode), HEX), [0x9000])
               @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
-              .then =>
-                  l 'DONE'
-              .fail => l 'FAIL', arguments
+              .then => _.noop()
+              .fail => _.noop()
             @_setState(ledger.wallet.States.UNLOCKED)
             do unbind
             callback?(yes)

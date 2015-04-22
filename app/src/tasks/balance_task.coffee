@@ -42,3 +42,5 @@ class ledger.tasks.BalanceTask extends ledger.tasks.Task
 
   @reset: () ->
     singletons = []
+
+  _logger: -> ledger.utils.Logger.getLoggerByTag('BalanceTask')
