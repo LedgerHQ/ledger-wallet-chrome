@@ -1,0 +1,45 @@
+@import (reference) "../constants";
+
+// Switch - Off by default
+.switch {
+  // Variables
+  @width-switch: 32px;
+  @height-switch: 18px;
+  @width-switch-circle: 14px;
+  @height-switch-circle: 14px;
+
+  width: @width-switch;
+  height: @height-switch;
+  border-radius: @width-switch/2;
+  padding: 2px;
+  box-sizing: border-box;
+  background-color: @color-light-grey;
+  cursor: pointer;
+
+  > .circle {
+    width: @width-switch-circle;
+    height: @height-switch-circle;
+    border-radius: @width-switch-circle / 2;
+    background-color: @color-white;
+    box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.1);
+    position: relative;
+    left: 0px;
+  }
+
+  &.on {
+    background-color: @color-action-green;
+
+    & > .circle {
+      position: relative;
+      left: @width-switch-circle;
+    }
+  }
+
+  &.animated {
+    transition: background-color @animation-very-short-duration ease-in;
+
+    & > .circle {
+      transition: all @animation-very-short-duration ease-in;
+    }
+  }
+}

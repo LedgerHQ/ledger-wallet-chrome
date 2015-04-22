@@ -61,10 +61,10 @@ class @WalletNavigationController extends @NavigationController
   _listenBalanceEvents: ->
     # fetch balances
     balance = Wallet.instance.getBalance()
-    @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+    @view.balanceValue.text ledger.formatters.fromValue(balance.wallet.total)
     # listen events
     ledger.app.on 'wallet:balance:changed', (event, balance) =>
-      @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+      @view.balanceValue.text ledger.formatters.fromValue(balance.wallet.total)
 
   _listenSynchronizationEvents: ->
     @view.reloadIcon.on 'click', =>

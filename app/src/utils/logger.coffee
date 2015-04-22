@@ -1,9 +1,19 @@
 @ledger ?= {}
 @ledger.utils ?= {}
 
-Levels = {}
-for level, i in ["NONE", "RAW", "FATAL", "ERROR", "WARN", "BAD", "GOOD", "INFO", "VERB", "DEBUG", "TRACE", "ALL"]
-  Levels[level] = i++
+Levels =
+  NONE: 0
+  RAW: 1
+  FATAL: 2
+  ERROR: 3
+  WARN: 4
+  BAD: 5
+  GOOD: 6
+  INFO: 7
+  VERB: 8
+  DEBUG: 9
+  TRACE: 10
+  ALL: 11
 
 ###
   Utility class for dealing with logs
@@ -15,7 +25,8 @@ class @ledger.utils.Logger
 
   # Return storage instance if initialized or undefined.
   # @return [ledger.storage.ChromeStore, undefined]
-  @store: -> @_store ?= new ledger.storage?.ChromeStore("logs")
+  @store: ->
+    if ledger.storage.logs? then ledger.storage.logs else @_store ?= new ledger.storage.ChromeStore("logs")
 
 #################################
 # Class methods
@@ -32,13 +43,26 @@ class @ledger.utils.Logger
   @getLoggerByTag: (tag) ->
     @_loggers[tag] ?= new @(tag)
 
+  # Set all loggers level
+  @_setGlobalLoggersLevel: (level) -> logger.setLevel(level) for name, logger of @_loggers when logger.useGlobalSettings
+
+  @getGlobalLoggersLevel: ->
+    if ledger.preferences?.instance?
+      if ledger.preferences.instance.getLogState() then ledger.config.defaultLoggingLevel.Connected.Enabled else ledger.config.defaultLoggingLevel.Connected.Disabled
+    else if ledger.config?.defaultLoggingLevel?
+      if ledger.config.enableLogging then ledger.config.defaultLoggingLevel.Disconnected.Enabled else ledger.config.defaultLoggingLevel.Disconnected.Disabled
+    else
+      Levels.NONE
+
+  @updateGlobalLoggersLevel: -> @_setGlobalLoggersLevel(@getGlobalLoggersLevel())
+
 #################################
 # Instance methods
 #################################
 
   # Logger's constructor
   # @param [String, Number, Boolean] level of the Logger
-  constructor: (tag, @level=ledger.config?.defaultLoggingLevel) ->
+  constructor: (tag, @level = ledger.utils.Logger.getGlobalLoggersLevel(), @useGlobalSettings = yes) ->
     @_tag = tag
     @level = Levels[@level] if typeof @level == "string"
     @level = Levels.ALL if @level is true
@@ -157,7 +181,7 @@ class @ledger.utils.Logger
   @return String
   ###
   _header: (level, date) ->
-    _.str.sprintf('[%s][%5s]', @_timestamp(date), @levelName(level))
+    _.str.sprintf('[%s][%s][%s]', @_timestamp(date), @levelName(level), @_tag)
 
   ###
   @param [Date] date

@@ -58,7 +58,6 @@ class @ledger.dialogs.DialogController extends EventEmitter
 
   _pushViewController: (viewController) ->
     @_viewController?.onDetach()
-    @_selector.empty()
     @_backStack.push @_viewController if @_viewController?
     @_viewController = viewController
     @_viewController.parentViewController = @

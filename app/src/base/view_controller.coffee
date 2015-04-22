@@ -47,15 +47,19 @@ class @ViewController extends @EventEmitter
     $(@renderedSelector).find(selectorString)
 
   render: (selector) ->
-    @setControllerStylesheet()
     @renderedSelector = selector
     do @onBeforeRender
     @emit 'beforeRender', {sender: @}
     render @viewPath(), @, (html) =>
-      selector.html(html)
-      @_isRendered = yes
-      do @onAfterRender
-      @emit 'afterRender', {sender: @}
+      @setControllerStylesheet =>
+        selector.html(html)
+        @_isRendered = yes
+        do @onAfterRender
+        @emit 'afterRender', {sender: @}
+
+  rerender: ->
+    return if not @renderedSelector?
+    @render @renderedSelector
 
   className: ->
     @constructor.name
@@ -95,9 +99,22 @@ class @ViewController extends @EventEmitter
       return yes
     no
 
-  # Set the curre=nt stylesheet need for the controller
-  setControllerStylesheet: () ->
-    $("link[id='view_controller_style']").attr('href', '../assets/css/' + @cssPath() + '.css?' + (new Date()).getTime())
+  # Set the current stylesheet need for the controller
+  setControllerStylesheet: (callback) ->
+    if not @stylesheetIdentifier()?
+      callback?()
+      return
+    el = null
+    selector = $("link[id='#{@stylesheetIdentifier()}']")
+    if selector.length > 0
+      selector.attr('href', '../assets/css/' + @cssPath() + '.css?' + (new Date()).getTime())
+      el = selector[0]
+    else
+      el = $("<link id='#{@stylesheetIdentifier()}' href='../assets/css/#{@cssPath()}.css?#{new Date().getTime()}' rel='stylesheet'>")
+      $("head").append(el)
+    _.defer => callback?()
+
+  stylesheetIdentifier: -> "view_controller_style"
 
   # Called before the view controller is rendered
   onBeforeRender: ->

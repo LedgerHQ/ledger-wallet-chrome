@@ -19,3 +19,11 @@ _.extend @ledger.config,
 @DEBUG = ledger.config.btcshipDebug
 
 @configureApplication = (app) ->
+  _.extend @ledger.config,
+    defaultLoggingLevel:
+      Connected:
+        Enabled: ledger.utils.Logger.Levels.ALL
+        Disabled: ledger.utils.Logger.Levels.NONE
+      Disconnected:
+        Enabled: ledger.utils.Logger.Levels.ALL
+        Disabled: ledger.utils.Logger.Levels.ALL
