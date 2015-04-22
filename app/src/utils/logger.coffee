@@ -250,8 +250,6 @@ class @ledger.utils.Logger
 
     console[method](args...)
 
-ledger.utils.logger = new ledger.utils.Logger("DeprecatedLogger")
-
 # Shortcuts
 if @ledger.isDev
   @l = console.log.bind(console)

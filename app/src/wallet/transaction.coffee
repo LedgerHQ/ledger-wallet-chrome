@@ -7,6 +7,8 @@ Errors = @ledger.errors
 
 Amount = ledger.Amount
 
+$log = -> ledger.utils.Logger.getLoggerByTag("Transaction")
+
 @ledger.wallet ?= {}
 
 ###
@@ -28,8 +30,6 @@ class ledger.wallet.Transaction
   @MINIMUM_CONFIRMATIONS: 1
   #
   @MINIMUM_OUTPUT_VALUE: Amount.fromSatoshi(5430)
-  #
-  @_logger: -> ledger.utils.Logger.getLoggerByTag("Transaction")
 
   # @property [ledger.Amount]
   amount: undefined
