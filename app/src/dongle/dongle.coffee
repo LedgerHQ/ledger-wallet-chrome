@@ -392,7 +392,9 @@ class @ledger.dongle.Dongle extends EventEmitter
       else
         # 19.3. SETUP SECURE SCREEN
         @_sendApdu(new ByteString("E0"+"12"+"01"+"00"+"41"+pubKey, HEX), [0x9000])
-        .then (c) -> d.resolve(c.toString())
+        .then (c) ->
+          l 'initiateSecureScreen', c
+          d.resolve(c.toString())
         .fail (error) -> d.reject(error)
         .done()
       d.promise
@@ -410,7 +412,9 @@ class @ledger.dongle.Dongle extends EventEmitter
       else
         # 19.3. SETUP SECURE SCREEN
         @_sendApdu(new ByteString("E0"+"12"+"02"+"00"+"10"+resp, HEX), [0x9000])
-        .then () -> d.resolve()
+        .then () ->
+          l 'confirmSecureScreen'
+          d.resolve()
         .fail (error) -> d.reject(error)
         .done()
       d.promise

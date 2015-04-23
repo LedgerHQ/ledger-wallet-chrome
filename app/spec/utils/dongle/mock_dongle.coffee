@@ -21,6 +21,15 @@ class ledger.dongle.MockDongle extends EventEmitter
   # @property [Array<ledger.wallet.ExtendedPublicKey>]
   _xpubs: []
 
+  # M2FA
+  # @emit 'm2fa.identify', data.public_key  -  Sent by mobile clients to transmit their generated public key -- Attestation
+  _m2faPubKey: "04"+"78c0837ded209265ea8131283585f71c5bddf7ffafe04ccddb8fe10b3edc7833"+"d6dee70c3b9040e1a1a01c5cc04fcbf9b4de612e688d09245ef5f9135413cc1d"
+              #"04"+"ef11b67b618ab48cc4b3d8bfaf9fcb60e1de9138c0ac5db94de76483e5f623a9"+"5a41f175a4df565a4fca1e7159c5f05303705ebb7a7bc81716b6a47f079d5403"
+              #"04"+"c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c"+"29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
+
+  _m2faPrivKey: "80"+"dbd39adafe3a007706e61a17e0c56849146cfe95849afef7ede15a43a1984491"+"7e960af3"
+  _m2faAttestationKey: "04"+"e69fd3c044865200e66f124b5ea237c918503931bee070edfcab79a00a25d6b5"+"a09afbee902b4b763ecf1f9c25f82d6b0cf72bce3faf98523a1066948f1a395f"
+
 
   constructor: (pin, seed, isInBootloaderMode = no) ->
     super
@@ -28,7 +37,6 @@ class ledger.dongle.MockDongle extends EventEmitter
     @state = States.UNDEFINED
     @_setState(States.BLANK)
     @_setup(pin, seed, yes) if pin? and seed?
-
 
 
   isInBootloaderMode: -> @_isInBootloaderMode
@@ -47,7 +55,26 @@ class ledger.dongle.MockDongle extends EventEmitter
     parseInt(0x0001040d0146.toString(HEX), 16)
 
 
-  # @param [String] pin ASCII encoded
+  ###
+    Gets the raw version {ByteString} of the dongle.
+
+    @param [Boolean] isInBootLoaderMode Must be true if the current dongle is in bootloader mode.
+    @param [Boolean] forceBl Force the call in BootLoader mode
+    @param [Function] callback Called once the version is retrieved. The callback must be prototyped like size `(version, error) ->`
+    @return [Q.Promise]
+  ###
+  getRawFirmwareVersion: (isInBootLoaderMode, forceBl=no, callback=undefined) ->
+    d = ledger.defer(callback)
+    try
+      d.resolve ['00000020', '00010001']
+    catch
+      d.rejectWithError(ledger.errors.UnknowError, error)
+      console.error("Fail to getRawFirmwareVersion :", error)
+    d.promise
+
+
+
+# @param [String] pin ASCII encoded
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
   unlockWithPinCode: (pin, callback=undefined) ->
@@ -236,6 +263,73 @@ class ledger.dongle.MockDongle extends EventEmitter
   splitTransaction: (input) ->
     bitExt = new BitcoinExternal()
     bitExt.splitTransaction(new ByteString(input.raw, HEX))
+
+
+
+  # @param [String] pubKey public key, hex encoded. # Remote screen uncompressed public key - 65 length
+  # @param [Function] callback Optional argument
+  # @return [Q.Promise] Resolve with a 32 bytes length pairing blob hex encoded. # Pairing blob : 8 bytes random nonce and (4 bytes keycard challenge + 16 bytes pairing key) encrypted by the session key # Challenge
+  initiateSecureScreen: (pubKey, callback=undefined) ->
+    d = ledger.defer(callback)
+    if @state != States.UNLOCKED
+      d.rejectWithError(Errors.DongleLocked)
+    else if ! pubKey.match(/^[0-9A-Fa-f]{130}$/)?
+      d.rejectWithError(Errors.InvalidArgument, "Invalid pubKey : #{pubKey}")
+    else
+      # ECDH key exchange
+      ecdhdomain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
+      l 'ecdhdomain', ecdhdomain
+      ecdhprivkey = new JSUCrypt.key.EcFpPrivateKey(256, ecdhdomain, @_m2faPrivKey.match(/^(\w{2})(\w{64})(01)?(\w{8})$/)[2])
+      l 'ecdhprivkey', ecdhprivkey
+      ecdh = new JSUCrypt.keyagreement.ECDH_SVDP(ecdhprivkey)
+      l 'ecdh', ecdh
+      aKey = pubKey.match(/^(\w{2})(\w{64})(\w{64})$/)
+      l 'aKey', aKey
+      secret = ecdh.generate(new JSUCrypt.ECFp.AffinePoint(aKey[2], aKey[3], ecdhdomain.curve)) # 32 bytes secret is obtained, split into two 16 bytes components S1 and S2
+      l 'secret', secret
+      sessionKey = (Convert.toHexByte(secret[i] ^ secret[16+i]) for i in [0...16]).join('') # 16 bytes 3DES-2 session key
+      l 'sessionKey', sessionKey
+      sessionKey
+
+      # Deuxieme call
+      ###
+        The remote screen public key is sent to the dongle, which generates a cleartext random 8 bytes nonce,
+        a 4 bytes challenge on the printed keycard and a random 16 bytes 3DES-2 pairing key, concatenated and encrypted
+        using 3DES CBC and the generated session key
+      ###
+      _computeChallenge: (challenge=@lastChallenge) ->
+      l "%c[_computeChallenge] challenge=", "color: #888888", challenge
+      [nonce, blob] = [challenge[0...16], challenge[16..-1]]
+      l "%c[_computeChallenge] nonce=", "color: #888888", nonce, ", blob=", blob
+      bytes = @_decryptChallenge(blob)
+      l "%c[_computeChallenge] bytes=", "color: #888888", JSUCrypt.utils.byteArrayToHexStr(bytes)
+      [cardChallenge, pairingKey] = [bytes[0...4], bytes[4...20]]
+      @pairingKey = JSUCrypt.utils.byteArrayToHexStr(pairingKey)
+      l "%c[_computeChallenge] cardChallenge=", "color: #888888", JSUCrypt.utils.byteArrayToHexStr(cardChallenge), ", pairingKey=", @pairingKey
+      cardResp = JSUCrypt.utils.byteArrayToHexStr(@_prompt(cardChallenge))
+      l "%c[_computeChallenge] cardResp=", "color: #888888", cardResp
+      resp = JSUCrypt.utils.byteArrayToHexStr(@_cryptChallenge(nonce + cardResp + "00000000"))
+      return [resp, @pairingKey]
+
+
+
+
+    d.promise
+
+
+  # @param [String] resp challenge response, hex encoded.  #Encrypted nonce and challenge response + padding - 16 length
+  # @param [Function] callback Optional argument
+  # @return [Q.Promise] Resolve if pairing is successful.
+  confirmSecureScreen: (resp, callback=undefined) ->
+    d = ledger.defer(callback)
+    if @state != States.UNLOCKED
+      d.rejectWithError(Errors.DongleLocked)
+    else if ! resp.match(/^[0-9A-Fa-f]{32}$/)?
+      d.rejectWithError(Errors.InvalidArgument, "Invalid challenge resp : #{resp}")
+    else
+
+
+    d.promise
 
 
   # Get PubKeyHash from base58
