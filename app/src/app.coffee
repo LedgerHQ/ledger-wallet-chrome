@@ -146,7 +146,19 @@ require @ledger.imports, ->
 
       recomputeCountervalue = (node) =>
         qNode = $(node)
-        qNode.text(ledger.converters.satoshiToCurrencyFormatted(qNode.attr('data-countervalue')))
+        text = ''
+        currency = ledger.preferences.instance.getCurrency()
+        if ledger.formatters.symbolIsFirst()
+          text += currency + ' '
+        satoshis = qNode.attr('data-countervalue')
+        sign = satoshis.charAt(0)
+        sign = '' if (not sign? or (sign != '+' && sign != '-'))
+        satoshis = _.str.replace(satoshis, sign, '')
+        text += sign
+        text += ledger.converters.satoshiToCurrency(satoshis, currency)
+        if !ledger.formatters.symbolIsFirst()
+          text += ' ' + currency
+        qNode.text(text)
 
       handleChanges = (summaries) =>
         for summary in summaries

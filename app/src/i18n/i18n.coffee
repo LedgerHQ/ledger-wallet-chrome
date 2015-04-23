@@ -568,8 +568,22 @@ class ledger.i18n
     @return [String] The formatted amount
   ###
   @formatAmount: (amount, currency) ->
-    (amount).toLocaleString(_.str.replace(@favLocale.memoryValue, '_', '-'))
+    locale = _.str.replace(@favLocale.memoryValue, '_', '-')
+    if amount?
+      testValue = (amount).toLocaleString(locale, {style: "currency", currency: currency, currencyDisplay: "code", minimumFractionDigits: 2})
+      value = (amount).toLocaleString(locale, {minimumFractionDigits: 2})
+    else
+      testValue = (0).toLocaleString(locale, {style: "currency", currency: currency, currencyDisplay: "code", minimumFractionDigits: 2})
+      value = '--'
+    if _.isNaN(parseInt(testValue.charAt(0)))
+      value = currency + ' ' + value
+    else
+      value = value + ' ' + currency
+    value
 
+  @formatNumber: (number) ->
+    locale = _.str.replace(@favLocale.memoryValue, '_', '-')
+    return number.toLocaleString(locale, {minimumFractionDigits: 2})
 
   ###
     Formats date and time

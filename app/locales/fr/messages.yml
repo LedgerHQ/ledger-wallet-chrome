@@ -277,6 +277,7 @@ wallet:
       no_operations: "Aucune opération."
       confirmed: "Confirmée"
       unconfirmed: "Non confirmée"
+      countervalue: "Contre-valeur"
 
   top_menu:
     balance: 'SOLDE'

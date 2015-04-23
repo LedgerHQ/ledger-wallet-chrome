@@ -5,7 +5,10 @@
     <td class="fit-content align-right padding-right-very-small"></td>
     <td><%= t 'wallet.accounts.show.operations.bitcoin_address' %></td>
     <td></td>
-    <td class="fit-content align-right padding-right-medium price"><%= t 'wallet.accounts.show.operations.amount' %></td>
+  <% if ledger.preferences.instance.getCurrencyActive(): %>
+    <td class="fit-content align-right padding-right-medium"><%= t 'wallet.accounts.show.operations.countervalue' %></td>
+  <% end %>
+  <td class="fit-content align-right"><%= t 'wallet.accounts.show.operations.amount' %></td>
 </tr>
 </thead>
 <tbody>
@@ -27,12 +30,15 @@
         <% end %>
     </td>
     <td class="fit-content regular-grey-text-small"><%= if !ledger.preferences.instance.isConfirmationCountReached(operation.get('confirmations')) then t('wallet.accounts.show.operations.unconfirmed').toLowerCase() %></td>
+    <% if ledger.preferences.instance.getCurrencyActive(): %>
+      <td class="fit-content align-right padding-right-medium regular-grey-text" data-countervalue="<%= if operation.get('type') == 'reception' then '+' else '-' %><%= operation.get('total_value')%>"></td>
+    <% end %>
     <% if operation.get('type') == 'reception': %>
-    <td class="fit-content align-right padding-right-medium regular-valid-text">
+    <td class="fit-content align-right regular-valid-text">
       <%= if ledger.formatters.symbolIsFirst() then ledger.formatters.getUnitSymbol() + ' ' %>+<%= ledger.formatters.fromValue(operation.get('total_value')) %><%= if !ledger.formatters.symbolIsFirst() then ' ' + ledger.formatters.getUnitSymbol() %>
     </td>
     <% else: %>
-    <td class="fit-content align-right padding-right-medium regular-invalid-text">
+    <td class="fit-content align-right regular-invalid-text">
       <%= if ledger.formatters.symbolIsFirst() then ledger.formatters.getUnitSymbol() + ' ' %>-<%= ledger.formatters.fromValue(operation.get('total_value')) %><%= if !ledger.formatters.symbolIsFirst() then ' ' + ledger.formatters.getUnitSymbol() %>
     </td>
     <% end %>
