@@ -29,7 +29,7 @@ class @WalletNavigationController extends @NavigationController
     ##@updateBreadcrumbs url
     @_listenBalanceEvents()
     @_listenSynchronizationEvents()
-    @_listenSettingsEvents()
+    @_listenCountervalueEvents()
 
   updateMenu: (url) ->
     for baseUrl, itemSelector of @_menuItemBaseUrl
@@ -93,11 +93,12 @@ class @WalletNavigationController extends @NavigationController
   _isSynchronizationRunning: ->
     return ledger.tasks.OperationsConsumptionTask.instance.isRunning()
 
-  _listenSettingsEvents: ->
+  _listenCountervalueEvents: ->
     # update counter value
     @_updateCountervalue()
     # listen countervalue event
     ledger.preferences.instance.on 'currencyActive:changed', @_updateCountervalue
+    ledger.app.on 'wallet:balance:changed', @_updateCountervalue
 
   _updateCountervalue: ->
     @view.currencyContainer.removeAttr 'data-countervalue'
