@@ -20,7 +20,7 @@ class @WalletSettingsHardwareSmartphonesSettingViewController extends WalletSett
 
   render: (selector) ->
     # get out if firmware does not support mobile second factor
-    if ledger.app.wallet.getIntFirmwareVersion() < ledger.wallet.Firmware.V_LW_1_0_0
+    if ledger.app.dongle.getIntFirmwareVersion() < ledger.dongle.Firmware.V_LW_1_0_0
       return
     ledger.m2fa.PairedSecureScreen.getAllGroupedByUuidFromSyncedStore (smartphonesGroups, error) =>
       return if error? or not smartphonesGroups?

@@ -62,29 +62,26 @@ class @ledger.dongle.Manager extends EventEmitter
     device.isInBootloaderMode = _.contains([0x1807, 0x1808], device.productId)
     @_dongles[device.deviceId] = null
     @emit 'connecting', device
-    try
-      result = []
-      @cardFactory.list_async()
-      .then (cards) =>
-        result = result.concat(cards)
-        @factoryDongleBootloader.list_async()
-      .then (cards) =>
-        result = result.concat(cards)
-        @factoryDongleBootloaderHID.list_async()
-      .then (cards) =>
-        result = result.concat(cards)
-        return if result.length == 0
-        @cardFactory.getCardTerminal(result[0]).getCard_async().then (card) =>
-          _.extend card, deviceId: device.deviceId, productId: device.productId, vendorId: device.vendorId
-          dongle = new ledger.dongle.Dongle(card)
-          @_dongles[device.deviceId] = dongle
-          dongle.once 'state:locked', (event) => @emit 'connected', dongle
-          dongle.once 'state:blank', (event) => @emit 'connected', dongle
-          dongle.once 'forged', (event) => @emit 'forged', dongle
-          dongle.once 'state:disconnected', (event) =>
-            delete @_dongles[device.deviceId]
-            @emit 'disconnected', dongle
-    catch er
-      e er
+    result = []
+    @cardFactory.list_async()
+    .then (cards) =>
+      result = result.concat(cards)
+      @factoryDongleBootloader.list_async()
+    .then (cards) =>
+      result = result.concat(cards)
+      @factoryDongleBootloaderHID.list_async()
+    .then (cards) =>
+      result = result.concat(cards)
+      return if result.length == 0
+      @cardFactory.getCardTerminal(result[0]).getCard_async().then (card) =>
+        _.extend card, deviceId: device.deviceId, productId: device.productId, vendorId: device.vendorId
+        dongle = new ledger.dongle.Dongle(card)
+        @_dongles[device.deviceId] = dongle
+        dongle.once 'state:locked', (event) => @emit 'connected', dongle
+        dongle.once 'state:blank', (event) => @emit 'connected', dongle
+        dongle.once 'forged', (event) => @emit 'forged', dongle
+        dongle.once 'state:disconnected', (event) =>
+          delete @_dongles[device.deviceId]
+          @emit 'disconnected', dongle
 
   getConnectedDongles: -> _(_.values(@_dongles)).filter (d) -> d? && d.state isnt ledger.dongle.States.DISCONNECTED

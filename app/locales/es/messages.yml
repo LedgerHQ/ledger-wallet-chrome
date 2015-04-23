@@ -355,7 +355,7 @@ wallet:
       receiver_address: "Dirección de recepción bitcoin"
       receiver_address_placeholder: "Dirección Bitcoin"
       total_spent: "Total debitado"
-      transaction_fees_text: "(+0.0001 BTC gastos de transacción)"
+      transaction_fees_text: "(incl. %s gastos de transacción)"
       close_scanner: "Close scanner"
       qr_scanner: "Scan QR code"
 

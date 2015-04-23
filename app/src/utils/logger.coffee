@@ -123,9 +123,12 @@ class @ledger.utils.Logger
   # @param [String, Number, Boolean] level of the Logger
   constructor: (tag, @level = ledger.utils.Logger.getGlobalLoggersLevel(), @useGlobalSettings = yes) ->
     @_tag = tag
-    @level = Levels[@level] if typeof @level == "string"
-    @level = Levels.ALL if @level is true
-    @level = Levels.None if @level is false
+    if typeof @level == "string"
+      @level = Levels[@level]
+    else if @level is true
+      @level = Levels.ALL
+    else if @level is false
+      @level = Levels.NONE
     @constructor._loggers[tag] = this
 
   #################################

@@ -138,7 +138,7 @@ class @Coinkite
     tx = data.raw_unsigned_txn
     try
       transaction = Bitcoin.Transaction.deserialize(tx);
-      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, transaction, scripts, Coinkite.CK_PATH)
+      ledger.app.dongle._btchip.signP2SHTransaction_async(inputs, transaction, scripts, Coinkite.CK_PATH)
       .then (result) =>
         callback true
       .fail (error) =>

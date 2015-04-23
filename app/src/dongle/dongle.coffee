@@ -231,6 +231,19 @@ class @ledger.dongle.Dongle extends EventEmitter
       d.resolve(@state)
     d.promise
 
+  # @return [Q.Promise] resolve with a Number, reject with a ledger Error.
+  getRemainingPinAttempt: (callback=undefined) ->
+    _btchipQueue.enqueue "getRemainingPinAttempt", =>
+      d = ledger.defer(callback)
+      @_sendApdu(new ByteString("E0228000010000", HEX), [0x9000])
+      .catch (statusCode) ->
+        if m = statusCode.match(/63c(\d)/)
+          d.resolve(parseInt(m[1]))
+        else
+          d.reject(@_handleErrorCode(statusCode))
+      .done()
+      d.promise
+
   # @param [String] pin ASCII encoded
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
@@ -257,15 +270,8 @@ class @ledger.dongle.Dongle extends EventEmitter
           console.error("Fail to unlockWithPinCode 2 :", error)
         .done()
       .fail (err) =>
-        error = Errors.new(Errors.WrongPinCode, err)
         console.error("Fail to unlockWithPinCode 1 :", err)
-        if err.match(/6faa|63c0/)
-          @_setState(States.BLANK)
-          error.code = Errors.DongleLocked
-        else if ! err.match(/63c\d/)
-          @_setState(States.ERROR)
-        if err.match(/63c\d/)
-          error.retryCount = parseInt(err.substr(-1))
+        error = @_handleErrorCode(err)
         d.reject(error)
       .catch (error) ->
         console.error("Fail to unlockWithPinCode 1 :", error)
@@ -345,17 +351,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         ledger.wallet.HDWallet.instance?.cache?.set [[path, result.bitcoinAddress.value]]
         _.defer -> d.resolve(result)
       .fail (err) =>
-        if err.match("6982") # Pin required
-          @_setState(States.LOCKED)
-          error = Errors.new(Errors.DongleLocked, err)
-        else if err.match("6985") # Error ?
-          @_setState(States.BLANK)
-          error = Errors.new(Errors.BlankDongle, err)
-        else if err.match("6faa")
-          @_setState(States.ERROR)
-          error = Errors.new(Errors.UnknowError, err)
-        else
-          error = Errors.new(Errors.UnknowError, err)
+        error = @_handleErrorCode(err)
         _.defer -> d.reject(error)
       .catch (error) ->
         console.error("Fail to getPublicAddress :", error)
@@ -527,6 +523,32 @@ class @ledger.dongle.Dongle extends EventEmitter
     [@state, oldState] = [newState, @state]
     @emit "state:#{@state}", @state, args...
     @emit 'state:changed', @state
+
+  # Set appropriate state, and return corresponding Error
+  # @param [String] errorCode
+  # @return [Error]
+  _handleErrorCode: (errorCode) ->
+    if errorCode.match("6982") # Pin required
+      @_setState(States.LOCKED)
+      error = Errors.new(Errors.DongleLocked, errorCode)
+    else if errorCode.match("6985") # Error ?
+      @_setState(States.BLANK)
+      error = Errors.new(Errors.BlankDongle, errorCode)
+    else if errorCode.match("6faa")
+      @_setState(States.ERROR)
+      error = Errors.new(Errors.UnknowError, errorCode)
+    else if errorCode.match(/63c\d/)
+      error = Errors.new(Errors.WrongPinCode, errorCode)
+      error.retryCount = parseInt(errorCode.substr(-1))
+      if error.retryCount == 0
+        @_setState(States.BLANK)
+        error.code = Errors.DongleLocked
+      else
+        @_setState(States.ERROR)
+    else
+      @_setState(States.UnknowError)
+      error = Errors.new(Errors.UnknowError, errorCode)
+    return error
 
   _convertMessageSignature: (pubKey, message, signature) ->
     bitcoin = new BitcoinExternal()
