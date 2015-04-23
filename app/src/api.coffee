@@ -46,7 +46,9 @@ class @Api
     ledger.app.router.go '/wallet/api/accounts'
 
   @exportAccounts: (data) ->
-    accounts = [ Account.find({"index": 0}).first().serialize() ]
+    accounts = []
+    for account in Account.all()
+      accounts.push(account.serialize())
     @callback_success 'get_accounts', accounts: accounts
 
   @getOperations: (data) ->
@@ -54,7 +56,7 @@ class @Api
 
   @exportOperations: (account_id) ->
     account = Account.find({"id": account_id}).first()
-    operations = {}
+    operations = []
     for operation in account.get('operations')
       operations.push(operation.serialize())
     @callback_success 'get_operations', operations: operations
