@@ -102,7 +102,7 @@ class @WalletNavigationController extends @NavigationController
   _updateCountervalue: ->
     @view.currencyContainer.removeAttr 'data-countervalue'
     @view.currencyContainer.empty()
-    if ledger.preferences.instance.getCurrencyActive()
+    if ledger.preferences.instance.isCurrencyActive()
       @view.currencyContainer.attr 'data-countervalue', Wallet.instance.getBalance().wallet.total
     else
       @view.currencyContainer.text t('wallet.top_menu.balance')

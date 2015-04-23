@@ -58,7 +58,7 @@ class @ledger.utils.Logger
 
   @getGlobalLoggersLevel: ->
     if ledger.preferences?.instance?
-      if ledger.preferences.instance.getLogState() then ledger.config.defaultLoggingLevel.Connected.Enabled else ledger.config.defaultLoggingLevel.Connected.Disabled
+      if ledger.preferences.instance.isLogActive() then ledger.config.defaultLoggingLevel.Connected.Enabled else ledger.config.defaultLoggingLevel.Connected.Disabled
     else if ledger.config?.defaultLoggingLevel?
       if ledger.config.enableLogging then ledger.config.defaultLoggingLevel.Disconnected.Enabled else ledger.config.defaultLoggingLevel.Disconnected.Disabled
     else
