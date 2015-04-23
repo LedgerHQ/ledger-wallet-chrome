@@ -31,6 +31,9 @@ class ledger.formatters
         break
     throw new Error("unit must be in " + _.reduce(ledger.preferences.instance.getAllBitcoinUnits(), (cumul, unit) -> return cumul + ', ' + unit), '') if found == no
 
+    decimalSeparator = ledger.number.getLocaleDecimalSeparator(ledger.preferences.instance.getLocale().replace('_', '-'))
+    thousandSeparator = ledger.number.getLocaleThousandSeparator(ledger.preferences.instance.getLocale().replace('_', '-'))
+
     integerPart = new Bitcoin.BigInteger(value.toString())
     .divide Bitcoin.BigInteger.valueOf(10).pow(unit)
 
@@ -48,11 +51,16 @@ class ledger.formatters
         fractionalPart = parseFloat(fractionalPart) / Math.pow(10, d)
         fractionalPart = _.str.lpad(Math.ceil(fractionalPart).toString(), precision, '0')
 
-    value = integerPart + '.' + fractionalPart
+    reverseIntegerPart = integerPart.toString().match(/./g).reverse()
+    integerPart = []
+    for digit, index in reverseIntegerPart
+      integerPart.push digit
+      integerPart.push thousandSeparator if (index + 1) % 3 == 0
+    value = integerPart.reverse().join('') + decimalSeparator + fractionalPart
     # remove . if necessary
-    if _.str.endsWith value, '.'
+    if _.str.endsWith value, decimalSeparator
       value = _.str.splice value, -1, 1
-    return value
+    value
 
 
   ###
