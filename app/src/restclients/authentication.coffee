@@ -104,6 +104,7 @@ class AuthenticatedHttpClient extends @HttpClient
       @_authenticate().then(-> completion.success(@_authToken)).fail((ex) -> completion.failure(ex))
     completion.readonly()
 
+  getAuthTokenSync: -> @_authToken
 
 
   @instance: (baseUrl = ledger.config.restClient.baseUrl) -> @_instance ?= new @(baseUrl)

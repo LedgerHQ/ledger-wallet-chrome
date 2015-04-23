@@ -55,7 +55,7 @@ class ledger.formatters
     integerPart = []
     for digit, index in reverseIntegerPart
       integerPart.push digit
-      integerPart.push thousandSeparator if (index + 1) % 3 == 0
+      integerPart.push thousandSeparator if (index + 1) % 3 == 0 and (index + 1) reverseIntegerPart.length
     value = integerPart.reverse().join('') + decimalSeparator + fractionalPart
     # remove . if necessary
     if _.str.endsWith value, decimalSeparator
