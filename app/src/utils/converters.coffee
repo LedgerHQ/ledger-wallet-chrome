@@ -50,8 +50,7 @@ class ledger.converters
     currencyValueBTC = currencies[currency].values[0]['fromBTC'].value || 0
     val = currencyValueBTC * Math.pow(10, -8)
     currencyValueSatoshi = val * satoshiValue
-    return parseFloat(currencyValueSatoshi.toFixed(2))
-
+    ledger.i18n.formatNumber(parseFloat(currencyValueSatoshi.toFixed(2)))
 
   ###
     Converter from satoshi to a given currency with formatting
