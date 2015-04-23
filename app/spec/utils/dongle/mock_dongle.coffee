@@ -278,27 +278,50 @@ class ledger.dongle.MockDongle extends EventEmitter
     else
       # ECDH key exchange
       ecdhdomain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
-      l 'ecdhdomain', ecdhdomain
       ecdhprivkey = new JSUCrypt.key.EcFpPrivateKey(256, ecdhdomain, @_m2faPrivKey.match(/^(\w{2})(\w{64})(01)?(\w{8})$/)[2])
-      l 'ecdhprivkey', ecdhprivkey
-      ecdh = new JSUCrypt.keyagreement.ECDH_SVDP(ecdhprivkey)
-      l 'ecdh', ecdh
-      aKey = pubKey.match(/^(\w{2})(\w{64})(\w{64})$/)
-      l 'aKey', aKey
-      secret = ecdh.generate(new JSUCrypt.ECFp.AffinePoint(aKey[2], aKey[3], ecdhdomain.curve)) # 32 bytes secret is obtained, split into two 16 bytes components S1 and S2
-      l 'secret', secret
-      sessionKey = (Convert.toHexByte(secret[i] ^ secret[16+i]) for i in [0...16]).join('') # 16 bytes 3DES-2 session key
-      l 'sessionKey', sessionKey
-      sessionKey
+      # @_m2faPrivKey.match(/^(\w{2})(\w{64})(01)?(\w{8})$/)[2] = "dbd39adafe3a007706e61a17e0c56849146cfe95849afef7ede15a43a1984491"
+      # Ex : 99430387343382539980001755421992980571505177374957036595592547669622383985809
 
-      # Deuxieme call
+      ecdh = new JSUCrypt.keyagreement.ECDH_SVDP(ecdhprivkey)
+      # ecdh.key.d.toString() = 99430387343382539980001755421992980571505177374957036595592547669622383985809
+
+      aKey = pubKey.match(/^(\w{2})(\w{64})(\w{64})$/)
+      secret = ecdh.generate(new JSUCrypt.ECFp.AffinePoint(aKey[2], aKey[3], ecdhdomain.curve)) # 32 bytes secret is obtained
+
+      # Split into two 16 bytes components S1 and S2. S1 and S2 are XORed to produce a 16 bytes 3DES-2 session key
+      sessionKey = (Convert.toHexByte(secret[i] ^ secret[16+i]) for i in [0...16]).join('')
+      # Ex : b4ad97549846132b8ad8639f9d50391f
+
+      #@emit 'm2fa.identify', data.public_key
+
+
+      # Challenge - 4 bytes
+      keycard = ledger.keycard.generateKeycardFromSeed('dfaeee53c3d280707bbe27720d522ac1')
+      challenge = []
+      for i in [0..3]
+        randomNum = _.random(_.size(keycard) - 1)
+        challenge.push Object.keys(keycard)[randomNum]
+
+
+
+
+
+
       ###
         The remote screen public key is sent to the dongle, which generates a cleartext random 8 bytes nonce,
         a 4 bytes challenge on the printed keycard and a random 16 bytes 3DES-2 pairing key, concatenated and encrypted
         using 3DES CBC and the generated session key
       ###
-      _computeChallenge: (challenge=@lastChallenge) ->
-      l "%c[_computeChallenge] challenge=", "color: #888888", challenge
+
+      @emit 'm2fa.challenge', challenge
+
+      # 8 bytes Nonce
+      randomNumBlob = crypto.getRandomValues(new Uint32Array(10))
+      nonce = ''
+      for i in randomNumBlob
+        nonce += randomNumBlob[i]
+
+
       [nonce, blob] = [challenge[0...16], challenge[16..-1]]
       l "%c[_computeChallenge] nonce=", "color: #888888", nonce, ", blob=", blob
       bytes = @_decryptChallenge(blob)
@@ -308,8 +331,15 @@ class ledger.dongle.MockDongle extends EventEmitter
       l "%c[_computeChallenge] cardChallenge=", "color: #888888", JSUCrypt.utils.byteArrayToHexStr(cardChallenge), ", pairingKey=", @pairingKey
       cardResp = JSUCrypt.utils.byteArrayToHexStr(@_prompt(cardChallenge))
       l "%c[_computeChallenge] cardResp=", "color: #888888", cardResp
-      resp = JSUCrypt.utils.byteArrayToHexStr(@_cryptChallenge(nonce + cardResp + "00000000"))
-      return [resp, @pairingKey]
+
+      # Crypt Challenge
+      cipher = new JSUCrypt.cipher.DES(JSUCrypt.padder.None, JSUCrypt.cipher.MODE_CBC)
+      key = new JSUCrypt.key.DESKey(@sessionKey)
+      cipher.init(key, JSUCrypt.cipher.MODE_ENCRYPT)
+      blob = cipher.update(nonce + cardResp + "00000000")
+
+      resp = JSUCrypt.utils.byteArrayToHexStr(blob)
+
 
 
 
