@@ -170,6 +170,15 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new WalletP2shIndexDialogViewController({ inputs: params["?params"]?.inputs, scripts: params["?params"]?.scripts, outputs_number: params["?params"]?.outputs_number, outputs_script: params["?params"]?.outputs_script, paths: params["?params"]?.paths })
     dialog.show()
 
+  ## API
+  route '/wallet/api/accounts', (params = {}) ->
+    dialog = new WalletApiAccountsDialogViewController()
+    dialog.show()
+
+  route '/wallet/api/operations', (params = {}) ->
+    dialog = new WalletApiOperationsDialogViewController({ account_id: params["?params"]?.account_id })
+    dialog.show()
+
   ## Coinkite
   route '/apps/coinkite/dashboard/index', (params) ->
     app.navigate COINKITE_LAYOUT, AppsCoinkiteDashboardIndexViewController

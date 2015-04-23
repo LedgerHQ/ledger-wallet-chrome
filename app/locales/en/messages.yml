@@ -483,6 +483,18 @@ wallet:
       signature_failed: "Failed to sign the transaction"
       signature_successfull: "Signature successfull"
 
+  api:
+    accounts:
+      title: "Export accounts"
+      info: "Do you wish to export the list of your accounts?"
+    operations:
+      title: "Export operations"
+      info: "Do you wish to export the operations related to the following account?"
+      account_name: "Account name"
+    errors:
+      cancelled: "Request cancelled by the user"
+      account_not_found: "Account not found"
+      
   settings:
     common:
       settings: "Settings"

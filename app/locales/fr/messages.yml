@@ -483,6 +483,18 @@ wallet:
       signature_failed: "Erreur dans la signature"
       signature_successfull: "Signature effectuée avec succès"
 
+  api:
+    accounts:
+      title: "Export comptes"
+      info: "Souhaitez-vous exporter la liste de vos comptes?"
+    operations:
+      title: "Export operations"
+      info: "Souhaitez-vous exporter la liste des opérations associées au compte suivant?"
+      account_name: "Nom du compte"
+    errors:
+      cancelled: "Requête annulée par l'utilisateur"
+      account_not_found: "Compte introuvable"
+
   settings:
     common:
       settings: "Réglages"
