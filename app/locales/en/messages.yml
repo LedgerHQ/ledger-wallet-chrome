@@ -333,6 +333,7 @@ wallet:
         action: "ACCOUNT SETTINGS"
         balance: "BALANCE"
         balance_in_progress: "INCLUDING UNCONFIRMED"
+        countervalue: "Countervalue"
         actions: "ACTIONS"
         receive: "RECEIVE"
         send: "SEND"

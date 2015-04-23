@@ -333,6 +333,7 @@ wallet:
         action: "PARAMÈTRES DU COMPTE"
         balance: "SOLDE"
         balance_in_progress: "DONT NON CONFIRMÉ"
+        countervalue: "Contre-valeur"
         actions: "ACTIONS"
         receive: "RECEVOIR"
         send: "ENVOYER"
