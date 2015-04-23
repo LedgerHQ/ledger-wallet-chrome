@@ -6,14 +6,14 @@
     <thead>
       <tr>
         <td class="fit-content" id="confirmed_balance_subtitle"><%= t 'wallet.accounts.show.detail.balance' %></td>
-        <td class="fit-content unconfirmed-balance" id="unconfirmed_balance_subtitle"><%= t 'wallet.accounts.show.detail.balance_in_progress' %></td>
+        <td class="fit-content countervalue-balance" id="countervalue_balance_subtitle"><%= t 'wallet.accounts.show.detail.countervalue' %></td>
         <td class="align-right"><%= t 'wallet.accounts.show.detail.actions' %></td>
       </tr>
     </thead>
     <tbody>
       <tr class="no-border">
         <td class="fit-content" id="confirmed_balance_container"><span class="price" id="confirmed_balance">0</span><span class="btc-acronyme"> <%= ledger.formatters.getUnitSymbol() %></span></td>
-        <td class="fit-content unconfirmed-balance" id="unconfirmed_balance_container"><span id="unconfirmed_balance">0</span></td>
+        <td class="fit-content countervalue-balance" id="countervalue_balance_container"><span id="countervalue_balance">0</span></td>
         <td class="align-right">
           <div class="action-bar">
             <div class="left-spacer"></div>
