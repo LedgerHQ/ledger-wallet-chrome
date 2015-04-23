@@ -186,11 +186,9 @@ class ledger.wallet.Transaction
       validationKey,
       @_resumeData
     ).then( (@_signedRawTransaction) =>
-      l @_signedRawTransaction
       @_isValidated = yes
       _.defer => d.resolve(@)
     ).catch( (error) =>
-      l 'CATCHHH'
       _.defer => d.rejectWithError(Errors.SignatureError, error)
     ).done()
     d.promise

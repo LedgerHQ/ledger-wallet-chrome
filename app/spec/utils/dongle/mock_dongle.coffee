@@ -147,7 +147,7 @@ class ledger.dongle.MockDongle extends EventEmitter
   @param [Object] resumeData
   @return [Q.Promise] Resolve with resumeData
   ###
-  createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
+  createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData, network) ->
     d = ledger.defer()
     result = {}
 
@@ -222,9 +222,12 @@ class ledger.dongle.MockDongle extends EventEmitter
     else
       # Check keycard validity
       if resumeData.charsResponse isnt authorization
-        throw new Error 'Invalid Keycard !!'
+        _.delay (-> d.rejectWithError(Errors.WrongPinCode)), 1000
       # Build raw tx
-      result = resumeData.txb.build().toHex()
+      try
+        result = resumeData.txb.build().toHex()
+      catch
+        _.delay (-> d.rejectWithError(Errors.SignatureError)), 1000
 
     _.delay (-> d.resolve(result)), 1000 # Dirty delay fix, odd but necessary
     d.promise
