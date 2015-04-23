@@ -26,7 +26,7 @@ class ledger.preferences.Preferences
     btcUnit: ledger.preferences.defaults.Display.units.bitcoin.symbol
     currency: 'USD'
     miningFee: ledger.preferences.defaults.Bitcoin.fees.normal.value
-    blockchainExplorer: ledger.preferences.defaults.Bitcoin.explorers.blockchain.name
+    blockchainExplorer: _.keys(ledger.preferences.defaults.Bitcoin.explorers)[0]
     currencyEquivalentIsActive: false
     logState: true
     confirmationsCount: ledger.preferences.defaults.Bitcoin.confirmations.one
@@ -69,8 +69,6 @@ class ledger.preferences.Preferences
 
   # Set BTC Unit
   setBtcUnit: (value) ->
-    if value isnt 'BTC' and value isnt 'mBTC' and value isnt 'bits' and value isnt 'satoshi'
-      throw new Error("'BtcUnit' must be BTC, mBTC, bits or satoshi")
     if ledger.storage.sync?
       ledger.storage.sync.set({__preferences_btcUnit: value})
       @prefs.btcUnit = value
@@ -95,11 +93,13 @@ class ledger.preferences.Preferences
   getCurrencyActive: ->
     @prefs.currencyEquivalentIsActive
 
-
   # Set fiat currency equivalent functionality to active
   setCurrencyActive: (state = yes) ->
-    @prefs.currencyEquivalentIsActive = state
-
+    if ledger.storage.sync?
+      ledger.storage.sync.set({__preferences_currencyEquivalentIsActive: state})
+      @prefs.currencyEquivalentIsActive = state
+    else
+      throw new Error 'You must initialize your wallet'
 
   # Get Mining Fee
   getMiningFee: () ->
@@ -139,7 +139,7 @@ class ledger.preferences.Preferences
       throw new Error 'You must initialize your wallet'
 
   ###
-    If Logs must be visible todo
+    If Logs must be visible
   ###
   getLogState: () ->
     @prefs.logState
@@ -147,4 +147,17 @@ class ledger.preferences.Preferences
   setLogState: (value) ->
     if typeof value is 'boolean'
       throw new Error 'Log state must be a boolean'
-    @prefs.logState = value
+    if ledger.storage.sync?
+      ledger.storage.sync.set({__preferences_logState: value})
+      @prefs.logState = value
+    else
+      throw new Error 'You must initialize your wallet'
+
+  getAllBitcoinUnits: ->
+    _.map(_.values(ledger.preferences.defaults.Display.units), (unit) -> unit.symbol)
+
+  getBlockchainExplorerAddress: ->
+    return ledger.preferences.defaults.Bitcoin.explorers[@getBlockchainExplorer()].address
+
+  isConfirmationCountReached: (count) ->
+    return count >= @getConfirmationsCount()

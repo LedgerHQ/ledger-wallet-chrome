@@ -8,10 +8,11 @@ class ledger.widgets.SegmentedControl extends EventEmitter
 
   @Styles = Styles
   _el: null
-  _actions: []
+  _actions: null
 
   constructor: (node, style) ->
     super
+    @_actions = []
     @_el = $("<div class='#{style}'></div>")
     node.append @_el
 
@@ -21,6 +22,10 @@ class ledger.widgets.SegmentedControl extends EventEmitter
     @_el.append action
     @_actions.push action
     action
+
+  removeAllActions: ->
+    @_el.empty()
+    @_actions = []
 
   setSelectedIndex: (index) ->
     return if index >= @_actions.length

@@ -42,14 +42,8 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
   navigateContinue: ->
     ledger.app.router.go '/onboarding/device/connecting'
 
-  testSave: ->
-    l 'YO'
-    csv = new ledger.utils.CsvExporter("toto")
-    csv.setContent [{toto: 1, titi: 2}, {toto: 1, titi: 2}, {toto: 1, titi: 2}, {toto: 1, titi: 2},{toto: 1, titi: 2}]
-    csv.save()
-
   _listenEvents: ->
-    if ledger.app.wallet? and !ledger.app.wallet.isInBootloaderMode()
+    if (ledger.app.wallet? and !ledger.app.wallet.isInBootloaderMode()) or ledger.app.isConnectingDongle()
       do @navigateContinue
     else
       ledger.app.once 'dongle:connecting', =>

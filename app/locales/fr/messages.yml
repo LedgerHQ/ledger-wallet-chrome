@@ -318,7 +318,7 @@ wallet:
       print: "IMPRIMER"
       close: "FERMER"
       blockchain_link: "Plus d'informations"
-      transaction_fees_text: "(dont %s BTC de frais de transaction)"
+      transaction_fees_text: "(dont %s de frais de transaction)"
 
     index:
       <<: *default-operations-translation
@@ -366,7 +366,7 @@ wallet:
       receiver_address: "Adresse Bitcoin du destinataire"
       receiver_address_placeholder: "Adresse Bitcoin"
       total_spent: "Total dépensé"
-      transaction_fees_text: "(dont 0.0001 BTC de frais de transaction)"
+      transaction_fees_text: "(dont %s de frais de transaction)"
       close_scanner: "Fermer scanner"
       qr_scanner: "Scanner code QR"
 
@@ -507,7 +507,7 @@ wallet:
     display:
       units: "Unités"
       bitcoin_unit: "Unité Bitcoin"
-      show_currency: "Afficher la devise"
+      show_currency: "Afficher la contre-valeur"
       exchange_rate: "Taux d'échange"
       language_and_region: "Langue & région"
       interface_language: "Langue de l'interface"

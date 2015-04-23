@@ -5,9 +5,7 @@
   <div class="row bottom">
     <div class="regular-text-small stretchable"><%= t 'wallet.settings.bitcoin.default_value' %></div>
     <div class="small-grey-select">
-      <select id="fees_select" dir="rtl">
-        <option>Salut</option>
-      </select>
+      <select id="fees_select"></select>
     </div>
   </div>
 </div>

@@ -8,20 +8,21 @@ class @WalletAccountsShowViewController extends @ViewController
     emptyContainer: "#empty_container"
     operationsList: '#operations_list'
     accountName: '#account_name'
-    #btcAcronyme: '.btc-acronyme'
+    confirmedBalanceContainer: "#confirmed_balance_container"
 
   onAfterRender: ->
     super
+    # invert layout if needed
+    if ledger.formatters.symbolIsFirst() then @view.confirmedBalanceContainer.addClass 'inverted' else @view.confirmedBalanceContainer.removeClass 'inverted'
+
     # fetch balances
     balance = Wallet.instance.getBalance()
     @view.confirmedBalance.text ledger.formatters.fromValue(balance.wallet.total)
-    #@view.btcAcronyme.text ledger.formatters.getUnitSymbol()
     @view.unconfirmedBalance.text ledger.formatters.formatValue(balance.wallet.unconfirmed)
 
     # listen events
     ledger.app.on 'wallet:balance:changed', (event, balance) =>
       @view.confirmedBalance.text ledger.formatters.fromValue(balance.wallet.total)
-      #@view.btcAcronyme.text ledger.formatters.getUnitSymbol()
       @view.unconfirmedBalance.text ledger.formatters.formatValue(balance.wallet.unconfirmed)
 
     account = @getAccount()

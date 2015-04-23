@@ -5,9 +5,7 @@
   <div class="row bottom">
     <div class="regular-text-small stretchable"><%= t 'wallet.settings.bitcoin.default_explorer' %></div>
     <div class="small-grey-select">
-      <select id="blockchain_select" dir="rtl">
-        <option>Salut</option>
-      </select>
+      <select id="blockchain_select"></select>
     </div>
   </div>
 </div>

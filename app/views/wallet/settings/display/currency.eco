@@ -6,9 +6,7 @@
   <div class="row bottom" id="exchange_rate_row">
     <div class="regular-text-small stretchable"><%= t 'wallet.settings.display.exchange_rate' %></div>
     <div class="small-grey-select">
-      <select id="region_select" dir="rtl">
-        <option>Salut</option>
-      </select>
+      <select id="currencies_select"></select>
     </div>
   </div>
 </div>

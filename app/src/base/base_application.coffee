@@ -17,6 +17,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @walletsManager = new WalletsManager(this)
     @router = new Router(@)
     @_dongleAttestationLock = off
+    @_isConnectingDongle = no
     ledger.dialogs.manager.initialize($('#dialogs_container'))
 
   ###
@@ -31,7 +32,6 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @onStart()
     @devicesManager.start()
     @donglesManager.start()
-
 
   ###
     Reloads the whole application.
@@ -111,7 +111,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
       @_dongleAttestationLock = off
     return
 
-
+  isConnectingDongle: -> @_isConnectingDongle
 
   ###
     Returns the jQuery element used as the main div container in which controllers will render themselves.
@@ -160,8 +160,10 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     # Wallet management & wallet events re-dispatching
     @walletsManager.on 'connecting', (event, card) =>
       DongleLogger().info('Connecting', card.id)
+      @_isConnectingDongle = yes
       (Try => @onConnectingDongle(card)).printError()
     @walletsManager.on 'connected', (event, wallet) =>
+      @_isConnectingDongle = no
       @connectWallet(wallet)
 
   connectWallet: (wallet) ->
@@ -170,6 +172,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     DongleLogger().info("Connected", wallet.id)
     wallet.once 'disconnected', =>
       DongleLogger().info('Disconnected', wallet.id)
+      @_isConnectingDongle = no
       _.defer => (Try => @onDongleIsDisconnected(wallet)).printError()
       @wallet = null
     wallet.once 'unplugged', =>

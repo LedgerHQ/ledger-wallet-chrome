@@ -51,7 +51,9 @@ class ledger.i18n
 
     initLangAndLocale = () =>
       # Lang: Manage text translation
-      @checkLangIntoStores()# is Lang set into one of the store ?
+      @loadUserBrowserAcceptLangs()
+      .then =>
+        @checkLangIntoStores() # is Lang set into one of the store ?
       .then (info) =>
         #l info, ' - Loading favLang'
         @loadLang()# @favLang <- Stores
@@ -131,18 +133,18 @@ class ledger.i18n
   @setFavLangStoreValues: () =>
     deferred = Q.defer()
     if ledger.storage.sync?
-      ledger.storage.sync.get 'i18n_favLang', (r) =>
-        if Array.isArray(r.i18n_favLang)
-          r.i18n_favLang = r.i18n_favLang[0]
-        #l 'syncstore', r.i18n_favLang
-        @favLang.syncStoreValue = r.i18n_favLang
+      ledger.storage.sync.get '__i18n_favLang', (r) =>
+        if Array.isArray(r.__i18n_favLang)
+          r.__i18n_favLang = r.__i18n_favLang[0]
+        #l 'syncstore', r.__i18n_favLang
+        @favLang.syncStoreValue = r.__i18n_favLang
         deferred.resolve()
     else
-      @chromeStore.get 'i18n_favLang', (r) =>
-        if Array.isArray(r.i18n_favLang)
-          r.i18n_favLang = r.i18n_favLang[0]
-        @favLang.chromeStoreValue = r.i18n_favLang
-        #l 'chromestore', r.i18n_favLang
+      @chromeStore.get '__i18n_favLang', (r) =>
+        if Array.isArray(r.__i18n_favLang)
+          r.__i18n_favLang = r.__i18n_favLang[0]
+        @favLang.chromeStoreValue = r.__i18n_favLang
+        #l 'chromestore', r.__i18n_favLang
         deferred.resolve()
     return deferred.promise
 
@@ -152,16 +154,16 @@ class ledger.i18n
   ###
   @setLocaleStoreValues: () =>
     deferred = Q.defer()
-    @chromeStore.get 'i18n_favLocale', (r) =>
-      if Array.isArray(r.i18n_favLocale)
-        r.i18n_favLocale = r.i18n_favLocale[0]
-      @favLocale.chromeStoreValue = r.i18n_favLocale
+    @chromeStore.get '__i18n_favLocale', (r) =>
+      if Array.isArray(r.__i18n_favLocale)
+        r.__i18n_favLocale = r.__i18n_favLocale[0]
+      @favLocale.chromeStoreValue = r.__i18n_favLocale
 
       if ledger.storage.sync?
-        ledger.storage.sync.get 'i18n_favLocale', (r) =>
-          if Array.isArray(r.i18n_favLocale)
-            r.i18n_favLocale = r.i18n_favLocale[0]
-          @favLocale.syncStoreValue = r.i18n_favLocale
+        ledger.storage.sync.get '__i18n_favLocale', (r) =>
+          if Array.isArray(r.__i18n_favLocale)
+            r.__i18n_favLocale = r.__i18n_favLocale[0]
+          @favLocale.syncStoreValue = r.__i18n_favLocale
           deferred.resolve()
       else
         deferred.resolve()
@@ -194,7 +196,7 @@ class ledger.i18n
       @favLang.chromeStoreValue = @favLang.syncStoreValue
       # Send chromeStoreValue to chrome store
       #l 'set @favLang.syncStoreValue ' + @favLang.syncStoreValue + ' to @favLang.chromeStoreValue'
-      @chromeStore.set({i18n_favLang: @favLang.chromeStoreValue})
+      @chromeStore.set({__i18n_favLang: @favLang.chromeStoreValue})
     deferred.resolve()
     return deferred.promise
 
@@ -207,7 +209,7 @@ class ledger.i18n
     if ledger.storage.sync?
       @favLocale.chromeStoreValue = @favLocale.syncStoreValue
       # Send chromeStoreValue to chrome store
-      @chromeStore.set({i18n_favLocale: @favLocale.chromeStoreValue})
+      @chromeStore.set({__i18n_favLocale: @favLocale.chromeStoreValue})
     deferred.resolve()
     return deferred.promise
 
@@ -248,7 +250,7 @@ class ledger.i18n
   ###
   @loadUserBrowserUiLang: () =>
     deferred = Q.defer()
-    @browserUiLang = chrome.i18n.getUILanguage()
+    @browserUiLang = _.str.replace(chrome.i18n.getUILanguage(), '-', '_')
     deferred.resolve()
     return deferred.promise
 
@@ -261,11 +263,11 @@ class ledger.i18n
   @loadUserBrowserAcceptLangs: () =>
     deferred = Q.defer()
     chrome.i18n.getAcceptLanguages (requestedLocales) =>
-      @browserAcceptLanguages = requestedLocales
-      #l @browserAcceptLanguages
+      @browserAcceptLanguages = _.map(requestedLocales, (obj) -> return _.str.replace(obj, '-', '_'))
       deferred.resolve()
     return deferred.promise
 
+  @mostAcceptedLanguage: => @browserAcceptLanguages[0]
 
   ###
     Set @favLang.memoryValue with one of the browser accept language (@browserAcceptLanguages), fallback on browser UI language
@@ -307,9 +309,9 @@ class ledger.i18n
     # set tag language to one of the store
     if ledger.storage.sync?
       #l 'set tag to sync store'
-      ledger.storage.sync.set({i18n_favLang: @favLang.memoryValue})
+      ledger.storage.sync.set({__i18n_favLang: @favLang.memoryValue})
     else
-      @chromeStore.set({i18n_favLang: @favLang.memoryValue})
+      @chromeStore.set({__i18n_favLang: @favLang.memoryValue})
     # Update @syncStoreIsSet and @chromeStoreIsSet
     @checkLangIntoStores()
     # Update @syncStoreValue and @chromeStoreValue
@@ -332,10 +334,10 @@ class ledger.i18n
       else
         @favLang.memoryValue = 'en'
         throw new Error 'Language not yet supported! English set as default.'
-    @chromeStore.set({i18n_favLang: tag})
+    @chromeStore.set({__i18n_favLang: tag})
     if ledger.storage.sync?
       #l 'set tag to sync store'
-      ledger.storage.sync.set({i18n_favLang: tag})
+      ledger.storage.sync.set({__i18n_favLang: tag})
     # Update everything
     @setFavLangStoreValues()# set chromeStoreValue and syncStoreValue
     .then () =>
@@ -355,10 +357,10 @@ class ledger.i18n
     # set tag language to one of the store
     if ledger.storage.sync?
       #l 'set locale tag to sync store'
-      ledger.storage.sync.set({i18n_favLocale: @favLocale.memoryValue})
+      ledger.storage.sync.set({__i18n_favLocale: @favLocale.memoryValue})
     else
       #l 'set locale tag to chrome store'
-      @chromeStore.set({i18n_favLocale: @favLocale.memoryValue})
+      @chromeStore.set({__i18n_favLocale: @favLocale.memoryValue})
     # Update @syncStoreIsSet and @chromeStoreIsSet
     @checkLocaleIntoStores()
     # Update @syncStoreValue and @chromeStoreValue
@@ -376,10 +378,10 @@ class ledger.i18n
     # If tag language is set manually
     if tag?
       @favLocale.memoryValue = tag
-    @chromeStore.set({i18n_favLocale: @favLocale.memoryValue})
+    @chromeStore.set({__i18n_favLocale: @favLocale.memoryValue})
     if ledger.storage.sync?
       #l 'set locale tag to sync store'
-      ledger.storage.sync.set({i18n_favLocale: @favLocale.memoryValue})
+      ledger.storage.sync.set({__i18n_favLocale: @favLocale.memoryValue})
     # Update @syncStoreIsSet and @chromeStoreIsSet
     @checkLocaleIntoStores()
     # Update @syncStoreValue and @chromeStoreValue
@@ -397,16 +399,16 @@ class ledger.i18n
     deferred = Q.defer()
     if ledger.storage.sync?
       # Set @favLang from syncStore
-      ledger.storage.sync.get 'i18n_favLang', (r) =>
-        if Array.isArray(r.i18n_favLang)
-          r.i18n_favLang = r.i18n_favLang[0]
-        @favLang.memoryValue = r.i18n_favLang
+      ledger.storage.sync.get '__i18n_favLang', (r) =>
+        if Array.isArray(r.__i18n_favLang)
+          r.__i18n_favLang = r.__i18n_favLang[0]
+        @favLang.memoryValue = r.__i18n_favLang
     else
       # Set favLang from chromeStore
-      @chromeStore.get 'i18n_favLang', (r) =>
-        if Array.isArray(r.i18n_favLang)
-          r.i18n_favLang = r.i18n_favLang[0]
-        @favLang.memoryValue = r.i18n_favLang
+      @chromeStore.get '__i18n_favLang', (r) =>
+        if Array.isArray(r.__i18n_favLang)
+          r.__i18n_favLang = r.__i18n_favLang[0]
+        @favLang.memoryValue = r.__i18n_favLang
     deferred.resolve()
     return deferred.promise
 
@@ -419,21 +421,21 @@ class ledger.i18n
   @checkLangIntoStores: () =>
     deferred = Q.defer()
     if ledger.storage.sync?
-      ledger.storage.sync.get 'i18n_favLang', (r) =>
-        if r.i18n_favLang isnt undefined
+      ledger.storage.sync.get '__i18n_favLang', (r) =>
+        if r.__i18n_favLang isnt undefined
           @favLang.syncStoreIsSet = true
-          deferred.resolve('ledger.storage.sync.get r.i18n_favLang ' + r.i18n_favLang + ' is set into syncStore')
+          deferred.resolve('ledger.storage.sync.get r.__i18n_favLang ' + r.__i18n_favLang + ' is set into syncStore')
         else
           @favLang.syncStoreIsSet = false
-          deferred.reject('ledger.storage.sync.get r.i18n_favLang' + r.i18n_favLang + ' is not set into syncStore')
+          deferred.reject('ledger.storage.sync.get r.__i18n_favLang' + r.__i18n_favLang + ' is not set into syncStore')
     else
-      @chromeStore.get 'i18n_favLang', (r) =>
-        if r.i18n_favLang isnt undefined
+      @chromeStore.get '__i18n_favLang', (r) =>
+        if r.__i18n_favLang isnt undefined
           @favLang.chromeStoreIsSet = true
-          deferred.resolve('@chromeStore.get r.i18n_favLang ' + r.i18n_favLang + ' is set into chromeStore')
+          deferred.resolve('@chromeStore.get r.__i18n_favLang ' + r.__i18n_favLang + ' is set into chromeStore')
         else
           @favLang.chromeStoreIsSet = false
-          deferred.reject('@chromeStore.get r.i18n_favLang ' + r.i18n_favLang + ' is not set into chromeStore')
+          deferred.reject('@chromeStore.get r.__i18n_favLang ' + r.__i18n_favLang + ' is not set into chromeStore')
     return deferred.promise
 
 
@@ -441,7 +443,7 @@ class ledger.i18n
     Remove key 'i18n_favLang' from sync Store
   ###
   @removeUserFavLangSyncStore: () =>
-    ledger.storage.sync.remove('i18n_favLang', l)
+    ledger.storage.sync.remove('__i18n_favLang', l)
     @checkLangIntoStores()
 
 
@@ -449,7 +451,7 @@ class ledger.i18n
     Remove key 'i18n_favLang' from chrome Store
   ###
   @removeUserFavLangChromeStore: () =>
-    @chromeStore.remove('i18n_favLang', l)
+    @chromeStore.remove('__i18n_favLang', l)
     @checkLangIntoStores()
 
 
@@ -463,19 +465,19 @@ class ledger.i18n
     deferred = Q.defer()
     if ledger.storage.sync?
       # Set userFavLocale from syncStore
-      ledger.storage.sync.get 'i18n_favLocale', (r) =>
-        if Array.isArray(r.i18n_favLocale)
-          r.i18n_favLocale = r.i18n_favLocale[0]
-        # l r.i18n_favLocale
-        @favLocale.memoryValue = r.i18n_favLocale
+      ledger.storage.sync.get '__i18n_favLocale', (r) =>
+        if Array.isArray(r.__i18n_favLocale)
+          r.__i18n_favLocale = r.__i18n_favLocale[0]
+        # l r.__i18n_favLocale
+        @favLocale.memoryValue = r.__i18n_favLocale
         deferred.resolve()
     else
       # Set userFavLocale from chromeStore
-      @chromeStore.get 'i18n_favLocale', (r) =>
-        if Array.isArray(r.i18n_favLocale)
-          r.i18n_favLocale = r.i18n_favLocale[0]
-        @favLocale.memoryValue = r.i18n_favLocale
-        #l r.i18n_favLocale
+      @chromeStore.get '__i18n_favLocale', (r) =>
+        if Array.isArray(r.__i18n_favLocale)
+          r.__i18n_favLocale = r.__i18n_favLocale[0]
+        @favLocale.memoryValue = r.__i18n_favLocale
+        #l r.__i18n_favLocale
         deferred.resolve()
     return deferred.promise
 
@@ -488,21 +490,21 @@ class ledger.i18n
   @checkLocaleIntoStores: () =>
     deferred = Q.defer()
     if ledger.storage.sync?
-      ledger.storage.sync.get 'i18n_favLocale', (r) =>
-        if r.i18n_favLocale isnt undefined
+      ledger.storage.sync.get '__i18n_favLocale', (r) =>
+        if r.__i18n_favLocale isnt undefined
           @favLocale.syncStoreIsSet = true
-          deferred.resolve('ledger.storage.sync.get r.i18n_favLocale ' + r.i18n_favLocale + ' is set into synced Store')
+          deferred.resolve('ledger.storage.sync.get r.__i18n_favLocale ' + r.__i18n_favLocale + ' is set into synced Store')
         else
           @favLocale.syncStoreIsSet = false
-          deferred.reject('ledger.storage.sync.get r.i18n_favLocale ' + r.i18n_favLocale + ' is not set into synced Store')
+          deferred.reject('ledger.storage.sync.get r.__i18n_favLocale ' + r.__i18n_favLocale + ' is not set into synced Store')
     else
-      @chromeStore.get 'i18n_favLocale', (r) =>
-        if r.i18n_favLocale isnt undefined
+      @chromeStore.get '__i18n_favLocale', (r) =>
+        if r.__i18n_favLocale isnt undefined
           @favLocale.chromeStoreIsSet = true
-          deferred.resolve('@chromeStore.get r.i18n_favLocale ' + r.i18n_favLocale + ' is set into chromeStore')
+          deferred.resolve('@chromeStore.get r.__i18n_favLocale ' + r.__i18n_favLocale + ' is set into chromeStore')
         else
           @favLocale.chromeStoreIsSet = false
-          deferred.reject('@chromeStore.get r.i18n_favLocale ' + r.i18n_favLocale + ' is not set into chromeStore')
+          deferred.reject('@chromeStore.get r.__i18n_favLocale ' + r.__i18n_favLocale + ' is not set into chromeStore')
     return deferred.promise
 
 
@@ -510,7 +512,7 @@ class ledger.i18n
     Remove key 'i18n_favLocale' from sync Store
   ###
   @removeLocaleSyncStore: () =>
-    ledger.storage.sync.remove('i18n_favLocale', l)
+    ledger.storage.sync.remove('__i18n_favLocale', l)
     @checkLocaleIntoStores()
 
 
@@ -518,7 +520,7 @@ class ledger.i18n
     Remove key 'i18n_favLocale' from chrome Store
   ###
   @removeLocaleChromeStore: () =>
-    @chromeStore.remove('i18n_favLocale', l)
+    @chromeStore.remove('__i18n_favLocale', l)
     @checkLocaleIntoStores()
 
 
@@ -540,7 +542,7 @@ class ledger.i18n
    Set the locale for Moment.js
   ###
   @setMomentLocale: () =>
-    moment.locale(@favLocale.memoryValue.toLowerCase())
+    moment.locale(@favLocale.memoryValue)
 
 
   ###
@@ -570,7 +572,7 @@ class ledger.i18n
       style: "currency"
       currency: currency
       currencyDisplay: "symbol"
-    (amount).toLocaleString(@favLocale.memoryValue, options)
+    (amount).toLocaleString(_.str.replace(@favLocale.memoryValue, '_', '-'), options)
 
 
   ###

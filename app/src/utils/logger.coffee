@@ -13,7 +13,7 @@ Levels =
   VERB: 8
   DEBUG: 9
   TRACE: 10
-  ALL: 11
+  ALL: 12
 
 ###
   Utility class for dealing with logs
@@ -21,6 +21,7 @@ Levels =
 class @ledger.utils.Logger
   @Levels: Levels
 
+  @_privateMode: off
   @_loggers: {}
 
   # Return storage instance if initialized or undefined.
@@ -33,10 +34,19 @@ class @ledger.utils.Logger
 #################################
   
   # @return [Q.Promise]
-  @logs: (cb) ->
+  @logs: (cb) -> @_getLogs(@store())
+
+  @publicLogs: (cb) -> @_getLogs(@_store ?= new ledger.storage.ChromeStore("logs"), cb)
+
+  @privateLogs: (cb) ->
+    return cb?([]) unless ledger.storage.logs?
+    @_getLogs(ledger.storage.logs, cb)
+
+  @_getLogs: (store, cb) ->
     closure = new CompletionClosure(cb)
-    @store()?.keys (keys) =>
-      @store().get keys, (items) => closure.success(_.values(items))
+    store.keys (keys) =>
+      store.get keys, (items) =>
+        closure.success(_.values(items))
     closure.readonly()
 
   # @return [legder.utils.Logger]
@@ -45,7 +55,6 @@ class @ledger.utils.Logger
 
   # Set all loggers level
   @_setGlobalLoggersLevel: (level) -> logger.setLevel(level) for name, logger of @_loggers when logger.useGlobalSettings
-
 
   @getGlobalLoggersLevel: ->
     if ledger.preferences?.instance?
@@ -57,6 +66,55 @@ class @ledger.utils.Logger
 
   @updateGlobalLoggersLevel: -> @_setGlobalLoggersLevel(@getGlobalLoggersLevel())
 
+  @exportLogsToCsv: (callback = undefined) ->
+    now = new Date()
+    csv = new ledger.utils.CsvExporter("ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}")
+    @publicLogs (publicLogs) =>
+      @privateLogs (privateLogs) =>
+        csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
+        csv.save(callback)
+
+  @exportLogsWithLink: (callback) ->
+    now = new Date()
+    suggestedName = "ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
+    csv = new ledger.utils.CsvExporter(suggestedName)
+    @publicLogs (publicLogs) =>
+      @privateLogs (privateLogs) =>
+        csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
+        callback?(name: suggestedName, url: csv.url())
+
+  @downloadLogsWithLink: ->
+    @exportLogsWithLink (data) ->
+      pom = document.createElement('a')
+      pom.href = data.url
+      pom.setAttribute('download', data.name)
+      pom.click()
+
+  @setPrivateModeEnabled: (enable) ->
+    if enable isnt @_privateMode
+      @_privateMode = enable
+      @_logStream = if enable then @_createStream() else null
+
+  @isPrivateModeEnabled: -> @_privateMode
+
+  @_createStream: ->
+    stream = new Stream()
+    stream.on "data", =>
+      stream._store ||= ledger.storage.logs
+      return unless stream._store?
+      logs = stream.read()
+      # Insert logs
+      data = {}
+      for log in logs
+        for key, entry of log
+          data[key] = entry
+      stream._store.set data
+      # Clear old
+      @_clear(stream.store)
+      stream.close() if @_logStream isnt stream
+    stream.open()
+    stream
+
 #################################
 # Instance methods
 #################################
@@ -67,7 +125,7 @@ class @ledger.utils.Logger
     @_tag = tag
     @level = Levels[@level] if typeof @level == "string"
     @level = Levels.ALL if @level is true
-    @level = Levels.None if @level is false
+    @level = Levels.NONE if @level is false
     @constructor._loggers[tag] = this
 
   #################################
@@ -78,12 +136,14 @@ class @ledger.utils.Logger
   # @return [ledger.storage.ChromeStore, undefined]
   store: -> @constructor.store()
 
+  isPrivateModeEnabled: -> @constructor.isPrivateModeEnabled()
+
   # Sets the log level
   # @param [Boolean] active or not the logger.
   setLevel: (level) -> @level = level
 
   #
-  levelName: (level=@level) -> _.invert(Levels)[level]
+  levelName: (level = @level) -> _.invert(Levels)[level]
 
   # Sets the active state
   # @param [Boolean] active or not the logger.
@@ -131,10 +191,12 @@ class @ledger.utils.Logger
   #################################
 
   # Clear logs from entries older than 24h
-  clear: ->
-    @store()?.keys (keys) =>
+  clear: -> @constructor._clear @store()
+
+  @_clear: (store) ->
+    store?.keys (keys) =>
       now = new Date().getTime()
-      @store().remove(key) for key in keys when (now - key > 86400000) # 86400000ms => 24h
+      store.remove(key) for key in keys when (now - key > 86400000) # 86400000ms => 24h
 
   # Retreive saved logs
   # @param [Function] cb A callback invoked once we get the logs as an array
@@ -150,11 +212,14 @@ class @ledger.utils.Logger
   # @param [String] msg Message to log.
   # @param [String] msgType Log level.
   _storeLog: (msg, msgType) ->
-      now = new Date()
-      log = {}
-      log[now.getTime()] = date: now.toUTCString(), type: msgType, msg: msg, tag: @_tag
+    now = new Date()
+    log = {}
+    log[now.getTime()] = date: now.toUTCString(), type: msgType,  tag: @_tag, msg: msg
+    if @isPrivateModeEnabled()
+      @_privateLogStream().write(log)
+    else
       @clear()
-      @store()?.set(log)
+      @store().set(log)
 
   #################################
   # Protected. Formatting methods
@@ -230,7 +295,7 @@ class @ledger.utils.Logger
       when Levels.INFO then 'color: #00f'
       when Levels.GOOD then 'color: #090'
       when Levels.DEBUG then 'color: #444'
-      when Levels.TRACE then 'color: #888'
+      when Levels.TRACE then 'color: #777'
       else 'color: #000'
 
     # Add arguments catchers to colorify strings
@@ -250,6 +315,8 @@ class @ledger.utils.Logger
       else "log"
 
     console[method](args...)
+
+  _privateLogStream: -> @constructor._logStream
 
 ledger.utils.logger = new ledger.utils.Logger("DeprecatedLogger")
 

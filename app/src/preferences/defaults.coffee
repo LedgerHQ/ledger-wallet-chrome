@@ -19,10 +19,13 @@ ledger.preferences.defaults =
     units:
       bitcoin:
         symbol: 'BTC'
+        unit: 8
       milibitcoin:
         symbol: 'mBTC'
+        unit: 5
       microbitcoin:
         symbol: 'bits'
+        unit: 2
     languages: null # lazy
     regions: null # lazy
 

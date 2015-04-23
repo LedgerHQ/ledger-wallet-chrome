@@ -243,7 +243,6 @@ class ledger.wallet.transaction.Transaction
 
 _.extend ledger.wallet.transaction,
 
-    MINIMUM_CONFIRMATIONS: 1
     MINIMUM_OUTPUT_VALUE: 5430
 
 
