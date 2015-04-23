@@ -8,6 +8,7 @@ ledger.preferences.init = (cb) ->
   ledger.preferences.instance.init(cb)
 
 ledger.preferences.close = ->
+  ledger.preferences.instance.close()
   ledger.preferences.instance = undefined
 
 PreferencesStructure =
@@ -59,8 +60,11 @@ class ledger.preferences.Preferences extends EventEmitter
       preference.storeKey = @_prefIdToStoreKey(prefId)
       preference.getter = defaultGetter.bind(preference) unless preference.getter?
       preference.setter = defaultSetter.bind(preference) unless preference.setter?
+    ledger.storage.sync.on 'pulled', => @_updatePreferences(on, _.noop)
 
   init: (callback) -> @_updatePreferences(off, callback)
+
+  close: () ->
 
   getLanguage: -> @_getPreference('language')
   setLanguage: (value) -> @_setPreference('language', value)
@@ -102,12 +106,13 @@ class ledger.preferences.Preferences extends EventEmitter
     throw new Error("Preference #{prefId} does not exist") unless preference?
     oldValue = preference.getter()
     preference.setter(value)
-    @emit "#{prefId}:changed", oldValue: oldValue, newValue: preference.getter() if emit
+    @emit "#{prefId}:changed", oldValue: oldValue, newValue: preference.getter() if emit and oldValue != value
 
   _getPreference: (prefId) ->
     preference = @_preferences[prefId]
     throw new Error("Preference #{prefId} does not exist") unless preference?
-    preference.getter() or preference.default
+    value = preference.getter()
+    if value? then value else preference.default
 
   _prefIdToStoreKey: (prefId) -> "__preferences_#{prefId}"
   _storeKeyToPrefId: (storeKey) -> storeKey.substr(14)

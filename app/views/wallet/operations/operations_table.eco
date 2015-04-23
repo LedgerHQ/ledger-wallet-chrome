@@ -5,7 +5,7 @@
     <td class="fit-content align-right padding-right-very-small"></td>
     <td><%= t 'wallet.accounts.show.operations.bitcoin_address' %></td>
     <td></td>
-  <% if ledger.preferences.instance.getCurrencyActive(): %>
+  <% if ledger.preferences.instance.isCurrencyActive(): %>
     <td class="fit-content align-right padding-right-medium"><%= t 'wallet.accounts.show.operations.countervalue' %></td>
   <% end %>
   <td class="fit-content align-right"><%= t 'wallet.accounts.show.operations.amount' %></td>
@@ -30,7 +30,7 @@
         <% end %>
     </td>
     <td class="fit-content regular-grey-text-small"><%= if !ledger.preferences.instance.isConfirmationCountReached(operation.get('confirmations')) then t('wallet.accounts.show.operations.unconfirmed').toLowerCase() %></td>
-    <% if ledger.preferences.instance.getCurrencyActive(): %>
+    <% if ledger.preferences.instance.isCurrencyActive(): %>
       <td class="fit-content align-right padding-right-medium regular-grey-text" data-countervalue="<%= if operation.get('type') == 'reception' then '+' else '-' %><%= operation.get('total_value')%>"></td>
     <% end %>
     <% if operation.get('type') == 'reception': %>

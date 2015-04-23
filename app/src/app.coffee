@@ -140,7 +140,7 @@ require @ledger.imports, ->
         @_listenedCountervalueNodes = undefined
         @_reprocessCountervalueNodesCallback = undefined
         ledger.preferences.instance.off 'currency:changed', @_reprocessCountervalueNodesCallback
-        ledger.preferences.instance.off 'region:changed', @_reprocessCountervalueNodesCallback
+        ledger.preferences.instance.off 'locale:changed', @_reprocessCountervalueNodesCallback
         ledger.tasks.TickerTask.instance.off 'updated', @_reprocessCountervalueNodesCallback
         return
 
@@ -179,7 +179,7 @@ require @ledger.imports, ->
 
       # listen app events
       ledger.preferences.instance.on 'currency:changed', @_reprocessCountervalueNodesCallback
-      ledger.preferences.instance.on 'region:changed', @_reprocessCountervalueNodesCallback
+      ledger.preferences.instance.on 'locale:changed', @_reprocessCountervalueNodesCallback
       ledger.tasks.TickerTask.instance.on 'updated', @_reprocessCountervalueNodesCallback
 
       # listen countervalue nodes
