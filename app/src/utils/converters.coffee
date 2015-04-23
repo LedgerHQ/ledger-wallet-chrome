@@ -30,7 +30,7 @@ class ledger.converters
     currency ?= ledger.preferences.instance.getCurrency()
     currencies = ledger.tasks.TickerTask.instance.getCache()
     # satoshiValueCurrency is the amount in Satoshi for 1 in the given currency
-    satoshiValueCurrency = currencies[currency].values[2]['toSatoshis'].value
+    satoshiValueCurrency = currencies[currency].values[2]['toSatoshis'].value || 0
     satoshiValue = satoshiValueCurrency * currencyValue
     Math.round(satoshiValue)
 
@@ -47,7 +47,7 @@ class ledger.converters
     currencies = ledger.tasks.TickerTask.instance.getCache()
 
     # currencyValueBTC is the amount in the given currency for 1 BTC
-    currencyValueBTC = currencies[currency].values[0]['fromBTC'].value
+    currencyValueBTC = currencies[currency].values[0]['fromBTC'].value || 0
     val = currencyValueBTC * Math.pow(10, -8)
     currencyValueSatoshi = val * satoshiValue
     return parseFloat(currencyValueSatoshi.toFixed(2))
@@ -63,9 +63,13 @@ class ledger.converters
   @satoshiToCurrencyFormatted: (satoshiValue, currency) =>
     currency ?= ledger.preferences.instance.getCurrency()
     currencies = ledger.tasks.TickerTask.instance.getCache()
-    # currencyValueBTC is the amount in the given currency for 1 BTC
-    currencyValueBTC = currencies[currency].values[0]['fromBTC'].value
-    val = currencyValueBTC * Math.pow(10, -8)
-    currencyValueSatoshi = val * satoshiValue
-    res = parseFloat(currencyValueSatoshi.toFixed(2))
+    
+    if currencies?[currency]?.values?[0]?['fromBTC']?.value?
+      # currencyValueBTC is the amount in the given currency for 1 BTC
+      currencyValueBTC = currencies[currency].values[0]['fromBTC'].value || 0
+      val = currencyValueBTC * Math.pow(10, -8)
+      currencyValueSatoshi = val * satoshiValue
+      res = parseFloat(currencyValueSatoshi.toFixed(2))
+    else
+      res = undefined
     return ledger.i18n.formatAmount(res, currency)
