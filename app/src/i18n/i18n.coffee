@@ -568,11 +568,7 @@ class ledger.i18n
     @return [String] The formatted amount
   ###
   @formatAmount: (amount, currency) ->
-    options =
-      style: "currency"
-      currency: currency
-      currencyDisplay: "symbol"
-    (amount).toLocaleString(_.str.replace(@favLocale.memoryValue, '_', '-'), options)
+    (amount).toLocaleString(_.str.replace(@favLocale.memoryValue, '_', '-'))
 
 
   ###
