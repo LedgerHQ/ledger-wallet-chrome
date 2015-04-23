@@ -11,7 +11,6 @@ class @WalletAccountsShowViewController extends @ViewController
     confirmedBalanceContainer: "#confirmed_balance_container"
     unconfirmedBalanceContainer: "#unconfirmed_balance_container"
 
-
   onAfterRender: ->
     super
     @_updateBalancesLayout()
