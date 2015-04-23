@@ -116,7 +116,7 @@ onboarding:
         unplug_plug: "Unplug then plug back your Ledger Wallet to access your accounts and bitcoins."
 
       forged:
-        device_forged: "This Ledger Nano is not genuine, or firmware update has failed"
+        device_forged: "This Ledger Wallet is not genuine"
         forbidden_access: "For safety reasons, you are not authorized to use this application."
         get_help: "Please visit our help center at support.ledgerwallet.com for more information."
 

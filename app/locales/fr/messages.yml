@@ -116,7 +116,7 @@ onboarding:
         unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder vos comptes et bitcoins."
 
       forged:
-        device_forged: "Ce Ledger Nano n'est pas authentique, ou la mise à jour du firmware a échoué"
+        device_forged: "Ce Ledger Wallet n'est pas authentique"
         forbidden_access: "Pour des raisons de sécurité, vous n'êtes pas autorisé à utiliser cette application."
         get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
 
