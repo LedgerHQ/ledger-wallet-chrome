@@ -4,6 +4,8 @@ ledger.base ?= {}
 ledger.base.application ?= {}
 
 DongleLogger = -> ledger.utils.Logger.getLoggerByTag('AppDongle')
+ApplicationLogger = -> ledger.utils.Logger.getLoggerByTag('Application')
+XhrLogger = -> ledger.utils.Logger.getLoggerByTag('XHR')
 
 ###
   Base class for the main application class. This class holds the non-specific part of the application (i.e. click dispatching, application lifecycle)
@@ -19,6 +21,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @_dongleAttestationLock = off
     @_isConnectingDongle = no
     ledger.dialogs.manager.initialize($('#dialogs_container'))
+    window.onerror = ApplicationLogger().error.bind(ApplicationLogger())
 
   ###
     Starts the application by configuring the application environment, starting services and rendering view controllers
@@ -29,6 +32,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @_listenClickEvents()
     @_listenWalletEvents()
     @_listenDongleEvents()
+    @_listenXhr()
     @onStart()
     @devicesManager.start()
     @donglesManager.start()
@@ -198,6 +202,15 @@ class ledger.base.application.BaseApplication extends @EventEmitter
       dongle.once 'state:unlocked', =>
         (Try => @onDongleIsUnlocked(dongle)).printError()
       (Try => @onDongleConnected(dongle)).printError()
+
+  _listenXhr: ->
+    formatRequest = (request, response) -> "#{request.type} #{request.url}" + if response? then " [#{response.status}] - #{response.statusText}" else ""
+    $(document).bind 'ajaxSend', (_1, _2, request) ->
+      XhrLogger().info formatRequest(request, null)
+    .bind 'ajaxSuccess',  (_1, response, request) ->
+      XhrLogger().good formatRequest(request, response)
+    .bind 'ajaxError',  (_1, response, request) ->
+      XhrLogger().bad formatRequest(request, response)
 
   onConnectingDongle: (card) ->
 

@@ -16,18 +16,20 @@ ledger.preferences.init = (cb) ->
       deferred.promise
     getAllPrefs(_.keys(obj), _.values(obj)).then(=> cb?()).done()
 
+ledger.preferences.close = ->
+  ledger.preferences.instance = undefined
 
 ###
   Helpers to get/set preferences
 ###
-class ledger.preferences.Preferences
+class ledger.preferences.Preferences extends EventEmitter
 
   prefs:
     btcUnit: ledger.preferences.defaults.Display.units.bitcoin.symbol
     currency: 'USD'
     miningFee: ledger.preferences.defaults.Bitcoin.fees.normal.value
     blockchainExplorer: _.keys(ledger.preferences.defaults.Bitcoin.explorers)[0]
-    currencyEquivalentIsActive: false
+    currencyEquivalentIsActive: true
     logState: true
     confirmationsCount: ledger.preferences.defaults.Bitcoin.confirmations.one
 
@@ -46,8 +48,9 @@ class ledger.preferences.Preferences
       ledger.preferences.instance.setLanguage('es')
   ###
   setLanguage: (value) ->
+    oldValue = @getLanguage()
     ledger.i18n.setFavLangByUI(value)
-
+    @emit 'language:changed', {oldValue: oldValue, newValue: value}
 
   # Get Locale - Region preference for Date and currency formatting
   getLocale: () ->
@@ -60,8 +63,9 @@ class ledger.preferences.Preferences
       ledger.preferences.instance.setLocale('en-GB')
   ###
   setLocale: (value) ->
+    oldValue = @getLocale()
     ledger.i18n.setLocaleByUI(value)
-
+    @emit 'region:changed', {oldValue: oldValue, newValue: value}
 
   # Get BTC Unit
   getBtcUnit: () ->
@@ -84,7 +88,9 @@ class ledger.preferences.Preferences
   setCurrency: (value) ->
     if ledger.storage.sync?
       ledger.storage.sync.set({__preferences_currency: value})
+      oldValue = @prefs.currency
       @prefs.currency = value
+      @emit 'currency:changed', {oldValue: oldValue, newValue: value}
     else
       throw new Error 'You must initialize your wallet'
 
@@ -94,10 +100,12 @@ class ledger.preferences.Preferences
     @prefs.currencyEquivalentIsActive
 
   # Set fiat currency equivalent functionality to active
-  setCurrencyActive: (state = yes) ->
+  setCurrencyActive: (state) ->
     if ledger.storage.sync?
       ledger.storage.sync.set({__preferences_currencyEquivalentIsActive: state})
+      oldValue = @prefs.currencyEquivalentIsActive
       @prefs.currencyEquivalentIsActive = state
+      @emit 'currencyActive:changed', {oldValue: oldValue, newValue: state}
     else
       throw new Error 'You must initialize your wallet'
 

@@ -19,6 +19,7 @@ class ledger.tasks.BalanceTask extends ledger.tasks.Task
       return unless @isRunning()
       if error?
         @emit "failure", @
+        @logger().error("Error during balance computation ", error)
         ledger.app.emit "wallet:balance:failed"
       else
         account = Account.find(index: @_accountIndex).first()
@@ -42,5 +43,3 @@ class ledger.tasks.BalanceTask extends ledger.tasks.Task
 
   @reset: () ->
     singletons = []
-
-  _logger: -> ledger.utils.Logger.getLoggerByTag('BalanceTask')

@@ -59,6 +59,7 @@
         '../libs/lokijs.min'
         '../libs/bitcoinjs-min'
         '../libs/zbarqrcode'
+        '../libs/mutation-summary'
 
         # Used be m2fa.DebugClient
         '../libs/lw-api-js/ucrypt/ka'

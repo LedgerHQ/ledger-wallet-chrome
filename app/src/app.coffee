@@ -57,7 +57,6 @@ require @ledger.imports, ->
         @performDongleAttestation()
         ledger.tasks.TickerTask.instance.start()
 
-
     onDongleCertificationDone: (wallet, error) ->
       return unless @isInWalletMode()
       if not error?
@@ -83,6 +82,7 @@ require @ledger.imports, ->
           ledger.db.contexts.open()
           Wallet.initializeWallet =>
             ledger.preferences.init =>
+              @_listenCountervalueEvents(true)
               ledger.utils.Logger.updateGlobalLoggersLevel()
               @emit 'wallet:initialized'
               _.defer =>
@@ -117,6 +117,8 @@ require @ledger.imports, ->
 
     _releaseWallet: (removeDongle = yes) ->
       @emit 'dongle:disconnected'
+      @_listenCountervalueEvents(false)
+      ledger.preferences.close()
       ledger.utils.Logger.updateGlobalLoggersLevel()
       Wallet.releaseWallet()
       ledger.wallet.release(@wallet)
@@ -130,6 +132,53 @@ require @ledger.imports, ->
         @wallet?.lock()
       ledger.dialogs.manager.dismissAll(no)
       @router.go '/onboarding/device/plug' if @isInWalletMode()
+
+    _listenCountervalueEvents: (listen) ->
+      if !listen
+        @_countervalueObserver.disconnect()
+        @_countervalueObserver = undefined
+        @_listenedCountervalueNodes = undefined
+        @_reprocessCountervalueNodesCallback = undefined
+        ledger.preferences.instance.off 'currency:changed', @_reprocessCountervalueNodesCallback
+        ledger.preferences.instance.off 'region:changed', @_reprocessCountervalueNodesCallback
+        ledger.tasks.TickerTask.instance.off 'updated', @_reprocessCountervalueNodesCallback
+        return
+
+      recomputeCountervalue = (node) =>
+        qNode = $(node)
+        qNode.text(ledger.converters.satoshiToCurrencyFormatted(qNode.attr('data-countervalue')))
+
+      handleChanges = (summaries) =>
+        for summary in summaries
+          for node in summary.added
+            # add from watchlist
+            @_listenedCountervalueNodes.push node
+            recomputeCountervalue(node)
+          for node in summary.valueChanged
+            recomputeCountervalue(node)
+          for node in summary.removed
+            # remove from watchlist
+            index = @_listenedCountervalueNodes.indexOf(node)
+            @_listenedCountervalueNodes.splice(index, 1) if index != -1
+
+      @_reprocessCountervalueNodesCallback = =>
+        for node in @_listenedCountervalueNodes
+          recomputeCountervalue(node)
+
+      # listen app events
+      ledger.preferences.instance.on 'currency:changed', @_reprocessCountervalueNodesCallback
+      ledger.preferences.instance.on 'region:changed', @_reprocessCountervalueNodesCallback
+      ledger.tasks.TickerTask.instance.on 'updated', @_reprocessCountervalueNodesCallback
+
+      # listen countervalue nodes
+      @_listenedCountervalueNodes = []
+      @_countervalueObserver = new MutationSummary(
+        callback: handleChanges
+        rootNode: $('body').get(0)
+        observeOwnChanges: false
+        oldPreviousSibling: false
+        queries: [{ attribute: 'data-countervalue' }]
+      )
 
   @WALLET_LAYOUT = 'WalletNavigationController'
   @ONBOARDING_LAYOUT = 'OnboardingNavigationController'
