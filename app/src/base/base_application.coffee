@@ -139,6 +139,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
         when 'reload-page' then @reloadUi(yes)
         when 'reload-application' then do @reload
         when 'update-firmware' then do @onCommandFirmwareUpdate
+        when 'export-logs' then do @onCommandExportLogs
 
   ###
     Catches click on links and dispatch them if possible to the router.
@@ -247,3 +248,5 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   onDongleIsInBootloaderMode: (dongle) ->
 
   onCommandFirmwareUpdate: ->
+
+  onCommandExportLogs: ->

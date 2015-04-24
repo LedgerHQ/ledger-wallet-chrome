@@ -101,6 +101,9 @@ require @ledger.imports, ->
       @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
       @router.go '/'
 
+    onCommandExportLogs: ->
+      ledger.utils.Logger.downloadLogsWithLink()
+
     _listenAppEvents: () ->
       @on 'wallet:operations:sync:failed', =>
         return unless @isInWalletMode()
