@@ -33,4 +33,4 @@ describe "Currency converters", ->
 
   it "should converts Satoshi to EUR", ->
     res = converters.satoshiToCurrency(9999999, 'EUR')
-    expect(res).toBe(25)
+    expect(res).toBe('25.00')
