@@ -3,10 +3,13 @@ class @WalletSendProcessingDialogViewController extends @DialogViewController
   view:
     contentContainer: '#content_container'
 
+  initialize: ->
+    super
+    @_startSignature()
+
   onAfterRender: ->
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
-    do @_startSignature
 
   _startSignature: ->
     # sign transaction

@@ -3,7 +3,7 @@
 _.extend ledger.wallet,
 
   sweepPrivateKey: ({privateKey, account, txFee}, callback) ->
-    txFee ?= 10000
+    txFee ?= ledger.preferences.instance.getMiningFee()
     completion = new CompletionClosure(callback)
     recipientAddress = account.getHDAccount().getCurrentPublicAddress()
     ecKey = new window.bitcoin.ECKey.fromWIF(privateKey)
