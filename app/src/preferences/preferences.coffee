@@ -97,6 +97,7 @@ class ledger.preferences.Preferences extends EventEmitter
   setLogActive: (value) -> @_setPreference 'logActive', value
 
   getAllBitcoinUnits: -> _.map(_.values(ledger.preferences.defaults.Display.units), (unit) -> unit.symbol)
+  getBitcoinUnitMaximumDecimalDigitsCount: () -> _.object.apply(_, _.unzip(_.map(ledger.preferences.defaults.Display.units, (u) -> [u.symbol, u.unit])))[@getBtcUnit()]
   getBlockchainExplorerAddress: -> ledger.preferences.defaults.Bitcoin.explorers[@getBlockchainExplorer()].address
 
   isConfirmationCountReached: (count) -> count >= @getConfirmationsCount()

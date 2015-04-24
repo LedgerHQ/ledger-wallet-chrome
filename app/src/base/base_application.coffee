@@ -83,13 +83,15 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   ###
     Reloads the currently displayed view controller and css files.
   ###
-  reloadUi: () ->
-    $('link').each (_, link) ->
-      if link.href? && link.href.length > 0
-        cleanHref = link.href
-        cleanHref = cleanHref.replace(/\?[0-9]*/i, '')
-        link.href = cleanHref + '?' + (new Date).getTime()
-    @_navigationController.render @_navigationControllerSelector() if @_navigationController?
+  reloadUi: (reloadViewTemplates = no) ->
+    if reloadViewTemplates
+      $('link').each (_, link) ->
+        if link.href? && link.href.length > 0
+          cleanHref = link.href
+          cleanHref = cleanHref.replace(/\?[0-9]*/i, '')
+          link.href = cleanHref + '?' + (new Date).getTime()
+    @_navigationController.rerender()
+    dialog.rerender() for dialog in ledger.dialogs.manager.getAllDialogs()
 
   ###
     This method is used to dispatch an action to the view controller hierarchy. First it tries to trigger an action on
@@ -127,7 +129,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   _listenCommands: ->
     chrome.commands.onCommand.addListener (command) =>
       switch command
-        when 'reload-page' then do @reloadUi
+        when 'reload-page' then @reloadUi(yes)
         when 'reload-application' then do @reload
         when 'update-firmware' then do @onCommandFirmwareUpdate
 
