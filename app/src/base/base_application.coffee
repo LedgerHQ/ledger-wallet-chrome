@@ -14,7 +14,7 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   constructor: ->
     @_navigationController = null
-    @donglesManager = new ledger.dongle.Manager()
+    #@donglesManager = new ledger.dongle.Manager()
     @devicesManager = new DevicesManager()
     @walletsManager = new WalletsManager(this)
     @router = new Router(@)
@@ -35,13 +35,13 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @_listenXhr()
     @onStart()
     @devicesManager.start()
-    @donglesManager.start()
+    #@donglesManager.start()
 
   ###
     Reloads the whole application.
   ###
   reload: () ->
-    @donglesManager.stop()
+    #@donglesManager.stop()
     @devicesManager.stop()
     chrome.runtime.reload()
 
@@ -172,11 +172,22 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   _listenWalletEvents: () ->
     # Wallet management & wallet events re-dispatching
     @walletsManager.on 'connecting', (event, card) =>
+      return if @wallet?
       DongleLogger().info('Connecting', card.id)
       @_isConnectingDongle = yes
+      @_connectingCard = card.id
       (Try => @onConnectingDongle(card)).printError()
+    @walletsManager.on 'disconnect', (event, card) =>
+      if @_connectingCard is card.id
+        try
+          @_isConnectingDongle = no
+          @_connectingCard = undefined
+          _.defer => (Try => @onDongleIsDisconnected(null)).printError()
+        catch er
+          e er
     @walletsManager.on 'connected', (event, wallet) =>
       @_isConnectingDongle = no
+      @_connectingCard = undefined
       @connectWallet(wallet)
 
   connectWallet: (wallet) ->
