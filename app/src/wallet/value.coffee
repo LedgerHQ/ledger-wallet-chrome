@@ -9,7 +9,7 @@ class ledger.wallet.Value
   @from: (value) ->
     return value if _.isKindOf(value, Value)
     out = switch
-      when _.isString value then new Value(parseInt(value))
+      when _.isString value then new Value(value)
       when _.isNumber value then new Value(value)
     out
 
