@@ -283,6 +283,10 @@
         'controllers/wallet/settings/bitcoin/wallet_settings_bitcoin_blockchain_setting_view_controller'
         'controllers/wallet/settings/wallet_settings_bitcoin_section_dialog_view_controller'
 
+        # - Tools
+        'controllers/wallet/settings/tools/wallet_settings_tools_logs_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_tools_section_dialog_view_controller'
+
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
         'controllers/onboarding/onboarding_navigation_controller'

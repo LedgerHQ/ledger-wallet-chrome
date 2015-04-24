@@ -172,9 +172,17 @@ class ledger.formatters
 
   # This generic method formats the input value in units (BTC, mBTC, bits) to Satoshi
   @_formatUnitToSatoshi: (value, _name) ->
-    places = value.toString().length - value.toString().indexOf('.') - 1
-    num = new Bitcoin.BigInteger(value.toString())
-    .multiply Bitcoin.BigInteger.valueOf(10).pow(ledger.preferences.defaults.Display.units[_name].unit - places)
+    [intPart, fracPart] = value.toString().split(".")
+    fracPart ?= 0
+    # Check if we should round
+    if(fracPart.toString().length < ledger.preferences.defaults.Display.units[_name].unit)
+      fracPart = _.str.rpad(fracPart, ledger.preferences.defaults.Display.units[_name].unit, '0')
+    else
+      d = fracPart.toString().length - ledger.preferences.defaults.Display.units[_name].unit
+      fracPart = parseFloat(fracPart) / Math.pow(10, d)
+      fracPart = _.str.lpad(Math.ceil(fracPart).toString(), ledger.preferences.defaults.Display.units[_name].unit, '0')
+    res = intPart + fracPart
+    num = new Bitcoin.BigInteger(res.toString())
     num.toString()
 
 

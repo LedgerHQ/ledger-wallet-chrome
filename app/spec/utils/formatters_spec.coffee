@@ -60,11 +60,30 @@ describe "Unit Formatters -", ->
   it "should convert bits to Satoshi", ->
     res = formatters.fromMicroBtcToSatoshi(4.89)
     expect(res).toBe('489')
+    res = formatters.fromMicroBtcToSatoshi(0.89)
+    expect(res).toBe('89')
+    res = formatters.fromMicroBtcToSatoshi(0.5555)
+    expect(res).toBe('56')
+    res = formatters.fromMicroBtcToSatoshi(895621.45)
+    expect(res).toBe('89562145')
 
   it "should convert milli to Satoshi", ->
     res = formatters.fromMilliBtcToSatoshi(4.89)
     expect(res).toBe('489000')
+    res = formatters.fromMilliBtcToSatoshi(12399)
+    expect(res).toBe('1239900000')
+    res = formatters.fromMilliBtcToSatoshi(0.89)
+    expect(res).toBe('89000')
+    res = formatters.fromMilliBtcToSatoshi(0.555555)
+    expect(res).toBe('55556')
+
 
   it "should convert BTC to Satoshi", ->
     res = formatters.fromBtcToSatoshi(4.89)
     expect(res).toBe('489000000')
+    res = formatters.fromBtcToSatoshi(89562551.45)
+    expect(res).toBe('8956255145000000')
+    res = formatters.fromBtcToSatoshi(0.45)
+    expect(res).toBe('45000000')
+    res = formatters.fromBtcToSatoshi(0.555555555)
+    expect(res).toBe('55555556')
