@@ -356,8 +356,6 @@
           '../spec/jasmine/boot'
         ]
         files: [
-          '../spec/i18n/i18n_spec'
-
           '../spec/utils/storage/store_spec'
           '../spec/utils/storage/chrome_store_spec'
           '../spec/utils/storage/secure_store_spec'
@@ -367,6 +365,8 @@
 
           '../spec/utils/formatters_spec'
           '../spec/utils/converters_spec'
+
+          '../spec/i18n/i18n_spec'
 
           '../spec/m2fa/client_spec'
           '../spec/m2fa/m2fa_spec'

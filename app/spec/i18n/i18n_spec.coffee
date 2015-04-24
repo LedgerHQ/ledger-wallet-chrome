@@ -5,18 +5,18 @@ describe "Internationalization and Localization -", ->
   describe "Test setFavLangByUI() - ", ->
 
     it "should change the language", ->
-      i18n.setFavLangByUI('es')
-      expect(i18n.favLang.memoryValue).toBe('es')
+      i18n.setFavLangByUI('en')
+      expect(i18n.favLang.memoryValue).toBe('en')
 
     it "should sync the language to chrome store", (done) ->
       i18n.setFavLangByUI('en')
       res = ''
       call = () ->
         d = Q.defer()
-        chromeStore.get 'i18n_favLang', (r) ->
-          if Array.isArray(r.i18n_favLang)
-            r.i18n_favLang = r.i18n_favLang[0]
-          res = r.i18n_favLang
+        chromeStore.get '__i18n_favLang', (r) ->
+          if Array.isArray(r.__i18n_favLang)
+            r.i18n_favLang = r.__i18n_favLang[0]
+          res = r.__i18n_favLang
           d.resolve(res)
         return d.promise
       call()
@@ -30,10 +30,10 @@ describe "Internationalization and Localization -", ->
       res = ''
       call = () ->
         d = Q.defer()
-        ledger.storage.sync.get 'i18n_favLang', (r) ->
-          if Array.isArray(r.i18n_favLang)
-            r.i18n_favLang = r.i18n_favLang[0]
-          res = r.i18n_favLang
+        ledger.storage.sync.get '__i18n_favLang', (r) ->
+          if Array.isArray(r.__i18n_favLang)
+            r.i18n_favLang = r.__i18n_favLang[0]
+          res = r.__i18n_favLang
           d.resolve(res)
         return d.promise
       call()
@@ -59,10 +59,10 @@ describe "Internationalization and Localization -", ->
       res = ''
       call = () ->
         d = Q.defer()
-        chromeStore.get 'i18n_favLocale', (r) ->
-          if Array.isArray(r.i18n_favLocale)
-            r.i18n_favLang = r.i18n_favLocale[0]
-          res = r.i18n_favLocale
+        chromeStore.get '__i18n_favLocale', (r) ->
+          if Array.isArray(r.__i18n_favLocale)
+            r.__i18n_favLang = r.__i18n_favLocale[0]
+          res = r.__i18n_favLocale
           d.resolve(res)
         return d.promise
       call()
@@ -76,10 +76,10 @@ describe "Internationalization and Localization -", ->
       res = ''
       call = () ->
         d = Q.defer()
-        ledger.storage.sync.get 'i18n_favLocale', (r) ->
-          if Array.isArray(r.i18n_favLocale)
-            r.i18n_favLocale = r.i18n_favLocale[0]
-          res = r.i18n_favLocale
+        ledger.storage.sync.get '__i18n_favLocale', (r) ->
+          if Array.isArray(r.__i18n_favLocale)
+            r.i18n_favLocale = r.__i18n_favLocale[0]
+          res = r.__i18n_favLocale
           d.resolve(res)
         return d.promise
       call()
@@ -93,7 +93,7 @@ describe "Internationalization and Localization -", ->
   describe "Check lang and locale memory and stores values after full initialization", ->
 
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
 
     beforeEach (done) ->
       ledger.storage.sync.clear ->
@@ -103,8 +103,9 @@ describe "Internationalization and Localization -", ->
 
 
     it "should set two chars tag lang and four chars tag locale", (done) ->
-      i18n.browserAcceptLanguages = ['be', 'fr-CA', 'zh-tw', 'fr']
-      i18n.loadUserBrowserAcceptLangs = () -> i18n.browserAcceptLanguages
+      i18n.loadUserBrowserAcceptLangs = () ->
+        i18n.browserAcceptLanguages = ['be', 'fr-CA', 'zh-tw', 'fr']
+        Q()
       i18n.init ->
         expect(i18n.favLang.memoryValue).toBe('fr')
         expect(i18n.favLang.chromeStoreValue).toBe('fr')
@@ -114,21 +115,24 @@ describe "Internationalization and Localization -", ->
         expect(i18n.favLocale.syncStoreValue).toBe('fr-CA')
         done()
 
+    # Should be 'fr' if it is the first supported language in the browserAcceptLanguages array
     it "should set two chars tag lang and locale", (done) ->
-      i18n.browserAcceptLanguages = ['zh', 'es', 'en-GB', 'it']
-      i18n.loadUserBrowserAcceptLangs = () -> i18n.browserAcceptLanguages
+      i18n.loadUserBrowserAcceptLangs = () ->
+        i18n.browserAcceptLanguages = ['zh', 'fr', 'en-GB', 'it']
+        Q()
       i18n.init ->
-        expect(i18n.favLang.memoryValue).toBe('es')
-        expect(i18n.favLang.chromeStoreValue).toBe('es')
-        expect(i18n.favLang.syncStoreValue).toBe('es')
-        expect(i18n.favLocale.memoryValue).toBe('es')
-        expect(i18n.favLocale.chromeStoreValue).toBe('es')
-        expect(i18n.favLocale.syncStoreValue).toBe('es')
+        expect(i18n.favLang.memoryValue).toBe('fr')
+        expect(i18n.favLang.chromeStoreValue).toBe('fr')
+        expect(i18n.favLang.syncStoreValue).toBe('fr')
+        expect(i18n.favLocale.memoryValue).toBe('fr')
+        expect(i18n.favLocale.chromeStoreValue).toBe('fr')
+        expect(i18n.favLocale.syncStoreValue).toBe('fr')
         done()
 
     it "should fallback to browser UI lang - chrome.i18n.getUILanguage()", (done) ->
-      i18n.browserAcceptLanguages = ['dfr', 'huj', 'jla', 'dede', 'lp']
-      i18n.loadUserBrowserAcceptLangs = () -> i18n.browserAcceptLanguages
+      i18n.loadUserBrowserAcceptLangs = () ->
+        i18n.browserAcceptLanguages = ['dfr', 'huj', 'jla', 'dede', 'lp']
+        Q()
       i18n.init ->
         expect(i18n.favLang.memoryValue).toBe(chrome.i18n.getUILanguage())
         expect(i18n.favLang.chromeStoreValue).toBe(chrome.i18n.getUILanguage())
@@ -139,8 +143,9 @@ describe "Internationalization and Localization -", ->
         done()
 
     it "should have sync store set", (done) ->
-      i18n.browserAcceptLanguages = ['be', 'fr-CA', 'zh-tw', 'fr']
-      i18n.loadUserBrowserAcceptLangs = () -> i18n.browserAcceptLanguages
+      i18n.loadUserBrowserAcceptLangs = () ->
+        i18n.browserAcceptLanguages = ['be', 'fr-CA', 'zh-tw', 'fr']
+        Q()
       i18n.init ->
         expect(i18n.favLang.syncStoreIsSet).toBe(true)
         expect(i18n.favLocale.syncStoreIsSet).toBe(true)

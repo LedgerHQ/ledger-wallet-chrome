@@ -327,7 +327,7 @@ class ledger.i18n
     # If tag language is set manually
     if tag?
       if tag.length > 2
-        throw new Error 'Tag language must be two characters. Use ledger.i18n.setLocale() if you want to set the region'
+        throw new Error 'Tag language must be two characters. Use ledger.i18n.setLocaleByUI() if you want to set the region'
       # Check if it is a supported language
       if tag in Object.keys(@Languages)
         @favLang.memoryValue = tag
