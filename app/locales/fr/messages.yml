@@ -116,7 +116,7 @@ onboarding:
         unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder vos comptes et bitcoins."
 
       forged:
-        device_forged: "Ce Ledger Nano n'est pas authentique, ou la mise à jour du firmware a échoué"
+        device_forged: "Ce Ledger Wallet n'est pas authentique"
         forbidden_access: "Pour des raisons de sécurité, vous n'êtes pas autorisé à utiliser cette application."
         get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
 
@@ -277,6 +277,7 @@ wallet:
       no_operations: "Aucune opération."
       confirmed: "Confirmée"
       unconfirmed: "Non confirmée"
+      countervalue: "Contre-valeur"
 
   top_menu:
     balance: 'SOLDE'
@@ -332,6 +333,7 @@ wallet:
         action: "PARAMÈTRES DU COMPTE"
         balance: "SOLDE"
         balance_in_progress: "DONT NON CONFIRMÉ"
+        countervalue: "Contre-valeur"
         actions: "ACTIONS"
         receive: "RECEVOIR"
         send: "ENVOYER"
@@ -519,7 +521,7 @@ wallet:
     display:
       units: "Unités"
       bitcoin_unit: "Unité Bitcoin"
-      show_currency: "Afficher la contre-valeur"
+      show_currency: "Contre-valeur"
       exchange_rate: "Taux d'échange"
       language_and_region: "Langue & région"
       interface_language: "Langue de l'interface"

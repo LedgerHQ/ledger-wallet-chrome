@@ -55,3 +55,16 @@ describe "Unit Formatters -", ->
     expect(res).toBe('0.096790')
     res = formatters.fromValue(967897800, -1)
     expect(res).toBe('9.678978')
+
+
+  it "should convert bits to Satoshi", ->
+    res = formatters.fromMicroBtcToSatoshi(4.89)
+    expect(res).toBe('489')
+
+  it "should convert milli to Satoshi", ->
+    res = formatters.fromMilliBtcToSatoshi(4.89)
+    expect(res).toBe('489000')
+
+  it "should convert BTC to Satoshi", ->
+    res = formatters.fromBtcToSatoshi(4.89)
+    expect(res).toBe('489000000')

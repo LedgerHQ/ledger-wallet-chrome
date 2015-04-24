@@ -18,6 +18,7 @@ permissions:
   - "*://api.coinkite.com/*"
   - "*://coinkite.com/*"
   - "storage"
+  - "unlimitedStorage"
   - "usb"
   - "hid"
   -

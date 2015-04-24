@@ -22,7 +22,6 @@ class AuthenticatedHttpClient extends @HttpClient
     else
       # If not authenticated, then grab the authentication promise and perform the call after
       @_authenticateAndPerfomSafeCall(request, deferred)
-
     deferred
 
   # Performs an authentication and then a safe call (i.e. a call that cannot fail due to authentication issue)
@@ -104,6 +103,9 @@ class AuthenticatedHttpClient extends @HttpClient
     else
       @_authenticate().then(-> completion.success(@_authToken)).fail((ex) -> completion.failure(ex))
     completion.readonly()
+
+  getAuthTokenSync: -> @_authToken
+
 
   @instance: (baseUrl = ledger.config.restClient.baseUrl) -> @_instance ?= new @(baseUrl)
 

@@ -30,7 +30,7 @@ class @WalletSettingsDisplayCurrencySettingViewController extends WalletSettings
 
   _updateSwitchState: ->
     # update switch state
-    @view.switch.setOn(ledger.preferences.instance.getCurrencyActive())
+    @view.switch.setOn(ledger.preferences.instance.isCurrencyActive())
 
   _listenEvents: ->
     @view.switch.on 'isOn', => @_handleSwitchChanged(on)

@@ -31,6 +31,9 @@ class ledger.formatters
         break
     throw new Error("unit must be in " + _.reduce(ledger.preferences.instance.getAllBitcoinUnits(), (cumul, unit) -> return cumul + ', ' + unit), '') if found == no
 
+    decimalSeparator = ledger.number.getLocaleDecimalSeparator(ledger.preferences.instance.getLocale().replace('_', '-'))
+    thousandSeparator = ledger.number.getLocaleThousandSeparator(ledger.preferences.instance.getLocale().replace('_', '-'))
+
     integerPart = new Bitcoin.BigInteger(value.toString())
     .divide Bitcoin.BigInteger.valueOf(10).pow(unit)
 
@@ -48,11 +51,16 @@ class ledger.formatters
         fractionalPart = parseFloat(fractionalPart) / Math.pow(10, d)
         fractionalPart = _.str.lpad(Math.ceil(fractionalPart).toString(), precision, '0')
 
-    value = integerPart + '.' + fractionalPart
+    reverseIntegerPart = integerPart.toString().match(/./g).reverse()
+    integerPart = []
+    for digit, index in reverseIntegerPart
+      integerPart.push digit
+      integerPart.push thousandSeparator if (index + 1) % 3 == 0 and (index + 1) < reverseIntegerPart.length
+    value = integerPart.reverse().join('') + decimalSeparator + fractionalPart
     # remove . if necessary
-    if _.str.endsWith value, '.'
+    if _.str.endsWith value, decimalSeparator
       value = _.str.splice value, -1, 1
-    return value
+    value
 
 
   ###
@@ -137,9 +145,7 @@ class ledger.formatters
   ###
   @fromBtcToSatoshi: (value) ->
     return if not value?
-    value = value * Math.pow(10, ledger.preferences.defaults.Display.units.bitcoin.unit)
-    # to string
-    value = value.toString()
+    @_formatUnitToSatoshi(value, 'bitcoin')
 
 
   ###
@@ -150,22 +156,27 @@ class ledger.formatters
   ###
   @fromMilliBtcToSatoshi: (value) ->
     return if not value?
-    value = value * Math.pow(10, ledger.preferences.defaults.Display.units.milibitcoin.unit)
-    # to string
-    value = value.toString()
+    @_formatUnitToSatoshi(value, 'milibitcoin')
 
 
   ###
-    This method converts uBTC to Satoshi
+    This method converts uBTC/bits to Satoshi
 
     @param [Number] value An input value in uBTC
     @return [String] The formatted value
   ###
   @fromMicroBtcToSatoshi: (value) ->
     return if not value?
-    value = value * Math.pow(10, ledger.preferences.defaults.Display.units.microbitcoin.unit)
-    # to string
-    value = value.toString()
+    @_formatUnitToSatoshi(value, 'microbitcoin')
+
+
+  # This generic method formats the input value in units (BTC, mBTC, bits) to Satoshi
+  @_formatUnitToSatoshi: (value, _name) ->
+    places = value.toString().length - value.toString().indexOf('.') - 1
+    num = new Bitcoin.BigInteger(value.toString())
+    .multiply Bitcoin.BigInteger.valueOf(10).pow(ledger.preferences.defaults.Display.units[_name].unit - places)
+    num.toString()
+
 
   @fromValueToSatoshi: (value) ->
     switch @getUnitSymbol()
