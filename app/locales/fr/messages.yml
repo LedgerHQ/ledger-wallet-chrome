@@ -29,6 +29,7 @@ common:
   later: "Plus tard"
   reset: "Réinitialiser"
   save: "Enregistrer"
+  export: "Exporter"
   back: "Retour"
   next: "Suivant"
   test: "Test"
@@ -506,6 +507,7 @@ wallet:
       tools: "Outils"
       display: "Affichage"
       apps: "Apps (beta)"
+      tools: "Outils"
       version: "Version %s"
 
     hardware:
@@ -534,6 +536,11 @@ wallet:
       default_value: "Frais par défaut"
       blockchain_explorer: "Explorer de Blockchain"
       default_explorer: "Explorateur par défaut"
+
+    tools:
+      logs: "Logs"
+      stored_logs: "Logs enregistrés"
+      disclamer: "Les logs contiennent des événements anonymes de navigation et de communication avec le matériel qui ne sont pas liés à votre portefeuille ou votre identité Bitcoin. Ces données ne sont utilisées que pour du diagnostic et ne sont jamais envoyées sur nos serveurs."
 
 apps:
   coinkite:

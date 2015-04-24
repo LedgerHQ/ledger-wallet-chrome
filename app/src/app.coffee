@@ -16,7 +16,6 @@ require @ledger.imports, ->
           @setExecutionMode(@Modes.Wallet)
           @router.go('/')
 
-
     ###
       Sets the execution mode of the application. In Wallet mode, the application handles the wallets state by starting services,
       emitting specific events. This mode is the normal one, it allows access to accounts, balances...
