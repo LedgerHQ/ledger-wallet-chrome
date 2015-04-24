@@ -10,6 +10,7 @@ class @HttpClient
    @return [jqXHR] A jQuery.jqXHR
   ###
   jqAjax: (r) ->
+    @setHttpHeader('X-LedgerWallet-AuthToken', ledger.api.authenticated().getAuthTokenSync()) if ledger.api.authenticated()?.getAuthTokenSync()?
     r.headers = _.extend({}, @headers, r.headers)
     r.success ?= r.onSuccess
     r.error ?= r.onError
