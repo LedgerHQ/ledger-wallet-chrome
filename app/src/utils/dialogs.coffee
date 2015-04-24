@@ -40,6 +40,9 @@ class @ledger.dialogs.DialogController extends EventEmitter
     @_viewController.once 'afterRender', done
     @_viewController.render selector
 
+  rerender: ->
+    @render @_selector if @_selector
+
   handleAction: (actionName, params) -> @_viewController.handleAction(actionName, params)
 
   push: (viewController) ->
@@ -147,6 +150,8 @@ class @ledger.dialogs.DialogsController
     return if @_dialogs.length == 0
     while @_dialogs.length > 0
       @_dialogs[@_dialogs.length - 1].dismiss(animated)
+
+  getAllDialogs: -> @_dialogs
 
   displayedDialog: () -> @_dialogs[@_dialogs.length - 1]
 

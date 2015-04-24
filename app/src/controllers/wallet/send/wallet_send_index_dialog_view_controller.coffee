@@ -14,7 +14,7 @@ class @WalletSendIndexDialogViewController extends DialogViewController
       @view.amountInput.val @params.amount
     if @params.address?
       @view.receiverInput.val @params.address
-    @view.amountInput.amountInput()
+    @view.amountInput.amountInput(ledger.preferences.instance.getBitcoinUnitMaximumDecimalDigitsCount())
     @view.errorContainer.hide()
     do @_updateTotalInput
     do @_listenEvents

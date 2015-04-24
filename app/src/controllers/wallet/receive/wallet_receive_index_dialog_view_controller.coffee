@@ -17,7 +17,7 @@ class @WalletReceiveIndexDialogViewController extends DialogViewController
         colorDark : "#000000"
         colorLight : "#ffffff"
         correctLevel : QRCode.CorrectLevel.H
-    @view.amountInput.amountInput()
+    @view.amountInput.amountInput(ledger.preferences.instance.getBitcoinUnitMaximumDecimalDigitsCount())
     @view.receiverAddress.text @params.address
     do @_listenEvents
 
