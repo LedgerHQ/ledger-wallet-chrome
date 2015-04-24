@@ -298,47 +298,32 @@ class ledger.dongle.MockDongle extends EventEmitter
       # Challenge - 4 bytes
       keycard = ledger.keycard.generateKeycardFromSeed('dfaeee53c3d280707bbe27720d522ac1')
       challenge = []
+      challengeStr = ''
       for i in [0..3]
         randomNum = _.random(_.size(keycard) - 1)
         challenge.push Object.keys(keycard)[randomNum]
-
-
-
-
+        challengeStr += ('0' + Object.keys(keycard)[randomNum])
+      #l challengeStr
 
 
       ###
-        The remote screen public key is sent to the dongle, which generates a cleartext random 8 bytes nonce,
-        a 4 bytes challenge on the printed keycard and a random 16 bytes 3DES-2 pairing key, concatenated and encrypted
-        using 3DES CBC and the generated session key
+        The remote screen public key is sent to the dongle, which generates
+          a cleartext random 8 bytes nonce,
+          a 4 bytes challenge on the printed keycard
+          and a random 16 bytes 3DES-2 pairing key, concatenated and encrypted using 3DES CBC and the generated session key
       ###
 
-      @emit 'm2fa.challenge', challenge
+      #@emit 'm2fa.challenge', challenge
 
       # 8 bytes Nonce
-      randomNumBlob = crypto.getRandomValues(new Uint32Array(10))
+      randomNumBlob = crypto.getRandomValues(new Uint8Array(8))
       nonce = ''
-      for i in randomNumBlob
-        nonce += randomNumBlob[i]
+      for val, i in randomNumBlob
+        nonce += Convert.toHexByte randomNumBlob[i]
 
 
-      [nonce, blob] = [challenge[0...16], challenge[16..-1]]
-      l "%c[_computeChallenge] nonce=", "color: #888888", nonce, ", blob=", blob
-      bytes = @_decryptChallenge(blob)
-      l "%c[_computeChallenge] bytes=", "color: #888888", JSUCrypt.utils.byteArrayToHexStr(bytes)
-      [cardChallenge, pairingKey] = [bytes[0...4], bytes[4...20]]
-      @pairingKey = JSUCrypt.utils.byteArrayToHexStr(pairingKey)
-      l "%c[_computeChallenge] cardChallenge=", "color: #888888", JSUCrypt.utils.byteArrayToHexStr(cardChallenge), ", pairingKey=", @pairingKey
-      cardResp = JSUCrypt.utils.byteArrayToHexStr(@_prompt(cardChallenge))
-      l "%c[_computeChallenge] cardResp=", "color: #888888", cardResp
 
-      # Crypt Challenge
-      cipher = new JSUCrypt.cipher.DES(JSUCrypt.padder.None, JSUCrypt.cipher.MODE_CBC)
-      key = new JSUCrypt.key.DESKey(@sessionKey)
-      cipher.init(key, JSUCrypt.cipher.MODE_ENCRYPT)
-      blob = cipher.update(nonce + cardResp + "00000000")
 
-      resp = JSUCrypt.utils.byteArrayToHexStr(blob)
 
 
 
@@ -350,7 +335,7 @@ class ledger.dongle.MockDongle extends EventEmitter
   # @param [String] resp challenge response, hex encoded.  #Encrypted nonce and challenge response + padding - 16 length
   # @param [Function] callback Optional argument
   # @return [Q.Promise] Resolve if pairing is successful.
-  confirmSecureScreen: (resp, callback=undefined) ->
+  confirmSecureScreen: (challengeResp, callback=undefined) ->
     d = ledger.defer(callback)
     if @state != States.UNLOCKED
       d.rejectWithError(Errors.DongleLocked)
@@ -358,6 +343,26 @@ class ledger.dongle.MockDongle extends EventEmitter
       d.rejectWithError(Errors.InvalidArgument, "Invalid challenge resp : #{resp}")
     else
 
+
+
+      [nonce, blob] = [challengeResp[0...16], challengeResp[16..-1]]
+      l "%c[_computeChallenge] nonce=", "color: #888888", nonce, ", blob=", blob
+      bytes = @_decryptChallenge(blob)
+      l "%c[_computeChallenge] bytes=", "color: #888888", JSUCrypt.utils.byteArrayToHexStr(bytes)
+      [cardChallenge, pairingKey] = [bytes[0...4], bytes[4...20]]
+      @pairingKey = JSUCrypt.utils.byteArrayToHexStr(pairingKey)
+      l "%c[_computeChallenge] cardChallenge=", "color: #888888", JSUCrypt.utils.byteArrayToHexStr(cardChallenge), ", pairingKey=", @pairingKey
+      cardResp = JSUCrypt.utils.byteArrayToHexStr(@_prompt(cardChallenge))
+      l "%c[_computeChallenge] cardResp=", "color: #888888", cardResp
+
+
+      # Crypt Challenge
+      cipher = new JSUCrypt.cipher.DES(JSUCrypt.padder.None, JSUCrypt.cipher.MODE_CBC)
+      key = new JSUCrypt.key.DESKey(@sessionKey)
+      cipher.init(key, JSUCrypt.cipher.MODE_ENCRYPT)
+      blob = cipher.update(nonce + cardResp + "00000000")
+
+      resp = JSUCrypt.utils.byteArrayToHexStr(blob)
 
     d.promise
 

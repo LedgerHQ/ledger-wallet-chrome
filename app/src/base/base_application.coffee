@@ -13,8 +13,8 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   constructor: ->
     configureApplication @
     @_navigationController = null
-    @donglesManager = new ledger.dongle.Manager()
-    #@donglesManager = new ledger.dongle.MockDongleManager()
+    #@donglesManager = new ledger.dongle.Manager()
+    @donglesManager = new ledger.dongle.MockDongleManager()
     @router = new Router(@)
     @_dongleAttestationLock = off
     ledger.dialogs.manager.initialize($('#dialogs_container'))
