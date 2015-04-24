@@ -44,8 +44,6 @@ permissions:
 
 optional_permissions:
   - "videoCapture"
-  - fileSystem:
-    - "write"
 
 externally_connectable:
   matches:
