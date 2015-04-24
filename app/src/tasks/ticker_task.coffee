@@ -38,14 +38,16 @@ class ledger.tasks.TickerTask extends ledger.tasks.Task
 
   onStart: () ->
     super
-    @updateTicker()
+    @_updateTicker yes
 
-  updateTicker: () ->
+  updateTicker: -> @_updateTicker no
+
+  _updateTicker: (scheduleNext) ->
     return unless @isRunning()
     @_currenciesRestClient.getAllCurrencies (currencies) =>
       @_cache.set(currencies)
       #5 minutes * 60 seconds * 1000 milliseconds = 600000ms
-      setTimeout((() => @updateTicker()), 300000)
+      setTimeout((() => @updateTicker()), 300000) if scheduleNext
       @emit 'updated', @_cache.get()
       #l @_cache.get()
 
@@ -55,6 +57,6 @@ class ledger.tasks.TickerTask extends ledger.tasks.Task
   getCacheAsync: (callback=undefined) ->
     if @_cache.isCacheEmpty()
       @once 'updated', (event, data) => callback?(data)
-      @updateTicker()
+      @_updateTicker no
     else
       callback?(@_cache.get())
