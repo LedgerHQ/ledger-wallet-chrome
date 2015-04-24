@@ -4,7 +4,7 @@ class @WalletSettingsHardwareSmartphonesSettingViewController extends WalletSett
 
   initialize: ->
     super
-    @_smartphonesGroups: []
+    @_smartphonesGroups = []
 
   pairSmartphone: ->
     dialog = new WalletPairingIndexDialogViewController()
