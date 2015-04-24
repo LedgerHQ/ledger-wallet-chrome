@@ -93,6 +93,13 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @_navigationController.rerender()
     dialog.rerender() for dialog in ledger.dialogs.manager.getAllDialogs()
 
+  scheduleReloadUi: (reloadViewTemplates = no) ->
+    clearTimeout(@_reloadUiSchedule) if @_reloadUiSchedule
+    @_reloadUiSchedule = setTimeout =>
+      @_reloadUiSchedule = null
+      @reloadUi(reloadViewTemplates)
+    , 500
+
   ###
     This method is used to dispatch an action to the view controller hierarchy. First it tries to trigger an action on
     open dialogs then it will attempt to trigger action on the navigation controller. The navigation controller will dispatch

@@ -82,6 +82,7 @@ require @ledger.imports, ->
           ledger.db.contexts.open()
           Wallet.initializeWallet =>
             ledger.preferences.init =>
+              @_listenPreferencesEvents()
               @_listenCountervalueEvents(true)
               ledger.utils.Logger.updateGlobalLoggersLevel()
               @emit 'wallet:initialized'
@@ -114,6 +115,9 @@ require @ledger.imports, ->
       @on 'wallet:operations:update wallet:operations:new', =>
         return unless @isInWalletMode()
         Wallet.instance.retrieveAccountsBalances()
+
+    _listenPreferencesEvents: ->
+      ledger.preferences.instance.on 'btcUnit:changed language:changed locale:changed confirmationsCount:changed', => @scheduleReloadUi()
 
     _releaseWallet: (removeDongle = yes) ->
       @emit 'dongle:disconnected'
