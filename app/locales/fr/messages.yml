@@ -538,9 +538,9 @@ wallet:
       default_explorer: "Explorateur par défaut"
 
     tools:
-      logs: "Logs"
+      logs: "Diagnostic"
       stored_logs: "Logs enregistrés"
-      disclamer: "Les logs contiennent des événements anonymes de navigation et de communication avec le matériel qui ne sont pas liés à votre portefeuille ou votre identité Bitcoin. Ces données ne sont utilisées que pour du diagnostic et ne sont jamais envoyées sur nos serveurs."
+      disclamer: "Les logs contiennent des événements anonymes qui sont enregistrés et cryptés localement sur votre ordinateur. Ces données ne sont pas envoyées à nos serveurs et ne peuvent être qu'exportés manuellement, sur demande du support Ledger."
 
 apps:
   coinkite:

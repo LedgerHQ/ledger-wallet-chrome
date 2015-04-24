@@ -15,10 +15,6 @@ describe "Unit Formatters -", ->
     expect(res).toEqual( jasmine.any(String) )
 
 
-  it "should .0xx have not effect", ->
-    expect(formatters.formatUnit(10.00, 'BTC')).toBe('0.0000001')
-
-
   it "should converts to BTC", ->
     res = formatters.formatUnit(1000, 'BTC')
     expect(res).toBe('0.00001')
