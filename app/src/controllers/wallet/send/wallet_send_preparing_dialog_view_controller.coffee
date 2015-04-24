@@ -2,17 +2,12 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
 
   view:
     contentContainer: '#content_container'
-    
-  cancel: ->
-    Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
-    @dismiss()
 
-  onAfterRender: ->
+  initialize: ->
     super
-    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
-    account = Account.find(index: 0).first()
     # fetch amount
-    account.createTransaction amount: @params.amount, fees: 10000, address: @params.address, (transaction, error) =>
+    account = Account.find(index: 0).first()
+    account.createTransaction amount: @params.amount, fees: ledger.preferences.instance.getMiningFee(), address: @params.address, (transaction, error) =>
       return if not @isShown()
       if error?
         reason = switch error.code
@@ -28,6 +23,14 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
           dialog.show()
       else
         @_routeToNextDialog(transaction)
+
+  cancel: ->
+    Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
+    @dismiss()
+
+  onAfterRender: ->
+    super
+    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
 
   _routeToNextDialog: (transaction) ->
     cardBlock = (transaction) =>
