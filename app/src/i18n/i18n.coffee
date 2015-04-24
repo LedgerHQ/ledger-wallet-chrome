@@ -553,6 +553,9 @@ class ledger.i18n
   ###
   @t: (messageId) =>
     messageId = _.string.replace(messageId, '.', '_')
+    key = @.translations[@favLang.memoryValue][messageId]
+    if not key? or not key['message']?
+      return messageId
     res = @.translations[@favLang.memoryValue][messageId]['message']
     return res if res? and res.length > 0
     return messageId
