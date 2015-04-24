@@ -7,16 +7,9 @@ class ledger.wallet.Value
   Value = @
 
   @from: (value) ->
-    return value if _.isKindOf(value, ledger.wallet.Value)
+    return value if _.isKindOf(value, Value)
     out = switch
-      when _.isString value
-        [integerPart, fractionalPart] = value.split('.')
-
-        fractionalPart = _.str.rpad(fractionalPart, 8, '0')
-        v = new Bitcoin.BigInteger(integerPart)
-        .multiply Bitcoin.BigInteger.valueOf(10e+7)
-        .add(new Bitcoin.BigInteger(fractionalPart))
-        new ledger.wallet.Value(v)
+      when _.isString value then new Value(value)
       when _.isNumber value then new Value(value)
     out
 

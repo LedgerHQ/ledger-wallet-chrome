@@ -1,5 +1,19 @@
 # Changelog
 
+1.2.0
+=====
+- Add new preferences dialog
+- Add high level JS API - https://github.com/LedgerHQ/ledger-wallet-api
+- Bugs fixes
+
+1.1.3
+=====
+- Embed new firmware 1.0.1
+- Add Coinkite app (beta)
+- Add BitID support
+- Add API support (beta)
+- Bug fixes
+
 1.1.2
 =====
 - Improve QR code scanner

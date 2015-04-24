@@ -13,6 +13,7 @@
         '../libs/jquery.selectric.min'
         '../libs/qrcode.min'
         '../libs/jquery.suggest'
+        '../libs/cryptojs.min'
         '../public/tooltipster/js/jquery.tooltipster.min'
         '../libs/lw-api-js/lib/bitcoinjs-min'
         '../libs/lw-api-js/lib/util'
@@ -52,11 +53,13 @@
         '../libs/BigInt'
         '../libs/sha256'
         '../libs/checkBitcoinAddress'
+        '../libs/bitcoinUtils'
         '../libs/lru'
-        '../libs/moment.min'
+        '../libs/moment'
         '../libs/lokijs.min'
         '../libs/bitcoinjs-min'
         '../libs/zbarqrcode'
+        '../libs/mutation-summary'
 
         # Used be m2fa.DebugClient
         '../libs/lw-api-js/ucrypt/ka'
@@ -84,13 +87,13 @@
         'utils/url'
         'utils/easing'
         'utils/router'
-        'utils/i18n'
         'utils/jquery'
         'utils/spinners'
         'utils/pin_codes'
         'utils/qr_codes'
         'utils/lru'
         'utils/formatters'
+        'utils/converters'
         'utils/stream'
         'utils/completion_closure'
         'utils/try'
@@ -98,6 +101,7 @@
         'utils/amount'
         'utils/progressbars'
         'utils/keycard'
+        'utils/csv_exporter'
 
         ## Crypto
         'utils/crypto/aes'
@@ -108,6 +112,7 @@
         'utils/bitcoin/bitcoin'
         'utils/bitcoin/bip39_wordlist'
         'utils/bitcoin/bip39'
+        'utils/bitcoin/bitid'
 
         ## Storage
         'utils/storage/store'
@@ -119,6 +124,7 @@
 
         ## Logger
         'utils/logger'
+        'utils/apdu_logger'
 
         ## Data synchronization
 
@@ -132,6 +138,10 @@
         'managers/permissions_manager'
         'managers/wallets_manager'
         'managers/system_manager'
+        'managers/application_manager'
+
+        ## Apps
+        'utils/apps/coinkite'
 
         ## Rest clients
         'restclients/authentication'
@@ -141,6 +151,7 @@
         'restclients/balance_restclient'
         'restclients/sync_rest_client'
         'restclients/m2fa_restclient'
+        'restclients/currencies_restclient'
 
         ## Tasks
         'tasks/task'
@@ -150,6 +161,7 @@
         'tasks/operations_synchronization_task'
         'tasks/operations_consumption_task'
         'tasks/address_derivation_task'
+        'tasks/ticker_task'
 
         ## Wallet
         'wallet/hardware_wallet'
@@ -160,6 +172,7 @@
         'wallet/cache'
         'wallet/extended_public_key'
         'wallet/sweep_private_key'
+        'wallet/wallet_setup_consistency_checker'
 
         'utils/database/database'
         'base/base_application'
@@ -230,8 +243,49 @@
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'
 
+        # BitID
+        'controllers/wallet/bitid/wallet_bitid_index_dialog_view_controller'
+        'controllers/wallet/bitid/wallet_bitid_authenticating_dialog_view_controller'
+        'controllers/wallet/bitid/wallet_bitid_form_dialog_view_controller'
+
+        # XPubKey
+        'controllers/wallet/xpubkey/wallet_xpubkey_index_dialog_view_controller'
+        'controllers/wallet/xpubkey/wallet_xpubkey_processing_dialog_view_controller'
+
+        # P2SH
+        'controllers/wallet/p2sh/wallet_p2sh_index_dialog_view_controller'
+        'controllers/wallet/p2sh/wallet_p2sh_signing_dialog_view_controller'
+
         # Settings
-        'controllers/wallet/settings/wallet_settings_hardware_dialog_view_controller'
+        # - Base
+        'controllers/wallet/settings/wallet_settings_index_dialog_view_controller'
+        'controllers/wallet/settings/base/wallet_settings_section_dialog_view_controller'
+        'controllers/wallet/settings/base/wallet_settings_setting_view_controller'
+
+        # - Hardware
+        'controllers/wallet/settings/hardware/wallet_settings_hardware_firmware_setting_view_controller'
+        'controllers/wallet/settings/hardware/wallet_settings_hardware_smartphones_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_hardware_section_dialog_view_controller'
+
+        # - Apps
+        'controllers/wallet/settings/apps/wallet_settings_apps_list_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_apps_section_dialog_view_controller'
+
+        # - Display
+        'controllers/wallet/settings/display/wallet_settings_display_units_setting_view_controller'
+        'controllers/wallet/settings/display/wallet_settings_display_currency_setting_view_controller'
+        'controllers/wallet/settings/display/wallet_settings_display_language_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_display_section_dialog_view_controller'
+
+        # - Bitcoin
+        'controllers/wallet/settings/bitcoin/wallet_settings_bitcoin_confirmations_setting_view_controller'
+        'controllers/wallet/settings/bitcoin/wallet_settings_bitcoin_fees_setting_view_controller'
+        'controllers/wallet/settings/bitcoin/wallet_settings_bitcoin_blockchain_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_bitcoin_section_dialog_view_controller'
+
+        # - Tools
+        'controllers/wallet/settings/tools/wallet_settings_tools_logs_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_tools_section_dialog_view_controller'
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
@@ -245,6 +299,8 @@
         'controllers/onboarding/device/onboarding_device_error_view_controller'
         'controllers/onboarding/device/onboarding_device_connecting_view_controller'
         'controllers/onboarding/device/onboarding_device_update_view_controller'
+        'controllers/onboarding/device/onboarding_device_unsupported_view_controller'
+        'controllers/onboarding/device/onboarding_device_failed_view_controller'
 
         # Management
         'controllers/onboarding/management/onboarding_management_security_view_controller'
@@ -261,20 +317,34 @@
         'controllers/wallet/pairing/wallet_pairing_progress_dialog_view_controller'
         'controllers/wallet/pairing/wallet_pairing_finalizing_dialog_view_controller'
 
-        # Specs
+        ## Widgets
+        'widgets/switch'
+        'widgets/segmented_control'
+
+        ## i18n
+        'i18n/i18n'
+        'i18n/i18n_languages'
+
+        ## Preferences
+        'preferences/defaults'
+        'preferences/preferences'
+
+        ## Specs
         '../spec/jasmine/jasmine'
         '../spec/jasmine/jasmine-html'
         '../spec/jasmine/boot'
-
         '../spec/utils/storage/store_spec'
         '../spec/utils/storage/chrome_store_spec'
         '../spec/utils/storage/secure_store_spec'
-        '../spec/restclients/synced_rest_client_spec'
+        #'../spec/restclients/synced_rest_client_spec'
         '../spec/utils/storage/synced_store_spec'
         '../spec/utils/bitcoin/bip39_spec'
+        '../spec/utils/formatters_spec'
+        '../spec/utils/converters_spec'
+        '../spec/i18n/i18n_spec'
 
-        '../spec/m2fa/client_spec'
-        '../spec/m2fa/m2fa_spec'
+        #'../spec/m2fa/client_spec'
+        #'../spec/m2fa/m2fa_spec'
 
         '../spec/spec_helper'
 
@@ -293,4 +363,22 @@
         'controllers/update/update_cardcheck_view_controller'
         'controllers/update/update_error_view_controller'
 
-      ]
+        ## API
+        'api'
+        'controllers/wallet/api/wallet_api_accounts_dialog_view_controller'
+        'controllers/wallet/api/wallet_api_operations_dialog_view_controller'
+
+        ## Coinkite
+        'controllers/apps/coinkite/apps_coinkite_navigation_controller'
+        'controllers/apps/coinkite/dashboard/apps_coinkite_dashboard_index_view_controller'
+        'controllers/apps/coinkite/dashboard/apps_coinkite_dashboard_compatibility_view_controller'
+        'controllers/apps/coinkite/settings/apps_coinkite_settings_index_dialog_view_controller'
+        'controllers/apps/coinkite/keygen/apps_coinkite_keygen_index_dialog_view_controller'
+        'controllers/apps/coinkite/keygen/apps_coinkite_keygen_processing_dialog_view_controller'
+        'controllers/apps/coinkite/keygen/apps_coinkite_keygen_show_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_index_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_fetching_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_show_dialog_view_controller'
+        'controllers/apps/coinkite/cosign/apps_coinkite_cosign_signing_dialog_view_controller'
+
+    ]

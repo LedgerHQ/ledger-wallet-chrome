@@ -4,6 +4,8 @@ ledger.base ?= {}
 ledger.base.application ?= {}
 
 DongleLogger = -> ledger.utils.Logger.getLoggerByTag('AppDongle')
+ApplicationLogger = -> ledger.utils.Logger.getLoggerByTag('Application')
+XhrLogger = -> ledger.utils.Logger.getLoggerByTag('XHR')
 
 ###
   Base class for the main application class. This class holds the non-specific part of the application (i.e. click dispatching, application lifecycle)
@@ -12,12 +14,14 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   constructor: ->
     @_navigationController = null
-    @donglesManager = new ledger.dongle.Manager()
+    #@donglesManager = new ledger.dongle.Manager()
     @devicesManager = new DevicesManager()
     @walletsManager = new WalletsManager(this)
     @router = new Router(@)
     @_dongleAttestationLock = off
+    @_isConnectingDongle = no
     ledger.dialogs.manager.initialize($('#dialogs_container'))
+    window.onerror = ApplicationLogger().error.bind(ApplicationLogger())
 
   ###
     Starts the application by configuring the application environment, starting services and rendering view controllers
@@ -28,16 +32,16 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @_listenClickEvents()
     @_listenWalletEvents()
     @_listenDongleEvents()
+    @_listenXhr()
     @onStart()
     @devicesManager.start()
-    @donglesManager.start()
-
+    #@donglesManager.start()
 
   ###
     Reloads the whole application.
   ###
   reload: () ->
-    @donglesManager.stop()
+    #@donglesManager.stop()
     @devicesManager.stop()
     chrome.runtime.reload()
 
@@ -79,13 +83,22 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   ###
     Reloads the currently displayed view controller and css files.
   ###
-  reloadUi: () ->
-    $('link').each (_, link) ->
-      if link.href? && link.href.length > 0
-        cleanHref = link.href
-        cleanHref = cleanHref.replace(/\?[0-9]*/i, '')
-        link.href = cleanHref + '?' + (new Date).getTime()
-    @_navigationController.render @_navigationControllerSelector() if @_navigationController?
+  reloadUi: (reloadViewTemplates = no) ->
+    if reloadViewTemplates
+      $('link').each (_, link) ->
+        if link.href? && link.href.length > 0
+          cleanHref = link.href
+          cleanHref = cleanHref.replace(/\?[0-9]*/i, '')
+          link.href = cleanHref + '?' + (new Date).getTime()
+    @_navigationController.rerender()
+    dialog.rerender() for dialog in ledger.dialogs.manager.getAllDialogs()
+
+  scheduleReloadUi: (reloadViewTemplates = no) ->
+    clearTimeout(@_reloadUiSchedule) if @_reloadUiSchedule
+    @_reloadUiSchedule = setTimeout =>
+      @_reloadUiSchedule = null
+      @reloadUi(reloadViewTemplates)
+    , 500
 
   ###
     This method is used to dispatch an action to the view controller hierarchy. First it tries to trigger an action on
@@ -107,11 +120,11 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     return if @_dongleAttestationLock is on
     @_dongleAttestationLock = on
     @wallet?.isDongleCertified (dongle, error) =>
-      (Try => @onDongleCertificationDone(dongle, (if error? then no else yes))).printError()
+      (Try => @onDongleCertificationDone(dongle, error)).printError()
       @_dongleAttestationLock = off
     return
 
-
+  isConnectingDongle: -> @_isConnectingDongle
 
   ###
     Returns the jQuery element used as the main div container in which controllers will render themselves.
@@ -123,9 +136,10 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   _listenCommands: ->
     chrome.commands.onCommand.addListener (command) =>
       switch command
-        when 'reload-page' then do @reloadUi
+        when 'reload-page' then @reloadUi(yes)
         when 'reload-application' then do @reload
         when 'update-firmware' then do @onCommandFirmwareUpdate
+        when 'export-logs' then do @onCommandExportLogs
 
   ###
     Catches click on links and dispatch them if possible to the router.
@@ -159,25 +173,42 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   _listenWalletEvents: () ->
     # Wallet management & wallet events re-dispatching
     @walletsManager.on 'connecting', (event, card) =>
+      return if @wallet?
       DongleLogger().info('Connecting', card.id)
+      @_isConnectingDongle = yes
+      @_connectingCard = card.id
       (Try => @onConnectingDongle(card)).printError()
+    @walletsManager.on 'disconnect', (event, card) =>
+      if @_connectingCard is card.id
+        try
+          @_isConnectingDongle = no
+          @_connectingCard = undefined
+          _.defer => (Try => @onDongleIsDisconnected(null)).printError()
+        catch er
+          e er
     @walletsManager.on 'connected', (event, wallet) =>
-      @wallet = wallet
-      @_dongleAttestationLock = off
-      DongleLogger().info("Connected", wallet.id)
-      wallet.once 'disconnected', =>
-        DongleLogger().info('Disconnected', wallet.id)
-        _.defer => (Try => @onDongleIsDisconnected(wallet)).printError()
-        @wallet = null
-      wallet.once 'unplugged', =>
-        (Try => @onDongleNeedsUnplug(wallet)).printError()
-      wallet.once 'state:unlocked', =>
-        DongleLogger().info('Dongle unlocked', wallet.id)
-        (Try => @onDongleIsUnlocked(wallet)).printError()
-      (Try => @onDongleConnected(wallet)).printError()
-      if wallet.isInBootloaderMode()
-        DongleLogger().info('Dongle is Bootloader mode', wallet.id)
-        (Try => @onDongleIsInBootloaderMode(wallet)).printError()
+      @_isConnectingDongle = no
+      @_connectingCard = undefined
+      @connectWallet(wallet)
+
+  connectWallet: (wallet) ->
+    @wallet = wallet
+    @_dongleAttestationLock = off
+    DongleLogger().info("Connected", wallet.id)
+    wallet.once 'disconnected', =>
+      DongleLogger().info('Disconnected', wallet.id)
+      @_isConnectingDongle = no
+      _.defer => (Try => @onDongleIsDisconnected(wallet)).printError()
+      @wallet = null
+    wallet.once 'unplugged', =>
+      (Try => @onDongleNeedsUnplug(wallet)).printError()
+    wallet.once 'state:unlocked', =>
+      DongleLogger().info('Dongle unlocked', wallet.id)
+      (Try => @onDongleIsUnlocked(wallet)).printError()
+    (Try => @onDongleConnected(wallet)).printError()
+    if wallet.isInBootloaderMode()
+      DongleLogger().info('Dongle is Bootloader mode', wallet.id)
+      (Try => @onDongleIsInBootloaderMode(wallet)).printError()
 
   _listenDongleEvents: () ->
     return
@@ -193,6 +224,15 @@ class ledger.base.application.BaseApplication extends @EventEmitter
         (Try => @onDongleIsUnlocked(dongle)).printError()
       (Try => @onDongleConnected(dongle)).printError()
 
+  _listenXhr: ->
+    formatRequest = (request, response) -> "#{request.type} #{request.url}" + if response? then " [#{response.status}] - #{response.statusText}" else ""
+    $(document).bind 'ajaxSend', (_1, _2, request) ->
+      XhrLogger().info formatRequest(request, null)
+    .bind 'ajaxSuccess',  (_1, response, request) ->
+      XhrLogger().good formatRequest(request, response)
+    .bind 'ajaxError',  (_1, response, request) ->
+      XhrLogger().bad formatRequest(request, response)
+
   onConnectingDongle: (card) ->
 
   onDongleConnected: (dongle) ->
@@ -203,8 +243,10 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
   onDongleIsDisconnected: (dongle) ->
 
-  onDongleCertificationDone: (dongle, isCertified) ->
+  onDongleCertificationDone: (dongle, error) ->
 
   onDongleIsInBootloaderMode: (dongle) ->
 
   onCommandFirmwareUpdate: ->
+
+  onCommandExportLogs: ->

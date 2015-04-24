@@ -12,6 +12,7 @@ class @OnboardingDevicePinViewController extends @OnboardingViewController
       ledger.app.wallet.unlockWithPinCode value, (success, error) =>
         l error if error?
         if success == yes
+          ledger.utils.Logger.setPrivateModeEnabled on
           ledger.app.router.go '/onboarding/device/opening'
         else if error.code == ledger.errors.WrongPinCode and error['retryCount'] > 0
           ledger.app.router.go '/onboarding/device/wrongpin', {tries_left: error['retryCount']}

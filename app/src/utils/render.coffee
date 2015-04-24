@@ -4,7 +4,11 @@ helpers =
 
 @render = (template, params, callback) =>
   template = template.substr(1) if _.string.startsWith(template, '/')
-  require('../views/' + template, =>
+  if JST?[template]?
     context = _.extend(params, helpers)
-    callback(JST[template](context))
-  )
+    _.defer => callback?(JST[template](context))
+  else
+    require('../views/' + template, =>
+      context = _.extend(params, helpers)
+      callback(JST[template](context))
+    )

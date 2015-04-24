@@ -7,29 +7,44 @@
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.amount' %></td>
         <% if @operation.get('type') == 'reception': %>
-          <td class="align-right" id="operation_amount">
-            <span class="regular-valid-text">+<%= ledger.formatters.bitcoin.fromValue(@operation.get('total_value')) %> BTC</span>
+          <td class="align-right">
+            <span class="regular-valid-text"><%= if ledger.formatters.symbolIsFirst() then ledger.formatters.getUnitSymbol() + ' ' %>+<%= ledger.formatters.fromValue(@operation.get('total_value')) %><%= if !ledger.formatters.symbolIsFirst() then ' ' + ledger.formatters.getUnitSymbol() %></span>
           </td>
           <% else: %>
-          <td class="align-right" id="operation_amount">
-            <span class="regular-invalid-text">-<%= ledger.formatters.bitcoin.fromValue(@operation.get('total_value')) %> BTC</span>
-            <span class="regular-grey-text-small"><%= _.str.sprintf t('wallet.operations.detail.transaction_fees_text'), ledger.formatters.bitcoin.fromValue(@operation.get('fees')) %></span>
+          <td class="align-right">
+            <span class="regular-invalid-text"><%= if ledger.formatters.symbolIsFirst() then ledger.formatters.getUnitSymbol() + ' ' %>-<%= ledger.formatters.fromValue(@operation.get('total_value')) %><%= if !ledger.formatters.symbolIsFirst() then ' ' + ledger.formatters.getUnitSymbol() %></span>
+            <span class="regular-grey-text-small"><%= _.str.sprintf t('wallet.operations.detail.transaction_fees_text'), ledger.formatters.formatValue(@operation.get('fees')) %></span>
           </td>
         <% end %>
       </tr>
+      <% if ledger.preferences.instance.isCurrencyActive(): %>
+      <tr>
+        <td class="row-title"><%= t 'wallet.operations.detail.countervalue' %></td>
+        <% if @operation.get('type') == 'reception': %>
+          <td class="align-right">
+            <span class="regular-grey-text" data-countervalue="+<%= @operation.get('total_value') %>"></span>
+          </td>
+          <% else: %>
+          <td class="align-right">
+            <span class="regular-grey-text" data-countervalue="-<%= @operation.get('total_value') %>"></span>
+            <span class="regular-grey-text-small"><%= _.str.sprintf t('wallet.operations.detail.transaction_fees_text'), ledger.converters.satoshiToCurrencyFormatted(@operation.get('fees')) %></span>
+          </td>
+        <% end %>
+      </tr>
+      <% end %>
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.time' %></td>
-        <td class="align-right" id="operation_time"><%= moment(new Date(@operation.get('time'))).format t 'common.date_format' %></td>
+        <td class="align-right"><%= ledger.i18n.formatDateTime(new Date(@operation.get('time'))) %></td>
       </tr>
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.status' %></td>
-        <% if @operation.get('confirmations') < ledger.wallet.transaction.MINIMUM_CONFIRMATIONS: %>
-          <td class="align-right regular-grey-text" id="operation_status">
+        <% if !ledger.preferences.instance.isConfirmationCountReached(@operation.get('confirmations')): %>
+          <td class="align-right regular-grey-text">
             <%= t 'wallet.operations.detail.unconfirmed' %>
             <span class="regular-grey-text-small">(<%= @operation.get('confirmations') %>)</span>
           </td>
         <% else: %>
-          <td class="align-right regular-valid-text" id="operation_status">
+          <td class="align-right regular-valid-text">
             <%= t 'wallet.operations.detail.confirmed' %>
             <span class="regular-grey-text-small">(<%= @operation.get('confirmations') %>)</span>
           </td>
@@ -37,7 +52,7 @@
       </tr>
       <tr>
         <td class="row-title top-aligned"><%= t 'wallet.operations.detail.sender' %></td>
-        <td class="align-right regular-text" id="operation_inputs">
+        <td class="align-right" id="operation_inputs">
           <% for input in @operation.get('senders'): %>
           <%= input %><br />
           <% end %>

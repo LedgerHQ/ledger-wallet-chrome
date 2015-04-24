@@ -16,7 +16,7 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
       do @_listenEvents
 
   openSupport: ->
-    window.open t 'application.support_url'
+    window.open t 'application.support_key_not_recognized_url'
 
   _hideContent: (hidden, animated = yes) ->
     @view.contentContainer.children().each (index, node) =>
@@ -43,7 +43,7 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
     ledger.app.router.go '/onboarding/device/connecting'
 
   _listenEvents: ->
-    if ledger.app.wallet? and !ledger.app.wallet.isInBootloaderMode()
+    if (ledger.app.wallet? and !ledger.app.wallet.isInBootloaderMode()) or ledger.app.isConnectingDongle()
       do @navigateContinue
     else
       ledger.app.once 'dongle:connecting', =>

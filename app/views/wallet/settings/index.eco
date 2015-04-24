@@ -1,0 +1,32 @@
+<section id="settings_index_dialog">
+  <header>
+    <h1><%= t 'wallet.settings.common.settings' %></h1>
+  </header>
+  <div class="sections-container">
+    <a class="panel" href="#openDisplay">
+      <i class="fa fa-desktop"></i>
+      <div class="uppercase-action"><%= t 'wallet.settings.common.display' %></div>
+    </a>
+    <a class="panel" href="#openBitcoin">
+      <i class="fa fa-bitcoin"></i>
+      <div class="uppercase-action"><%= t 'wallet.settings.common.bitcoin' %></div>
+    </a>
+    <a class="panel" href="#openHardware">
+      <i class="fa fa-rocket"></i>
+      <div class="uppercase-action"><%= t 'wallet.settings.common.hardware' %></div>
+    </a>
+    <a class="panel" href="#openApps">
+      <i class="fa fa-th"></i>
+      <div class="uppercase-action"><%= t 'wallet.settings.common.apps' %></div>
+    </a>
+    <a class="panel" href="#openTools">
+      <i class="fa fa-wrench"></i>
+      <div class="uppercase-action"><%= t 'wallet.settings.common.tools' %></div>
+    </a>
+  </div>
+</section>
+<div class="dialog-actions-bar">
+  <div class="uppercase-action"><%= _.str.sprintf(t('wallet.settings.common.version'), ledger.managers.application.stringVersion()) %></div>
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.close' %></a>
+</div>

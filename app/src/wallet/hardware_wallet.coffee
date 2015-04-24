@@ -105,14 +105,13 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
         do:  =>
           @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).then =>
             ## This needs a BIG refactoring
-            l @getFirmwareVersion()
             if @getIntFirmwareVersion() >= ledger.wallet.Firmware.V1_4_13
               # ledger.app.wallet._lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).then(function (){l('done');}).fail(e)
               #.sendApdu_async(0xe0, 0x26, 0x00, 0x00, new ByteString(Convert.toHexByte(operationMode), HEX), [0x9000])
-              @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
-              .then =>
-                  l 'DONE'
-              .fail => l 'FAIL', arguments
+              mode = if @getIntFirmwareVersion() >= ledger.wallet.Firmware.V_LW_1_0_0 then 0x02 else 0x01
+              @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, mode, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
+              .then => _.noop()
+              .fail => _.noop()
             @_setState(ledger.wallet.States.UNLOCKED)
             do unbind
             callback?(yes)
@@ -128,6 +127,10 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
             do unbind
             callback?(no, {title: 'Wrong PIN', code: ledger.errors.WrongPinCode, error, retryCount: retryNumber})
     @_lwCard.verifyPIN pin
+
+  lock: () ->
+    if @_currentState isnt ledger.wallet.States.BLANK and @_currentState isnt ledger.wallet.States.FROZEN and @_currentState?
+      @_setState(ledger.wallet.States.LOCKED)
 
   setup: (pincode, seed, callback) ->
     throw 'Cannot setup if the wallet is not blank' if @_state isnt ledger.wallet.States.BLANK and @_state isnt ledger.wallet.States.FROZEN
@@ -153,14 +156,14 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
 
   getBitIdAddress: (callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
-    @_lwCard.getBitIDAddress()
+    @_lwCard.getBitIDAddress("0'/0/0xb11e")
     .then (data) =>
       @_bitIdData = data
       callback?(@_bitIdData.bitcoinAddress.value)
     .fail (error) => callback?(null, error)
     return
 
-  signMessageWithBitId: (message, callback) ->
+  signMessageWithBitId: (derivationPath, message, callback) ->
     throw 'Cannot get bit id address if the wallet is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
 
     onSuccess = (e, data) =>
@@ -178,7 +181,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
       @_vents.off 'LW.getMessageSignature:error', onFailure
     @_vents.on 'LW.getMessageSignature', onSuccess
     @_vents.on 'LW.getMessageSignature:error', onFailure
-    @_lwCard.getMessageSignature(message)
+    @_lwCard.getMessageSignature(derivationPath, message)
 
   getPublicAddress: (derivationPath, callback) ->
     throw 'Cannot get a public while the key is not unlocked' if @_state isnt ledger.wallet.States.UNLOCKED
@@ -239,9 +242,7 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
         completion.failure(new ledger.StandardError(ledger.errors.DongleNotCertified))
       return
     .fail (err) =>
-      e err
-      error = new ledger.StandardError(Errors.SignatureError, err)
-      #completion.failure(error)
+      completion.failure(new ledger.StandardError(ledger.errors.CommunicationError, err))
       return
     .done()
     completion.readonly()
@@ -347,12 +348,13 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
     unbind = () =>
       for callbackName, params of operation
         for event in params.events
-          @_vents.off event, params.do
+          @_vents.off event, params.handler
 
     for callbackName, params of operation
       for event in params.events
-       do (params) =>
-          @_vents.on event, (ev, data) ->
+        do (params) =>
+          params.handler = (ev, data) ->
             _.defer () ->
-              params.do(data, ev)
+            params.do(data, ev)
+          @_vents.on event, params.handler
     unbind

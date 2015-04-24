@@ -1,0 +1,13 @@
+<section id="settings_bitcoin_dialog">
+  <header>
+    <h1><%= t 'wallet.settings.common.bitcoin' %></h1>
+  </header>
+  <div id="confirmations_table_container"></div>
+  <div id="fees_table_container"></div>
+  <div id="blockchain_table_container"></div>
+</section>
+<div class="dialog-actions-bar">
+  <a class="uppercase-action" href="#openOtherSettings"><%= t 'wallet.settings.common.other_settings' %></a>
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.close' %></a>
+</div>

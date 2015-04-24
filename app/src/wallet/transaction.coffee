@@ -93,9 +93,16 @@ class ledger.wallet.transaction.Transaction
 
   getValidationMode: () -> @_validationMode
 
-  getAmout: () -> @amount
+  getAmount: () -> @amount
 
   getRecipientAddress: () -> @receiverAddress
+
+  serialize: ->
+    amount: @amount.toNumber(),
+    address: @receiverAddress,
+    fee: @fees.toNumber(),
+    hash: @hash,
+    raw: @getSignedTransaction()
 
   getValidationDetails: () ->
     indexes = []
@@ -200,6 +207,7 @@ class ledger.wallet.transaction.Transaction
         ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
           if error?
             hadNetworkFailure = yes
+            completion.failure(new ledger.StandardError(ledger.errors.NetworkError)) unless hasNext
             return do done
 
           output.raw = rawTransaction
@@ -231,9 +239,10 @@ class ledger.wallet.transaction.Transaction
             do done
     completion.readonly()
 
+  _logger: -> ledger.utils.Logger.getLoggerByTag("Transaction")
+
 _.extend ledger.wallet.transaction,
 
-    MINIMUM_CONFIRMATIONS: 1
     MINIMUM_OUTPUT_VALUE: 5430
 
 

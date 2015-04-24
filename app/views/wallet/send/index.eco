@@ -8,7 +8,7 @@
         <td class="row-title"><%= t 'wallet.send.index.amount' %></td>
         <td class="align-right">
           <input id="amount_input" class="large-text-input" placeholder="<%= t 'wallet.send.index.amount_placeholder' %>" value=""/>
-          <label class="large-text-input">BTC</label>
+          <label class="large-text-input"><%= ledger.formatters.getUnitSymbol() %></label>
         </td>
       </tr>
       <tr>
@@ -28,6 +28,6 @@
 <div class="dialog-actions-bar">
   <a id="open_scanner_button" class="cancel-rounded-button"><i class="fa fa-camera"></i></a>
   <div class="left-spacer"></div>
-  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
+  <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
   <a class="action-rounded-button" href="#send" id="send_button"><%= t 'common.send' %></a>
 </div>

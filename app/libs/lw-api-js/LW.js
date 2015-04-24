@@ -14,6 +14,7 @@ function LW (id, dongle, deviceManager) {
     this.operationMode = null;              /* BTChip Operation Mode */
     this.wallets = new Array();             /* Contains the list of wallets */
     this.deviceManager = deviceManager;
+    this.bitIdAddress = new Array();
 
     /* Event : LW.CardConnected */
     this.event('LW.CardConnected', {lW: this})
@@ -273,8 +274,8 @@ LW.prototype = {
             }
 
             lW.dongle.setupNew_async(
-                0x05,
-                BTChip.FEATURE_DETERMINISTIC_SIGNATURE,
+                BTChip.MODE_WALLET,
+                BTChip.FEATURE_DETERMINISTIC_SIGNATURE | BTChip.FEATURE_NO_2FA_P2SH,
                 BTChip.VERSION_BITCOIN_MAINNET,
                 BTChip.VERSION_BITCOIN_P2SH_MAINNET,
                 new ByteString(pincode, ASCII),
@@ -325,8 +326,8 @@ LW.prototype = {
         pubkeyLength = pubkeyLength.toString(16);
 
         return lW.dongle.setup_forwardAsync(
-            0x05, // Usually : BTChip.MODE_WALLET 
-            BTChip.FEATURE_DETERMINISTIC_SIGNATURE,
+            BTChip.MODE_WALLET, 
+            BTChip.FEATURE_DETERMINISTIC_SIGNATURE | BTChip.FEATURE_NO_2FA_P2SH,
             BTChip.VERSION_BITCOIN_MAINNET,
             BTChip.VERSION_BITCOIN_P2SH_MAINNET,
             pubkeyLength,
@@ -355,75 +356,84 @@ LW.prototype = {
         });
     },
 
-    getBitIDAddress: function (){
+    getBitIDAddress: function (derivationPath){
         var deferred = Q.defer()
-        LWTools.console("LW.getBitIDAddress", 3);
+        LWTools.console("LW.getBitIDAddress(" + derivationPath + ")", 3);
         var lW = this;
 
-        try {
-            return lW.dongle.getWalletPublicKey_async("0'/0/0xb11e").then(function(result) {
-                LWTools.console("BitID public key :", 3);
-                LWTools.console(result, 3);
-                lW.bitIdPubKey = result.publicKey;
-                lW.event('LW.getBitIDAddress', {lW: lW, result: result});
-                deferred.resolve(result)
-                return result;
-            }).fail(function(error) {
-                LWTools.console("BitID public key fail", 2);
-                LWTools.console(error, 2);
+        if (typeof lW.bitIdAddress[derivationPath] == "object") {
+            result = lW.bitIdAddress[derivationPath];
+            lW.event('LW.getBitIDAddress', {lW: lW, result: result});
+            deferred.resolve(result);
+            return deferred.promise;
+        } else {
 
-                if (error.indexOf("6982") >= 0) {
+            try {
 
-                    LWTools.console("PINRequired", 2);
+                return lW.dongle.getWalletPublicKey_async(derivationPath).then(function(result) {
+                    LWTools.console("BitID public key :", 3);
+                    LWTools.console(result, 3);
+                    lW.bitIdAddress[derivationPath] = result;
+                    lW.event('LW.getBitIDAddress', {lW: lW, result: result});
+                    deferred.resolve(result);
+                    return result;
+                }).fail(function(error) {
+                    LWTools.console("BitID public key fail", 2);
+                    LWTools.console(error, 2);
 
-                    /* Event : LW.PINRequired */
-                    lW.event('LW.PINRequired',  {lW: lW});
-                    deferred.reject({lW: lW})
+                    if (error.indexOf("6982") >= 0) {
 
-                } else if (error.indexOf("6985") >= 0) {
+                        LWTools.console("PINRequired", 2);
 
-                    LWTools.console("BlankCard", 2);
+                        /* Event : LW.PINRequired */
+                        lW.event('LW.PINRequired',  {lW: lW});
+                        deferred.reject({lW: lW})
 
-                    lW.setupCard();
+                    } else if (error.indexOf("6985") >= 0) {
 
-                } else if (error.indexOf("6faa") >= 0) {
+                        LWTools.console("BlankCard", 2);
 
-                    LWTools.console("CardLocked", 2);
+                        lW.setupCard();
 
-                    /* Event : LW.ErrorOccured */
-                    lW.event('LW.ErrorOccured', {lW: lW, title: 'dongleLocked', message: error});
-                    deferred.reject({lW: lW, title: 'dongleLocked', message: error})
-                } else {
+                    } else if (error.indexOf("6faa") >= 0) {
 
-                    LWTools.console("public key fail", 1);
-                    LWTools.console(error, 1);
+                        LWTools.console("CardLocked", 2);
 
-                    /* Event : LW.ErrorOccured */
-                    lW.event('LW.ErrorOccured', {lW: lW, title: 'error', message: error});
-                    deferred.reject({lW: lW, title: 'error', message: error})
-                }
+                        /* Event : LW.ErrorOccured */
+                        lW.event('LW.ErrorOccured', {lW: lW, title: 'dongleLocked', message: error});
+                        deferred.reject({lW: lW, title: 'dongleLocked', message: error})
+                    } else {
+
+                        LWTools.console("public key fail", 1);
+                        LWTools.console(error, 1);
+
+                        /* Event : LW.ErrorOccured */
+                        lW.event('LW.ErrorOccured', {lW: lW, title: 'error', message: error});
+                        deferred.reject({lW: lW, title: 'error', message: error})
+                    }
 
 
-                return false;
-            });
+                    return false;
+                });
+            }
+            catch(e) {
+                LWTools.console("Get public key failed", 1);
+                LWTools.console(e, 1);
+            }
         }
-        catch(e) {
-            LWTools.console("Get public key failed", 1);
-            LWTools.console(e, 1);
-        }
-        return d.promise
+
+        return deferred.promise
     },
 
-    getMessageSignature: function(message) {
-        LWTools.console("LW.getMessageSignature", 3);
+    getMessageSignature: function(derivationPath, message) {
         var lW = this;
 
-        if (lW.bitIdPubKey) {
-            LWTools.console('signMessage ( ' + message + ')', 3);
+        if (typeof lW.bitIdAddress[derivationPath] == "object") {
             message = new ByteString(message,ASCII);
             pin = new ByteString(lW.PIN,ASCII);
+            lW.currentDerivationPath = derivationPath;
 
-            return lW.dongle.signMessagePrepare_async("0'/0/0xb11e", message).then(function(result) {
+            return lW.dongle.signMessagePrepare_async(derivationPath, message).then(function(result) {
                 return lW.dongle.signMessageSign_async(pin).then(function(result) {
 
                     function convertBase64(data) {
@@ -478,7 +488,7 @@ LW.prototype = {
                     var signature = result.signature;
 
                     try {
-                        var signedMessage = convertMessageSignature(lW.bitIdPubKey, new ByteString(message, ASCII), signature);
+                        var signedMessage = convertMessageSignature(lW.bitIdAddress[derivationPath].publicKey, new ByteString(message, ASCII), signature);
                         lW.event("LW.getMessageSignature", signedMessage);
                         return signedMessage;
                     } catch (e) {
@@ -488,13 +498,9 @@ LW.prototype = {
                 });
             })
         } else {
-            return lW.getBitIDAddress().then(function(result) {
-                return lW.getMessageSignature(message);
+            return lW.getBitIDAddress(derivationPath).then(function(result) {
+                return lW.getMessageSignature(derivationPath, message);
             });
-
         };
-
-
-    },
+    }
 }
-

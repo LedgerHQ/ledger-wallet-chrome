@@ -278,3 +278,9 @@ class @Model extends @EventEmitter
   getCollectionName: () -> @constructor.getCollectionName()
 
   @AllModelClasses: () -> @_allModelClasses
+
+  serialize: () ->
+    json = $.extend {}, @_object
+    delete json['meta']
+    delete json['objType']
+    return json
