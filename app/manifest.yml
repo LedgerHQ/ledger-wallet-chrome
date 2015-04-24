@@ -59,20 +59,26 @@ commands:
     suggested_key:
       default: "Ctrl+R"
       mac: "Command+R"
-    description: "Reload the current page"
+    description: "__MSG_application_commands_reload_page__"
 
   reload-application:
     debug: true
     suggested_key:
       default: "Ctrl+Shift+R"
       mac: "Command+Shift+R"
-    description: "Reload the application"
+    description: "__MSG_application_commands_reload_application__"
 
   update-firmware:
     suggested_key:
       default: "Ctrl+Shift+U"
       mac: "Command+Shift+U"
-    description: "Update the chip firmware"
+    description: "__MSG_application_commands_update_firmware__"
+
+  export-logs:
+    suggested_key:
+      default: "Ctrl+Shift+L"
+      mac: "Command+Shift+L"
+    description: "__MSG_application_commands_export_logs__"
 
 icons:
   16: "assets/images/icon-16.png"

@@ -8,6 +8,12 @@ application:
   support_key_not_recognized_url: 'https://ledger.groovehq.com/knowledge_base/categories/troubleshooting-20'
   support_coinkite_url: 'https://ledger.groovehq.com/knowledge_base/topics/how-to-use-the-coinkite-app'
 
+  commands:
+    reload_page: "Reload the current page"
+    reload_application: "Reload the application"
+    update_firmware: "Update the chip firmware"
+    export_logs: "Export the global logs"
+
 common:
   bitcoin_acronym: 'BTC'
   default_account_name: "My account"
