@@ -460,6 +460,43 @@ wallet:
       uri_placeholder: "Enter the URI"
       invalid_uri: "URI is invalid"
 
+  xpubkey:
+    index:
+      title: "Extended public key export"
+      info: "Export the extended publick key corresponding to the following path:"
+      path: "Derivation path"
+    processing:
+      title: "Extended public key"
+      info: "Computing extended public key"
+    errors:
+      cancelled: "Export request cancelled"
+      derivation_failed: "Failed to compute the xpubkey"
+      derivation_successfull: "Export successfull"
+
+  p2sh:
+    index:
+      title: "Signature request"
+      info: "Do you want to proceed with the signature?"
+    signing:
+      title: "Transaction signing"
+      info: "The transaction is being signed by your Ledger Nano"
+    errors:
+      cancelled: "Signature request declined"
+      signature_failed: "Failed to sign the transaction"
+      signature_successfull: "Signature successfull"
+
+  api:
+    accounts:
+      title: "Export accounts"
+      info: "Do you wish to export the list of your accounts?"
+    operations:
+      title: "Export operations"
+      info: "Do you wish to export the operations related to the following account?"
+      account_name: "Account name"
+    errors:
+      cancelled: "Request cancelled by the user"
+      account_not_found: "Account not found"
+      
   settings:
     common:
       settings: "Settings"
@@ -530,6 +567,9 @@ apps:
       note: "Be sure to activate the <b>cosign</b> permission for this key."
 
     keygen:
+      index:
+        title: "Extended public key export"
+        info: "Do you wish to export to Coinkite an extended public key? It will add the Nano as a signing device for the vault you are creating."
       processing:
         title: "Extended public key"
         info: "Computing extended public key for Coinkite"
@@ -541,6 +581,7 @@ apps:
         path: "Coinkite derivation path"
       errors:
         derivation_failed: "Fail to compute extended key. Please contact support."
+        cancelled: "The request has been cancelled by the user."
 
     cosign:
       index:
@@ -560,6 +601,7 @@ apps:
         title: "Transaction signing"
         info: "The transaction is being signed by your Ledger Nano"
         success: "Success"
+        success_info: "The transaction has been successfully signed and sent to Coinkite server."
         already_signed: "This transaction has already been signed by this Ledger Nano and processed by Coinkite."
       errors:
         wrong_nano: "Invalid transaction"
@@ -569,3 +611,4 @@ apps:
         missing_api_key: "Missing API credentials"
         missing_api_key_text: "You must enter your API credentials in the settings."
         signature_failed: "Fail to sign transaction"
+        request_cancelled: "The signature request has been cancelled by the user."

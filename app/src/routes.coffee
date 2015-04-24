@@ -160,6 +160,25 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new WalletBitidFormDialogViewController()
     dialog.show()
 
+  # XPubKey
+  route '/wallet/xpubkey/index', (params = {}) ->
+    dialog = new WalletXpubkeyIndexDialogViewController({ path: params["?params"]?.path })
+    dialog.show()
+
+  # P2SH
+  route '/wallet/p2sh/index', (params = {}) ->
+    dialog = new WalletP2shIndexDialogViewController({ inputs: params["?params"]?.inputs, scripts: params["?params"]?.scripts, outputs_number: params["?params"]?.outputs_number, outputs_script: params["?params"]?.outputs_script, paths: params["?params"]?.paths })
+    dialog.show()
+
+  ## API
+  route '/wallet/api/accounts', (params = {}) ->
+    dialog = new WalletApiAccountsDialogViewController()
+    dialog.show()
+
+  route '/wallet/api/operations', (params = {}) ->
+    dialog = new WalletApiOperationsDialogViewController({ account_id: params["?params"]?.account_id })
+    dialog.show()
+
   ## Coinkite
   route '/apps/coinkite/dashboard/index', (params) ->
     app.navigate COINKITE_LAYOUT, AppsCoinkiteDashboardIndexViewController
@@ -168,12 +187,20 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new AppsCoinkiteSettingsIndexDialogViewController()
     dialog.show()
 
+  route '/apps/coinkite/keygen/index', (params) ->
+    dialog = new AppsCoinkiteKeygenIndexDialogViewController({ index: params["?params"]?.index })
+    dialog.show()
+
   route '/apps/coinkite/keygen/processing', (params) ->
     dialog = new AppsCoinkiteKeygenProcessingDialogViewController()
     dialog.show()
 
   route '/apps/coinkite/cosign/index', (params) ->
     dialog = new AppsCoinkiteCosignIndexDialogViewController()
+    dialog.show()
+
+  route '/apps/coinkite/cosign/show', (params) ->
+    dialog = new AppsCoinkiteCosignShowDialogViewController({ json: params["?params"]?.json })
     dialog.show()
 
   route '/apps/coinkite/dashboard/compatibility', (params) ->

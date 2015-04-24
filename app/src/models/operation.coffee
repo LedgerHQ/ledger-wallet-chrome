@@ -8,6 +8,11 @@ class @Operation extends Model
     @_pendingRawTransactionStream ?= new Stream().open()
     @_pendingRawTransactionStream
 
+  serialize: () ->
+    json = super
+    delete json['uid']
+    return json
+
   get: (key) ->
     switch key
       when 'total_value'
