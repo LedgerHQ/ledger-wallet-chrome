@@ -173,14 +173,13 @@ class ledger.formatters
   # This generic method formats the input value in units (BTC, mBTC, bits) to Satoshi
   @_formatUnitToSatoshi: (value, _name) ->
     [intPart, fracPart] = value.toString().split(".")
-    fracPart ?= 0
-    # Check if we should round
-    if(fracPart.toString().length < ledger.preferences.defaults.Display.units[_name].unit)
-      fracPart = _.str.rpad(fracPart, ledger.preferences.defaults.Display.units[_name].unit, '0')
+    fracPart ?= ''
+    # Check if value should be truncated
+    if fracPart.length > ledger.preferences.defaults.Display.units[_name].unit
+      @_logger().warn('Fractional part cannot be less than one Satoshi')
+      fracPart = fracPart.substring(0, ledger.preferences.defaults.Display.units[_name].unit)
     else
-      d = fracPart.toString().length - ledger.preferences.defaults.Display.units[_name].unit
-      fracPart = parseFloat(fracPart) / Math.pow(10, d)
-      fracPart = _.str.lpad(Math.ceil(fracPart).toString(), ledger.preferences.defaults.Display.units[_name].unit, '0')
+      fracPart = _.str.rpad(fracPart, ledger.preferences.defaults.Display.units[_name].unit, '0')
     res = intPart + fracPart
     num = new Bitcoin.BigInteger(res.toString())
     num.toString()
@@ -192,6 +191,9 @@ class ledger.formatters
       when ledger.preferences.defaults.Display.units.milibitcoin.symbol then return @fromMilliBtcToSatoshi(value)
       when ledger.preferences.defaults.Display.units.microbitcoin.symbol then return @fromMicroBtcToSatoshi(value)
     undefined
+
+  @_logger: ->
+    ledger.utils.Logger.getLoggerByTag('Formatters')
 
   ###
     This private method defaults to BTC when preferences are not yet ready

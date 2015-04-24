@@ -63,7 +63,7 @@ describe "Unit Formatters -", ->
     res = formatters.fromMicroBtcToSatoshi(0.89)
     expect(res).toBe('89')
     res = formatters.fromMicroBtcToSatoshi(0.5555)
-    expect(res).toBe('56')
+    expect(res).toBe('55')
     res = formatters.fromMicroBtcToSatoshi(895621.45)
     expect(res).toBe('89562145')
 
@@ -75,7 +75,7 @@ describe "Unit Formatters -", ->
     res = formatters.fromMilliBtcToSatoshi(0.89)
     expect(res).toBe('89000')
     res = formatters.fromMilliBtcToSatoshi(0.555555)
-    expect(res).toBe('55556')
+    expect(res).toBe('55555')
 
 
   it "should convert BTC to Satoshi", ->
@@ -86,4 +86,4 @@ describe "Unit Formatters -", ->
     res = formatters.fromBtcToSatoshi(0.45)
     expect(res).toBe('45000000')
     res = formatters.fromBtcToSatoshi(0.555555555)
-    expect(res).toBe('55555556')
+    expect(res).toBe('55555555')
