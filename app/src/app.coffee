@@ -117,6 +117,7 @@ require @ledger.imports, ->
 
     _listenPreferencesEvents: ->
       ledger.preferences.instance.on 'btcUnit:changed language:changed locale:changed confirmationsCount:changed', => @scheduleReloadUi()
+      ledger.preferences.instance.on 'logActive:changed', => ledger.utils.Logger.updateGlobalLoggersLevel()
 
     _releaseWallet: (removeDongle = yes) ->
       @emit 'dongle:disconnected'
@@ -138,13 +139,13 @@ require @ledger.imports, ->
 
     _listenCountervalueEvents: (listen) ->
       if !listen
-        @_countervalueObserver.disconnect()
+        @_countervalueObserver?.disconnect()
         @_countervalueObserver = undefined
         @_listenedCountervalueNodes = undefined
         @_reprocessCountervalueNodesCallback = undefined
-        ledger.preferences.instance.off 'currency:changed', @_reprocessCountervalueNodesCallback
-        ledger.preferences.instance.off 'locale:changed', @_reprocessCountervalueNodesCallback
-        ledger.tasks.TickerTask.instance.off 'updated', @_reprocessCountervalueNodesCallback
+        ledger.preferences.instance?.off 'currency:changed', @_reprocessCountervalueNodesCallback
+        ledger.preferences.instance?.off 'locale:changed', @_reprocessCountervalueNodesCallback
+        ledger.tasks.TickerTask.instance?.off 'updated', @_reprocessCountervalueNodesCallback
         return
 
       recomputeCountervalue = (node) =>

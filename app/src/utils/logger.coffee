@@ -56,6 +56,7 @@ class @ledger.utils.Logger
   # Set all loggers level
   @_setGlobalLoggersLevel: (level) -> logger.setLevel(level) for name, logger of @_loggers when logger.useGlobalSettings
 
+
   @getGlobalLoggersLevel: ->
     if ledger.preferences?.instance?
       if ledger.preferences.instance.isLogActive() then ledger.config.defaultLoggingLevel.Connected.Enabled else ledger.config.defaultLoggingLevel.Connected.Disabled

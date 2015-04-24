@@ -105,11 +105,11 @@ class @ledger.wallet.HardwareWallet extends EventEmitter
         do:  =>
           @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).then =>
             ## This needs a BIG refactoring
-            l @getFirmwareVersion()
             if @getIntFirmwareVersion() >= ledger.wallet.Firmware.V1_4_13
               # ledger.app.wallet._lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).then(function (){l('done');}).fail(e)
               #.sendApdu_async(0xe0, 0x26, 0x00, 0x00, new ByteString(Convert.toHexByte(operationMode), HEX), [0x9000])
-              @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, 0x01, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
+              mode = if @getIntFirmwareVersion() >= ledger.wallet.Firmware.V_LW_1_0_0 then 0x02 else 0x01
+              @_lwCard.dongle.card.sendApdu_async(0xE0, 0x26, mode, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
               .then => _.noop()
               .fail => _.noop()
             @_setState(ledger.wallet.States.UNLOCKED)

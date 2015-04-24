@@ -8,7 +8,7 @@ ledger.preferences.init = (cb) ->
   ledger.preferences.instance.init(cb)
 
 ledger.preferences.close = ->
-  ledger.preferences.instance.close()
+  ledger.preferences.instance?.close()
   ledger.preferences.instance = undefined
 
 PreferencesStructure =
@@ -65,6 +65,7 @@ class ledger.preferences.Preferences extends EventEmitter
   init: (callback) -> @_updatePreferences(off, callback)
 
   close: () ->
+    @off()
 
   getLanguage: -> @_getPreference('language')
   setLanguage: (value) -> @_setPreference('language', value)
