@@ -31,6 +31,9 @@ class ledger.formatters
         break
     throw new Error("unit must be in " + _.reduce(ledger.preferences.instance.getAllBitcoinUnits(), (cumul, unit) -> return cumul + ', ' + unit), '') if found == no
 
+    decimalSeparator = ledger.number.getLocaleDecimalSeparator(ledger.preferences.instance.getLocale().replace('_', '-'))
+    thousandSeparator = ledger.number.getLocaleThousandSeparator(ledger.preferences.instance.getLocale().replace('_', '-'))
+
     integerPart = new Bitcoin.BigInteger(value.toString())
     .divide Bitcoin.BigInteger.valueOf(10).pow(unit)
 
@@ -48,11 +51,16 @@ class ledger.formatters
         fractionalPart = parseFloat(fractionalPart) / Math.pow(10, d)
         fractionalPart = _.str.lpad(Math.ceil(fractionalPart).toString(), precision, '0')
 
-    value = integerPart + '.' + fractionalPart
+    reverseIntegerPart = integerPart.toString().match(/./g).reverse()
+    integerPart = []
+    for digit, index in reverseIntegerPart
+      integerPart.push digit
+      integerPart.push thousandSeparator if (index + 1) % 3 == 0 and (index + 1) < reverseIntegerPart.length
+    value = integerPart.reverse().join('') + decimalSeparator + fractionalPart
     # remove . if necessary
-    if _.str.endsWith value, '.'
+    if _.str.endsWith value, decimalSeparator
       value = _.str.splice value, -1, 1
-    return value
+    value
 
 
   ###
@@ -63,14 +71,15 @@ class ledger.formatters
     @return [String] The formatted value
   ###
   @fromValue: (value, precision) ->
-    @formatUnit(value, ledger.preferences.instance.getBtcUnit(), precision)
+    @formatUnit(value, @_getBtcUnit(), precision)
 
 
   ###
     This method formats the amount and add symbol
   ###
   @formatValue: (value, precision) ->
-    num = @formatUnit(value, ledger.preferences.instance.getBtcUnit(), precision)
+
+    num = @formatUnit(value, @_getBtcUnit(), precision)
     if @symbolIsFirst()
       return @getUnitSymbol() + ' ' + num
     else
@@ -88,7 +97,7 @@ class ledger.formatters
     Add unit symbol
   ###
   @getUnitSymbol: ->
-    ledger.preferences.instance.getBtcUnit()
+    @_getBtcUnit()
 
 
   ###
@@ -183,3 +192,15 @@ class ledger.formatters
       when ledger.preferences.defaults.Display.units.milibitcoin.symbol then return @fromMilliBtcToSatoshi(value)
       when ledger.preferences.defaults.Display.units.microbitcoin.symbol then return @fromMicroBtcToSatoshi(value)
     undefined
+
+  ###
+    This private method defaults to BTC when preferences are not yet ready
+    (API calls don't wait for the wallet to be fully initialized)
+
+    @return [String] The BTC formatting unit
+  ###
+  @_getBtcUnit: ->
+    if ledger.preferences.instance?
+      ledger.preferences.instance.getBtcUnit()
+    else
+      'BTC'

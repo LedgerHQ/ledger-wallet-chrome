@@ -29,7 +29,7 @@ class @WalletNavigationController extends @NavigationController
     ##@updateBreadcrumbs url
     @_listenBalanceEvents()
     @_listenSynchronizationEvents()
-    @_listenSettingsEvents()
+    @_listenCountervalueEvents()
 
   updateMenu: (url) ->
     for baseUrl, itemSelector of @_menuItemBaseUrl
@@ -75,6 +75,7 @@ class @WalletNavigationController extends @NavigationController
   _listenSynchronizationEvents: ->
     @view.reloadIcon.on 'click', =>
       Wallet.instance.retrieveAccountsBalances()
+      ledger.tasks.TickerTask.instance.updateTicker()
       ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary()
       _.defer @_updateReloadIconState
     ledger.app.on 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done', @_onSynchronizationStateChanged
@@ -93,16 +94,17 @@ class @WalletNavigationController extends @NavigationController
   _isSynchronizationRunning: ->
     return ledger.tasks.OperationsConsumptionTask.instance.isRunning()
 
-  _listenSettingsEvents: ->
+  _listenCountervalueEvents: ->
     # update counter value
     @_updateCountervalue()
     # listen countervalue event
     ledger.preferences.instance.on 'currencyActive:changed', @_updateCountervalue
+    ledger.app.on 'wallet:balance:changed', @_updateCountervalue
 
   _updateCountervalue: ->
     @view.currencyContainer.removeAttr 'data-countervalue'
     @view.currencyContainer.empty()
-    if ledger.preferences.instance.getCurrencyActive()
+    if ledger.preferences.instance.isCurrencyActive()
       @view.currencyContainer.attr 'data-countervalue', Wallet.instance.getBalance().wallet.total
     else
       @view.currencyContainer.text t('wallet.top_menu.balance')

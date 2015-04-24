@@ -1,0 +1,13 @@
+<div class="large-table">
+  <div class="header top">
+    <div class="uppercase-section-column stretchable"><%= t 'wallet.settings.tools.logs' %></div>
+    <div id="switch_container"></div>
+  </div>
+  <div class="row bottom" id="export_logs_row">
+    <div class="regular-text-small stretchable"><%= t 'wallet.settings.tools.stored_logs' %></div>
+    <a class="uppercase-action" href="#exportLogs"><i class="fa fa-external-link-square"></i><%= t 'common.export' %></a>
+  </div>
+</div>
+<div class="regular-soft-grey-text-small">
+  <%= t 'wallet.settings.tools.disclamer' %>
+</div>

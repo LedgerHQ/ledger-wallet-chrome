@@ -29,6 +29,7 @@ common:
   later: "Plus tard"
   reset: "Réinitialiser"
   save: "Enregistrer"
+  export: "Exporter"
   back: "Retour"
   next: "Suivant"
   test: "Test"
@@ -116,7 +117,7 @@ onboarding:
         unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder vos comptes et bitcoins."
 
       forged:
-        device_forged: "Ce Ledger Nano n'est pas authentique, ou la mise à jour du firmware a échoué"
+        device_forged: "Ce Ledger Wallet n'est pas authentique"
         forbidden_access: "Pour des raisons de sécurité, vous n'êtes pas autorisé à utiliser cette application."
         get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
 
@@ -277,6 +278,7 @@ wallet:
       no_operations: "Aucune opération."
       confirmed: "Confirmée"
       unconfirmed: "Non confirmée"
+      countervalue: "Contre-valeur"
 
   top_menu:
     balance: 'SOLDE'
@@ -332,6 +334,7 @@ wallet:
         action: "PARAMÈTRES DU COMPTE"
         balance: "SOLDE"
         balance_in_progress: "DONT NON CONFIRMÉ"
+        countervalue: "Contre-valeur"
         actions: "ACTIONS"
         receive: "RECEVOIR"
         send: "ENVOYER"
@@ -458,6 +461,43 @@ wallet:
       uri_placeholder: "Entrez l'URI"
       invalid_uri: "URI invalide"
 
+  xpubkey:
+    index:
+      title: "Export de clé publique étendue"
+      info: "Autoriser l'export de la clé publique étendue correspondant au chemin de dérivation suivant:"
+      path: "Chemin de dérivation"
+    processing:
+      title: "Clé publique étendue"
+      info: "Calcul de la clé publique étendue"
+    errors:
+      cancelled: "Export non autorisé"
+      derivation_failed: "Erreur dans le calcul de la xpubkey"
+      derivation_successfull: "Clé exportée avec succès"
+
+  p2sh:
+    index:
+      title: "Demande de signature"
+      info: "Souhaitez-vous autoriser la demande de signature?"
+    signing:
+      title: "Signature"
+      info: "Le signature de la transaction par votre Ledger Nano est en cours"
+    errors:
+      cancelled: "Demande de signature refusée"
+      signature_failed: "Erreur dans la signature"
+      signature_successfull: "Signature effectuée avec succès"
+
+  api:
+    accounts:
+      title: "Export comptes"
+      info: "Souhaitez-vous exporter la liste de vos comptes?"
+    operations:
+      title: "Export operations"
+      info: "Souhaitez-vous exporter la liste des opérations associées au compte suivant?"
+      account_name: "Nom du compte"
+    errors:
+      cancelled: "Requête annulée par l'utilisateur"
+      account_not_found: "Compte introuvable"
+
   settings:
     common:
       settings: "Réglages"
@@ -467,6 +507,7 @@ wallet:
       tools: "Outils"
       display: "Affichage"
       apps: "Apps (beta)"
+      tools: "Outils"
       version: "Version %s"
 
     hardware:
@@ -482,7 +523,7 @@ wallet:
     display:
       units: "Unités"
       bitcoin_unit: "Unité Bitcoin"
-      show_currency: "Afficher la contre-valeur"
+      show_currency: "Contre-valeur"
       exchange_rate: "Taux d'échange"
       language_and_region: "Langue & région"
       interface_language: "Langue de l'interface"
@@ -495,6 +536,11 @@ wallet:
       default_value: "Frais par défaut"
       blockchain_explorer: "Explorer de Blockchain"
       default_explorer: "Explorateur par défaut"
+
+    tools:
+      logs: "Logs"
+      stored_logs: "Logs enregistrés"
+      disclamer: "Les logs contiennent des événements anonymes de navigation et de communication avec le matériel qui ne sont pas liés à votre portefeuille ou votre identité Bitcoin. Ces données ne sont utilisées que pour du diagnostic et ne sont jamais envoyées sur nos serveurs."
 
 apps:
   coinkite:
@@ -528,6 +574,9 @@ apps:
       note: "Attention à bien activer la permission <b>cosign</b> sur cette clé API."
 
     keygen:
+      index:
+        title: "Export de clé publique étendue"
+        info: "Souhaitez-vous donner à Coinkite une clé publique étendue? Cela ajoutera ce Nano en tant que clé de signature pour le wallet que vous êtes en train de créer."
       processing:
         title: "Clé de signature"
         info: "Dérivation de la clé publique étendue pour Coinkite"
@@ -539,6 +588,7 @@ apps:
         note: "Ces informations vous permettent d'ajouter ce Ledger Nano comme clé de signature sur votre wallet multisignature Coinkite. Le chemin de dérivation est utile pour restaurer manuellement la clé publique étendue depuis votre seed."
       errors:
         derivation_failed: "Erreur dans le calcul de la clé publique étendue. Contactez le support"
+        cancelled: "La demande d'export a été annulée par l'utilisateur."
 
     cosign:
       index:
@@ -558,6 +608,7 @@ apps:
         title: "Signature de la transaction"
         info: "La transaction est en cours de signature"
         success: "Signature réussie"
+        success_info: "La transaction a été signée et envoyée sur le serveur de Coinkite."      
         already_signed: "Cette transaction a déjà été signée avec succès par ce Ledger Nano."
       errors:
         wrong_nano: "Transaction invalide"
@@ -567,3 +618,4 @@ apps:
         missing_api_key: "Clés API manquantes"
         missing_api_key_text: "Vous devez renseigner votre clé API ainsi que le secret dans les règlages."
         signature_failed: "Erreur dans la signature"
+        request_cancelled: "La demande de signature a été annulée par l'utilisateur."

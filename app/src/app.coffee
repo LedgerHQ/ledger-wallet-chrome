@@ -16,7 +16,6 @@ require @ledger.imports, ->
           @setExecutionMode(@Modes.Wallet)
           @router.go('/')
 
-
     ###
       Sets the execution mode of the application. In Wallet mode, the application handles the wallets state by starting services,
       emitting specific events. This mode is the normal one, it allows access to accounts, balances...
@@ -140,13 +139,25 @@ require @ledger.imports, ->
         @_listenedCountervalueNodes = undefined
         @_reprocessCountervalueNodesCallback = undefined
         ledger.preferences.instance.off 'currency:changed', @_reprocessCountervalueNodesCallback
-        ledger.preferences.instance.off 'region:changed', @_reprocessCountervalueNodesCallback
+        ledger.preferences.instance.off 'locale:changed', @_reprocessCountervalueNodesCallback
         ledger.tasks.TickerTask.instance.off 'updated', @_reprocessCountervalueNodesCallback
         return
 
       recomputeCountervalue = (node) =>
         qNode = $(node)
-        qNode.text(ledger.converters.satoshiToCurrencyFormatted(qNode.attr('data-countervalue')))
+        text = ''
+        currency = ledger.preferences.instance.getCurrency()
+        if ledger.formatters.symbolIsFirst()
+          text += currency + ' '
+        satoshis = qNode.attr('data-countervalue')
+        sign = satoshis.charAt(0)
+        sign = '' if (not sign? or (sign != '+' && sign != '-'))
+        satoshis = _.str.replace(satoshis, sign, '')
+        text += sign
+        text += ledger.converters.satoshiToCurrency(satoshis, currency)
+        if !ledger.formatters.symbolIsFirst()
+          text += ' ' + currency
+        qNode.text(text)
 
       handleChanges = (summaries) =>
         for summary in summaries
@@ -167,7 +178,7 @@ require @ledger.imports, ->
 
       # listen app events
       ledger.preferences.instance.on 'currency:changed', @_reprocessCountervalueNodesCallback
-      ledger.preferences.instance.on 'region:changed', @_reprocessCountervalueNodesCallback
+      ledger.preferences.instance.on 'locale:changed', @_reprocessCountervalueNodesCallback
       ledger.tasks.TickerTask.instance.on 'updated', @_reprocessCountervalueNodesCallback
 
       # listen countervalue nodes
