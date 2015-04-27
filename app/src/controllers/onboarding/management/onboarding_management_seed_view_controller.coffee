@@ -13,6 +13,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     super
     if @params.wallet_mode == 'create'
       @params.mnemonic = ledger.bitcoin.bip39.generateMnemonic()
+      ledger.print.Piper.instance.printMnemonic( @params.mnemonic )
 
   navigationContinueParams: ->
     wallet_mode: @params.wallet_mode
