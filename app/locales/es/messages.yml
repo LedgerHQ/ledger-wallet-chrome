@@ -8,7 +8,6 @@ application:
   support_key_not_recognized_url: 'https://ledger.groovehq.com/knowledge_base/categories/troubleshooting-20'
 
 common:
-  bitcoin_acronym: 'BTC'
   default_account_name: "Mi cuenta"
   date_time_format: 'L [a las] LT'
   date_format: 'L'

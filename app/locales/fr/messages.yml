@@ -15,7 +15,6 @@ application:
     export_logs: "Exporter les logs globaux"
 
 common:
-  bitcoin_acronym: 'BTC'
   default_account_name: "Mon compte"
   date_time_format: 'L [à] LT'
   date_format: 'L'
@@ -212,7 +211,7 @@ onboarding:
 update:
   common:
     firmware_update: "Mise à jour de la puce"
-    need_to_repeat_several_times: "Vous pouvez être amené(e) à répéter cette opération plusieurs fois."
+    need_to_repeat_several_times: "Vous pouvez être amené(e) à brancher et débrancher plusieurs fois."
 
   index:
     important_notice: "Informations importantes"

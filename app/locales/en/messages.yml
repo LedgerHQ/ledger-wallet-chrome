@@ -15,7 +15,6 @@ application:
     export_logs: "Export the global logs"
 
 common:
-  bitcoin_acronym: 'BTC'
   default_account_name: "My account"
   date_time_format: 'L [at] LT'
   date_format: 'L'
@@ -212,7 +211,7 @@ onboarding:
 update:
   common:
     firmware_update: "Chip firmware update"
-    need_to_repeat_several_times: "You may need to repeat this step several times."
+    need_to_repeat_several_times: "You may need to unplug and replug several times."
 
   index:
     important_notice: "Important notice"
