@@ -30,6 +30,8 @@ class ledger.dongle.MockDongle extends EventEmitter
   _m2faPrivKey: "80"+"dbd39adafe3a007706e61a17e0c56849146cfe95849afef7ede15a43a1984491"+"7e960af3"
   _m2faAttestationKey: "04"+"e69fd3c044865200e66f124b5ea237c918503931bee070edfcab79a00a25d6b5"+"a09afbee902b4b763ecf1f9c25f82d6b0cf72bce3faf98523a1066948f1a395f"
 
+  _sessionKey: ''
+
 
   constructor: (pin, seed, isInBootloaderMode = no) ->
     super
@@ -289,7 +291,7 @@ class ledger.dongle.MockDongle extends EventEmitter
       secret = ecdh.generate(new JSUCrypt.ECFp.AffinePoint(aKey[2], aKey[3], ecdhdomain.curve)) # 32 bytes secret is obtained
 
       # Split into two 16 bytes components S1 and S2. S1 and S2 are XORed to produce a 16 bytes 3DES-2 session key
-      sessionKey = (Convert.toHexByte(secret[i] ^ secret[16+i]) for i in [0...16]).join('')
+      @_sessionKey = (Convert.toHexByte(secret[i] ^ secret[16+i]) for i in [0...16]).join('')
       # Ex : b4ad97549846132b8ad8639f9d50391f
 
       #@emit 'm2fa.identify', data.public_key
@@ -320,14 +322,6 @@ class ledger.dongle.MockDongle extends EventEmitter
       nonce = ''
       for val, i in randomNumBlob
         nonce += Convert.toHexByte randomNumBlob[i]
-
-
-
-
-
-
-
-
 
     d.promise
 
