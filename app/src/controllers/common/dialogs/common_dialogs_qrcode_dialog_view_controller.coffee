@@ -6,7 +6,7 @@ class @CommonDialogsQrcodeDialogViewController extends @DialogViewController
 
   onAfterRender: ->
     super
-    @_startScanner()
+    _.defer => @_startScanner()
 
   show: ->
     ledger.managers.permissions.request 'videoCapture', (granted) =>
