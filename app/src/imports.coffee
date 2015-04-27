@@ -329,6 +329,9 @@
         'preferences/defaults'
         'preferences/preferences'
 
+        ## Print
+        'print/piper'
+
         ## Specs
         '../spec/jasmine/jasmine'
         '../spec/jasmine/jasmine-html'
