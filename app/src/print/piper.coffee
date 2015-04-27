@@ -42,25 +42,14 @@ class ledger.print.Piper
 
   _getFirstBitcoinAddress: (mnemonic) ->
     seed = ledger.bitcoin.bip39.generateSeed mnemonic
-    bip32RootKey = bitcoin.HDNode.fromSeedHex(seed, bitcoin.networks.bitcoin)
-    bip32ExtendedKey = bip32RootKey
-
+    node = bitcoin.HDNode.fromSeedHex(seed, bitcoin.networks.bitcoin)
     # Derive the key from the path
-    path = "m/44'/0'/0'/0"
-    pathBits = path.split("/")
-    for val, i in pathBits
-      bit = pathBits[i]
-      index = parseInt(bit)
-      if (isNaN index)
-        continue
-    hardened = bit[bit.length-1] == "'"
-    if (hardened)
-      bip32ExtendedKey = bip32ExtendedKey.deriveHardened(index)
-    else
-      bip32ExtendedKey = bip32ExtendedKey.derive(index)
-      key = bip32ExtendedKey.derive(index)
-      address = key.getAddress().toString()
-      address
+    path = "44'/0'/0'/0"
+    path = path.split('/')
+    for item in path
+      [index, hardened] = item.split "'"
+      node  = if hardened? then node.deriveHardened parseInt(index) else node = node.derive(index).derive(index)
+    node.getAddress().toString()
 
 
   _encryptData: (text, pubKey) ->
