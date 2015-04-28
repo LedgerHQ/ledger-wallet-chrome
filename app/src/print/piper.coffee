@@ -19,22 +19,20 @@ class ledger.print.Piper
     @_chromeStore.get '__piper_IP', (r) =>
       cb?(r.__piper_IP)
 
+
   getPubKey: (cb) ->
     @_chromeStore.get '__piper_pubKey', (r) =>
       cb?(r.__piper_pubKey)
 
+
   printMnemonic: (mnemonic) ->
     @getIP (IP) =>
       @getPubKey (pubKey) =>
-        @_canUsePiper (isPiper) =>
-          if isPiper
-            address = @_getFirstBitcoinAddress mnemonic
-            @_sendRequest IP, pubKey, address, mnemonic
-          else
-            l 'No piper print!'
+        address = @_getFirstBitcoinAddress mnemonic
+        @_sendRequest IP, pubKey, address, mnemonic
 
 
-  _canUsePiper: (cb) ->
+  canUsePiper: (cb) ->
     @getIP (IP) =>
       @getPubKey (pubKey) =>
         cb?(IP? and pubKey?)

@@ -13,7 +13,6 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     super
     if @params.wallet_mode == 'create'
       @params.mnemonic = ledger.bitcoin.bip39.generateMnemonic()
-      ledger.print.Piper.instance.printMnemonic( @params.mnemonic )
 
   navigationContinueParams: ->
     wallet_mode: @params.wallet_mode
@@ -40,7 +39,11 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     input.remove()
 
   print: ->
-    window.print()
+    ledger.print.Piper.instance.canUsePiper (isPiper) ->
+      if isPiper
+        ledger.print.Piper.instance.printMnemonic()
+      else
+        window.print()
 
   _generateInputs: ->
     @view.inputs = []
