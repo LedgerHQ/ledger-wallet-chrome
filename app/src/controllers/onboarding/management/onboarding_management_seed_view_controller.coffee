@@ -39,9 +39,9 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     input.remove()
 
   print: ->
-    ledger.print.Piper.instance.canUsePiper (isPiper) ->
+    ledger.print.Piper.instance.canUsePiper (isPiper) =>
       if isPiper
-        ledger.print.Piper.instance.printMnemonic()
+        ledger.print.Piper.instance.printMnemonic @params.mnemonic
       else
         window.print()
 
