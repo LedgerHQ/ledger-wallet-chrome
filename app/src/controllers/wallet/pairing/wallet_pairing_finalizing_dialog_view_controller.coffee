@@ -9,7 +9,7 @@ class @WalletPairingFinalizingDialogViewController extends DialogViewController
   onAfterRender: ->
     super
     @_request = @params.request
-    @_request?.onComplete => @_onComplete()
+    @_request?.onComplete @_onComplete
 
     # setup ui
     @view.errorLabel.hide()
