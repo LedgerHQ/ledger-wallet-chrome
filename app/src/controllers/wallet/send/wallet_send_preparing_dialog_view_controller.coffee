@@ -6,7 +6,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
   initialize: ->
     super
     account = Account.find(index: 0).first()
-    amount = ledger.Amount.fromBtc(@params.amount)
+    amount = ledger.Amount.fromSatoshi(@params.amount)
     fees = ledger.wallet.Transaction.DEFAULT_FEES
     account.createTransaction amount: amount, fees: fees, address: @params.address, (transaction, error) =>
       return if not @isShown()

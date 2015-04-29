@@ -178,6 +178,7 @@ class ledger.dongle.MockDongle extends EventEmitter
   createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData, network) ->
     d = ledger.defer()
     result = {}
+    l 'resumeData', resumeData
 
     if _.isEmpty resumeData
       txb = new bitcoin.TransactionBuilder()
@@ -239,15 +240,25 @@ class ledger.dongle.MockDongle extends EventEmitter
 
       result.indexesKeyCard = indexesKeyCard.join('')
       result.authorizationReference = indexesKeyCard.join('')
-      result.authorizationRequired = 2
-      result.authorizationPaired = undefined
       result.publicKeys = []
       result.publicKeys.push recipientAddress #first addr detail  - en Hex dans array
 
       result.txb = txb
       result.charsResponse = "0" + charsResponse.join('0')
 
+
+      # Keycard or m2fa
+      # authorizationRequired => 2 if keycard / 3 if m2fa
+      result.authorizationRequired = 2
+      # authorizationPaired => undefined if keycard
+      result.authorizationPaired = undefined
+
+      l 'resumeData', resumeData
+      l 'result', result
+      l 'arguments', arguments
+
     else
+      l 'resumeData', resumeData
       # Check keycard validity
       if resumeData.charsResponse isnt authorization
         _.delay (-> d.rejectWithError(Errors.WrongPinCode)), 1000
