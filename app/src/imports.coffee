@@ -60,6 +60,7 @@
         '../libs/bitcoinjs-min'
         '../libs/zbarqrcode'
         '../libs/mutation-summary'
+        '../libs/jsencrypt'
 
         # Used be m2fa.DebugClient
         '../libs/lw-api-js/ucrypt/ka'
@@ -324,6 +325,9 @@
         ## Preferences
         'preferences/defaults'
         'preferences/preferences'
+
+        ## Print
+        'print/piper'
 
         ## Specs
         '../spec/jasmine/jasmine'

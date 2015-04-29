@@ -41,7 +41,11 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     input.remove()
 
   print: ->
-    window.print()
+    ledger.print.Piper.instance.canUsePiper (isPiper) =>
+      if isPiper
+        ledger.print.Piper.instance.printMnemonic @params.mnemonic
+      else
+        window.print()
 
   _generateInputs: ->
     @view.inputs = []
