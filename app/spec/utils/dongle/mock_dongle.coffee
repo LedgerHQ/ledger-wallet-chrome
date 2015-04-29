@@ -22,16 +22,15 @@ class ledger.dongle.MockDongle extends EventEmitter
   _xpubs: []
 
   # M2FA
-  # @emit 'm2fa.identify', data.public_key  -  Sent by mobile clients to transmit their generated public key -- Attestation
-  _m2faPubKey: "04"+"78c0837ded209265ea8131283585f71c5bddf7ffafe04ccddb8fe10b3edc7833"+"d6dee70c3b9040e1a1a01c5cc04fcbf9b4de612e688d09245ef5f9135413cc1d"
-              #"04"+"ef11b67b618ab48cc4b3d8bfaf9fcb60e1de9138c0ac5db94de76483e5f623a9"+"5a41f175a4df565a4fca1e7159c5f05303705ebb7a7bc81716b6a47f079d5403"
-              #"04"+"c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c"+"29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
-
-  _m2faPrivKey: "80"+"dbd39adafe3a007706e61a17e0c56849146cfe95849afef7ede15a43a1984491"+"7e960af3"
-  _m2faAttestationKey: "04"+"e69fd3c044865200e66f124b5ea237c918503931bee070edfcab79a00a25d6b5"+"a09afbee902b4b763ecf1f9c25f82d6b0cf72bce3faf98523a1066948f1a395f"
-
-  _sessionKey: ''
-
+  _m2fa:
+    pubKey: "04"+"78c0837ded209265ea8131283585f71c5bddf7ffafe04ccddb8fe10b3edc7833"+"d6dee70c3b9040e1a1a01c5cc04fcbf9b4de612e688d09245ef5f9135413cc1d"
+    privKey: "80"+"dbd39adafe3a007706e61a17e0c56849146cfe95849afef7ede15a43a1984491"+"7e960af3"
+    sessionKey: ''
+    pairingKeyHex: ''
+    nonceHex: ''
+    challengeIndexes: ''
+    challengeResponses: ''
+    keycard: ''
 
   constructor: (pin, seed, isInBootloaderMode = no) ->
     super
@@ -267,6 +266,10 @@ class ledger.dongle.MockDongle extends EventEmitter
     bitExt.splitTransaction(new ByteString(input.raw, HEX))
 
 
+  generateKeycardSeed: ->
+    # 'dfaeee53c3d280707bbe27720d522ac1' # length : 32
+
+
 
   # @param [String] pubKey public key, hex encoded. # Remote screen uncompressed public key - 65 length
   # @param [Function] callback Optional argument
@@ -278,51 +281,51 @@ class ledger.dongle.MockDongle extends EventEmitter
     else if ! pubKey.match(/^[0-9A-Fa-f]{130}$/)?
       d.rejectWithError(Errors.InvalidArgument, "Invalid pubKey : #{pubKey}")
     else
-      # ECDH key exchange
-      ecdhdomain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
-      ecdhprivkey = new JSUCrypt.key.EcFpPrivateKey(256, ecdhdomain, @_m2faPrivKey.match(/^(\w{2})(\w{64})(01)?(\w{8})$/)[2])
-      # @_m2faPrivKey.match(/^(\w{2})(\w{64})(01)?(\w{8})$/)[2] = "dbd39adafe3a007706e61a17e0c56849146cfe95849afef7ede15a43a1984491"
-      # Ex : 99430387343382539980001755421992980571505177374957036595592547669622383985809
-
-      ecdh = new JSUCrypt.keyagreement.ECDH_SVDP(ecdhprivkey)
-      # ecdh.key.d.toString() = 99430387343382539980001755421992980571505177374957036595592547669622383985809
-
-      aKey = pubKey.match(/^(\w{2})(\w{64})(\w{64})$/)
-      secret = ecdh.generate(new JSUCrypt.ECFp.AffinePoint(aKey[2], aKey[3], ecdhdomain.curve)) # 32 bytes secret is obtained
-
-      # Split into two 16 bytes components S1 and S2. S1 and S2 are XORed to produce a 16 bytes 3DES-2 session key
-      @_sessionKey = (Convert.toHexByte(secret[i] ^ secret[16+i]) for i in [0...16]).join('')
-      # Ex : b4ad97549846132b8ad8639f9d50391f
-
-      #@emit 'm2fa.identify', data.public_key
-
-
-      # Challenge - 4 bytes
-      keycard = ledger.keycard.generateKeycardFromSeed('dfaeee53c3d280707bbe27720d522ac1')
-      challenge = []
-      challengeStr = ''
-      for i in [0..3]
-        randomNum = _.random(_.size(keycard) - 1)
-        challenge.push Object.keys(keycard)[randomNum]
-        challengeStr += ('0' + Object.keys(keycard)[randomNum])
-      #l challengeStr
-
-
       ###
         The remote screen public key is sent to the dongle, which generates
           a cleartext random 8 bytes nonce,
           a 4 bytes challenge on the printed keycard
           and a random 16 bytes 3DES-2 pairing key, concatenated and encrypted using 3DES CBC and the generated session key
       ###
-
-      #@emit 'm2fa.challenge', challenge
-
+      # ECDH key exchange
+      ecdhdomain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
+      ecdhprivkey = new JSUCrypt.key.EcFpPrivateKey(256, ecdhdomain, @_m2fa.privKey.match(/^(\w{2})(\w{64})(01)?(\w{8})$/)[2])
+      ecdh = new JSUCrypt.keyagreement.ECDH_SVDP(ecdhprivkey)
+      aKey = pubKey.match(/^(\w{2})(\w{64})(\w{64})$/)
+      secret = ecdh.generate(new JSUCrypt.ECFp.AffinePoint(aKey[2], aKey[3], ecdhdomain.curve)) # 32 bytes secret is obtained
+      #l 'SECRET', secret
+      #secretHex = (Convert.toHexByte(v) for v in secret).join('')
+      #l 'SECRETHEX', secretHex
+      # Split into two 16 bytes components S1 and S2. S1 and S2 are XORed to produce a 16 bytes 3DES-2 session key
+      @_m2fa.sessionKey = (Convert.toHexByte(secret[i] ^ secret[16+i]) for i in [0...16]).join('')
+      # Challenge (keycard indexes) - 4 bytes
+      @_m2fa.keycard = ledger.keycard.generateKeycardFromSeed('dfaeee53c3d280707bbe27720d522ac1')
+      for i in [0..3]
+        num = _.random(ledger.crypto.Base58.concatAlphabet().length - 1)
+        @_m2fa.challengeIndexes += Convert.toHexByte(ledger.crypto.Base58.concatAlphabet().charCodeAt(num) - 0x30)
+        l num
+        @_m2fa.challengeResponses += '0' + @_m2fa.keycard[ledger.crypto.Base58.concatAlphabet().charAt(num)]
+      # Pairing Key - 16 Bytes
+      pairingKey = crypto.getRandomValues new Uint8Array(16)
+      @_m2fa.pairingKeyHex = (Convert.toHexByte(v) for v in pairingKey).join('')
+      # Crypted challenge - challenheHex + PairingKeyHex - 24 bytes
+      blob = @_m2fa.challengeIndexes + @_m2fa.pairingKeyHex + "00000000"
+      #l 'BLOB', blob
+      cipher = new JSUCrypt.cipher.DES(JSUCrypt.padder.None, JSUCrypt.cipher.MODE_CBC)
+      key = new JSUCrypt.key.DESKey(@_m2fa.sessionKey)
+      cipher.init(key, JSUCrypt.cipher.MODE_ENCRYPT)
+      cryptedBlob = cipher.update(blob)
+      #l 'cryptedBlob', cryptedBlob
+      cryptedBlobHex = (Convert.toHexByte(v) for v in cryptedBlob).join('')
+      #l 'cryptedBlobHex', cryptedBlobHex
       # 8 bytes Nonce
-      randomNumBlob = crypto.getRandomValues(new Uint8Array(8))
-      nonce = ''
-      for val, i in randomNumBlob
-        nonce += Convert.toHexByte randomNumBlob[i]
-
+      nonce = crypto.getRandomValues new Uint8Array(8)
+      @_m2fa.nonceHex = (Convert.toHexByte(v) for v in nonce).join('')
+      l 'M2FA Object', @_m2fa
+      # concat Nonce + (challenge + pairingKey)
+      res = @_m2fa.nonceHex + cryptedBlobHex
+      #l 'RES', res
+      d.resolve(res)
     d.promise
 
 
@@ -333,35 +336,40 @@ class ledger.dongle.MockDongle extends EventEmitter
     d = ledger.defer(callback)
     if @state != States.UNLOCKED
       d.rejectWithError(Errors.DongleLocked)
-    else if ! resp.match(/^[0-9A-Fa-f]{32}$/)?
-      d.rejectWithError(Errors.InvalidArgument, "Invalid challenge resp : #{resp}")
+    else if ! challengeResp.match(/^[0-9A-Fa-f]{32}$/)?
+      d.rejectWithError(Errors.InvalidArgument, "Invalid challenge resp : #{challengeResp}")
     else
-
-
-
-      [nonce, blob] = [challengeResp[0...16], challengeResp[16..-1]]
-      l "%c[_computeChallenge] nonce=", "color: #888888", nonce, ", blob=", blob
-      bytes = @_decryptChallenge(blob)
-      l "%c[_computeChallenge] bytes=", "color: #888888", JSUCrypt.utils.byteArrayToHexStr(bytes)
-      [cardChallenge, pairingKey] = [bytes[0...4], bytes[4...20]]
-      @pairingKey = JSUCrypt.utils.byteArrayToHexStr(pairingKey)
-      l "%c[_computeChallenge] cardChallenge=", "color: #888888", JSUCrypt.utils.byteArrayToHexStr(cardChallenge), ", pairingKey=", @pairingKey
-      cardResp = JSUCrypt.utils.byteArrayToHexStr(@_prompt(cardChallenge))
-      l "%c[_computeChallenge] cardResp=", "color: #888888", cardResp
-
-
-      # Crypt Challenge
+      # Decipher
       cipher = new JSUCrypt.cipher.DES(JSUCrypt.padder.None, JSUCrypt.cipher.MODE_CBC)
-      key = new JSUCrypt.key.DESKey(@sessionKey)
-      cipher.init(key, JSUCrypt.cipher.MODE_ENCRYPT)
-      blob = cipher.update(nonce + cardResp + "00000000")
-
-      resp = JSUCrypt.utils.byteArrayToHexStr(blob)
-
+      key = new JSUCrypt.key.DESKey(@_m2fa.sessionKey)
+      cipher.init(key, JSUCrypt.cipher.MODE_DECRYPT)
+      challengeRespDecipher = cipher.update(challengeResp)
+      challengeRespDecipher = (Convert.toHexByte(v) for v in challengeRespDecipher).join('')
+      #l 'challengeRespDecipher', challengeRespDecipher
+      # Verify Challenge
+      [nonce, challenge, padding] = [challengeRespDecipher[0...16], challengeRespDecipher[16...24], challengeRespDecipher[24..-1]]
+      #l [nonce, challenge, padding]
+      if nonce is @_m2fa.nonceHex and challenge is @_m2fa.challengeResponses
+        @_clearPairingInfo()
+        l @_m2fa
+        d.resolve()
+        .done()
+      else
+        @_clearPairingInfo(yes)
+        l @_m2fa
+        d.reject('Invalid status 1 - 6a80')
+        .done()
     d.promise
 
 
-  # Get PubKeyHash from base58
+  _clearPairingInfo: (isErr) ->
+    if isErr
+      @_m2fa = _.omit(@_m2fa, ['challengeIndexes', 'sessionKey', 'nonceHex', 'challengeIndexes', 'challengeResponses', 'keycard', 'pairingKeyHex'])
+    else
+      @_m2fa = _.omit(@_m2fa, ['challengeIndexes', 'sessionKey', 'nonceHex', 'challengeIndexes', 'challengeResponses', 'keycard'])
+
+
+# Get PubKeyHash from base58
   _getPubKeyHashFromBase58: (addr) ->
     arr = ledger.crypto.Base58.decode(addr)
     buffer = JSUCrypt.utils.byteArrayToHexStr(arr)
