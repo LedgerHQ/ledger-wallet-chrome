@@ -31,7 +31,7 @@ class @WalletSendMobileDialogViewController extends @DialogViewController
     dialog = new WalletSendMethodDialogViewController(transaction: @params.transaction)
     @getDialog().push dialog
 
-  _onComplete: (pincode, error) =>
+  _onComplete: (pincode, error) ->
     if error?
       @_request = null
       @dismiss =>
