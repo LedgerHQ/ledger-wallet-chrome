@@ -300,10 +300,11 @@ class ledger.dongle.MockDongle extends EventEmitter
       @_m2fa.sessionKey = (Convert.toHexByte(secret[i] ^ secret[16+i]) for i in [0...16]).join('')
       # Challenge (keycard indexes) - 4 bytes
       @_m2fa.keycard = ledger.keycard.generateKeycardFromSeed('dfaeee53c3d280707bbe27720d522ac1')
+      @_m2fa.challengeIndexes = ''
+      @_m2fa.challengeResponses = ''
       for i in [0..3]
         num = _.random(ledger.crypto.Base58.concatAlphabet().length - 1)
         @_m2fa.challengeIndexes += Convert.toHexByte(ledger.crypto.Base58.concatAlphabet().charCodeAt(num) - 0x30)
-        l num
         @_m2fa.challengeResponses += '0' + @_m2fa.keycard[ledger.crypto.Base58.concatAlphabet().charAt(num)]
       # Pairing Key - 16 Bytes
       pairingKey = crypto.getRandomValues new Uint8Array(16)
@@ -321,7 +322,7 @@ class ledger.dongle.MockDongle extends EventEmitter
       # 8 bytes Nonce
       nonce = crypto.getRandomValues new Uint8Array(8)
       @_m2fa.nonceHex = (Convert.toHexByte(v) for v in nonce).join('')
-      l 'M2FA Object', @_m2fa
+      #l 'M2FA Object', @_m2fa
       # concat Nonce + (challenge + pairingKey)
       res = @_m2fa.nonceHex + cryptedBlobHex
       #l 'RES', res
@@ -351,14 +352,10 @@ class ledger.dongle.MockDongle extends EventEmitter
       #l [nonce, challenge, padding]
       if nonce is @_m2fa.nonceHex and challenge is @_m2fa.challengeResponses
         @_clearPairingInfo()
-        l @_m2fa
         d.resolve()
-        .done()
       else
         @_clearPairingInfo(yes)
-        l @_m2fa
-        d.reject('Invalid status 1 - 6a80')
-        .done()
+        d.reject('Pairing fail -  Invalid status 1 - 6a80')
     d.promise
 
 

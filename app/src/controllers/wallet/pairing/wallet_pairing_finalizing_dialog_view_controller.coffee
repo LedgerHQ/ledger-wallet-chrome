@@ -9,7 +9,7 @@ class @WalletPairingFinalizingDialogViewController extends DialogViewController
   onAfterRender: ->
     super
     @_request = @params.request
-    @_request?.onComplete => @_onComplete()
+    @_request?.onComplete @_onComplete
 
     # setup ui
     @view.errorLabel.hide()
@@ -37,6 +37,7 @@ class @WalletPairingFinalizingDialogViewController extends DialogViewController
     return _.str.trim(@view.phoneNameInput.val())
 
   _onComplete: (screen, error) ->
+    l screen, error
     @_request = null
     @dismiss =>
       if screen?
