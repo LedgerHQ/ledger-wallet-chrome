@@ -9,7 +9,6 @@ class @WalletBitidIndexDialogViewController extends DialogViewController
   onAfterRender: ->
     super
     @view.confirmButton.addClass "disabled"
-    chrome.app.window.current().show()
     @uri = @params.uri
     @doNotBroadcast = @params.silent
     @view.bitidDomain.text ledger.bitcoin.bitid.uriToDerivationUrl(@uri)

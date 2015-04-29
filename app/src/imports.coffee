@@ -59,6 +59,8 @@
         '../libs/lokijs.min'
         '../libs/bitcoinjs-min'
         '../libs/zbarqrcode'
+        '../libs/mutation-summary'
+        '../libs/jsencrypt'
 
         # Used be m2fa.DebugClient
         '../libs/lw-api-js/ucrypt/ka'
@@ -243,6 +245,14 @@
         'controllers/wallet/bitid/wallet_bitid_authenticating_dialog_view_controller'
         'controllers/wallet/bitid/wallet_bitid_form_dialog_view_controller'
 
+        # XPubKey
+        'controllers/wallet/xpubkey/wallet_xpubkey_index_dialog_view_controller'
+        'controllers/wallet/xpubkey/wallet_xpubkey_processing_dialog_view_controller'
+
+        # P2SH
+        'controllers/wallet/p2sh/wallet_p2sh_index_dialog_view_controller'
+        'controllers/wallet/p2sh/wallet_p2sh_signing_dialog_view_controller'
+
         # Settings
         # - Base
         'controllers/wallet/settings/wallet_settings_index_dialog_view_controller'
@@ -269,6 +279,10 @@
         'controllers/wallet/settings/bitcoin/wallet_settings_bitcoin_fees_setting_view_controller'
         'controllers/wallet/settings/bitcoin/wallet_settings_bitcoin_blockchain_setting_view_controller'
         'controllers/wallet/settings/wallet_settings_bitcoin_section_dialog_view_controller'
+
+        # - Tools
+        'controllers/wallet/settings/tools/wallet_settings_tools_logs_setting_view_controller'
+        'controllers/wallet/settings/wallet_settings_tools_section_dialog_view_controller'
 
         ## Onboarding controllers
         'controllers/onboarding/onboarding_view_controller'
@@ -312,6 +326,9 @@
         'preferences/defaults'
         'preferences/preferences'
 
+        ## Print
+        'print/piper'
+
         ## Update controllers
         'controllers/update/update_navigation_controller'
         'controllers/update/update_view_controller'
@@ -329,12 +346,15 @@
 
         ## API
         'api'
+        'controllers/wallet/api/wallet_api_accounts_dialog_view_controller'
+        'controllers/wallet/api/wallet_api_operations_dialog_view_controller'
 
         ## Coinkite
         'controllers/apps/coinkite/apps_coinkite_navigation_controller'
         'controllers/apps/coinkite/dashboard/apps_coinkite_dashboard_index_view_controller'
         'controllers/apps/coinkite/dashboard/apps_coinkite_dashboard_compatibility_view_controller'
         'controllers/apps/coinkite/settings/apps_coinkite_settings_index_dialog_view_controller'
+        'controllers/apps/coinkite/keygen/apps_coinkite_keygen_index_dialog_view_controller'
         'controllers/apps/coinkite/keygen/apps_coinkite_keygen_processing_dialog_view_controller'
         'controllers/apps/coinkite/keygen/apps_coinkite_keygen_show_dialog_view_controller'
         'controllers/apps/coinkite/cosign/apps_coinkite_cosign_index_dialog_view_controller'

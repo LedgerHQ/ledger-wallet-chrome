@@ -43,7 +43,7 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
     ledger.app.router.go '/onboarding/device/connecting'
 
   _listenEvents: ->
-    if ledger.app.dongle? and !ledger.app.dongle.isInBootloaderMode()
+    if ledger.app.dongle? and !ledger.app.dongle.isInBootloaderMode() or ledger.app.isConnectingDongle()
       do @navigateContinue
     else
       ledger.app.once 'dongle:connecting', @_onDongleConnecting.bind(@)

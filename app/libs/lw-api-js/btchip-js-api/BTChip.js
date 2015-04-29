@@ -503,28 +503,27 @@ var BTChip = Class.create({
                 return deferred.promise;
 	},
 
-  startP2SHUntrustedHashTransactionInput_async: function(newTransaction, transaction, redeemScript, currentIndex) {
+  startP2SHUntrustedHashTransactionInput_async: function(newTransaction, version, inputs, redeemScript, currentIndex) {
     var currentObject = this;
-    var version_hex = new ByteString(Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(transaction.version), 4)), HEX);
-    var data = version_hex.concat(currentObject.createVarint(transaction['ins'].length));
+    var data = version.concat(currentObject.createVarint(inputs.length));
     var deferred = Q.defer();
     currentObject.startUntrustedHashTransactionInputRaw_async(newTransaction, true, data).then(function (result) {
       var i = 0;
       async.eachSeries(
-        transaction['ins'],
+        inputs,
         function (input, finishedCallback) {
           data = new ByteString(Convert.toHexByte(0x00), HEX);
-          var txhash = Bitcoin.convert.bytesToHex(Bitcoin.convert.hexToBytes(input.outpoint.hash).reverse());
-          var outpoint = Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(input.outpoint.index), 4));
-          data = data.concat(new ByteString(txhash, HEX)).concat(new ByteString(outpoint, HEX));
+          var txhash = currentObject.reverseBytestring(new ByteString(input[0], HEX));
+          var outpoint = currentObject.reverseBytestring(new ByteString(input[1], HEX));
+          data = data.concat(txhash).concat(outpoint);
           if (i == currentIndex) {
-            script = redeemScript;
+            script = new ByteString(redeemScript, HEX);
           } else {
             script = "";
           }
           data = data.concat(currentObject.createVarint(script.length));
           if (script.length == 0) {
-            data = data.concat(new ByteString("FFFFFFFF", HEX));
+            data = data.concat(new ByteString("FFFFFFFF", HEX)); // TODO: unusual sequence
           }
           currentObject.startUntrustedHashTransactionInputRaw_async(true, false, data).then(function (result) {
             var offset = 0;
@@ -533,7 +532,7 @@ var BTChip = Class.create({
               var blockSize = (script.length - offset > 255 ? 255 : script.length - offset);
               block = script.bytes(offset, blockSize);
               if (offset + blockSize == script.length) {
-                block = block.concat(new ByteString("FFFFFFFF", HEX));
+                block = block.concat(new ByteString("FFFFFFFF", HEX)); // TODO: unusual sequence
               }
               blocks.push(block);
               offset += blockSize;
@@ -564,20 +563,12 @@ var BTChip = Class.create({
     return this.card.sendApdu_async(0xe0, 0x4a, (lastRound ? 0x80 : 0x00), 0x00, transactionData, [0x9000]);
   },
 
-  untrustedHashTransactionInputFinalizeFull_async: function(transaction) {
+  untrustedHashTransactionInputFinalizeFull_async: function(numOutputs, output) {
     var currentObject = this;
-    var data = currentObject.createVarint(transaction['outs'].length);
+    var data = currentObject.createVarint(numOutputs);    
     var deferred = Q.defer();
     return currentObject.untrustedHashTransactionInputFinalizeFullRaw_async(false, data).then(function (result) {
-      var data = new ByteString('', HEX);
-      transaction.outs.forEach(
-        function(txout) {
-          data = data.concat(new ByteString(Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(txout.value, 8)), HEX));
-          var scriptBytes = txout.script.buffer;
-          data = data.concat(currentObject.createVarint(scriptBytes.length))
-          data = data.concat(new ByteString(Bitcoin.convert.bytesToHex(scriptBytes), HEX));       
-        }
-      );
+      var data = new ByteString(output, HEX);
       var internalPromise = Q.defer();
       var outputsBlocks = [];
       var offset = 0;
@@ -888,25 +879,28 @@ var BTChip = Class.create({
                 return deferred.promise;
 	},
 
-  signP2SHTransaction_async: function(inputs, transaction, scripts, path) {
+  // Inputs : [ [ prevout tx hash, prevout index ] ]
+  // Scripts : [ redeem scripts ] for each input
+  // Output : the full output script
+  // Paths : [ key path ] for each associated input
+  signP2SHTransaction_async: function(inputs, scripts, numOutputs, output, paths) {
     var authorization = new ByteString("", HEX);
     var signatures = [];
     var scriptData;
+    var defaultVersion = new ByteString("01000000", HEX);
     var lockTime = BTChip.DEFAULT_LOCKTIME;
     var sigHashType = BTChip.SIGHASH_ALL;
     var currentObject = this;
     var deferred = Q.defer();
     var firstRun = true;
-
     var currentIndex = 0
     async.eachSeries(
       inputs,
       function(input, finishedCallback) {
-        var script = new ByteString(scripts[input[0]].redeem, HEX);
-        currentObject.startP2SHUntrustedHashTransactionInput_async(firstRun, transaction, script, currentIndex).then(function (result) {
-          currentObject.untrustedHashTransactionInputFinalizeFull_async(transaction).then(function (result) {
-            currentObject.signTransaction_async(path + "/" + input[0], authorization, lockTime, sigHashType).then(function (result) {
-              signatures.push([result.toString(), input[1], input[0]]);
+        currentObject.startP2SHUntrustedHashTransactionInput_async(firstRun, defaultVersion, inputs, scripts[currentIndex], currentIndex).then(function (result) {
+          currentObject.untrustedHashTransactionInputFinalizeFull_async(numOutputs, output).then(function (result) {
+            currentObject.signTransaction_async(paths[currentIndex], authorization, lockTime, sigHashType).then(function (result) {               
+              signatures.push(result.toString(HEX));
               firstRun = false;
               currentIndex++;
               finishedCallback();
@@ -919,6 +913,51 @@ var BTChip = Class.create({
       }
     );
     return deferred.promise;
+  },
+
+  formatP2SHInputScript: function(redeemScript, signatures) {
+    var OP_0 = 0x00;
+    var OP_1_BEFORE = 0x50;
+    var OP_PUSHDATA1 = 0x4c;  
+    var OP_PUSHDATA2 = 0x4d;
+    var m = redeemScript.byteAt(0) - OP_1_BEFORE;
+    var result = new ByteString("00", HEX); // start with OP_0
+    for (var i=0; i<m; i++) {
+      if (i < signatures.length) {
+        result = result.concat(new ByteString(Convert.toHexByte(signatures[i].length), HEX)).concat(signatures[i]);
+      }
+      else {
+        result = result.concat(new ByteString("00", HEX));
+      }
+    }
+    if (redeemScript.length > 255) {
+        result = result.concat(new ByteString(Convert.toHexByte(OP_PUSHDATA2) + 
+          Convert.toHexByte(redeemScript.length & 0xff) + Convert.toHexByte((redeemScript.length >> 8) & 0xff), HEX));
+    }
+    else
+    if (redeemScript.length >= OP_PUSHDATA1) {
+        result = result.concat(new ByteString(Convert.toHexByte(OP_PUSHDATA1) + 
+          Convert.toHexByte(redeemScript.length), HEX));
+    }
+    else {
+        result = result.concat(new ByteString(Convert.toHexByte(redeemScript.length), HEX));
+    }
+    result = result.concat(redeemScript);
+    return result;
+  },
+
+  formatP2SHOutputScript: function(transaction) {
+    var data = new ByteString('', HEX);
+    currentObject = this;
+    transaction.outs.forEach(
+      function(txout) {
+        data = data.concat(new ByteString(Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(txout.value, 8)), HEX));
+        var scriptBytes = txout.script.buffer;
+        data = data.concat(currentObject.createVarint(scriptBytes.length))
+        data = data.concat(new ByteString(Bitcoin.convert.bytesToHex(scriptBytes), HEX));       
+      }
+    );
+    return data.toString();    
   },
 
 	serializeTransaction: function(transaction) {
@@ -1028,7 +1067,6 @@ var BTChip = Class.create({
 	},
 
 	setDriverMode_async : function(mode) {
-		console.log('Driver Mode : '+mode);
 		return this.card.sendApdu_async(0xe0, 0x2a, mode, 0x00, 0x00, [0x9000]);
 	},
 

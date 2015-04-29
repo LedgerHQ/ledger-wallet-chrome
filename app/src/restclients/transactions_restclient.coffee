@@ -13,7 +13,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     if _.isFunction(batchSize)
       callback = batchSize
       batchSize = null
-    batchSize ?= 20
+    batchSize ?= 200
     transactions = []
     _.async.eachBatch addresses, batchSize, (batch, done, hasNext, batchIndex, batchCount) =>
       @http().get
@@ -27,7 +27,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
   createTransactionStream: (addresses) ->
     stream = new Stream()
     stream.onOpen = =>
-      _.async.eachBatch addresses, 20, (batch, done, hasNext) =>
+      _.async.eachBatch addresses, 200, (batch, done, hasNext) =>
         @http().get
           url: "blockchain/addresses/#{batch.join(',')}/transactions"
           onSuccess: (transactions) ->

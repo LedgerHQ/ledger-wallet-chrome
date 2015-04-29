@@ -25,7 +25,7 @@ Q.longStackSupport = true
     defaultLoggingLevel:
       Connected:
         Enabled: ledger.utils.Logger.Levels.ALL
-        Disabled: ledger.utils.Logger.Levels.ALL
+        Disabled: ledger.utils.Logger.Levels.NONE
       Disconnected:
         Enabled: ledger.utils.Logger.Levels.ALL
         Disabled: ledger.utils.Logger.Levels.ALL

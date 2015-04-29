@@ -39,9 +39,11 @@ class @EventEmitter
     @_getEventEmitter().emit event, data
 
   once: (event, handler) ->
+    @off event, handler
     @_getEventEmitter().once event, handler
 
   on: (event, handler) ->
+    @off event, handler
     @_getEventEmitter().on event, handler
 
   off: (event, handler) ->

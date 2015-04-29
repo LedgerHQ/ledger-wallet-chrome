@@ -34,10 +34,10 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
         for address in input.addresses
           derivation = ledger.wallet.HDWallet.instance?.cache?.getDerivationPath(address)
           if derivation?
-            l "New transaction on #{derivation}"
+            @logger().info "New transaction on #{derivation}"
             account = ledger.wallet.HDWallet.instance?.getAccountFromDerivationPath(derivation)
             if account?
-              l 'Add transaction'
+              @logger().info 'Add transaction'
               account.notifyPathsAsUsed(derivation)
               Account.fromHDWalletAccount(account)?.addRawTransactionAndSave transaction
               Wallet.instance?.retrieveAccountsBalances()
@@ -45,14 +45,14 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
               ledger.app.emit 'wallet:operations:new'
               ledger.app.emit 'wallet:operations:new'
             else
-              l 'Failed to add transaction'
+              @logger().warn "Failed to retrieve an account for #{derivation} ", transaction
     found
 
   _handleNewBlock: (block) ->
-    l 'Receive block', block
+    @logger().trace 'Receive new block'
     for transactionHash in block['transaction_hashes']
       if Operation.find(hash: transactionHash).count() > 0
-        l 'Found transaction in block'
+        @logger().trace 'Found transaction in block'
         if ledger.tasks.OperationsSynchronizationTask.instance.isRunning()
           ledger.tasks.OperationsSynchronizationTask.instance.synchronizeConfirmationNumbers()
         else

@@ -257,9 +257,10 @@ class @ledger.dongle.Dongle extends EventEmitter
         # 19.7. SET OPERATION MODE
         @_sendApdu(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
         .then =>
-          if @getIntFirmwareVersion() >= ledger.dongle.Firmware.V1_4_13
+          if @getIntFirmwareVersion() >= Firmware.V1_4_13
             # 19.7. SET OPERATION MODE
-            @_sendApdu(0xE0, 0x26, 0x01, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).fail(=> e('Unlock FAIL', arguments)).done()
+            mode = if @getIntFirmwareVersion() >= Firmware.V_LW_1_0_0 then 0x02 else 0x01
+            @_sendApdu(0xE0, 0x26, mode, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).fail(=> e('Unlock FAIL', arguments)).done()
           @_setState(States.UNLOCKED)
           d.resolve()
         .fail (err) =>
@@ -475,12 +476,15 @@ class @ledger.dongle.Dongle extends EventEmitter
         return result
       )
 
+  formatP2SHOutputScript: (transaction) ->
+    @_btchip.formatP2SHOutputScript(transaction)
+
   ###
   @return [Q.Promise]
   ###
-  signP2SHTransaction: (inputs, transaction, scripts, path) ->
+  signP2SHTransaction: (inputs, scripts, numOutputs, output, paths) ->
     _btchipQueue.enqueue "signP2SHTransaction", =>
-      @_btchip.signP2SHTransaction_async(inputs, transaction, scripts, path)
+      @_btchip.signP2SHTransaction_async(inputs, scripts, numOutputs, output, paths)
 
   ###
   @param [String] input hex encoded

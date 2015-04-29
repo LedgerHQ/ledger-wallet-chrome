@@ -81,7 +81,7 @@ class ledger.wallet.HDWallet.Account
     @_account.currentPublicIndex ?= 0
 
   initializeXpub: (callback) ->
-    ledger.app.dongle.getExtendedPublicKey "#{@wallet.getRootDerivationPath()}/#{@index}'", (xpub) =>
+    ledger.app.dongle.getExtendedPublicKey @getRootDerivationPath(), (xpub) =>
       @_xpub = xpub
       callback?()
 
@@ -96,6 +96,9 @@ class ledger.wallet.HDWallet.Account
     @_store = null
     @_storeId = null
     @index = null
+
+  getRootDerivationPath: () ->
+    "#{@wallet.getRootDerivationPath()}/#{@index}'"
 
   getAllChangeAddressesPaths: () ->
     paths = []

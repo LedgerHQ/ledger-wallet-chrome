@@ -98,8 +98,8 @@ describe "Internationalization and Localization -", ->
     beforeEach (done) ->
       ledger.storage.sync.clear ->
         chrome.storage.local.clear -> done()
-      #originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
-      #jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
+    #originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
+    #jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
 
 
     it "should set two chars tag lang and four chars tag locale", (done) ->

@@ -262,7 +262,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @emit "erasureStep", if error?.retryCount? then error.retryCount else 3
         @_waitForPowerCycle()
       return
-    .fail ->
+    .fail =>
       @_failure(Errors.CommunicationError)
     .done()
 

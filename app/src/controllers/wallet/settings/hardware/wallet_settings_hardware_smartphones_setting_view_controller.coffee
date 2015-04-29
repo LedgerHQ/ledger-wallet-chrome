@@ -1,7 +1,10 @@
 class @WalletSettingsHardwareSmartphonesSettingViewController extends WalletSettingsSettingViewController
 
   renderSelector: "#smartphones_table_container"
-  _smartphonesGroups: []
+
+  initialize: ->
+    super
+    @_smartphonesGroups = []
 
   pairSmartphone: ->
     dialog = new WalletPairingIndexDialogViewController()

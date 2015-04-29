@@ -43,7 +43,6 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       account = ledger.wallet.HDWallet.instance.getOrCreateAccount(accountIndex)
 
       done = =>
-        l account.getCurrentPublicAddressPath()
         @emit 'bip44:account:done'
         accountIndex += 1
         do recoverAccount
@@ -58,22 +57,15 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       publicIndex = parseInt publicIndex
       changeIndex = parseInt changeIndex
       paths = []
-      l 'Before path'
       if isRestoringPublicChain
-        l publicIndex, publicIndex + 10
-        l 'Range', publicIndex, (publicIndex + 20)
         for i in [publicIndex...publicIndex + 20]
           paths.push account.getPublicAddressPath(i)
       if isRestoringChangeChain
         for i in [changeIndex...changeIndex + 20]
           paths.push account.getChangeAddressPath(i)
-      l 'Before address', paths
       ledger.wallet.pathsToAddresses paths, (addresses) =>
         addressesPaths = _.invert addresses
-        l 'After address'
-        l addressesPaths
         ledger.api.TransactionsRestClient.instance.getTransactions _.values(addresses), (transactions, error) =>
-          l 'Received', transactions
           return @emit 'bip44:fatal' if error?
           usedAddresses = []
           select = (array) -> _.select array, ((i) -> if addressesPaths[i]? then yes else no)
@@ -89,7 +81,6 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
           shiftPublic = account.getCurrentPublicAddressIndex()
 
           usedPaths = _.unique((addressesPaths[usedAddress] for usedAddress in usedAddresses))
-          l 'used', usedPaths
           account.notifyPathsAsUsed _.values(usedPaths)
 
           shiftChange = shiftChange isnt account.getCurrentChangeAddressIndex()

@@ -4,6 +4,8 @@ ledger.base ?= {}
 ledger.base.application ?= {}
 
 DongleLogger = -> ledger.utils.Logger.getLoggerByTag('AppDongle')
+ApplicationLogger = -> ledger.utils.Logger.getLoggerByTag('Application')
+XhrLogger = -> ledger.utils.Logger.getLoggerByTag('XHR')
 
 ###
   Base class for the main application class. This class holds the non-specific part of the application (i.e. click dispatching, application lifecycle)
@@ -17,7 +19,9 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @donglesManager = new ledger.dongle.MockDongleManager()
     @router = new Router(@)
     @_dongleAttestationLock = off
+    @_isConnectingDongle = no
     ledger.dialogs.manager.initialize($('#dialogs_container'))
+    window.onerror = ApplicationLogger().error.bind(ApplicationLogger())
 
   ###
     Starts the application by configuring the application environment, starting services and rendering view controllers
@@ -26,9 +30,9 @@ class ledger.base.application.BaseApplication extends @EventEmitter
     @_listenCommands()
     @_listenClickEvents()
     @_listenDongleEvents()
+    @_listenXhr()
     @onStart()
     @donglesManager.start()
-
 
   ###
     Reloads the whole application.
@@ -75,13 +79,22 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   ###
     Reloads the currently displayed view controller and css files.
   ###
-  reloadUi: () ->
-    $('link').each (_, link) ->
-      if link.href? && link.href.length > 0
-        cleanHref = link.href
-        cleanHref = cleanHref.replace(/\?[0-9]*/i, '')
-        link.href = cleanHref + '?' + (new Date).getTime()
-    @_navigationController.render @_navigationControllerSelector() if @_navigationController?
+  reloadUi: (reloadViewTemplates = no) ->
+    if reloadViewTemplates
+      $('link').each (_, link) ->
+        if link.href? && link.href.length > 0
+          cleanHref = link.href
+          cleanHref = cleanHref.replace(/\?[0-9]*/i, '')
+          link.href = cleanHref + '?' + (new Date).getTime()
+    @_navigationController.rerender()
+    dialog.rerender() for dialog in ledger.dialogs.manager.getAllDialogs()
+
+  scheduleReloadUi: (reloadViewTemplates = no) ->
+    clearTimeout(@_reloadUiSchedule) if @_reloadUiSchedule
+    @_reloadUiSchedule = setTimeout =>
+      @_reloadUiSchedule = null
+      @reloadUi(reloadViewTemplates)
+    , 500
 
   ###
     This method is used to dispatch an action to the view controller hierarchy. First it tries to trigger an action on
@@ -107,6 +120,8 @@ class ledger.base.application.BaseApplication extends @EventEmitter
       (Try => @onDongleCertificationDone(dongle, error)).printError()
     return
 
+  isConnectingDongle: -> @_isConnectingDongle
+
   ###
     Returns the jQuery element used as the main div container in which controllers will render themselves.
 
@@ -117,9 +132,10 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   _listenCommands: ->
     chrome.commands.onCommand.addListener (command) =>
       switch command
-        when 'reload-page' then do @reloadUi
+        when 'reload-page' then @reloadUi(yes)
         when 'reload-application' then do @reload
         when 'update-firmware' then do @onCommandFirmwareUpdate
+        when 'export-logs' then do @onCommandExportLogs
 
   ###
     Catches click on links and dispatch them if possible to the router.
@@ -153,10 +169,20 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   _listenDongleEvents: () ->
     # Dongle management & dongle events re-dispatching
     @donglesManager.on 'connecting', (event, device) =>
+      return if @dongle?
       DongleLogger().info('Connecting', device.deviceId)
+      @_isConnectingDongle = yes
+      @_connectingDevice = device.deviceId
       (Try => @onConnectingDongle(device)).printError()
     @donglesManager.on 'connected', (event, dongle) =>
+      @_isConnectingDongle = no
+      @_connectingDevice = undefined
       @connectDongle(dongle)
+    @donglesManager.on 'disconnect', (event, device) =>
+      return if @_connectingDevice isnt device.deviceId
+      @_isConnectingDongle = no
+      @_connectingDevice = undefined
+      _.defer => (Try => @onDongleIsDisconnected(null)).printError()
 
   connectDongle: (dongle) ->
     @dongle = dongle
@@ -178,6 +204,24 @@ class ledger.base.application.BaseApplication extends @EventEmitter
 
 
   onConnectingDongle: (device) ->
+      @dongle = dongle
+      dongle.once 'disconnected', =>
+        _.defer => (Try => @onDongleIsDisconnected(dongle)).printError()
+        @dongle = null
+      dongle.once 'state:error', =>
+        (Try => @onDongleNeedsUnplug(dongle)).printError()
+      dongle.once 'state:unlocked', =>
+        (Try => @onDongleIsUnlocked(dongle)).printError()
+      (Try => @onDongleConnected(dongle)).printError()
+
+  _listenXhr: ->
+    formatRequest = (request, response) -> "#{request.type} #{request.url}" + if response? then " [#{response.status}] - #{response.statusText}" else ""
+    $(document).bind 'ajaxSend', (_1, _2, request) ->
+      XhrLogger().info formatRequest(request, null)
+    .bind 'ajaxSuccess',  (_1, response, request) ->
+      XhrLogger().good formatRequest(request, response)
+    .bind 'ajaxError',  (_1, response, request) ->
+      XhrLogger().bad formatRequest(request, response)
 
   onDongleConnected: (dongle) ->
 
@@ -192,3 +236,5 @@ class ledger.base.application.BaseApplication extends @EventEmitter
   onDongleIsInBootloaderMode: (dongle) ->
 
   onCommandFirmwareUpdate: ->
+
+  onCommandExportLogs: ->
