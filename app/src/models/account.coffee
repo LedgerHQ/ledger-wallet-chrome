@@ -9,6 +9,9 @@ class @Account extends Model
 
   getHDWalletAccount: () -> ledger.wallet.HDWallet.instance.getAccount(@get('index'))
 
+  serialize: () ->
+    $.extend super, { root_path: @getHDWalletAccount().getRootDerivationPath() }
+
   ## Balance management
 
   retrieveBalance: () ->

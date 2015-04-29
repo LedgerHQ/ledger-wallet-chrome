@@ -19,6 +19,10 @@
       <i class="fa fa-th"></i>
       <div class="uppercase-action"><%= t 'wallet.settings.common.apps' %></div>
     </a>
+    <a class="panel" href="#openTools">
+      <i class="fa fa-wrench"></i>
+      <div class="uppercase-action"><%= t 'wallet.settings.common.tools' %></div>
+    </a>
   </div>
 </section>
 <div class="dialog-actions-bar">

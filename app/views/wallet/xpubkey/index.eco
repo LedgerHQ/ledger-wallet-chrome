@@ -1,0 +1,28 @@
+<section id="wallet_xpubkey_index_dialog">
+  <header>
+    <h1><%= t 'wallet.xpubkey.index.title' %></h1>
+  </header>
+  <table class="no-table-head">
+    <tbody>
+      <tr>
+        <td class="no-border">
+          <%= t 'wallet.xpubkey.index.info' %>
+        </td>
+      </tr>    
+      <tr>
+        <td class="row-title"><%= t 'wallet.xpubkey.index.path' %></td>
+      </tr>
+      <tr>
+        <td>
+          <span id="derivation_path"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+<div id="error_container"></div>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
+  <a class="action-rounded-button" href="#confirm"><%= t 'common.confirm' %></a>
+</div>

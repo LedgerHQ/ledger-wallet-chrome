@@ -107,6 +107,11 @@ class @ViewController extends @EventEmitter
     el = null
     selector = $("link[id='#{@stylesheetIdentifier()}']")
     if selector.length > 0
+      currentHref = selector.attr('href')
+      if currentHref? and ledger.isProd
+        currentHref = currentHref.substr(0, if currentHref.indexOf('?') isnt -1 then currentHref.indexOf('?') else currentHref.length)
+        if currentHref is "../assets/css/#{@cssPath()}.css"
+          return callback?()
       selector.attr('href', '../assets/css/' + @cssPath() + '.css?' + (new Date()).getTime())
       el = selector[0]
     else

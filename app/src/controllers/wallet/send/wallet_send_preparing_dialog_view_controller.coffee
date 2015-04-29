@@ -3,13 +3,8 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
   view:
     contentContainer: '#content_container'
 
-  cancel: ->
-    Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
-    @dismiss()
-
-  onAfterRender: ->
+  initialize: ->
     super
-    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
     account = Account.find(index: 0).first()
     amount = ledger.Amount.fromBtc(@params.amount)
     fees = ledger.wallet.Transaction.DEFAULT_FEES
@@ -31,6 +26,14 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
           dialog.show()
       else
         @_routeToNextDialog(transaction)
+
+  cancel: ->
+    Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
+    @dismiss()
+
+  onAfterRender: ->
+    super
+    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
 
   _routeToNextDialog: (transaction) ->
     cardBlock = (transaction) =>
