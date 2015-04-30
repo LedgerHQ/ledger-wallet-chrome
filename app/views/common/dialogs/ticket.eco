@@ -1,0 +1,36 @@
+<section id="dialogs_ticket_dialog">
+    <header>
+        <h1>Envoyer un ticket au support</h1>
+    </header>
+    <form action="">
+        Message : <textarea id="ticket_body" name="ticket_body" cols="150" rows="15"></textarea>
+
+        Email : <input type="email" id="ticket_email" name="ticket_email" required> <br/>
+
+        Name : <input type="text" id="ticket_name" name="name"> <br/>
+
+        Subject : <input type="text" id="ticket_subject" name="subject"> <br/>
+
+        tags :
+        <select multiple id="ticket_tags" name="ticket_tags">
+            <option value="tag-support">support</option>
+            <option value="tag-feature-request">feature request</option>
+            <option value="tag-sales">sales</option>
+            <option value="tag-partnership">partnership</option>
+            <option value="tag-other">other</option>
+        </select> <br/>
+
+        Envoyer les logs :
+        <!--<input type="checkbox" id="ticket_isLogSent" name="ticket_isLogSent" value="ticket_isLogSent" checked> <br/>-->
+
+        <div id="ticket_isOkToSendLog"></div>
+
+    </form>
+
+</section>
+<div class="dialog-actions-bar">
+    <a href="#sendTicket" class="action-rounded-button"><%= t 'common.send' %></a>
+
+    <div class="left-spacer"></div>
+    <a href="#dismiss" class="cancel-rounded-button"><%= t 'common.cancel' %></a>
+</div>

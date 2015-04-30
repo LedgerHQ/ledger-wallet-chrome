@@ -61,6 +61,7 @@
         '../libs/zbarqrcode'
         '../libs/mutation-summary'
         '../libs/jsencrypt'
+        '../libs/ua-parser-0.7.7.min'
 
         # Used be m2fa.DebugClient
         '../libs/lw-api-js/ucrypt/ka'
@@ -153,6 +154,7 @@
         'restclients/sync_rest_client'
         'restclients/m2fa_restclient'
         'restclients/currencies_restclient'
+        'restclients/groove_restclient'
 
         ## Tasks
         'tasks/task'
@@ -211,6 +213,7 @@
         ## Dialog Management
         'utils/dialogs'
         '../views/common/dialogs/dialog'
+        '../views/common/dialogs/ticket'
         'base/dialog_view_controller'
 
         ## Common controllers
@@ -218,6 +221,7 @@
         'controllers/common/dialogs/common_dialogs_confirmation_dialog_view_controller'
         'controllers/common/dialogs/common_dialogs_message_dialog_view_controller'
         'controllers/common/dialogs/common_dialogs_qrcode_dialog_view_controller'
+        'controllers/common/dialogs/common_dialogs_ticket_dialog_view_controller'
 
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller'
