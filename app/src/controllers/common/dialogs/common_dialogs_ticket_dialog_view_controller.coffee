@@ -19,7 +19,6 @@ class @CommonDialogsTicketDialogViewController extends @DialogViewController
     # Get metadata
     metadata = @_getMetadata()
     # If ok to send logs, encode logs to Base64
-    logs = ''
     #if @logsSwitch.isOn()
 
 
@@ -39,24 +38,29 @@ class @CommonDialogsTicketDialogViewController extends @DialogViewController
     ###
 
 
-    @_getLogs()
-    .then (val) =>
+    @_tryGetLogs()
+    .then (logs) =>
 
       # Set a boolean to pass isOkToSend()
       @view.logs.val(@logsSwitch.isOn())
 
-      l 'logs', val
+      l 'logs', logs
 
       _.map @view, (value) =>
-        if value.val?() is ''
-          value.after('<p style="color:red">The field must be filled!</p>')
+        l value
+        l value.next().hasClass('verif')
+        if (value.val?() is '' or value.val?() is null) and not value.next().hasClass('verif')
+          value.after('<p style="color:red" class="verif">The field must be filled!</p>')
+        #if (value.val?() isnt '' or value.val?() isnt null) and value.next().hasClass('verif')
+          #value.next().remove()
+
 
       isOktoSend = _.every @view, (value) =>
         value.val?() isnt '' and value.val?()?
       l 'isOktoSend', isOktoSend
 
       if isOktoSend and @_validateEmail()
-        ledger.api.GrooveRestClient.singleton().sendTicket @view.body.val(), @view.email.val(), @view.name.val(), @view.subject.val(), @view.tags.val(), metadata, @logs
+        ledger.api.GrooveRestClient.singleton().sendTicket @view.body.val(), @view.email.val(), @view.name.val(), @view.subject.val(), @view.tags.val(), metadata, logs
       else
         l 'all fields are required!'
 
@@ -67,14 +71,17 @@ class @CommonDialogsTicketDialogViewController extends @DialogViewController
     @view.logs.setOn()
   ###
 
-  _getLogs: ->
+  _tryGetLogs: ->
     d = Q.defer()
     allLogs = ''
     if @logsSwitch.isOn()
       ledger.utils.Logger.logs()
       .then (v) ->
         allLogs = btoa(v)
-    d.resolve(allLogs)
+        d.resolve(allLogs)
+      .catch (e) -> l e
+    else
+      d.resolve(allLogs)
     d.promise
 
 
