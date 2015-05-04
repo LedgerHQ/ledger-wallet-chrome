@@ -15,8 +15,6 @@ require @ledger.imports, ->
         ledger.preferences.defaults.init =>
           @setExecutionMode(@Modes.Wallet)
           @router.go('/')
-          #_.delay (-> (new CommonDialogsTicketDialogViewController).show()), 5000
-          (new CommonDialogsTicketDialogViewController).show()
 
     ###
       Sets the execution mode of the application. In Wallet mode, the application handles the wallets state by starting services,
