@@ -33,8 +33,8 @@ CurrentCommand = null
 
 ledger.app ?= {}
 ledger.wallet ?= {}
-ledger.wallet.HDWallet ?= {}
-ledger.wallet.HDWallet.instance ?= {}
+ledger.wallet.Wallet ?= {}
+ledger.wallet.Wallet.instance ?= {}
 
 enqueue = (command, parameters, queryId) ->
   Queue.push command: command, parameters: parameters, queryId: queryId
@@ -73,7 +73,7 @@ class WorkerWallet
 
 class WorkerCache
 
-  ledger.wallet.HDWallet.instance.cache = new @
+  ledger.wallet.Wallet.instance.cache = new @
 
   get: () -> null
 

@@ -346,7 +346,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       d = ledger.defer(callback)
       @_btchip.getWalletPublicKey_async(path)
       .then (result) =>
-        ledger.wallet.HDWallet.instance?.cache?.set [[path, result.bitcoinAddress.value]]
+        ledger.wallet.Wallet.instance?.cache?.set [[path, result.bitcoinAddress.value]]
         _.defer -> d.resolve(result)
       .fail (err) =>
         error = @_handleErrorCode(err)

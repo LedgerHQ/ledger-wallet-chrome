@@ -103,11 +103,11 @@ class ledger.wallet.ExtendedPublicKey
   _insertPublicAddressInCache: (partialPath, publicAddress) ->
     return unless @_enableCache
     completePath = @_derivationPath + partialPath
-    ledger.wallet?.HDWallet?.instance?.cache?.set [[completePath, publicAddress]]
+    ledger.wallet?.Wallet?.instance?.cache?.set [[completePath, publicAddress]]
 
   _getPublicAddressFromCache: (partialPath) ->
     return unless @_enableCache
     completePath = @_derivationPath + partialPath
-    ledger.wallet?.HDWallet?.instance?.cache?.get completePath
+    ledger.wallet?.Wallet?.instance?.cache?.get completePath
 
   toString: -> @_xpub58

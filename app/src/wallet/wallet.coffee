@@ -1,6 +1,6 @@
 @ledger.wallet ?= {}
 
-class ledger.wallet.HDWallet
+class ledger.wallet.Wallet
 
   getAccount: (accountIndex) -> @_accounts[accountIndex]
 
@@ -24,7 +24,7 @@ class ledger.wallet.HDWallet
   getAccountFromAddress: (address) -> @getAccountFromDerivationPath(@cache?.getDerivationPath(address))
 
   createAccount: () ->
-    account = new ledger.wallet.HDWallet.Account(@, @getAccountsCount(), @_store)
+    account = new ledger.wallet.Wallet.Account(@, @getAccountsCount(), @_store)
     @_accounts.push account
     do @save
     account
@@ -40,7 +40,7 @@ class ledger.wallet.HDWallet
       return callback?() unless result.accounts?
       _.async.each [0...result.accounts], (accountIndex, done, hasNext) =>
         try
-          account = new ledger.wallet.HDWallet.Account(@, accountIndex, @_store)
+          account = new ledger.wallet.Wallet.Account(@, accountIndex, @_store)
           account.initialize () =>
             @_accounts.push account
             done?()
@@ -66,7 +66,7 @@ class ledger.wallet.HDWallet
 
   @instance: undefined
 
-class ledger.wallet.HDWallet.Account
+class ledger.wallet.Wallet.Account
 
   constructor: (wallet, index, store) ->
     @wallet = wallet
@@ -237,10 +237,10 @@ openStores = (dongle, done) ->
 
 openHdWallet = (dongle, done) ->
   Try =>
-    hdWallet = new ledger.wallet.HDWallet()
+    hdWallet = new ledger.wallet.Wallet()
     hdWallet.initialize ledger.storage.wallet, () =>
       Try =>
-        ledger.wallet.HDWallet.instance = hdWallet
+        ledger.wallet.Wallet.instance = hdWallet
         ledger.tasks.AddressDerivationTask.instance.start()
         _.defer =>
           Try =>
@@ -252,13 +252,13 @@ openHdWallet = (dongle, done) ->
   .printError()
 
 openAddressCache = (dongle, done) ->
-  cache = new ledger.wallet.HDWallet.Cache(ledger.wallet.HDWallet.instance)
+  cache = new ledger.wallet.Wallet.Cache(ledger.wallet.Wallet.instance)
   cache.initialize =>
-    ledger.wallet.HDWallet.instance.cache = cache
+    ledger.wallet.Wallet.instance.cache = cache
     done?()
 
 restoreStructure = (dongle, done) ->
-  if ledger.wallet.HDWallet.instance.isEmpty()
+  if ledger.wallet.Wallet.instance.isEmpty()
     ledger.app.emit 'wallet:initialization:creation'
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'done', () =>
       done?()
@@ -271,7 +271,7 @@ restoreStructure = (dongle, done) ->
     done?()
 
 completeInitialization = (dongle, done) ->
-  ledger.wallet.HDWallet.instance.isInitialized = yes
+  ledger.wallet.Wallet.instance.isInitialized = yes
   done?()
 
 _.extend ledger.wallet,
@@ -284,5 +284,5 @@ _.extend ledger.wallet,
 
   release: (dongle, callback) ->
     ledger.storage.closeStores()
-    ledger.wallet.HDWallet.instance?.release()
-    ledger.wallet.HDWallet.instance = null
+    ledger.wallet.Wallet.instance?.release()
+    ledger.wallet.Wallet.instance = null

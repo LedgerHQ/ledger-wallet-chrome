@@ -1,5 +1,5 @@
 
-class ledger.wallet.HDWallet.Cache
+class ledger.wallet.Wallet.Cache
 
   constructor: (hdwallet) ->
     @hdwallet = hdwallet
