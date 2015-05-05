@@ -75,7 +75,7 @@ _.extend ledger.errors,
   #   ledger.error.new("an error message")
   #   ledger.error.new(NotFound, "an error message")
   new: (code, msg) -> 
-    defaultMessage = ledger.errors.DefaultMessages[code]
+    defaultMessage =  ledger.errors.DefaultMessages[code] or _.findKey(ledger.errors, (c) -> c is code)
     [code, msg] = [0, code] if defaultMessage == undefined
     self = new Error(msg || defaultMessage)
     self.code = code
