@@ -30,8 +30,10 @@ require @ledger.imports, ->
       @_currentMode = newMode
       if @isInFirmwareUpdateMode()
         @_releaseWallet(no)
+        ledger.utils.Logger.setGlobalLoggersPersistentLogsEnabled(off)
         ledger.utils.Logger.setGlobalLoggersLevel(ledger.utils.Logger.Levels.NONE)
       else
+        ledger.utils.Logger.setGlobalLoggersPersistentLogsEnabled(on)
         ledger.utils.Logger.updateGlobalLoggersLevel()
         @connectDongle(ledger.app.dongle) if ledger.app.dongle?
       return

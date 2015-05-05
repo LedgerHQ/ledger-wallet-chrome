@@ -56,7 +56,7 @@ class @ledger.utils.Logger
   @_setGlobalLoggersLevel: (level) -> logger.setLevel(level) for name, logger of @_loggers when logger.useGlobalSettings
   @setGlobalLoggersLevel: (level) -> @_setGlobalLoggersLevel(level)
 
-  @setGlobalLoggersPersistentLogsEnabled: (enable) -> logger.setPersistentsLogsEnabled(enable) for name, logger of @_loggers when logger.useGlobalSettings
+  @setGlobalLoggersPersistentLogsEnabled: (enable) -> logger.setPersistentLogsEnabled(enable) for name, logger of @_loggers when logger.useGlobalSettings
 
   @getGlobalLoggersLevel: ->
     if ledger.preferences?.instance?
@@ -128,7 +128,7 @@ class @ledger.utils.Logger
     @level = Levels[@level] if typeof @level == "string"
     @level = Levels.ALL if @level is true
     @level = Levels.NONE if @level is false
-    @setPersistentsLogsEnabled on
+    @setPersistentLogsEnabled on
     @constructor._loggers[tag] = this
 
   setPersistentLogsEnabled: (enable) -> @_areLogsPersistents = enable
