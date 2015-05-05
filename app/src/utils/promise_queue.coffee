@@ -64,21 +64,18 @@ class @ledger.utils.PromiseQueue extends @EventEmitter
       @emit 'task:starting', taskId
       try
         # TODO: use defer.promise.isFilfilled instead of done, but fail randomly sometimes.
-        done = false
-        task().then( (args...) -> defer.resolve(args...)
-        ).progress( (args...) -> defer.notify(args...)
-        ).catch( (args...) -> defer.reject(args...)
+        timer = setTimeout (=> @_timeout(taskId, defer)), PromiseQueue.TIMOUT_DELAY
+        task().finally( =>
+          clearTimeout(timer)
+          @emit 'task:done', taskId
+          @_taskDone(); return
+        ).then( (args...) -> defer.resolve(args...); return
+        ).progress( (args...) -> defer.notify(args...); return
+        ).catch( (args...) -> defer.reject(args...); return
         ).done()
-        setTimeout (=>
-          @_timeout(taskId, defer) unless done
-        ), PromiseQueue.TIMOUT_DELAY
       catch err
         console.error("PromiseQueue#{@brakName} Fail to exec task #{taskId} :", err)
         defer.reject(err)
-      defer.promise.finally =>
-        done = true
-        @emit 'task:done', taskId
-        @_taskDone()
     if @_taskRunning
       @_queue.push([taskId, taskWrapper])
       @emit 'queue:pushed', taskId
