@@ -54,7 +54,9 @@ class @ledger.utils.Logger
 
   # Set all loggers level
   @_setGlobalLoggersLevel: (level) -> logger.setLevel(level) for name, logger of @_loggers when logger.useGlobalSettings
+  @setGlobalLoggersLevel: (level) -> @_setGlobalLoggersLevel(level)
 
+  @setGlobalLoggersPersistentLogsEnabled: (enable) -> logger.setPersistentsLogsEnabled(enable) for name, logger of @_loggers when logger.useGlobalSettings
 
   @getGlobalLoggersLevel: ->
     if ledger.preferences?.instance?
@@ -126,7 +128,10 @@ class @ledger.utils.Logger
     @level = Levels[@level] if typeof @level == "string"
     @level = Levels.ALL if @level is true
     @level = Levels.NONE if @level is false
+    @setPersistentsLogsEnabled on
     @constructor._loggers[tag] = this
+
+  setPersistentLogsEnabled: (enable) -> @_areLogsPersistents = enable
 
   #################################
   # Accessors
@@ -212,6 +217,7 @@ class @ledger.utils.Logger
   # @param [String] msg Message to log.
   # @param [String] msgType Log level.
   _storeLog: (msg, msgType) ->
+    return unless @_areLogsPersistents
     now = new Date()
     log = {}
     log[now.getTime()] = date: now.toUTCString(), type: msgType,  tag: @_tag, msg: msg
