@@ -236,6 +236,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
                 @_dongle.isBetaCertified (__, error) =>
                   @_setCurrentState(if error? and ledger.fup.versions.Nano.CurrentVersion.Overwrite is false then States.InitializingOs else States.ReloadingBootloaderFromOs)
                   @_handleCurrentState()
+                return
             when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update, ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Higher
               index = 0
               while index < ledger.fup.updates.OS_INIT.length and !ledger.fup.utils.compareVersions(@_dongleVersion, ledger.fup.updates.OS_INIT[index][0]).eq()
@@ -250,6 +251,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
                 @_setCurrentState(States.ReloadingBootloaderFromOs)
                 @_handleCurrentState()
             else return @_failure(Errors.HigherVersion)
+          return
 
   _processErasing: ->
     @_waitForUserApproval('erasure')

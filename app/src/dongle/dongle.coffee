@@ -279,7 +279,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       d.promise
 
   lock: () ->
-    if @_currentState isnt ledger.wallet.States.BLANK and @_currentState isnt ledger.wallet.States.FROZEN and @_currentState?
+    if @state isnt ledger.dongle.States.BLANK and @state?
       @_setState(States.LOCKED)
 
   ###
