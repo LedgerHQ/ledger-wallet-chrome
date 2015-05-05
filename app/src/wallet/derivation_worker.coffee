@@ -17,7 +17,7 @@ try
       '../../libs/underscore-min.js'
       '../../libs/underscore.string.min.js'
       '../utils/object.js'
-      'value.js'
+      '../utils/amount.js'
   )
 catch er
   console.error er

@@ -164,7 +164,6 @@
         ## Wallet
         'wallet/utils'
         'wallet/transaction'
-        'wallet/value'
         'wallet/hdwallet'
         'wallet/cache'
         'wallet/extended_public_key'
