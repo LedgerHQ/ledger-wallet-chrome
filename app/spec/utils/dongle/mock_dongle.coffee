@@ -18,7 +18,6 @@ Errors = @ledger.errors
 
 class ledger.dongle.MockDongle extends EventEmitter
 
-  # @property [Array<ledger.wallet.ExtendedPublicKey>]
   _xpubs: []
 
   # M2FA
@@ -32,8 +31,10 @@ class ledger.dongle.MockDongle extends EventEmitter
     challengeResponses: ''
     keycard: ''
 
-  constructor: (pin, seed, isInBootloaderMode = no) ->
+  constructor: (pin, seed, pairingKeyHex = undefined, isInBootloaderMode = no) ->
     super
+    @_m2fa = _.clone(@_m2fa)
+    @_m2fa.pairingKeyHex = pairingKeyHex
     @_isInBootloaderMode = isInBootloaderMode
     @state = States.UNDEFINED
     @_setState(States.BLANK)
@@ -75,7 +76,7 @@ class ledger.dongle.MockDongle extends EventEmitter
 
 
 
-# @param [String] pin ASCII encoded
+  # @param [String] pin ASCII encoded
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
   unlockWithPinCode: (pin, callback=undefined) ->
@@ -161,7 +162,6 @@ class ledger.dongle.MockDongle extends EventEmitter
   isFirmwareUpdateAvailable: (callback=undefined) -> ledger.defer(callback).resolve(false).promise
 
 
-
   ###
   @param [Array<Object>] inputs
   @param [Array] associatedKeysets
@@ -178,7 +178,6 @@ class ledger.dongle.MockDongle extends EventEmitter
   createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData, network) ->
     d = ledger.defer()
     result = {}
-    l 'resumeData', resumeData
 
     if _.isEmpty resumeData
       txb = new bitcoin.TransactionBuilder()
@@ -234,33 +233,46 @@ class ledger.dongle.MockDongle extends EventEmitter
         charsQuestion.push recipientAddress.charAt randomNum
         charsResponse.push keycard[charsQuestion[i]]
         indexesKeyCard.push Convert.toHexByte randomNum
-      #l 'Indexes', indexesKeyCard
-      #l 'Questions', charsQuestion
-      #l 'Responses', charsResponse
 
       result.indexesKeyCard = indexesKeyCard.join('')
       result.authorizationReference = indexesKeyCard.join('')
       result.publicKeys = []
-      result.publicKeys.push recipientAddress #first addr detail  - en Hex dans array
-
+      result.publicKeys.push recipientAddress
       result.txb = txb
       result.charsResponse = "0" + charsResponse.join('0')
 
+      # M2fa
+      amount = '0000000000000000' + amount._value.toRadix(16)
+      amount = amount.substr(amount.length - 16, 16)
+      fees = '0000000000000000' + fees._value.toRadix(16)
+      fees = fees.substr(fees.length - 16, 16)
+      change = '0000000000000000' + new BigInteger(change.toString()).toRadix(16)
+      change = change.substr(change.length - 16, 16)
+      sizeAddress = Convert.toHexByte recipientAddress.length
+      pin = new ByteString(charsResponse.join(''), ASCII).toString(HEX)
+      m2faData = pin + amount + fees + change + sizeAddress + (new ByteString(recipientAddress, ASCII).toString(HEX))
+      padding = m2faData.length % 8
+      m2faData = _.str.rpad m2faData, m2faData.length + (8 - padding), '0'
+      # Encrypt
+      cipher = new JSUCrypt.cipher.DES(JSUCrypt.padder.None , JSUCrypt.cipher.MODE_CBC)
+      key = new JSUCrypt.key.DESKey(@_m2fa.pairingKeyHex)
+      cipher.init(key, JSUCrypt.cipher.MODE_ENCRYPT)
+      m2faData = cipher.update(m2faData)
+      m2faDataHex = (Convert.toHexByte(v) for v in m2faData).join('')
 
       # Keycard or m2fa
       # authorizationRequired => 2 if keycard / 3 if m2fa
-      result.authorizationRequired = 2
-      # authorizationPaired => undefined if keycard
-      result.authorizationPaired = undefined
+      auth = @_setAuthorization(m2faDataHex)
+      _.extend result, auth
 
-      l 'resumeData', resumeData
       l 'result', result
-      l 'arguments', arguments
-
+      l 'm2fa', @_m2fa
+      result
     else
       l 'resumeData', resumeData
-      # Check keycard validity
-      if resumeData.charsResponse isnt authorization
+      # Check keycard and m2fa validity
+      m2faResponse = new ByteString((v.charAt(1) for v in resumeData.charsResponse.match(/.{2}/g)).join(''), ASCII).toString(HEX)
+      if resumeData.charsResponse isnt authorization and m2faResponse isnt authorization
         _.delay (-> d.rejectWithError(Errors.WrongPinCode)), 1000
       # Build raw tx
       try
@@ -272,14 +284,22 @@ class ledger.dongle.MockDongle extends EventEmitter
     d.promise
 
 
+  _setAuthorization: (data) ->
+    result = {}
+    if @_m2fa.pairingKeyHex?
+      l 'pairing key exists'
+      result.authorizationRequired = 3
+      result.authorizationPaired = data
+    else
+      l 'pairing key doesn\'t exist'
+      result.authorizationRequired = 2
+      result.authorizationPaired = undefined
+    result
+
+
   splitTransaction: (input) ->
     bitExt = new BitcoinExternal()
     bitExt.splitTransaction(new ByteString(input.raw, HEX))
-
-
-  generateKeycardSeed: ->
-    # 'dfaeee53c3d280707bbe27720d522ac1' # length : 32
-
 
 
   # @param [String] pubKey public key, hex encoded. # Remote screen uncompressed public key - 65 length
@@ -294,9 +314,9 @@ class ledger.dongle.MockDongle extends EventEmitter
     else
       ###
         The remote screen public key is sent to the dongle, which generates
-          a cleartext random 8 bytes nonce,
-          a 4 bytes challenge on the printed keycard
-          and a random 16 bytes 3DES-2 pairing key, concatenated and encrypted using 3DES CBC and the generated session key
+        a cleartext random 8 bytes nonce,
+        a 4 bytes challenge on the printed keycard
+        and a random 16 bytes 3DES-2 pairing key, concatenated and encrypted using 3DES CBC and the generated session key
       ###
       # ECDH key exchange
       ecdhdomain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
@@ -304,9 +324,6 @@ class ledger.dongle.MockDongle extends EventEmitter
       ecdh = new JSUCrypt.keyagreement.ECDH_SVDP(ecdhprivkey)
       aKey = pubKey.match(/^(\w{2})(\w{64})(\w{64})$/)
       secret = ecdh.generate(new JSUCrypt.ECFp.AffinePoint(aKey[2], aKey[3], ecdhdomain.curve)) # 32 bytes secret is obtained
-      #l 'SECRET', secret
-      #secretHex = (Convert.toHexByte(v) for v in secret).join('')
-      #l 'SECRETHEX', secretHex
       # Split into two 16 bytes components S1 and S2. S1 and S2 are XORed to produce a 16 bytes 3DES-2 session key
       @_m2fa.sessionKey = (Convert.toHexByte(secret[i] ^ secret[16+i]) for i in [0...16]).join('')
       # Challenge (keycard indexes) - 4 bytes
@@ -317,26 +334,18 @@ class ledger.dongle.MockDongle extends EventEmitter
         num = _.random(ledger.crypto.Base58.concatAlphabet().length - 1)
         @_m2fa.challengeIndexes += Convert.toHexByte(ledger.crypto.Base58.concatAlphabet().charCodeAt(num) - 0x30)
         @_m2fa.challengeResponses += '0' + @_m2fa.keycard[ledger.crypto.Base58.concatAlphabet().charAt(num)]
-      # Pairing Key - 16 Bytes
-      pairingKey = crypto.getRandomValues new Uint8Array(16)
-      @_m2fa.pairingKeyHex = (Convert.toHexByte(v) for v in pairingKey).join('')
       # Crypted challenge - challenheHex + PairingKeyHex - 24 bytes
       blob = @_m2fa.challengeIndexes + @_m2fa.pairingKeyHex + "00000000"
-      #l 'BLOB', blob
       cipher = new JSUCrypt.cipher.DES(JSUCrypt.padder.None, JSUCrypt.cipher.MODE_CBC)
       key = new JSUCrypt.key.DESKey(@_m2fa.sessionKey)
       cipher.init(key, JSUCrypt.cipher.MODE_ENCRYPT)
       cryptedBlob = cipher.update(blob)
-      #l 'cryptedBlob', cryptedBlob
       cryptedBlobHex = (Convert.toHexByte(v) for v in cryptedBlob).join('')
-      #l 'cryptedBlobHex', cryptedBlobHex
       # 8 bytes Nonce
       nonce = crypto.getRandomValues new Uint8Array(8)
       @_m2fa.nonceHex = (Convert.toHexByte(v) for v in nonce).join('')
-      #l 'M2FA Object', @_m2fa
       # concat Nonce + (challenge + pairingKey)
       res = @_m2fa.nonceHex + cryptedBlobHex
-      #l 'RES', res
       d.resolve(res)
     d.promise
 
@@ -370,6 +379,11 @@ class ledger.dongle.MockDongle extends EventEmitter
     d.promise
 
 
+  _generatePairingKeyHex: ->
+    pairingKey = crypto.getRandomValues new Uint8Array(16)
+    @_m2fa.pairingKeyHex = (Convert.toHexByte(v) for v in pairingKey).join('')
+
+
   _clearPairingInfo: (isErr) ->
     if isErr
       @_m2fa = _.omit(@_m2fa, ['challengeIndexes', 'sessionKey', 'nonceHex', 'challengeIndexes', 'challengeResponses', 'keycard', 'pairingKeyHex'])
@@ -377,7 +391,7 @@ class ledger.dongle.MockDongle extends EventEmitter
       @_m2fa = _.omit(@_m2fa, ['challengeIndexes', 'sessionKey', 'nonceHex', 'challengeIndexes', 'challengeResponses', 'keycard'])
 
 
-# Get PubKeyHash from base58
+  # Get PubKeyHash from base58
   _getPubKeyHashFromBase58: (addr) ->
     arr = ledger.crypto.Base58.decode(addr)
     buffer = JSUCrypt.utils.byteArrayToHexStr(arr)
@@ -398,9 +412,7 @@ class ledger.dongle.MockDongle extends EventEmitter
     [restoreSeed, callback] = [callback, restoreSeed] if ! callback && typeof restoreSeed == 'function'
     Throw new Error('Setup need a seed') if not restoreSeed?
     @_pin = pin
-    #l @_masterNode
     @_masterNode = bitcoin.HDNode.fromSeedHex(restoreSeed)
-    #l @_masterNode
     # Validate seed
     if restoreSeed?
       bytesSeed = new ByteString(restoreSeed, HEX)
@@ -414,7 +426,6 @@ class ledger.dongle.MockDongle extends EventEmitter
   _getNodeFromPath: (path) ->
     path = path.split('/')
     node = @_masterNode
-    #l @_masterNode
     for item in path
       [index, hardened] = item.split "'"
       node  = if hardened? then node.deriveHardened parseInt(index) else node = node.derive index

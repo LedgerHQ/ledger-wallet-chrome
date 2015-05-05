@@ -16,8 +16,8 @@ class ledger.dongle.MockDongleManager extends EventEmitter
     l 'stop'
 
   # Create Dongle, observe dongle state and emit corresponding events
-  createDongle: (pin, seed) ->
-    @dongleInstance = new ledger.dongle.MockDongle(pin, seed)
+  createDongle: (pin, seed, pairingKeyHex) ->
+    @dongleInstance = new ledger.dongle.MockDongle(pin, seed, pairingKeyHex)
     @dongleInstance.id = @_dongles.length + 1
     @dongleInstance.deviceId = @dongleInstance.id
     @_dongles.push(@dongleInstance)
