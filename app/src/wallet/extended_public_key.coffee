@@ -66,8 +66,8 @@ class ledger.wallet.ExtendedPublicKey
   __b58chars: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 
   _b58Encode: (v) ->
-    long_value = ledger.wallet.Value.from 0
-    value256 = ledger.wallet.Value.from 256
+    long_value = ledger.Amount.fromSatoshi 0
+    value256 = ledger.Amount.fromSatoshi 256
     for i in [(v.length - 1)..0]
       long_value = long_value.add value256.pow(v.length - i - 1).multiply(v.byteAt(i))
 

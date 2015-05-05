@@ -14,7 +14,7 @@ _.extend ledger.wallet,
       return d.reject(error) if error?
 
       txBuilder = new window.bitcoin.TransactionBuilder()
-      amountToSend = new ledger.wallet.Value()
+      amountToSend = new ledger.Amount()
 
       _.async.each outputs, (output, done, hasNext) ->
         amountToSend = amountToSend.add output.value
