@@ -5,13 +5,11 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
 
   initialize: ->
     super
+    # fetch amount
     account = Account.find(index: 0).first()
-    amount = ledger.Amount.fromSatoshi(@params.amount)
-    fees = ledger.wallet.Transaction.DEFAULT_FEES
-    account.createTransaction amount: amount, fees: fees, address: @params.address, (transaction, error) =>
+    account.createTransaction amount: @params.amount, fees: ledger.preferences.instance.getMiningFee(), address: @params.address, (transaction, error) =>
       return if not @isShown()
       if error?
-        console.error(error)
         reason = switch error.code
           when ledger.errors.NetworkError then 'network_no_response'
           when ledger.errors.NotEnoughFunds then 'unsufficient_balance'
@@ -19,7 +17,6 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
         @dismiss =>
           errorMessage = switch reason
             when 'dust_transaction' then _.str.sprintf(t("common.errors." + reason), ledger.formatters.formatValue(ledger.wallet.transaction.MINIMUM_OUTPUT_VALUE))
-            when undefined then error.message
             else t("common.errors." + reason)
           Api.callback_cancel 'send_payment', errorMessage
           dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: errorMessage)
@@ -44,7 +41,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
       @getDialog().push new WalletSendMethodDialogViewController(transaction: transaction)
 
     # if mobile validation is supported
-    if ledger.app.dongle.getIntFirmwareVersion() >= ledger.dongle.Firmware.V_LW_1_0_0
+    if ledger.app.wallet.getIntFirmwareVersion() >= ledger.wallet.Firmware.V_LW_1_0_0
       # fetch grouped paired screens
       ledger.m2fa.PairedSecureScreen.getAllGroupedByUuidFromSyncedStore (groups, error) =>
         groups = _.values(_.omit(groups, undefined)) if groups?

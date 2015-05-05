@@ -25,16 +25,10 @@ class ledger.wallet.Transaction
   #
   @ValidationModes: ValidationModes
   #
-  @DEFAULT_FEES: Amount.fromBits(50)
-  #
-  @MINIMUM_CONFIRMATIONS: 1
-  #
   @MINIMUM_OUTPUT_VALUE: Amount.fromSatoshi(5430)
 
   # @property [ledger.Amount]
   amount: undefined
-  # @property [ledger.Amount]
-  fees: @DEFAULT_FEES
   # @property [String]
   recipientAddress: undefined
   # @property [Array<Object>]
