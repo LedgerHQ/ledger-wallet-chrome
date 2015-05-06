@@ -69,7 +69,19 @@ class ledger.utils.CsvExporter
           chrome.runtime.lastError
           completion.failure(new ledger.StandardError(ledger.errors.WriteError))
 
-  url: ->
+  url: -> URL.createObjectURL(@blob())
+
+  blob: ->
     fileContent = (if @_headerLine? then [@_headerLine].concat(@_lines) else @_lines).join("\n")
-    blob = new Blob([fileContent], type: 'text/csv;charset=utf8;')
-    URL.createObjectURL(blob)
+    new Blob([fileContent], type: 'text/csv;charset=utf8;')
+
+  zip: (callback) ->
+    #use a zip.BlobWriter object to write zipped data into a Blob object
+    zip.createWriter new zip.BlobWriter("application/zip"), (zipWriter) =>
+    #use a BlobReader object to read the data stored into blob variable
+      zipWriter.add @_defaultFileName, new zip.BlobReader(@blob()), ->
+        #close the writer and calls callback function
+        zipWriter.close(callback)
+    , (e) ->
+      l e
+      callback

@@ -17,7 +17,7 @@ class @HttpClient
     r.data ?= r.body
     r.complete ?= r.onComplete
     r.data = JSON.stringify(r.data) if r.contentType == 'application/json'
-    r.url = @baseUrl + r.url
+    r.url = @baseUrl + r.url unless r.url.match(/^[a-z0-9A-Z]+:\//)?
     r.crossDomain = true
     $.ajax(r)
 
@@ -78,6 +78,20 @@ class @HttpClient
   ###
   postForm: (r) ->
     @do _.extend(r, {type: 'POST', dataType: 'text', contentType: 'application/x-www-form-urlencoded'})
+
+  ###
+   Performs a HTTP POST request using multipart/form-data.
+
+   @param [Object] r A jQuery style request {http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings jQuery Ajax Setting}
+   @return [Q.Promise] A Q.Promise
+   @see HttpClient#do
+  ###
+  postFile: (r) ->
+    formData = new FormData()
+    for key, value of r.data
+      formData.append(key, value)
+    r.data = formData
+    @do _.extend(r, {type: 'POST', contentType: false, processData: false})
 
   ###
    Performs a HTTP PUT request.

@@ -62,6 +62,10 @@
         '../libs/mutation-summary'
         '../libs/jsencrypt'
         '../libs/ua-parser-0.7.7.min'
+        '../libs/zip/zip'
+        '../libs/zip/z-worker'
+        '../libs/zip/inflate'
+        '../libs/zip/deflate'
 
         # Used be m2fa.DebugClient
         '../libs/lw-api-js/ucrypt/ka'

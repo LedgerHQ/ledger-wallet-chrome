@@ -18,42 +18,16 @@ class @CommonDialogsTicketDialogViewController extends @DialogViewController
   sendTicket: ->
     # Get metadata
     metadata = @_getMetadata()
-    # If ok to send logs, encode logs to Base64
-    #if @logsSwitch.isOn()
-
-
-    #logs = btoa logger?.logs()
-    ###
-    ledger.utils.Logger.logs().then( (v) ->
-      l v
-      logs = btoa v
-      l logs)
-    ###
-
-    ###
-    if @logsSwitch.isOn()
-      ledger.utils.Logger.logs()
-      .then (v) ->
-        @logs = btoa(v)
-    ###
-
-
-    @_tryGetLogs()
+    @_getLogs()
     .then (logs) =>
-
       # Set a boolean to pass isOkToSend()
       @view.logs.val(@logsSwitch.isOn())
-
-      l 'logs', logs
-
+      # form checking UI
       _.map @view, (value) =>
-        l value
-        l value.next().hasClass('verif')
         if (value.val?() is '' or value.val?() is null) and not value.next().hasClass('verif')
           value.after('<p style="color:red" class="verif">The field must be filled!</p>')
         #if (value.val?() isnt '' or value.val?() isnt null) and value.next().hasClass('verif')
           #value.next().remove()
-
 
       isOktoSend = _.every @view, (value) =>
         value.val?() isnt '' and value.val?()?
@@ -65,24 +39,27 @@ class @CommonDialogsTicketDialogViewController extends @DialogViewController
         l 'all fields are required!'
 
 
-
-  ###
-  _updateSwitchState: ->
-    @view.logs.setOn()
-  ###
-
-  _tryGetLogs: ->
+  _getLogs: ->
     d = Q.defer()
-    allLogs = ''
     if @logsSwitch.isOn()
-      ledger.utils.Logger.logs()
-      .then (v) ->
-        allLogs = btoa(v)
-        d.resolve(allLogs)
-      .catch (e) -> l e
+      ledger.utils.Logger.exportLogsToBlob ({blob, name}) =>
+        @_zipBlob name + '.csv', blob, (zip) ->
+          d.resolve(zip)
     else
-      d.resolve(allLogs)
+      d.resolve(null)
     d.promise
+
+
+  _zipBlob: (filename, blob, callback) ->
+    #use a zip.BlobWriter object to write zipped data into a Blob object
+    zip.createWriter new zip.BlobWriter("application/zip"), (zipWriter) ->
+      #use a BlobReader object to read the data stored into blob variable
+      zipWriter.add filename, new zip.BlobReader(blob), ->
+        #close the writer and calls callback function
+        zipWriter.close(callback)
+    , (e) ->
+      l e
+      callback
 
 
   _validateEmail: ->
@@ -90,11 +67,9 @@ class @CommonDialogsTicketDialogViewController extends @DialogViewController
     filter = /^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+.)+([a-zA-Z0-9]{2,4})+$/
     if (filter.test email.val())
       l 'Given email is valid'
-      #email.focus
       true
     else
       l 'Please enter a valid email!'
-      #email.focus
       false
 
 

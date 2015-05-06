@@ -2,7 +2,6 @@
 class ledger.api.GrooveRestClient extends ledger.api.RestClient
 
   sendTicket: (body, email, name, subject, tags, metadata, logs, callback=undefined) ->
-    l logs
     @http().post
       url: "support/ticket",
       data: {
@@ -11,9 +10,12 @@ class ledger.api.GrooveRestClient extends ledger.api.RestClient
         "name": name,
         "subject": subject,
         "tags": tags,
-        "metadata": metadata,
-        "logs": logs
+        "metadata": metadata
       }
-      onSuccess: (response) ->
-        callback?(l response)
+      onSuccess: (resp) =>
+        @http().postFile
+          url: "support/ticket/" + resp.id,
+          data: {
+            "logFile": logs
+          }
       onError: @networkErrorCallback(callback)
