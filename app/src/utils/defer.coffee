@@ -1,4 +1,4 @@
-@legder || = {}
+@legder ?= {}
 
 @ledger.defer = (arg=undefined, args...) ->
   isCallback = typeof arg == 'function' && args.length == 0
@@ -15,8 +15,12 @@
   defer.resolve = (args...) -> @oldResolve(args...); return @
   defer.reject = (args...) -> @oldReject(args...); return @
   defer.promise.onFulfilled = (callback) ->
-    @then( (result) -> callback(if result != undefined then result else true)
-    ).catch( (reason) -> callback(false, reason)
+    @then( (result) ->
+      callback(if result != undefined then result else true)
+      return
+    ).catch( (reason) ->
+      callback(false, reason)
+      return
     ).done()
 
   # CompletionClosure legacy
@@ -28,6 +32,6 @@
   defer.promise.onComplete = defer.promise.onFulfilled
   defer.onComplete = (args...) -> @promise.onComplete(args...)
 
-  defer.promise.onFulfilled(callback) if isCallback
+  defer.promise.onFulfilled callback if isCallback
 
   return defer

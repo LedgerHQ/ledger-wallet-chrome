@@ -107,6 +107,7 @@
         'utils/keycard'
         'utils/promise_queue'
         'utils/csv_exporter'
+        'utils/completion_closure'
 
         ## Crypto
         'utils/crypto/aes'
@@ -160,6 +161,7 @@
         'tasks/operations_consumption_task'
         'tasks/address_derivation_task'
         'tasks/ticker_task'
+        'tasks/wallet_open_task'
 
         ## Wallet
         'wallet/utils'

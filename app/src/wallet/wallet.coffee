@@ -221,14 +221,12 @@ class ledger.wallet.Wallet.Account
 _.extend ledger.wallet,
 
   initialize: (dongle, callback=undefined) ->
-    Try =>
     hdWallet = new ledger.wallet.Wallet()
     hdWallet.initialize ledger.storage.wallet, () =>
-      Try =>
         ledger.wallet.Wallet.instance = hdWallet
-      .printError()
-    .printError()
+        callback?()
 
   release: (dongle, callback) ->
     ledger.wallet.Wallet.instance?.release()
     ledger.wallet.Wallet.instance = null
+    callback?()

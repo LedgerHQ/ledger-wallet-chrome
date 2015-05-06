@@ -1,37 +1,3 @@
-class ledger.tasks.WalletOpenTask extends ledger.tasks.Task
-
-  steps: [
-    openStores
-    startDerivationTask
-    openAddressCache
-    restoreStructure
-    completeLayoutInitialization
-    openDatabase
-    initializeWalletModel
-    initializePreferences
-  ]
-
-  @instance: new @
-  @reset: -> @instance = new @
-
-  onStart: ->
-    super
-    @_completion = new ledger.utils.CompletionClosure()
-    _.async.each @steps, (step, next, hasNext) =>
-      return unless @isRunning()
-      raise = (error) =>
-        @_completion.failure(error)
-        @stopIfNeccessary()
-      step ledger.app.dongle, raise, =>
-        do next
-        @_completion.success(this) unless hasNext
-
-  onStop: ->
-    @_completion.failure(ledger.errors.new(ledger.errors.InterruptedTask)) unless @_completion.isCompleted()
-
-
-
-logger = -> ledger.utils.Logger.getLoggerByTag("WalletOpening")
 
 ###
   Procedures declaration
@@ -39,7 +5,7 @@ logger = -> ledger.utils.Logger.getLoggerByTag("WalletOpening")
 
 openStores = (dongle, raise, done) ->
   ledger.bitcoin.bitid.getAddress (address) =>
-    bitIdAddress = address.bitcoinAddress.value
+    bitIdAddress = address.bitcoinAddress.toString(ASCII)
     dongle.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>
       if not (pubKey?.bitcoinAddress?) or not (bitIdAddress?)
         logger().error("Fatal error during openStores, missing bitIdAddress and/or pubKey.bitcoinAddress")
@@ -48,10 +14,13 @@ openStores = (dongle, raise, done) ->
         return
       ledger.storage.openStores bitIdAddress, pubKey.bitcoinAddress.value
       done?()
+      return
+    return
 
 openHdWallet = (dongle, raise, done) -> ledger.wallet.initialize(dongle, done)
 
 startDerivationTask = (dongle, raise, done) ->
+  hdWallet = ledger.wallet.Wallet.instance
   ledger.tasks.AddressDerivationTask.instance.start()
   _.defer =>
     for accountIndex in [0...hdWallet.getAccountsCount()]
@@ -90,3 +59,52 @@ openDatabase = (dongle, raise, done) ->
 initializeWalletModel = (dongle, raise, done) -> Wallet.initializeWallet done
 
 initializePreferences = (dongle, raise, done) -> ledger.preferences.init done
+
+ProceduresOrder = [
+  openStores
+  openHdWallet
+  startDerivationTask
+  openAddressCache
+  restoreStructure
+  completeLayoutInitialization
+  openDatabase
+  initializeWalletModel
+  initializePreferences
+]
+
+###
+  End of procedures declaration
+###
+
+class ledger.tasks.WalletOpenTask extends ledger.tasks.Task
+
+  steps: ProceduresOrder
+
+  @instance: new @
+  @reset: -> @instance = new @
+
+  constructor: ->
+    super
+    @_completion = new ledger.utils.CompletionClosure()
+
+  onStart: ->
+    super
+    raise = (error) =>
+      @_completion.failure(error)
+      raise.next = _.noop
+      @stopIfNeccessary()
+
+    _.async.each @steps, (step, next, hasNext) =>
+      return unless @isRunning()
+      raise.next = next
+      step ledger.app.dongle, raise, =>
+        do raise.next
+        @_completion.success(this) unless hasNext
+
+  onStop: ->
+    @_completion.failure(ledger.errors.new(ledger.errors.InterruptedTask)) unless @_completion.isCompleted()
+    @_completion = new ledger.utils.CompletionClosure()
+
+  onComplete: (callback) -> @_completion.onComplete callback
+
+logger = -> ledger.utils.Logger.getLoggerByTag("WalletOpening")
