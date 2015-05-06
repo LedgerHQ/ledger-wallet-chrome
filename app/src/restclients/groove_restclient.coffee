@@ -13,9 +13,10 @@ class ledger.api.GrooveRestClient extends ledger.api.RestClient
         "metadata": metadata
       }
       onSuccess: (resp) =>
-        @http().postFile
-          url: "support/ticket/" + resp.id,
-          data: {
-            "logFile": logs
-          }
+        if logs?
+          @http().postFile
+            url: "support/ticket/" + resp.id,
+            data: {
+              "logFile": logs
+            }
       onError: @networkErrorCallback(callback)
