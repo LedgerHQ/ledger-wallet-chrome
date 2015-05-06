@@ -87,6 +87,7 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   constructor: (card) ->
     super
+    @_xpubs = _.clone(@_xpubs)
     @id = card.deviceId
     @deviceId = card.deviceId
     @productId = card.productId
