@@ -20,6 +20,9 @@ class @ledger.dongle.Manager extends EventEmitter
   _dongles: {}
 
   constructor: (app) ->
+    @_dongles = {}
+    @_cardFactories = {}
+
     @cardFactory = new ChromeapiPlugupCardTerminalFactory()
     @factoryDongleBootloader = new ChromeapiPlugupCardTerminalFactory(0x1808)
     @factoryDongleBootloaderHID = new ChromeapiPlugupCardTerminalFactory(0x1807)
@@ -55,23 +58,16 @@ class @ledger.dongle.Manager extends EventEmitter
       info = {productId: device.productId, vendorId: device.vendorId}
       type.getDevices info, (d) ->
         devices = devices.concat(d)
-        cb?(devices) unless hasNext
+        cb?(devices) if !hasNext or devices.length > 0
         next()
 
   _connectDongle: (device) ->
     device.isInBootloaderMode = _.contains([0x1807, 0x1808], device.productId)
+    @_cardFactories[((device.productId << 16) | device.vendorId) >>> 0] ?= new ChromeapiPlugupCardTerminalFactory(if device.isInBootloaderMode then device.productId else undefined)
     @_dongles[device.deviceId] = null
     @emit 'connecting', device
     result = []
-    @cardFactory.list_async()
-    .then (cards) =>
-      result = result.concat(cards)
-      @factoryDongleBootloader.list_async()
-    .then (cards) =>
-      result = result.concat(cards)
-      @factoryDongleBootloaderHID.list_async()
-    .then (cards) =>
-      result = result.concat(cards)
+    @_cardFactories[((device.productId << 16) | device.vendorId) >>> 0].list_async().then (result) =>
       return if result.length == 0
       @cardFactory.getCardTerminal(result[0]).getCard_async().then (card) =>
         _.extend card, deviceId: device.deviceId, productId: device.productId, vendorId: device.vendorId
@@ -83,5 +79,6 @@ class @ledger.dongle.Manager extends EventEmitter
         dongle.once 'state:disconnected', (event) =>
           delete @_dongles[device.deviceId]
           @emit 'disconnected', dongle
+        return
 
   getConnectedDongles: -> _(_.values(@_dongles)).filter (d) -> d? && d.state isnt ledger.dongle.States.DISCONNECTED

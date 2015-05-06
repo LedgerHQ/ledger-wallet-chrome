@@ -84,7 +84,7 @@ class ledger.tasks.WalletOpenTask extends ledger.tasks.Task
   @reset: -> @instance = new @
 
   constructor: ->
-    super
+    super 'wallet_open_task'
     @_completion = new ledger.utils.CompletionClosure()
 
   onStart: ->
