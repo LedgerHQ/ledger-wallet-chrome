@@ -27,7 +27,7 @@ class ledger.tasks.WalletOpenTask extends ledger.tasks.Task
         @_completion.success(this) unless hasNext
 
   onStop: ->
-    @_completion.failure("Unable to complete the wallet opening")
+    @_completion.failure(ledger.errors.new(ledger.errors.InterruptedTask)) unless @_completion.isCompleted()
 
 
 
