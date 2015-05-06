@@ -302,7 +302,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_waitForPowerCycle(null, yes)
       .fail (e) =>
         switch @_getCard().SW
-          when 0x6985 then @_failure(Errors.ErrorDongleMayHaveASeed)
+          when 0x6985
+            @_processInitOs()
+            return
           when 0x6faa then @_failure(Errors.ErrorDueToCardPersonalization)
           else @_failure(Errors.CommunicationError)
         @_waitForDisconnectDongle()
