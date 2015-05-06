@@ -10,7 +10,7 @@ class @UpdateNavigationController extends @NavigationController
     @_request.on 'plug', => @_onPlugDongle()
     @_request.on 'unplug', =>  @_onDongleNeedPowerCycle()
     @_request.on 'stateChanged', (ev, data) => @_onStateChanged(data.newState, data.oldState)
-    @_request.on 'needsUserApproval', @_onNeedsUserApproval
+    @_request.on 'needsUserApproval', => @_onNeedsUserApproval()
     ledger.app.on 'dongle:disconnected', =>
       if _(@topViewController()).isKindOf(UpdateIndexViewController) or _(@topViewController()).isKindOf(UpdateSeedViewController) or _(@topViewController()).isKindOf(UpdateDoneViewController) or _(@topViewController()).isKindOf(UpdateErrorViewController)
         ledger.app.setExecutionMode(ledger.app.Modes.Wallet)

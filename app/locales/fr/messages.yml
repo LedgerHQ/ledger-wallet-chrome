@@ -15,7 +15,6 @@ application:
     export_logs: "Exporter les logs globaux"
 
 common:
-  bitcoin_acronym: 'BTC'
   default_account_name: "Mon compte"
   date_time_format: 'L [à] LT'
   date_format: 'L'
@@ -55,6 +54,7 @@ common:
     unsufficient_balance: "Le solde de votre portefeuille est insuffisant."
     wrong_keycode: "Le code de validation n'est pas correct."
     network_no_response: "Le serveur de transactions n'a pas répondu."
+    network_error: "Erreur réseau."
     invalid_receiver_address: "L'adresse bitcoin à créditer n'est pas correcte."
     invalid_amount: "Le montant à envoyer n'est pas valide."
     unknown: "Une erreur inconnue est survenue."
@@ -83,11 +83,11 @@ onboarding:
       is_not_recognized: "Si votre Ledger Wallet n'est pas reconnu, consultez notre centre d'aide."
 
     unplug:
-      unlock_my_wallet: "Dévérouiller mon portefeuille"
+      unlock_my_wallet: "Déverrouiller mon portefeuille"
       you_can_unplug: "Vous pouvez maintenant débrancher votre Ledger Wallet en toute sécurité."
 
     pin:
-      enter_your_pin_code: "Entez votre code PIN pour dévérouiller votre portefeuille :"
+      enter_your_pin_code: "Entez votre code PIN pour déverrouiller votre portefeuille :"
       i_lost_my_pin_code: "Si vous avez oublié votre code PIN, consultez notre centre d'aide."
 
     connecting:
@@ -212,7 +212,7 @@ onboarding:
 update:
   common:
     firmware_update: "Mise à jour de la puce"
-    need_to_repeat_several_times: "Vous pouvez être amené(e) à répéter cette opération plusieurs fois."
+    need_to_repeat_several_times: "Vous pouvez être amené(e) à brancher et débrancher plusieurs fois."
 
   index:
     important_notice: "Informations importantes"

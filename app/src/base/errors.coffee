@@ -13,6 +13,7 @@ _.extend ledger.errors,
   InconsistentState: 105
   OperationCanceledError: 106
   PermissionDenied: 107
+  TimeoutError: 108
 
   # Dongle errors
   NotSupportedDongle: 200
@@ -20,7 +21,7 @@ _.extend ledger.errors,
   DongleAlreadyUnlock: 202
   WrongPinCode: 203
   DongleLocked: 204
-  UnableToGetBitIdAddress: 205
+  BlankDongle: 205
   DongleNotCertified: 206
   CommunicationError: 207
 
@@ -41,18 +42,55 @@ _.extend ledger.errors,
   ErrorDueToCardPersonalization: 408
   HigherVersion: 409
 
+  # M2FA errors
+  TransactionCancelled: "secure_screen_cancelled_transaction"
+  InvalidResult: "secure_screen_invalid_pin"
+
   # I/O Errors
   WriteError: 500
 
+  DefaultMessages:
+    0: "StandardError"
 
-  create: (code, title, error) -> code: code, title: title, error: error
-  throw: (code, message) -> throw new ledger.StandardError(code, message)
+    100: "Unknow error"
+    101: "Invalid argument"
+    102: "Not found"
+    103: "Network error"
+    104: "Authentication failed"
 
-class ledger.StandardError extends Error
+    200: "Not supported dongle"
+    201: "Dongle not blank"
+    202: "Dongle already unlock"
+    203: "Wrong PIN code"
+    204: "Dongle locked"
+    205: "Blank dongle"
+    206: "Dongle not certified"
+    207: "Unable to get BitId address"
+
+    300: "Not enough funds"
+    301: "Signature error"
+    302: "Dust transaction"
+  
   # @exemple Initializations
-  #   new ledger.StandardError(ledger.errors.NotFound[, "an error message"])
-  constructor: (@code, @message=undefined) ->
-    super(@message)
+  #   ledger.error.new("an error message")
+  #   ledger.error.new(NotFound, "an error message")
+  new: (code, msg) -> 
+    defaultMessage =  ledger.errors.DefaultMessages[code] or _.str.humanize(_.findKey(ledger.errors, (c) -> c is code))
+    [code, msg] = [0, code] if _.str.isBlank defaultMessage
+    self = new Error(msg || defaultMessage)
+    self.code = code
+    self.name = _.invert(ledger.errors)[code]
+    self.localizedMessage = -> t(@_i18nId())
+    self._i18nId = -> "common.errors.#{_.underscore(@name)}"
+    return self
 
-  name: ->
-    _.invert(ledger.errors)[@code]
+  throw: (code, msg) -> throw @new(code, msg)
+
+  newHttp: (xhr) ->
+    self = @new(ledger.errors.NetworkError, xhr.statusText)
+    self._xhr = xhr
+    self.getXmlHttpRequest = -> @_xhr
+    self.getStatusCode = -> @getXmlHttpRequest().status
+    self.getStatusText = -> @getXmlHttpRequest().statusText
+    self.isDueToNoInternetConnectivity = -> @getStatusCode() is 0
+    return self

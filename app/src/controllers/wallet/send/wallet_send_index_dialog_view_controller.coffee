@@ -40,10 +40,15 @@ class @WalletSendIndexDialogViewController extends DialogViewController
   openScanner: ->
     dialog = new CommonDialogsQrcodeDialogViewController
     dialog.qrcodeCheckBlock = (data) =>
+      if Bitcoin.Address.validate data
+        return true
       params = ledger.managers.schemes.bitcoin.parseURI data
       return params?
     dialog.once 'qrcode', (event, data) =>
-      params = ledger.managers.schemes.bitcoin.parseURI data
+      if Bitcoin.Address.validate data
+        params = {address: data}
+      else
+        params = ledger.managers.schemes.bitcoin.parseURI data
       @view.amountInput.val params.amount if params?.amount?
       @view.receiverInput.val params.address if params?.address?
       @_updateTotalInput()

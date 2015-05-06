@@ -20,9 +20,9 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   onStop: () ->
 
   _restoreChronocoinLayout: () ->
-    wallet = ledger.app.wallet
-    wallet.getPublicAddress "0'/0/0", (publicAddress) =>
-      wallet.getPublicAddress "0'/1/0", (changeAddress) =>
+    dongle = ledger.app.dongle
+    dongle.getPublicAddress "0'/0/0", (publicAddress) =>
+      dongle.getPublicAddress "0'/1/0", (changeAddress) =>
         ledger.api.TransactionsRestClient.instance.getTransactions [publicAddress.bitcoinAddress.value, changeAddress.bitcoinAddress.value], (transactions, error) =>
           if transactions?.length > 0
             account = ledger.wallet.HDWallet.instance.getOrCreateAccount(0)

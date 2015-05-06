@@ -60,6 +60,7 @@
         '../libs/bitcoinjs-min'
         '../libs/zbarqrcode'
         '../libs/mutation-summary'
+        '../libs/jsencrypt'
 
         # Used be m2fa.DebugClient
         '../libs/lw-api-js/ucrypt/ka'
@@ -71,11 +72,14 @@
         ## Application configuration
         'configuration'
 
+        ## Logger
+        'utils/logger'
+        'utils/apdu_logger'
+
         ## Routes
         'routes'
 
         ## Utils
-        'utils/log'
         'utils/string'
         'utils/number'
         'utils/array'
@@ -95,12 +99,13 @@
         'utils/formatters'
         'utils/converters'
         'utils/stream'
-        'utils/completion_closure'
+        'utils/defer'
         'utils/try'
         'utils/comparison_result'
         'utils/amount'
         'utils/progressbars'
         'utils/keycard'
+        'utils/promise_queue'
         'utils/csv_exporter'
 
         ## Crypto
@@ -122,21 +127,14 @@
         'utils/storage/object_store'
         'utils/storage/storage'
 
-        ## Logger
-        'utils/logger'
-        'utils/apdu_logger'
-
         ## Data synchronization
 
         ## Errors
         'base/errors'
-        'utils/http_error'
 
         ## Managers
-        'managers/devices_manager'
         'managers/schemes_manager'
         'managers/permissions_manager'
-        'managers/wallets_manager'
         'managers/system_manager'
         'managers/application_manager'
 
@@ -164,7 +162,6 @@
         'tasks/ticker_task'
 
         ## Wallet
-        'wallet/hardware_wallet'
         'wallet/utils'
         'wallet/transaction'
         'wallet/value'
@@ -184,7 +181,7 @@
 
         ## Dongle
         'dongle/dongle'
-        'dongle/transaction'
+        'dongle/utils'
         'dongle/manager'
 
         ## Mobile 2FA
@@ -329,6 +326,9 @@
         'preferences/defaults'
         'preferences/preferences'
 
+        ## Print
+        'print/piper'
+
         ## Specs
         '../spec/jasmine/jasmine'
         '../spec/jasmine/jasmine-html'
@@ -342,11 +342,6 @@
         '../spec/utils/formatters_spec'
         '../spec/utils/converters_spec'
         '../spec/i18n/i18n_spec'
-
-        #'../spec/m2fa/client_spec'
-        #'../spec/m2fa/m2fa_spec'
-
-        '../spec/spec_helper'
 
         ## Update controllers
         'controllers/update/update_navigation_controller'
@@ -381,4 +376,24 @@
         'controllers/apps/coinkite/cosign/apps_coinkite_cosign_show_dialog_view_controller'
         'controllers/apps/coinkite/cosign/apps_coinkite_cosign_signing_dialog_view_controller'
 
-    ]
+        # Specs
+        '../spec/spec_helper'
+      ]
+
+      specs:
+        jasmine: [
+          '../spec/jasmine/jasmine'
+          '../spec/jasmine/jasmine-html'
+          '../spec/jasmine/boot'
+        ]
+        files: [
+          '../spec/utils/storage/store_spec'
+          '../spec/utils/storage/chrome_store_spec'
+          '../spec/utils/storage/secure_store_spec'
+          '../spec/restclients/synced_rest_client_spec'
+          '../spec/utils/storage/synced_store_spec'
+          '../spec/utils/bitcoin/bip39_spec'
+
+          '../spec/m2fa/client_spec'
+          '../spec/m2fa/m2fa_spec'
+        ]

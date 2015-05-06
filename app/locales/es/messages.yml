@@ -8,7 +8,6 @@ application:
   support_key_not_recognized_url: 'https://ledger.groovehq.com/knowledge_base/categories/troubleshooting-20'
 
 common:
-  bitcoin_acronym: 'BTC'
   default_account_name: "Mi cuenta"
   date_time_format: 'L [a las] LT'
   date_format: 'L'
@@ -43,6 +42,7 @@ common:
     unsufficient_balance: "El saldo de su monedero es insuficiente."
     wrong_keycode: "El código de validación no es correcta."
     network_no_response: "El servidor des transacciónes no ha respondido."
+    network_error: "Error de red."
     invalid_receiver_address: "La dirección Bitcoin de destino no es correcto."
     invalid_amount: "La cantidad enviada no es válida."
     unknown: "Se produjo un error desconocido."

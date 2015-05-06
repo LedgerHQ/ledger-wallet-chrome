@@ -26,7 +26,8 @@ _.extend ledger.wallet,
     # Uncomment for debugging with predefined addresses
     # return pathsToPredefinedAddresses(paths, callback)
 
-    @safe()
+    # throw error unless dongle is plugged and unlocked
+    ledger.dongle.unlocked()
 
     addresses = {}
     notFound = []
@@ -48,12 +49,3 @@ _.extend ledger.wallet,
         do done
 
     return
-
-  # @return Return true if wallet is plugged and unblocked.
-  isPluggedAndUnlocked: () ->
-    ledger.app.wallet? && ledger.app.wallet._state == ledger.wallet.States.UNLOCKED
-
-  # @return Return current unblocked wallet or throw error if wallet is not plugged or not unblocked.
-  safe: () ->
-    throw 'the wallet is not connected and unlocked' unless @isPluggedAndUnlocked()
-    return ledger.app.wallet
