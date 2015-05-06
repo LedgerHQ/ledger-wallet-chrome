@@ -95,7 +95,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     @_btchip = new BTChip(card)
     unless @isInBootloaderMode()
       @_recoverFirmwareVersion().then( =>
-        @_recoverOperationMode()
+        #@_recoverOperationMode() It seems useless by now
         # Set dongle state on failure.
         @getPublicAddress("0'/0/0").then( =>
           # @todo Se connecter directement à la carte sans redemander le PIN

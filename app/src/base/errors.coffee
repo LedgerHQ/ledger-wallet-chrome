@@ -49,6 +49,10 @@ _.extend ledger.errors,
   # I/O Errors
   WriteError: 500
 
+  # Wallet Opening Errors
+  UnableToRetrieveBitidAddress: 600
+  FatalErrorDuringLayoutWalletRecovery: 601
+
   DefaultMessages:
     0: "StandardError"
 

@@ -80,20 +80,17 @@ require @ledger.imports, ->
       return unless @isInWalletMode()
       @emit 'dongle:unlocked', @dongle
       @emit 'wallet:initializing'
-      ledger.wallet.initialize @dongle, =>
-        ledger.db.init =>
-          ledger.db.contexts.open()
-          Wallet.initializeWallet =>
-            ledger.preferences.init =>
-              @_listenPreferencesEvents()
-              @_listenCountervalueEvents(true)
-              ledger.utils.Logger.updateGlobalLoggersLevel()
-              @emit 'wallet:initialized'
-              _.defer =>
-                Wallet.instance.retrieveAccountsBalances()
-                ledger.tasks.TransactionObserverTask.instance.start()
-                ledger.tasks.OperationsSynchronizationTask.instance.start()
-                ledger.tasks.OperationsConsumptionTask.instance.start()
+      ledger.tasks.WalletOpenTask.instance.startIfNeccessary()
+      ledger.tasks.WalletOpenTask.instance.onComplete (__, error) =>
+        @_listenPreferencesEvents()
+        @_listenCountervalueEvents(true)
+        ledger.utils.Logger.updateGlobalLoggersLevel()
+        @emit 'wallet:initialized'
+        _.defer =>
+          Wallet.instance.retrieveAccountsBalances()
+          ledger.tasks.TransactionObserverTask.instance.start()
+          ledger.tasks.OperationsSynchronizationTask.instance.start()
+          ledger.tasks.OperationsConsumptionTask.instance.start()
 
     onDongleIsDisconnected: (dongle) ->
       @emit 'dongle:disconnected'
@@ -132,6 +129,7 @@ require @ledger.imports, ->
       ledger.preferences.close()
       ledger.utils.Logger.updateGlobalLoggersLevel()
       Wallet.releaseWallet()
+      ledger.storage.closeStores()
       ledger.wallet.release(@dongle)
       ledger.tasks.Task.stopAllRunningTasks()
       ledger.tasks.Task.resetAllSingletonTasks()
