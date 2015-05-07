@@ -1,0 +1,30 @@
+@import (reference) "../../constants";
+@import (reference) "../../common";
+
+section#send_method_dialog {
+  width: @dialog-width-send;
+
+  > div.regular-text {
+    line-height: 20px;
+    margin-top: @metrics-small-padding;
+  }
+
+  #mobile_table {
+    margin-top: @metrics-almost-medium-padding;
+
+    .row {
+      > .regular-text-small {
+        margin-left: @metrics-very-small-padding;
+      }
+
+      > .regular-grey-text-small {
+        margin-right: @metrics-very-small-padding;
+      }
+    }
+  }
+
+  > #card_table {
+    margin-top: @metrics-small-padding;
+  }
+
+}

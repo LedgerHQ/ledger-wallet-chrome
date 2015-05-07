@@ -31,6 +31,8 @@ class @DevicesManager extends EventEmitter
         {productId: 0x1b7c, vendorId: 0x2581, type: 'usb'}
         {productId: 0x2b7c, vendorId: 0x2581, type: 'hid'}
         {productId: 0x3b7c, vendorId: 0x2581, type: 'hid'}
+        {productId: 0x1808, vendorId: 0x2581, type: 'usb'}
+        {productId: 0x1807, vendorId: 0x2581, type: 'hid'}
       ]
       getDevices devicesInfo, (devices) =>
         oldDevices = @_devices
@@ -43,12 +45,13 @@ class @DevicesManager extends EventEmitter
           if oldDevices[device_id]?
             @_devices[device_id] = oldDevices[device_id]
           else
-            @_devices[device_id] = {id: device_id}
+            @_devices[device_id] = {id: device_id, productId: device['productId'], vendorId: device['vendorId']}
         oldDevicesList = _.values(oldDevices)
         devicesList = _.values(@_devices)
         oldDifferences = (item for item in devicesList when _.indexOf(oldDevicesList, item) == -1)
         newDifferences = (item for item in oldDevicesList when _.indexOf(devicesList, item) == -1)
         differences = newDifferences.concat(oldDifferences)
+
         for difference in differences
           if _.where(oldDevices, {id: difference.id}).length > 0
             @emit 'unplug', difference

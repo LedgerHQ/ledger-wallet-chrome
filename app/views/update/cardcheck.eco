@@ -1,0 +1,26 @@
+<div id="view_controller_content">
+  <div class="page-large-indication"><%- t 'update.cardcheck.make_sure' %></div>
+  <div class="page-indication"><%- t 'update.cardcheck.four_characters' %></div>
+  <div class="security-container">
+    <div class="labels">
+      <div class="label very-light">1</div>
+      <div class="label light">2</div>
+      <div class="label">3</div>
+      <div class="label">4</div>
+      <div class="label">5</div>
+      <div class="label">6</div>
+      <div class="label light">7</div>
+      <div class="label very-light">8</div>
+    </div>
+    <div class="values">
+      <div class="value very-light"></div>
+      <div class="value light"></div>
+      <div id="value1" class="value"></div>
+      <div id="value2" class="value"></div>
+      <div id="value3" class="value"></div>
+      <div id="value4" class="value"></div>
+      <div class="value light"></div>
+      <div class="value very-light"></div>
+    </div>
+  </div>
+</div>

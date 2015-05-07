@@ -1,0 +1,27 @@
+@import (reference) "../../common";
+
+section#dialogs_message_dialog {
+  display:flex;
+  max-width: @dialog-width-default;
+
+  > .content-container {
+    text-align: center;
+
+    > .uppercase-section-title {
+      margin-top: @metrics-small-padding;
+    }
+
+    > .regular-text-small {
+      margin-top: @metrics-very-small-padding;
+      line-height: 20px;
+    }
+
+    > .cancel-rounded-button {
+      margin-top: @metrics-almost-medium-padding;
+    }
+  }
+
+  > .spacer {
+    width: @metrics-medium-padding;
+  }
+}

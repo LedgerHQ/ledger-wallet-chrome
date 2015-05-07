@@ -1,5 +1,13 @@
 <section id="send_preparing_dialog">
-  <div id="spinner_container"></div>
-  <div class="uppercase-section-title" id="title"><%= t 'wallet.send.preparing.title' %></div>
-  <div class="regular-grey-text-small"><%= t 'wallet.send.preparing.may_take_a_while' %></div>
+  <header>
+    <h1><%= t 'wallet.send.common.send_bitcoins' %></h1>
+  </header>
+  <div id="content_container">
+    <div class="regular-text"><%= t 'wallet.send.preparing.preparing_transaction' %></div>
+    <div class="regular-grey-text-small"><%= t 'common.may_take_a_while' %></div>
+  </div>
 </section>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
+</div>

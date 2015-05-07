@@ -1,0 +1,27 @@
+<section id="coinkite_cosign_show_dialog">
+  <header>
+    <h1><%= t 'apps.coinkite.cosign.show.title' %></h1>
+  </header>
+  <table class="no-table-head">
+    <tbody>
+      <tr>
+        <td class="row-title"><%= t 'wallet.operations.detail.amount' %></td>
+        <td class="align-right" id="operation_amount">
+          <span class="regular-text"><%= ledger.formatters.formatValue(@amount) %></span>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title top-aligned"><%= t 'wallet.operations.detail.receiver' %></td>
+        <td class="align-right"><%= @address %></td>
+      </tr>
+      <tr class="no-border spacer50">
+        <td colspan="2" class="regular-text"><%- t 'apps.coinkite.cosign.show.note' %></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
+  <a class="action-rounded-button" href="#confirm"><%= t 'apps.coinkite.cosign.show.confirm_signature' %></a>
+</div>

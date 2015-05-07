@@ -19,13 +19,13 @@ class TryResult
   getError: () -> @_error
   getValue: () -> @_value
   isFailure: -> if @_error? then yes else no
-  isSuccess: -> not @isSuccess()
+  isSuccess: -> not @isFailure()
 
   then: (func) -> @promise().then(func)
   fail: (func) -> @promise().fail(func)
   promise: () -> @_deffered.promise
 
-  printError: -> @fail (er) => e er
+  printError: -> @fail => e @_error
 
 ###
   Executes the function passed in parameter. Try returns a {TryResult} which represents the computation of the function that

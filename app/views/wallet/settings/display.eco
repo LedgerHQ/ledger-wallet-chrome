@@ -1,0 +1,13 @@
+<section id="settings_display_dialog">
+  <header>
+    <h1><%= t 'wallet.settings.common.display' %></h1>
+  </header>
+  <div id="units_table_container"></div>
+  <div id="currency_table_container"></div>
+  <div id="language_table_container"></div>
+</section>
+<div class="dialog-actions-bar">
+  <a class="uppercase-action" href="#openOtherSettings"><%= t 'wallet.settings.common.other_settings' %></a>
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.close' %></a>
+</div>

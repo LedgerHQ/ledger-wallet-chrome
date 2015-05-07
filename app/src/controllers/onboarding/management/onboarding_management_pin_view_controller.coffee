@@ -66,8 +66,11 @@ class @OnboardingManagementPinViewController extends @OnboardingViewController
     # pin codes
     @view.autoPinCode.setEnabled(@_isPinKindAuto())
     @view.manualPinCode.setEnabled(!@_isPinKindAuto())
+    @view.manualPinCode.setStealsFocus(@_isPinKindAuto() is no then yes)
     if !@_isPinKindAuto()
       @view.manualPinCode.focus()
+    else
+      @view.autoRadio.focus()
 
     # helper links
     if @_isPinKindAuto()

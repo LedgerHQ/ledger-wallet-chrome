@@ -1,19 +1,37 @@
-﻿application:
+﻿language:
+  name: "Español"
+
+application:
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet gestiona sus cuentas Bitcoin de manera eficiente y segura."
   support_url: 'http://support.ledgerwallet.com/'
+  support_key_not_recognized_url: 'https://ledger.groovehq.com/knowledge_base/categories/troubleshooting-20'
 
 common:
-  bitcoin_acronym: 'BTC'
   default_account_name: "Mi cuenta"
-  date_format: 'DD/MM/YYYY à HH:mm'
+  date_time_format: 'L [a las] LT'
+  date_format: 'L'
+  time_format: 'LT'
   close: "Close"
   cancel: "Cancel"
-
-  dialogs:
-    yes: "Si"
-    no: "No"
-    confirmation: "Confirmación"
+  print: "Print"
+  copy: "Copy"
+  finish: "Finish"
+  confirm: "Confirm"
+  confirmation: "Confirmación"
+  send: "Send"
+  continue: "Continue"
+  erase: "Erase"
+  update: "Update"
+  restore: "Restore"
+  later: "Later"
+  reset: "Reset"
+  back: "Back"
+  yes: "Si"
+  no: "No"
+  may_take_a_while: "Please wait, this operation may take a few moments."
+  get_help: "Pongase en contacto con el centro de ayuda en support.ledgerwallet.com"
+  checking: "Checking..."
 
   keycard:
     uppercase_letters: "Mayúsculas"
@@ -24,12 +42,21 @@ common:
     unsufficient_balance: "El saldo de su monedero es insuficiente."
     wrong_keycode: "El código de validación no es correcta."
     network_no_response: "El servidor des transacciónes no ha respondido."
+    network_error: "Error de red."
     invalid_receiver_address: "La dirección Bitcoin de destino no es correcto."
     invalid_amount: "La cantidad enviada no es válida."
     unknown: "Se produjo un error desconocido."
+    unable_to_validate: "Unable to validate transaction."
+    secure_screen_cancelled_transaction: "The smartphone cancelled the transaction."
+    secure_screen_invalid_pin: "The smartphone returned a wrong pin code."
+    deleting_this_paired_smartphone: "By deleting this smartphone, you will no longer be able to manually validate transactions of this Ledger Wallet.<br />Do you want to continue?"
+    going_to_firmware_update: "By switching to firmware update mode, all your pending activites will be interrupted.<br />Do you want to continue ?"
+    wrong_transaction_signature: "The transaction has not been signed correctly due to hardware fault. Please contact the support for immediate assistance."
+    dust_transaction: "The transaction amount must be at least %s."
 
   qrcode:
-    present: "Present the recipient QR code in front of the webcam."
+    scan_qrcode: "Scan QR code"
+    present: "Present the QR code in front of the webcam."
     nowebcam: "No webcam is detected on your computer."
 
 onboarding:
@@ -46,10 +73,26 @@ onboarding:
       enter_your_pin_code: "Ingrese su PIN para desbloquear su billetera :"
       i_lost_my_pin_code: "Si ha olvidado su PIN, por favor visite nuestro Centro de asistencia."
 
+    connecting:
+      is_connecting: "Verifying authenticity of your Ledger Wallet..."
+
     opening:
       is_opening: "Por favor, espere mientras abre su monedero..."
       is_synchronizing: "Sincronizando su cartera. Esto puede tardar varios minutos..."
       not_opening: "Si su cartera Ledger no se abre, consulte el centro de asistencia."
+
+    update:
+      new_firmware_available: "A new firmware update is available for your Ledger Wallet (%s)."
+      new_1_0_0: "This update adds a new authentication to validate outgoing transactions on your smartphone."
+      new_1_0_1: "This update fixes critical bugs in the cryptography library."
+
+    unsupported:
+      not_linked: "Your hardware wallet does not seem to be linked to any security card."
+      please_update: "To use or generate a security card, please update your hardware wallet firmware."
+
+    failed:
+      unexpected_error: "An error occurred while communicating with your wallet."
+      unplug: "Unplug your Ledger Wallet and try again. If the error persists, please consider updating the firmware again."
 
     errors:
       frozen:
@@ -62,9 +105,9 @@ onboarding:
         tries_left: "Usted tiene %s prueba(s) antes de bloquear su monedero."
         unplug_plug: "Desconecte y vuelva a conectar el Monedero Ledger para acceder a sus cuentas y bitcoins."
 
-      unsupported:
-        device_unsupported: "Su monedero no esta aceptado"
-        unsuported_kind: "Este tipo de monedero no esta aceptado por la aplicación Ledger Wallet."
+      forged:
+        device_forged: "This Ledger Wallet is not genuine"
+        forbidden_access: "For safety reasons, you are not authorized to use this  application."
         get_help: "Pongase en contacto con el centro de ayuda en support.ledgerwallet.com"
 
   management:
@@ -76,7 +119,6 @@ onboarding:
     create_my_wallet: "Crear mi cartera"
     recover_my_wallet: "Restaurar mi cartera"
     cancel_wallet_configuration: "¿Quieres cancelar la configuración de su cartera Ledger?"
-    wallet_not_affected: "No se harán cambios a su monedero."
 
     security:
       security_informations: "Información de <b>seguridad</b>"
@@ -123,9 +165,7 @@ onboarding:
       your_recovery_phrase: "Su frase de restauración :"
       invalid_recovery_phrase: "La frase de restauración no es válida."
       it_wont_be_displayed_again: "Su frase de restauración no se mostrará de nuevo."
-      without_it: "Sin ella, no tendrá acceso a su monedero en caso de pérdida."
-      copy: "Copie la frase de restauración en el portapapeles"
-      print: "IMPRIMIR"
+      without_it: "Sin ella, no tendrá acceso a su bitcoins en caso de pérdida."
 
     summary:
       your_wallet_is: "Su monedero esta"
@@ -152,6 +192,66 @@ onboarding:
       error_occured: "Se ha producido un error grave. Contactar con el soporte de ayuda."
       contact_support: "CONTACTAR EL SOPORTE"
 
+update:
+  common:
+    firmware_update: "Chip firmware update"
+    need_to_repeat_several_times: "You may need to repeat this step several times."
+
+  index:
+    important_notice: "Important notice"
+    update_process: "The update process requires to erase your Ledger Wallet.<br />Your recovery sheet will allow you to restore your bitcoins."
+    clicking_continue: "By clicking CONTINUE, you confirm to be in possession of your <b>security card QR code</b> and your <b>24 words recovery phrase</b>. If you attempt to update your Ledger Wallet without these information, you will loose your bitcoins."
+    please_note: "Please note: You will need to pair your smartphone again to re-enable mobile second factor authentication."
+
+  plug:
+    plug_your_wallet: "Plug your Ledger Wallet"
+    insert_your_wallet: "Insert your Ledger Wallet in the USB port."
+
+  unplug:
+    unplug_your_wallet: "Unplug your Ledger Wallet"
+    remove_your_wallet: "Remove your Ledger Wallet from the USB port."
+
+  seed:
+    security_card_qrcode: "Security card QR code"
+    enter_characters: "Scan (or type the 32 characters) your security card QR code:"
+    on_the_left: "You will find it on the left page of your recovery sheet."
+
+  erasing:
+    erasure_confirmation: "Reset confirmation"
+    ready_to_start_process: "You are now ready to start the update process."
+    factory_settings: "To continue, you need your 24 words recovery phrase."
+
+  updating:
+    update_confirmation: "Update confirmation"
+    wallet_is_ready: "Your Ledger Wallet is erased and ready to be updated."
+    clicking_continue: "The firmware will update from %s to %s."
+
+  loading:
+    updating_wallet: "Update in progress"
+    loading: "Loading %s..."
+    do_not_unplug: "Please wait. Do not unplug your Ledger Wallet."
+
+  done:
+    successfully_updated: "Your Ledger Wallet has been successfully updated."
+    update_succeeded: "Update succeeded"
+    use_24_words: "Use your 24 words recovery phrase from your recovery sheet to restore your bitcoins."
+
+  linux:
+    linux_users: "Linux users"
+    follow_instructions: "Your Ledger Wallet needs to be added to the list of known USB devices."
+    first: "Open your terminal and execute this command (root permissions are required):"
+    fc: "wget -q -O - https://www.ledgerwallet.com/support/add_udev_rules.sh | sudo bash"
+    second: "This step will automatically download a script that adds a new udev rule which is required to get your newly updated Ledger Wallet recognized by Linux."
+
+  cardcheck:
+      security_card_check: "Security card check"
+      make_sure: "Please make sure these values are correct on your security card:"
+      four_characters: "Do not click CONTINUE if the 4 highlighted characters are not the same as yours."
+
+  error:
+    update_failed: "Update failed"
+    error_updated: "An error occurred while updating your Ledger Wallet (code: %s)."
+
 wallet:
   defaults:
     operations: &default-operations-translation
@@ -176,6 +276,7 @@ wallet:
       signout: 'LOCK'
       help: 'AYUDA'
       account: 'CUENTA'
+      settings: "SETTINGS"
 
   dashboard:
     index:
@@ -200,7 +301,7 @@ wallet:
       status: "Estado"
       sender: "Desde"
       receiver: "a"
-      identifier: "Identificación de la transacción"
+      identifier: "Identificación"
       send_by_email: "ENVIAR POR MAIL"
       print: "IMPRIMIR"
       close: "CERRAR"
@@ -233,7 +334,7 @@ wallet:
     index:
       title: "RECIBIR BITCOINS"
       amount: "CANTIDAD (OPCIONAL)"
-      amount_placeholder: "cantidad"
+      amount_placeholder: "Cantidad"
       receiver_account: "CUENTA DE CREDITO"
       receiver_address: "DIRECCIÓN DE RECEPCIÓN BITCOIN"
       qr_code_explanation: "Escáner de códigos QR por la persona que desea <br /> usted enviar bitcoins"
@@ -242,60 +343,104 @@ wallet:
       close: "CANCELAR"
 
   send:
+    common:
+      send_bitcoins: "ENVIAR BITCOINS"
+      other_validation_methods: "Other validation methods"
+
     index:
-      title: "ENVIAR BITCOINS"
-      amount: "CANTIDAD"
-      amount_placeholder: "cantidad"
-      sender_account: "CUENTA DEBITADA"
-      receiver_address: "DIRECCIÓN DE RECEPCIÓN BITCOIN"
-      receiver_address_placeholder: "DIRECCIÓN BITCOIN"
-      total_spent: "TOTAL DEBITADO"
-      transaction_fees_text: "(+0.0001 BTC gastos de transacción)"
-      send: "ENVOYER"
-      close: "ANNULER"
-      confirm: "CONFIRMER"
+      amount: "Cantidad"
+      amount_placeholder: "Cantidad"
+      sender_account: "Cuenta debitada"
+      receiver_address: "Dirección de recepción bitcoin"
+      receiver_address_placeholder: "Dirección Bitcoin"
+      total_spent: "Total debitado"
+      transaction_fees_text: "(incl. %s gastos de transacción)"
       close_scanner: "Close scanner"
       qr_scanner: "Scan QR code"
 
-    validation:
-      title: "Code de validation nécessaire"
+    card:
       grab_your_card: "Munissez-vous de votre <b>carte de sécurité</b> (carte noire) et tapez sur votre clavier la lettre ou chiffre indiqué dans la case noire pour chaque valeur en surbrillance :"
       entered_code: "Code entré :"
       address_to_validate: "Recipient's Bitcoin address to validate."
       amount_and_address_to_validate: "Amount and recipient's Bitcoin address to validate."
       to: "to"
 
-    mobile_validation:
-      title: "[ALPHA]Waiting for mobile validation"
-      content: "[ALPHA]Please confirm the transaction on your mobile device"
+    method:
+      select_method: "Please select a validation method in order to authenticate the outgoing transaction from your Ledger Wallet:"
+      pair_a_mobile_phone: "Pair a smartphone"
+      mobile_phone: "Smartphone"
+      security_card: "Security card"
+      single_paired_device: "%s pairing"
+      multiple_paired_devices: "%s pairings"
+
+    mobile:
+      sending_transaction: "Sending transaction to \"%s\"..."
+      open_mobile_app: "Open the Ledger Wallet mobile app to validate the transaction."
 
     processing:
-      sending: "Envoi en cours..."
-      validating: "Validation de la transaction..."
-      may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
+      finalizing_transaction: "Finalizing transaction..."
 
     preparing:
-      title: "Préparation de la transaction..."
-      may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
+      preparing_transaction: "Preparing transaction..."
 
-    error:
-      title: "Envoi échoué"
-      unable_to_send_bitcoins: "La transaction n’a pas pu être effectuée."
-      close: "Fermer"
+    validating:
+      validating_transaction: "Validating transaction..."
 
-    success:
-      title: "Envoi terminé"
-      able_to_send_bitcoins: "La transaction a bien été effectuée."
-      close: "Fermer"
-      confirmed_in_a_few_minutes: "L'opération apparaîtra comme confirmée dans quelques minutes."
+    errors:
+      sending_failed: "Sending failed"
+      sending_succeeded: "Sending succeeded"
+      transaction_completed: "The transaction successfully completed."
 
   pairing:
     common:
-      pair_a_new_mobile: "PAIR A NEW MOBILE PHONE"
+      pair_a_new_mobile: "Pair a smartphone"
+
+    errors:
+      pairing_failed: "Pairing failed"
+      pairing_succeeded: "Pairing succeeded"
+      dongle_is_now_paired: "Your Ledger Wallet is now paired with your smartphone \"%s\"."
+      inconsistent_state: "Something wrong happened (inconsistent state)."
+      client_cancelled: "The mobile application cancelled the pairing process."
+      dongle_needs_power_cycle: "Your Ledger Wallet needs to be unplugged and plugged back to pair a new smartphone."
+      invalid_challenge_response: "The security card validation code is incorrect."
+      dongle_cancelled: "Your Ledger Wallet cancelled the pairing process."
+      unknown: "An unknown error occurred."
 
     index:
       download_the_app: "<b>Download</b> the Ledger Wallet mobile app."
       compatibility_details_available: "Compatibility details and installation guides are available from our <b>help center</b>."
-      open_the_app: "<b>Scan<b/> the pairing QR code."
-      tap_pair: "Tap “Pair a new Ledger Wallet” to start the scanner."
+      open_the_app: "<b>Scan</b> the pairing QR code."
+      tap_pair: "Tap “Pair a Ledger Wallet” to start the scanner."
       scan_this_qrcode: "Scan this pairing QR code."
+
+    progress:
+      pairing_with_mobile_device: "Pairing in progress..."
+      follow_instructions: "Follow the instructions displayed on the smartphone screen."
+
+    finalizing:
+      assign_a_name: "To finish, please give a name to this smartphone."
+      placeholder_name: "Smartphone name"
+      default_name: "My smartphone"
+      name_already_used_by_paired_device: "This name is already used by another smartphone."
+      please_enter_a_name: "Please enter a smartphone name."
+
+  settings:
+    common:
+      settings: "Settings"
+      other_settings: "Other settings"
+      hardware: "Hardware"
+      bitcoin: "Bitcoin"
+      tools: "Tools"
+      display: "Display"
+      apps: "Apps (beta)"
+      version: "Version %s"
+
+    hardware:
+      firmware: "Firmware"
+      paired_smartphones: "Paired smartphones"
+      flash_firmware: "Flash firmware"
+      no_update_available: "No update available"
+      update_available: "%s available!"
+      pair_a_smartphone: "Pair a smartphone"
+      single_paired_device: "%s pairing"
+      multiple_paired_devices: "%s pairings"

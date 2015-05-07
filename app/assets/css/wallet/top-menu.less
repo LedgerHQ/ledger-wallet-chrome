@@ -14,7 +14,12 @@
     display: flex;
     flex-grow: 1;
     align-items: stretch;
-    padding-left: @metrics-medium-padding;
+    padding: 0 @metrics-medium-padding;
+
+    #help-item {
+      margin-left: auto;
+      margin-right: 0;
+    }
 
     .menu-item {
       color: @color-white;
@@ -23,8 +28,8 @@
       padding-top: 24px;
 
       &.selected {
-        >div {
-          >a {
+        > div {
+          > a {
             opacity: 0.75;
           }
 
@@ -34,12 +39,11 @@
         }
       }
 
-      >div {
-
+      > div {
         display: flex;
         flex-direction: column;
 
-        >a {
+        > a {
           font-size: @font-size-large;
           text-decoration: none;
           color: @color-white;
@@ -83,9 +87,6 @@
           flex-grow: 1;
         }
       }
-
-
-
     }
 
     .right {
@@ -100,17 +101,18 @@
     align-items: center;
     background-color: @color-dark-grey-blue;
     padding: 0 @metrics-medium-padding;
-    color: @color-white;
 
     .balance-label {
-      letter-spacing: -0.5px;
+      color: @color-light-grey;
+      font-size: @font-size-small;
     }
 
     .balance-value {
+      color: @color-white;
       font-size: 25px;
       font-weight: @font-weight-light;
       letter-spacing: -1.5px;
-      margin-top: 2px;
+      margin-top: 5px;
 
       sup {
         vertical-align: super;

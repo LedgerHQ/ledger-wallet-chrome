@@ -1,8 +1,9 @@
-class @CommonDialogsConfirmationDialogViewController extends @DialogViewController
+class @CommonDialogsConfirmationDialogViewController extends ledger.common.DialogViewController
 
-  positiveLocalizableKey: 'common.dialogs.yes'
-  negativeLocalizableKey: 'common.dialogs.no'
-  titleLocalizableKey: 'common.dialogs.confirmation'
+  positiveLocalizableKey: 'common.yes'
+  negativeLocalizableKey: 'common.no'
+  titleLocalizableKey: 'common.confirmation'
+  messageLocalizableKey: null
 
   clickPositive: ->
     @emit 'click:positive'
@@ -14,6 +15,3 @@ class @CommonDialogsConfirmationDialogViewController extends @DialogViewControll
 
   setMessageLocalizableKey: (key) ->
     @messageLocalizableKey = key
-
-  setAbstractLocalizableKey: (key) ->
-    @abstractLocalizableKey = key

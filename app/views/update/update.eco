@@ -1,0 +1,16 @@
+<div id="content_container">
+  <div id="title_container">
+    <div class="page-title"><%= t 'update.common.firmware_update' %></div>
+    <div id="page_subtitle" class="page-subtitle"></div>
+  </div>
+  <div id="dynamic_container">
+    <div id="left_navigation">
+      <a id="previous_button" class="back" href="#navigatePrevious" style="display: none;"></a>
+    </div>
+    <div id="navigation_controller_content"></div>
+    <div id="right_navigation">
+      <a id="next_button" class="continue" href="#navigateNext" style="display: none;"></a>
+    </div>
+  </div>
+  <div id="empty_container"></div>
+</div>

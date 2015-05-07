@@ -1,0 +1,35 @@
+@import (reference) "../../common";
+
+section#settings_index_dialog {
+  width: @dialog-width-settings-table;
+
+  .sections-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: @metrics-small-padding;
+    justify-content: space-between;
+
+    .panel {
+      width: 90px;
+      height: 85px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: @metrics-very-small-padding;
+
+      > .fa {
+        font-size: @font-size-very-very-very-large;
+        color: @color-dark-grey;
+        margin-bottom: @metrics-very-small-padding;
+      }
+
+      &:last-child {
+        margin-right: auto;
+        margin-left: @metrics-very-small-padding;
+      }
+    }
+  }
+}

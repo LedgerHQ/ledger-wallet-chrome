@@ -1,11 +1,16 @@
 describe "m2fa.Client", ->
 
   beforeEach ->
-    spyOn(window, 'WebSocket').and.returnValue jasmine.createSpyObj('ws', ['send', 'close'])
+    spyOn(window, 'WebSocket')
     @pairingId = "aPairingId"
     @client = new ledger.m2fa.Client(@pairingId)
-    spyOn(@client, "_send")
-    @ws = @client.ws
+    @client.ws = @ws = jasmine.createSpyObj('ws', ['send', 'close'])
+    [@ws.onopen, @ws.onmessage, @ws.onclose] = [ws.onopen, ws.onmessage, ws.onclose]
+    spyOn(@client, "_send").and.callThrough()
+    @ws.readyState = WebSocket.OPEN
+
+  afterEach ->
+    @client.stop()
   
   it "connect to 2fa on creation and set event callbacks", ->
     expect(window.WebSocket).toHaveBeenCalledWith(ledger.config.m2fa.baseUrl)
@@ -71,7 +76,7 @@ describe "m2fa.Client", ->
     expect(@client.emit).toHaveBeenCalledWith('m2fa.accept')
     @client.emit.calls.reset()
 
-    @client._onResponse({pin: "01020304"})
+    @client._onResponse({pin: "01020304", is_accepted: true})
     expect(@client.emit).toHaveBeenCalledWith('m2fa.response', "01020304")
     @client.emit.calls.reset()
     

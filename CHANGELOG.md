@@ -1,5 +1,40 @@
 # Changelog
 
+1.2.0
+=====
+- Add new preferences dialog
+- Add high level JS API - https://github.com/LedgerHQ/ledger-wallet-api
+- Bugs fixes
+
+1.1.3
+=====
+- Embed new firmware 1.0.1
+- Add Coinkite app (beta)
+- Add BitID support
+- Add API support (beta)
+- Bug fixes
+
+1.1.2
+=====
+- Improve QR code scanner
+- Improve app update detection
+- Add settings section
+- Add shortcut to go to firmware update mode
+
+1.1.1
+=====
+- Fix attestation freeze
+- UI improvements
+- Add update flow security card check
+
+1.1.0
+=====
+- Add mobile second factor authentication for validating transactions
+- Add pairing process to bind a Ledger Wallet with a smartphone
+- Add firmware update process
+- UI improvements
+- Bug fixes
+
 1.0.7
 =====
 - Improve transactions synchronization

@@ -1,36 +1,54 @@
-class @WalletSendPreparingDialogViewController extends @DialogViewController
+class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewController
 
   view:
-    spinnerContainer: '#spinner_container'
+    contentContainer: '#content_container'
 
-  onAfterRender: ->
+  initialize: ->
     super
-    @view.spinner = ledger.spinners.createLargeSpinner(@view.spinnerContainer[0])
-    account = Account.find(index: 0).first()
-
     # fetch amount
-    ledger.wallet.transaction.createAndPrepareTransaction @params.amount, 10000, @params.address, account, account, (transaction, error) =>
+    account = Account.find(index: 0).first()
+    account.createTransaction amount: @params.amount, fees: ledger.preferences.instance.getMiningFee(), address: @params.address, (transaction, error) =>
       return if not @isShown()
       if error?
         reason = switch error.code
           when ledger.errors.NetworkError then 'network_no_response'
           when ledger.errors.NotEnoughFunds then 'unsufficient_balance'
-        @once 'dismiss', =>
-          dialog = new WalletSendErrorDialogViewController reason: reason
+          when ledger.errors.DustTransaction then 'dust_transaction'
+        @dismiss =>
+          errorMessage = switch reason
+            when 'dust_transaction' then _.str.sprintf(t("common.errors." + reason), ledger.formatters.formatValue(ledger.wallet.transaction.MINIMUM_OUTPUT_VALUE))
+            else t("common.errors." + reason)
+          Api.callback_cancel 'send_payment', errorMessage
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: errorMessage)
           dialog.show()
-        @dismiss()
       else
-        invertModes = _.invert(ledger.wallet.transaction.Transaction.ValidationModes)
-        l "[PreparingTxDialog]", invertModes[transaction.getValidationMode()], transaction
-        switch transaction.getValidationMode()
-          when ledger.wallet.transaction.Transaction.ValidationModes.KEYCARD
-            @once 'dismiss', =>
-              dialog = new WalletSendValidationDialogViewController transaction: transaction
-              dialog.show()
-            @dismiss()
-          when ledger.wallet.transaction.Transaction.ValidationModes.SECURE_SCREEN
-            l "%c[M2FA] Secure screen dialog in preparation", "#888888"
-            @once 'dismiss', =>
-              dialog = new WalletSendMobileValidationDialogViewController transaction: transaction
-              dialog.show()
-            @dismiss()
+        @_routeToNextDialog(transaction)
+
+  cancel: ->
+    Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
+    @dismiss()
+
+  onAfterRender: ->
+    super
+    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
+
+  _routeToNextDialog: (transaction) ->
+    cardBlock = (transaction) =>
+      @getDialog().push new WalletSendValidatingDialogViewController(transaction: transaction, options: {hideOtherValidationMethods: true}, validationMode: 'card')
+    mobileBlock = (transaction, secureScreens) =>
+      @getDialog().push new WalletSendValidatingDialogViewController(transaction: transaction, secureScreens: secureScreens, validationMode: 'mobile')
+    methodBlock = (transaction) =>
+      @getDialog().push new WalletSendMethodDialogViewController(transaction: transaction)
+
+    # if mobile validation is supported
+    if ledger.app.dongle.getIntFirmwareVersion() >= ledger.dongle.Firmware.V_LW_1_0_0
+      # fetch grouped paired screens
+      ledger.m2fa.PairedSecureScreen.getAllGroupedByUuidFromSyncedStore (groups, error) =>
+        groups = _.values(_.omit(groups, undefined)) if groups?
+        ## if paired and only one pairing id exists
+        if error? or not groups? or groups.length != 1
+          methodBlock(transaction)
+        else
+          mobileBlock(transaction, groups[0])
+    else
+      cardBlock(transaction)

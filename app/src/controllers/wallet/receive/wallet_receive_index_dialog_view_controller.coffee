@@ -1,4 +1,4 @@
-class @WalletReceiveIndexDialogViewController extends DialogViewController
+class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewController
 
   view:
     amountInput: '#amount_input'
@@ -6,7 +6,7 @@ class @WalletReceiveIndexDialogViewController extends DialogViewController
 
   initialize: ->
     super
-    @params.address = ledger.wallet.HDWallet.instance.getAccount(0).getCurrentPublicAddress()
+    @params.address = ledger.wallet.Wallet.instance.getAccount(0).getCurrentPublicAddress()
 
   onAfterRender: ->
     super
@@ -17,7 +17,7 @@ class @WalletReceiveIndexDialogViewController extends DialogViewController
         colorDark : "#000000"
         colorLight : "#ffffff"
         correctLevel : QRCode.CorrectLevel.H
-    @view.amountInput.amountInput()
+    @view.amountInput.amountInput(ledger.preferences.instance.getBitcoinUnitMaximumDecimalDigitsCount())
     @view.receiverAddress.text @params.address
     do @_listenEvents
 
@@ -34,7 +34,7 @@ class @WalletReceiveIndexDialogViewController extends DialogViewController
   _listenEvents: ->
     @view.amountInput.on 'keydown', (e) =>
       _.defer =>
-        @params.amount = @view.amountInput.val()
+        @params.amount = ledger.formatters.fromSatoshiToBTC(ledger.formatters.fromValueToSatoshi(@view.amountInput.val()))
         @_refreshQrCode()
 
   _refreshQrCode: () ->

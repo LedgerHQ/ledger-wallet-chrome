@@ -5,18 +5,27 @@
 @ledger.config ?= {}
 _.extend @ledger.config,
   m2fa:
-    baseUrl: 'wss://ws01.ledgerwallet.com/2fa/channels' #'ws://nicolasbigot.fr:9000/2fa/channels'
+    baseUrl: 'wss://ws.ledgerwallet.com/2fa/channels'
   restClient:
-    baseUrl: 'https://api02.ledgerwallet.com/'
+    baseUrl: 'https://api.ledgerwallet.com/'
   syncRestClient:
-    pullIntervalDelay: 10000
+    pullIntervalDelay: 60000
     pullThrottleDelay: 1000
     pushDebounceDelay: 1000
+  defaultLoggingLevel: "INFO"
+  btcshipDebug: false
+
+# Btcship logging
+@DEBUG = ledger.config.btcshipDebug
 
 Q.longStackSupport = true
 
 @configureApplication = (app) ->
-  chrome.commands.onCommand.addListener (command) =>
-    switch command
-      when 'reload-page' then do app.reloadUi
-      when 'reload-application' then do app.reload
+  _.extend @ledger.config,
+    defaultLoggingLevel:
+      Connected:
+        Enabled: ledger.utils.Logger.Levels.ALL
+        Disabled: ledger.utils.Logger.Levels.NONE
+      Disconnected:
+        Enabled: ledger.utils.Logger.Levels.ALL
+        Disabled: ledger.utils.Logger.Levels.ALL

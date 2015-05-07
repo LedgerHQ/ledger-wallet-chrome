@@ -1,13 +1,13 @@
 <div id="content-container">
   <div class="logo-container">
-    <img src="../assets/images/onboarding/large_logo.png" width="244" height="181">
+    <img src="../../assets/images/onboarding/large_logo.png" width="256" height="156">
   </div>
   <div class="greyed-container">
     <img src="../../assets/images/common/large_<%= if @params.error? then 'error' else 'check' %>.png" width="50" height="50" />
     <div class="black-title"><%= if @params.error? then t 'onboarding.management.done.configuration_failed_' + @params.wallet_mode else t 'onboarding.management.done.configuration_is_complete_' + @params.wallet_mode %></div>
     <div class="black-indication"><%= if @params.error? then t 'onboarding.management.done.error_occured' else t 'onboarding.management.done.you_can_access_your_wallet' %></div>
     <% if not @params.error?: %>
-    <div class="small-indication"><%= t('onboarding.management.done.unplug_plug') %></div>
+    <div class="medium-indication"><%= t('onboarding.management.done.unplug_plug') %></div>
     <% else: %>
     <a href="#openSupport" class="action-rounded-button"><%= t 'onboarding.management.done.contact_support' %></a>
     <% end %>

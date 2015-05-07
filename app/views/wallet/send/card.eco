@@ -1,0 +1,19 @@
+<section id="send_card_dialog">
+  <header>
+    <h1><%= t 'wallet.send.common.send_bitcoins' %></h1>
+  </header>
+  <div class="regular-text"><%- t 'wallet.send.card.grab_your_card' %></div>
+  <div id="validation_container">
+    <div id="validation_texts">
+      <div id="validation_indication"></div>
+      <div id="validation_subtitle" class="regular-grey-text-small"></div>
+    </div>
+    <div id="validation_code"></div>
+  </div>
+  <div id="card_container"></div>
+</section>
+<div class="dialog-actions-bar">
+  <a id="other_validation_methods" class="uppercase-action" href="#otherValidationMethods"><%= t 'wallet.send.common.other_validation_methods' %></a>
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
+</div>

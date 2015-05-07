@@ -1,0 +1,20 @@
+<div id="mobile_table" class="large-table">
+  <div class="header <%= "top" if @mobilesGroups.length > 0 %>">
+    <div class="uppercase-section-column stretchable"><%= t 'wallet.send.method.mobile_phone' %></div>
+    <a class="uppercase-action" href="#pairMobilePhone"><i class="fa fa-plus"></i><%= t 'wallet.send.method.pair_a_mobile_phone' %></a>
+  </div>
+  <% for mobilesGroup, i in @mobilesGroups: %>
+  <a class="row <% if i == @mobilesGroups.length - 1: %><%= "bottom" %><% else: %><%= "middle" %><% end %>" href="#selectMobileGroup(index=<%= i %>)">
+    <div class="light-grey-icon-large"><i class="fa fa-mobile"></i></div>
+    <div class="regular-text-small stretchable"><%= mobilesGroup[0].name %></div>
+    <div class="regular-grey-text-small">
+      <% if mobilesGroup.length > 1: %>
+      <%= _.str.sprintf(t('wallet.send.method.multiple_paired_devices'), mobilesGroup.length) %>
+      <% else: %>
+      <%= _.str.sprintf(t('wallet.send.method.single_paired_device'), mobilesGroup.length) %>
+      <% end %>
+    </div>
+    <div class="regular-grey-text"><i class="fa fa-angle-right"></i></div>
+  </a>
+  <% end %>
+</div>

@@ -4,6 +4,8 @@ gulp            = require 'gulp'
 less            = require 'gulp-less'
 coffee          = require 'gulp-coffee'
 yaml            = require 'gulp-yaml'
+Yaml            = require 'js-yaml'
+Eco             = require 'eco'
 eco             = require 'gulp-eco'
 del             = require 'del'
 sourcemaps      = require 'gulp-sourcemaps'
@@ -22,6 +24,11 @@ path            = require 'path'
 join            = path.join
 resolve         = path.resolve
 rsa             = require 'node-rsa'
+concat          = require 'gulp-concat'
+tap             = require 'gulp-tap'
+_               = require 'underscore'
+_.str           = require 'underscore.string'
+
 
 class BuildMode
   constructor: (Name, BuildDir, MangleVersion) ->
@@ -39,6 +46,8 @@ i18n = () ->
     i18nContent = {}
     json = JSON.parse(file.contents.toString(encoding))
     json.application.name = "#{json.application.name} (#{COMPILATION_MODE.Name})" if COMPILATION_MODE.MangleVersion is true and json.application?.name?
+
+    # Format the 'json' object to be suitable for chrome.i18n
     flatify = (json, path = '') ->
       for key, value of json
         if typeof value is "object"
@@ -47,9 +56,27 @@ i18n = () ->
           i18nContent[path + key] = {message: value, description: "Description for #{path + key} = #{value}"}
 
     flatify json
+    # Insert the newly created content
     file.contents = new Buffer(JSON.stringify(i18nContent), encoding)
+
     @push file
     callback()
+
+
+buildLangFilePlugin = () ->
+  through2.obj (chunk, encoding, callback) ->
+    languages = {}
+
+    tag = chunk.relative.substring(0, chunk.relative.indexOf("/"))
+    langFile = JSON.parse(chunk.contents.toString(encoding))
+
+    languages = "window.ledger.i18n.Languages['" + tag + "'] = " + "'" + langFile.language.name + "';"
+
+    chunk.contents = new Buffer(JSON.stringify(languages), encoding)
+
+    @push chunk
+    callback()
+
 
 releaseManifest = () ->
   through2.obj (file, encoding, callback) ->
@@ -71,8 +98,6 @@ ensureDirectoryExists = (dirname) ->
 ensureDistDir = () -> ensureDirectoryExists 'dist'
 
 ensureSignatureDir = () -> ensureDirectoryExists('signature')
-
-
 
 tasks =
 
@@ -123,12 +148,27 @@ tasks =
     .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/"
 
   translate: () ->
-    gulp.src 'app/locales/**/*.yml'
+    gulp.src 'app/locales/**/!(es)/*.yml'
     .pipe plumber()
     .pipe changed "#{COMPILATION_MODE.BuildDir}/_locales"
     .pipe yaml()
     .pipe i18n()
     .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/_locales"
+
+  buildLangFile: () ->
+    gulp.src 'app/locales/**/!(es)/*.yml'
+    .pipe plumber()
+    .pipe yaml()
+    .pipe buildLangFilePlugin()
+    .pipe tap (file, t) ->
+      file.contents = new Buffer file.contents.toString().replace(/^"|"$/g, '')
+    .pipe concat 'i18n_languages.js'
+    .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/src/i18n"
+
+  regions: () ->
+    gulp.src 'app/src/i18n/regions.yml'
+    .pipe yaml()
+    .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/src/i18n"
 
   js: () ->
     gulp.src 'app/**/*.js'
@@ -192,13 +232,79 @@ tasks =
       tasks.fonts
       tasks.html
       tasks.less
+      tasks.buildLangFile
+      tasks.regions
     ]
     run = (tasks.promisify(task()) for task in run)
     Q.all(run).then ->
       tasks.promisify(tasks.finalize()).then ->
         if COMPILATION_MODE is DEBUG_MODE then promise.resolve()
         else
-          Q.all([tasks.promisify(tasks.minify()), tasks.promisify(tasks.uglify())]).then(promise.resolve)
+          Q.all([tasks.promisify(tasks.minify())]).then(promise.resolve)
+
+  createFupManifest: () ->
+    getVersionFromDotNotation =  (dotNotation) -> dotNotation.replace(/\./g, '')
+    varify = (name, src) -> name + "_" + (/[a-z-]+-([0-9]+)/).exec(src)[1]
+    getVersionFromVarName = (name) -> (/[A-Za-z_]+([0-9]+)/).exec(name)[1]
+    normalizeVersion = (src) -> src.substring(0, 3) + _.str.lpad(src.substring(3), 3, '0')
+    expressionFromNormalizedVersion = (src) ->
+      parts = [src.substr(0, 1), src.substr(1, 1), src.substr(2, 1), parseInt(src.substring(3))]
+      first = if parts[0] is '1' then '0x20' else '0x00'
+      "[#{first}, (#{parts[1]} << 16) + (#{parts[2]} << 8) + (#{parts[3]})]"
+    expressionFromDotNotation = (src) ->
+      parts = []
+      loop
+        index = src.indexOf('.')
+        parts.push src.substring(0, index)
+        src = src.substring(index + 1)
+        break if src.indexOf('.') is -1
+      parts.push src
+      first = if parts[0] is '1' then '0x20' else '0x00'
+      "[#{first}, (#{parts[1]} << 16) + (#{parts[2]} << 8) + (#{parts[3]})]"
+
+    l = console.log.bind(console)
+    deferred = Q.defer()
+    glob 'app/firmwares/*.js', {}, (er, files) ->
+      template = fs.readFileSync 'compilation/fup_manifest.coffee.template', "utf-8"
+      imports = []
+      names = []
+      for file in files
+        localFile = file.substring(4).replace('.js', '')
+        imports.push "'../#{localFile}'"
+        names.push localFile.replace("firmwares/btchipfirmware-", '')
+      names = _.groupBy names, (name) -> (/([a-z-]+)-[0-9]+/).exec(name)[1]
+
+      reloader_from_bl = (varify('BL_RELOADER', e) for e in names['reloader-from-loader'])
+      reloader_from_bl = _.sortBy reloader_from_bl, (varName) -> normalizeVersion(getVersionFromVarName(varName))
+
+      bl_loader = (varify('BL_LOADER', e) for e in names['loader-from-loader'])
+      bl_loader = _.sortBy bl_loader, (varName) -> normalizeVersion(getVersionFromVarName(varName))
+
+      os_loader = (varify('LOADER', e) for e in names['loader'])
+      os_loader = _.sortBy os_loader, (varName) -> normalizeVersion(getVersionFromVarName(varName))
+
+      bl_reloader = []
+      for e in names['reloader']
+        varName = varify('RELOADER', e)
+        bl_reloader.push [expressionFromNormalizedVersion(normalizeVersion(getVersionFromVarName(varName))), varName]
+      bl_reloader = _.sortBy bl_reloader, (entry) -> normalizeVersion(getVersionFromVarName(entry[1]))
+
+      os_init = []
+      for e in names['init']
+        varName = varify((if getVersionFromVarName(varify('VOID', e))[0] is '0' then 'INIT' else 'INIT_LW'), e)
+        os_init.push [expressionFromNormalizedVersion(normalizeVersion(getVersionFromVarName(varName))), varName]
+      os_init = _.sortBy os_init, (entry) -> normalizeVersion(getVersionFromVarName(entry[1]))
+
+      manifest = Yaml.safeLoad(fs.readFileSync('app/firmwares/manifest.yml', 'utf8'))
+
+      manifest['current_version']['bootloader'] = expressionFromDotNotation(manifest['current_version']['bootloader'])
+      manifest['current_version']['os'] = expressionFromDotNotation(manifest['current_version']['os'])
+      manifest['current_version']['reloader'] = expressionFromDotNotation(manifest['current_version']['reloader'])
+
+      file = Eco.render template, imports: imports, reloader_from_bl: reloader_from_bl, bl_loader: bl_loader, os_loader: os_loader, bl_reloader: bl_reloader, os_init: os_init, manifest: manifest
+      fs.writeFile 'app/src/fup/firmwares_manifest.coffee', file, -> deferred.resolve()
+      return
+    deferred.promise
 
 gulp.task 'doc', (cb) ->
   {exec} = require 'child_process'
@@ -239,6 +345,9 @@ gulp.task 'debug', ['debug:clean'], ->
 gulp.task 'release', ['release:clean'], ->
   COMPILATION_MODE = RELEASE_MODE
   tasks.compile()
+
+gulp.task 'fup:manifest', ->
+  tasks.createFupManifest()
 
 gulp.task 'zip', ['release'], ->
   ensureDistDir()

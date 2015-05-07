@@ -1,40 +1,45 @@
-class @WalletSendProcessingDialogViewController extends @DialogViewController
+class @WalletSendProcessingDialogViewController extends ledger.common.DialogViewController
 
   view:
-    title: '#title'
-    spinnerContainer: '#spinner_container'
+    contentContainer: '#content_container'
+
+  initialize: ->
+    super
+    @_startSignature()
 
   onAfterRender: ->
     super
-    @view.spinner = ledger.spinners.createLargeSpinner(@view.spinnerContainer[0])
-    do @_startSignature
+    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
 
   _startSignature: ->
-    @view.title.text t 'wallet.send.processing.validating'
     # sign transaction
-    @params.transaction.validate @params.keycode, (transaction, error) =>
+    promise = if @params.keycode? then @params.transaction.validateWithKeycard(@params.keycode) else @params.transaction.validateWithPinCode(@params.pincode)
+    promise.onComplete (transaction, error) =>
       return if not @isShown()
       if error?
-        @once 'dismiss', =>
+        @dismiss =>
           reason = switch error.code
             when ledger.errors.SignatureError then 'wrong_keycode'
             when ledger.errors.UnknownError then 'unknown'
-          dialog = new WalletSendErrorDialogViewController reason: reason
+          Api.callback_cancel 'send_payment', t("common.errors." + reason)
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors." + reason))
           dialog.show()
-        @dismiss()
       else
         @_startSending()
 
   _startSending: ->
-    @view.title.text t 'wallet.send.processing.sending'
     # push transaction
     ledger.api.TransactionsRestClient.instance.postTransaction @params.transaction, (transaction, error) =>
       return if not @isShown()
-      @once 'dismiss', =>
-        if error?
-          dialog = new WalletSendErrorDialogViewController reason: 'network_no_response'
-          dialog.show()
+      @dismiss =>
+        dialog =
+        if error?.isDueToNoInternetConnectivity()
+          Api.callback_cancel 'send_payment', t("common.errors.network_no_response")
+          new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.network_no_response"))
+        else if error?
+          Api.callback_cancel 'send_payment', t("common.errors.wrong_transaction_signature")
+          new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.wrong_transaction_signature"))
         else
-          dialog = new WalletSendSuccessDialogViewController
-          dialog.show()
-      @dismiss()
+          Api.callback_success 'send_payment', transaction: transaction.serialize()
+          new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.send.errors.sending_succeeded"), subtitle: t("wallet.send.errors.transaction_completed"))
+        dialog.show()

@@ -1,0 +1,10 @@
+<section id="dialogs_message_dialog">
+  <div class="spacer"></div>
+  <div class="content-container">
+    <img src="../assets/images/common/large_<%= @params.kind %>.png" width="50" height="50" />
+    <div class="uppercase-section-title"><%= @params.title %></div>
+    <div class="regular-text-small"><%- @params.subtitle %></div>
+    <a href="#dismiss" class="cancel-rounded-button"><%= t "common.close" %></a>
+  </div>
+  <div class="spacer"></div>
+</section>

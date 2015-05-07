@@ -1,0 +1,10 @@
+<div class="large-table">
+  <div class="header top">
+    <div class="uppercase-section-column stretchable"><%= t 'wallet.settings.hardware.firmware' %></div>
+    <a class="uppercase-action" href="#flashFirmware"><i class="fa fa-flash"></i><%= t 'wallet.settings.hardware.flash_firmware' %></a>
+  </div>
+  <div class="row bottom">
+    <div class="regular-text-small stretchable" id="current_version_text"><%= t 'common.checking' %></div>
+    <div class="regular-grey-text-small" id="update_availability_text"></div>
+  </div>
+</div>

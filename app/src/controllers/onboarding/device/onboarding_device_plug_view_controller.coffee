@@ -10,13 +10,13 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
 
   onAfterRender: ->
     super
-    if @params.animateIntro
+    if @params.animateIntro is true
       do @_animateIntro
     else
       do @_listenEvents
 
   openSupport: ->
-    window.open t 'application.support_url'
+    window.open t 'application.support_key_not_recognized_url'
 
   _hideContent: (hidden, animated = yes) ->
     @view.contentContainer.children().each (index, node) =>
@@ -40,15 +40,15 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
     , 1500
 
   navigateContinue: ->
-    ledger.app.wallet.getState (state) =>
-      if state == ledger.wallet.States.LOCKED
-        ledger.app.router.go '/onboarding/device/pin'
-      else
-        ledger.app.router.go '/onboarding/management/welcome'
+    ledger.app.router.go '/onboarding/device/connecting'
 
   _listenEvents: ->
-    if ledger.app.wallet?
+    if ledger.app.dongle? and !ledger.app.dongle.isInBootloaderMode() or ledger.app.isConnectingDongle()
       do @navigateContinue
     else
-      ledger.app.once 'dongle:connected', =>
-        do @navigateContinue
+      ledger.app.once 'dongle:connecting', @_onDongleConnecting.bind(@)
+      ledger.app.once 'dongle:connected', @navigateContinue.bind(@)
+
+  _onDongleConnecting: ->
+    ledger.app.off('dongle:connected', @navigateContinue.bind(@))
+    @navigateContinue()

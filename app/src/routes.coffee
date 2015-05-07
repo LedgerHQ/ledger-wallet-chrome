@@ -1,16 +1,21 @@
 # routes that do not need a plugged ledger wallet
 ledger.router ?= {}
-ledger.router.ignorePluggedWalletForRouting = yes
+ledger.router.ignorePluggedWalletForRouting = @ledger.isDev
 ledger.router.pluggedWalletRoutesExceptions = [
   '/',
   '/onboarding/device/plug'
+  '/onboarding/device/connecting'
+  '/onboarding/device/forged'
 ]
 
 # routes declarations
 @declareRoutes = (route, app) ->
   ## Default
   route '/', ->
-    app.router.go '/onboarding/device/plug', {animateIntro: yes}
+    if app.isInWalletMode()
+      app.router.go '/onboarding/device/plug', {animateIntro: yes}
+    else
+      app.router.go '/update/index'
 
   ## Onboarding
   # Device
@@ -20,14 +25,26 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/device/unplug', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUnplugViewController
 
+  route '/onboarding/device/connecting', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceConnectingViewController
+
   route '/onboarding/device/pin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDevicePinViewController
 
   route '/onboarding/device/opening', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceOpeningViewController
 
+  route '/onboarding/device/update', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUpdateViewController
+
   route '/onboarding/device/error', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceErrorViewController
+
+  route '/onboarding/device/unsupported', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceUnsupportedViewController
+
+  route '/onboarding/device/failed', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceFailedViewController
 
   route '/onboarding/device/wrongpin', (params) ->
     app.router.go '/onboarding/device/error',
@@ -41,11 +58,11 @@ ledger.router.pluggedWalletRoutesExceptions = [
       message: t 'onboarding.device.errors.frozen.blank_next_time'
       indication: t 'onboarding.device.errors.frozen.unplug_plug'
 
-  route '/onboarding/device/unsupported', (params) ->
+  route '/onboarding/device/forged', (params) ->
     app.router.go '/onboarding/device/error',
-      error: t 'onboarding.device.errors.unsupported.device_unsupported'
-      message: t 'onboarding.device.errors.unsupported.unsuported_kind'
-      indication: t 'onboarding.device.errors.unsupported.get_help'
+      error: t 'onboarding.device.errors.forged.device_forged'
+      message: t 'onboarding.device.errors.forged.forbidden_access'
+      indication: t 'onboarding.device.errors.forged.get_help'
 
   # Management
   route '/onboarding/management/security', (params) ->
@@ -78,18 +95,18 @@ ledger.router.pluggedWalletRoutesExceptions = [
     app.navigate WALLET_LAYOUT, WalletAccountsShowViewController
 
   # Send
-  route '/wallet/send/index', (params) ->
-    dialog = new WalletSendIndexDialogViewController()
+  route '/wallet/send/index', (params = {}) ->
+    dialog = new WalletSendIndexDialogViewController({ amount: params["?params"]?.amount, address: params["?params"]?.address})
     dialog.show()
 
   # Receive
   route '/wallet/receive/index', (params) ->
-    dialog = new WalletReceiveIndexDialogViewController()
+    dialog = new WalletReceiveIndexDialogViewController(params)
     dialog.show()
 
-  # Pairing
-  route '/wallet/pairing/index', (params) ->
-    dialog = new WalletPairingIndexDialogViewController()
+  # Settings
+  route '/wallet/settings/index', (params) ->
+    dialog = new WalletSettingsIndexDialogViewController()
     dialog.show()
 
   # Help
@@ -99,3 +116,97 @@ ledger.router.pluggedWalletRoutesExceptions = [
   # Operations
   route '/wallet/accounts/{id}/operations', (params) ->
     app.navigate WALLET_LAYOUT, WalletOperationsIndexViewController
+
+  ## Firmware Update
+  route '/update/index', (params) ->
+    app.navigate UPDATE_LAYOUT, UpdateIndexViewController
+
+  route '/update/plug', (params) ->
+    app.navigate UPDATE_LAYOUT, UpdatePlugViewController
+
+  route '/update/unplug', (params) ->
+    app.navigate UPDATE_LAYOUT, UpdateUnplugViewController
+
+  route '/update/seed', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateSeedViewController
+
+  route '/update/erasing', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateErasingViewController
+
+  route '/update/updating', ->
+    app.navigate UPDATE_LAYOUT, UpdateUpdatingViewController
+
+  route '/update/loading', ->
+    app.navigate UPDATE_LAYOUT, UpdateLoadingViewController
+
+  route '/update/done', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateDoneViewController
+
+  route '/update/linux', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateLinuxViewController
+
+  route '/update/cardcheck', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateCardcheckViewController
+
+  route '/update/error', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateErrorViewController
+
+  # BitID
+  route '/wallet/bitid/index', (params = {}) ->
+    dialog = new WalletBitidIndexDialogViewController({ uri: params["?params"]?.uri, silent: params["?params"]?.silent })
+    dialog.show()
+
+  route '/wallet/bitid/form', (params) ->
+    dialog = new WalletBitidFormDialogViewController()
+    dialog.show()
+
+  # XPubKey
+  route '/wallet/xpubkey/index', (params = {}) ->
+    dialog = new WalletXpubkeyIndexDialogViewController({ path: params["?params"]?.path })
+    dialog.show()
+
+  # P2SH
+  route '/wallet/p2sh/index', (params = {}) ->
+    dialog = new WalletP2shIndexDialogViewController({ inputs: params["?params"]?.inputs, scripts: params["?params"]?.scripts, outputs_number: params["?params"]?.outputs_number, outputs_script: params["?params"]?.outputs_script, paths: params["?params"]?.paths })
+    dialog.show()
+
+  ## API
+  route '/wallet/api/accounts', (params = {}) ->
+    dialog = new WalletApiAccountsDialogViewController()
+    dialog.show()
+
+  route '/wallet/api/operations', (params = {}) ->
+    dialog = new WalletApiOperationsDialogViewController({ account_id: params["?params"]?.account_id })
+    dialog.show()
+
+  ## Coinkite
+  route '/apps/coinkite/dashboard/index', (params) ->
+    app.navigate COINKITE_LAYOUT, AppsCoinkiteDashboardIndexViewController
+
+  route '/apps/coinkite/settings/index', (params) ->
+    dialog = new AppsCoinkiteSettingsIndexDialogViewController()
+    dialog.show()
+
+  route '/apps/coinkite/keygen/index', (params) ->
+    dialog = new AppsCoinkiteKeygenIndexDialogViewController({ index: params["?params"]?.index })
+    dialog.show()
+
+  route '/apps/coinkite/keygen/processing', (params) ->
+    dialog = new AppsCoinkiteKeygenProcessingDialogViewController()
+    dialog.show()
+
+  route '/apps/coinkite/cosign/index', (params) ->
+    dialog = new AppsCoinkiteCosignIndexDialogViewController()
+    dialog.show()
+
+  route '/apps/coinkite/cosign/show', (params) ->
+    dialog = new AppsCoinkiteCosignShowDialogViewController({ json: params["?params"]?.json })
+    dialog.show()
+
+  route '/apps/coinkite/dashboard/compatibility', (params) ->
+    dialog = new AppsCoinkiteDashboardCompatibilityDialogViewController()
+    dialog.show()
+
+  route '/apps/coinkite/help/index', (params) ->
+    window.open t 'application.support_coinkite_url'
+

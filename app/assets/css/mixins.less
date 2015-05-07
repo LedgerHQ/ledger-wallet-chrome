@@ -6,3 +6,15 @@
 .selectable {
   -webkit-user-select: text;
 }
+
+.inverted {
+  direction: rtl;
+}
+
+@media print
+{
+  .no-print, .no-print *
+  {
+    display: none !important;
+  }
+}

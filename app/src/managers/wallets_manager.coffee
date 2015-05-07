@@ -5,21 +5,36 @@ class @WalletsManager extends EventEmitter
 
   constructor: (app) ->
     @cardFactory = new ChromeapiPlugupCardTerminalFactory()
+    @factoryDongleBootloader = new ChromeapiPlugupCardTerminalFactory(0x1808);
+    @factoryDongleBootloaderHID = new ChromeapiPlugupCardTerminalFactory(0x1807);
     app.devicesManager.on 'plug', (e, card) => @connectCard(card)
     app.devicesManager.on 'unplug', (e, card) => @disconnectCard(card)
 
   connectCard: (card) ->
     try
+      card.isInBootloaderMode = if card.productId is 0x1808 or card.productId is 0x1807 then yes else no
       @emit 'connecting', card
-      @cardFactory.list_async().then (result) =>
-        setTimeout =>
+      result = []
+      @cardFactory.list_async()
+      .then (cards) =>
+        result = result.concat(cards)
+        @factoryDongleBootloader.list_async()
+      .then (cards) =>
+        result = result.concat(cards)
+        @factoryDongleBootloaderHID.list_async()
+      .then (cards) =>
+        result = result.concat(cards)
+        _.defer =>
           if result.length > 0
             @cardFactory.getCardTerminal(result[0]).getCard_async().then (lwCard) =>
-              setTimeout () =>
-                @_wallets[card.id] = new ledger.wallet.HardwareWallet(this, card.id, lwCard)
-                @_wallets[card.id].once 'connected', (event, wallet) => @emit 'connected', wallet
+              _.defer =>
+                @_wallets[card.id] = new ledger.wallet.HardwareWallet(this, card, lwCard)
+                @_wallets[card.id].once 'connected', (event, wallet) =>
+                  @emit 'connected', wallet
+                  if _(ledger.app.devicesManager.devices()).where(id: wallet.id).length is 0
+                    _.defer => wallet.disconnect()
+                @_wallets[card.id].once 'forged', (event, wallet) => @emit 'forged', wallet
                 @_wallets[card.id].connect()
-        , 0
     catch er
       e er
 
@@ -39,5 +54,5 @@ class @WalletsManager extends EventEmitter
     @_wallets[card.id]?.disconnect()
     @emit 'disconnect', card
 
-  getAllWallets: -> _.values(@_wallets)
+  getConnectedWallets: -> _(_.values(@_wallets)).filter (w) -> w._state isnt ledger.wallet.States.DISCONNECTED
 

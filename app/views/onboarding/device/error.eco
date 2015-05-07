@@ -1,6 +1,6 @@
 <div id="content-container">
   <div class="logo-container">
-    <img src="../assets/images/onboarding/large_logo.png" width="244" height="181">
+    <img src="../../assets/images/onboarding/large_logo.png" width="256" height="156">
   </div>
   <div class="greyed-container">
     <img src="../../assets/images/common/large_<%= if @params.serious? and @params.serious == yes then 'error' else 'fail' %>.png" width="50" height="50" />
@@ -9,7 +9,7 @@
     <div class="black-indication"><%= @params.message %></div>
     <% end %>
     <% if @params.indication?: %>
-    <div class="small-indication"><%= @params.indication %></div>
+    <div class="medium-indication"><%= @params.indication %></div>
     <% end %>
   </div>
 </div>

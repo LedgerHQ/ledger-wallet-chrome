@@ -1,6 +1,6 @@
 @ledger.m2fa ?= {}
 
-DebugWebsocket = (message) -> l message
+DebugWebsocket = (message) -> ledger.utils.Logger.getLoggerByTag("WebSocket").info message
 
 
 # The mobile 2FA ChromeClient.
@@ -23,7 +23,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
     return @_connectionPromise && @_connectionPromise.isFullfilled()
 
   # Sets the name of the dongle asynchronously. Default is ""
-  pairedDongleName: new CompletionClosure().success("")
+  pairedDongleName: ledger.defer("")
 
   # Transmit 4 bytes challenge. 
   # @params [String] challenge is encoded in hex "8 nonce bytes"+"4 challenge bytes"
@@ -46,6 +46,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
 
   # Redefine from Task
   onStop: () ->
+    ledger.m2fa.clients = _.omit(ledger.m2fa.clients, @pairingId)
     @_leaveRoom()
 
   _joinRoom: (pairingId) ->
@@ -67,6 +68,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
     @_connectionPromise
 
   _leaveRoom: () ->
+    return unless @ws?
     [ws, @ws, @_connectionPromise] = [@ws, undefined, undefined]
     ws.onclose = undefined
     ws.send JSON.stringify(type: 'leave') if ws.readyState == WebSocket.OPEN
@@ -121,7 +123,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
   # If the 'request' message is accepted, the message must contain the "pin" parameter in order to validate the transaction.
   # @params [Object] data {"type": "response", "pin": "xxxxxxxxxxxx..."}
   _onResponse: (data) ->
-    if data['is_accepted']
+    if data.is_accepted
       @emit 'm2fa.response', data.pin
     else
       @emit 'm2fa.reject'
@@ -129,6 +131,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
   # Sent by mobile clients to transmit their generated public key.
   # @params [Object] data {"type": "identity", "public_key": "xxxxxxxxxxxx..."}
   _onIdentify: (data) ->
+    @lastIdentifyData = data
     @emit 'm2fa.identify', data.public_key
 
   # Sent by mobile apps to transmit their previously received challenge response.

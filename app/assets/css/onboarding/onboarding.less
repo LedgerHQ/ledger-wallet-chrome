@@ -1,8 +1,6 @@
 @import (reference) "../constants";
 
 .main-container {
-  display: flex;
-  flex-direction: column;
   justify-content: center;
 }
 #content-container {
@@ -15,6 +13,8 @@
   > .greyed-container {
     background-color: @color-extra-light-grey;
     padding: @metrics-large-padding 0;
+    border-top: 1px solid @color-very-light-grey;
+    border-bottom: 1px solid @color-very-light-grey;
 
     .black-indication {
       font-size: @font-size-very-large;
@@ -26,6 +26,7 @@
       font-size: @font-size-medium;
       font-weight: @font-weight-light;
       letter-spacing: -0.2px;
+      color: @color-dark-grey;
     }
     a.medium-indication {
       color: @color-dark-grey;
@@ -51,10 +52,6 @@
         .black-title;
         font-weight: @font-weight-semibold;
       }
-    }
-
-    .small-indication {
-      letter-spacing: -0.3px;
     }
 
     &.detailed {
@@ -88,17 +85,15 @@
     }
   }
   a.greyed-container.detailed:hover {
-    background-color: darken(@color-extra-light-grey, 2%);
+    background-color: darken(@color-extra-light-grey, 1%);
   }
 
   @import "device";
   @import "management";
 }
 
-
-
 @media print {
-  #content-container { 
+  #content-container {
     height: 900px;
     .navigation-container, .action-bar {
       display: none;

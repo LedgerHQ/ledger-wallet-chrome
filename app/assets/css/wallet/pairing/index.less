@@ -1,7 +1,7 @@
 @import (reference) "../../common";
 
 section#pairing_index_dialog {
-  width: 365px;
+  width: @dialog-width-pairing;
 
   > .step-container {
     display: flex;
@@ -10,6 +10,7 @@ section#pairing_index_dialog {
 
     > .step-number {
       .light-grey-text-huge;
+      flex-shrink: 0;
     }
 
     > .step-content {

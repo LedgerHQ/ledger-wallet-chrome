@@ -1,0 +1,6 @@
+<div id="view_controller_content">
+  <div class="page-large-indication"><%- t 'update.linux.follow_instructions' %></div>
+  <div class="page-indication"><%= t 'update.linux.first' %></div>
+  <div class="shell-command"><%= t 'update.linux.fc' %></div>
+  <div class="page-indication"><%= t 'update.linux.second' %></div>
+</div>

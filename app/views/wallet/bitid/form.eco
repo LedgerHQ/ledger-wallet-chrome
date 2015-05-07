@@ -1,0 +1,22 @@
+<section id="wallet_bitid_form_dialog">
+  <header>
+    <h1><%= t 'wallet.bitid.form.title' %></h1>
+  </header>
+  <table class="no-table-head">
+    <tbody>
+      <tr>
+        <td class="row-title"><%= t 'wallet.bitid.form.uri' %></td>
+      </tr>
+      <tr>
+        <td>
+          <input id="bitid_uri" class="text-input" placeholder="<%= t 'wallet.bitid.form.uri_placeholder' %>" value=""/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.close' %></a>
+  <a class="action-rounded-button" href="#next"><%= t 'common.next' %></a>
+</div>

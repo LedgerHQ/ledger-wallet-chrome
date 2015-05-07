@@ -1,0 +1,5 @@
+<div id="view_controller_content">
+  <div class="page-large-indication"><%- t 'update.index.update_process' %></div>
+  <div class="page-indication"><%- t 'update.index.clicking_continue' %></div>
+  <div class="regular-grey-text-small"><%= t 'update.index.please_note' %></div>
+</div>

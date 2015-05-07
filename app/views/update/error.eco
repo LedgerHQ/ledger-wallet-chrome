@@ -1,0 +1,6 @@
+<div id="view_controller_content">
+  <img src="../assets/images/common/large_error.png" width="50" height="50" />
+  <div class="page-large-indication"><%- _.str.sprintf(t('update.error.error_updated'), @params.errorCode) %></div>
+  <div class="page-indication"><%- t 'update.error.plug_back' %></div>
+  <div class="regular-grey-text-small"><%- t 'update.error.problem_persists' %></div>
+</div>

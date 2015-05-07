@@ -2,18 +2,7 @@
 
 PREDEFINED_CHANGE_ADDRESSES = []
 PREDEFINED_PUBLIC_ADDRESSES = [
-  "1P78Rgr9j2zjXzgSLGrBtrcCMtMXT9Xcph"
-  "1N78dYebs1F3mE9HnqEtZJtSiGMcrnwWGa"
-  "1LLmKpkcipSY3jbRmbK1E8QPduPEoU7XBE"
-  "1CN48KfRbGx2NqY7aEMxxXLNkqGr3Z9pUy"
-  "13UYbtyCqStgAJ4zNYyuKdZF8NV3zweLzp"
-  "1Np3B317y2vEaU3VweQfCbvBxEoEonPsv1"
-  "1MCN7i7GCoLjJNzX7oqCcd2SYhkhwNr6qk"
-  "14NDJh45EBVAihEBTuQwpLht3ouyFA6krw"
-  "14PKwmc61g26Rsnw1MPi77FYXKTZiJiUDf"
-  "15D9MY3bqmTHiiLLQVUWsGYjsu2XxBLsJx"
-  "1EDLmH7BBE2apBCvUVp7J9dzZ4RYVHCY4Y"
-  "1MrpXW4dUz4FgFhNwkeqHqsWJDn12mPZPe"
+  "1KAkAp8Jxan81z72WzDpS27Az1FXB3tmak"
 ]
 
 pathsToPredefinedAddresses = (paths, callback) ->
@@ -37,13 +26,14 @@ _.extend ledger.wallet,
     # Uncomment for debugging with predefined addresses
     # return pathsToPredefinedAddresses(paths, callback)
 
-    @safe()
+    # throw error unless dongle is plugged and unlocked
+    ledger.dongle.unlocked()
 
     addresses = {}
     notFound = []
     _.async.each paths, (path, done, hasNext) ->
       # Hit the cache first
-      address = ledger.wallet.HDWallet.instance?.cache?.get(path)
+      address = ledger.wallet.Wallet.instance?.cache?.get(path)
       if address?
         addresses[path] = address
         callback?(addresses, notFound) unless hasNext is true
@@ -59,12 +49,3 @@ _.extend ledger.wallet,
         do done
 
     return
-
-  # @return Return true if wallet is plugged and unblocked.
-  isPluggedAndUnlocked: () ->
-    ledger.app.wallet? && ledger.app.wallet._state == ledger.wallet.States.UNLOCKED
-
-  # @return Return current unblocked wallet or throw error if wallet is not plugged or not unblocked.
-  safe: () ->
-    throw 'the wallet is not connected and unlocked' unless @isPluggedAndUnlocked()
-    return ledger.app.wallet

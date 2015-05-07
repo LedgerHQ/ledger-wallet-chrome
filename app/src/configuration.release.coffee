@@ -5,12 +5,25 @@
 @ledger.config ?= {}
 _.extend @ledger.config,
   m2fa:
-    baseUrl: 'wss://ws01.ledgerwallet.com/2fa/channels'
+    baseUrl: 'wss://ws.ledgerwallet.com/2fa/channels'
   restClient:
-    baseUrl: 'https://api02.ledgerwallet.com/'
+    baseUrl: 'https://api.ledgerwallet.com/'
   syncRestClient:
-    pullIntervalDelay: 10000
+    pullIntervalDelay: 60000
     pullThrottleDelay: 1000
     pushDebounceDelay: 1000
+  defaultLoggingLevel: "NONE"
+  btcshipDebug: false
+
+# Btcship logging
+@DEBUG = ledger.config.btcshipDebug
 
 @configureApplication = (app) ->
+  _.extend @ledger.config,
+    defaultLoggingLevel:
+      Connected:
+        Enabled: ledger.utils.Logger.Levels.ALL
+        Disabled: ledger.utils.Logger.Levels.NONE
+      Disconnected:
+        Enabled: ledger.utils.Logger.Levels.ALL
+        Disabled: ledger.utils.Logger.Levels.ALL

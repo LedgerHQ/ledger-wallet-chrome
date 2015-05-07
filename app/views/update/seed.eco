@@ -1,0 +1,14 @@
+<div id="view_controller_content">
+  <div class="page-large-indication"><%- t 'update.seed.enter_characters' %></div>
+  <div class="page-indication"><%- t 'update.seed.on_the_left' %></div>
+  <div class="seed_container">
+    <div class="spacer left">
+      <a id="open_scanner_button" class="cancel-rounded-button"><i class="fa fa-camera"></i></a>
+    </div>
+    <div class="seed"></div>
+    <input id="seed_input" spellcheck="false" maxlength="32"></input>
+    <div class="spacer right">
+      <img id="valid_check" src="../assets/images/common/large_check.png" width="30" height="30" />
+    </div>
+  </div>
+</div>

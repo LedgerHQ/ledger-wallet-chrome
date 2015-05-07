@@ -1,0 +1,4 @@
+<div id="view_controller_content">
+  <div class="page-large-indication"><%- t 'update.erasing.ready_to_start_process' %></div>
+  <div class="page-indication"><%- t 'update.erasing.factory_settings' %></div>
+</div>

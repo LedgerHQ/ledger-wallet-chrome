@@ -1,0 +1,5 @@
+<div id="view_controller_content">
+  <img src="../assets/images/common/unplug_wallet.png" width="187" height="44" />
+  <div class="page-large-indication"><%- t 'update.unplug.remove_your_wallet' %></div>
+  <div class="page-indication"><%- t 'update.common.need_to_repeat_several_times' %></div>
+</div>

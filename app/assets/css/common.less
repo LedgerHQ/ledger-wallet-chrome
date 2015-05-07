@@ -3,9 +3,12 @@
 
 // containers classes
 .main-container {
+  display: flex;
+  flex-direction: column;
   background-color: @color-background-color;
   .fullsize;
 }
+
 .error-container {
   .bold-invalid-text;
   padding: @metrics-large-padding 0;
@@ -13,39 +16,121 @@
   text-align: center;
 }
 
-// buttons
-.rounded-button(@color) {
-  font-size: @font-size-large;
-  text-transform: uppercase;
-  border-radius: @border-radius-default-value;
-  padding: 9px 14px;
-  color: @color-white;
-  background-color: @color;
-  display: inline-block;
-  letter-spacing: -0.5px;
+// sections
+section {
+  width: 100%;
+  display: table;
+  margin-top: @metrics-large-padding - 5px;
 
-  a& {
-    text-decoration: none;
+  &:first-child {
+    margin-top: 0px;
+  }
 
-    &:hover {
-      background-color: darken(@color, @color-default-darken-value);
-      cursor: pointer;
+  > header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0px;
+
+    > h1 {
+      .uppercase-section-title;
+      margin-right: @metrics-very-small-padding;
+    }
+
+    a.uppercase-action {
+      margin-left: auto;
     }
   }
 
-  &.disabled {
-    opacity: 0.5;
-    pointer-events: none;
+  table {
+    width: 100%;
+    vertical-align: middle;
+
+    thead tr td {
+      .uppercase-section-column;
+      border-bottom: 1px solid transparent;
+      padding-top: @metrics-almost-medium-padding;
+      padding-bottom: 6px;
+    }
+
+    tbody tr td {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      vertical-align: middle;
+      padding-right: @metrics-large-padding;
+      border-bottom: 1px solid @color-very-light-grey;
+      font-size: @font-size-medium;
+
+      &.row-title {
+        .uppercase-section-column;
+        &.top-aligned {
+          vertical-align: top;
+        }
+        &.optional {
+          color: @color-dark-grey;
+        }
+      }
+
+      .light-indicator {
+        border: 1px solid @color-soft-grey;
+        margin-left: 3px;
+        border-radius: @border-radius-default-value;
+        .regular-grey-text-small;
+        padding: 0 3px;
+      }
+    }
+
+    tbody tr[data-href] {
+      &:hover {
+        background-color: #f4f4f4;
+      }
+    }
+
+    tr.no-border td {
+      border-bottom: 0px solid transparent;
+    }
+
+    tr td.fit-content {
+      width: 1%;
+      white-space: nowrap;
+    }
+
+    tr td:last-child {
+      padding-right: 0px;
+    }
+
+    &.no-table-head tr:first-child td {
+      padding-top: @metrics-almost-medium-padding + 1px;
+    }
+
+    .align-right {
+      text-align: right;
+      padding-right: 0px;
+    }
+
+    .padding-right-very-small {
+      padding-right: @metrics-very-small-padding;
+    }
+
+    .padding-right-small {
+      padding-right: @metrics-small-padding;
+    }
+
+    .padding-right-medium {
+      padding-right: @metrics-medium-padding;
+    }
+
+    .padding-right-very-large {
+      padding-right: @metrics-very-large-padding;
+    }
+
+    .padding-right-extra-large {
+      padding-right: @metrics-extra-large-padding;
+    }
+
+    .padding-right-ultra-large {
+      padding-right: @metrics-ultra-large-padding;
+    }
   }
-}
-.action-rounded-button {
-  .rounded-button(@color-action-green);
-}
-.cancel-rounded-button {
-  .rounded-button(@color-light-grey);
-}
-.important-rounded-button {
-  .rounded-button(@color-invalid-red);
 }
 
 // texts
@@ -69,12 +154,25 @@
   font-weight: @font-weight-semibold;
   color: @color-night-blue;
   text-transform: uppercase;
+  text-decoration: none;
+}
+a {
+  .uppercase-section-title {
+    .uppercase-section-title;
+  }
 }
 .uppercase-section-column {
   font-weight: @font-weight-semibold;
   font-size: @font-size-very-small;
   letter-spacing: -0.2px;
+  color: @color-black;
   text-transform: uppercase;
+  text-decoration: none;
+}
+a {
+  .uppercase-section-column {
+    .uppercase-section-column;
+  }
 }
 
 .text(@color, @size: @font-size-medium, @weight: @font-weight-regular) {
@@ -83,7 +181,12 @@
   font-weight: @weight;
 
   b {
-    font-weight: @font-weight-semibold;
+    & when (@weight = @font-weight-regular) {
+      font-weight: @font-weight-semibold;
+    }
+    & when (@weight = @font-weight-light) {
+      font-weight: @font-weight-regular;
+    }
   }
 
   a {
@@ -111,6 +214,12 @@
 .regular-grey-text-small {
   .text(@color-dark-grey, @font-size-very-small);
 }
+.regular-soft-grey-text {
+  .text(@color-soft-grey);
+}
+.regular-soft-grey-text-small {
+  .text(@color-soft-grey, @font-size-very-small);
+}
 .regular-valid-text {
   .text(@color-valid-green);
 }
@@ -125,12 +234,48 @@
   .text(@color-dark-grey, @font-size-giga-giga-large, @font-weight-light);
   letter-spacing: -2px;
 }
+.page-title {
+  font-weight: @font-weight-light;
+  font-size: @font-size-ultra-ultra-ultra-large;
+  color: @color-dark-grey-blue;
+  letter-spacing: -2px;
+}
+.page-subtitle {
+  font-weight: @font-weight-light;
+  font-size: @font-size-extra-extra-large;
+  color: @color-soft-grey;
+  letter-spacing: -1px;
+  margin-top: 15px;
+}
+.page-indication {
+  .text(@color-black, @font-size-large, @font-weight-light);
+  line-height: 26px;
+}
+.page-large-indication {
+  .text(@color-black, @font-size-very-large, @font-weight-regular);
+  line-height: 30px;
+  letter-spacing: -0.5px;
+}
 
 // icons
 .uppercase-action {
   > i.fa {
     margin-right: 6px;
   }
+}
+.icon(@color, @size) {
+  color: @color;
+  font-size: @size;
+
+  a&:hover {
+    color: darken(@color, @color-very-strong-darken-value);
+  }
+}
+.light-grey-icon-large {
+  .icon(@color-light-grey, @font-size-very-very-large);
+}
+.light-grey-icon-medium {
+  .icon(@color-light-grey, @font-size-large);
 }
 
 // inputs
@@ -143,12 +288,11 @@
 
   &::-webkit-input-placeholder {
     font-weight: @font-weight-light;
-    color: @color-light-grey;
-    text-transform: capitalize;
+    color: @color-soft-grey;
   }
 
   &.optional {
-    color: @color-soft-grey;
+    color: @color-dark-grey;
   }
 }
 .large-text-input {
@@ -156,6 +300,14 @@
   font-size: @font-size-extra-large;
   font-weight: @font-weight-light;
   letter-spacing: -0.8px;
+}
+.textarea-input {
+  border: 0;
+  background-color: transparent;
+  outline: none;
+  text-align: left;
+  font-size: @font-size-medium;
+  resize: none;
 }
 
 // common
@@ -176,8 +328,12 @@
     margin-right: 0px;
   }
 
-  .cancel-rounded-button {
+  > .left-spacer {
     margin-left: auto;
+  }
+
+  > .right-spacer {
+    margin-right: auto;
   }
 }
 
@@ -204,4 +360,11 @@
 .tooltipster-light .tooltipster-content {
   font-size: @font-size-medium;
   line-height: @font-size-medium + 2px;
+}
+
+.spacer20 {
+  padding-top: 20px;
+}
+.spacer50 {
+  padding-top: 50px;
 }

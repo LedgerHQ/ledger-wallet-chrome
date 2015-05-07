@@ -1,0 +1,14 @@
+<div id="content-container">
+  <div class="logo-container">
+    <img src="../../assets/images/onboarding/large_logo.png" width="256" height="156">
+  </div>
+  <div class="greyed-container">
+    <img src="../../assets/images/common/large_settings.png" width="50" height="50" />
+    <div class="black-indication"><%= _.str.sprintf(t('onboarding.device.update.new_firmware_available'), ledger.fup.utils.versionToString(ledger.fup.versions.Nano.CurrentVersion.Os)) %></div>
+    <div class="medium-indication"><%= t ledger.fup.versions.Nano.CurrentVersion.WhatsNew %></div>
+    <div class="actions-container">
+      <a class="cancel-rounded-button" href="#notNow"><%= t 'common.later' %></a>
+      <a class="action-rounded-button" href="#updateNow"><%= t 'common.update' %></a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+@import (reference) "../common";
+
+#view_controller_content {
+  > .progress-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    > #bar_container {
+      margin: @metrics-almost-medium-padding 0;
+
+      > .progressbar {
+        width: 420px;
+      }
+    }
+
+    > .percent {
+      text-align: right;
+      width: 30px;
+      margin-left: @metrics-small-padding;
+      flex-shrink: 1;
+    }
+  }
+}

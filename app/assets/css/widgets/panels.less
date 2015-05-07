@@ -1,0 +1,19 @@
+@import (reference) "../constants";
+
+.panel {
+  padding: @metrics-small-padding;
+  border-radius: @border-radius-default-value;
+  background-color: @color-extra-light-grey;
+  border: 1px solid @color-very-light-grey;
+  display: block;
+
+  a& {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  a&:hover {
+    background-color: darken(@color-extra-light-grey, 1%);
+    color: inherit;
+  }
+}

@@ -1,0 +1,68 @@
+@import (reference) "constants";
+
+.large-table {
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    ._item(@color-extra-light-grey);
+  }
+  a.header {
+    text-decoration: none;
+  }
+  a.header:hover {
+    background-color: darken(@color-extra-light-grey, 1%);
+  }
+
+  .row {
+    ._item(@color-white);
+  }
+  a.row {
+    text-decoration: none;
+  }
+  a.row:hover {
+    background-color: darken(@color-white, 1%);
+  }
+
+  ._item(@color) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 @metrics-small-padding;
+    height: 48px;
+    background-color: @color;
+    border: 1px solid @color-very-light-grey;
+    border-radius: @border-radius-default-value;
+
+    > .stretchable {
+      flex-grow: 1;
+      flex-shrink: 0;
+    }
+
+    &.freeform {
+      padding: 18px @metrics-small-padding;
+      height: auto;
+    }
+
+    &.top {
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
+    &.middle {
+      border-top: 0;
+      border-radius: 0;
+    }
+
+    &.bottom {
+      border-top: 0;
+      border-top-right-radius: 0;
+      border-top-left-radius: 0;
+    }
+
+    &.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+}
