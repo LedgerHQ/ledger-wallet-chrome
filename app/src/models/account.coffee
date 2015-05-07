@@ -1,4 +1,4 @@
-class @Account extends Model
+class @Account extends ledger.database.Model
   do @init
   @has many: 'operations', sortBy: ['time', 'desc'], onDelete: 'destroy'
   @index 'index'

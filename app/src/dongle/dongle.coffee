@@ -236,7 +236,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     _btchipQueue.enqueue "getRemainingPinAttempt", =>
       d = ledger.defer(callback)
       @_sendApdu(new ByteString("E0228000010000", HEX), [0x9000])
-      .catch (statusCode) ->
+      .catch (statusCode) =>
         if m = statusCode.match(/63c(\d)/)
           d.resolve(parseInt(m[1]))
         else

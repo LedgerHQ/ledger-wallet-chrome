@@ -1,6 +1,6 @@
 
-ledger.db ?= {}
-ledger.db.contexts ?= {}
+ledger.database = {} unless ledger.database?
+ledger.database.contexts = {} unless ledger.database.contexts?
 
 collectionNameForRelationship = (object, relationship) ->
   switch relationship.type
@@ -66,7 +66,7 @@ class Collection
   _modelize: (data) ->
     return null unless data?
     modelizeSingleItem = (item) =>
-      Class = Model.AllModelClasses()[item.objType]
+      Class = ledger.database.Model.AllModelClasses()[item.objType]
       new Class(@_context, item)
     if _.isArray(data)
       (modelizeSingleItem(item) for item in data when item?)
@@ -77,7 +77,7 @@ class Collection
     model._object = @_collection.get model.getId()
     model
 
-class ledger.db.contexts.Context extends EventEmitter
+class ledger.database.contexts.Context extends EventEmitter
 
   constructor: (db) ->
     @_db = db
@@ -88,13 +88,13 @@ class ledger.db.contexts.Context extends EventEmitter
     @initialize()
 
   initialize: () ->
-    modelClasses = Model.AllModelClasses()
+    modelClasses = ledger.database.Model.AllModelClasses()
     for className, modelClass of modelClasses
       collection = @getCollection(className)
       collection.getCollection().DynamicViews = []
       collection.getCollection().ensureIndex(index) for index in modelClass._indexes if modelClass.__indexes?
     try
-      new MigrationHandler(@).applyMigrations()
+      new ledger.database.MigrationHandler(@).applyMigrations()
     catch er
       e er
 
@@ -109,22 +109,22 @@ class ledger.db.contexts.Context extends EventEmitter
   notifyDatabaseChange: () ->
     @_db.scheduleFlush()
 
-  close: () ->
+  close: ->
 
   _listenCollectionEvent: (collection) ->
     collection.getCollection().on 'insert', (data) =>
-      @emit "insert:#{data['objType'].toLowerCase()}", @_modelize(data)
+      @emit "insert:" + data['objType'].toLowerCase(), @_modelize(data)
     collection.getCollection().on 'update', (data) =>
-      @emit "update:#{data['objType'].toLowerCase()}", @_modelize(data)
+      @emit "update:" + data['objType'].toLowerCase(), @_modelize(data)
     collection.getCollection().on 'delete', (data) =>
-      @emit "delete:#{data['objType'].toLowerCase()}", @_modelize(data)
+      @emit "delete:" + data['objType'].toLowerCase(), @_modelize(data)
 
   _modelize: (data) -> @getCollection(data['objType'])?._modelize(data)
 
-_.extend ledger.db.contexts,
+_.extend ledger.database.contexts,
 
   open: () ->
-    ledger.db.contexts.main = new ledger.db.contexts.Context(ledger.db.main)
+    ledger.database.contexts.main = new ledger.database.contexts.Context(ledger.database.main)
 
   close: () ->
-    ledger.db.contexts.main?.close()
+    ledger.database.contexts.main?.close()

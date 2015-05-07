@@ -167,11 +167,11 @@
         'wallet/extended_public_key'
         'wallet/sweep_private_key'
 
-        'utils/database/database'
+        'database/database'
         'base/base_application'
-        'base/model_context'
-        'base/model'
-        'base/migrations'
+        'database/model_context'
+        'database/model'
+        'database/migrations'
         'base/view_controller'
         'base/navigation_controller'
 

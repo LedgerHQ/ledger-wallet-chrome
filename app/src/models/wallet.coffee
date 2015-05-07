@@ -1,4 +1,4 @@
-class @Wallet extends Model
+class @Wallet extends ledger.database.Model
   do @init
 
   #@hasMany accounts: 'Account'

@@ -52,8 +52,8 @@ completeLayoutInitialization = (dongle, raise, done) ->
   done?()
 
 openDatabase = (dongle, raise, done) ->
-  ledger.db.init =>
-    ledger.db.contexts.open()
+  ledger.database.init =>
+    ledger.database.contexts.open()
     done()
 
 initializeWalletModel = (dongle, raise, done) -> Wallet.initializeWallet done

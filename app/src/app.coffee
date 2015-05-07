@@ -131,8 +131,8 @@ require @ledger.imports, ->
       ledger.wallet.release(@dongle)
       ledger.tasks.Task.stopAllRunningTasks()
       ledger.tasks.Task.resetAllSingletonTasks()
-      ledger.db.contexts.close()
-      ledger.db.close()
+      ledger.database.contexts.close()
+      ledger.database.close()
       if removeDongle
         @dongle = null
       else
@@ -204,7 +204,7 @@ require @ledger.imports, ->
   @UPDATE_LAYOUT = 'UpdateNavigationController'
   @COINKITE_LAYOUT = 'AppsCoinkiteNavigationController'
 
-  Model.commitRelationship()
+  ledger.database.Model.commitRelationship()
 
   @ledger.application = new Application()
   @ledger.app = @ledger.application

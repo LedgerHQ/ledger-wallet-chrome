@@ -1,5 +1,5 @@
 
-ledger.db ?= {}
+ledger.database ?= {}
 
 class Database extends EventEmitter
 
@@ -48,10 +48,10 @@ class Database extends EventEmitter
     @flush()
     @_db = null
 
-_.extend ledger.db,
+_.extend ledger.database,
 
   init: (callback) ->
-    ledger.db.main = ledger.db.open 'main', ->
+    ledger.database.main = ledger.database.open 'main', ->
       callback?()
 
   open: (databaseName, callback) ->
@@ -60,7 +60,7 @@ _.extend ledger.db,
     db
 
   close: () ->
-    ledger.db.main?.close()
-    ledger.db.main = null
+    ledger.database.main?.close()
+    ledger.database.main = null
 
 

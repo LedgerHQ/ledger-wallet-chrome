@@ -1,5 +1,5 @@
 
-class @Operation extends Model
+class @Operation extends ledger.database.Model
   do @init
 
   @index 'uid'
