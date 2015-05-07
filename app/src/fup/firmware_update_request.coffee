@@ -422,7 +422,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_doProcessLoadingScript(adpus, state, ignoreSW, offset).then(-> d.resolve()).fail((ex) -> d.reject(ex))
     d.promise
 
-  _doProcessLoadingScript: (adpus, state, ignoreSW, offset) ->
+  _doProcessLoadingScript: (adpus, state, ignoreSW, offset, forceTimeout = no) ->
     @_notifyProgress(state, offset, adpus.length)
     if offset >= adpus.length
       @_exchangeNeedsExtraTimeout = no
@@ -431,7 +431,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
      @_getCard().exchange_async(new ByteString(adpus[offset], HEX))
       .then =>
         if ignoreSW or @_getCard().SW == 0x9000
-          if @_exchangeNeedsExtraTimeout
+          if @_exchangeNeedsExtraTimeout or forceTimeout
             deferred = Q.defer()
             _.delay (=> deferred.resolve(@_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1))), ExchangeTimeout
             deferred.promise
@@ -439,11 +439,17 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
             @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
         else
           @_exchangeNeedsExtraTimeout = no
-          throw new Error('Unexpected status ' + @_getCard().SW)
+          if forceTimeout is no
+            @_doProcessLoadingScript(adpus, state, ignoreSW, offset, yes)
+          else
+            throw new Error('Unexpected status ' + @_getCard().SW)
       .fail (ex) =>
         return @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1) if offset is adpus.length - 1
         @_exchangeNeedsExtraTimeout = no
-        throw new Error("ADPU sending failed " + ex)
+        if forceTimeout is no
+          @_doProcessLoadingScript(adpus, state, ignoreSW, offset, yes)
+        else
+          throw new Error("ADPU sending failed " + ex)
     catch ex
       e ex
 
