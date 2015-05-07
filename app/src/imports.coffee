@@ -139,14 +139,14 @@
         'utils/apps/coinkite'
 
         ## Rest clients
-        'restclients/authentication'
-        'restclients/restclient'
-        'restclients/unspent_outputs_restclient'
-        'restclients/transactions_restclient'
-        'restclients/balance_restclient'
-        'restclients/sync_rest_client'
-        'restclients/m2fa_restclient'
-        'restclients/currencies_restclient'
+        'api/authentication'
+        'api/restclient'
+        'api/unspent_outputs_restclient'
+        'api/transactions_restclient'
+        'api/balance_restclient'
+        'api/sync_rest_client'
+        'api/m2fa_restclient'
+        'api/currencies_restclient'
 
         ## Tasks
         'tasks/task'
@@ -386,7 +386,7 @@
           '../spec/utils/storage/store_spec'
           '../spec/utils/storage/chrome_store_spec'
           '../spec/utils/storage/secure_store_spec'
-          '../spec/restclients/synced_rest_client_spec'
+          '../spec/api/synced_rest_client_spec'
           '../spec/utils/storage/synced_store_spec'
           '../spec/utils/bitcoin/bip39_spec'
 
