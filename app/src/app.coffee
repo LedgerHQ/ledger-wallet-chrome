@@ -68,9 +68,7 @@ require @ledger.imports, ->
       else if error.code is ledger.errors.CommunicationError
         @emit 'dongle:communication_error', @dongle
 
-    onDongleIsInBootloaderMode: (dongle) ->
-      @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
-      ledger.app.router.go '/'
+    onDongleIsInBootloaderMode: (dongle) -> ledger.app.router.go '/' if @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
 
     onDongleNeedsUnplug: (dongle) ->
       @emit 'dongle:unplugged', @dongle if @isInWalletMode()
@@ -100,9 +98,7 @@ require @ledger.imports, ->
       return unless @isInWalletMode()
       @_releaseWallet()
 
-    onCommandFirmwareUpdate: ->
-      @router.go '/' if @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
-
+    onCommandFirmwareUpdate: -> @router.go '/' if @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
 
     onCommandExportLogs: ->
       ledger.utils.Logger.downloadLogsWithLink()
