@@ -1,4 +1,4 @@
-class @WalletXpubkeyProcessingDialogViewController extends @DialogViewController
+class @WalletXpubkeyProcessingDialogViewController extends ledger.common.DialogViewController
 
   view:
     contentContainer: '#content_container'

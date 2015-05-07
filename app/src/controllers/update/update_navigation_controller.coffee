@@ -1,4 +1,4 @@
-class @UpdateNavigationController extends @NavigationController
+class @UpdateNavigationController extends ledger.common.NavigationController
 
   view:
     pageSubtitle: "#page_subtitle"

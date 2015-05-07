@@ -1,4 +1,4 @@
-class @WalletBitidIndexDialogViewController extends DialogViewController
+class @WalletBitidIndexDialogViewController extends ledger.common.DialogViewController
 
   view:
     confirmButton: '#confirm_button'

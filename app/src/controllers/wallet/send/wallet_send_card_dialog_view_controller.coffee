@@ -1,4 +1,4 @@
-class @WalletSendCardDialogViewController extends @DialogViewController
+class @WalletSendCardDialogViewController extends ledger.common.DialogViewController
 
   view:
     cardContainer: "#card_container"

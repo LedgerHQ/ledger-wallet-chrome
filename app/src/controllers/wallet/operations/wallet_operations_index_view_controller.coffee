@@ -1,4 +1,4 @@
-class @WalletOperationsIndexViewController extends ViewController
+class @WalletOperationsIndexViewController extends ledger.common.ViewController
 
   view:
     emptyContainer: "#empty_container"

@@ -1,4 +1,4 @@
-class @AppsCoinkiteKeygenShowDialogViewController extends @DialogViewController
+class @AppsCoinkiteKeygenShowDialogViewController extends ledger.common.DialogViewController
 
   view:
     xpubInput: '#xpub_input'

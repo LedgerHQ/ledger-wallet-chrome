@@ -1,4 +1,4 @@
-class @WalletBitidFormDialogViewController extends DialogViewController
+class @WalletBitidFormDialogViewController extends ledger.common.DialogViewController
 
   view:
     bitidUri: '#bitid_uri'

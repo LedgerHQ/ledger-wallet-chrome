@@ -1,4 +1,4 @@
-class @WalletReceiveIndexDialogViewController extends DialogViewController
+class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewController
 
   view:
     amountInput: '#amount_input'

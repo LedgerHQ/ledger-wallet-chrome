@@ -1,4 +1,4 @@
-class @WalletP2shSigningDialogViewController extends @DialogViewController
+class @WalletP2shSigningDialogViewController extends ledger.common.DialogViewController
 
   view:
     contentContainer: '#content_container'

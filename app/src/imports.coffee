@@ -169,12 +169,12 @@
         'wallet/sweep_private_key'
 
         'database/database'
-        'base/base_application'
+        'common/base_application'
         'database/model_context'
         'database/model'
         'database/migrations'
-        'base/view_controller'
-        'base/navigation_controller'
+        'common/view_controller'
+        'common/navigation_controller'
 
         ## Dongle
         'dongle/dongle'
@@ -204,7 +204,7 @@
         ## Dialog Management
         'utils/dialogs'
         '../views/common/dialogs/dialog'
-        'base/dialog_view_controller'
+        'common/dialog_view_controller'
 
         ## Common controllers
         # Dialogs

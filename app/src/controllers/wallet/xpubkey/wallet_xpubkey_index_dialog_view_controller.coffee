@@ -1,4 +1,4 @@
-class @WalletXpubkeyIndexDialogViewController extends DialogViewController
+class @WalletXpubkeyIndexDialogViewController extends ledger.common.DialogViewController
 
   view:
     derivationPath: '#derivation_path'

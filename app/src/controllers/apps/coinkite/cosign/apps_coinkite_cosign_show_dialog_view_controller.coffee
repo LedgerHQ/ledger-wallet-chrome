@@ -1,4 +1,4 @@
-class @AppsCoinkiteCosignShowDialogViewController extends DialogViewController
+class @AppsCoinkiteCosignShowDialogViewController extends ledger.common.DialogViewController
 
   cancellable: no
 

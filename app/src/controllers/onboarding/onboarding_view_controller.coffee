@@ -1,4 +1,4 @@
-class @OnboardingViewController extends @ViewController
+class @OnboardingViewController extends ledger.common.ViewController
 
   navigation:
     continueUrl: undefined
