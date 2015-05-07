@@ -326,20 +326,6 @@
         ## Print
         'print/piper'
 
-        ## Specs
-        '../spec/jasmine/jasmine'
-        '../spec/jasmine/jasmine-html'
-        '../spec/jasmine/boot'
-        '../spec/utils/storage/store_spec'
-        '../spec/utils/storage/chrome_store_spec'
-        '../spec/utils/storage/secure_store_spec'
-        #'../spec/restclients/synced_rest_client_spec'
-        '../spec/utils/storage/synced_store_spec'
-        '../spec/utils/bitcoin/bip39_spec'
-        '../spec/utils/formatters_spec'
-        '../spec/utils/converters_spec'
-        '../spec/i18n/i18n_spec'
-
         ## Update controllers
         'controllers/update/update_navigation_controller'
         'controllers/update/update_view_controller'
@@ -375,6 +361,9 @@
 
         # Specs
         '../spec/spec_helper'
+
+        '../spec/utils/dongle/mock_dongle_manager'
+        '../spec/utils/dongle/mock_dongle'
       ]
 
       specs:
@@ -387,9 +376,15 @@
           '../spec/utils/storage/store_spec'
           '../spec/utils/storage/chrome_store_spec'
           '../spec/utils/storage/secure_store_spec'
+          #'../spec/restclients/synced_rest_client_spec'
           '../spec/api/synced_rest_client_spec'
           '../spec/utils/storage/synced_store_spec'
           '../spec/utils/bitcoin/bip39_spec'
+
+          '../spec/utils/formatters_spec'
+          '../spec/utils/converters_spec'
+
+          '../spec/i18n/i18n_spec'
 
           '../spec/m2fa/client_spec'
           '../spec/m2fa/m2fa_spec'

@@ -187,7 +187,8 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @return [Q.Promise]
   isCertified: (callback=undefined) -> @_checkCertification(Attestation, callback)
 
-  isBetaCertified: (callback=undefined) -> @_checkCertification(BetaAttestation, callback)
+  isBetaCertified: (callback=undefined) ->
+    @_checkCertification(BetaAttestation, callback)
 
   _checkCertification: (Attestation, callback) ->
     _btchipQueue.enqueue "checkCertification", =>
@@ -220,7 +221,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       .done()
       d.promise
 
-  # Return asynchronosly state. Wait until a state is set.
+  # Return asynchronously state. Wait until a state is set.
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
   getState: (callback=undefined) ->
@@ -342,6 +343,8 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
   getPublicAddress: (path, callback=undefined) ->
+    #l path
+    #l new Error().stack
     Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
     _btchipQueue.enqueue "getPublicAddress", =>
       d = ledger.defer(callback)
@@ -391,7 +394,9 @@ class @ledger.dongle.Dongle extends EventEmitter
       else
         # 19.3. SETUP SECURE SCREEN
         @_sendApdu(new ByteString("E0"+"12"+"01"+"00"+"41"+pubKey, HEX), [0x9000])
-        .then (c) -> d.resolve(c.toString())
+        .then (c) ->
+          l 'initiateSecureScreen', c
+          d.resolve(c.toString())
         .fail (error) -> d.reject(error)
         .done()
       d.promise
@@ -409,7 +414,9 @@ class @ledger.dongle.Dongle extends EventEmitter
       else
         # 19.3. SETUP SECURE SCREEN
         @_sendApdu(new ByteString("E0"+"12"+"02"+"00"+"10"+resp, HEX), [0x9000])
-        .then () -> d.resolve()
+        .then () ->
+          l 'confirmSecureScreen'
+          d.resolve()
         .fail (error) -> d.reject(error)
         .done()
       d.promise

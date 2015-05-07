@@ -225,7 +225,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_handleCurrentState()
       else
         @_fup.getFirmwareUpdateAvailability @_dongle, @_lastMode is Modes.Bootloader, no, (availability, error) =>
-          return @_failure(Errors.UnableToRetrieveVersion) if error?
+          return if error?
           @_dongleVersion = availability.dongleVersion
           switch availability.result
             when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Overwrite

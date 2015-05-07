@@ -22,9 +22,7 @@ $log = -> ledger.utils.Logger.getLoggerByTag("Transaction")
 class ledger.wallet.Transaction
   Transaction = @
 
-  #
   @ValidationModes: ValidationModes
-  #
   @MINIMUM_OUTPUT_VALUE: Amount.fromSatoshi(5430)
 
   # @property [ledger.Amount]
@@ -103,6 +101,7 @@ class ledger.wallet.Transaction
   #   @option [String] validationCharacters
   #   @option [Boolean] needsAmountValidation
   getValidationDetails: ->
+    l @_resumeData
     details =
       validationMode: @_validationMode
       recipientsAddress:

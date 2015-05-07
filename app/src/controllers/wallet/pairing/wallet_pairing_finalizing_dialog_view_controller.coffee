@@ -37,6 +37,7 @@ class @WalletPairingFinalizingDialogViewController extends ledger.common.DialogV
     return _.str.trim(@view.phoneNameInput.val())
 
   _onComplete: (screen, error) ->
+    l screen, error
     @_request = null
     @dismiss =>
       if screen?
