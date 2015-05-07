@@ -76,26 +76,4 @@ _.extend ledger.errors,
     301: "Signature error"
     302: "Dust transaction"
   
-  # @exemple Initializations
-  #   ledger.error.new("an error message")
-  #   ledger.error.new(NotFound, "an error message")
-  new: (code, msg) -> 
-    defaultMessage =  ledger.errors.DefaultMessages[code] or _.str.humanize(_.findKey(ledger.errors, (c) -> c is code))
-    [code, msg] = [0, code] if _.str.isBlank defaultMessage
-    self = new Error(msg || defaultMessage)
-    self.code = code
-    self.name = _.invert(ledger.errors)[code]
-    self.localizedMessage = -> t(@_i18nId())
-    self._i18nId = -> "common.errors.#{_.underscore(@name)}"
-    return self
 
-  throw: (code, msg) -> throw @new(code, msg)
-
-  newHttp: (xhr) ->
-    self = @new(ledger.errors.NetworkError, xhr.statusText)
-    self._xhr = xhr
-    self.getXmlHttpRequest = -> @_xhr
-    self.getStatusCode = -> @getXmlHttpRequest().status
-    self.getStatusText = -> @getXmlHttpRequest().statusText
-    self.isDueToNoInternetConnectivity = -> @getStatusCode() is 0
-    return self

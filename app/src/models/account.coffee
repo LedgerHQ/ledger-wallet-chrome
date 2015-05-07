@@ -32,8 +32,8 @@ class @Account extends ledger.database.Model
   createTransaction: ({amount, fees, address}, callback) ->
     amount = ledger.Amount.fromSatoshi(amount)
     fees = ledger.Amount.fromSatoshi(fees)
-    inputsPath = @getHDWalletAccount().getAllAddressesPaths()
-    changePath = @getHDWalletAccount().getCurrentChangeAddressPath()
+    inputsPath = @getWalletAccount().getAllAddressesPaths()
+    changePath = @getWalletAccount().getCurrentChangeAddressPath()
     ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
 
   addRawTransactionAndSave: (rawTransaction, callback = _.noop) ->

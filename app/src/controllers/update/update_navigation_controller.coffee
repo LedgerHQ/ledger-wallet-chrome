@@ -60,7 +60,7 @@ class @UpdateNavigationController extends @NavigationController
 
   _onError: (error) ->
     @_currentError = error
-    ledger.app.router.go '/update/error', {errorCode: error.code}
+    ledger.app.router.go '/update/error', {errorCode: error.code.intValue()}
 
   _onStateChanged: (newState, oldState) ->
     switch newState

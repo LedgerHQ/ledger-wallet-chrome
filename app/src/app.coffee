@@ -8,6 +8,7 @@ require @ledger.imports, ->
 
     onStart: ->
       Api.init()
+      ledger.errors.init()
       ledger.utils.Logger.updateGlobalLoggersLevel()
       @_listenAppEvents()
       addEventListener "message", Api.listener.bind(Api), false

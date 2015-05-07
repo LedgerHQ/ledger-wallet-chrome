@@ -127,7 +127,8 @@
         ## Data synchronization
 
         ## Errors
-        'base/errors'
+        'errors/errors'
+        'errors/utils'
 
         ## Managers
         'managers/schemes_manager'
