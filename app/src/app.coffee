@@ -13,8 +13,7 @@ require @ledger.imports, ->
       addEventListener "message", Api.listener.bind(Api), false
       ledger.i18n.init =>
         ledger.preferences.defaults.init =>
-          @setExecutionMode(@Modes.Wallet)
-          @router.go('/')
+          @router.go('/') if @setExecutionMode(@Modes.Wallet)
 
     ###
       Sets the execution mode of the application. In Wallet mode, the application handles the wallets state by starting services,
@@ -26,17 +25,17 @@ require @ledger.imports, ->
     ###
     setExecutionMode: (newMode) ->
       throw "Unknown execution mode: #{newMode}. Available modes are ledger.app.Wallet or ledger.app.FirmwareUpdate." if _(_.values(@Modes)).find((m) -> m is newMode).length is 0
-      return if newMode is @_currentMode
+      return false if newMode is @_currentMode
       @_currentMode = newMode
       if @isInFirmwareUpdateMode()
         @_releaseWallet(no)
         ledger.utils.Logger.setGlobalLoggersPersistentLogsEnabled(off)
-        ledger.utils.Logger.setGlobalLoggersLevel(ledger.utils.Logger.Levels.NONE)
+        ledger.utils.Logger.updateGlobalLoggersLevel()
       else
         ledger.utils.Logger.setGlobalLoggersPersistentLogsEnabled(on)
         ledger.utils.Logger.updateGlobalLoggersLevel()
         @connectDongle(ledger.app.dongle) if ledger.app.dongle?
-      return
+      return true
 
     ###
       Checks if the application is in wallet mode.
@@ -102,8 +101,8 @@ require @ledger.imports, ->
       @_releaseWallet()
 
     onCommandFirmwareUpdate: ->
-      @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
-      @router.go '/'
+      @router.go '/' if @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
+
 
     onCommandExportLogs: ->
       ledger.utils.Logger.downloadLogsWithLink()
