@@ -1,5 +1,7 @@
+ledger.database ?= {}
+migrations = _
 
-class @MigrationHandler
+class ledger.database.MigrationHandler
 
   constructor: (context) ->
     @context = context

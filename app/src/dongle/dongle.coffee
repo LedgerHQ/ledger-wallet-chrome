@@ -87,6 +87,7 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   constructor: (card) ->
     super
+    @_xpubs = _.clone(@_xpubs)
     @id = card.deviceId
     @deviceId = card.deviceId
     @productId = card.productId
@@ -94,7 +95,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     @_btchip = new BTChip(card)
     unless @isInBootloaderMode()
       @_recoverFirmwareVersion().then( =>
-        @_recoverOperationMode()
+        #@_recoverOperationMode() It seems useless by now
         # Set dongle state on failure.
         @getPublicAddress("0'/0/0").then( =>
           # @todo Se connecter directement à la carte sans redemander le PIN
@@ -236,7 +237,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     _btchipQueue.enqueue "getRemainingPinAttempt", =>
       d = ledger.defer(callback)
       @_sendApdu(new ByteString("E0228000010000", HEX), [0x9000])
-      .catch (statusCode) ->
+      .catch (statusCode) =>
         if m = statusCode.match(/63c(\d)/)
           d.resolve(parseInt(m[1]))
         else
@@ -349,7 +350,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       d = ledger.defer(callback)
       @_btchip.getWalletPublicKey_async(path)
       .then (result) =>
-        ledger.wallet.HDWallet.instance?.cache?.set [[path, result.bitcoinAddress.value]]
+        ledger.wallet.Wallet.instance?.cache?.set [[path, result.bitcoinAddress.value]]
         _.defer -> d.resolve(result)
       .fail (err) =>
         error = @_handleErrorCode(err)

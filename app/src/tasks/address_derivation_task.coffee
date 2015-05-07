@@ -29,7 +29,7 @@ class ledger.tasks.AddressDerivationTask extends ledger.tasks.Task
 
     @_vents.on 'private:setCacheEntries', (ev, data) =>
       {command, queryId, parameters} = data
-      ledger.wallet.HDWallet.instance?.cache?.set parameters[0]
+      ledger.wallet.Wallet.instance?.cache?.set parameters[0]
       @_worker.postMessage command: command, queryId: queryId, result: 'success', error: undefined
 
   onStop: () ->

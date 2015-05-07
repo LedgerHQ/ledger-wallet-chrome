@@ -1,13 +1,13 @@
-class @Account extends Model
+class @Account extends ledger.database.Model
   do @init
   @has many: 'operations', sortBy: ['time', 'desc'], onDelete: 'destroy'
   @index 'index'
 
-  @fromHDWalletAccount: (hdAccount) ->
+  @fromWalletAccount: (hdAccount) -> # TODO: Rename to fromWalletAccount
     return null unless hdAccount?
     @find(index: hdAccount.index).first()
 
-  getHDWalletAccount: () -> ledger.wallet.HDWallet.instance.getAccount(@get('index'))
+  getWalletAccount: () -> ledger.wallet.Wallet.instance.getAccount(@get('index')) # TODO: Rename to getWalletAccount
 
   serialize: () ->
     $.extend super, { root_path: @getHDWalletAccount().getRootDerivationPath() }
@@ -32,12 +32,12 @@ class @Account extends Model
   createTransaction: ({amount, fees, address}, callback) ->
     amount = ledger.Amount.fromSatoshi(amount)
     fees = ledger.Amount.fromSatoshi(fees)
-    inputsPath = @getHDWalletAccount().getAllAddressesPaths()
-    changePath = @getHDWalletAccount().getCurrentChangeAddressPath()
+    inputsPath = @getWalletAccount().getAllAddressesPaths()
+    changePath = @getWalletAccount().getCurrentChangeAddressPath()
     ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
 
   addRawTransactionAndSave: (rawTransaction, callback = _.noop) ->
-    hdAccount = ledger.wallet.HDWallet.instance?.getAccount(@get('index'))
+    hdAccount = ledger.wallet.Wallet.instance?.getAccount(@get('index'))
     ledger.wallet.pathsToAddresses hdAccount.getAllPublicAddressesPaths(), (publicAddresses) =>
       ledger.wallet.pathsToAddresses hdAccount.getAllChangeAddressesPaths(), (changeAddresses) =>
         {inserts, updates} = @_addRawTransaction rawTransaction, _.values(publicAddresses), _.values(changeAddresses)

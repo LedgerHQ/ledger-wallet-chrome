@@ -1,6 +1,6 @@
 @ledger.wallet ?= {}
 
-class ledger.wallet.HDWallet
+class ledger.wallet.Wallet
 
   getAccount: (accountIndex) -> @_accounts[accountIndex]
 
@@ -24,7 +24,7 @@ class ledger.wallet.HDWallet
   getAccountFromAddress: (address) -> @getAccountFromDerivationPath(@cache?.getDerivationPath(address))
 
   createAccount: () ->
-    account = new ledger.wallet.HDWallet.Account(@, @getAccountsCount(), @_store)
+    account = new ledger.wallet.Wallet.Account(@, @getAccountsCount(), @_store)
     @_accounts.push account
     do @save
     account
@@ -40,7 +40,7 @@ class ledger.wallet.HDWallet
       return callback?() unless result.accounts?
       _.async.each [0...result.accounts], (accountIndex, done, hasNext) =>
         try
-          account = new ledger.wallet.HDWallet.Account(@, accountIndex, @_store)
+          account = new ledger.wallet.Wallet.Account(@, accountIndex, @_store)
           account.initialize () =>
             @_accounts.push account
             done?()
@@ -53,7 +53,7 @@ class ledger.wallet.HDWallet
     @_accounts = null
     @cache = null
 
-  isEmpty: () -> @_accounts?.length == 0
+  isEmpty: -> @_accounts?.length == 0
 
   isInitialized: no
 
@@ -66,7 +66,7 @@ class ledger.wallet.HDWallet
 
   @instance: undefined
 
-class ledger.wallet.HDWallet.Account
+class ledger.wallet.Wallet.Account
 
   constructor: (wallet, index, store) ->
     @wallet = wallet
@@ -218,71 +218,15 @@ class ledger.wallet.HDWallet.Account
     saveHash[@_storeId] = @_account
     @_store.set saveHash, callback
 
-openStores = (dongle, done) ->
-  Try =>
-    ledger.bitcoin.bitid.getAddress (address) =>
-      Try =>
-        bitIdAddress = address.bitcoinAddress.value
-        dongle.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>
-          Try =>
-            if not (pubKey?.bitcoinAddress?) or not (bitIdAddress?)
-              console.error("Fatal error during openStores, missing bitIdAddress and/or pubKey.bitcoinAddress")
-              ledger.app.emit 'wallet:initialization:fatal_error'
-              return
-            ledger.storage.openStores bitIdAddress, pubKey.bitcoinAddress.value
-            done?()
-          .printError()
-      .printError()
-  .printError()
-
-openHdWallet = (dongle, done) ->
-  Try =>
-    hdWallet = new ledger.wallet.HDWallet()
-    hdWallet.initialize ledger.storage.wallet, () =>
-      Try =>
-        ledger.wallet.HDWallet.instance = hdWallet
-        ledger.tasks.AddressDerivationTask.instance.start()
-        _.defer =>
-          Try =>
-            for accountIndex in [0...hdWallet.getAccountsCount()]
-              ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{hdWallet.getRootDerivationPath()}/#{accountIndex}'", _.noop
-            done?()
-          .printError()
-      .printError()
-  .printError()
-
-openAddressCache = (dongle, done) ->
-  cache = new ledger.wallet.HDWallet.Cache(ledger.wallet.HDWallet.instance)
-  cache.initialize =>
-    ledger.wallet.HDWallet.instance.cache = cache
-    done?()
-
-restoreStructure = (dongle, done) ->
-  if ledger.wallet.HDWallet.instance.isEmpty()
-    ledger.app.emit 'wallet:initialization:creation'
-    ledger.tasks.WalletLayoutRecoveryTask.instance.on 'done', () =>
-      done?()
-    ledger.tasks.WalletLayoutRecoveryTask.instance.on 'fatal_error', () =>
-      ledger.storage.local.clear()
-      ledger.app.emit 'wallet:initialization:failed'
-    ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
-  else
-    ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
-    done?()
-
-completeInitialization = (dongle, done) ->
-  ledger.wallet.HDWallet.instance.isInitialized = yes
-  done?()
-
 _.extend ledger.wallet,
 
   initialize: (dongle, callback=undefined) ->
-    intializationMethods = [openStores, openHdWallet, openAddressCache, restoreStructure, completeInitialization]
-    _.async.each intializationMethods, (method , done, hasNext) =>
-      method(dongle, done)
-      callback?() unless hasNext
+    hdWallet = new ledger.wallet.Wallet()
+    hdWallet.initialize ledger.storage.wallet, () =>
+        ledger.wallet.Wallet.instance = hdWallet
+        callback?()
 
   release: (dongle, callback) ->
-    ledger.storage.closeStores()
-    ledger.wallet.HDWallet.instance?.release()
-    ledger.wallet.HDWallet.instance = null
+    ledger.wallet.Wallet.instance?.release()
+    ledger.wallet.Wallet.instance = null
+    callback?()

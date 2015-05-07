@@ -1,6 +1,6 @@
 @ledger.m2fa ?= {}
 
-DebugWebsocket = (message) -> l message
+DebugWebsocket = (message) -> ledger.utils.Logger.getLoggerByTag("WebSocket").info message
 
 
 # The mobile 2FA ChromeClient.

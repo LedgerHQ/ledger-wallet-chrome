@@ -2,22 +2,22 @@ try
   importScripts(
       '../utils/logger.js'
       '../../libs/bitcoinjs-min.js'
-      '../../libs/lw-api-js/lib/bitcoinjs-min.js'
+      '../../libs/btchip/lib/bitcoinjs-min.js'
       'extended_public_key.js'
-      '../../libs/lw-api-js/lib/inheritance.js'
-      '../../libs/lw-api-js/lib/BitcoinExternal.js'
-      '../../libs/lw-api-js/btchip-js-api/ByteString.js'
-      '../../libs/lw-api-js/btchip-js-api/Convert.js'
-      '../../libs/lw-api-js/btchip-js-api/GlobalConstants.js'
-      '../../libs/lw-api-js/ucrypt/JSUCrypt.js'
-      '../../libs/lw-api-js/ucrypt/helpers.js'
-      '../../libs/lw-api-js/ucrypt/hash.js'
-      '../../libs/lw-api-js/ucrypt/sha256.js'
-      '../../libs/lw-api-js/ucrypt/ripemd160.js'
+      '../../libs/btchip/lib/inheritance.js'
+      '../../libs/btchip/lib/BitcoinExternal.js'
+      '../../libs/btchip/btchip-js-api/ByteString.js'
+      '../../libs/btchip/btchip-js-api/Convert.js'
+      '../../libs/btchip/btchip-js-api/GlobalConstants.js'
+      '../../libs/btchip/ucrypt/JSUCrypt.js'
+      '../../libs/btchip/ucrypt/helpers.js'
+      '../../libs/btchip/ucrypt/hash.js'
+      '../../libs/btchip/ucrypt/sha256.js'
+      '../../libs/btchip/ucrypt/ripemd160.js'
       '../../libs/underscore-min.js'
       '../../libs/underscore.string.min.js'
       '../utils/object.js'
-      'value.js'
+      '../utils/amount.js'
   )
 catch er
   console.error er
@@ -33,8 +33,8 @@ CurrentCommand = null
 
 ledger.app ?= {}
 ledger.wallet ?= {}
-ledger.wallet.HDWallet ?= {}
-ledger.wallet.HDWallet.instance ?= {}
+ledger.wallet.Wallet ?= {}
+ledger.wallet.Wallet.instance ?= {}
 
 enqueue = (command, parameters, queryId) ->
   Queue.push command: command, parameters: parameters, queryId: queryId
@@ -73,7 +73,7 @@ class WorkerWallet
 
 class WorkerCache
 
-  ledger.wallet.HDWallet.instance.cache = new @
+  ledger.wallet.Wallet.instance.cache = new @
 
   get: () -> null
 

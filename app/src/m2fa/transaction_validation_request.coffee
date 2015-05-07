@@ -45,3 +45,4 @@ class @ledger.m2fa.TransactionValidationRequest extends @EventEmitter
     @_clients = []
 
   onComplete: (cb) -> @_onComplete = cb
+
