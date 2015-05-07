@@ -33,8 +33,11 @@ class ledger.dongle.MockDongleManager extends EventEmitter
 
   # Simulates Remove/Put the dongle
   powerCycle: (delay, cb) ->
-    @emit 'disconnected', @dongleInstance
+    @emit 'disconnect', @dongleInstance
+    @dongleInstance.disconnect()
+    ledger.tasks.TickerTask.instance.stop()
     setTimeout =>
+      @dongleInstance.connect()
       @emit 'connecting', @dongleInstance
       @emit 'connected', @dongleInstance
       cb?()

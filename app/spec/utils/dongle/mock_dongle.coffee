@@ -19,6 +19,7 @@ Errors = @ledger.errors
 class ledger.dongle.MockDongle extends EventEmitter
 
   _xpubs: []
+  _remainingPinAttempt: 2
 
   # M2FA
   _m2fa:
@@ -44,7 +45,15 @@ class ledger.dongle.MockDongle extends EventEmitter
   isInBootloaderMode: -> @_isInBootloaderMode
 
 
-  disconnect: () -> @_setState(States.DISCONNECTED)
+  disconnect: () ->
+    @emit 'disconnected', @
+    @_setState(States.DISCONNECTED)
+
+
+  connect: () ->
+    @emit 'connected', @
+    @_setState(States.LOCKED)
+
 
   # Return asynchronosly state. Wait until a state is set.
   # @param [Function] callback Optional argument
@@ -75,7 +84,6 @@ class ledger.dongle.MockDongle extends EventEmitter
     d.promise
 
 
-
   # @param [String] pin ASCII encoded
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
@@ -84,9 +92,28 @@ class ledger.dongle.MockDongle extends EventEmitter
     d = ledger.defer(callback)
     if pin is @_pin
       @_setState(States.UNLOCKED)
+      @_remainingPinAttempt = 3
       d.resolve()
     else
-      d.reject()
+      console.error("Fail to unlockWithPinCode 1 :", '63c' + @_remainingPinAttempt)
+      error = @_handleErrorCode('63c' + @_remainingPinAttempt)
+      @_remainingPinAttempt -= 1
+      d.reject(error)
+    d.promise
+
+
+  lock: () ->
+    if @state isnt ledger.dongle.States.BLANK and @state?
+      @_setState(States.LOCKED)
+
+
+  # @return [Q.Promise] resolve with a Number, reject with a ledger Error.
+  getRemainingPinAttempt: (callback=undefined) ->
+    d = ledger.defer(callback)
+    if @_remainingPinAttempt < 0
+        d.resolve(@_remainingPinAttempt)
+    else
+        d.reject(@_handleErrorCode('6985'))
     d.promise
 
 
@@ -284,6 +311,7 @@ class ledger.dongle.MockDongle extends EventEmitter
     d.promise
 
 
+
   _setAuthorization: (data) ->
     result = {}
     if @_m2fa.pairingKeyHex?
@@ -430,3 +458,31 @@ class ledger.dongle.MockDongle extends EventEmitter
       [index, hardened] = item.split "'"
       node  = if hardened? then node.deriveHardened parseInt(index) else node = node.derive index
     node
+
+
+  # Set appropriate state, and return corresponding Error
+  # @param [String] errorCode
+  # @return [Error]
+  _handleErrorCode: (errorCode) ->
+    if errorCode.match("6982") # Pin required
+      @_setState(States.LOCKED)
+      error = Errors.new(Errors.DongleLocked, errorCode)
+    else if errorCode.match("6985") # Error ?
+      @_setState(States.BLANK)
+      error = Errors.new(Errors.BlankDongle, errorCode)
+    else if errorCode.match("6faa")
+      @_setState(States.ERROR)
+      error = Errors.new(Errors.UnknowError, errorCode)
+    else if errorCode.match(/63c\d/)
+      error = Errors.new(Errors.WrongPinCode, errorCode)
+      error.retryCount = parseInt(errorCode.substr(-1))
+      if error.retryCount == 0
+        @_setState(States.BLANK)
+        error.code = Errors.DongleLocked
+      else
+        @_setState(States.ERROR)
+    else
+      @_setState(States.UnknowError)
+      error = Errors.new(Errors.UnknowError, errorCode)
+    l 'ERROR', error
+    return error

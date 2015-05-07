@@ -220,7 +220,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       .done()
       d.promise
 
-  # Return asynchronosly state. Wait until a state is set.
+  # Return asynchronously state. Wait until a state is set.
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
   getState: (callback=undefined) ->
@@ -280,7 +280,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       d.promise
 
   lock: () ->
-    if @_currentState isnt ledger.wallet.States.BLANK and @_currentState isnt ledger.wallet.States.FROZEN and @_currentState?
+    if @state isnt ledger.dongle.States.BLANK and @state?
       @_setState(States.LOCKED)
 
   ###

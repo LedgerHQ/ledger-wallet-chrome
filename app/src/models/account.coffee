@@ -30,6 +30,8 @@ class @Account extends Model
     @return [Q.Promise] A closure
   ###
   createTransaction: ({amount, fees, address}, callback) ->
+    amount = ledger.Amount.fromSatoshi(amount)
+    fees = ledger.Amount.fromSatoshi(fees)
     inputsPath = @getHDWalletAccount().getAllAddressesPaths()
     changePath = @getHDWalletAccount().getCurrentChangeAddressPath()
     ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
