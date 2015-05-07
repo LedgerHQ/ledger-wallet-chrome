@@ -1,4 +1,4 @@
-class @WalletNavigationController extends @NavigationController
+class @WalletNavigationController extends ledger.common.NavigationController
 
   _menuItemBaseUrl: {
 #    '/wallet/dashboard/': '#dashboard-item'
@@ -9,14 +9,18 @@ class @WalletNavigationController extends @NavigationController
     '/wallet/accounts/': '#account-item'
   }
   view:
-    balanceValue: '#balance-value'
+    balanceValue: '#balance_value'
     reloadIcon: '#reload_icon'
+    currencyContainer: '#currency_container'
 
   constructor: () ->
-    ledger.application.router.on 'routed', (event, data) =>
-      {url} = data
-      @updateMenu url
-      ##@updateBreadcrumbs url
+    super
+    ledger.application.router.on 'routed', @_onRoutedUrl
+
+  _onRoutedUrl: (event, data) ->
+    {url} = data
+    @updateMenu url
+    ##@updateBreadcrumbs url
 
   onAfterRender: () ->
     super
@@ -25,6 +29,7 @@ class @WalletNavigationController extends @NavigationController
     ##@updateBreadcrumbs url
     @_listenBalanceEvents()
     @_listenSynchronizationEvents()
+    @_listenCountervalueEvents()
 
   updateMenu: (url) ->
     for baseUrl, itemSelector of @_menuItemBaseUrl
@@ -60,22 +65,25 @@ class @WalletNavigationController extends @NavigationController
 
   _listenBalanceEvents: ->
     # fetch balances
-    balance = Wallet.instance.getBalance()
-    @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+    @_updateBalanceValue()
     # listen events
-    ledger.app.on 'wallet:balance:changed', (event, balance) =>
-      @view.balanceValue.text ledger.formatters.bitcoin.fromValue(balance.wallet.total)
+    ledger.app.on 'wallet:balance:changed', @_updateBalanceValue
+
+  _updateBalanceValue: (balance) ->
+    @view.balanceValue.text ledger.formatters.fromValue(Wallet.instance.getBalance().wallet.total)
 
   _listenSynchronizationEvents: ->
     @view.reloadIcon.on 'click', =>
       Wallet.instance.retrieveAccountsBalances()
+      ledger.tasks.TickerTask.instance.updateTicker()
       ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary()
-      _.defer => @_updateReloadIconState()
-    ledger.app.on 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done', (e) =>
-      _.defer => @_updateReloadIconState()
-    ledger.tasks.OperationsSynchronizationTask.instance.on 'start stop', =>
-      _.defer => @_updateReloadIconState()
+      _.defer @_updateReloadIconState
+    ledger.app.on 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done', @_onSynchronizationStateChanged
+    ledger.tasks.OperationsSynchronizationTask.instance.on 'start stop', @_onSynchronizationStateChanged
     @_updateReloadIconState()
+
+  _onSynchronizationStateChanged: ->
+    _.defer @_updateReloadIconState
 
   _updateReloadIconState: =>
     if @_isSynchronizationRunning()
@@ -85,3 +93,18 @@ class @WalletNavigationController extends @NavigationController
 
   _isSynchronizationRunning: ->
     return ledger.tasks.OperationsConsumptionTask.instance.isRunning()
+
+  _listenCountervalueEvents: ->
+    # update counter value
+    @_updateCountervalue()
+    # listen countervalue event
+    ledger.preferences.instance.on 'currencyActive:changed', @_updateCountervalue
+    ledger.app.on 'wallet:balance:changed', @_updateCountervalue
+
+  _updateCountervalue: ->
+    @view.currencyContainer.removeAttr 'data-countervalue'
+    @view.currencyContainer.empty()
+    if ledger.preferences.instance.isCurrencyActive()
+      @view.currencyContainer.attr 'data-countervalue', Wallet.instance.getBalance().wallet.total
+    else
+      @view.currencyContainer.text t('wallet.top_menu.balance')

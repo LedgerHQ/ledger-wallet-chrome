@@ -29,7 +29,10 @@ class @WalletsManager extends EventEmitter
             @cardFactory.getCardTerminal(result[0]).getCard_async().then (lwCard) =>
               _.defer =>
                 @_wallets[card.id] = new ledger.wallet.HardwareWallet(this, card, lwCard)
-                @_wallets[card.id].once 'connected', (event, wallet) => @emit 'connected', wallet
+                @_wallets[card.id].once 'connected', (event, wallet) =>
+                  @emit 'connected', wallet
+                  if _(ledger.app.devicesManager.devices()).where(id: wallet.id).length is 0
+                    _.defer => wallet.disconnect()
                 @_wallets[card.id].once 'forged', (event, wallet) => @emit 'forged', wallet
                 @_wallets[card.id].connect()
     catch er

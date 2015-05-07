@@ -15,7 +15,7 @@ $.fn.extend
         e.preventDefault()
 
   # Once called the current DOM input node only allow ammount formatted content
-  amountInput: ->
+  amountInput: (maximumNumberDigits = 8) ->
     @on 'keydown', (e) ->
 
       # Check if it already contains a decimal point
@@ -26,8 +26,10 @@ $.fn.extend
     @on 'input', () ->
       @value = _.str.replace(@value, ',', '.') if @value.indexOf(',') != -1
       decimalPointIndex = @value.indexOf('.')
-      if decimalPointIndex != -1 and @value.length - decimalPointIndex > 9
-        @value = @value.substring(0, @value.indexOf('.') + 9)
+      if maximumNumberDigits <= 0 and decimalPointIndex != -1
+        @value = @value.replace('.', '')
+      if decimalPointIndex != -1 and @value.length - decimalPointIndex >= maximumNumberDigits
+        @value = @value.substring(0, @value.indexOf('.') + maximumNumberDigits + 1)
       if (/[^\.0-9]/).test(@value)
         @value = @value.replace(/[^\.0-9]/g, '')
       if @value.indexOf('.') != @value.lastIndexOf('.')

@@ -31,16 +31,6 @@
           <div class="selector" />
         </div>
       </li>
-      <li id="help-item" class="menu-item">
-        <div>
-          <a href="/wallet/help/index">
-            <img src="../assets/images/wallet/help_icon.png" />
-            <span><%= t('wallet.top_menu.items.help') %></span>
-          </a>
-          <div class="spacer" />
-          <div class="selector" />
-        </div>
-      </li>
       <li id="settings-item" class="menu-item">
         <div>
           <a href="/wallet/settings/index">
@@ -51,13 +41,23 @@
           <div class="selector" />
         </div>
       </li>
+      <li id="help-item" class="menu-item">
+        <div>
+          <a href="/wallet/help/index">
+            <img src="../assets/images/wallet/help_icon.png" />
+            <span><%= t('wallet.top_menu.items.help') %></span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
     </ul>
     <div class="right">
       <div>
-        <p class="balance-label"><%= t 'wallet.top_menu.balance' %></p>
-        <p class="balance-value">
-          <span id="balance-value">0.0</span>
-          <sup><%= t 'common.bitcoin_acronym' %></sup>
+        <p class="balance-label" id="currency_container"></p>
+        <p class="balance-value <%= if ledger.formatters.symbolIsFirst() then 'inverted' %>">
+          <span id="balance_value">0</span>
+          <sup><%= ledger.formatters.getUnitSymbol() %></sup>
         </p>
       </div>
       <a class="reload-icon" id="reload_icon">
@@ -65,7 +65,5 @@
       </a>
     </div>
   </div>
-  <div id="navigation_controller_content" >
-
-  </div>
+  <div id="navigation_controller_content"></div>
 </div>

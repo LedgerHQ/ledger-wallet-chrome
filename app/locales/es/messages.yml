@@ -1,13 +1,17 @@
-﻿application:
+﻿language:
+  name: "Español"
+
+application:
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet gestiona sus cuentas Bitcoin de manera eficiente y segura."
   support_url: 'http://support.ledgerwallet.com/'
   support_key_not_recognized_url: 'https://ledger.groovehq.com/knowledge_base/categories/troubleshooting-20'
 
 common:
-  bitcoin_acronym: 'BTC'
   default_account_name: "Mi cuenta"
-  date_format: 'DD/MM/YYYY à HH:mm'
+  date_time_format: 'L [a las] LT'
+  date_format: 'L'
+  time_format: 'LT'
   close: "Close"
   cancel: "Cancel"
   print: "Print"
@@ -38,6 +42,7 @@ common:
     unsufficient_balance: "El saldo de su monedero es insuficiente."
     wrong_keycode: "El código de validación no es correcta."
     network_no_response: "El servidor des transacciónes no ha respondido."
+    network_error: "Error de red."
     invalid_receiver_address: "La dirección Bitcoin de destino no es correcto."
     invalid_amount: "La cantidad enviada no es válida."
     unknown: "Se produjo un error desconocido."
@@ -47,6 +52,7 @@ common:
     deleting_this_paired_smartphone: "By deleting this smartphone, you will no longer be able to manually validate transactions of this Ledger Wallet.<br />Do you want to continue?"
     going_to_firmware_update: "By switching to firmware update mode, all your pending activites will be interrupted.<br />Do you want to continue ?"
     wrong_transaction_signature: "The transaction has not been signed correctly due to hardware fault. Please contact the support for immediate assistance."
+    dust_transaction: "The transaction amount must be at least %s."
 
   qrcode:
     scan_qrcode: "Scan QR code"
@@ -348,7 +354,7 @@ wallet:
       receiver_address: "Dirección de recepción bitcoin"
       receiver_address_placeholder: "Dirección Bitcoin"
       total_spent: "Total debitado"
-      transaction_fees_text: "(+0.0001 BTC gastos de transacción)"
+      transaction_fees_text: "(incl. %s gastos de transacción)"
       close_scanner: "Close scanner"
       qr_scanner: "Scan QR code"
 
@@ -426,6 +432,8 @@ wallet:
       bitcoin: "Bitcoin"
       tools: "Tools"
       display: "Display"
+      apps: "Apps (beta)"
+      version: "Version %s"
 
     hardware:
       firmware: "Firmware"

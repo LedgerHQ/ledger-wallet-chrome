@@ -1,4 +1,4 @@
-class @AppsCoinkiteNavigationController extends @NavigationController
+class @AppsCoinkiteNavigationController extends ledger.common.NavigationController
 
   _menuItemBaseUrl: {
     '/apps/coinkite/dashboard/index': '#dashboard-item'

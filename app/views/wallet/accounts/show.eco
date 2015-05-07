@@ -6,16 +6,17 @@
     <thead>
       <tr>
         <td class="fit-content" id="confirmed_balance_subtitle"><%= t 'wallet.accounts.show.detail.balance' %></td>
-        <td class="unconfirmed-balance" id="unconfirmed_balance_subtitle"><%= t 'wallet.accounts.show.detail.balance_in_progress' %></td>
-        <td class="fit-content align-right"><%= t 'wallet.accounts.show.detail.actions' %></td>
+        <td class="fit-content countervalue-balance" id="countervalue_balance_subtitle"><%= t 'wallet.accounts.show.detail.countervalue' %></td>
+        <td class="align-right"><%= t 'wallet.accounts.show.detail.actions' %></td>
       </tr>
     </thead>
     <tbody>
       <tr class="no-border">
-        <td class="fit-content"><span class="price" id="confirmed_balance">0.0</span><span class="btc-acronyme"> BTC</span></td>
-        <td class="unconfirmed-balance"><span id="unconfirmed_balance">0.0</span> <span>BTC</span></td>
-        <td class="fit-content">
+        <td class="fit-content" id="confirmed_balance_container"><span class="price" id="confirmed_balance">0</span><span class="btc-acronyme"> <%= ledger.formatters.getUnitSymbol() %></span></td>
+        <td class="fit-content countervalue-balance" id="countervalue_balance_container"><span id="countervalue_balance">0</span></td>
+        <td class="align-right">
           <div class="action-bar">
+            <div class="left-spacer"></div>
             <a class="action-rounded-button" href="/wallet/send/index"><%= t 'wallet.accounts.show.detail.send' %></a>
             <a class="action-rounded-button" href="/wallet/receive/index"><%= t 'wallet.accounts.show.detail.receive' %></a>
           </div>

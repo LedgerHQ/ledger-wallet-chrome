@@ -1,0 +1,11 @@
+<div class="large-table">
+  <div class="header top">
+    <div class="uppercase-section-column"><%= t 'wallet.settings.bitcoin.transaction_fees' %></div>
+  </div>
+  <div class="row bottom">
+    <div class="regular-text-small stretchable"><%= t 'wallet.settings.bitcoin.default_value' %></div>
+    <div class="small-grey-select">
+      <select id="fees_select"></select>
+    </div>
+  </div>
+</div>

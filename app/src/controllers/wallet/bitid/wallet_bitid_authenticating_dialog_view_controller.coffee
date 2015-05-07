@@ -1,4 +1,4 @@
-class @WalletBitidAuthenticatingDialogViewController extends @DialogViewController
+class @WalletBitidAuthenticatingDialogViewController extends ledger.common.DialogViewController
 
   view:
     contentContainer: '#content_container'
@@ -12,15 +12,16 @@ class @WalletBitidAuthenticatingDialogViewController extends @DialogViewControll
     ledger.bitcoin.bitid.callback(
       @params.uri,
       @params.address,
-      @params.signature,
+      @params.signature
+    ).then(
       (result) =>
         if result.error?
           @_error(result.error)
         else
           @_success()
-      ,(result) =>
-        @_error(result.error)
-      )
+      , (jqXHR, textStatus, errorThrown) =>
+        @_error(textStatus || t("errors.network_error"))
+    )
 
   _success: ->
     console.log "success"

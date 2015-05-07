@@ -12,6 +12,18 @@ _.extend @ledger.config,
     pullIntervalDelay: 60000
     pullThrottleDelay: 1000
     pushDebounceDelay: 1000
-  enableLogging: no
+  defaultLoggingLevel: "NONE"
+  btcshipDebug: false
+
+# Btcship logging
+@DEBUG = ledger.config.btcshipDebug
 
 @configureApplication = (app) ->
+  _.extend @ledger.config,
+    defaultLoggingLevel:
+      Connected:
+        Enabled: ledger.utils.Logger.Levels.ALL
+        Disabled: ledger.utils.Logger.Levels.NONE
+      Disconnected:
+        Enabled: ledger.utils.Logger.Levels.ALL
+        Disabled: ledger.utils.Logger.Levels.ALL

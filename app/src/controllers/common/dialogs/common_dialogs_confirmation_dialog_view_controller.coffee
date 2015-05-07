@@ -1,4 +1,4 @@
-class @CommonDialogsConfirmationDialogViewController extends @DialogViewController
+class @CommonDialogsConfirmationDialogViewController extends ledger.common.DialogViewController
 
   positiveLocalizableKey: 'common.yes'
   negativeLocalizableKey: 'common.no'

@@ -1,3 +1,6 @@
+language:
+  name: "Français"
+
 application:
   name: 'Ledger Wallet'
   small_description: "Ledger Wallet gère vos comptes Bitcoin de façon efficace et sécurisée."
@@ -5,10 +8,17 @@ application:
   support_key_not_recognized_url: 'https://ledger.groovehq.com/knowledge_base/categories/troubleshooting-20'
   support_coinkite_url: 'https://ledger.groovehq.com/knowledge_base/topics/how-to-use-the-coinkite-app'
 
+  commands:
+    reload_page: "Recharger la page courante"
+    reload_application: "Recharger l'application"
+    update_firmware: "Mettre à jour la puce"
+    export_logs: "Exporter les logs globaux"
+
 common:
-  bitcoin_acronym: 'BTC'
   default_account_name: "Mon compte"
-  date_format: 'DD/MM/YYYY à HH:mm'
+  date_time_format: 'L [à] LT'
+  date_format: 'L'
+  time_format: 'LT'
   close: "Fermer"
   cancel: "Annuler"
   print: "Imprimer"
@@ -24,8 +34,10 @@ common:
   later: "Plus tard"
   reset: "Réinitialiser"
   save: "Enregistrer"
+  export: "Exporter"
   back: "Retour"
   next: "Suivant"
+  test: "Test"
   yes: "Oui"
   no: "Non"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
@@ -42,6 +54,7 @@ common:
     unsufficient_balance: "Le solde de votre portefeuille est insuffisant."
     wrong_keycode: "Le code de validation n'est pas correct."
     network_no_response: "Le serveur de transactions n'a pas répondu."
+    network_error: "Erreur réseau."
     invalid_receiver_address: "L'adresse bitcoin à créditer n'est pas correcte."
     invalid_amount: "Le montant à envoyer n'est pas valide."
     unknown: "Une erreur inconnue est survenue."
@@ -51,11 +64,17 @@ common:
     deleting_this_paired_smartphone: "En supprimant ce smartphone, vous ne pourrez plus valider les transactions de ce Ledger Wallet.<br />Souhaitez-vous continuer ?"
     going_to_firmware_update: "En passant en mode de mise à jour de la puce, toutes vos activités en cours seront interrompues.<br />Souhaitez-vous continuer ?"
     wrong_transaction_signature: "Une erreur est survenue durant la signature de la transaction. Veuillez contacter le support pour une assistance immédiate."
+    dust_transaction: "Le montant de la transaction doit être au moins de %s."
 
   qrcode:
     scan_qrcode: "Scanner code QR"
     present: "Présentez le code QR devant la webcam."
     nowebcam: "Aucune webcam n'est détectée sur votre ordinateur."
+
+  fees:
+    normal: "%s (normal)"
+    fast: "%s (confirmation rapide)"
+    slow: "%s (confirmation lente)"
 
 onboarding:
   device:
@@ -64,11 +83,11 @@ onboarding:
       is_not_recognized: "Si votre Ledger Wallet n'est pas reconnu, consultez notre centre d'aide."
 
     unplug:
-      unlock_my_wallet: "Dévérouiller mon portefeuille"
+      unlock_my_wallet: "Déverrouiller mon portefeuille"
       you_can_unplug: "Vous pouvez maintenant débrancher votre Ledger Wallet en toute sécurité."
 
     pin:
-      enter_your_pin_code: "Entez votre code PIN pour dévérouiller votre portefeuille :"
+      enter_your_pin_code: "Entez votre code PIN pour déverrouiller votre portefeuille :"
       i_lost_my_pin_code: "Si vous avez oublié votre code PIN, consultez notre centre d'aide."
 
     connecting:
@@ -104,7 +123,7 @@ onboarding:
         unplug_plug: "Débranchez puis rebranchez votre Ledger Wallet pour accéder vos comptes et bitcoins."
 
       forged:
-        device_forged: "Ce Ledger Nano n'est pas authentique, ou la mise à jour du firmware a échoué"
+        device_forged: "Ce Ledger Wallet n'est pas authentique"
         forbidden_access: "Pour des raisons de sécurité, vous n'êtes pas autorisé à utiliser cette application."
         get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
 
@@ -193,7 +212,7 @@ onboarding:
 update:
   common:
     firmware_update: "Mise à jour de la puce"
-    need_to_repeat_several_times: "Vous pouvez être amené(e) à répéter cette opération plusieurs fois."
+    need_to_repeat_several_times: "Vous pouvez être amené(e) à brancher et débrancher plusieurs fois."
 
   index:
     important_notice: "Informations importantes"
@@ -249,6 +268,8 @@ update:
   error:
     update_failed: "Mise à jour échouée"
     error_updated: "Une erreur est survenue pendant la mise à jour de votre Ledger Wallet (code: %s)."
+    plug_back: "Débranchez puis rebrancher votre portefeuille, puis réessayez."
+    problem_persists: "Si le problème persiste, merci de visiter notre centre d'aide sur support.ledgerwallet.com."
 
 wallet:
   defaults:
@@ -263,6 +284,7 @@ wallet:
       no_operations: "Aucune opération."
       confirmed: "Confirmée"
       unconfirmed: "Non confirmée"
+      countervalue: "Contre-valeur"
 
   top_menu:
     balance: 'SOLDE'
@@ -304,7 +326,7 @@ wallet:
       print: "IMPRIMER"
       close: "FERMER"
       blockchain_link: "Plus d'informations"
-      transaction_fees_text: "(dont %s BTC de frais de transaction)"
+      transaction_fees_text: "(dont %s de frais de transaction)"
 
     index:
       <<: *default-operations-translation
@@ -318,6 +340,7 @@ wallet:
         action: "PARAMÈTRES DU COMPTE"
         balance: "SOLDE"
         balance_in_progress: "DONT NON CONFIRMÉ"
+        countervalue: "Contre-valeur"
         actions: "ACTIONS"
         receive: "RECEVOIR"
         send: "ENVOYER"
@@ -352,7 +375,7 @@ wallet:
       receiver_address: "Adresse Bitcoin du destinataire"
       receiver_address_placeholder: "Adresse Bitcoin"
       total_spent: "Total dépensé"
-      transaction_fees_text: "(dont 0.0001 BTC de frais de transaction)"
+      transaction_fees_text: "(dont %s de frais de transaction)"
       close_scanner: "Fermer scanner"
       qr_scanner: "Scanner code QR"
 
@@ -444,6 +467,43 @@ wallet:
       uri_placeholder: "Entrez l'URI"
       invalid_uri: "URI invalide"
 
+  xpubkey:
+    index:
+      title: "Export de clé publique étendue"
+      info: "Autoriser l'export de la clé publique étendue correspondant au chemin de dérivation suivant:"
+      path: "Chemin de dérivation"
+    processing:
+      title: "Clé publique étendue"
+      info: "Calcul de la clé publique étendue"
+    errors:
+      cancelled: "Export non autorisé"
+      derivation_failed: "Erreur dans le calcul de la xpubkey"
+      derivation_successfull: "Clé exportée avec succès"
+
+  p2sh:
+    index:
+      title: "Demande de signature"
+      info: "Souhaitez-vous autoriser la demande de signature?"
+    signing:
+      title: "Signature"
+      info: "Le signature de la transaction par votre Ledger Nano est en cours"
+    errors:
+      cancelled: "Demande de signature refusée"
+      signature_failed: "Erreur dans la signature"
+      signature_successfull: "Signature effectuée avec succès"
+
+  api:
+    accounts:
+      title: "Export comptes"
+      info: "Souhaitez-vous exporter la liste de vos comptes?"
+    operations:
+      title: "Export operations"
+      info: "Souhaitez-vous exporter la liste des opérations associées au compte suivant?"
+      account_name: "Nom du compte"
+    errors:
+      cancelled: "Requête annulée par l'utilisateur"
+      account_not_found: "Compte introuvable"
+
   settings:
     common:
       settings: "Réglages"
@@ -452,6 +512,9 @@ wallet:
       bitcoin: "Bitcoin"
       tools: "Outils"
       display: "Affichage"
+      apps: "Apps (beta)"
+      tools: "Outils"
+      version: "Version %s"
 
     hardware:
       firmware: "Logiciel de la puce"
@@ -463,6 +526,28 @@ wallet:
       single_paired_device: "%s association"
       multiple_paired_devices: "%s associations"
 
+    display:
+      units: "Unités"
+      bitcoin_unit: "Unité Bitcoin"
+      show_currency: "Contre-valeur"
+      exchange_rate: "Taux d'échange"
+      language_and_region: "Langue & région"
+      interface_language: "Langue de l'interface"
+      region: "Région"
+
+    bitcoin:
+      confirmations_to_spend: "Confirmations pour dépenser"
+      required_confirmations: "Confirmations requises"
+      transaction_fees: "Frais de transactions"
+      default_value: "Frais par défaut"
+      blockchain_explorer: "Explorer de Blockchain"
+      default_explorer: "Explorateur par défaut"
+
+    tools:
+      logs: "Diagnostic"
+      stored_logs: "Logs enregistrés"
+      disclamer: "Les logs contiennent des événements anonymes qui sont enregistrés et cryptés localement sur votre ordinateur. Ces données ne sont pas envoyées à nos serveurs et ne peuvent être qu'exportés manuellement, sur demande du support Ledger."
+
 apps:
   coinkite:
     top_menu:
@@ -472,6 +557,7 @@ apps:
         key: "EXPORT CLÉ"
         cosign: "COSIGNATURE"
         wallet: "RETOUR"
+
     dashboard:
       title: "Coinkite cosigning interface"
       compatibility:
@@ -484,6 +570,7 @@ apps:
         fail: "Echec!"
         fail_text: "Votre Ledger Nano n'est pas compatible. Vous devez le réinitialiser: entrez trois fois un mauvais PIN puis restaurez votre seed. Assurez vous surtout d'avoir bien votre livret de restauration sinon vous perdez vos bitcoins!"
         warning: "ATTENTION: si le test est un échec, vous devrez débrancher et rebrancher votre Nano."
+
     settings:
       title: "Vos accès API à Coinkite"
       api_key: "API key"
@@ -491,7 +578,11 @@ apps:
       api_key_placeholder: "Entrez votre clé API"
       api_secret_placeholder: "Entrez le secret"
       note: "Attention à bien activer la permission <b>cosign</b> sur cette clé API."
+
     keygen:
+      index:
+        title: "Export de clé publique étendue"
+        info: "Souhaitez-vous donner à Coinkite une clé publique étendue? Cela ajoutera ce Nano en tant que clé de signature pour le wallet que vous êtes en train de créer."
       processing:
         title: "Clé de signature"
         info: "Dérivation de la clé publique étendue pour Coinkite"
@@ -503,6 +594,8 @@ apps:
         note: "Ces informations vous permettent d'ajouter ce Ledger Nano comme clé de signature sur votre wallet multisignature Coinkite. Le chemin de dérivation est utile pour restaurer manuellement la clé publique étendue depuis votre seed."
       errors:
         derivation_failed: "Erreur dans le calcul de la clé publique étendue. Contactez le support"
+        cancelled: "La demande d'export a été annulée par l'utilisateur."
+
     cosign:
       index:
         title: "Cosigner une transaction"
@@ -521,6 +614,7 @@ apps:
         title: "Signature de la transaction"
         info: "La transaction est en cours de signature"
         success: "Signature réussie"
+        success_info: "La transaction a été signée et envoyée sur le serveur de Coinkite."      
         already_signed: "Cette transaction a déjà été signée avec succès par ce Ledger Nano."
       errors:
         wrong_nano: "Transaction invalide"
@@ -530,3 +624,4 @@ apps:
         missing_api_key: "Clés API manquantes"
         missing_api_key_text: "Vous devez renseigner votre clé API ainsi que le secret dans les règlages."
         signature_failed: "Erreur dans la signature"
+        request_cancelled: "La demande de signature a été annulée par l'utilisateur."

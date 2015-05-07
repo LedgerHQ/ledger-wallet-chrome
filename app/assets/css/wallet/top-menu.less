@@ -16,7 +16,7 @@
     align-items: stretch;
     padding: 0 @metrics-medium-padding;
 
-    #settings-item {
+    #help-item {
       margin-left: auto;
       margin-right: 0;
     }
@@ -101,17 +101,18 @@
     align-items: center;
     background-color: @color-dark-grey-blue;
     padding: 0 @metrics-medium-padding;
-    color: @color-white;
 
     .balance-label {
-      letter-spacing: -0.5px;
+      color: @color-light-grey;
+      font-size: @font-size-small;
     }
 
     .balance-value {
+      color: @color-white;
       font-size: 25px;
       font-weight: @font-weight-light;
       letter-spacing: -1.5px;
-      margin-top: 2px;
+      margin-top: 5px;
 
       sup {
         vertical-align: super;

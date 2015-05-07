@@ -17,9 +17,9 @@ class ledger.tasks.BalanceTask extends ledger.tasks.Task
     account = undefined
     ledger.api.BalanceRestClient.instance.getAccountBalance @_accountIndex, (balance, error) =>
       return unless @isRunning()
-      l balance
       if error?
         @emit "failure", @
+        @logger().error("Error during balance computation ", error)
         ledger.app.emit "wallet:balance:failed"
       else
         account = Account.find(index: @_accountIndex).first()

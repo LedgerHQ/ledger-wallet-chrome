@@ -1,7 +1,7 @@
 ###
   Base view controller for all update view controllers. This class holds methods which are common to all update view controllers.
 ###
-class @UpdateViewController extends @ViewController
+class @UpdateViewController extends ledger.common.ViewController
 
   navigation:
     nextRoute: undefined

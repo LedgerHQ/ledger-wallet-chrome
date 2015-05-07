@@ -1,6 +1,6 @@
 @ledger.m2fa ?= {}
 
-DebugWebsocket = (message) -> l message
+DebugWebsocket = (message) -> ledger.utils.Logger.getLoggerByTag("WebSocket").info message
 
 
 # The mobile 2FA ChromeClient.
@@ -23,7 +23,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
     return @_connectionPromise && @_connectionPromise.isFullfilled()
 
   # Sets the name of the dongle asynchronously. Default is ""
-  pairedDongleName: new CompletionClosure().success("")
+  pairedDongleName: ledger.defer("")
 
   # Transmit 4 bytes challenge. 
   # @params [String] challenge is encoded in hex "8 nonce bytes"+"4 challenge bytes"

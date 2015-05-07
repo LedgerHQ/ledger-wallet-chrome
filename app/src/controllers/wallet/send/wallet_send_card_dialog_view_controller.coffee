@@ -1,4 +1,4 @@
-class @WalletSendCardDialogViewController extends @DialogViewController
+class @WalletSendCardDialogViewController extends ledger.common.DialogViewController
 
   view:
     cardContainer: "#card_container"
@@ -13,7 +13,7 @@ class @WalletSendCardDialogViewController extends @DialogViewController
   cancel: ->
     Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
     @dismiss()
-    
+
   onAfterRender: ->
     super
     @_setupUI()
@@ -56,6 +56,7 @@ class @WalletSendCardDialogViewController extends @DialogViewController
       @view.validationSubtitle.text t 'wallet.send.card.address_to_validate'
 
   _updateValidableIndication: ->
+    console.log("_updateValidableIndication=",@_validationDetails)
     return if @_validationDetails.localizedIndexes.length == 0
     index = @_validationDetails.localizedIndexes[0]
     value = @_validationDetails.localizedString.slice(0, index)
@@ -68,12 +69,13 @@ class @WalletSendCardDialogViewController extends @DialogViewController
     @view.validationIndication.html value
 
   _buildValidableSettings: (validationDetails) ->
+    console.log("validationDetails=", validationDetails)
     string = ''
     indexes = []
     decal = 0
     # add amount
     if validationDetails.needsAmountValidation
-      value = ledger.formatters.bitcoin.fromValue(validationDetails.amount.text)
+      value = ledger.formatters.fromValue(validationDetails.amount.text)
       # normalize value
       dotIndex = value.indexOf '.'
       if dotIndex == -1
@@ -89,4 +91,6 @@ class @WalletSendCardDialogViewController extends @DialogViewController
     decal += string.length
     string += validationDetails.recipientsAddress.text
     indexes = indexes.concat _.map(validationDetails.recipientsAddress.indexes, (num) => num + decal)
-    {localizedString: string, localizedIndexes: indexes}
+    r = {localizedString: string, localizedIndexes: indexes}
+    console.log("_buildValidableSettings=", r)
+    r

@@ -1,4 +1,4 @@
-class @OnboardingViewController extends @ViewController
+class @OnboardingViewController extends ledger.common.ViewController
 
   view:
     continueButton: '#continue_button'

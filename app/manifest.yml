@@ -1,9 +1,10 @@
 name: "__MSG_application_name__"
 description: "__MSG_application_small_description__"
-version: "1.1.3"
+version: "1.2.0"
 manifest_version: 2
 minimum_chrome_version: "38"
 default_locale: "en"
+key: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk2jSUQ+PRQdNdw9T6XLr7TLwQpOry4TwwtACJUuK2HasLurg5/2ebzezBeU49ptRLUV5uSq9Pp2bhN+97Vyi2ryrIGemiNdeFWzG1MK8fNDDdaFYXUEC3oRWnzyGNbYHz7lwV4lc65del8tQDiUpjw5bsd+tUrRuasNINeLmQaV0yGQrPVMFjO9n3SpGtom1urLKOPEzNa9mLNsCV4hqz2AI4KMa6sA4hVAEMUDXBRD7ezRv3qX0EeyVel8n2lZTCyxoHZScMxgUlFPXBYVx2U8IBYQU+uCOdxPbe4ON16egzZHPsULmoZnBry0v1cJpMX5BTYlEjkHRRwnTCWJ/AwIDAQAB"
 
 app:
   background:
@@ -15,7 +16,9 @@ permissions:
   - "*://*.ledgerwallet.com/*"
   - "*://*.chain.com/v2/notifications/*"
   - "*://api.coinkite.com/*"
+  - "*://coinkite.com/*"
   - "storage"
+  - "unlimitedStorage"
   - "usb"
   - "hid"
   -
@@ -54,20 +57,26 @@ commands:
     suggested_key:
       default: "Ctrl+R"
       mac: "Command+R"
-    description: "Reload the current page"
+    description: "__MSG_application_commands_reload_page__"
 
   reload-application:
     debug: true
     suggested_key:
       default: "Ctrl+Shift+R"
       mac: "Command+Shift+R"
-    description: "Reload the application"
+    description: "__MSG_application_commands_reload_application__"
 
   update-firmware:
     suggested_key:
       default: "Ctrl+Shift+U"
       mac: "Command+Shift+U"
-    description: "Update the chip firmware"
+    description: "__MSG_application_commands_update_firmware__"
+
+  export-logs:
+    suggested_key:
+      default: "Ctrl+Shift+L"
+      mac: "Command+Shift+L"
+    description: "__MSG_application_commands_export_logs__"
 
 icons:
   16: "assets/images/icon-16.png"

@@ -1,1 +1,1 @@
-class @OnboardingNavigationController extends @NavigationController
+class @OnboardingNavigationController extends ledger.common.NavigationController

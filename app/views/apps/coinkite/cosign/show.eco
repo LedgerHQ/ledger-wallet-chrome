@@ -7,7 +7,7 @@
       <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.amount' %></td>
         <td class="align-right" id="operation_amount">
-          <span class="regular-text"><%= ledger.formatters.bitcoin.fromValue(@amount) %> BTC</span>
+          <span class="regular-text"><%= ledger.formatters.formatValue(@amount) %></span>
         </td>
       </tr>
       <tr>
@@ -22,6 +22,6 @@
 </section>
 <div class="dialog-actions-bar">
   <div class="left-spacer"></div>
-  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
+  <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
   <a class="action-rounded-button" href="#confirm"><%= t 'apps.coinkite.cosign.show.confirm_signature' %></a>
 </div>

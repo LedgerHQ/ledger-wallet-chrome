@@ -1,15 +1,10 @@
-class @WalletSendValidatingDialogViewController extends @DialogViewController
+class @WalletSendValidatingDialogViewController extends ledger.common.DialogViewController
 
   view:
     contentContainer: '#content_container'
 
-  cancel: ->
-    Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
-    @dismiss()
-
-  onAfterRender: ->
+  initialize: ->
     super
-    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
     @params.transaction.prepare (transaction, error) =>
       return unless @isShown()
       if error?
@@ -24,3 +19,11 @@ class @WalletSendValidatingDialogViewController extends @DialogViewController
         @getDialog().push new WalletSendCardDialogViewController(transaction: transaction, options: @params.options)
       else
         @getDialog().push new WalletSendMobileDialogViewController(transaction: transaction, secureScreens: @params.secureScreens)
+
+  cancel: ->
+    Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
+    @dismiss()
+
+  onAfterRender: ->
+    super
+    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])

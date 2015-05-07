@@ -1,4 +1,4 @@
-
+ledger.utils ?= {}
 ###
   A helper class for defining a callback. A completion closure is a callback holder that can be either successful
   or failed. If a result is set and no function is defined, the CompletionClosure will keep the result until a callback function
@@ -42,7 +42,7 @@
       .done()
 
 ###
-class @CompletionClosure
+class ledger.utils.CompletionClosure
 
   ###
     Wraps a node-like asynchronous method in a {CompletionClosure}. This method is useful if you need promise chaining.

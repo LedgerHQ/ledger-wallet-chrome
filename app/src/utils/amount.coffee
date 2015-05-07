@@ -4,45 +4,51 @@ class @ledger.Amount
 
   Amount = @
 
-  # @param [String, Number] value A BTC amount.
-  @fromBtc: (value) ->
-    return value if _.isKindOf(value, Amount)
-    @fromSatoshi(+value * 1e8)
-
-  # @param [String, Number] value A bits (aka µBTC) amount.
-  @fromBits: (value) ->
-    return value if _.isKindOf(value, Amount)
-    @fromSatoshi(+value * 1e2)
-
   # @param [String, Number] value A satoshi amount.
   @fromSatoshi: (value) ->
     return value if _.isKindOf(value, Amount)
-    new Amount(new Bitcoin.BigInteger(Math.trunc(+value).toString()))
+    return new Amount(value) if _.isKindOf(value, Bitcoin.BigInteger)
+    new Amount(new Bitcoin.BigInteger(value.toString()))
 
   # @param [Bitcoin.BigInteger] value The amount value in satoshi.
-  constructor: (value) ->
-    @_number = value.clone()
+  constructor: (value=Bitcoin.BigInteger.ZERO) ->
+    @_value = value.clone()
 
   # @param [ledger.Amount] amount
   # @return [ledger.Amount]
   add: (amount) ->
-    new Amount(@_number.add(amount._number))
+    amount = Amount.fromSatoshi(amount)
+    new Amount(@_value.add(amount._value))
 
   # @param [ledger.Amount] amount
   # @return [ledger.Amount]
-  substract: (amount) ->
-    new Amount(@_number.substract(amount._number))
+  subtract: (amount) ->
+    amount = Amount.fromSatoshi(amount)
+    new Amount(@_value.subtract(amount._value))
 
   # @param [String, Number, Bitcoin.BigInteger] number
   # @return [ledger.Amount]
   multiply: (number) ->
-    number = new Bitcoin.BigInteger(number.toString()) unless _(number).isKindOf(Bitcoin.BigInteger)
-    new Amount(@_number.multiply(value._number))
+    number = Amount.fromSatoshi(number)
+    new Amount(@_value.multiply(number._value))
 
-  # @param [ledger.Amount] amount
+  pow: (e) ->
+    e = Amount.fromSatoshi(e)
+    new Amount(@_value.pow(e._value))
+
+  mod: (amount) ->
+    amount = Amount.fromSatoshi(amount)
+    new Amount(@_value.mod(amount._value))
+
+  divide: (amount) ->
+    amount = Amount.fromSatoshi(amount)
+    new Amount(@_value.divide(amount._value))
+
+  # @param [ledger.Amount, Number, ] amount
   # @return [Number]
   compare: (amount) ->
-    @_number.compareTo(value.amount)
+    amount = Amount.fromSatoshi(amount)
+    @_value.compareTo(amount._value)
 
   # @return [Boolean]
   lt: (amount) -> @compare(amount) < 0
@@ -73,6 +79,8 @@ class @ledger.Amount
   # @return [String]
   toSatoshiString: (base=10) -> @toSatoshiNumber().toString(base)
   # @return [Number]
-  toSatoshiNumber: () -> @_number.intValue()
+  toSatoshiNumber: () -> @_value.intValue()
   # @return [Bitcoin.BigInteger]
-  toBigInteger: () -> @_number.clone()
+  toBigInteger: () -> @_value.clone()
+  toNumber: -> @_value.intValue()
+  toString: (base) -> @_value.toString(base)

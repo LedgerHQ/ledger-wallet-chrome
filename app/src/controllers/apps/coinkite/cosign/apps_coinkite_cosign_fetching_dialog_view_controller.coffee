@@ -1,4 +1,4 @@
-class @AppsCoinkiteCosignFetchingDialogViewController extends @DialogViewController
+class @AppsCoinkiteCosignFetchingDialogViewController extends ledger.common.DialogViewController
 
   view:
     contentContainer: '#content_container'
@@ -13,7 +13,7 @@ class @AppsCoinkiteCosignFetchingDialogViewController extends @DialogViewControl
           if error?
             @dismiss =>
               dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("apps.coinkite.cosign.errors.coinkite_api"), subtitle: error)
-              dialog.show()          
+              dialog.show()
           else
             setTimeout ( =>
               ck.getCosigner data, (cosigner, signed) =>
@@ -21,7 +21,7 @@ class @AppsCoinkiteCosignFetchingDialogViewController extends @DialogViewControl
                   if signed
                     @dismiss =>
                       dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("apps.coinkite.cosign.signing.success"), subtitle: t("apps.coinkite.cosign.signing.already_signed"))
-                      dialog.show()                    
+                      dialog.show()
                   else
                     ck.getCosignData request, cosigner, (data, error) =>
                       if error?
@@ -40,4 +40,4 @@ class @AppsCoinkiteCosignFetchingDialogViewController extends @DialogViewControl
       else
         @dismiss =>
           dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("apps.coinkite.cosign.errors.missing_api_key"), subtitle: t("apps.coinkite.cosign.errors.missing_api_key_text"))
-          dialog.show()              
+          dialog.show()

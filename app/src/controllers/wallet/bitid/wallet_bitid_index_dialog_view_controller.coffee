@@ -1,4 +1,4 @@
-class @WalletBitidIndexDialogViewController extends DialogViewController
+class @WalletBitidIndexDialogViewController extends ledger.common.DialogViewController
 
   view:
     confirmButton: '#confirm_button'
@@ -9,23 +9,27 @@ class @WalletBitidIndexDialogViewController extends DialogViewController
   onAfterRender: ->
     super
     @view.confirmButton.addClass "disabled"
-    chrome.app.window.current().show()
     @uri = @params.uri
     @doNotBroadcast = @params.silent
-    @derivationPath = ledger.bitcoin.bitid.uriToDerivationPath(@uri)
     @view.bitidDomain.text ledger.bitcoin.bitid.uriToDerivationUrl(@uri)
-    ledger.app.wallet._lwCard.getBitIDAddress @derivationPath
+    ledger.bitcoin.bitid.getAddress(uri: @uri)
     .then (data) =>
       @address = data.bitcoinAddress.value
       @view.bitidAddress.text(@address)
-      ledger.app.wallet.signMessageWithBitId @derivationPath, @uri, (result) =>
-        @signature = result
-        @view.confirmButton.removeClass "disabled"
-        if typeof @signature != "string" || @signature.length == 0
-          @view.errorContainer.text t('wallet.bitid.errors.signature_failed')
-          @view.confirmButton.text t('common.close')
-        else
-          @view.confirmButton.text t('common.confirm')
+      ledger.bitcoin.bitid.signMessage(@uri, uri: @uri)
+    .then (sig) =>
+      @signature = sig
+      @view.confirmButton.removeClass "disabled"
+      if typeof @signature != "string" || @signature.length == 0
+        @view.errorContainer.text t('wallet.bitid.errors.signature_failed')
+        @view.confirmButton.text t('common.close')
+      else
+        @view.confirmButton.text t('common.confirm')
+    .catch (error) =>
+      console.error(error)
+      @view.errorContainer.text t("wallet.bitid.errors.signature_failed")
+      @view.confirmButton.text t('common.close')
+    .done()
 
   cancel: ->
     Api.callback_cancel 'bitid', t('wallet.bitid.errors.cancelled')

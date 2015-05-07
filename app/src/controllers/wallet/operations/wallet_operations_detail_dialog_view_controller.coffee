@@ -1,8 +1,9 @@
-class @WalletOperationsDetailDialogViewController extends DialogViewController
+class @WalletOperationsDetailDialogViewController extends ledger.common.DialogViewController
 
   show: ->
     @operation = Operation.findById(parseInt(@params['operationId']))
     super
 
   openBlockchain: ->
-    window.open 'https://blockchain.info/tx/' + @operation.get('hash')
+    exploreURL = ledger.preferences.instance.getBlockchainExplorerAddress()
+    window.open _.str.sprintf(exploreURL, @operation.get('hash'))

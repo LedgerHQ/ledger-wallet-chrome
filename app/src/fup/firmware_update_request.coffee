@@ -31,7 +31,7 @@ Errors =
 ExchangeTimeout = 200
 
 ###
-  FirmwareUpdateRequest performs dongle firmware updates. Once started it will listen the {WalletsManager} in order to catch
+  FirmwareUpdateRequest performs dongle firmware updates. Once started it will listen the {DonglesManager} in order to catch
   connected dongles and update them. Only one instance of FirmwareUpdateRequest should be alive at the same time. (This is
   ensured by the {ledger.fup.FirmwareUpdater})
 
@@ -68,6 +68,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_isWaitForDongleSilent = no
     @_isCancelled = no
     @_eventHandler = []
+    @_logger = ledger.utils.Logger.getLoggerByTag('FirmwareUpdateRequest')
 
   ###
     Stops all current tasks and listened events.
@@ -150,56 +151,55 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _waitForConnectedDongle: (callback = undefined, silent = no) ->
     @_isWaitForDongleSilent = silent
     return @_connectionCompletion if @_connectionCompletion?
-    completion = new CompletionClosure(callback)
-    registerWallet = (wallet) =>
-      @_lastMode = if wallet.isInBootloaderMode() then Modes.Bootloader else Modes.Os
-      @_wallet = wallet
+    d = ledger.defer(callback)
+    registerDongle = (dongle) =>
+      @_lastMode = if dongle.isInBootloaderMode() then Modes.Bootloader else Modes.Os
+      @_dongle = dongle
       handler =  =>
         @_setCurrentState(States.Undefined)
-        @_wallet = null
+        @_dongle = null
         @_waitForConnectedDongle(null, @_isWaitForDongleSilent)
-      wallet.once 'disconnected', handler
-      @_eventHandler.push [wallet, 'disconnected', handler]
+      dongle.once 'state:disconnected', handler
+      @_eventHandler.push [dongle, 'state:disconnected', handler]
       @_handleCurrentState()
-      completion.success(wallet)
-
-    [wallet] = ledger.app.walletsManager.getConnectedWallets()
+      d.resolve(dongle)
+    [dongle] = ledger.app.donglesManager.getConnectedDongles()
     try
-      unless wallet?
-        @_connectionCompletion = completion.readonly()
+      unless dongle?
+        @_connectionCompletion = d.promise
         delay = if !silent then 0 else 1000
-        setTimeout (=> @emit 'plug' unless @_wallet?), delay
-        handler = (e, wallet) =>
+        setTimeout (=> @emit 'plug' unless @_dongle?), delay
+        handler = (e, dongle) =>
           @_connectionCompletion = null
-          registerWallet(wallet)
-        ledger.app.walletsManager.once 'connected', handler
-        @_eventHandler.push [ledger.app.walletsManager, 'connected', handler]
+          registerDongle(dongle)
+        ledger.app.donglesManager.once 'connected', handler
+        @_eventHandler.push [ledger.app.donglesManager, 'connected', handler]
       else
-        registerWallet(wallet)
+        registerDongle(dongle)
     catch er
       e er
-    completion.readonly()
-
+    d.promise
 
   _waitForDisconnectDongle: (callback = undefined, silent = no) ->
     return @_disconnectionCompletion if @_disconnectionCompletion?
-    completion = new CompletionClosure(callback)
-    if @_wallet?
+    d = ledger.defer(callback)
+    if @_dongle?
       @emit 'unplug' unless silent
-      @_disconnectionCompletion = completion.readonly()
-      @_wallet.once 'disconnected', =>
+      @_disconnectionCompletion = d.promise
+      @_dongle.once 'state:disconnected', =>
         @_disconnectionCompletion = null
-        @_wallet = null
-        completion.success()
+        @_dongle = null
+        d.resolve()
     else
-      completion.success()
-    completion.readonly()
+      d.resolve()
+    d.promise
 
-  _waitForPowerCycle: (callback = undefined, silent = no) -> @_waitForDisconnectDongle(null, silent).then(=> @_waitForConnectedDongle(callback, silent).promise())
+  _waitForPowerCycle: (callback = undefined, silent = no) -> @_waitForDisconnectDongle(null, silent).then(=> @_waitForConnectedDongle(callback, silent))
 
   _handleCurrentState: () ->
     # If there is no dongle wait for one
-    (return @_waitForConnectedDongle()) unless @_wallet?
+    return @_waitForConnectedDongle() unless @_dongle?
+    @_logger.info("Handle current state", lastMode: @_lastMode, currentState: @_currentState)
 
     # Otherwise handle the current by calling the right method depending on the last mode and the state
     if @_lastMode is Modes.Os
@@ -218,13 +218,14 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         else @_failure(Errors.InconsistentState)
 
   _processInitStageOs: ->
-    @_wallet.getState (state) =>
-      if state isnt ledger.wallet.States.BLANK and state isnt ledger.wallet.States.FROZEN
+    @_logger.info("Process init stage OS")
+    @_dongle.getState (state) =>
+      if state isnt ledger.dongle.States.BLANK and state isnt ledger.dongle.States.FROZEN
         @_setCurrentState(States.Erasing)
         @_handleCurrentState()
       else
-        @_fup.getFirmwareUpdateAvailability @_wallet, @_lastMode is Modes.Bootloader, no, (availability, error) =>
-          return @_failure(Errors.UnableToRetrieveVersion) if error?
+        @_fup.getFirmwareUpdateAvailability @_dongle, @_lastMode is Modes.Bootloader, no, (availability, error) =>
+          return if error?
           @_dongleVersion = availability.dongleVersion
           switch availability.result
             when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Overwrite
@@ -232,9 +233,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
                 @_setCurrentState(States.InitializingOs)
                 @_handleCurrentState()
               else
-                @_wallet.isDongleBetaCertified (__, error) =>
+                @_dongle.isBetaCertified (__, error) =>
                   @_setCurrentState(if error? and ledger.fup.versions.Nano.CurrentVersion.Overwrite is false then States.InitializingOs else States.ReloadingBootloaderFromOs)
                   @_handleCurrentState()
+                return
             when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update, ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Higher
               index = 0
               while index < ledger.fup.updates.OS_INIT.length and !ledger.fup.utils.compareVersions(@_dongleVersion, ledger.fup.updates.OS_INIT[index][0]).eq()
@@ -249,6 +251,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
                 @_setCurrentState(States.ReloadingBootloaderFromOs)
                 @_handleCurrentState()
             else return @_failure(Errors.HigherVersion)
+          return
 
   _processErasing: ->
     @_waitForUserApproval('erasure')
@@ -257,11 +260,11 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         getRandomChar = -> "0123456789".charAt(_.random(10))
         @_stateCache.pincode = getRandomChar() + getRandomChar()
       pincode = @_stateCache.pincode
-      @_wallet.unlockWithPinCode pincode, (isUnlocked, error) =>
+      @_dongle.unlockWithPinCode pincode, (isUnlocked, error) =>
         @emit "erasureStep", if error?.retryCount? then error.retryCount else 3
         @_waitForPowerCycle()
       return
-    .fail ->
+    .fail =>
       @_failure(Errors.CommunicationError)
     .done()
 
@@ -299,14 +302,18 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_waitForPowerCycle(null, yes)
       .fail (e) =>
         switch @_getCard().SW
-          when 0x6985 then @_failure(Errors.ErrorDongleMayHaveASeed)
+          when 0x6985
+            @_processInitOs()
+            return
           when 0x6faa then @_failure(Errors.ErrorDueToCardPersonalization)
           else @_failure(Errors.CommunicationError)
         @_waitForDisconnectDongle()
+    .fail (err) ->
+      console.error(err)
 
   _processInitStageBootloader: ->
     @_lastVersion = null
-    @_wallet.getRawFirmwareVersion yes, yes, (version, error) =>
+    @_dongle.getRawFirmwareVersion yes, yes, (version, error) =>
       return @_failure(Errors.UnableToRetrieveVersion) if error?
       @_lastVersion = version
       if ledger.fup.utils.compareVersions(version, ledger.fup.versions.Nano.CurrentVersion.Bootloader).eq()
@@ -350,11 +357,12 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .fail (ex) =>
       @_failure(ledger.errors.CommunicationError)
 
-  _getVersion: (forceBl, callback) -> @_wallet.getRawFirmwareVersion(@_lastMode is Modes.Bootloader, forceBl, callback)
+  _getVersion: (forceBl, callback) -> @_dongle.getRawFirmwareVersion(@_lastMode is Modes.Bootloader, forceBl, callback)
 
   _failure: (reason) ->
-    @emit "error", cause: new ledger.StandardError(reason)
+    @emit "error", cause: ledger.errors.new(reason)
     @_waitForPowerCycle()
+    return
 
   _success: ->
     @_setCurrentState(States.Done)
@@ -362,7 +370,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _attemptToFailDonglePinCode: (pincode) ->
     deferred = Q.defer()
-    @_wallet.unlockWithPinCode pincode, (isUnlocked, error) =>
+    @_dongle.unlockWithPinCode pincode, (isUnlocked, error) =>
       if isUnlocked or error.code isnt ledger.errors.WrongPinCode
         @emit "erasureStep", 3
         @_waitForPowerCycle().then -> deferred.reject()
@@ -370,8 +378,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @emit "erasureStep", error.retryCount
         @_waitForPowerCycle()
         .then =>
-          @_wallet.getState (state) =>
-            deferred.resolve(state is ledger.wallet.States.BLANK or state is ledger.wallet.States.FROZEN)
+          @_dongle.getState (state) =>
+            deferred.resolve(state is ledger.dongle.States.BLANK or state is ledger.dongle.States.FROZEN)
     deferred.promise
 
   _setCurrentState: (newState) ->
@@ -400,11 +408,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _waitForUserApproval: (approvalName) ->
     if _.contains(@_approvedStates, approvalName)
-      deferred = Q.defer()
-      deferred.resolve()
-      deferred.promise
+      Q()
     else
-      @_setIsNeedingUserApproval  yes
+      @_setIsNeedingUserApproval yes
       @_deferredApproval.promise.then => @_approvedStates.push approvalName
 
   _removeUserApproval: (approvalName) ->
@@ -412,11 +418,11 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     return
 
   _processLoadingScript: (adpus, state, ignoreSW, offset = 0) ->
-    completion = new CompletionClosure()
-    @_doProcessLoadingScript(adpus, state, ignoreSW, offset).then(-> completion.success()).fail((ex) -> completion.failure(ex))
-    completion.readonly()
+    d = ledger.defer()
+    @_doProcessLoadingScript(adpus, state, ignoreSW, offset).then(-> d.resolve()).fail((ex) -> d.reject(ex))
+    d.promise
 
-  _doProcessLoadingScript: (adpus, state, ignoreSW, offset) ->
+  _doProcessLoadingScript: (adpus, state, ignoreSW, offset, forceTimeout = no) ->
     @_notifyProgress(state, offset, adpus.length)
     if offset >= adpus.length
       @_exchangeNeedsExtraTimeout = no
@@ -425,19 +431,25 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
      @_getCard().exchange_async(new ByteString(adpus[offset], HEX))
       .then =>
         if ignoreSW or @_getCard().SW == 0x9000
-          if @_exchangeNeedsExtraTimeout
+          if @_exchangeNeedsExtraTimeout or forceTimeout
             deferred = Q.defer()
             _.delay (=> deferred.resolve(@_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1))), ExchangeTimeout
-            deferred.promise()
+            deferred.promise
           else
             @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
         else
           @_exchangeNeedsExtraTimeout = no
-          throw new Error('Unexpected status ' + @_getCard().SW)
+          if forceTimeout is no
+            @_doProcessLoadingScript(adpus, state, ignoreSW, offset, yes)
+          else
+            throw new Error('Unexpected status ' + @_getCard().SW)
       .fail (ex) =>
         return @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1) if offset is adpus.length - 1
         @_exchangeNeedsExtraTimeout = no
-        throw new Error("ADPU sending failed " + ex)
+        if forceTimeout is no
+          @_doProcessLoadingScript(adpus, state, ignoreSW, offset, yes)
+        else
+          throw new Error("ADPU sending failed " + ex)
     catch ex
       e ex
 
@@ -452,6 +464,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       e er
       throw new Error("Communication Error")
 
-  _getCard: -> @_wallet?._lwCard.dongle.card
+  _getCard: -> @_dongle?._btchip.card
 
   _notifyProgress: (state, offset, total) -> _.defer => @_onProgress?(state, offset, total)

@@ -1,23 +1,23 @@
 try
   importScripts(
-      '../utils/log.js'
+      '../utils/logger.js'
       '../../libs/bitcoinjs-min.js'
-      '../../libs/lw-api-js/lib/bitcoinjs-min.js'
+      '../../libs/btchip/lib/bitcoinjs-min.js'
       'extended_public_key.js'
-      '../../libs/lw-api-js/lib/inheritance.js'
-      '../../libs/lw-api-js/lib/BitcoinExternal.js'
-      '../../libs/lw-api-js/btchip-js-api/ByteString.js'
-      '../../libs/lw-api-js/btchip-js-api/Convert.js'
-      '../../libs/lw-api-js/btchip-js-api/GlobalConstants.js'
-      '../../libs/lw-api-js/ucrypt/JSUCrypt.js'
-      '../../libs/lw-api-js/ucrypt/helpers.js'
-      '../../libs/lw-api-js/ucrypt/hash.js'
-      '../../libs/lw-api-js/ucrypt/sha256.js'
-      '../../libs/lw-api-js/ucrypt/ripemd160.js'
+      '../../libs/btchip/lib/inheritance.js'
+      '../../libs/btchip/lib/BitcoinExternal.js'
+      '../../libs/btchip/btchip-js-api/ByteString.js'
+      '../../libs/btchip/btchip-js-api/Convert.js'
+      '../../libs/btchip/btchip-js-api/GlobalConstants.js'
+      '../../libs/btchip/ucrypt/JSUCrypt.js'
+      '../../libs/btchip/ucrypt/helpers.js'
+      '../../libs/btchip/ucrypt/hash.js'
+      '../../libs/btchip/ucrypt/sha256.js'
+      '../../libs/btchip/ucrypt/ripemd160.js'
       '../../libs/underscore-min.js'
       '../../libs/underscore.string.min.js'
       '../utils/object.js'
-      'value.js'
+      '../utils/amount.js'
   )
 catch er
   console.error er
@@ -33,8 +33,8 @@ CurrentCommand = null
 
 ledger.app ?= {}
 ledger.wallet ?= {}
-ledger.wallet.HDWallet ?= {}
-ledger.wallet.HDWallet.instance ?= {}
+ledger.wallet.Wallet ?= {}
+ledger.wallet.Wallet.instance ?= {}
 
 enqueue = (command, parameters, queryId) ->
   Queue.push command: command, parameters: parameters, queryId: queryId
@@ -60,7 +60,7 @@ sendCommand = (command, parameters, callback) ->
 
 class WorkerWallet
 
-  ledger.app.wallet = new @
+  ledger.app.dongle = new @
 
   getPublicAddress: (path, callback) ->
     sendCommand 'private:getPublicAddress', [path], (result, error) =>
@@ -73,7 +73,7 @@ class WorkerWallet
 
 class WorkerCache
 
-  ledger.wallet.HDWallet.instance.cache = new @
+  ledger.wallet.Wallet.instance.cache = new @
 
   get: () -> null
 
@@ -85,7 +85,7 @@ registerExtendedPublicKeyForPath = (path) ->
   if ExtendedPublicKeys[path]?
     postResult 'Already registered'
     return
-  ExtendedPublicKeys[path] = new ledger.wallet.ExtendedPublicKey(ledger.app.wallet, path)
+  ExtendedPublicKeys[path] = new ledger.wallet.ExtendedPublicKey(ledger.app.dongle, path)
   ExtendedPublicKeys[path].initialize (xpub) =>
     if xpub?
       postResult 'registered'
@@ -104,7 +104,7 @@ getPublicAddress = (path) ->
 
   # No result from cache perform the derivation on the chip
   unless address?
-    ledger.app.wallet.getPublicAddress path, (publicKey) ->
+    ledger.app.dongle.getPublicAddress path, (publicKey) ->
       @_derivationPath
       if publicKey?
        address = publicKey?.bitcoinAddress?.value

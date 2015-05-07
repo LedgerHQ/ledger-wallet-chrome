@@ -1,4 +1,4 @@
-class @WalletBitidFormDialogViewController extends DialogViewController
+class @WalletBitidFormDialogViewController extends ledger.common.DialogViewController
 
   view:
     bitidUri: '#bitid_uri'
@@ -14,7 +14,7 @@ class @WalletBitidFormDialogViewController extends DialogViewController
       @view.errorContainer.show()
       @view.errorContainer.text nextError
     else
-      @view.errorContainer.hide()     
+      @view.errorContainer.hide()
       dialog = new WalletBitidIndexDialogViewController uri: @_uri(), silent: true
       @getDialog().push dialog
 
@@ -24,4 +24,4 @@ class @WalletBitidFormDialogViewController extends DialogViewController
   _nextFormError: ->
     if !ledger.bitcoin.bitid.isValidUri(@_uri())
       return t 'wallet.bitid.form.invalid_uri'
-    undefined        
+    undefined

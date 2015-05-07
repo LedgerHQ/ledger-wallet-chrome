@@ -1,4 +1,4 @@
-class @UpdateNavigationController extends @NavigationController
+class @UpdateNavigationController extends ledger.common.NavigationController
 
   view:
     pageSubtitle: "#page_subtitle"
@@ -10,15 +10,14 @@ class @UpdateNavigationController extends @NavigationController
     @_request.on 'plug', => @_onPlugDongle()
     @_request.on 'unplug', =>  @_onDongleNeedPowerCycle()
     @_request.on 'stateChanged', (ev, data) => @_onStateChanged(data.newState, data.oldState)
-    @_request.on 'needsUserApproval', @_onNeedsUserApproval
+    @_request.on 'needsUserApproval', => @_onNeedsUserApproval()
     ledger.app.on 'dongle:disconnected', =>
       if _(@topViewController()).isKindOf(UpdateIndexViewController) or _(@topViewController()).isKindOf(UpdateSeedViewController) or _(@topViewController()).isKindOf(UpdateDoneViewController) or _(@topViewController()).isKindOf(UpdateErrorViewController)
         ledger.app.setExecutionMode(ledger.app.Modes.Wallet)
         ledger.app.router.go '/onboarding/device/plug', animateIntro: no
-    @_request.on 'error', (event, error) => @_onError(error)
+    @_request.on 'error', (event, error) => @_onError(error.cause)
     @_request.onProgress @_onProgress.bind(@)
     ledger.fup.FirmwareUpdater.instance.load =>
-    window.fup = @_request # TODO: REMOVE THIS
 
   renderChild: ->
     super
@@ -40,13 +39,15 @@ class @UpdateNavigationController extends @NavigationController
     if @topViewController().shouldEnablePreviousButton() then @view.previousButton.removeClass 'disabled' else @view.previousButton.addClass 'disabled'
 
   _onPlugDongle: ->
+    @_currentError = null
     ledger.app.router.go '/update/plug'
 
   _onErasingDongle: ->
     ledger.app.router.go '/update/erasing'
 
   _onDongleNeedPowerCycle: ->
-    ledger.app.router.go '/update/unplug'
+    unless @_currentError?
+      ledger.app.router.go '/update/unplug'
 
   _onReloadingBootloaderFromOs: ->
     ledger.app.router.go '/update/updating'
@@ -58,7 +59,8 @@ class @UpdateNavigationController extends @NavigationController
     ledger.app.router.go '/update/done'
 
   _onError: (error) ->
-    ledger.app.router.go '/update/error', {errorCode: error.code}
+    @_currentError = error
+    ledger.app.router.go '/update/error', {errorCode: error.code.intValue()}
 
   _onStateChanged: (newState, oldState) ->
     switch newState

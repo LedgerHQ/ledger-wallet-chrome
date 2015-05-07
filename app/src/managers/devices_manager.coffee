@@ -51,6 +51,7 @@ class @DevicesManager extends EventEmitter
         oldDifferences = (item for item in devicesList when _.indexOf(oldDevicesList, item) == -1)
         newDifferences = (item for item in oldDevicesList when _.indexOf(devicesList, item) == -1)
         differences = newDifferences.concat(oldDifferences)
+
         for difference in differences
           if _.where(oldDevices, {id: difference.id}).length > 0
             @emit 'unplug', difference
