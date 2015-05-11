@@ -10,13 +10,26 @@ class Database extends EventEmitter
   load: (callback) ->
     @_store.get @_name, (json) =>
       try
-        @_db = new loki(@_name)
+        @_migrateJsonToLoki125 json
+        l json
+        @_db = new loki(@_name, ENV: 'BROWSER')
         @_db.loadJSON JSON.stringify(json[@_name]) if json[@_name]?
         @_db.save = @scheduleFlush.bind(this)
       catch er
         e er
       callback?()
       @emit 'loaded'
+
+  _migrateJsonToLoki125: (json) ->
+    if !json['__version']? or json['__version'] isnt '1.2.5'
+      @_migrateDbJsonToLoki125(value) for key, value of json when !key.match(/^(__version)$/)
+
+  _migrateDbJsonToLoki125: (dbJson) ->
+    for collection in dbJson['collections']
+      for item in collection['data']
+        item['$loki'] = item['id']
+        item['id'] = item['originalId'] or item['$loki']
+        delete item['originalId']
 
   perform: (callback) ->
     if @_db?
