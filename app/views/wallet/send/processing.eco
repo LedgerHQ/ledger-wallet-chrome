@@ -4,10 +4,14 @@
   </header>
   <div id="content_container">
     <div class="regular-text"><%= t 'wallet.send.processing.finalizing_transaction' %></div>
+    <div class="progress_container">
+      <div id="progressbar_container"></div>
+      <div class="regular-grey-text-small" id="progress_label">0%</div>
+    </div>
     <div class="regular-grey-text-small"><%= t 'common.may_take_a_while' %></div>
   </div>
 </section>
 <div class="dialog-actions-bar">
   <div class="left-spacer"></div>
-  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
+  <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
 </div>
