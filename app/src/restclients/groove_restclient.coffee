@@ -2,6 +2,7 @@
 class ledger.api.GrooveRestClient extends ledger.api.RestClient
 
   sendTicket: (body, email, name, subject, tags, metadata, logs, callback=undefined) ->
+    l arguments
     @http().post
       url: "support/ticket",
       data: {

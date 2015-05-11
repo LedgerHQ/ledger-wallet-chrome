@@ -75,6 +75,13 @@ common:
     fast: "%s (confirmation rapide)"
     slow: "%s (confirmation lente)"
 
+  help:
+    help: "Aide"
+    browse_knowledge_base: "Parcourir la base de connaissance"
+    contact_support_team: "Contacter l'équipe support"
+    self_help: "Pour une auto-assistance immédiate"
+    dedicated_help: "Pour une aide personnalisée"
+
 onboarding:
   device:
     plug:
