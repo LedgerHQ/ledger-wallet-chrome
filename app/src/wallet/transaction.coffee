@@ -141,11 +141,12 @@ class ledger.wallet.Transaction
   # @param [String] changePath
   # @param [Function] callback
   # @return [Q.Promise]
-  prepare: (callback=undefined) ->
+  prepare: (callback = undefined, progressCallback = undefined) ->
     if not @amount? or not @fees? or not @recipientAddress?
       Errors.throw('Transaction must me initialized before preparation')
     d = ledger.defer(callback)
     @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
+    .progress => l arguments
     .then (@_resumeData) =>
       @_validationMode = @_resumeData.authorizationRequired
       @authorizationPaired = @_resumeData.authorizationPaired
