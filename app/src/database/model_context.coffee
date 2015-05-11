@@ -26,6 +26,7 @@ class Collection
     @_context.notifyDatabaseChange()
 
   update: (model) ->
+    l model
     @_collection.update(model._object)
     @_context.notifyDatabaseChange()
 

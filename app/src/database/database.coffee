@@ -27,7 +27,7 @@ class Database extends EventEmitter
   _migrateDbJsonToLoki125: (dbJson) ->
     for collection in dbJson['collections']
       for item in collection['data']
-        item['$loki'] = item['id']
+        item['$loki'] = item['id'] if item['id']
         item['id'] = item['originalId'] or item['$loki']
         delete item['originalId']
 
