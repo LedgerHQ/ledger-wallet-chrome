@@ -12,7 +12,7 @@ resolveRelationship = (object, relationship) ->
       object._collection.getRelationshipView(object, relationship).modelize()
 
 
-class @Model extends @EventEmitter
+class @ledger.database.Model extends @EventEmitter
 
   constructor: (context, base) ->
     throw 'Model can not be build without a context' unless context?
@@ -199,12 +199,12 @@ class @Model extends @EventEmitter
         @_commitRemovePendingRelationship(pending, relationship)
     @_pendingRelationships = null
 
-  @create: (base, context = ledger.db.contexts.main) -> new @ context, base
+  @create: (base, context = ledger.database.contexts.main) -> new @ context, base
 
-  @findById: (id, context = ledger.db.contexts.main) -> context.getCollection(@getCollectionName()).get(id)
+  @findById: (id, context = ledger.database.contexts.main) -> context.getCollection(@getCollectionName()).get(id)
 
-  @findOrCreate: (query, base, context = ledger.db.contexts.main) ->
-    if _.isKindOf(base, ledger.db.contexts.Context)
+  @findOrCreate: (query, base, context = ledger.database.contexts.main) ->
+    if _.isKindOf(base, ledger.database.contexts.Context)
       context = base
       base = undefined
     if _.isObject query
@@ -216,12 +216,12 @@ class @Model extends @EventEmitter
     object = @create base, context unless object?
     object
 
-  @find: (query, context = ledger.db.contexts.main) ->
+  @find: (query, context = ledger.database.contexts.main) ->
     chain = context.getCollection(@getCollectionName()).query()
     chain.find(query) if query?
     chain
 
-  @all: (context = ledger.db.contexts.main) -> context.getCollection(@getCollectionName()).query().data()
+  @all: (context = ledger.database.contexts.main) -> context.getCollection(@getCollectionName()).query().data()
 
 
   # Relationship creator
@@ -270,8 +270,8 @@ class @Model extends @EventEmitter
     @_indexes.push field
 
   @init: () ->
-    Model._allModelClasses ?= {}
-    Model._allModelClasses[@name] = @
+    ledger.database.Model._allModelClasses ?= {}
+    ledger.database.Model._allModelClasses[@name] = @
 
   @getCollectionName: () -> @name
 

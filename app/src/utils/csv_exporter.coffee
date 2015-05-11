@@ -38,13 +38,11 @@ class ledger.utils.CsvExporter
   setHeaderLine: (line) -> @_headerLine = line.join ','
 
   save: (callback = undefined) ->
-    completion = new CompletionClosure(callback)
-    @_performSave(completion)
-    completion
+    deferred = ledger.defer(callback)
+    @_performSave(deferred)
+    deferred.promise
 
-    completion.readonly()
-
-  _performSave: (completion) ->
+  _performSave: (deferred) ->
     chrome.fileSystem.chooseEntry
       type: 'saveFile'
       suggestedName: "#{@_defaultFileName}.csv"
@@ -52,22 +50,22 @@ class ledger.utils.CsvExporter
     , (entry) =>
       if !entry? or entry.length is 0
         chrome.runtime.lastError
-        completion.failure(new ledger.StandardError(ledger.errors.OperationCanceledError))
+        deferred.rejectWithError(ledger.errors.OperationCanceledError)
       else
         entry.createWriter (writer) =>
           try
             writer.onerror = =>
               chrome.runtime.lastError
-              completion.failure(new ledger.StandardError(ledger.errors.WriteError))
-            writer.onwriteend = -> completion.success(this)
+              deferred.rejectWithError(ledger.errors.WriteError)
+            writer.onwriteend = -> deferred.resolve(this)
             fileContent = (if @_headerLine? then [@_headerLine].concat(@_lines) else @_lines).join("\n")
             writer.write new Blob([fileContent], type: "text/csv")
           catch er
             chrome.runtime.lastError
-            completion.failure(new ledger.StandardError(ledger.errors.WriteError))
+            deferred.rejectWithError(ledger.errors.WriteError)
         , =>
           chrome.runtime.lastError
-          completion.failure(new ledger.StandardError(ledger.errors.WriteError))
+          deferred.rejectWithError(ledger.errors.WriteError)
 
   url: ->
     fileContent = (if @_headerLine? then [@_headerLine].concat(@_lines) else @_lines).join("\n")

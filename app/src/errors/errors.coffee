@@ -13,6 +13,8 @@ _.extend ledger.errors,
   InconsistentState: 105
   OperationCanceledError: 106
   PermissionDenied: 107
+  TimeoutError: 108
+  InterruptedTask: 109
 
   # Dongle errors
   NotSupportedDongle: 200
@@ -20,7 +22,7 @@ _.extend ledger.errors,
   DongleAlreadyUnlock: 202
   WrongPinCode: 203
   DongleLocked: 204
-  UnableToGetBitIdAddress: 205
+  BlankDongle: 205
   DongleNotCertified: 206
   CommunicationError: 207
 
@@ -41,18 +43,37 @@ _.extend ledger.errors,
   ErrorDueToCardPersonalization: 408
   HigherVersion: 409
 
+  # M2FA errors
+  TransactionCancelled: "secure_screen_cancelled_transaction"
+  InvalidResult: "secure_screen_invalid_pin"
+
   # I/O Errors
   WriteError: 500
 
+  # Wallet Opening Errors
+  UnableToRetrieveBitidAddress: 600
+  FatalErrorDuringLayoutWalletRecovery: 601
 
-  create: (code, title, error) -> code: code, title: title, error: error
-  throw: (code, message) -> throw new ledger.StandardError(code, message)
+  DefaultMessages:
+    0: "StandardError"
 
-class ledger.StandardError extends Error
-  # @exemple Initializations
-  #   new ledger.StandardError(ledger.errors.NotFound[, "an error message"])
-  constructor: (@code, @message=undefined) ->
-    super(@message)
+    100: "Unknow error"
+    101: "Invalid argument"
+    102: "Not found"
+    103: "Network error"
+    104: "Authentication failed"
 
-  name: ->
-    _.invert(ledger.errors)[@code]
+    200: "Not supported dongle"
+    201: "Dongle not blank"
+    202: "Dongle already unlock"
+    203: "Wrong PIN code"
+    204: "Dongle locked"
+    205: "Blank dongle"
+    206: "Dongle not certified"
+    207: "Unable to get BitId address"
+
+    300: "Not enough funds"
+    301: "Signature error"
+    302: "Dust transaction"
+  
+

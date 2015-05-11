@@ -1,1 +1,1 @@
-class @OnboardingDeviceErrorViewController extends @ViewController 
+class @OnboardingDeviceErrorViewController extends ledger.common.ViewController

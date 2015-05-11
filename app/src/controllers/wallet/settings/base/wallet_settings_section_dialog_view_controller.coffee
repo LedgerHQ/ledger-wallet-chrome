@@ -1,4 +1,4 @@
-class @WalletSettingsSectionDialogViewController extends DialogViewController
+class @WalletSettingsSectionDialogViewController extends ledger.common.DialogViewController
 
   settingViewControllersClasses: [] # [FirstViewControllerClass, AnotherViewControllerClass, ...]
   _settingViewControllersInstances: {} # {FirstViewControllerClass: instance}

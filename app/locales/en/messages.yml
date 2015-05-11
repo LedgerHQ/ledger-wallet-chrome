@@ -54,6 +54,7 @@ common:
     unsufficient_balance: "The balance of your wallet is too low."
     wrong_keycode: "The validation code is incorrect."
     network_no_response: "The transactions server did not respond."
+    network_error: "Network error."
     invalid_receiver_address: "Recipient bitcoin address is incorrect."
     invalid_amount: "The amount to send is invalid."
     unknown: "An unknown error occured."
@@ -502,7 +503,7 @@ wallet:
     errors:
       cancelled: "Request cancelled by the user"
       account_not_found: "Account not found"
-      
+
   settings:
     common:
       settings: "Settings"

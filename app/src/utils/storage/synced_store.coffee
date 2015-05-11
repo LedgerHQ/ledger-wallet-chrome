@@ -108,8 +108,8 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
           console.error("BadRequest during SyncedStore initialization:", jqXHR)
         else
           ecbr(jqXHR)
-    ledger.app.wallet.once 'state:changed', =>
-      clearInterval(@pullTimer) if ledger.app.wallet._state != ledger.wallet.States.UNLOCKED
+    ledger.app.dongle.once 'state:changed', =>
+      clearInterval(@pullTimer) if !ledger.app.dongle? || ledger.app.dongle.state != ledger.dongle.States.UNLOCKED
 
   # @param [Function] cb A callback invoked once init is done. cb()
   # @param [Function] ecb A callback invoked when init fail. Take $.ajax.fail args.

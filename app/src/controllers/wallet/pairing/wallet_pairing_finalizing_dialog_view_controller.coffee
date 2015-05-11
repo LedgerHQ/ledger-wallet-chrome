@@ -1,4 +1,4 @@
-class @WalletPairingFinalizingDialogViewController extends DialogViewController
+class @WalletPairingFinalizingDialogViewController extends ledger.common.DialogViewController
 
   cancellable: no
 
@@ -23,8 +23,7 @@ class @WalletPairingFinalizingDialogViewController extends DialogViewController
         @view.phoneNameInput.focus()
 
   terminate: ->
-    @_verifyEnteredName (showedError) =>
-      @_request?.setSecureScreenName(@_enteredName()) if showedError is false
+    @_verifyEnteredName().then => @_request?.setSecureScreenName(@_enteredName())
 
   onDismiss: ->
     super
@@ -38,6 +37,7 @@ class @WalletPairingFinalizingDialogViewController extends DialogViewController
     return _.str.trim(@view.phoneNameInput.val())
 
   _onComplete: (screen, error) ->
+    l screen, error
     @_request = null
     @dismiss =>
       if screen?
@@ -46,21 +46,23 @@ class @WalletPairingFinalizingDialogViewController extends DialogViewController
         dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.pairing.errors.pairing_failed"), subtitle: t("wallet.pairing.errors." + error))
       dialog.show()
 
-  _verifyEnteredName: (completion) ->
-    name = @_enteredName()
+  _verifyEnteredName: ->
+    d = ledger.defer()
     resultBlock = (message) =>
       # check message
       if message?
         @view.errorLabel.text(message)
         @view.errorLabel.show()
-        completion?(true)
+        d.reject(message)
       else
         @view.errorLabel.text("")
         @view.errorLabel.hide()
-        completion?(false)
+        d.resolve()
     # check name
+    name = @_enteredName()
     if name.length == 0
       resultBlock(t 'wallet.pairing.finalizing.please_enter_a_name')
     else
       ledger.m2fa.PairedSecureScreen.getByNameFromSyncedStore name, (screen) =>
         resultBlock(if screen? then t 'wallet.pairing.finalizing.name_already_used_by_paired_device' else null)
+    d.promise

@@ -54,6 +54,7 @@ common:
     unsufficient_balance: "Le solde de votre portefeuille est insuffisant."
     wrong_keycode: "Le code de validation n'est pas correct."
     network_no_response: "Le serveur de transactions n'a pas répondu."
+    network_error: "Erreur réseau."
     invalid_receiver_address: "L'adresse bitcoin à créditer n'est pas correcte."
     invalid_amount: "Le montant à envoyer n'est pas valide."
     unknown: "Une erreur inconnue est survenue."

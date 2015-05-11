@@ -1,3 +1,6 @@
+@ledger ?= {}
+ledger.common ?= {}
+
 ###
   View controllers are the bridge between models and view. They are responsible of fetching data and injecting them in views.
   View controllers are automatically bound to an eco HTML template depending of the class name. For example an instance of
@@ -16,7 +19,7 @@
           ... Do something with the value ...
 
 ###
-class @ViewController extends @EventEmitter
+class ledger.common.ViewController extends @EventEmitter
 
   renderedSelector: undefined
   parentViewController: undefined

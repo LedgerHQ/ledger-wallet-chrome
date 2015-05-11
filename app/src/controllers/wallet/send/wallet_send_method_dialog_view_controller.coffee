@@ -1,4 +1,4 @@
-class @WalletSendMethodDialogViewController extends @DialogViewController
+class @WalletSendMethodDialogViewController extends ledger.common.DialogViewController
 
   view:
     mobileTableContainer: "#mobile_table_container"
@@ -10,7 +10,7 @@ class @WalletSendMethodDialogViewController extends @DialogViewController
   cancel: ->
     Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
     @dismiss()
-    
+
   onAfterRender: ->
     super
     @_refreshMobilesList()

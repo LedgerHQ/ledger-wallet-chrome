@@ -18,7 +18,7 @@ class @WalletSettingsHardwareFirmwareSettingViewController extends WalletSetting
     dialog.show()
 
   _refreshFirmwareStatus: ->
-    ledger.fup.FirmwareUpdater.instance.getFirmwareUpdateAvailability ledger.app.wallet, no, no, (availability, error) =>
+    ledger.fup.FirmwareUpdater.instance.getFirmwareUpdateAvailability ledger.app.dongle, no, no, (availability, error) =>
       return if error?
       @view.updateAvailabilityText.text do =>
         if availability.available

@@ -1,6 +1,6 @@
 @ledger.wallet ?= {}
 
-class ledger.wallet.HDWallet
+class ledger.wallet.Wallet
 
   getAccount: (accountIndex) -> @_accounts[accountIndex]
 
@@ -24,7 +24,7 @@ class ledger.wallet.HDWallet
   getAccountFromAddress: (address) -> @getAccountFromDerivationPath(@cache?.getDerivationPath(address))
 
   createAccount: () ->
-    account = new ledger.wallet.HDWallet.Account(@, @getAccountsCount(), @_store)
+    account = new ledger.wallet.Wallet.Account(@, @getAccountsCount(), @_store)
     @_accounts.push account
     do @save
     account
@@ -40,7 +40,7 @@ class ledger.wallet.HDWallet
       return callback?() unless result.accounts?
       _.async.each [0...result.accounts], (accountIndex, done, hasNext) =>
         try
-          account = new ledger.wallet.HDWallet.Account(@, accountIndex, @_store)
+          account = new ledger.wallet.Wallet.Account(@, accountIndex, @_store)
           account.initialize () =>
             @_accounts.push account
             done?()
@@ -53,7 +53,7 @@ class ledger.wallet.HDWallet
     @_accounts = null
     @cache = null
 
-  isEmpty: () -> @_accounts?.length == 0
+  isEmpty: -> @_accounts?.length == 0
 
   isInitialized: no
 
@@ -66,7 +66,7 @@ class ledger.wallet.HDWallet
 
   @instance: undefined
 
-class ledger.wallet.HDWallet.Account
+class ledger.wallet.Wallet.Account
 
   constructor: (wallet, index, store) ->
     @wallet = wallet
@@ -81,7 +81,7 @@ class ledger.wallet.HDWallet.Account
     @_account.currentPublicIndex ?= 0
 
   initializeXpub: (callback) ->
-    ledger.app.wallet.getExtendedPublicKey @getRootDerivationPath(), (xpub) =>
+    ledger.app.dongle.getExtendedPublicKey @getRootDerivationPath(), (xpub) =>
       @_xpub = xpub
       callback?()
 
@@ -194,7 +194,7 @@ class ledger.wallet.HDWallet.Account
     index = parseInt(index) if _.isString(index)
     @_account.currentPublicIndex = index + 1
     @save()
-    ledger.app.wallet?.getPublicAddress @getCurrentPublicAddressPath(), => callback?()
+    ledger.app.dongle?.getPublicAddress @getCurrentPublicAddressPath(), callback
 
   shiftCurrentChangeAddressPath: (callback) ->
     l 'shift change'
@@ -203,7 +203,7 @@ class ledger.wallet.HDWallet.Account
     index = parseInt(index) if _.isString(index)
     @_account.currentChangeIndex = index + 1
     @save()
-    ledger.app.wallet?.getPublicAddress @getCurrentChangeAddressPath(), => callback?()
+    ledger.app.dongle?.getPublicAddress @getCurrentChangeAddressPath(), callback
 
   importPublicAddressPath: (addressPath) ->
     @_account.importedPublicPaths ?= []
@@ -218,56 +218,15 @@ class ledger.wallet.HDWallet.Account
     saveHash[@_storeId] = @_account
     @_store.set saveHash, callback
 
-openStores = (wallet, done) ->
-  wallet.getBitIdAddress (bitIdAddress) =>
-    wallet.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>
-      if not pubKey?.bitcoinAddress? or not bitIdAddress?
-        ledger.app.emit 'wallet:initialization:fatal_error'
-        return
-      ledger.storage.openStores bitIdAddress, pubKey.bitcoinAddress.value
-      done?()
-
-openHdWallet = (wallet, done) ->
-  hdWallet = new ledger.wallet.HDWallet()
-  hdWallet.initialize ledger.storage.wallet, () =>
-    ledger.wallet.HDWallet.instance = hdWallet
-    ledger.tasks.AddressDerivationTask.instance.start()
-    _.defer =>
-      for accountIndex in [0...hdWallet.getAccountsCount()]
-        ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{hdWallet.getRootDerivationPath()}/#{accountIndex}'", _.noop
-      done?()
-
-openAddressCache = (wallet, done) ->
-  cache = new ledger.wallet.HDWallet.Cache(ledger.wallet.HDWallet.instance)
-  cache.initialize =>
-    ledger.wallet.HDWallet.instance.cache = cache
-    done?()
-
-restoreStructure = (wallet, done) ->
-  if ledger.wallet.HDWallet.instance.isEmpty()
-    ledger.app.emit 'wallet:initialization:creation'
-    ledger.tasks.WalletLayoutRecoveryTask.instance.on 'done', () => done?()
-    ledger.tasks.WalletLayoutRecoveryTask.instance.on 'fatal_error', () =>
-      ledger.storage.local.clear()
-      ledger.app.emit 'wallet:initialization:failed'
-    ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
-  else
-    ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
-    done?()
-
-completeInitialization = (wallet, done) ->
-  ledger.wallet.HDWallet.instance.isInitialized = yes
-  done?()
-
 _.extend ledger.wallet,
 
-  initialize:  (wallet, callback) ->
-    intializationMethods = [openStores, openHdWallet, openAddressCache, restoreStructure, completeInitialization]
-    _.async.each intializationMethods, (method , done, hasNext) =>
-      method wallet, done
-      callback?() unless hasNext
+  initialize: (dongle, callback=undefined) ->
+    hdWallet = new ledger.wallet.Wallet()
+    hdWallet.initialize ledger.storage.wallet, () =>
+        ledger.wallet.Wallet.instance = hdWallet
+        callback?()
 
-  release: (wallet, callback) ->
-    ledger.storage.closeStores()
-    ledger.wallet.HDWallet.instance?.release()
-    ledger.wallet.HDWallet.instance = null
+  release: (dongle, callback) ->
+    ledger.wallet.Wallet.instance?.release()
+    ledger.wallet.Wallet.instance = null
+    callback?()

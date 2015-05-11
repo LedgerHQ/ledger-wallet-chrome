@@ -1,6 +1,6 @@
 require @ledger.imports, ->
 
-  class Application extends ledger.base.application.BaseApplication
+  class Application extends ledger.common.application.BaseApplication
 
     Modes:
       Wallet: "Wallet"
@@ -8,13 +8,13 @@ require @ledger.imports, ->
 
     onStart: ->
       Api.init()
+      ledger.errors.init()
       ledger.utils.Logger.updateGlobalLoggersLevel()
       @_listenAppEvents()
       addEventListener "message", Api.listener.bind(Api), false
       ledger.i18n.init =>
         ledger.preferences.defaults.init =>
-          @setExecutionMode(@Modes.Wallet)
-          @router.go('/')
+          @router.go('/') if @setExecutionMode(@Modes.Wallet)
 
     ###
       Sets the execution mode of the application. In Wallet mode, the application handles the wallets state by starting services,
@@ -26,13 +26,17 @@ require @ledger.imports, ->
     ###
     setExecutionMode: (newMode) ->
       throw "Unknown execution mode: #{newMode}. Available modes are ledger.app.Wallet or ledger.app.FirmwareUpdate." if _(_.values(@Modes)).find((m) -> m is newMode).length is 0
-      return if newMode is @_currentMode
+      return false if newMode is @_currentMode
       @_currentMode = newMode
       if @isInFirmwareUpdateMode()
         @_releaseWallet(no)
+        ledger.utils.Logger.setGlobalLoggersPersistentLogsEnabled(off)
+        ledger.utils.Logger.updateGlobalLoggersLevel()
       else
-        @connectWallet(ledger.app.wallet) if ledger.app.wallet?
-      return
+        ledger.utils.Logger.setGlobalLoggersPersistentLogsEnabled(on)
+        ledger.utils.Logger.updateGlobalLoggersLevel()
+        @connectDongle(ledger.app.dongle) if ledger.app.dongle?
+      return true
 
     ###
       Checks if the application is in wallet mode.
@@ -48,58 +52,54 @@ require @ledger.imports, ->
     ###
     isInFirmwareUpdateMode: -> @_currentMode is @Modes.FirmwareUpdate
 
-    onConnectingDongle: (card) ->
-      @emit 'dongle:connecting', card if @isInWalletMode() and !card.isInBootloaderMode
+    onConnectingDongle: (device) ->
+      @emit 'dongle:connecting', device if @isInWalletMode() and !device.isInBootloaderMode
 
-    onDongleConnected: (wallet) ->
-      if @isInWalletMode() and not wallet.isInBootloaderMode()
+    onDongleConnected: (dongle) ->
+      if @isInWalletMode() and not dongle.isInBootloaderMode()
         @performDongleAttestation()
         ledger.tasks.TickerTask.instance.start()
 
-    onDongleCertificationDone: (wallet, error) ->
+    onDongleCertificationDone: (dongle, error) ->
       return unless @isInWalletMode()
       if not error?
-        @emit 'dongle:connected', @wallet
+        @emit 'dongle:connected', @dongle
       else if error.code is ledger.errors.DongleNotCertified
-        @emit 'dongle:forged', @wallet
+        @emit 'dongle:forged', @dongle
       else if error.code is ledger.errors.CommunicationError
-        @emit 'dongle:communication_error', @wallet
+        @emit 'dongle:communication_error', @dongle
 
-    onDongleIsInBootloaderMode: (wallet) ->
-      @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
-      ledger.app.router.go '/'
+    onDongleIsInBootloaderMode: (dongle) -> ledger.app.router.go '/' if @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
 
-    onDongleNeedsUnplug: (wallet) ->
-      @emit 'dongle:unplugged', @wallet if @isInWalletMode()
+    onDongleNeedsUnplug: (dongle) ->
+      @emit 'dongle:unplugged', @dongle if @isInWalletMode()
 
-    onDongleIsUnlocked: (wallet) ->
+    onDongleIsUnlocked: (dongle) ->
       return unless @isInWalletMode()
-      @emit 'dongle:unlocked', @wallet
+      @emit 'dongle:unlocked', @dongle
       @emit 'wallet:initializing'
-      ledger.wallet.initialize @wallet, =>
-        ledger.db.init =>
-          ledger.db.contexts.open()
-          Wallet.initializeWallet =>
-            ledger.preferences.init =>
-              @_listenPreferencesEvents()
-              @_listenCountervalueEvents(true)
-              ledger.utils.Logger.updateGlobalLoggersLevel()
-              @emit 'wallet:initialized'
-              _.defer =>
-                Wallet.instance.retrieveAccountsBalances()
-                ledger.tasks.TransactionObserverTask.instance.start()
-                ledger.tasks.OperationsSynchronizationTask.instance.start()
-                ledger.tasks.OperationsConsumptionTask.instance.start()
+      ledger.tasks.WalletOpenTask.instance.startIfNeccessary()
+      ledger.tasks.WalletOpenTask.instance.onComplete (__, error) =>
+        if error?
+          # TODO: Handle wallet opening fatal error
+        else
+          @_listenPreferencesEvents()
+          @_listenCountervalueEvents(true)
+          ledger.utils.Logger.updateGlobalLoggersLevel()
+          @emit 'wallet:initialized'
+          _.defer =>
+            Wallet.instance.retrieveAccountsBalances()
+            ledger.tasks.TransactionObserverTask.instance.start()
+            ledger.tasks.OperationsSynchronizationTask.instance.start()
+            ledger.tasks.OperationsConsumptionTask.instance.start()
 
-    onDongleIsDisconnected: (wallet) ->
+    onDongleIsDisconnected: (dongle) ->
       @emit 'dongle:disconnected'
       ledger.utils.Logger.setPrivateModeEnabled off
       return unless @isInWalletMode()
       @_releaseWallet()
 
-    onCommandFirmwareUpdate: ->
-      @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
-      @router.go '/'
+    onCommandFirmwareUpdate: -> @router.go '/' if @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
 
     onCommandExportLogs: ->
       ledger.utils.Logger.downloadLogsWithLink()
@@ -108,8 +108,8 @@ require @ledger.imports, ->
       @on 'wallet:operations:sync:failed', =>
         return unless @isInWalletMode()
         _.delay =>
-          ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary() if @wallet?
-          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() if @wallet?
+          ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary() if @dongle?
+          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() if @dongle?
         , 500
 
       @on 'wallet:operations:sync:done', =>
@@ -128,15 +128,16 @@ require @ledger.imports, ->
       ledger.preferences.close()
       ledger.utils.Logger.updateGlobalLoggersLevel()
       Wallet.releaseWallet()
-      ledger.wallet.release(@wallet)
+      ledger.storage.closeStores()
+      ledger.wallet.release(@dongle)
       ledger.tasks.Task.stopAllRunningTasks()
       ledger.tasks.Task.resetAllSingletonTasks()
-      ledger.db.contexts.close()
-      ledger.db.close()
+      ledger.database.contexts.close()
+      ledger.database.close()
       if removeDongle
-        @wallet = null
+        @dongle = null
       else
-        @wallet?.lock()
+        @dongle?.lock()
       ledger.dialogs.manager.dismissAll(no)
       @router.go '/onboarding/device/plug' if @isInWalletMode()
 
@@ -204,7 +205,7 @@ require @ledger.imports, ->
   @UPDATE_LAYOUT = 'UpdateNavigationController'
   @COINKITE_LAYOUT = 'AppsCoinkiteNavigationController'
 
-  Model.commitRelationship()
+  ledger.database.Model.commitRelationship()
 
   @ledger.application = new Application()
   @ledger.app = @ledger.application

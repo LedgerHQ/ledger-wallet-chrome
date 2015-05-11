@@ -1,4 +1,4 @@
-class @CommonDialogsQrcodeDialogViewController extends @DialogViewController
+class @CommonDialogsQrcodeDialogViewController extends ledger.common.DialogViewController
 
   view:
     videoCaptureContainer: '#video_capture_container'

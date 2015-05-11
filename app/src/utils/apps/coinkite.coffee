@@ -22,9 +22,9 @@ class @Coinkite
   getExtendedPublicKey: (index, callback) ->
     path = @_buildPath(index)
     try
-      ledger.app.wallet.getExtendedPublicKey path, (key) =>
+      ledger.app.dongle.getExtendedPublicKey path, (key) =>
         @xpub = key._xpub58
-        ledger.app.wallet.signMessageWithBitId path, "Coinkite", (signature) =>
+        ledger.bitcoin.bitid.signMessage "Coinkite", path: path, pubkey: key._xpub, (signature) =>
           callback?({xpub: @xpub, signature: signature, path: path}, null)
     catch error
       callback?(null, error)
@@ -43,7 +43,7 @@ class @Coinkite
   getCosigner: (data, callback) ->
     @cosigner = null
     try
-      ledger.app.wallet.getExtendedPublicKey Coinkite.CK_PATH, (key) =>
+      ledger.app.dongle.getExtendedPublicKey Coinkite.CK_PATH, (key) =>
         xpub = key._xpub58
         async.eachSeries data.cosigners, ((cosigner, finishedCallback) =>
           check = cosigner.xpubkey_check
@@ -85,7 +85,7 @@ class @Coinkite
     try
       transaction = Bitcoin.Transaction.deserialize(data.raw_unsigned_txn);
       outputs_number = transaction['outs'].length
-      outputs_script = ledger.app.wallet._lwCard.dongle.formatP2SHOutputScript(transaction)
+      outputs_script = ledger.app.dongle.formatP2SHOutputScript(transaction)
       inputs = []
       paths = []
       scripts = []
@@ -93,7 +93,7 @@ class @Coinkite
         paths.push(@_buildPath(data.ledger_key?.subkey_index) + "/" + input.sp)
         inputs.push([input.txn, Bitcoin.convert.bytesToHex(ledger.bitcoin.numToBytes(parseInt(input.out_num), 4).reverse())])
         scripts.push(data.redeem_scripts[input.sp].redeem)
-      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, scripts, outputs_number, outputs_script, paths)
+      ledger.app.dongle.signP2SHTransaction(inputs, scripts, outputs_number, outputs_script, paths)
       .then (result) =>
         signatures = []
         index = 0
@@ -175,7 +175,7 @@ class @Coinkite
     inputs = [ ["214af8788d11cf6e3a8dd2efb00d0c3facb446273dee2cf8023e1fae8b2afcbd", "00000000"] ]
     scripts = [ "522102feec7dd82317846908c20c342a02a8e8c17fb327390ce8d6669ef09a9c85904b210308aaece16e0f99b78e4beb30d8b18652af318428d6d64df26f8089010c7079f452ae" ]
     outputs_number = transaction['outs'].length
-    outputs_script = ledger.app.wallet._lwCard.dongle.formatP2SHOutputScript(transaction)
+    outputs_script = ledger.app.dongle.formatP2SHOutputScript(transaction)
     paths = [ Coinkite.CK_PATH + "/0" ]
     data = {
       "input_info": [
@@ -201,7 +201,7 @@ class @Coinkite
       },
     }
     try
-      ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(inputs, scripts, outputs_number, outputs_script, paths)
+      ledger.app.dongle.signP2SHTransaction(inputs, scripts, outputs_number, outputs_script, paths)
       .then (result) =>
         callback true
       .fail (error) =>

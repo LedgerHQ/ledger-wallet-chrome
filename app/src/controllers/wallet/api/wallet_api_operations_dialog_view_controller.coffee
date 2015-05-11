@@ -1,4 +1,4 @@
-class @WalletApiOperationsDialogViewController extends DialogViewController
+class @WalletApiOperationsDialogViewController extends ledger.common.DialogViewController
 
   cancellable: no
 

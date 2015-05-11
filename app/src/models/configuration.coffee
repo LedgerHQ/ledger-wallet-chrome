@@ -1,4 +1,4 @@
-class @Configuration extends @Model
+class @Configuration extends ledger.database.Model
   do @init
 
   @_instance: undefined

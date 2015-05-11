@@ -1,4 +1,4 @@
-class @WalletPairingProgressDialogViewController extends DialogViewController
+class @WalletPairingProgressDialogViewController extends ledger.common.DialogViewController
 
   view:
     contentContainer: "#content_container"
@@ -31,8 +31,8 @@ class @WalletPairingProgressDialogViewController extends DialogViewController
   _onComplete: (screen, error) ->
     @_request = null
     @dismiss () =>
-      if screen?
-        dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.pairing.errors.pairing_succeeded"), subtitle: _.str.sprintf(t("wallet.pairing.errors.dongle_is_now_paired"), screen.name))
-      else
+      if error?
         dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.pairing.errors.pairing_failed"), subtitle: t("wallet.pairing.errors." + error))
+      else
+        dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.pairing.errors.pairing_succeeded"), subtitle: _.str.sprintf(t("wallet.pairing.errors.dongle_is_now_paired"), screen.name))
       dialog.show()

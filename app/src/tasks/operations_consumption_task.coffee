@@ -5,10 +5,10 @@ class ledger.tasks.OperationsConsumptionTask extends ledger.tasks.Task
 
   onStart: () ->
     iterate = (accountIndex) =>
-      if accountIndex >= ledger.wallet.HDWallet.instance.getAccountsCount()
+      if accountIndex >= ledger.wallet.Wallet.instance.getAccountsCount()
         ledger.app.emit 'wallet:operations:sync:done'
         return
-      hdaccount = ledger.wallet.HDWallet.instance?.getAccount(accountIndex)
+      hdaccount = ledger.wallet.Wallet.instance?.getAccount(accountIndex)
       @retrieveAccountOperations hdaccount, =>
         accountIndex += 1
         if accountIndex < Wallet.instance.get('accounts').length
@@ -23,7 +23,7 @@ class ledger.tasks.OperationsConsumptionTask extends ledger.tasks.Task
       stream = ledger.api.TransactionsRestClient.instance.createTransactionStream(addresses)
       stream.on 'data', =>
         return unless @isRunning()
-        account = Account.fromHDWalletAccount hdaccount
+        account = Account.fromWalletAccount hdaccount
         for transaction in stream.read()
           account.addRawTransactionAndSave transaction
 

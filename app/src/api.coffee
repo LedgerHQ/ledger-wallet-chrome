@@ -2,7 +2,7 @@ class @Api
 
   @init: ->
     @_has_session = false
-    ledger.app.on 'wallet:authenticated', ->
+    ledger.app.on 'dongle:unlocked', ->
       Api._has_session = true
     ledger.app.on 'dongle:disconnected', ->
       Api._has_session = false
@@ -36,7 +36,7 @@ class @Api
   @hasSession: (data) ->
     chrome.runtime.sendMessage {
       command: 'has_session',
-      success: Api._has_session
+      success: @_has_session
     }    
 
   @sendPayment: (data) ->
@@ -63,10 +63,10 @@ class @Api
 
   @signMessage: (data) ->
     try
-      ledger.app.wallet._lwCard.getBitIDAddress data.path
+      ledger.bitcoin.bitid.getAddress path: data.path
       .then (result) =>
         @address = result.bitcoinAddress.value
-        ledger.app.wallet._lwCard.dongle.getMessageSignature(data.path, data.message)
+        ledger.bitcoin.bitid.signMessage(data.message, path: data.path)
         .then (result) =>
           @callback_success('sign_message', signature: result, address: @address)
           return
@@ -78,6 +78,19 @@ class @Api
         return
     catch error
       callback_cancel('sign_message', JSON.stringify(error))
+
+  @cosignTransaction: (data) ->
+    try
+      transaction = Bitcoin.Transaction.deserialize(data.transaction);
+      ledger.app.dongle.signP2SHTransaction(data.inputs, transaction, data.scripts, data.path)
+      .then (result) =>
+        @callback_success('cosign_transaction', signatures: result)
+        return
+      .fail (error) =>
+        @callback_cancel('cosign_transaction', JSON.stringify(error))
+        return
+    catch error
+      @callback_cancel('cosign_transaction', JSON.stringify(error))
 
   @signP2SH: (data) ->
     ledger.app.router.go '/wallet/p2sh/index', {inputs: JSON.stringify(data.inputs), scripts: JSON.stringify(data.scripts), outputs_number: data.outputs_number, outputs_script: data.outputs_script, paths: JSON.stringify(data.paths)}
