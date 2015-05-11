@@ -376,7 +376,6 @@
           '../spec/utils/storage/store_spec'
           '../spec/utils/storage/chrome_store_spec'
           '../spec/utils/storage/secure_store_spec'
-          #'../spec/restclients/synced_rest_client_spec'
           '../spec/api/synced_rest_client_spec'
           '../spec/utils/storage/synced_store_spec'
           '../spec/utils/bitcoin/bip39_spec'
@@ -388,4 +387,6 @@
 
           '../spec/m2fa/client_spec'
           '../spec/m2fa/m2fa_spec'
+          '../spec/tasks/address_derivation_task_spec'
+          '../spec/wallet/extended_public_key_spec'
         ]

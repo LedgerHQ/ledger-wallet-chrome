@@ -128,7 +128,7 @@ class ledger.dongle.MockDongle extends EventEmitter
     d = ledger.defer(callback)
     Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
     res = @getPublicAddressSync(path)
-    ledger.wallet.HDWallet.instance?.cache?.set [[path, res.bitcoinAddress.value]]
+    ledger.wallet.Wallet.instance?.cache?.set [[path, res.bitcoinAddress.value]]
     _.defer -> d.resolve(res)
     return d.promise
 
@@ -223,6 +223,7 @@ class ledger.dongle.MockDongle extends EventEmitter
 
       values = []
       balance = Bitcoin.BigInteger.valueOf(0)
+
       # Add Input
       for [rawTx, outputIndex] in rawTxs
         tx = bitcoin.Transaction.fromHex(rawTx.toString())
@@ -244,7 +245,8 @@ class ledger.dongle.MockDongle extends EventEmitter
       txb.addOutput(scriptPubKey, amount.toSatoshiNumber())
       # change addr
       scriptPubKey = bitcoin.Script.fromHex(scriptPubKeyStart + @_getPubKeyHashFromBase58(@_getNodeFromPath(changePath).getAddress().toString()).toString() + scriptPubKeyEnd)
-      txb.addOutput(scriptPubKey, change)
+      if change isnt 0
+        txb.addOutput(scriptPubKey, change)
 
       # Signature
       for path, index in associatedKeysets
@@ -253,44 +255,47 @@ class ledger.dongle.MockDongle extends EventEmitter
       # Keycard
       keycard = ledger.keycard.generateKeycardFromSeed('dfaeee53c3d280707bbe27720d522ac1')
       charsQuestion = []
-      indexesKeyCard = [] # charQuestion indexes of recipient address
+      indexes = [] # charQuestion indexes of recipient address
       charsResponse = []
       for i in [0..3]
         randomNum = _.random recipientAddress.length - 1
         charsQuestion.push recipientAddress.charAt randomNum
         charsResponse.push keycard[charsQuestion[i]]
-        indexesKeyCard.push Convert.toHexByte randomNum
+        indexes.push Convert.toHexByte randomNum
 
-      result.indexesKeyCard = indexesKeyCard.join('')
-      result.authorizationReference = indexesKeyCard.join('')
+      result.authorizationReference = indexes.join('')
       result.publicKeys = []
       result.publicKeys.push recipientAddress
       result.txb = txb
       result.charsResponse = "0" + charsResponse.join('0')
 
       # M2fa
-      amount = '0000000000000000' + amount._value.toRadix(16)
-      amount = amount.substr(amount.length - 16, 16)
-      fees = '0000000000000000' + fees._value.toRadix(16)
-      fees = fees.substr(fees.length - 16, 16)
-      change = '0000000000000000' + new BigInteger(change.toString()).toRadix(16)
-      change = change.substr(change.length - 16, 16)
-      sizeAddress = Convert.toHexByte recipientAddress.length
-      pin = new ByteString(charsResponse.join(''), ASCII).toString(HEX)
-      m2faData = pin + amount + fees + change + sizeAddress + (new ByteString(recipientAddress, ASCII).toString(HEX))
-      padding = m2faData.length % 8
-      m2faData = _.str.rpad m2faData, m2faData.length + (8 - padding), '0'
-      # Encrypt
-      cipher = new JSUCrypt.cipher.DES(JSUCrypt.padder.None , JSUCrypt.cipher.MODE_CBC)
-      key = new JSUCrypt.key.DESKey(@_m2fa.pairingKeyHex)
-      cipher.init(key, JSUCrypt.cipher.MODE_ENCRYPT)
-      m2faData = cipher.update(m2faData)
-      m2faDataHex = (Convert.toHexByte(v) for v in m2faData).join('')
-
-      # Keycard or m2fa
-      # authorizationRequired => 2 if keycard / 3 if m2fa
-      auth = @_setAuthorization(m2faDataHex)
-      _.extend result, auth
+      if @_m2fa.pairingKeyHex?
+        amount = '0000000000000000' + amount._value.toRadix(16)
+        amount = amount.substr(amount.length - 16, 16)
+        fees = '0000000000000000' + fees._value.toRadix(16)
+        fees = fees.substr(fees.length - 16, 16)
+        change = '0000000000000000' + new BigInteger(change.toString()).toRadix(16)
+        change = change.substr(change.length - 16, 16)
+        sizeAddress = Convert.toHexByte recipientAddress.length
+        pin = new ByteString(charsResponse.join(''), ASCII).toString(HEX)
+        m2faData = pin + amount + fees + change + sizeAddress + (new ByteString(recipientAddress, ASCII).toString(HEX))
+        padding = m2faData.length % 8
+        m2faData = _.str.rpad m2faData, m2faData.length + (8 - padding), '0'
+        # Encrypt
+        cipher = new JSUCrypt.cipher.DES(JSUCrypt.padder.None , JSUCrypt.cipher.MODE_CBC)
+        key = new JSUCrypt.key.DESKey(@_m2fa.pairingKeyHex)
+        cipher.init(key, JSUCrypt.cipher.MODE_ENCRYPT)
+        m2faData = cipher.update(m2faData)
+        m2faDataHex = (Convert.toHexByte(v) for v in m2faData).join('')
+        # Set authorizations
+        result.authorizationRequired = 3
+        result.authorizationPaired = m2faDataHex
+        result.indexesKeyCard = '04' + indexes.join('') + m2faDataHex
+      else
+        result.authorizationRequired = 2
+        result.authorizationPaired = undefined
+        result.indexesKeyCard = indexes.join('')
 
       l 'result', result
       l 'm2fa', @_m2fa
@@ -309,20 +314,6 @@ class ledger.dongle.MockDongle extends EventEmitter
 
     _.delay (-> d.resolve(result)), 1000 # Dirty delay fix, odd but necessary
     d.promise
-
-
-
-  _setAuthorization: (data) ->
-    result = {}
-    if @_m2fa.pairingKeyHex?
-      l 'pairing key exists'
-      result.authorizationRequired = 3
-      result.authorizationPaired = data
-    else
-      l 'pairing key doesn\'t exist'
-      result.authorizationRequired = 2
-      result.authorizationPaired = undefined
-    result
 
 
   splitTransaction: (input) ->
