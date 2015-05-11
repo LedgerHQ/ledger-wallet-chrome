@@ -2,6 +2,8 @@ class @WalletSendValidatingDialogViewController extends ledger.common.DialogView
 
   view:
     contentContainer: '#content_container'
+    progressbarContainer: '#progressbar_container'
+    progressLabel: "#progress_label"
 
   initialize: ->
     super
@@ -26,4 +28,4 @@ class @WalletSendValidatingDialogViewController extends ledger.common.DialogView
 
   onAfterRender: ->
     super
-    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
+    @view.progressBar = new ledger.progressbars.ProgressBar(@view.progressbarContainer)

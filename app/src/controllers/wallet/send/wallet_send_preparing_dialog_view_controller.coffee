@@ -2,8 +2,6 @@ class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewC
 
   view:
     contentContainer: '#content_container'
-    progressbarContainer: '#progressbar_container'
-    progressLabel: "#progress_label"
 
   initialize: ->
     super
@@ -32,7 +30,7 @@ class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewC
 
   onAfterRender: ->
     super
-    @view.progressBar = new ledger.progressbars.ProgressBar(@view.progressbarContainer)
+    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
 
   _routeToNextDialog: (transaction) ->
     cardBlock = (transaction) =>
