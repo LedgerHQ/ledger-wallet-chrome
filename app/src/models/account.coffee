@@ -41,12 +41,11 @@ class @Account extends ledger.database.Model
   ###
   _createTransactionGetChangeAddressPath: (changeIndex, callback) ->
     changePath =  @getWalletAccount().getChangeAddressPath(changeIndex)
-    if ledger.app.dongle.getIntFirmwareVersion() is ledger.dongle.Firmware.V_LW_1_0_0
+    if ledger.app.dongle.getIntFirmwareVersion() isnt ledger.dongle.Firmware.V_LW_1_0_0
       callback changePath
     else
       ledger.tasks.AddressDerivationTask.instance.getPublicAddress changePath, (xpubAddress) =>
         ledger.app.dongle.getPublicAddress changePath, (address) =>
-          l address
           address = address.bitcoinAddress.toString(ASCII)
           if xpubAddress is address
             callback?(changePath)

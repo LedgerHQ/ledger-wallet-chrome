@@ -8,8 +8,8 @@ Errors = @ledger.errors
 Amount = ledger.Amount
 
 $log = -> ledger.utils.Logger.getLoggerByTag("Transaction")
-$info = -> $log().info.apply @, arguments
-$error = -> $log().error.apply @, arguments
+$info = -> $log().info arguments...
+$error = -> $log().error arguments...
 
 @ledger.wallet ?= {}
 
