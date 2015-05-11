@@ -10,9 +10,9 @@ class @ledger.storage.SecureStore extends ledger.storage.ChromeStore
   # @see Store.keys
   keys: (cb) ->
     super (encrypted_keys) =>
-      cb(@_aes.decrypt(encrypted_key) for encrypted_key in encrypted_keys)
+      cb(_.compact(Try(=> @_aes.decrypt(encrypted_key)).orNull() for encrypted_key in encrypted_keys))
 
   _preprocessKey: (key) -> super(@_aes.encrypt(key))
-  _deprocessKey: (raw_key) -> @_aes.decrypt(super(raw_key))
-  _preprocessValue: (value) -> @_aes.encrypt(super(value))
-  _deprocessValue: (raw_value) -> super(@_aes.decrypt(raw_value))
+  _deprocessKey: (raw_key) -> Try(=> @_aes.decrypt(super(raw_key))).orNull()
+  _preprocessValue: (value) -> Try(=> @_aes.encrypt(super(value))).orNull()
+  _deprocessValue: (raw_value) -> Try(=> super(@_aes.decrypt(raw_value))).orNull()

@@ -1,4 +1,4 @@
-class @WalletNavigationController extends @NavigationController
+class @WalletNavigationController extends ledger.common.NavigationController
 
   _menuItemBaseUrl: {
 #    '/wallet/dashboard/': '#dashboard-item'

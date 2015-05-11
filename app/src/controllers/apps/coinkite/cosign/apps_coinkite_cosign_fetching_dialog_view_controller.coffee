@@ -1,4 +1,4 @@
-class @AppsCoinkiteCosignFetchingDialogViewController extends @DialogViewController
+class @AppsCoinkiteCosignFetchingDialogViewController extends ledger.common.DialogViewController
 
   view:
     contentContainer: '#content_container'

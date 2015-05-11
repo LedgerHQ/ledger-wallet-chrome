@@ -4,7 +4,7 @@
 #
 # @event push Called when a view controller is pushed
 # @event pop Called when a view controller is popped
-class @NavigationController extends @ViewController
+class ledger.common.NavigationController extends ledger.common.ViewController
 
   _historyLength: 1
   viewControllers: []

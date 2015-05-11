@@ -1,4 +1,4 @@
-class @WalletP2shIndexDialogViewController extends DialogViewController
+class @WalletP2shIndexDialogViewController extends ledger.common.DialogViewController
 
   view:
     confirmButton: '#confirm_button'

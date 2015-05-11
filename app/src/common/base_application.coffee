@@ -1,7 +1,7 @@
 
 @ledger ?= {}
-ledger.base ?= {}
-ledger.base.application ?= {}
+ledger.common ?= {}
+ledger.common.application ?= {}
 
 DongleLogger = -> ledger.utils.Logger.getLoggerByTag('AppDongle')
 ApplicationLogger = -> ledger.utils.Logger.getLoggerByTag('Application')
@@ -10,7 +10,7 @@ XhrLogger = -> ledger.utils.Logger.getLoggerByTag('XHR')
 ###
   Base class for the main application class. This class holds the non-specific part of the application (i.e. click dispatching, application lifecycle)
 ###
-class ledger.base.application.BaseApplication extends @EventEmitter
+class ledger.common.application.BaseApplication extends @EventEmitter
 
   constructor: ->
     configureApplication @

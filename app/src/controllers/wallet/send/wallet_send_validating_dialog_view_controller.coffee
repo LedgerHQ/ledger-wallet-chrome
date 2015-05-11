@@ -1,4 +1,4 @@
-class @WalletSendValidatingDialogViewController extends @DialogViewController
+class @WalletSendValidatingDialogViewController extends ledger.common.DialogViewController
 
   view:
     contentContainer: '#content_container'

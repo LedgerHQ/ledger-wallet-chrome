@@ -1,4 +1,4 @@
-class @AppsCoinkiteKeygenProcessingDialogViewController extends @DialogViewController
+class @AppsCoinkiteKeygenProcessingDialogViewController extends ledger.common.DialogViewController
 
   cancellable: no
 

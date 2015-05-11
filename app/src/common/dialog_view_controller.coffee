@@ -3,7 +3,7 @@
 #
 # @event show Emitted when the dialog is done showing
 # @event dismiss Emitted when the dialog is dismissed
-class @DialogViewController extends ViewController
+class ledger.common.DialogViewController extends ledger.common.ViewController
 
   # Override in order to make the dialog cancellable or not
   cancellable: yes

@@ -1,4 +1,4 @@
-class @WalletOperationsDetailDialogViewController extends DialogViewController
+class @WalletOperationsDetailDialogViewController extends ledger.common.DialogViewController
 
   show: ->
     @operation = Operation.findById(parseInt(@params['operationId']))

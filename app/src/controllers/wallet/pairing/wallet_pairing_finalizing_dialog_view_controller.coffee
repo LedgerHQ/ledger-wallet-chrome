@@ -1,4 +1,4 @@
-class @WalletPairingFinalizingDialogViewController extends DialogViewController
+class @WalletPairingFinalizingDialogViewController extends ledger.common.DialogViewController
 
   cancellable: no
 

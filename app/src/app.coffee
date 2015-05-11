@@ -1,6 +1,6 @@
 require @ledger.imports, ->
 
-  class Application extends ledger.base.application.BaseApplication
+  class Application extends ledger.common.application.BaseApplication
 
     Modes:
       Wallet: "Wallet"

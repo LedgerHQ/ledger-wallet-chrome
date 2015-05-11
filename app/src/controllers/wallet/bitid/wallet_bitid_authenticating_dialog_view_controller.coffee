@@ -1,4 +1,4 @@
-class @WalletBitidAuthenticatingDialogViewController extends @DialogViewController
+class @WalletBitidAuthenticatingDialogViewController extends ledger.common.DialogViewController
 
   view:
     contentContainer: '#content_container'

@@ -1,4 +1,4 @@
-class @WalletPairingProgressDialogViewController extends DialogViewController
+class @WalletPairingProgressDialogViewController extends ledger.common.DialogViewController
 
   view:
     contentContainer: "#content_container"

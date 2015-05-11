@@ -1,4 +1,4 @@
-class @WalletPairingIndexDialogViewController extends DialogViewController
+class @WalletPairingIndexDialogViewController extends ledger.common.DialogViewController
 
   initialize: ->
     super

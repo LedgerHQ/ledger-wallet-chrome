@@ -1,4 +1,4 @@
-class @WalletSendMethodDialogViewController extends @DialogViewController
+class @WalletSendMethodDialogViewController extends ledger.common.DialogViewController
 
   view:
     mobileTableContainer: "#mobile_table_container"

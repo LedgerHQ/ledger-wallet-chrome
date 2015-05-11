@@ -31,7 +31,7 @@ class @ledger.database.Model extends @EventEmitter
     else
       @_object?[key]
 
-  getId: () -> @_object?['id']
+  getId: () -> @_object?['$loki']
 
   set: (key, value) ->
     @_object ?= {}
@@ -242,7 +242,23 @@ class @ledger.database.Model extends @EventEmitter
     sort = null
     if relationshipDeclaration['sortBy']?
       sort = relationshipDeclaration['sortBy']
-      sort = [sort, 'asc'] unless _.isArray(sort)
+      if _(sort).isArray()
+        finalSort = []
+        normalizedIndex = 0
+        for index in [0..sort.length]
+          value = sort[index]
+          if normalizedIndex % 2 == 0
+            finalSort.push [value] if value?
+          else if _(value).isString() and !value.match(/^(asc|desc)$/)
+            normalizedIndex += 1
+            finalSort[finalSort.length - 1][1] = no
+            finalSort.push [value]
+          else
+            finalSort[finalSort.length - 1][1] = if !value? or value is 'desc' then yes else no
+          normalizedIndex += 1
+        sort = finalSort
+      else if !_(sort).isFunction()
+        sort = [[sort, no]]
     onDelete = if relationshipDeclaration['onDelete']? then relationshipDeclaration['onDelete'] else 'nullify'
     unless _.contains(['nullify', 'destroy', 'none'], onDelete)
       e "Relationship #{@name}::#{r[0]} delete rule '#{onDelete}' is not valid. Please review this. Should be either 'nullify', 'none' or 'destroy'"

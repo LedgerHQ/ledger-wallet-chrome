@@ -1,4 +1,4 @@
-class @WalletSettingsIndexDialogViewController extends DialogViewController
+class @WalletSettingsIndexDialogViewController extends ledger.common.DialogViewController
 
   openHardware: ->
     @getDialog().push new WalletSettingsHardwareSectionDialogViewController()

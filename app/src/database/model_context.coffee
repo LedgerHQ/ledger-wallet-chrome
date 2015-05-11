@@ -17,6 +17,7 @@ class Collection
 
   insert: (model) ->
     model._object ?= {}
+    model._object['objType'] = model.getCollectionName()
     model._object = @_collection.insert(model._object)
     @_context.notifyDatabaseChange()
 
@@ -42,8 +43,12 @@ class Collection
           query["#{relationship.inverse}_id"] = object.getId()
           view.applyFind(query)
         when 'many_many' then throw 'Not implemented yet'
-      if relationship.sort?
-        view.applySimpleSort(relationship.sort[0], relationship.sort[1] is 'desc')
+      if _(relationship.sort).isArray() and relationship.sort.length is 1
+        view.applySimpleSort(relationship.sort[0][0], relationship.sort[0][1])
+      else if _(relationship.sort).isArray()
+        view.applySortCriteria(relationship.sort)
+      else if _(relationship.sort).isFunction()
+        view.applySort(relationship.sort)
     view.modelize = =>
       @_modelize(view.data())
     view
