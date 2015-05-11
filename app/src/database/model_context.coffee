@@ -47,8 +47,7 @@ class Collection
       if _(relationship.sort).isArray() and relationship.sort.length is 1
         view.applySimpleSort(relationship.sort[0][0], relationship.sort[0][1])
       else if _(relationship.sort).isArray()
-        view.applySimpleSort(relationship.sort[0][0], relationship.sort[0][1])
-        #view.applySortCriteria(relationship.sort)
+        view.applySortCriteria(relationship.sort)
       else if _(relationship.sort).isFunction()
         view.applySort(relationship.sort)
     view.modelize = =>
@@ -122,7 +121,6 @@ class ledger.database.contexts.Context extends EventEmitter
     collection.getCollection().on 'insert', (data) =>
       @emit "insert:" + data['objType'].toLowerCase(), @_modelize(data)
     collection.getCollection().on 'update', (data) =>
-      l data
       @emit "update:" + data['objType'].toLowerCase(), @_modelize(data)
     collection.getCollection().on 'delete', (data) =>
       @emit "delete:" + data['objType'].toLowerCase(), @_modelize(data)
