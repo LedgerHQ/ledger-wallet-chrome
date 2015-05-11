@@ -21,7 +21,7 @@ pathsToPredefinedAddresses = (paths, callback) ->
 
 _.extend ledger.wallet,
 
-  pathsToAddresses: (paths, callback) ->
+  pathsToAddresses: (paths, callback = undefined) ->
 
     # Uncomment for debugging with predefined addresses
     # return pathsToPredefinedAddresses(paths, callback)

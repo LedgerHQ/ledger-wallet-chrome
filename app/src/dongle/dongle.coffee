@@ -18,6 +18,8 @@ Firmware =
   V1_4_12: 0x0001040c0146
   V1_4_13: 0x0001040d0146
   V_LW_1_0_0: 0x20010000010f
+  V_LW_1_0_1: 0x200100010110
+
 
 # Ledger OS pubKey, used for pairing.
 Attestation =

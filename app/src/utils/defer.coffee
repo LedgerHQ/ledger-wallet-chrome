@@ -16,10 +16,10 @@
   defer.reject = (args...) -> @oldReject(args...); return @
   defer.promise.onFulfilled = (callback) ->
     @then( (result) ->
-      callback(if result != undefined then result else true)
+      _.defer -> callback(if result != undefined then result else true)
       return
     ).catch( (reason) ->
-      callback(false, reason)
+      _.defer -> callback(false, reason)
       return
     ).done()
 

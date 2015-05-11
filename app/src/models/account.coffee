@@ -33,8 +33,29 @@ class @Account extends ledger.database.Model
     amount = ledger.Amount.fromSatoshi(amount)
     fees = ledger.Amount.fromSatoshi(fees)
     inputsPath = @getWalletAccount().getAllAddressesPaths()
-    changePath = @getWalletAccount().getCurrentChangeAddressPath()
-    ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
+    @_createTransactionGetChangeAddressPath @getWalletAccount().getCurrentChangeAddressIndex(), (changePath) =>
+      ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
+
+  ###
+    Special get change address path to 'avoid' LW 1.0.0 derivation failure.
+  ###
+  _createTransactionGetChangeAddressPath: (changeIndex, callback) ->
+    changePath =  @getWalletAccount().getChangeAddressPath(changeIndex)
+    if ledger.app.dongle.getIntFirmwareVersion() is ledger.dongle.Firmware.V_LW_1_0_0
+      callback changePath
+    else
+      ledger.tasks.AddressDerivationTask.instance.getPublicAddress changePath, (xpubAddress) =>
+        ledger.app.dongle.getPublicAddress changePath, (address) =>
+          l address
+          address = address.bitcoinAddress.toString(ASCII)
+          if xpubAddress is address
+            callback?(changePath)
+          else
+            @_createTransactionGetChangeAddressPath(changeIndex + 1, callback)
+
+
+
+
 
   addRawTransactionAndSave: (rawTransaction, callback = _.noop) ->
     hdAccount = ledger.wallet.Wallet.instance?.getAccount(@get('index'))
