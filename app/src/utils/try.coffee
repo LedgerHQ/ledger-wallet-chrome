@@ -18,6 +18,8 @@ class TryResult
 
   getError: () -> @_error
   getValue: () -> @_value
+  getOrElse: (value) -> if @isFailure() then value else @getValue()
+  orNull: -> @getOrElse(null)
   isFailure: -> if @_error? then yes else no
   isSuccess: -> not @isFailure()
 

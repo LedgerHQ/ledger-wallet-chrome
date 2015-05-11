@@ -8,6 +8,8 @@ Errors = @ledger.errors
 Amount = ledger.Amount
 
 $log = -> ledger.utils.Logger.getLoggerByTag("Transaction")
+$info = -> $log().info.apply @, arguments
+$error = -> $log().error.apply @, arguments
 
 @ledger.wallet ?= {}
 
@@ -101,7 +103,6 @@ class ledger.wallet.Transaction
   #   @option [String] validationCharacters
   #   @option [Boolean] needsAmountValidation
   getValidationDetails: ->
-    l @_resumeData
     details =
       validationMode: @_validationMode
       recipientsAddress:
@@ -179,6 +180,7 @@ class ledger.wallet.Transaction
       @_resumeData
     ).then( (@_signedRawTransaction) =>
       @_isValidated = yes
+      $info("Raw TX: ", @getSignedTransaction())
       _.defer => d.resolve(@)
     ).catch( (error) =>
       _.defer => d.rejectWithError(Errors.SignatureError, error)
@@ -203,15 +205,24 @@ class ledger.wallet.Transaction
     return d.rejectWithError(Errors.NotEnoughFunds) && d.promise unless inputsPath?.length
     requiredAmount = amount.add(fees)
 
+    $info("--- CREATE TRANSACTION ---")
+    $info("Amount: ", amount.toString())
+    $info("Fees: ", fees.toString())
+    $info("Address: ", address)
+    $info("Inputs paths: ", inputsPath)
+    $info("Change path: ", changePath)
     ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
-      return d.rejectWithError(Errors.NetworkError, error) if error?
+      if error?
+        $error("Error during unspents outputs gathering", error)
+        return d.rejectWithError(Errors.NetworkError, error)
       # Collect each valid outputs and sort them by desired priority
       validOutputs = _(output for output in outputs when output.paths.length > 0).sortBy (output) ->  -output['confirmatons']
-      return d.rejectWithError(Errors.NotEnoughFunds) if validOutputs.length == 0
+      if validOutputs.length == 0
+        $error("Error not enough funds")
+        return d.rejectWithError(Errors.NotEnoughFunds)
       finalOutputs = []
       collectedAmount = new Amount()
       hadNetworkFailure = no
-
       # For each valid outputs we try to get its raw transaction.
       _.async.each validOutputs, (output, done, hasNext) =>
         ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->

@@ -101,4 +101,4 @@ class @ledger.storage.Store extends EventEmitter
   _to_ns_key: (key) -> @_name + "." + key
   _to_ns_keys: (keys) -> (@_to_ns_key(key) for key in keys)
   _from_ns_key: (ns_key) -> ns_key.replace(@_nameRegex, '')
-  _from_ns_keys: (ns_keys) -> (@_from_ns_key(ns_key) for ns_key in ns_keys when ns_key.match(@_nameRegex))
+  _from_ns_keys: (ns_keys) -> _.compact (@_from_ns_key(ns_key) for ns_key in ns_keys when ns_key.match(@_nameRegex))
