@@ -15,7 +15,7 @@ class @ledger.storage.SecureStore extends ledger.storage.ChromeStore
       _.defer => cb?(@_keysCache)
     else
       super (encrypted_keys) =>
-        @_keysCache = _.uniq(_.compact(Try(=> @_aes.decrypt(encrypted_key)).orNull() for encrypted_key in encrypted_keys))
+        @_keysCache = _.uniq(@_keysCache.concat(_.compact(Try(=> @_aes.decrypt(encrypted_key)).orNull() for encrypted_key in encrypted_keys)))
         @_hasCalledKeys = yes
         cb?(@_keysCache)
 
