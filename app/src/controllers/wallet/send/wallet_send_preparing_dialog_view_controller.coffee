@@ -16,7 +16,7 @@ class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewC
           when ledger.errors.DustTransaction then 'dust_transaction'
         @dismiss =>
           errorMessage = switch reason
-            when 'dust_transaction' then _.str.sprintf(t("common.errors." + reason), ledger.formatters.formatValue(ledger.wallet.transaction.MINIMUM_OUTPUT_VALUE))
+            when 'dust_transaction' then _.str.sprintf(t("common.errors." + reason), ledger.formatters.formatValue(ledger.wallet.Transaction.MINIMUM_OUTPUT_VALUE))
             else t("common.errors." + reason)
           Api.callback_cancel 'send_payment', errorMessage
           dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: errorMessage)

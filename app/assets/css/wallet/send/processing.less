@@ -6,15 +6,28 @@ section#send_processing_dialog {
 
   > #content_container {
     text-align: center;
-    margin-top: @metrics-almost-medium-padding;
-    padding-top: @metrics-almost-medium-padding;
-
-    > .spinner {
-      padding-bottom: @metrics-almost-small-padding;
-    }
+    padding: @metrics-very-small-padding 0;
 
     > .regular-text {
-      margin-top: @metrics-almost-medium-padding;
+      margin-top: @metrics-medium-padding;
+    }
+
+    > .progress_container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      margin-top: @metrics-small-padding;
+
+      > #progressbar_container {
+        > .progressbar {
+          width: 320px;
+        }
+      }
+
+      > .regular-grey-text-small {
+        margin-left: @metrics-small-padding;
+      }
     }
 
     > .regular-grey-text-small {

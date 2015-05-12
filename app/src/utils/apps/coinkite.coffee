@@ -24,8 +24,9 @@ class @Coinkite
     try
       ledger.app.dongle.getExtendedPublicKey path, (key) =>
         @xpub = key._xpub58
-        ledger.bitcoin.bitid.signMessage "Coinkite", path: path, pubkey: key._xpub, (signature) =>
-          callback?({xpub: @xpub, signature: signature, path: path}, null)
+        ledger.app.dongle.getPublicAddress path, (address) =>
+          ledger.app.dongle.signMessage "Coinkite", path: path, pubKey: address.publicKey, (signature) =>
+            callback?({xpub: @xpub, signature: signature, path: path}, null)
     catch error
       callback?(null, error)
 
@@ -138,12 +139,12 @@ class @Coinkite
             body = 
               _humans: "This transaction has been signed by a Ledger Wallet Nano",
               content: JSON.stringify(rv)
-            ledger.app.wallet.getPublicAddress path, (key, error) =>
+            ledger.app.dongle.getPublicAddress path, (key, error) =>
               if error?
                 return callback?(null, error)
               else
                 body.signed_by = key.bitcoinAddress.value
-                ledger.app.wallet.signMessageWithBitId path, sha256_digest(body.content), (signature) =>
+                ledger.app.dongle.signMessage sha256_digest(body.content), path: path, pubKey: key.publicKey, (signature) =>
                   body.signature_sha256 = signature
                   callback?(JSON.stringify(body), null)
         else
@@ -166,7 +167,7 @@ class @Coinkite
 
   verifyExtendedPublicKey: (request, callback) ->
     check = request.xpubkey_check
-    ledger.app.wallet.getExtendedPublicKey @_buildPath(request.ledger_key?.subkey_index), (key) =>
+    ledger.app.dongle.getExtendedPublicKey @_buildPath(request.ledger_key?.subkey_index), (key) =>
       xpub = key._xpub58
       callback?(xpub.indexOf(check, xpub.length - check.length) > 0)
 

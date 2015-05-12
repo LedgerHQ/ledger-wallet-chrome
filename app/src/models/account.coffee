@@ -3,14 +3,14 @@ class @Account extends ledger.database.Model
   @has many: 'operations', sortBy: ['time', 'desc', 'type', 'asc'], onDelete: 'destroy'
   @index 'index'
 
-  @fromWalletAccount: (hdAccount) -> # TODO: Rename to fromWalletAccount
+  @fromWalletAccount: (hdAccount) ->
     return null unless hdAccount?
     @find(index: hdAccount.index).first()
 
-  getWalletAccount: () -> ledger.wallet.Wallet.instance.getAccount(@get('index')) # TODO: Rename to getWalletAccount
+  getWalletAccount: () -> ledger.wallet.Wallet.instance.getAccount(@get('index'))
 
   serialize: () ->
-    $.extend super, { root_path: @getHDWalletAccount().getRootDerivationPath() }
+    $.extend super, { root_path: @getWalletAccount().getRootDerivationPath() }
 
   ## Balance management
 

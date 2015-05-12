@@ -367,21 +367,23 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
   signMessage: (message, {path, pubKey}, callback=undefined) ->
-    _btchipQueue.enqueue "signMessage", =>
-      @getPublicAddress(path).then((address) => @signMessage(message, path: path, pubKey: address.publicKey, callback)) if ! pubKey?
-      d = ledger.defer(callback)
-      message = new ByteString(message, ASCII)
-      @_btchip.signMessagePrepare_async(path, message)
-      .then =>
-        return @_btchip.signMessageSign_async(new ByteString(_pin, ASCII))
-      .then (sig) =>
-        signedMessage = @_convertMessageSignature(pubKey, message, sig.signature)
-        d.resolve(signedMessage)
-      .catch (error) ->
-        console.error("Fail to signMessage :", error)
-        d.reject(error)
-      .done()
-      d.promise
+    if ! pubKey?
+      @getPublicAddress(path).then((address) => console.log("address=", address); @signMessage(message, path: path, pubKey: address.publicKey, callback))
+    else
+      _btchipQueue.enqueue "signMessage", =>
+        d = ledger.defer(callback)
+        message = new ByteString(message, ASCII)
+        @_btchip.signMessagePrepare_async(path, message)
+        .then =>
+          return @_btchip.signMessageSign_async(new ByteString(_pin, ASCII))
+        .then (sig) =>
+          signedMessage = @_convertMessageSignature(pubKey, message, sig.signature)
+          d.resolve(signedMessage)
+        .catch (error) ->
+          console.error("Fail to signMessage :", error)
+          d.reject(error)
+        .done()
+        d.promise
 
   # @param [String] pubKey public key, hex encoded.
   # @param [Function] callback Optional argument

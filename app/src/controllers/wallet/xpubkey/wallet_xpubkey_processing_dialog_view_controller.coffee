@@ -6,7 +6,7 @@ class @WalletXpubkeyProcessingDialogViewController extends ledger.common.DialogV
   onAfterRender: ->
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
-    ledger.app.wallet.getExtendedPublicKey @params.path, (key, error) =>
+    ledger.app.dongle.getExtendedPublicKey @params.path, (key, error) =>
       if error?
         Api.callback_cancel('get_xpubkey', t("wallet.xpubkey.errors.derivation_failed"))
         @dismiss =>

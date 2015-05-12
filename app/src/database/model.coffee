@@ -299,4 +299,5 @@ class @ledger.database.Model extends @EventEmitter
     json = $.extend {}, @_object
     delete json['meta']
     delete json['objType']
+    delete json['$loki']
     return json
