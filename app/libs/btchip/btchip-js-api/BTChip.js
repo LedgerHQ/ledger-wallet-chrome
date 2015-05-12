@@ -786,8 +786,7 @@ var BTChip = Class.create({
         for (var index in inputs) {
             if (typeof inputs[index] === "function")
                 continue;
-            progressObject["currentTrustedInputProgress_" + index] = 0;
-            console.log(inputs[index]);
+            progressObject["currentTrustedInputProgress_" + index] = resuming ? inputs[index][0].inputs.length + inputs[index][0].outputs.length : 0;
             progressObject["trustedInputsProgressTotal_" + index] = inputs[index][0].inputs.length + inputs[index][0].outputs.length;
         }
         var notify = function (notifyObject) {
@@ -801,7 +800,6 @@ var BTChip = Class.create({
             }
             deferred.notify(result);
         };
-        console.log(inputs);
         async.eachSeries(
             inputs,
             // Iteration callback
