@@ -51,7 +51,7 @@ class Collection
         view.applySort(relationship.sort)
     view.modelize = =>
       @_modelize(view.data())
-    view
+    view.rematerialize()
 
   query: () ->
     query = @_collection.chain()
