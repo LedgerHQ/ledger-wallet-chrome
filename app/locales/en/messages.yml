@@ -40,10 +40,16 @@ common:
   test: "Test"
   yes: "Yes"
   no: "No"
+  name: "Name"
+  email_address: "Email address"
+  subject: "Subject"
+  tag: "Tag"
+  message: "Message"
   may_take_a_while: "Please wait, this operation may take a few moments."
   get_help: "Please visit our help center at support.ledgerwallet.com for more information."
   signing: "Signing..."
   checking: "Checking..."
+  sending: "Sending..."
 
   keycard:
     uppercase_letters: "Uppercase letters"
@@ -65,6 +71,9 @@ common:
     going_to_firmware_update: "By switching to firmware update mode, all your pending activites will be interrupted.<br />Do you want to continue ?"
     wrong_transaction_signature: "The transaction has not been signed correctly due to hardware fault. Please contact the support for immediate assistance."
     dust_transaction: "The transaction amount must be at least %s."
+    fill_all_fields: "Please make sure that all fields are filled in."
+    not_a_valid_email: "The email address does not seem to be valid."
+    error_occurred: "An error occurred. Please try again later."
 
   qrcode:
     scan_qrcode: "Scan QR code"
@@ -75,6 +84,21 @@ common:
     normal: "%s (normal)"
     fast: "%s (fast confirmation)"
     slow: "%s (slow confirmation)"
+
+  help:
+    help: "Help"
+    browse_knowledge_base: "Browse knowledge base"
+    contact_support_team: "Contact support team"
+    self_help: "For immediate self-help"
+    dedicated_help: "For fast-and-furious assistance"
+    attach_debug_logs: "Attach debug logs"
+    support_tag: "Support"
+    feature_request_tag: "Feature request"
+    sales_tag: "Sales"
+    other_tag: "Other"
+    sent_message: "Message sent"
+    not_sent_message: "Message not sent"
+    thank_you_message: "Thank you for contacting the support team. We'll get back to you shortly."
 
 onboarding:
   device:

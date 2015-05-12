@@ -9,13 +9,6 @@
   .fullsize;
 }
 
-.error-container {
-  .bold-invalid-text;
-  padding: @metrics-large-padding 0;
-  letter-spacing: -0.5px;
-  text-align: center;
-}
-
 // sections
 section {
   width: 100%;
@@ -287,7 +280,6 @@ a {
   font-size: @font-size-medium;
 
   &::-webkit-input-placeholder {
-    font-weight: @font-weight-light;
     color: @color-soft-grey;
   }
 
@@ -308,6 +300,16 @@ a {
   text-align: left;
   font-size: @font-size-medium;
   resize: none;
+}
+.rounded-text-area {
+  border: 1px solid @color-very-light-grey;
+  border-radius: @border-radius-default-value;
+  background-color: @color-white;
+  outline: none;
+  font-family: 'Open Sans';
+  font-size: @font-size-small;
+  resize: none;
+  padding: @metrics-almost-small-padding @metrics-small-padding;
 }
 
 // common

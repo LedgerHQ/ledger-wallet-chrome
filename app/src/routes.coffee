@@ -111,7 +111,8 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   # Help
   route '/wallet/help/index', (params) ->
-    window.open t 'application.support_url'
+    dialog = new CommonDialogsHelpDialogViewController()
+    dialog.show()
 
   # Operations
   route '/wallet/accounts/{id}/operations', (params) ->
