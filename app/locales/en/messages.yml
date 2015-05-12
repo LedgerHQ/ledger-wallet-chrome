@@ -405,7 +405,7 @@ wallet:
       preparing_transaction: "Preparing transaction..."
 
     validating:
-      validating_transaction: "Validating transaction..."
+      validating_transaction: "Verifying transaction..."
 
     errors:
       sending_failed: "Sending failed"
