@@ -28,6 +28,9 @@ class @WalletSendProcessingDialogViewController extends ledger.common.DialogView
           dialog.show()
       else
         @_startSending()
+    promise.progress ({percent}) =>
+      @view.progressBar.setProgress(percent / 100)
+      @view.progressLabel.text percent + '%'
 
   _startSending: ->
     # push transaction

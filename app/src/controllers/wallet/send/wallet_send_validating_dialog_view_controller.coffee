@@ -7,7 +7,7 @@ class @WalletSendValidatingDialogViewController extends ledger.common.DialogView
 
   initialize: ->
     super
-    @params.transaction.prepare (transaction, error) =>
+    promise = @params.transaction.prepare (transaction, error) =>
       return unless @isShown()
       if error?
         reason = switch error.code
@@ -21,6 +21,9 @@ class @WalletSendValidatingDialogViewController extends ledger.common.DialogView
         @getDialog().push new WalletSendCardDialogViewController(transaction: transaction, options: @params.options)
       else
         @getDialog().push new WalletSendMobileDialogViewController(transaction: transaction, secureScreens: @params.secureScreens)
+    promise.progress ({percent}) =>
+      @view.progressBar.setProgress(percent / 100)
+      @view.progressLabel.text percent + '%'
 
   cancel: ->
     Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
