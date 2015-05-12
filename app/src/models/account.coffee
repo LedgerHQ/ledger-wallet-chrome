@@ -1,6 +1,6 @@
 class @Account extends ledger.database.Model
   do @init
-  @has many: 'operations', sortBy: ['time', 'desc', 'type', 'asc'], onDelete: 'destroy'
+  @has many: 'operations', sortBy: ['time', 'desc'], onDelete: 'destroy'
   @index 'index'
 
   @fromWalletAccount: (hdAccount) ->

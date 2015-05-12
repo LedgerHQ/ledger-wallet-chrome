@@ -70,7 +70,7 @@ class @ledger.utils.PromiseQueue extends @EventEmitter
           @emit 'task:done', taskId
           @_taskDone(); return
         ).then( (args...) -> defer.resolve(args...); return
-        ).progress( (args...) ->
+        ).progress( (args...) =>
           clearTimeout(timer)
           timer = @_setTimeout(taskId, defer)
           defer.notify(args...); return
