@@ -46,6 +46,12 @@ chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse) =>
         command: 'get_operations',
         account_id: data.account_id
       }
+    when 'get_new_addresses'
+      payload = {
+        command: 'get_new_addresses',
+        account_id: data.account_id,
+        count: data.count
+      }
     when 'send_payment'
       payload = {
         command: 'send_payment',

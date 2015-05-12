@@ -500,6 +500,11 @@ wallet:
       title: "Export operations"
       info: "Do you wish to export the operations related to the following account?"
       account_name: "Account name"
+    addresses:
+      title: "Export new addresses"
+      info: "Do you wish to export new available addresses from the following account?"
+      account_name: "Account name"
+      count: "Number of addresses"
     errors:
       cancelled: "Request cancelled by the user"
       account_not_found: "Account not found"

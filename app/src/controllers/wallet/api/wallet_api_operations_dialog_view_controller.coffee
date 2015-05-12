@@ -4,6 +4,7 @@ class @WalletApiOperationsDialogViewController extends ledger.common.DialogViewC
 
   view:
     accountName: '#account_name'
+    confirmButton: '#confirmButton'
 
   onAfterRender: ->
     super
@@ -12,8 +13,9 @@ class @WalletApiOperationsDialogViewController extends ledger.common.DialogViewC
     if @account
       @view.accountName.text @account.get('name')
     else
+      @view.accountName.text t('wallet.api.errors.account_not_found')
+      @view.confirmButton.addClass "disabled"
       Api.callback_cancel 'get_operations', t('wallet.api.errors.account_not_found')
-      @dismiss()
 
   cancel: ->
     Api.callback_cancel 'get_operations', t('wallet.api.errors.cancelled')

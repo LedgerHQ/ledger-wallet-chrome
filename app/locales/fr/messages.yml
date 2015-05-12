@@ -500,6 +500,11 @@ wallet:
       title: "Export operations"
       info: "Souhaitez-vous exporter la liste des opérations associées au compte suivant?"
       account_name: "Nom du compte"
+    addresses:
+      title: "Export d'addresses"
+      info: "Souhaitez-vous exporter une liste de nouvelles adresses pour ce compte?"
+      account_name: "Nom du compte"
+      count: "Nombre d'adresses"
     errors:
       cancelled: "Requête annulée par l'utilisateur"
       account_not_found: "Compte introuvable"

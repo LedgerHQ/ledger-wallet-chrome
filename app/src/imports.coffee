@@ -345,6 +345,7 @@
         'api'
         'controllers/wallet/api/wallet_api_accounts_dialog_view_controller'
         'controllers/wallet/api/wallet_api_operations_dialog_view_controller'
+        'controllers/wallet/api/wallet_api_addresses_dialog_view_controller'
 
         ## Coinkite
         'controllers/apps/coinkite/apps_coinkite_navigation_controller'
