@@ -1,4 +1,4 @@
-class @WalletSendIndexDialogViewController extends DialogViewController
+class @WalletSendIndexDialogViewController extends ledger.common.DialogViewController
 
   view:
     amountInput: '#amount_input'
@@ -40,10 +40,15 @@ class @WalletSendIndexDialogViewController extends DialogViewController
   openScanner: ->
     dialog = new CommonDialogsQrcodeDialogViewController
     dialog.qrcodeCheckBlock = (data) =>
+      if Bitcoin.Address.validate data
+        return true
       params = ledger.managers.schemes.bitcoin.parseURI data
       return params?
     dialog.once 'qrcode', (event, data) =>
-      params = ledger.managers.schemes.bitcoin.parseURI data
+      if Bitcoin.Address.validate data
+        params = {address: data}
+      else
+        params = ledger.managers.schemes.bitcoin.parseURI data
       @view.amountInput.val params.amount if params?.amount?
       @view.receiverInput.val params.address if params?.address?
       @_updateTotalInput()
@@ -64,7 +69,7 @@ class @WalletSendIndexDialogViewController extends DialogViewController
 
   _nextFormError: ->
     # check amount
-    if @_transactionAmount().length == 0 or not ledger.wallet.Value.from(@_transactionAmount()).gt(0)
+    if @_transactionAmount().length == 0 or not ledger.Amount.fromSatoshi(@_transactionAmount()).gt(0)
       return t 'common.errors.invalid_amount'
     else if not Bitcoin.Address.validate @_receiverBitcoinAddress()
       return t 'common.errors.invalid_receiver_address'
@@ -72,5 +77,5 @@ class @WalletSendIndexDialogViewController extends DialogViewController
 
   _updateTotalInput: ->
     fees = ledger.preferences.instance.getMiningFee()
-    val = ledger.wallet.Value.from(@_transactionAmount()).add(fees).toString()
+    val = ledger.Amount.fromSatoshi(@_transactionAmount()).add(fees).toString()
     @view.totalInput.text ledger.formatters.formatValue(val) + ' ' + _.str.sprintf(t('wallet.send.index.transaction_fees_text'), ledger.formatters.formatValue(fees))

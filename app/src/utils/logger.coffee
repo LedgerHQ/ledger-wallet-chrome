@@ -43,11 +43,10 @@ class @ledger.utils.Logger
     @_getLogs(ledger.storage.logs, cb)
 
   @_getLogs: (store, cb) ->
-    closure = new CompletionClosure(cb)
+    d = ledger.defer(cb)
     store.keys (keys) =>
-      store.get keys, (items) =>
-        closure.success(_.values(items))
-    closure.readonly()
+      store.get keys, (items) => d.resolve(_.values(items))
+    d.promise
 
   # @return [legder.utils.Logger]
   @getLoggerByTag: (tag) ->
@@ -55,7 +54,9 @@ class @ledger.utils.Logger
 
   # Set all loggers level
   @_setGlobalLoggersLevel: (level) -> logger.setLevel(level) for name, logger of @_loggers when logger.useGlobalSettings
+  @setGlobalLoggersLevel: (level) -> @_setGlobalLoggersLevel(level)
 
+  @setGlobalLoggersPersistentLogsEnabled: (enable) -> logger.setPersistentLogsEnabled(enable) for name, logger of @_loggers when logger.useGlobalSettings
 
   @getGlobalLoggersLevel: ->
     if ledger.preferences?.instance?
@@ -75,7 +76,26 @@ class @ledger.utils.Logger
         csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
         csv.save(callback)
 
-  @exportLogsWithLink: (callback) ->
+  @exportLogsToBlob: (callback = undefined) ->
+    now = new Date()
+    suggestedName = "ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
+    csv = new ledger.utils.CsvExporter(suggestedName)
+    @publicLogs (publicLogs) =>
+      @privateLogs (privateLogs) =>
+        csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
+        callback?(name: suggestedName, blob: csv.blob())
+
+  @exportLogsToZip: (callback = undefined) ->
+    now = new Date()
+    suggestedName = "ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
+    csv = new ledger.utils.CsvExporter(suggestedName)
+    @publicLogs (publicLogs) =>
+      @privateLogs (privateLogs) =>
+        csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
+        csv.zip (zip) =>
+          callback?(name: suggestedName, zip: zip)
+
+  @exportLogsWithLink: (callback = undefined) ->
     now = new Date()
     suggestedName = "ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
     csv = new ledger.utils.CsvExporter(suggestedName)
@@ -127,7 +147,10 @@ class @ledger.utils.Logger
     @level = Levels[@level] if typeof @level == "string"
     @level = Levels.ALL if @level is true
     @level = Levels.NONE if @level is false
+    @setPersistentLogsEnabled on
     @constructor._loggers[tag] = this
+
+  setPersistentLogsEnabled: (enable) -> @_areLogsPersistents = enable
 
   #################################
   # Accessors
@@ -213,6 +236,7 @@ class @ledger.utils.Logger
   # @param [String] msg Message to log.
   # @param [String] msgType Log level.
   _storeLog: (msg, msgType) ->
+    return unless @_areLogsPersistents
     now = new Date()
     log = {}
     log[now.getTime()] = date: now.toUTCString(), type: msgType,  tag: @_tag, msg: msg
@@ -318,8 +342,6 @@ class @ledger.utils.Logger
     console[method](args...)
 
   _privateLogStream: -> @constructor._logStream
-
-ledger.utils.logger = new ledger.utils.Logger("DeprecatedLogger")
 
 # Shortcuts
 if @ledger.isDev

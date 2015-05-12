@@ -1,4 +1,4 @@
-class @WalletSettingsSettingViewController extends ViewController
+class @WalletSettingsSettingViewController extends ledger.common.ViewController
 
   renderSelector: null
 

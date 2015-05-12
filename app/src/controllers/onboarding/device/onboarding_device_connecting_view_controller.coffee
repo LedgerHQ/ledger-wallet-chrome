@@ -25,23 +25,23 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
 
   _navigateContinue: ->
     @_stopTimer()
-    ledger.app.wallet?.isFirmwareUpdateAvailable (isAvailable) =>
+    ledger.app.dongle?.isFirmwareUpdateAvailable (isAvailable) =>
       if isAvailable
         ledger.app.router.go '/onboarding/device/update'
       else
-        ledger.app.wallet.getState (state) =>
-          if state == ledger.wallet.States.LOCKED
+        ledger.app.dongle.getState (state) =>
+          if state == ledger.dongle.States.LOCKED
             ledger.app.router.go '/onboarding/device/pin'
           else
             ledger.app.router.go '/onboarding/management/welcome'
 
   _navigateForged: ->
     @_stopTimer()
-    ledger.app.wallet?.isDongleBetaCertified (__, error) =>
+    ledger.app.dongle?.isBetaCertified (__, error) =>
       if error?
         ledger.app.router.go '/onboarding/device/forged'
       else
-        ledger.app.wallet?.isFirmwareOverwriteOrUpdateAvailable (isAvailable) =>
+        ledger.app.dongle?.isFirmwareOverwriteOrUpdateAvailable (isAvailable) =>
           if isAvailable and not ledger.fup.versions.Nano.CurrentVersion.Beta
             ledger.app.setExecutionMode(ledger.app.Modes.FirmwareUpdate)
             ledger.app.router.go '/update/index', {hidePreviousButton: yes}
@@ -63,7 +63,7 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
       @timer = null
 
   _launchAttestation: ->
-    if ledger.app.wallet?
+    if ledger.app.dongle?
       ledger.app.performDongleAttestation()
     @timer = setTimeout =>
       # attestation timed out

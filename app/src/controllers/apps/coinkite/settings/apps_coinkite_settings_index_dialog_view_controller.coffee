@@ -1,4 +1,4 @@
-class @AppsCoinkiteSettingsIndexDialogViewController extends DialogViewController
+class @AppsCoinkiteSettingsIndexDialogViewController extends ledger.common.DialogViewController
 
   view:
     apiKeyInput: '#api_key_input'

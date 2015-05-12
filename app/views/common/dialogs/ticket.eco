@@ -1,0 +1,44 @@
+<section id="dialogs_ticket_dialog">
+  <header>
+    <h1><%= t 'common.help.contact_support_team' %></h1>
+  </header>
+  <table class="no-table-head" >
+    <tbody>
+      <tr>
+        <td class="row-title"><%= t 'common.name' %></td>
+        <td class="align-right">
+          <input class="text-input" placeholder="<%= t 'common.name' %>" id="name_input" />
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title"><%= t 'common.email_address' %></td>
+        <td class="align-right">
+          <input class="text-input" placeholder="<%= t 'common.email_address' %>" id="email_address_input"  />
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title"><%= t 'common.tag' %></td>
+        <td class="align-right">
+          <div id="tags_segmented_control_container"></div>
+        </td>
+      </tr>
+      <tr class="no-border">
+        <td class="row-title"><%= t 'common.subject' %></td>
+        <td class="align-right">
+          <input class="text-input" placeholder="<%= t 'common.subject' %>" id="subject_input" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <textarea class="rounded-text-area" placeholder="<%= t 'common.message' %>" id="message_text_area" ></textarea>
+  <div id="error_container"></div>
+</section>
+<div class="dialog-actions-bar">
+  <div id="logs_container">
+    <div class="uppercase-action"><%= t 'common.help.attach_debug_logs' %></div>
+    <div id="logs_switch_container"></div>
+  </div>
+  <div class="left-spacer"></div>
+  <a href="#dismiss" class="cancel-rounded-button"><%= t 'common.cancel' %></a>
+  <a href="#sendTicket" class="action-rounded-button" id="send_button"><%= t 'common.send' %></a>
+</div>

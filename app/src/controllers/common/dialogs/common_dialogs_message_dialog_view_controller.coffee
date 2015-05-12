@@ -1,4 +1,4 @@
-class @CommonDialogsMessageDialogViewController extends @DialogViewController
+class @CommonDialogsMessageDialogViewController extends ledger.common.DialogViewController
 
   ###
     @param kind [String] The message kind [error|success]

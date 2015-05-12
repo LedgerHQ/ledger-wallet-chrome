@@ -1,0 +1,48 @@
+@import (reference) "../../application";
+
+section#dialogs_help_dialog {
+  width: @dialog-width-help;
+  
+  .sections-container {
+    margin-top: @metrics-medium-padding;
+    display: flex;
+    flex-direction: column;
+
+    > .panel {
+      display: flex;
+      flex-direction: row;
+      margin-top: @metrics-very-small-padding;
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      > .icon {
+        margin-right: @metrics-small-padding;
+        
+        > .fa {
+          font-size: @font-size-very-very-very-large;
+          color: @color-dark-grey;
+        }
+      }
+
+      > .content {
+        flex-grow: 1;
+
+        > .regular-soft-grey-text-small {
+          margin-top: @metrics-very-small-padding;
+        }
+      }
+
+      > .arrow {
+        margin-left: @metrics-small-padding;
+        align-self: center;
+
+        > .fa {
+          font-size: @font-size-very-large;
+          color: @color-soft-grey;
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-class @WalletSendPreparingDialogViewController extends @DialogViewController
+class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewController
 
   view:
     contentContainer: '#content_container'
@@ -16,7 +16,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
           when ledger.errors.DustTransaction then 'dust_transaction'
         @dismiss =>
           errorMessage = switch reason
-            when 'dust_transaction' then _.str.sprintf(t("common.errors." + reason), ledger.formatters.formatValue(ledger.wallet.transaction.MINIMUM_OUTPUT_VALUE))
+            when 'dust_transaction' then _.str.sprintf(t("common.errors." + reason), ledger.formatters.formatValue(ledger.wallet.Transaction.MINIMUM_OUTPUT_VALUE))
             else t("common.errors." + reason)
           Api.callback_cancel 'send_payment', errorMessage
           dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: errorMessage)
@@ -41,7 +41,7 @@ class @WalletSendPreparingDialogViewController extends @DialogViewController
       @getDialog().push new WalletSendMethodDialogViewController(transaction: transaction)
 
     # if mobile validation is supported
-    if ledger.app.wallet.getIntFirmwareVersion() >= ledger.wallet.Firmware.V_LW_1_0_0
+    if ledger.app.dongle.getIntFirmwareVersion() >= ledger.dongle.Firmware.V_LW_1_0_0
       # fetch grouped paired screens
       ledger.m2fa.PairedSecureScreen.getAllGroupedByUuidFromSyncedStore (groups, error) =>
         groups = _.values(_.omit(groups, undefined)) if groups?

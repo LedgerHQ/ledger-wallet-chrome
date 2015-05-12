@@ -1,0 +1,27 @@
+<section id="dialogs_help_dialog">
+  <header>
+    <h1><%= t 'common.help.help' %></h1>
+  </header>
+  <div class="sections-container">
+    <a class="panel" href="#browseKnowledge">
+      <div class="icon"><i class="fa fa-support"></i></div>
+      <div class="content">
+        <div class="uppercase-action"><%= t 'common.help.browse_knowledge_base' %></div>
+        <div class="regular-soft-grey-text-small"><%= t 'common.help.self_help' %></div>
+      </div>
+      <div class="arrow"><i class="fa fa-angle-right"></i></div>
+    </a>
+    <a class="panel" href="#contactSupport">
+      <div class="icon"><i class="fa fa-comments"></i></div>
+      <div class="content">
+        <div class="uppercase-action"><%= t 'common.help.contact_support_team' %></div>
+        <div class="regular-soft-grey-text-small"><%= t 'common.help.dedicated_help' %></div>
+      </div>
+      <div class="arrow"><i class="fa fa-angle-right"></i></div>
+    </a>
+  </div>
+</section>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a href="#dismiss" class="cancel-rounded-button"><%= t 'common.close' %></a>
+</div>

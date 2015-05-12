@@ -1,4 +1,4 @@
-class @AppsCoinkiteCosignIndexDialogViewController extends DialogViewController
+class @AppsCoinkiteCosignIndexDialogViewController extends ledger.common.DialogViewController
 
   view:
     requestInput: '#request_input'

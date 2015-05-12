@@ -15,7 +15,6 @@ application:
     export_logs: "Exporter les logs globaux"
 
 common:
-  bitcoin_acronym: 'BTC'
   default_account_name: "Mon compte"
   date_time_format: 'L [à] LT'
   date_format: 'L'
@@ -41,10 +40,16 @@ common:
   test: "Test"
   yes: "Oui"
   no: "Non"
+  name: "Nom"
+  email_address: "Adresse email"
+  subject: "Sujet"
+  tag: "Tag"
+  message: "Message"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
   get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
   signing: "Signature..."
   checking: "Vérification..."
+  sending: "Envoi..."
 
   keycard:
     uppercase_letters: "Majuscules"
@@ -55,6 +60,7 @@ common:
     unsufficient_balance: "Le solde de votre portefeuille est insuffisant."
     wrong_keycode: "Le code de validation n'est pas correct."
     network_no_response: "Le serveur de transactions n'a pas répondu."
+    network_error: "Erreur réseau."
     invalid_receiver_address: "L'adresse bitcoin à créditer n'est pas correcte."
     invalid_amount: "Le montant à envoyer n'est pas valide."
     unknown: "Une erreur inconnue est survenue."
@@ -65,6 +71,9 @@ common:
     going_to_firmware_update: "En passant en mode de mise à jour de la puce, toutes vos activités en cours seront interrompues.<br />Souhaitez-vous continuer ?"
     wrong_transaction_signature: "Une erreur est survenue durant la signature de la transaction. Veuillez contacter le support pour une assistance immédiate."
     dust_transaction: "Le montant de la transaction doit être au moins de %s."
+    fill_all_fields: "Merci de vérifier que tous les champs soient remplis."
+    not_a_valid_email: "L'adresse email spécifiée ne semble pas être valide."
+    error_occurred: "Une erreur est survenue. Veuillez réessayer dans quelques instants."
 
   qrcode:
     scan_qrcode: "Scanner code QR"
@@ -76,6 +85,21 @@ common:
     fast: "%s (confirmation rapide)"
     slow: "%s (confirmation lente)"
 
+  help:
+    help: "Aide"
+    browse_knowledge_base: "Parcourir la base de connaissance"
+    contact_support_team: "Contacter l'équipe support"
+    self_help: "Pour une auto-assistance immédiate"
+    dedicated_help: "Pour une aide personnalisée"
+    attach_debug_logs: "Joindre les logs de debug"
+    support_tag: "Support"
+    feature_request_tag: "Nouvelle fonctionnalité"
+    sales_tag: "Ventes"
+    other_tag: "Autre"
+    sent_message: "Message envoyé"
+    not_sent_message: "Message non envoyé"
+    thank_you_message: "Merci d'avoir contacté l'équipe support. Une réponse sera apportée dans les plus brefs délais."
+
 onboarding:
   device:
     plug:
@@ -83,11 +107,11 @@ onboarding:
       is_not_recognized: "Si votre Ledger Wallet n'est pas reconnu, consultez notre centre d'aide."
 
     unplug:
-      unlock_my_wallet: "Dévérouiller mon portefeuille"
+      unlock_my_wallet: "Déverrouiller mon portefeuille"
       you_can_unplug: "Vous pouvez maintenant débrancher votre Ledger Wallet en toute sécurité."
 
     pin:
-      enter_your_pin_code: "Entez votre code PIN pour dévérouiller votre portefeuille :"
+      enter_your_pin_code: "Entez votre code PIN pour déverrouiller votre portefeuille :"
       i_lost_my_pin_code: "Si vous avez oublié votre code PIN, consultez notre centre d'aide."
 
     connecting:
@@ -212,7 +236,7 @@ onboarding:
 update:
   common:
     firmware_update: "Mise à jour de la puce"
-    need_to_repeat_several_times: "Vous pouvez être amené(e) à répéter cette opération plusieurs fois."
+    need_to_repeat_several_times: "Vous pouvez être amené(e) à brancher et débrancher plusieurs fois."
 
   index:
     important_notice: "Informations importantes"
@@ -405,7 +429,7 @@ wallet:
       preparing_transaction: "Préparation de la transaction..."
 
     validating:
-      validating_transaction: "Validation de la transaction..."
+      validating_transaction: "Vérification de la transaction..."
 
     errors:
       sending_failed: "Envoi échoué"
@@ -500,6 +524,11 @@ wallet:
       title: "Export operations"
       info: "Souhaitez-vous exporter la liste des opérations associées au compte suivant?"
       account_name: "Nom du compte"
+    addresses:
+      title: "Export d'addresses"
+      info: "Souhaitez-vous exporter une liste de nouvelles adresses pour ce compte?"
+      account_name: "Nom du compte"
+      count: "Nombre d'adresses"
     errors:
       cancelled: "Requête annulée par l'utilisateur"
       account_not_found: "Compte introuvable"

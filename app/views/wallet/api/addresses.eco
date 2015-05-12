@@ -1,0 +1,36 @@
+<section id="wallet_api_addresses_dialog">
+  <header>
+    <h1><%= t 'wallet.api.addresses.title' %></h1>
+  </header>
+  <table class="no-table-head">
+    <tbody>
+      <tr>
+        <td class="no-border">
+          <%= t 'wallet.api.addresses.info' %>
+        </td>
+      </tr>    
+      <tr>
+        <td class="row-title"><%= t 'wallet.api.addresses.account_name' %></td>
+      </tr>
+      <tr>
+        <td>
+          <span id="account_name"></span>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title"><%= t 'wallet.api.addresses.count' %></td>
+      </tr>
+      <tr>
+        <td>
+          <span id="count"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+<div id="error_container"></div>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
+  <a class="action-rounded-button" href="#confirm" id="confirmButton"><%= t 'common.confirm' %></a>
+</div>

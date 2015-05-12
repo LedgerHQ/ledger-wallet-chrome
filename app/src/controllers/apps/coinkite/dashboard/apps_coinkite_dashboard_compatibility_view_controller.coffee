@@ -1,4 +1,4 @@
-class @AppsCoinkiteDashboardCompatibilityDialogViewController extends @DialogViewController
+class @AppsCoinkiteDashboardCompatibilityDialogViewController extends ledger.common.DialogViewController
 
   view:
     contentContainer: '#content_container'

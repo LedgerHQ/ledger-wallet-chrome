@@ -21,18 +21,19 @@ pathsToPredefinedAddresses = (paths, callback) ->
 
 _.extend ledger.wallet,
 
-  pathsToAddresses: (paths, callback) ->
+  pathsToAddresses: (paths, callback = undefined) ->
 
     # Uncomment for debugging with predefined addresses
     # return pathsToPredefinedAddresses(paths, callback)
 
-    @safe()
+    # throw error unless dongle is plugged and unlocked
+    ledger.dongle.unlocked()
 
     addresses = {}
     notFound = []
     _.async.each paths, (path, done, hasNext) ->
       # Hit the cache first
-      address = ledger.wallet.HDWallet.instance?.cache?.get(path)
+      address = ledger.wallet.Wallet.instance?.cache?.get(path)
       if address?
         addresses[path] = address
         callback?(addresses, notFound) unless hasNext is true
@@ -48,12 +49,3 @@ _.extend ledger.wallet,
         do done
 
     return
-
-  # @return Return true if wallet is plugged and unblocked.
-  isPluggedAndUnlocked: () ->
-    ledger.app.wallet? && ledger.app.wallet._state == ledger.wallet.States.UNLOCKED
-
-  # @return Return current unblocked wallet or throw error if wallet is not plugged or not unblocked.
-  safe: () ->
-    throw 'the wallet is not connected and unlocked' unless @isPluggedAndUnlocked()
-    return ledger.app.wallet

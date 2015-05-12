@@ -1,4 +1,4 @@
-class @WalletP2shSigningDialogViewController extends @DialogViewController
+class @WalletP2shSigningDialogViewController extends ledger.common.DialogViewController
 
   view:
     contentContainer: '#content_container'
@@ -11,7 +11,7 @@ class @WalletP2shSigningDialogViewController extends @DialogViewController
     @outputs_number = @params.outputs_number
     @outputs_script = @params.outputs_script
     @paths = @params.paths
-    ledger.app.wallet._lwCard.dongle.signP2SHTransaction_async(@inputs, @scripts, @outputs_number, @outputs_script, @paths)
+    ledger.app.dongle.signP2SHTransaction(@inputs, @scripts, @outputs_number, @outputs_script, @paths)
     .then (signatures) =>
       Api.callback_success('sign_p2sh', {signatures: signatures})
       @dismiss =>

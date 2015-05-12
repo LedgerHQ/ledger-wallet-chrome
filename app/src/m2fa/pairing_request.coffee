@@ -33,56 +33,49 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
   constructor: (pairindId, promise, client) ->
     @pairingId = pairindId
     @_client = client
-    @_secureScreenName = new CompletionClosure()
+    @_secureScreenName = ledger.defer()
     @_client.pairedDongleName = @_secureScreenName
     @_currentState = ledger.m2fa.PairingRequest.States.WAITING
-    @_onComplete = new CompletionClosure()
+    @_defer = ledger.defer (args...) => @_onComplete?(args...)
     @_identifyData = {}
 
-    promise.then(
-      (result) =>
-        @_success(result)
-      ,
-      (err) =>
-        _.defer =>
-          try
-            failure = switch err
-              when 'invalidChallenge' then ledger.m2fa.PairingRequest.Errors.InvalidChallengeResponse
-              when 'cancel' then ledger.m2fa.PairingRequest.Errors.Cancelled
-              when 'initiateFailure' then ledger.m2fa.PairingRequest.Errors.NeedPowerCycle
-              else ledger.m2fa.PairingRequest.Errors.UnknownError
-            @_failure(failure)
-          catch er
-            e er
-      ,
-      (progress) =>
-        try
-          switch progress
-            when 'pubKeyReceived'
-              @_identifyData = _.clone(@_client.lastIdentifyData)
-              return @_failure(ledger.m2fa.PairingRequest.Errors.InconsistentState) if @_currentState isnt ledger.m2fa.PairingRequest.States.WAITING
-              @_currentState = ledger.m2fa.PairingRequest.States.CHALLENGING
-              @emit 'join'
-            when 'challengeReceived'
-              return @_failure(ledger.m2fa.PairingRequest.Errors.InconsistentState) if @_currentState isnt ledger.m2fa.PairingRequest.States.CHALLENGING
-              @_currentState = ledger.m2fa.PairingRequest.States.FINISHING
-              @emit 'answerChallenge'
-            when 'secureScreenDisconnect'
-              @_failure(ledger.m2fa.PairingRequest.Errors.ClientCancelled) if @_currentState isnt ledger.m2fa.PairingRequest.States.WAITING
-            when 'sendChallenge' then @emit 'sendChallenge'
-            when 'secureScreenConfirmed' then @emit 'finalizing'
-        catch er
-          e er
-    ).done()
-    @_client.on 'm2fa.disconnect'
+    promise
+    .then (result) => @_success(result)
+    .catch (err) =>
+      _.defer =>
+        failure = switch err
+          when 'invalidChallenge' then ledger.m2fa.PairingRequest.Errors.InvalidChallengeResponse
+          when 'cancel' then ledger.m2fa.PairingRequest.Errors.Cancelled
+          when 'initiateFailure' then ledger.m2fa.PairingRequest.Errors.NeedPowerCycle
+          else ledger.m2fa.PairingRequest.Errors.UnknownError
+        @_failure(failure)
+    .progress (progress) =>
+      try
+        switch progress
+          when 'pubKeyReceived'
+            @_identifyData = _.clone(@_client.lastIdentifyData)
+            return @_failure(ledger.m2fa.PairingRequest.Errors.InconsistentState) if @_currentState isnt ledger.m2fa.PairingRequest.States.WAITING
+            @_currentState = ledger.m2fa.PairingRequest.States.CHALLENGING
+            @emit 'join'
+          when 'challengeReceived'
+            return @_failure(ledger.m2fa.PairingRequest.Errors.InconsistentState) if @_currentState isnt ledger.m2fa.PairingRequest.States.CHALLENGING
+            @_currentState = ledger.m2fa.PairingRequest.States.FINISHING
+            @emit 'answerChallenge'
+          when 'secureScreenDisconnect'
+            @_failure(ledger.m2fa.PairingRequest.Errors.ClientCancelled) if @_currentState isnt ledger.m2fa.PairingRequest.States.WAITING
+          when 'sendChallenge' then @emit 'sendChallenge'
+          when 'secureScreenConfirmed' then @emit 'finalizing'
+      catch er
+        e er
+    .done()
     @_promise = promise
 
   # Sets the completion callback.
   # @param [Function] A callback to call once the pairing process is completed
-  onComplete: (cb) -> @_onComplete.onComplete(cb)
+  onComplete: (cb) -> @_onComplete = cb
 
   # Sets the secure screen name. This is a mandatory step for saving the paired secure screen
-  setSecureScreenName: (name) -> @_secureScreenName.success(name)
+  setSecureScreenName: (name) -> @_secureScreenName.resolve(name)
 
   getCurrentState: () -> @_currentState
 
@@ -92,20 +85,20 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
 
   cancel: () ->
     @_promise = null
-    @_secureScreenName.failure('cancel')
+    @_secureScreenName.reject('cancel')
     @_client.stopIfNeccessary()
-    @_onComplete = new CompletionClosure()
+    @_defer = ledger.defer()
     @emit 'cancel'
     do @off
 
   _failure: (reason) ->
     @_currentState = ledger.m2fa.PairingRequest.States.DEAD
-    unless @_onComplete.isCompleted()
-      @_onComplete.failure(reason)
+    unless @_defer.promise.isFulfilled()
+      @_defer.reject(reason)
       @emit 'error', {reason: reason}
 
   _success: (screen) ->
     @_currentState = ledger.m2fa.PairingRequest.States.DEAD
-    unless @_onComplete.isCompleted()
-      @_onComplete.success(screen)
+    unless @_defer.promise.isFulfilled()
+      @_defer.resolve(screen)
       @emit 'success'

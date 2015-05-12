@@ -1,4 +1,4 @@
-class @WalletReceiveIndexDialogViewController extends DialogViewController
+class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewController
 
   view:
     amountInput: '#amount_input'
@@ -6,7 +6,7 @@ class @WalletReceiveIndexDialogViewController extends DialogViewController
 
   initialize: ->
     super
-    @params.address = ledger.wallet.HDWallet.instance.getAccount(0).getCurrentPublicAddress()
+    @params.address = ledger.wallet.Wallet.instance.getAccount(0).getCurrentPublicAddress()
 
   onAfterRender: ->
     super

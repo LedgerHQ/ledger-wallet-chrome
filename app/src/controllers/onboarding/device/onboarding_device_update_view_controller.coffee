@@ -5,8 +5,8 @@ class @OnboardingDeviceUpdateViewController extends @OnboardingViewController
     ledger.app.router.go '/'
 
   notNow: ->
-    ledger.app.wallet.getState (state) =>
-      if state == ledger.wallet.States.LOCKED
+    ledger.app.dongle.getState (state) =>
+      if state == ledger.dongle.States.LOCKED
         ledger.app.router.go '/onboarding/device/pin'
       else
         ledger.app.router.go '/onboarding/management/welcome'

@@ -2,7 +2,7 @@ class @Api
 
   @init: ->
     @_has_session = false
-    ledger.app.on 'wallet:authenticated', ->
+    ledger.app.on 'wallet:initialized', ->
       Api._has_session = true
     ledger.app.on 'dongle:disconnected', ->
       Api._has_session = false
@@ -28,6 +28,8 @@ class @Api
         @getAccounts(data)
       when 'get_operations'
         @getOperations(data)
+      when 'get_new_addresses'
+        @getNewAddresses(data)
       when 'coinkite_get_xpubkey'
         @coinkiteGetXPubKey(data)
       when 'coinkite_sign_json'
@@ -36,7 +38,7 @@ class @Api
   @hasSession: (data) ->
     chrome.runtime.sendMessage {
       command: 'has_session',
-      success: Api._has_session
+      success: @_has_session
     }    
 
   @sendPayment: (data) ->
@@ -61,12 +63,26 @@ class @Api
       operations.push(operation.serialize())
     @callback_success 'get_operations', operations: operations
 
+  @getNewAddresses: (data) ->
+    ledger.app.router.go '/wallet/api/addresses', {account_id: data.account_id, count: data.count}
+
+  @exportNewAddresses: (account_id, count) ->
+    account = Account.find({"id": account_id}).first().getWalletAccount()
+    current = account.getCurrentPublicAddressIndex()
+    ledger.wallet.pathsToAddresses _(_.range(current, current + count)).map((i) ->
+      account.getRootDerivationPath() + '/0/' + i
+    ), (result) =>
+      @callback_success 'get_new_addresses',
+        addresses: result
+        account_id: account_id
+      return
+
   @signMessage: (data) ->
     try
-      ledger.app.wallet._lwCard.getBitIDAddress data.path
+      ledger.bitcoin.bitid.getAddress path: data.path
       .then (result) =>
         @address = result.bitcoinAddress.value
-        ledger.app.wallet._lwCard.dongle.getMessageSignature(data.path, data.message)
+        ledger.bitcoin.bitid.signMessage(data.message, path: data.path)
         .then (result) =>
           @callback_success('sign_message', signature: result, address: @address)
           return
@@ -78,6 +94,19 @@ class @Api
         return
     catch error
       callback_cancel('sign_message', JSON.stringify(error))
+
+  @cosignTransaction: (data) ->
+    try
+      transaction = Bitcoin.Transaction.deserialize(data.transaction);
+      ledger.app.dongle.signP2SHTransaction(data.inputs, transaction, data.scripts, data.path)
+      .then (result) =>
+        @callback_success('cosign_transaction', signatures: result)
+        return
+      .fail (error) =>
+        @callback_cancel('cosign_transaction', JSON.stringify(error))
+        return
+    catch error
+      @callback_cancel('cosign_transaction', JSON.stringify(error))
 
   @signP2SH: (data) ->
     ledger.app.router.go '/wallet/p2sh/index', {inputs: JSON.stringify(data.inputs), scripts: JSON.stringify(data.scripts), outputs_number: data.outputs_number, outputs_script: data.outputs_script, paths: JSON.stringify(data.paths)}

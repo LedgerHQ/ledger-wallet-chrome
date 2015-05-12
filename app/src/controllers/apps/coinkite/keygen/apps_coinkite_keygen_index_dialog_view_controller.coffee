@@ -1,4 +1,4 @@
-class @AppsCoinkiteKeygenIndexDialogViewController extends DialogViewController
+class @AppsCoinkiteKeygenIndexDialogViewController extends ledger.common.DialogViewController
 
   cancellable: no
 

@@ -1,4 +1,4 @@
-class @CommonDialogsQrcodeDialogViewController extends @DialogViewController
+class @CommonDialogsQrcodeDialogViewController extends ledger.common.DialogViewController
 
   view:
     videoCaptureContainer: '#video_capture_container'
@@ -6,7 +6,7 @@ class @CommonDialogsQrcodeDialogViewController extends @DialogViewController
 
   onAfterRender: ->
     super
-    @_startScanner()
+    _.defer => @_startScanner()
 
   show: ->
     ledger.managers.permissions.request 'videoCapture', (granted) =>

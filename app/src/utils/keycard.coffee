@@ -11,12 +11,13 @@ class @ledger.keycard
     keycard = for i in cipher.update(data)
       [a, b] = (parseInt(n,16) for n in Convert.toHexByte(i).split(''))
       a ^ b
-    alphabet1 = new ByteString("ABCDEFGHJKLMNPQRSTUVWXYZ", ASCII)
-    alphabet2 = new ByteString("abcdefghijkmnopqrstuvwxyz", ASCII)
-    alphabet3 = new ByteString("0123456789", ASCII)
+    alphabet1 = new ByteString(ledger.crypto.Base58.Alphabet.Uppercase, ASCII)
+    alphabet2 = new ByteString(ledger.crypto.Base58.Alphabet.Lowercase, ASCII)
+    alphabet3 = new ByteString(ledger.crypto.Base58.Alphabet.Digits, ASCII)
     alphabetContent = [alphabet1, alphabet2, alphabet3]
     result = {}
     for alphabet in alphabetContent
       for i in [0..alphabet.length - 1]
         result[alphabet.bytes(i, 1).toString(ASCII)] = Convert.toHexByte(keycard[alphabet.byteAt(i) - 0x30])[1]
     result
+

@@ -1,16 +1,26 @@
-class @Account extends Model
+class @Account extends ledger.database.Model
   do @init
-  @has many: 'operations', sortBy: ['time', 'desc'], onDelete: 'destroy'
+  @has
+    many: 'operations', onDelete: 'destroy'
+    sortBy: (a, b) ->
+      d = b.time - a.time
+      if d is 0
+        if a.type > b.type then 1 else -1
+      else if d > 0
+        1
+      else
+        -1
+
   @index 'index'
 
-  @fromHDWalletAccount: (hdAccount) ->
+  @fromWalletAccount: (hdAccount) ->
     return null unless hdAccount?
     @find(index: hdAccount.index).first()
 
-  getHDWalletAccount: () -> ledger.wallet.HDWallet.instance.getAccount(@get('index'))
+  getWalletAccount: () -> ledger.wallet.Wallet.instance.getAccount(@get('index'))
 
   serialize: () ->
-    $.extend super, { root_path: @getHDWalletAccount().getRootDerivationPath() }
+    $.extend super, { root_path: @getWalletAccount().getRootDerivationPath() }
 
   ## Balance management
 
@@ -23,19 +33,41 @@ class @Account extends Model
     Creates a new transaction asynchronously. The created transaction will only be initialized (i.e. it will only retrieve
     a sufficient number of input to perform the transaction)
 
-    @param {ledger.wallet.Value} amount The amount to send expressed in satoshi
-    @param {ledger.wallet.Value} fees The miner fees expressed in satoshi
+    @param {ledger.Amount} amount The amount to send (expressed in satoshi)
+    @param {ledger.Amount} fees The miner fees (expressed in satoshi)
     @param {String} address The recipient address
     @option [Function] callback The callback called once the transaction is created
-    @return [CompletionClosure] A closure
+    @return [Q.Promise] A closure
   ###
   createTransaction: ({amount, fees, address}, callback) ->
-    inputsPath = @getHDWalletAccount().getAllAddressesPaths()
-    changePath = @getHDWalletAccount().getCurrentChangeAddressPath()
-    ledger.wallet.transaction.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
+    amount = ledger.Amount.fromSatoshi(amount)
+    fees = ledger.Amount.fromSatoshi(fees)
+    inputsPath = @getWalletAccount().getAllAddressesPaths()
+    @_createTransactionGetChangeAddressPath @getWalletAccount().getCurrentChangeAddressIndex(), (changePath) =>
+      ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
+
+  ###
+    Special get change address path to 'avoid' LW 1.0.0 derivation failure.
+  ###
+  _createTransactionGetChangeAddressPath: (changeIndex, callback) ->
+    changePath =  @getWalletAccount().getChangeAddressPath(changeIndex)
+    if ledger.app.dongle.getIntFirmwareVersion() isnt ledger.dongle.Firmware.V_LW_1_0_0
+      callback changePath
+    else
+      ledger.tasks.AddressDerivationTask.instance.getPublicAddress changePath, (xpubAddress) =>
+        ledger.app.dongle.getPublicAddress changePath, (address) =>
+          address = address.bitcoinAddress.toString(ASCII)
+          if xpubAddress is address
+            callback?(changePath)
+          else
+            @_createTransactionGetChangeAddressPath(changeIndex + 1, callback)
+
+
+
+
 
   addRawTransactionAndSave: (rawTransaction, callback = _.noop) ->
-    hdAccount = ledger.wallet.HDWallet.instance?.getAccount(@get('index'))
+    hdAccount = ledger.wallet.Wallet.instance?.getAccount(@get('index'))
     ledger.wallet.pathsToAddresses hdAccount.getAllPublicAddressesPaths(), (publicAddresses) =>
       ledger.wallet.pathsToAddresses hdAccount.getAllChangeAddressesPaths(), (changeAddresses) =>
         {inserts, updates} = @_addRawTransaction rawTransaction, _.values(publicAddresses), _.values(changeAddresses)

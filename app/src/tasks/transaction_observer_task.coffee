@@ -32,14 +32,14 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
       for input in io
         continue unless input.addresses?
         for address in input.addresses
-          derivation = ledger.wallet.HDWallet.instance?.cache?.getDerivationPath(address)
+          derivation = ledger.wallet.Wallet.instance?.cache?.getDerivationPath(address)
           if derivation?
             @logger().info "New transaction on #{derivation}"
-            account = ledger.wallet.HDWallet.instance?.getAccountFromDerivationPath(derivation)
+            account = ledger.wallet.Wallet.instance?.getAccountFromDerivationPath(derivation)
             if account?
               @logger().info 'Add transaction'
               account.notifyPathsAsUsed(derivation)
-              Account.fromHDWalletAccount(account)?.addRawTransactionAndSave transaction
+              Account.fromWalletAccount(account)?.addRawTransactionAndSave transaction
               Wallet.instance?.retrieveAccountsBalances()
               ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
               ledger.app.emit 'wallet:operations:new'

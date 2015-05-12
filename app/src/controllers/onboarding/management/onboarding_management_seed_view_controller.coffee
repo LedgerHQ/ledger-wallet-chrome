@@ -1,3 +1,5 @@
+Bip39 = ledger.bitcoin.bip39
+
 class @OnboardingManagementSeedViewController extends @OnboardingViewController
 
   view:
@@ -12,14 +14,14 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
   initialize: ->
     super
     if @params.wallet_mode == 'create'
-      @params.mnemonic = ledger.bitcoin.bip39.generateMnemonic()
+      @params.mnemonicPhrase = Bip39.generateMnemonicPhrase(Bip39.DEFAULT_PHRASE_LENGTH)
 
   navigationContinueParams: ->
     wallet_mode: @params.wallet_mode
     back: @representativeUrl()
     pin: @params.pin
     rootUrl: @params.rootUrl
-    seed: ledger.bitcoin.bip39.generateSeed @params.mnemonic
+    seed: Bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
 
   onAfterRender: ->
     super
@@ -28,7 +30,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     @_updateUI no
 
   copy: ->
-    text = @params.mnemonic
+    text = @params.mnemonicPhrase
     input = document.createElement("textarea");
     input.id = "toClipboard"
     input.value = text
@@ -39,11 +41,15 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     input.remove()
 
   print: ->
-    window.print()
+    ledger.print.Piper.instance.canUsePiper (isPiper) =>
+      if isPiper
+        ledger.print.Piper.instance.printMnemonic @params.mnemonic
+      else
+        window.print()
 
   _generateInputs: ->
     @view.inputs = []
-    for i in [0..ledger.bitcoin.bip39.mnemonicWordsNumber() - 1]
+    for i in [0...Bip39.DEFAULT_PHRASE_LENGTH]
       div = document.createElement("div")
       div.className = 'seed-word'
       span = document.createElement("span")
@@ -54,7 +60,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       div.appendChild(input)
       @view.inputs.push $(input)
       @view.seedContainer.append div
-      $(input).suggest(ledger.bitcoin.bip39.wordlist);
+      $(input).suggest(Bip39.wordlist);
       if i == 0
         input.focus()
 
@@ -64,8 +70,8 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       input.on 'keydown', ->
         return if self.params.wallet_mode == 'create'
         $(this).removeClass 'seed-invalid'
-        setTimeout =>
-          self.params.mnemonic = self._writtenMnemonic()
+        setTimeout ->
+          self.params.mnemonicPhrase = self._writtenMnemonic()
           do self._updateUI
         , 0
       input.on 'blur', ->
@@ -83,7 +89,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
             if self.view.inputs[i + beginInput]
               self.view.inputs[i + beginInput].val(words[i])
               self._inputIsValid self.view.inputs[i + beginInput]
-          self.params.mnemonic = self._writtenMnemonic()
+          self.params.mnemonicPhrase = self._writtenMnemonic()
           do self._updateUI
         , 0
 
@@ -105,8 +111,8 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
           input.prop 'disabled', no
 
       # write words
-      if @params.mnemonic?
-        words = @params.mnemonic.split(' ')
+      if @params.mnemonicPhrase?
+        words = @params.mnemonicPhrase.split(' ')
         for i in [0 .. words.length - 1]
           @view.inputs[i].val(words[i])
 
@@ -121,31 +127,22 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
         @_inputIsValid($(input))
 
     # validate mnemonic
-    if @_mnemonicIsValid()
+    if Bip39.isMnemonicPhraseValid(@params.mnemonicPhrase)
       @view.invalidLabel.fadeOut(if animated then 250 else 0)
       @view.continueButton.removeClass 'disabled'
     else
-      if ledger.bitcoin.bip39.numberOfWordsInMnemonic(@params.mnemonic) == ledger.bitcoin.bip39.mnemonicWordsNumber()
+      if Bip39.utils.mnemonicPhraseWordsLength(@params.mnemonicPhrase) == Bip39.DEFAULT_PHRASE_LENGTH
         @view.invalidLabel.fadeIn(if animated then 250 else 0)
       else
         @view.invalidLabel.fadeOut(if animated then 250 else 0)
       @view.continueButton.addClass 'disabled'
 
   _writtenMnemonic: ->
-    mnemonic = ''
-    first = yes
-    for input in @view.inputs
-      mnemonic += ' ' if not first
-      mnemonic += _.string.trim(input.val()).toLowerCase()
-      first = no
-    mnemonic
-
-  _mnemonicIsValid: ->
-    ledger.bitcoin.bip39.mnemonicIsValid(@params.mnemonic)
+    (_.string.trim(input.val()).toLowerCase() for input in @view.inputs).join(' ')
 
   _inputIsValid: (input) ->
     text = _.str.trim(input.val()).toLowerCase()
-    if text != "" and text not in ledger.bitcoin.bip39.wordlist
-      input.addClass 'seed-invalid'
-    else
+    if Bip39.utils.isMnemonicWordValid(text)
       input.removeClass 'seed-invalid'
+    else
+      input.addClass 'seed-invalid'

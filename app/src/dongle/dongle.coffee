@@ -17,18 +17,30 @@ Firmware =
   V1_4_11: 0x0001040b0146
   V1_4_12: 0x0001040c0146
   V1_4_13: 0x0001040d0146
-  V1_0_0B: 0x20010000010f
+  V_LW_1_0_0: 0x20010000010f
+  V_LW_1_0_1: 0x200100010110
+
 
 # Ledger OS pubKey, used for pairing.
 Attestation =
   String: "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6"
-
 Attestation.Bytes = parseInt(hex, 16) for hex in Attestation.String.match(/\w\w/g)
+Attestation.xPoint = Attestation.String.substr(2,64)
+Attestation.yPoint = Attestation.String.substr(66)
+
+BetaAttestation =
+  String: "04e69fd3c044865200e66f124b5ea237c918503931bee070edfcab79a00a25d6b5a09afbee902b4b763ecf1f9c25f82d6b0cf72bce3faf98523a1066948f1a395f"
+BetaAttestation.Bytes = parseInt(hex, 16) for hex in BetaAttestation.String.match(/\w\w/g)
+BetaAttestation.xPoint = BetaAttestation.String.substr(2,64)
+BetaAttestation.yPoint = BetaAttestation.String.substr(66)
+
 
 # This path do not need a verified PIN to sign messages.
 BitIdRootPath = "0'/0/0xb11e"
 
 Errors = @ledger.errors
+
+$log = -> ledger.utils.Logger.getLoggerByTag("Dongle")
 
 # Populate dongle namespace.
 @ledger.dongle ?= {}
@@ -36,11 +48,11 @@ _.extend @ledger.dongle,
   States: States
   Firmware: Firmware
   Attestation: Attestation
+  BetaAttestation: BetaAttestation
   BitIdRootPath: BitIdRootPath
 
 ###
 Signals :
-  @emit connected
   @emit state:changed(States)
   @emit state:locked
   @emit state:unlocked
@@ -49,12 +61,17 @@ Signals :
   @emit state:error(args...)
 ###
 class @ledger.dongle.Dongle extends EventEmitter
+  Dongle = @
 
   # @property
-  device_id: undefined
+  id: undefined
+  # @property
+  deviceId: undefined
+  # @property
+  productId: undefined
   # @property [String]
   state: States.UNDEFINED
-  # @property [Integer]
+  # @property [ByteString]
   firmwareVersion: undefined
   # @property [Integer]
   operationMode: undefined
@@ -62,24 +79,37 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @property [BtChip]
   _btchip: undefined
   # @property [Array<ledger.wallet.ExtendedPublicKey>]
-  _xpubs = []
+  _xpubs: []
 
   # @private @property [String] pin used to unlock dongle.
   _pin = undefined
 
-  constructor: (@device_id, card) ->
+  # @private @property [ledger.utils.PromiseQueue] Enqueue btchip calls to prevent multiple call to interfer
+  _btchipQueue = undefined
+
+  constructor: (card) ->
     super
+    @_xpubs = _.clone(@_xpubs)
+    @id = card.deviceId
+    @deviceId = card.deviceId
+    @productId = card.productId
+    _btchipQueue = new ledger.utils.PromiseQueue("Dongle##{@id}")
     @_btchip = new BTChip(card)
-    @_recoverFirmwareVersion().then( =>
-      return @_recoverOperationMode().q()
-    ).then( =>
-      # Set dongle state on failure.
-      return @getPublicAddress("0'/0/0").q()
-    ).then( =>
-      # @todo Se connecter directement à la carte sans redemander le PIN
-      console.warn("Dongle is already unlock ! Case not handle => Pin Code Required.")
-      @_setState(States.LOCKED)
-    ).done()
+    unless @isInBootloaderMode()
+      @_recoverFirmwareVersion().then( =>
+        #@_recoverOperationMode() It seems useless by now
+        # Set dongle state on failure.
+        @getPublicAddress("0'/0/0").then( =>
+          # @todo Se connecter directement à la carte sans redemander le PIN
+          console.warn("Dongle is already unlock ! Case not handle => Pin Code Required.")
+          @_setState(States.LOCKED)
+        ).catch( (e) -> #console.error(e)
+        ).done()
+      ).catch( (error) =>
+        console.error("Fail to initialize Dongle :", error)
+      ).done()
+    else
+      _.defer => @_setState(States.BLANK)
 
   # Called when 
   disconnect: () -> @_setState(States.DISCONNECTED)
@@ -88,7 +118,8 @@ class @ledger.dongle.Dongle extends EventEmitter
   getStringFirmwareVersion: -> @firmwareVersion.byteAt(1) + "." + @firmwareVersion.byteAt(2) + "." + @firmwareVersion.byteAt(3)
   
   # @return [Integer] Firmware version, 0x20010000010f for example.
-  getIntFirmwareVersion: -> @firmwareVersion
+  getIntFirmwareVersion: ->
+    parseInt(@firmwareVersion.toString(HEX), 16)
 
   ###
     Gets the raw version {ByteString} of the dongle.
@@ -96,302 +127,324 @@ class @ledger.dongle.Dongle extends EventEmitter
     @param [Boolean] isInBootLoaderMode Must be true if the current dongle is in bootloader mode.
     @param [Boolean] forceBl Force the call in BootLoader mode
     @param [Function] callback Called once the version is retrieved. The callback must be prototyped like size `(version, error) ->`
-    @return [CompletionClosure]
+    @return [Q.Promise]
   ###
   getRawFirmwareVersion: (isInBootLoaderMode, forceBl=no, callback=undefined) ->
-    completion = new CompletionClosure(callback)
-    apdu = new ByteString((if !isInBootLoaderMode and !forceBl then "E0C4000000" else "F001000000"), HEX)
-    @_sendApdu(apdu).then (result) =>
-      sw = @_btchip.card.SW
-      if !isInBootLoaderMode and !forceBl
-        if sw is 0x9000
-          completion.success([result.byteAt(1), (result.byteAt(2) << 16) + (result.byteAt(3) << 8) + result.byteAt(4)])
+    _btchipQueue.enqueue "getRawFirmwareVersion", =>
+      d = ledger.defer(callback)
+      apdu = new ByteString((if !isInBootLoaderMode and !forceBl then "E0C4000000" else "F001000000"), HEX)
+      @_sendApdu(apdu).then (result) =>
+        sw = @_btchip.card.SW
+        if !isInBootLoaderMode and !forceBl
+          if sw is 0x9000
+            d.resolve([result.byteAt(1), (result.byteAt(2) << 16) + (result.byteAt(3) << 8) + result.byteAt(4)])
+          else
+            # Not initialized now - Retry
+            d.resolve @getRawFirmwareVersion(isInBootLoaderMode, yes)
         else
-          # Not initialized now - Retry
-          @getRawFirmwareVersion(isInBootLoaderMode, yes).thenForward(completion)
-      else
-        if sw is 0x9000
-          completion.success([0, (result.byteAt(5) << 16) + (result.byteAt(6) << 8) + result.byteAt(7)])
-        else if !isInBootLoaderMode and (sw is 0x6d00 or sw is 0x6e00)
-          #  Unexpected - let's say it's 1.4.3
-          completion.success([0, (1 << 16) + (4 << 8) + (3)])
-        else
-          completion.failure(new ledger.StandardError(ledger.errors.UnknowError, "Failed to get version"))
-    .fail (error) ->
-      completion.failure(new ledger.StandardError(ledger.errors.UnknowError, error))
-    .done()
-    completion.readonly()
+          if sw is 0x9000
+            d.resolve([0, (result.byteAt(5) << 16) + (result.byteAt(6) << 8) + result.byteAt(7)])
+          else if !isInBootLoaderMode and (sw is 0x6d00 or sw is 0x6e00)
+            #  Unexpected - let's say it's 1.4.3
+            d.resolve([0, (1 << 16) + (4 << 8) + (3)])
+          else
+            d.rejectWithError(ledger.errors.UnknowError, "Failed to get version")
+      .fail (error) ->
+        d.rejectWithError(ledger.errors.UnknowError, error)
+      .catch (error) ->
+        console.error("Fail to getRawFirmwareVersion :", error)
+      .done()
+      d.promise
+
+  # @return [Boolean]
+  isInBootloaderMode: -> if @productId is 0x1808 or @productId is 0x1807 then yes else no
 
   # @return [ledger.fup.FirmwareUpdater]
   getFirmwareUpdater: () -> ledger.fup.FirmwareUpdater.instance
 
-  # @return [Boolean]
-  isFirmwareUpdateAvailable: () -> @getFirmwareUpdater().isFirmwareUpdateAvailable(this)
+  # @return [Q.Promise]
+  isFirmwareUpdateAvailable: (callback=undefined) ->
+    d = ledger.defer(callback)
+    @getFirmwareUpdater().getFirmwareUpdateAvailability(this)
+    .then (availablity) ->
+      d.resolve(availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update)
+    .fail (er) ->
+      d.rejectWithError(er)
+    .done()
+    d.promise
+
+  # @return [Q.Promise]
+  isFirmwareOverwriteOrUpdateAvailable: (callback=undefined) ->
+    d = ledger.defer(callback)
+    @getFirmwareUpdater().getFirmwareUpdateAvailability(this)
+    .then (availablity) ->
+      d.resolve(availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update or availablity.result is ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Overwrite)
+    .fail (er) ->
+      d.rejectWithError(er)
+    .done()
+    d.promise
 
   # Verify that dongle firmware is "official".
   # @param [Function] callback Optional argument
-  # @return [CompletionClosure]
-  isCertified: (callback=undefined) ->
-    completion = new CompletionClosure(callback)
-    randomValues = new Uint32Array(2)
-    crypto.getRandomValues(randomValues)
-    random = _.str.lpad(randomValues[0].toString(16), 8, '0') + _.str.lpad(randomValues[1].toString(16), 8, '0')
-    # 24.2. GET DEVICE ATTESTATION
-    @_sendApdu(new ByteString("E0"+"C2"+"00"+"00"+"08"+random, HEX), [0x9000])
-    .then (result) =>
-      attestation = result.toString(HEX)
-      dataToSign = attestation.substring(16,32) + random
-      dataSig = attestation.substring(32)
-      dataSigBytes = (parseInt(n,16) for n in dataSig.match(/\w\w/g))
+  # @return [Q.Promise]
+  isCertified: (callback=undefined) -> @_checkCertification(Attestation, callback)
 
-      sha = new JSUCrypt.hash.SHA256()
-      domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
-      affinePoint = new JSUCrypt.ECFp.AffinePoint(Attestation.xPoint, Attestation.yPoint)
-      pubkey = new JSUCrypt.key.EcFpPublicKey(256, domain, affinePoint)
-      ecsig = new JSUCrypt.signature.ECDSA(sha)
-      ecsig.init(pubkey, JSUCrypt.signature.MODE_VERIFY)
-      if ecsig.verify(dataToSign, dataSigBytes)
-        completion.success()
-      else
-        completion.failure()
-    .fail (err) =>
-      error = new ledger.StandardError(Errors.SignatureError, err)
-      completion.failure(error)
-    .done()
-    completion.readonly()
+  isBetaCertified: (callback=undefined) ->
+    @_checkCertification(BetaAttestation, callback)
 
-  # Return asynchronosly state. Wait until a state is set.
+  _checkCertification: (Attestation, callback) ->
+    _btchipQueue.enqueue "checkCertification", =>
+      d = ledger.defer(callback)
+      return d.resolve(true).promise if @getIntFirmwareVersion() < Firmware.V_LW_1_0_0
+      randomValues = new Uint32Array(2)
+      crypto.getRandomValues(randomValues)
+      random = _.str.lpad(randomValues[0].toString(16), 8, '0') + _.str.lpad(randomValues[1].toString(16), 8, '0')
+      # 24.2. GET DEVICE ATTESTATION
+      @_sendApdu(new ByteString("E0"+"C2"+"00"+"00"+"08"+random, HEX), [0x9000])
+      .then (result) =>
+        attestation = result.toString(HEX)
+        dataToSign = attestation.substring(16,32) + random
+        dataSig = attestation.substring(32)
+        dataSig = "30" + dataSig.substr(2)
+        dataSigBytes = (parseInt(n,16) for n in dataSig.match(/\w\w/g))
+        sha = new JSUCrypt.hash.SHA256()
+        domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
+        affinePoint = new JSUCrypt.ECFp.AffinePoint(Attestation.xPoint, Attestation.yPoint)
+        pubkey = new JSUCrypt.key.EcFpPublicKey(256, domain, affinePoint)
+        ecsig = new JSUCrypt.signature.ECDSA(sha)
+        ecsig.init(pubkey, JSUCrypt.signature.MODE_VERIFY)
+        if ecsig.verify(dataToSign, dataSigBytes)
+          d.resolve(this)
+        else
+          d.rejectWithError(Errors.DongleNotCertified)
+        return
+      .fail (err) =>
+        d.rejectWithError(Errors.CommunicationError, err)
+      .done()
+      d.promise
+
+  # Return asynchronously state. Wait until a state is set.
   # @param [Function] callback Optional argument
-  # @return [CompletionClosure]
+  # @return [Q.Promise]
   getState: (callback=undefined) ->
-    completion = new CompletionClosure(callback)
+    d = ledger.defer(callback)
     if @state is States.UNDEFINED
-      @once 'state:changed', (e, state) => completion.success(state)
+      @once 'state:changed', (e, state) => d.resolve(state)
     else
-      completion.success(@state)
-    completion.readonly()
+      d.resolve(@state)
+    d.promise
+
+  # @return [Q.Promise] resolve with a Number, reject with a ledger Error.
+  getRemainingPinAttempt: (callback=undefined) ->
+    _btchipQueue.enqueue "getRemainingPinAttempt", =>
+      d = ledger.defer(callback)
+      @_sendApdu(new ByteString("E0228000010000", HEX), [0x9000])
+      .catch (statusCode) =>
+        if m = statusCode.match(/63c(\d)/)
+          d.resolve(parseInt(m[1]))
+        else
+          d.reject(@_handleErrorCode(statusCode))
+      .done()
+      d.promise
 
   # @param [String] pin ASCII encoded
   # @param [Function] callback Optional argument
-  # @return [CompletionClosure]
+  # @return [Q.Promise]
   unlockWithPinCode: (pin, callback=undefined) ->
-    throw new ledger.StandardError(Errors.DongleAlreadyUnlock) if @state isnt States.LOCKED
-    completion = new CompletionClosure(callback)
-    _pin = pin
-    @_btchip.verifyPin_async(new ByteString(_pin, ASCII))
-    .then =>
-      # 19.7. SET OPERATION MODE
-      @_sendApdu(new ByteString("E0"+"26"+"01"+"01"+"01", HEX), [0x9000])
+    Errors.throw(Errors.DongleAlreadyUnlock) if @state isnt States.LOCKED
+    _btchipQueue.enqueue "unlockWithPinCode", =>
+      d = ledger.defer(callback)
+      _pin = pin
+      @_btchip.verifyPin_async(new ByteString(_pin, ASCII))
       .then =>
-        if @firmwareVersion >= ledger.dongle.Firmware.V1_4_13
-          # 19.7. SET OPERATION MODE
-          @_sendApdu(new ByteString("E0"+"26"+"01"+"00"+"01", HEX), [0x9000]).fail(=> e('Unlock FAIL', arguments)).done()
-        @_setState(States.UNLOCKED)
-        completion.success()
+        # 19.7. SET OPERATION MODE
+        @_sendApdu(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
+        .then =>
+          if @getIntFirmwareVersion() >= Firmware.V1_4_13
+            # 19.7. SET OPERATION MODE
+            mode = if @getIntFirmwareVersion() >= Firmware.V_LW_1_0_0 then 0x02 else 0x01
+            @_sendApdu(0xE0, 0x26, mode, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).fail(=> e('Unlock FAIL', arguments)).done()
+          @_setState(States.UNLOCKED)
+          d.resolve()
+        .fail (err) =>
+          error = Errors.new(Errors.NotSupportedDongle, err)
+          console.log("unlockWithPinCode 2 fail :", err)
+          d.reject(error)
+        .catch (error) ->
+          console.error("Fail to unlockWithPinCode 2 :", error)
+        .done()
       .fail (err) =>
-        error = new ledger.StandardError(Errors.NotSupportedDongle, err)
-        completion.failure(error)
+        console.error("Fail to unlockWithPinCode 1 :", err)
+        error = @_handleErrorCode(err)
+        d.reject(error)
+      .catch (error) ->
+        console.error("Fail to unlockWithPinCode 1 :", error)
       .done()
-    .fail (err) =>
-      error = new ledger.StandardError(Error.WrongPinCode, err)
-      if err.match(/6faa|63c0/)
-        @_setState(States.BLANK)
-        error.code = Error.DongleLocked
-      else
-        @_setState(States.ERROR)
-      if data.match(/63c\d/)
-        error.retryCount = parseInt(err.substr(-1))
-      completion.failure(error)
-    .done()
-    completion.readonly()
+      d.promise
+
+  lock: () ->
+    if @state isnt ledger.dongle.States.BLANK and @state?
+      @_setState(States.LOCKED)
 
   ###
   @overload setup(pin, callback)
     @param [String] pin
     @param [Function] callback
-    @return [CompletionClosure]
+    @return [Q.Promise]
 
   @overload setup(pin, options={}, callback=undefined)
     @param [String] pin
-    @param [Object] options
+    @param [String] restoreSeed
       @options options [String] restoreSeed
       @options options [ByteString] keyMap
     @param [Function] callback
-    @return [CompletionClosure]
+    @return [Q.Promise]
   ###
-  setup: (pin, options={}, callback=undefined) ->
+  setup: (pin, restoreSeed, callback=undefined) ->
     Errors.throw(Errors.DongleNotBlank) if @state isnt States.BLANK
-    [options, callback] = [callback, options] if ! callback && typeof options == 'function'
-    [restoreSeed, keyMap] = [options.restoreSeed, options.keyMap]
-    completion = new CompletionClosure(callback)
+    [restoreSeed, callback] = [callback, restoreSeed] if ! callback && typeof restoreSeed == 'function'
+    _btchipQueue.enqueue "setup", =>
+      d = ledger.defer(callback)
 
-    # Validate seed
-    if restoreSeed?
-      bytesSeed = new ByteString(restoreSeed, HEX)
-      if bytesSeed.length != 32
-        e('Invalid seed :', restoreSeed)
-        return completion.failure().readonly()
-
-    l("Setup in progress ... please wait")
-    @_btchip.setupNew_async(
-      BTChip.MODE_WALLET,
-      BTChip.FEATURE_DETERMINISTIC_SIGNATURE | BTChip.FEATURE_NO_2FA_P2SH,
-      BTChip.VERSION_BITCOIN_MAINNET,
-      BTChip.VERSION_BITCOIN_P2SH_MAINNET,
-      new ByteString(pin, ASCII),
-      undefined,
-      keyMap || BTChip.QWERTY_KEYMAP_NEW,
-      restoreSeed?,
-      bytesSeed
-    ).then( ->
+      # Validate seed
       if restoreSeed?
-        msg = "Seed restored, please reopen the extension"
-      else
-        msg = "Plug the dongle into a secure host to read the generated seed, then reopen the extension"
-      console.warn(msg)
-      @_setState(States.ERROR, msg)
-      completion.success()
-    ).fail( (err) =>
-      error = new ledger.StandardError(Errors.UnknowError, err)
-      completion.failure(error)
-    ).done()
+        bytesSeed = new ByteString(restoreSeed, HEX)
+        if bytesSeed.length != 64
+          e('Invalid seed :', restoreSeed)
+          return d.reject().promise
 
-    completion.readonly()
+      l("Setup in progress ... please wait")
+      @_btchip.setupNew_async(
+        BTChip.MODE_WALLET,
+        BTChip.FEATURE_DETERMINISTIC_SIGNATURE | BTChip.FEATURE_NO_2FA_P2SH,
+        BTChip.VERSION_BITCOIN_MAINNET,
+        BTChip.VERSION_BITCOIN_P2SH_MAINNET,
+        new ByteString(pin, ASCII),
+        undefined,
+        BTChip.QWERTY_KEYMAP_NEW,
+        restoreSeed?,
+        bytesSeed
+      ).then( =>
+        if restoreSeed?
+          msg = "Seed restored, please reopen the extension"
+        else
+          msg = "Plug the dongle into a secure host to read the generated seed, then reopen the extension"
+        console.warn(msg)
+        @_setState(States.ERROR, msg)
+        d.resolve()
+      ).fail( (err) =>
+        error = Errors.new(Errors.UnknowError, err)
+        d.reject(error)
+      ).catch( (error) ->
+        console.error("Fail to setup :", error)
+      ).done()
+
+      d.promise
 
   # @param [String] path
   # @param [Function] callback Optional argument
-  # @return [CompletionClosure]
+  # @return [Q.Promise]
   getPublicAddress: (path, callback=undefined) ->
-    Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED
-    completion = new CompletionClosure(callback)
-    @_btchip.getWalletPublicKey_async(path)
-    .then (result) =>
-      ledger.wallet.HDWallet.instance?.cache?.set [[path, result.bitcoinAddress.value]]
-      _.defer -> completion.success(result)
-    .fail (err) =>
-      if err.indexOf("6982") >= 0 # Pin required
-        @_setState(States.LOCKED)
-      else if err.indexOf("6985") >= 0 # Error ?
-        @_setState(States.BLANK)
-      else if err.indexOf("6faa") >= 0
-        @_setState(States.ERROR)
-      else
-        error = new ledger.StandardError(Errors.UnknowError, err)
-      _.defer -> completion.failure(error)
-    .done()
-    completion.readonly()
+    #l path
+    #l new Error().stack
+    Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
+    _btchipQueue.enqueue "getPublicAddress", =>
+      d = ledger.defer(callback)
+      @_btchip.getWalletPublicKey_async(path)
+      .then (result) =>
+        ledger.wallet.Wallet.instance?.cache?.set [[path, result.bitcoinAddress.value]]
+        _.defer -> d.resolve(result)
+      .fail (err) =>
+        error = @_handleErrorCode(err)
+        _.defer -> d.reject(error)
+      .catch (error) ->
+        console.error("Fail to getPublicAddress :", error)
+      .done()
+      d.promise
 
   # @param [String] message
   # @param [String] path Optional argument
   # @param [Function] callback Optional argument
-  # @return [CompletionClosure]
-  signMessage: (message, path, callback=undefined) ->
-    completion = new CompletionClosure(callback)
-    @getPublicAddress(path)
-    .then( (address) =>
-      message = new ByteString(message, ASCII)
-      return @_btchip.signMessagePrepare_async(path, message)
-    ).then( =>
-      return @_btchip.signMessageSign_async(new ByteString(_pin, ASCII))
-    ).then( (sig) =>
-      signedMessage = @_convertMessageSignature(address.publicKey, message, sig.signature)
-      completion.success(signedMessage)
-    ).fail( (error) ->
-      completion.failure(error)
-    ).done()
-    completion.readonly()
-
-  ###
-  @overload getBitIdAddress(subpath=undefined, callback=undefined)
-    @param [Integer, String] subpath
-    @param [Function] callback Optional argument
-    @return [CompletionClosure]
-
-  @overload getBitIdAddress(callback)
-    @param [Function] callback
-    @return [CompletionClosure]
-  ###
-  getBitIdAddress: (subpath=undefined, callback=undefined) ->
-    Errors.throw(Errors.DongleLocked) if @state isnt States.UNLOCKED
-    [subpath, callback] = [callback, subpath] if ! callback && typeof subpath == 'function'
-    path = ledger.dongle.BitIdRootPath
-    path += "/#{subpath}" if subpath?
-    @getPublicAddress(path, callback)
-
-  ###
-  @overload signMessageWithBitId(derivationPath, message, callback=undefined)
-    @param [String] message
-    @param [String] message
-    @param [Function] callback Optional argument
-    @return [CompletionClosure]
-
-  @overload signMessageWithBitId(derivationPath, message, subpath=undefined, callback=undefined)
-    @param [String] message
-    @param [String] message
-    @param [Integer, String] subpath Optional argument
-    @param [Function] callback Optional argument
-    @return [CompletionClosure]
-
-  @see signMessage && getBitIdAddress
-  ###
-  signMessageWithBitId: (derivationPath, message, subpath=undefined, callback=undefined) ->
-    [subpath, callback] = [callback, subpath] if ! callback && typeof subpath == 'function'
-    path = ledger.dongle.BitIdRootPath
-    path += "/#{subpath}" if subpath?
-    @signMessage(derivationPath, message, path, callback)
-
-  # @param [Function] callback Optional argument
-  # @return [CompletionClosure]
-  randomBitIdAddress: (callback=undefined) ->
-    i = sjcl.random.randomWords(1) & 0xffff
-    @getBitIdAddress(i, callback)
+  # @return [Q.Promise]
+  signMessage: (message, {path, pubKey}, callback=undefined) ->
+    if ! pubKey?
+      @getPublicAddress(path).then((address) => console.log("address=", address); @signMessage(message, path: path, pubKey: address.publicKey, callback))
+    else
+      _btchipQueue.enqueue "signMessage", =>
+        d = ledger.defer(callback)
+        message = new ByteString(message, ASCII)
+        @_btchip.signMessagePrepare_async(path, message)
+        .then =>
+          return @_btchip.signMessageSign_async(new ByteString(_pin, ASCII))
+        .then (sig) =>
+          signedMessage = @_convertMessageSignature(pubKey, message, sig.signature)
+          d.resolve(signedMessage)
+        .catch (error) ->
+          console.error("Fail to signMessage :", error)
+          d.reject(error)
+        .done()
+        d.promise
 
   # @param [String] pubKey public key, hex encoded.
   # @param [Function] callback Optional argument
-  # @return [CompletionClosure] Resolve with a 32 bytes length pairing blob hex encoded.
+  # @return [Q.Promise] Resolve with a 32 bytes length pairing blob hex encoded.
   initiateSecureScreen: (pubKey, callback=undefined) ->
-    Errors.throw(Errors.DongleLocked) if @state != States.UNLOCKED
-    Errors.throw(Errors.InvalidArgument, "Invalid pubKey : #{pubKey}") unless pubKey.match(/^[0-9A-Fa-f]{130}$/)
-    completion = new CompletionClosure(callback)
-    # 19.3. SETUP SECURE SCREEN
-    @_sendApdu(new ByteString("E0"+"12"+"01"+"00"+"41"+pubKey, HEX), [0x9000])
-    .then( (d) -> completion.success(d.toString()) )
-    .fail( (error) -> completion.failure(error) )
-    completion.readonly()
+    _btchipQueue.enqueue "initiateSecureScreen", =>
+      d = ledger.defer(callback)
+      if @state != States.UNLOCKED
+        d.rejectWithError(Errors.DongleLocked)
+      else if ! pubKey.match(/^[0-9A-Fa-f]{130}$/)?
+        d.rejectWithError(Errors.InvalidArgument, "Invalid pubKey : #{pubKey}")
+      else
+        # 19.3. SETUP SECURE SCREEN
+        @_sendApdu(new ByteString("E0"+"12"+"01"+"00"+"41"+pubKey, HEX), [0x9000])
+        .then (c) ->
+          l 'initiateSecureScreen', c
+          d.resolve(c.toString())
+        .fail (error) -> d.reject(error)
+        .done()
+      d.promise
 
   # @param [String] resp challenge response, hex encoded.
   # @param [Function] callback Optional argument
-  # @return [CompletionClosure] Resolve if pairing is successful.
+  # @return [Q.Promise] Resolve if pairing is successful.
   confirmSecureScreen: (resp, callback=undefined) ->
-    Errors.throw(Errors.DongleLocked) if @state != States.UNLOCKED
-    Errors.throw(Errors.InvalidArgument, "Invalid challenge resp : #{resp}") unless resp.match(/^[0-9A-Fa-f]{32}$/)
-    completion = new CompletionClosure(callback)
-    # 19.3. SETUP SECURE SCREEN
-    @_sendApdu(new ByteString("E0"+"12"+"02"+"00"+"10"+resp, HEX), [0x9000])
-    .then( () -> completion.success() )
-    .fail( (error) -> completion.failure(error) )
-    completion.readonly()
+    _btchipQueue.enqueue "confirmSecureScreen", =>
+      d = ledger.defer(callback)
+      if @state != States.UNLOCKED
+        d.rejectWithError(Errors.DongleLocked)
+      else if ! resp.match(/^[0-9A-Fa-f]{32}$/)?
+        d.rejectWithError(Errors.InvalidArgument, "Invalid challenge resp : #{resp}")
+      else
+        # 19.3. SETUP SECURE SCREEN
+        @_sendApdu(new ByteString("E0"+"12"+"02"+"00"+"10"+resp, HEX), [0x9000])
+        .then () ->
+          l 'confirmSecureScreen'
+          d.resolve()
+        .fail (error) -> d.reject(error)
+        .done()
+      d.promise
 
   # @param [String] path
   # @param [Function] callback Optional argument
-  # @return [CompletionClosure] Resolve if pairing is successful.
+  # @return [Q.Promise] Resolve if pairing is successful.
   getExtendedPublicKey: (path, callback=undefined) ->
     Errors.throw(Errors.DongleLocked) if @state != States.UNLOCKED
-    completion = new CompletionClosure(callback)
-    return completion.success(@_xpubs[path]).readonly() if @_xpubs[path]?
+    d = ledger.defer(callback)
+    return d.resolve(@_xpubs[path]).promise if @_xpubs[path]?
     xpub = new ledger.wallet.ExtendedPublicKey(@, path)
     xpub.initialize () =>
       @_xpubs[path] = xpub
-      completion.success(xpub)
-    completion.readonly()
+      d.resolve(xpub)
+    d.promise
 
   ###
   @param [Array<Object>] inputs
   @param [Array] associatedKeysets
   @param changePath
   @param [String] recipientAddress
-  @param [Integer] amount
-  @param [Integer] fee
+  @param [Amount] amount
+  @param [Amount] fee
   @param [Integer] lockTime
   @param [Integer] sighashType
   @param [String] authorization hex encoded
@@ -399,30 +452,43 @@ class @ledger.dongle.Dongle extends EventEmitter
   @return [Q.Promise] Resolve with resumeData
   ###
   createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
-    resumeData = _.clone(resumeData)
-    resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)
-    resumeData.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in resumeData.trustedInputs)
-    resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
-    @_btchip.createPaymentTransaction_async(
-      inputs, associatedKeysets, changePath,
-      new ByteString(recipientAddress, ASCII),
-      amount.toByteString(),
-      fees.toByteString(),
-      lockTime && lockTime.toByteString(),
-      sighashType && sighashType.toByteString(),
-      authorization && new ByteString(authorization, HEX),
-      resumeData
-    ).then (result) ->
-      switch typeof result
-        when 'object'
+    if resumeData?
+      resumeData = _.clone(resumeData)
+      resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)
+      resumeData.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in resumeData.trustedInputs)
+      resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
+    _btchipQueue.enqueue "createPaymentTransaction", =>
+      @_btchip.createPaymentTransaction_async(
+        inputs, associatedKeysets, changePath,
+        new ByteString(recipientAddress, ASCII),
+        amount.toByteString(),
+        fees.toByteString(),
+        lockTime && new ByteString(Convert.toHexInt(lockTime), HEX),
+        sighashType && new ByteString(Convert.toHexInt(sighashType), HEX),
+        authorization && new ByteString(authorization, HEX),
+        resumeData
+      )
+      .then( (result) ->
+        if result instanceof ByteString
+          result = result.toString(HEX)
+        else
           result.scriptData = result.scriptData.toString(HEX)
           result.trustedInputs = (trustedInput.toString(HEX) for trustedInput in result.trustedInputs)
           result.publicKeys = (publicKey.toString(HEX) for publicKey in result.publicKeys)
           result.authorizationPaired = result.authorizationPaired.toString(HEX) if result.authorizationPaired?
           result.authorizationReference = result.authorizationReference.toString(HEX) if result.authorizationReference?
-        when 'string'
-          result = result.toString(HEX)
-      return result
+        return result
+      )
+
+  formatP2SHOutputScript: (transaction) ->
+    @_btchip.formatP2SHOutputScript(transaction)
+
+  ###
+  @return [Q.Promise]
+  ###
+  signP2SHTransaction: (inputs, scripts, numOutputs, output, paths) ->
+    _btchipQueue.enqueue "signP2SHTransaction", =>
+      @_btchip.signP2SHTransaction_async(inputs, scripts, numOutputs, output, paths)
 
   ###
   @param [String] input hex encoded
@@ -444,31 +510,57 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   # @return [Q.Promise] Must be done
   _recoverFirmwareVersion: ->
-    @_btchip.getFirmwareVersion_async().then( (result) =>
-      firmwareVersion = result['firmwareVersion']
-      if (firmwareVersion.byteAt(1) == 0x01) && (firmwareVersion.byteAt(2) == 0x04) && (firmwareVersion.byteAt(3) < 7)
-        l "Using old BIP32 derivation"
-        @_btchip.setDeprecatedBIP32Derivation()
-      if (firmwareVersion.byteAt(1) == 0x01) && (firmwareVersion.byteAt(2) == 0x04) && (firmwareVersion.byteAt(3) < 8)
-        l "Using old setup keymap encoding"
-        @_btchip.setDeprecatedSetupKeymap()
-      @_btchip.setCompressedPublicKeys(result['compressedPublicKeys'])
-      @firmwareVersion = firmwareVersion
-    ).fail( (error) =>
-      e("Firmware version not supported :", error)
-    )
-  
+    _btchipQueue.enqueue "recoverFirmwareVersion", =>
+      @_btchip.getFirmwareVersion_async().then( (result) =>
+        firmwareVersion = result['firmwareVersion']
+        if (firmwareVersion.byteAt(1) == 0x01) && (firmwareVersion.byteAt(2) == 0x04) && (firmwareVersion.byteAt(3) < 7)
+          l "Using old BIP32 derivation"
+          @_btchip.setDeprecatedBIP32Derivation()
+        if (firmwareVersion.byteAt(1) == 0x01) && (firmwareVersion.byteAt(2) == 0x04) && (firmwareVersion.byteAt(3) < 8)
+          l "Using old setup keymap encoding"
+          @_btchip.setDeprecatedSetupKeymap()
+        @_btchip.setCompressedPublicKeys(result['compressedPublicKeys'])
+        @firmwareVersion = firmwareVersion
+      ).fail( (error) =>
+        e("Firmware version not supported :", error)
+      )
+
   # @return [Q.Promise] Must be done
   _recoverOperationMode: ->
-    @_btchip.getOperationMode_async().then (mode) =>
-      @operationMode = mode
+    _btchipQueue.enqueue "recoverOperationMode", =>
+      @_btchip.getOperationMode_async().then (mode) =>
+        @operationMode = mode
 
   _setState: (newState, args...) ->
-    [@state, oldState] = [@state, newState]
-    # Legacy
-    @emit 'connected' if newState == States.LOCKED && oldState == States.UNDEFINED
+    [@state, oldState] = [newState, @state]
     @emit "state:#{@state}", @state, args...
     @emit 'state:changed', @state
+
+  # Set appropriate state, and return corresponding Error
+  # @param [String] errorCode
+  # @return [Error]
+  _handleErrorCode: (errorCode) ->
+    if errorCode.match("6982") # Pin required
+      @_setState(States.LOCKED)
+      error = Errors.new(Errors.DongleLocked, errorCode)
+    else if errorCode.match("6985") # Error ?
+      @_setState(States.BLANK)
+      error = Errors.new(Errors.BlankDongle, errorCode)
+    else if errorCode.match("6faa")
+      @_setState(States.ERROR)
+      error = Errors.new(Errors.UnknowError, errorCode)
+    else if errorCode.match(/63c\d/)
+      error = Errors.new(Errors.WrongPinCode, errorCode)
+      error.retryCount = parseInt(errorCode.substr(-1))
+      if error.retryCount == 0
+        @_setState(States.BLANK)
+        error.code = Errors.DongleLocked
+      else
+        @_setState(States.ERROR)
+    else
+      @_setState(States.UnknowError)
+      error = Errors.new(Errors.UnknowError, errorCode)
+    return error
 
   _convertMessageSignature: (pubKey, message, signature) ->
     bitcoin = new BitcoinExternal()
