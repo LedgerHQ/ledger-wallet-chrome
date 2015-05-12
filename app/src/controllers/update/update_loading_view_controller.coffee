@@ -12,6 +12,7 @@ class @UpdateLoadingViewController extends UpdateViewController
   onAfterRender: ->
     super
     @view.progressBar = new ledger.progressbars.ProgressBar(@view.progressBarContainer)
+    @view.progressBar.setAnimated(false)
 
   onProgress: (state, current, total) ->
     super
