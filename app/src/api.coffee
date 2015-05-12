@@ -2,7 +2,7 @@ class @Api
 
   @init: ->
     @_has_session = false
-    ledger.app.on 'dongle:unlocked', ->
+    ledger.app.on 'wallet:initialized', ->
       Api._has_session = true
     ledger.app.on 'dongle:disconnected', ->
       Api._has_session = false
@@ -28,6 +28,8 @@ class @Api
         @getAccounts(data)
       when 'get_operations'
         @getOperations(data)
+      when 'get_new_addresses'
+        @getNewAddresses(data)
       when 'coinkite_get_xpubkey'
         @coinkiteGetXPubKey(data)
       when 'coinkite_sign_json'
@@ -60,6 +62,20 @@ class @Api
     for operation in account.get('operations')
       operations.push(operation.serialize())
     @callback_success 'get_operations', operations: operations
+
+  @getNewAddresses: (data) ->
+    ledger.app.router.go '/wallet/api/addresses', {account_id: data.account_id, count: data.count}
+
+  @exportNewAddresses: (account_id, count) ->
+    account = Account.find({"id": account_id}).first().getWalletAccount()
+    current = account.getCurrentPublicAddressIndex()
+    ledger.wallet.pathsToAddresses _(_.range(current, current + count)).map((i) ->
+      account.getRootDerivationPath() + '/0/' + i
+    ), (result) =>
+      @callback_success 'get_new_addresses',
+        addresses: result
+        account_id: account_id
+      return
 
   @signMessage: (data) ->
     try

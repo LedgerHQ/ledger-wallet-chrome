@@ -179,6 +179,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new WalletApiOperationsDialogViewController({ account_id: params["?params"]?.account_id })
     dialog.show()
 
+  route '/wallet/api/addresses', (params = {}) ->
+    dialog = new WalletApiAddressesDialogViewController({ account_id: params["?params"]?.account_id, count: params["?params"]?.count })
+    dialog.show()
+
   ## Coinkite
   route '/apps/coinkite/dashboard/index', (params) ->
     app.navigate COINKITE_LAYOUT, AppsCoinkiteDashboardIndexViewController
