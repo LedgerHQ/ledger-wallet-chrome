@@ -68,7 +68,6 @@ class @ledger.m2fa.PairingRequest extends @EventEmitter
       catch er
         e er
     .done()
-    @_client.on 'm2fa.disconnect'
     @_promise = promise
 
   # Sets the completion callback.
