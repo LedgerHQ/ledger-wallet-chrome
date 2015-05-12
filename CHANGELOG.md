@@ -1,4 +1,12 @@
 # Changelog
+1.3.0
+====
+- Add a new user interface to easily contact support
+- Add a progress bar during transaction
+- Fix error 407 during update
+- Add API method
+- New dongle management
+- Bugs fixes
 
 1.2.0
 =====
