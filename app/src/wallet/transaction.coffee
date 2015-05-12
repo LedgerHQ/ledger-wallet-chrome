@@ -188,6 +188,7 @@ class ledger.wallet.Transaction
       currentStep = progress.currentPublicKey + progress.currentSignTransaction + progress.currentTrustedInput + progress.currentTrustedInputProgress + progress.currentHashOutputBase58 + progress.currentUntrustedHash
       stepsCount = progress.publicKeyCount + progress.transactionSignCount + progress.trustedInputsCount + progress.trustedInputsProgressTotal + progress.hashOutputBase58Count + progress.untrustedHashCount
       percent = Math.ceil(currentStep / stepsCount * 100)
+      l progress
       d.notify({currentStep, stepsCount, percent})
       progressCallback?({currentStep, stepsCount, percent})
     .then (@_signedRawTransaction) =>

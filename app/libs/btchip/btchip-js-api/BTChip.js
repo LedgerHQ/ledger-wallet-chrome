@@ -892,7 +892,6 @@ var BTChip = Class.create({
                                         }
                                         // finished with this iteration
                                         i++;
-                                        deferred.notify(i / inputs.length);
                                         notify({stage: "getTrustedInput", currentSignTransaction: i});
                                         finishedCallback();
                                     }).fail(function (err) {
@@ -962,6 +961,7 @@ var BTChip = Class.create({
                     );
                 }
                 else {
+                    notify({stage: "getWalletPublicKey", currentPublicKey: inputs.length});
                     // this is resuming, reuse already computed during first pass
                     deferredPublicKeys.resolve(resumeData['publicKeys']);
                 }
