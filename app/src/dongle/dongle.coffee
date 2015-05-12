@@ -465,7 +465,8 @@ class @ledger.dongle.Dongle extends EventEmitter
         sighashType && new ByteString(Convert.toHexInt(sighashType), HEX),
         authorization && new ByteString(authorization, HEX),
         resumeData
-      ).then( (result) ->
+      )
+      .then( (result) ->
         if result instanceof ByteString
           result = result.toString(HEX)
         else

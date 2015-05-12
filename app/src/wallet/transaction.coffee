@@ -146,7 +146,13 @@ class ledger.wallet.Transaction
       Errors.throw('Transaction must me initialized before preparation')
     d = ledger.defer(callback)
     @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
-    .progress => l arguments
+    .progress (progress) =>
+      currentStep = progress.currentPublicKey + progress.currentSignTransaction + progress.currentTrustedInput + progress.currentTrustedInputProgress + progress.currentHashOutputBase58 + progress.currentUntrustedHash
+      stepsCount = progress.publicKeyCount + progress.transactionSignCount + progress.trustedInputsCount + progress.trustedInputsProgressTotal + progress.hashOutputBase58Count + progress.untrustedHashCount
+      percent = Math.ceil(currentStep / stepsCount * 100)
+      l percent + "%"
+      l progress
+      progressCallback?({currentStep, stepsCount, percent})
     .then (@_resumeData) =>
       @_validationMode = @_resumeData.authorizationRequired
       @authorizationPaired = @_resumeData.authorizationPaired
