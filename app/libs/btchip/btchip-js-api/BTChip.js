@@ -769,7 +769,7 @@ var BTChip = Class.create({
         }
 
         var deferred = Q.defer();
-        var inputIndex = 0
+        var inputIndex = 0;
         var progressObject = {
             stage: "undefined",
             currentPublicKey: 0,
@@ -778,13 +778,18 @@ var BTChip = Class.create({
             trustedInputsCount: inputs.length,
             currentSignTransaction: 0,
             transactionSignCount: resuming ? inputs.length : 0,
-            currentTrustedInputProgress: 0,
-            trustedInputsProgressTotal: 0,
             currentHashOutputBase58: 0,
-            hashOutputBase58Count: inputs.length,
+            hashOutputBase58Count: resuming ? inputs.length : 1,
             currentUntrustedHash: 0,
-            untrustedHashCount: inputs.length
+            untrustedHashCount: resuming ? inputs.length : 1
         };
+        for (var index in inputs) {
+            if (typeof inputs[index] === "function")
+                continue;
+            progressObject["currentTrustedInputProgress_" + index] = 0;
+            console.log(inputs[index]);
+            progressObject["trustedInputsProgressTotal_" + index] = inputs[index][0].inputs.length + inputs[index][0].outputs.length;
+        }
         var notify = function (notifyObject) {
             var result = {};
             for (var key in progressObject) {
@@ -796,6 +801,7 @@ var BTChip = Class.create({
             }
             deferred.notify(result);
         };
+        console.log(inputs);
         async.eachSeries(
             inputs,
             // Iteration callback
@@ -804,7 +810,9 @@ var BTChip = Class.create({
                 if (!resuming) {
                     currentObject.getTrustedInput_async(input[1], input[0])
                         .progress(function (p) {
-                            notify({stage: "getTrustedInputsRaw", currentTrustedInputProgress: p.inputIndex + p.outputIndex, trustedInputsProgressTotal: p.inputsCount + p.outputsCount});
+                            var inputProgress = {stage: "getTrustedInputsRaw"};
+                            inputProgress["currentTrustedInputProgress_" + (inputIndex - 1)] = p.inputIndex + p.outputIndex;
+                            notify(inputProgress);
                         })
                         .then(function (result) {
                         notify({stage: "getTrustedInput", currentTrustedInput: inputIndex});
@@ -883,6 +891,7 @@ var BTChip = Class.create({
                                         /* FIN ADD VINCENT */
                                         // return current state
                                         deferred.resolve(resumeData);
+                                        return ;
                                     }
                                     currentObject.signTransaction_async(associatedKeysets[i], authorization, lockTime, sigHashType).then(function (result) {
                                         signatures.push(result);

@@ -147,8 +147,13 @@ class ledger.wallet.Transaction
     d = ledger.defer(callback)
     @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
     .progress (progress) =>
-      currentStep = progress.currentPublicKey + progress.currentSignTransaction + progress.currentTrustedInput + progress.currentTrustedInputProgress + progress.currentHashOutputBase58 + progress.currentUntrustedHash
-      stepsCount = progress.publicKeyCount + progress.transactionSignCount + progress.trustedInputsCount + progress.trustedInputsProgressTotal + progress.hashOutputBase58Count + progress.untrustedHashCount
+      currentStep = progress.currentPublicKey + progress.currentSignTransaction + progress.currentTrustedInput + progress.currentHashOutputBase58 + progress.currentUntrustedHash
+      stepsCount = progress.publicKeyCount + progress.transactionSignCount + progress.trustedInputsCount + progress.hashOutputBase58Count + progress.untrustedHashCount
+      for key, value of progress
+        [__, index] = key.match(/currentTrustedInputProgress_(\d)/) or [null, null]
+        continue unless index?
+        currentStep += progress["currentTrustedInputProgress_#{index}"]
+        stepsCount += progress["trustedInputsProgressTotal_#{index}"]
       percent = Math.ceil(currentStep / stepsCount * 100)
       d.notify({currentStep, stepsCount, percent})
       progressCallback?({currentStep, stepsCount, percent})
@@ -185,8 +190,13 @@ class ledger.wallet.Transaction
       validationKey,
       @_resumeData
     ).progress (progress) =>
-      currentStep = progress.currentPublicKey + progress.currentSignTransaction + progress.currentTrustedInput + progress.currentTrustedInputProgress + progress.currentHashOutputBase58 + progress.currentUntrustedHash
-      stepsCount = progress.publicKeyCount + progress.transactionSignCount + progress.trustedInputsCount + progress.trustedInputsProgressTotal + progress.hashOutputBase58Count + progress.untrustedHashCount
+      currentStep = progress.currentPublicKey + progress.currentSignTransaction + progress.currentTrustedInput + progress.currentHashOutputBase58 + progress.currentUntrustedHash
+      stepsCount = progress.publicKeyCount + progress.transactionSignCount + progress.trustedInputsCount + progress.hashOutputBase58Count + progress.untrustedHashCount
+      for key, value of progress
+        [__, index] = key.match(/currentTrustedInputProgress_(\d)/) or [null, null]
+        continue unless index?
+        currentStep += progress["currentTrustedInputProgress_#{index}"]
+        stepsCount += progress["trustedInputsProgressTotal_#{index}"]
       percent = Math.ceil(currentStep / stepsCount * 100)
       d.notify({currentStep, stepsCount, percent})
       progressCallback?({currentStep, stepsCount, percent})
