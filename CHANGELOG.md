@@ -1,5 +1,5 @@
 # Changelog
-1.3.0
+1.3.0/1.3.1
 ====
 - Add a new user interface to easily contact support
 - Add a progress bar during transaction
