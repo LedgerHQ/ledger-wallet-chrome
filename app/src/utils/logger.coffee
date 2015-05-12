@@ -76,7 +76,26 @@ class @ledger.utils.Logger
         csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
         csv.save(callback)
 
-  @exportLogsWithLink: (callback) ->
+  @exportLogsToBlob: (callback = undefined) ->
+    now = new Date()
+    suggestedName = "ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
+    csv = new ledger.utils.CsvExporter(suggestedName)
+    @publicLogs (publicLogs) =>
+      @privateLogs (privateLogs) =>
+        csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
+        callback?(name: suggestedName, blob: csv.blob())
+
+  @exportLogsToZip: (callback = undefined) ->
+    now = new Date()
+    suggestedName = "ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
+    csv = new ledger.utils.CsvExporter(suggestedName)
+    @publicLogs (publicLogs) =>
+      @privateLogs (privateLogs) =>
+        csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
+        csv.zip (zip) =>
+          callback?(name: suggestedName, zip: zip)
+
+  @exportLogsWithLink: (callback = undefined) ->
     now = new Date()
     suggestedName = "ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
     csv = new ledger.utils.CsvExporter(suggestedName)
