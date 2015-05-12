@@ -1,12 +1,6 @@
 class @CommonDialogsTicketDialogViewController extends ledger.common.DialogViewController
 
   view:
-#    body: '#ticket_body'
-#    email: '#ticket_email'
-#    name: '#ticket_name'
-#    subject: '#ticket_subject'
-#    tags: '#ticket_tags'
-#    logs: '#ticket_isOkToSendLog'
     logsSwitchContainer: "#logs_switch_container"
     logsContainer: "#logs_container"
     tagsSegmentedControlContainer: "#tags_segmented_control_container"
@@ -109,31 +103,6 @@ class @CommonDialogsTicketDialogViewController extends ledger.common.DialogViewC
         sendBlock(data)
     else
       sendBlock(data)
-
-#  sendTicket: ->
-#    # Get metadata
-#    metadata = @_getMetadata()
-#    @_getLogs()
-#    .then (logs) =>
-#      # Set a boolean to pass isOkToSend()
-#      @view.logs.val(@logsSwitch.isOn())
-#      # form checking UI
-#      _.map @view, (value) =>
-#        if (value.val?() is '' or value.val?() is null) and not value.next().hasClass('verif')
-#          value.after('<p style="color:red" class="verif">The field must be filled!</p>')
-#        #if (value.val?() isnt '' or value.val?() isnt null) and value.next().hasClass('verif')
-#          #value.next().remove()
-#
-#      isOktoSend = _.every @view, (value) =>
-#        value.val?() isnt '' and value.val?()?
-#      l 'isOktoSend', isOktoSend
-#
-#      if isOktoSend and @_validateEmail()
-#        ledger.api.GrooveRestClient.singleton().sendTicket @view.body.val(), @view.email.val(), @view.name.val(), @view.subject.val(), @view.tags.val(), metadata, logs
-#      else
-#        l 'all fields are required!'
-#
-#
 
   _getMetadata: ->
     # Get OS, version Chrome, version firmware, version chromeApp, etc..
