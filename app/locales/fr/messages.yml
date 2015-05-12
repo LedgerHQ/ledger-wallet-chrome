@@ -40,6 +40,11 @@ common:
   test: "Test"
   yes: "Oui"
   no: "Non"
+  name: "Nom"
+  email_address: "Adresse email"
+  subject: "Sujet"
+  tag: "Tag"
+  message: "Message"
   may_take_a_while: "Veuillez patienter, cette opération peut prendre quelques instants."
   get_help: "Visitez notre centre d'aide sur support.ledgerwallet.com pour obtenir plus d’informations."
   signing: "Signature..."
@@ -81,6 +86,7 @@ common:
     contact_support_team: "Contacter l'équipe support"
     self_help: "Pour une auto-assistance immédiate"
     dedicated_help: "Pour une aide personnalisée"
+    attach_debug_logs: "Joindre les logs de debug"
 
 onboarding:
   device:
