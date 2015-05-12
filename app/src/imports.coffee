@@ -108,6 +108,7 @@
         'utils/progressbars'
         'utils/keycard'
         'utils/csv_exporter'
+        'utils/validers'
 
         ## Crypto
         'utils/crypto/aes'

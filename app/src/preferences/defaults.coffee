@@ -61,3 +61,19 @@ ledger.preferences.defaults =
       insight:
         name: 'Insight.is'
         address: 'https://insight.bitpay.com/tx/%s'
+
+  # support preferences
+  Support:
+    tags:
+      support:
+        value: 'support'
+        localization: 'common.help.support_tag'
+      feature:
+        value: 'feature request'
+        localization: 'common.help.feature_request_tag'
+      sales:
+        value: 'sales'
+        localization: 'common.help.sales_tag'
+      other:
+        value: 'other'
+        localization: 'common.help.other_tag'
