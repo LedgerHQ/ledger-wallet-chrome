@@ -1,16 +1,26 @@
 class @Account extends ledger.database.Model
   do @init
-  @has many: 'operations', sortBy: ['time', 'desc', 'type', 'asc'], onDelete: 'destroy'
+  @has
+    many: 'operations', onDelete: 'destroy'
+    sortBy: (a, b) ->
+      d = b.time - a.time
+      if d is 0
+        if a.type > b.type then 1 else -1
+      else if d > 0
+        1
+      else
+        -1
+
   @index 'index'
 
-  @fromWalletAccount: (hdAccount) -> # TODO: Rename to fromWalletAccount
+  @fromWalletAccount: (hdAccount) ->
     return null unless hdAccount?
     @find(index: hdAccount.index).first()
 
-  getWalletAccount: () -> ledger.wallet.Wallet.instance.getAccount(@get('index')) # TODO: Rename to getWalletAccount
+  getWalletAccount: () -> ledger.wallet.Wallet.instance.getAccount(@get('index'))
 
   serialize: () ->
-    $.extend super, { root_path: @getHDWalletAccount().getRootDerivationPath() }
+    $.extend super, { root_path: @getWalletAccount().getRootDerivationPath() }
 
   ## Balance management
 
@@ -33,8 +43,28 @@ class @Account extends ledger.database.Model
     amount = ledger.Amount.fromSatoshi(amount)
     fees = ledger.Amount.fromSatoshi(fees)
     inputsPath = @getWalletAccount().getAllAddressesPaths()
-    changePath = @getWalletAccount().getCurrentChangeAddressPath()
-    ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
+    @_createTransactionGetChangeAddressPath @getWalletAccount().getCurrentChangeAddressIndex(), (changePath) =>
+      ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
+
+  ###
+    Special get change address path to 'avoid' LW 1.0.0 derivation failure.
+  ###
+  _createTransactionGetChangeAddressPath: (changeIndex, callback) ->
+    changePath =  @getWalletAccount().getChangeAddressPath(changeIndex)
+    if ledger.app.dongle.getIntFirmwareVersion() isnt ledger.dongle.Firmware.V_LW_1_0_0
+      callback changePath
+    else
+      ledger.tasks.AddressDerivationTask.instance.getPublicAddress changePath, (xpubAddress) =>
+        ledger.app.dongle.getPublicAddress changePath, (address) =>
+          address = address.bitcoinAddress.toString(ASCII)
+          if xpubAddress is address
+            callback?(changePath)
+          else
+            @_createTransactionGetChangeAddressPath(changeIndex + 1, callback)
+
+
+
+
 
   addRawTransactionAndSave: (rawTransaction, callback = _.noop) ->
     hdAccount = ledger.wallet.Wallet.instance?.getAccount(@get('index'))

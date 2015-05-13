@@ -111,7 +111,8 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   # Help
   route '/wallet/help/index', (params) ->
-    window.open t 'application.support_url'
+    dialog = new CommonDialogsHelpDialogViewController()
+    dialog.show()
 
   # Operations
   route '/wallet/accounts/{id}/operations', (params) ->
@@ -177,6 +178,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   route '/wallet/api/operations', (params = {}) ->
     dialog = new WalletApiOperationsDialogViewController({ account_id: params["?params"]?.account_id })
+    dialog.show()
+
+  route '/wallet/api/addresses', (params = {}) ->
+    dialog = new WalletApiAddressesDialogViewController({ account_id: params["?params"]?.account_id, count: params["?params"]?.count })
     dialog.show()
 
   ## Coinkite

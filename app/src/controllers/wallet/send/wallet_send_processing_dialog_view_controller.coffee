@@ -2,6 +2,8 @@ class @WalletSendProcessingDialogViewController extends ledger.common.DialogView
 
   view:
     contentContainer: '#content_container'
+    progressbarContainer: '#progressbar_container'
+    progressLabel: "#progress_label"
 
   initialize: ->
     super
@@ -9,7 +11,7 @@ class @WalletSendProcessingDialogViewController extends ledger.common.DialogView
 
   onAfterRender: ->
     super
-    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
+    @view.progressBar = new ledger.progressbars.ProgressBar(@view.progressbarContainer)
 
   _startSignature: ->
     # sign transaction
@@ -26,6 +28,9 @@ class @WalletSendProcessingDialogViewController extends ledger.common.DialogView
           dialog.show()
       else
         @_startSending()
+    promise.progress ({percent}) =>
+      @view.progressBar.setProgress(percent / 100)
+      @view.progressLabel.text percent + '%'
 
   _startSending: ->
     # push transaction

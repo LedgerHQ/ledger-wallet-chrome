@@ -18,6 +18,8 @@ Firmware =
   V1_4_12: 0x0001040c0146
   V1_4_13: 0x0001040d0146
   V_LW_1_0_0: 0x20010000010f
+  V_LW_1_0_1: 0x200100010110
+
 
 # Ledger OS pubKey, used for pairing.
 Attestation =
@@ -365,21 +367,23 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
   signMessage: (message, {path, pubKey}, callback=undefined) ->
-    _btchipQueue.enqueue "signMessage", =>
-      @getPublicAddress(path).then((address) => @signMessage(message, path: path, pubKey: address.publicKey, callback)) if ! pubKey?
-      d = ledger.defer(callback)
-      message = new ByteString(message, ASCII)
-      @_btchip.signMessagePrepare_async(path, message)
-      .then =>
-        return @_btchip.signMessageSign_async(new ByteString(_pin, ASCII))
-      .then (sig) =>
-        signedMessage = @_convertMessageSignature(pubKey, message, sig.signature)
-        d.resolve(signedMessage)
-      .catch (error) ->
-        console.error("Fail to signMessage :", error)
-        d.reject(error)
-      .done()
-      d.promise
+    if ! pubKey?
+      @getPublicAddress(path).then((address) => console.log("address=", address); @signMessage(message, path: path, pubKey: address.publicKey, callback))
+    else
+      _btchipQueue.enqueue "signMessage", =>
+        d = ledger.defer(callback)
+        message = new ByteString(message, ASCII)
+        @_btchip.signMessagePrepare_async(path, message)
+        .then =>
+          return @_btchip.signMessageSign_async(new ByteString(_pin, ASCII))
+        .then (sig) =>
+          signedMessage = @_convertMessageSignature(pubKey, message, sig.signature)
+          d.resolve(signedMessage)
+        .catch (error) ->
+          console.error("Fail to signMessage :", error)
+          d.reject(error)
+        .done()
+        d.promise
 
   # @param [String] pubKey public key, hex encoded.
   # @param [Function] callback Optional argument
@@ -463,7 +467,8 @@ class @ledger.dongle.Dongle extends EventEmitter
         sighashType && new ByteString(Convert.toHexInt(sighashType), HEX),
         authorization && new ByteString(authorization, HEX),
         resumeData
-      ).then( (result) ->
+      )
+      .then( (result) ->
         if result instanceof ByteString
           result = result.toString(HEX)
         else

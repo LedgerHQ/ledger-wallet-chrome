@@ -1,20 +1,28 @@
-<section id="wallet_api_operations_dialog">
+<section id="wallet_api_addresses_dialog">
   <header>
-    <h1><%= t 'wallet.api.operations.title' %></h1>
+    <h1><%= t 'wallet.api.addresses.title' %></h1>
   </header>
   <table class="no-table-head">
     <tbody>
       <tr>
         <td class="no-border">
-          <%= t 'wallet.api.operations.info' %>
+          <%= t 'wallet.api.addresses.info' %>
         </td>
       </tr>    
       <tr>
-        <td class="row-title"><%= t 'wallet.api.operations.account_name' %></td>
+        <td class="row-title"><%= t 'wallet.api.addresses.account_name' %></td>
       </tr>
       <tr>
         <td>
           <span id="account_name"></span>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title"><%= t 'wallet.api.addresses.count' %></td>
+      </tr>
+      <tr>
+        <td>
+          <span id="count"></span>
         </td>
       </tr>
     </tbody>

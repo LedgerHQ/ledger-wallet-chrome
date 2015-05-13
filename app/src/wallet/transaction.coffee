@@ -8,8 +8,8 @@ Errors = @ledger.errors
 Amount = ledger.Amount
 
 $log = -> ledger.utils.Logger.getLoggerByTag("Transaction")
-$info = -> $log().info.apply @, arguments
-$error = -> $log().error.apply @, arguments
+$info = -> $log().info arguments...
+$error = -> $log().error arguments...
 
 @ledger.wallet ?= {}
 
@@ -141,11 +141,22 @@ class ledger.wallet.Transaction
   # @param [String] changePath
   # @param [Function] callback
   # @return [Q.Promise]
-  prepare: (callback=undefined) ->
+  prepare: (callback = undefined, progressCallback = undefined) ->
     if not @amount? or not @fees? or not @recipientAddress?
       Errors.throw('Transaction must me initialized before preparation')
     d = ledger.defer(callback)
     @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
+    .progress (progress) =>
+      currentStep = progress.currentPublicKey + progress.currentSignTransaction + progress.currentTrustedInput + progress.currentHashOutputBase58 + progress.currentUntrustedHash
+      stepsCount = progress.publicKeyCount + progress.transactionSignCount + progress.trustedInputsCount + progress.hashOutputBase58Count + progress.untrustedHashCount
+      for key, value of progress
+        [__, index] = key.match(/currentTrustedInputProgress_(\d)/) or [null, null]
+        continue unless index?
+        currentStep += progress["currentTrustedInputProgress_#{index}"]
+        stepsCount += progress["trustedInputsProgressTotal_#{index}"]
+      percent = Math.ceil(currentStep / stepsCount * 100)
+      d.notify({currentStep, stepsCount, percent})
+      progressCallback?({currentStep, stepsCount, percent})
     .then (@_resumeData) =>
       @_validationMode = @_resumeData.authorizationRequired
       @authorizationPaired = @_resumeData.authorizationPaired
@@ -158,17 +169,17 @@ class ledger.wallet.Transaction
   # @param [String] validationKey 4 chars ASCII encoded
   # @param [Function] callback
   # @return [Q.Promise]
-  validateWithPinCode: (validationPinCode, callback=undefined) -> @_validate((char.charCodeAt(0).toString(16) for char in validationPinCode).join(''), callback)
+  validateWithPinCode: (validationPinCode, callback=undefined, progressCallback=undefined) -> @_validate((char.charCodeAt(0).toString(16) for char in validationPinCode).join(''), callback, progressCallback)
 
   # @param [String] validationKey 4 chars ASCII encoded
   # @param [Function] callback
   # @return [Q.Promise]
-  validateWithKeycard: (validationKey, callback=undefined) -> @_validate(("0#{char}" for char in validationKey).join(''), callback)
+  validateWithKeycard: (validationKey, callback=undefined, progressCallback=undefined) -> @_validate(("0#{char}" for char in validationKey).join(''), callback, progressCallback)
 
   # @param [String] validationKey 4 bytes hex encoded
   # @param [Function] callback
   # @return [Q.Promise]
-  _validate: (validationKey, callback=undefined) ->
+  _validate: (validationKey, callback=undefined, progressCallback=undefined) ->
     if not @_resumeData? or not @_validationMode?
       Errors.throw('Transaction must me prepared before validation')
     d = ledger.defer(callback)
@@ -178,13 +189,24 @@ class ledger.wallet.Transaction
       undefined, # Default sigHash
       validationKey,
       @_resumeData
-    ).then( (@_signedRawTransaction) =>
+    ).progress (progress) =>
+      currentStep = progress.currentPublicKey + progress.currentSignTransaction + progress.currentTrustedInput + progress.currentHashOutputBase58 + progress.currentUntrustedHash
+      stepsCount = progress.publicKeyCount + progress.transactionSignCount + progress.trustedInputsCount + progress.hashOutputBase58Count + progress.untrustedHashCount
+      for key, value of progress
+        [__, index] = key.match(/currentTrustedInputProgress_(\d)/) or [null, null]
+        continue unless index?
+        currentStep += progress["currentTrustedInputProgress_#{index}"]
+        stepsCount += progress["trustedInputsProgressTotal_#{index}"]
+      percent = Math.ceil(currentStep / stepsCount * 100)
+      d.notify({currentStep, stepsCount, percent})
+      progressCallback?({currentStep, stepsCount, percent})
+    .then (@_signedRawTransaction) =>
       @_isValidated = yes
       $info("Raw TX: ", @getSignedTransaction())
       _.defer => d.resolve(@)
-    ).catch( (error) =>
+    .catch (error) =>
       _.defer => d.rejectWithError(Errors.SignatureError, error)
-    ).done()
+    .done()
     d.promise
 
   ###

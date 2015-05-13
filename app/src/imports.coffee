@@ -57,6 +57,11 @@
         '../libs/zbarqrcode'
         '../libs/mutation-summary'
         '../libs/jsencrypt'
+        '../libs/ua-parser-0.7.7.min'
+        '../libs/zip/zip'
+        '../libs/zip/z-worker'
+        '../libs/zip/inflate'
+        '../libs/zip/deflate'
 
         # Used be m2fa.DebugClient
         '../libs/btchip/ucrypt/ka'
@@ -104,11 +109,12 @@
         'utils/promise_queue'
         'utils/csv_exporter'
         'utils/completion_closure'
+        'utils/validers'
 
         ## Crypto
-        'utils/crypto/aes'
-        'utils/crypto/sha256'
-        'utils/crypto/base58'
+        'crypto/aes'
+        'crypto/sha256'
+        'crypto/base58'
 
         ## Bitcoin
         'utils/bitcoin/bitcoin'
@@ -117,12 +123,12 @@
         'utils/bitcoin/bitid'
 
         ## Storage
-        'utils/storage/store'
-        'utils/storage/chrome_store'
-        'utils/storage/secure_store'
-        'utils/storage/synced_store'
-        'utils/storage/object_store'
-        'utils/storage/storage'
+        'storage/store'
+        'storage/chrome_store'
+        'storage/secure_store'
+        'storage/synced_store'
+        'storage/object_store'
+        'storage/storage'
 
         ## Data synchronization
 
@@ -148,6 +154,7 @@
         'api/sync_rest_client'
         'api/m2fa_restclient'
         'api/currencies_restclient'
+        'api/groove_restclient'
 
         ## Tasks
         'tasks/task'
@@ -211,6 +218,8 @@
         'controllers/common/dialogs/common_dialogs_confirmation_dialog_view_controller'
         'controllers/common/dialogs/common_dialogs_message_dialog_view_controller'
         'controllers/common/dialogs/common_dialogs_qrcode_dialog_view_controller'
+        'controllers/common/dialogs/common_dialogs_ticket_dialog_view_controller'
+        'controllers/common/dialogs/common_dialogs_help_dialog_view_controller'
 
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller'
@@ -345,6 +354,7 @@
         'api'
         'controllers/wallet/api/wallet_api_accounts_dialog_view_controller'
         'controllers/wallet/api/wallet_api_operations_dialog_view_controller'
+        'controllers/wallet/api/wallet_api_addresses_dialog_view_controller'
 
         ## Coinkite
         'controllers/apps/coinkite/apps_coinkite_navigation_controller'
