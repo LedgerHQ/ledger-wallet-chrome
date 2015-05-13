@@ -1,5 +1,7 @@
 @ledger.wallet ?= {}
 
+logger = -> ledger.utils.Logger.getLoggerByTag("WalletLayout")
+
 class ledger.wallet.Wallet
 
   getAccount: (accountIndex) -> @_accounts[accountIndex]
@@ -161,13 +163,13 @@ class ledger.wallet.Wallet.Account
     return
 
   _notifyPublicAddressIndexAsUsed: (index) ->
-    l 'Notify public change', index, 'current is', @_account.currentPublicIndex
+    logger().info 'Notify public change', index, 'current is', @_account.currentPublicIndex
     if index < @_account.currentPublicIndex
-      l 'Index is less than current'
+      logger().info 'Index is less than current'
       derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
       @_account.excludedPublicPaths = _.without @_account.excludedPublicPaths, derivationPath
     else if index > @_account.currentPublicIndex
-      l 'Index is more than current'
+      logger().info 'Index is more than current'
       difference =  index - (@_account.currentPublicIndex + 1)
       @_account.excludedPublicPaths ?= []
       for i in [0...difference]
@@ -175,8 +177,8 @@ class ledger.wallet.Wallet.Account
         @_account.excludedPublicPaths.push derivationPath unless _.contains(@_account.excludedPublicPaths, derivationPath)
       @_account.currentPublicIndex = parseInt(index) + 1
     else if index == @_account.currentPublicIndex
-        l 'Index is equal to current'
-        @shiftCurrentPublicAddressPath()
+      logger().info 'Index is equal to current'
+      @shiftCurrentPublicAddressPath()
     @save()
 
   _notifyChangeAddressIndexAsUsed: (index) ->
@@ -195,7 +197,7 @@ class ledger.wallet.Wallet.Account
     @save()
 
   shiftCurrentPublicAddressPath: (callback) ->
-    l 'shift public'
+    logger().info 'shift public'
     index = @_account.currentPublicIndex
     index = 0 unless index?
     index = parseInt(index) if _.isString(index)
@@ -204,7 +206,7 @@ class ledger.wallet.Wallet.Account
     ledger.app.dongle?.getPublicAddress @getCurrentPublicAddressPath(), callback
 
   shiftCurrentChangeAddressPath: (callback) ->
-    l 'shift change'
+    logger().info 'shift change'
     index = @_account.currentChangeIndex
     index = 0 unless index?
     index = parseInt(index) if _.isString(index)
