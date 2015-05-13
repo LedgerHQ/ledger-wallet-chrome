@@ -65,7 +65,6 @@ class ledger.wallet.Wallet
     @_store.set {'accounts': @getAccountsCount()}, callback
 
   remove: (callback = _.noop) ->
-    for account in @_accounts
     _.async.each @_accounts, (account, done, hasNext) =>
       account.remove =>
         unless hasNext
