@@ -123,12 +123,12 @@
         'utils/bitcoin/bitid'
 
         ## Storage
-        'utils/storage/store'
-        'utils/storage/chrome_store'
-        'utils/storage/secure_store'
-        'utils/storage/synced_store'
-        'utils/storage/object_store'
-        'utils/storage/storage'
+        'storage/store'
+        'storage/chrome_store'
+        'storage/secure_store'
+        'storage/synced_store'
+        'storage/object_store'
+        'storage/storage'
 
         ## Data synchronization
 
