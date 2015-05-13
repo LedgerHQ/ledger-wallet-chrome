@@ -20,6 +20,10 @@
     )
     @env.addReporter(@htmlReporter)
     require @files, =>
+      # Use mock local storage
+      ledger.specs.storage.inject()
+      # Restore original storage implementation
+      _restoreChromeStore()
       d.resolve()
   d.promise
 
@@ -46,3 +50,15 @@ Do a && for each word in each string, do a || between strings
         break unless match
       return true if match
     return false
+
+###
+  Restore original storage implementation
+###
+_restoreChromeStore = ->
+  intervalID = setInterval ->
+    if jsApiReporter.status() is 'done'
+      l 'MOCK STORAGE DONE'
+      ledger.specs.storage.restore ->
+        clearInterval intervalID
+  , 1000
+

@@ -370,10 +370,11 @@
         'controllers/apps/coinkite/cosign/apps_coinkite_cosign_signing_dialog_view_controller'
 
         # Specs
-        '../spec/spec_helper'
-
         '../spec/utils/dongle/mock_dongle_manager'
         '../spec/utils/dongle/mock_dongle'
+        '../spec/utils/storage/store_mock'
+
+        '../spec/spec_helper'
       ]
 
       specs:
