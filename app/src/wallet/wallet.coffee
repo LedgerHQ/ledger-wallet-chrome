@@ -64,6 +64,13 @@ class ledger.wallet.Wallet
   save: (callback = _.noop) ->
     @_store.set {'accounts': @getAccountsCount()}, callback
 
+  remove: (callback = _.noop) ->
+    _.async.each @_accounts, (account, done, hasNext) =>
+      account.remove =>
+        unless hasNext
+          @_store.remove(["accounts"],  callback)
+        do done
+
   @instance: undefined
 
 class ledger.wallet.Wallet.Account
@@ -217,6 +224,8 @@ class ledger.wallet.Wallet.Account
     saveHash = {}
     saveHash[@_storeId] = @_account
     @_store.set saveHash, callback
+
+  remove: (callback = _.noop) -> @_store.remove([@_storeId], callback)
 
 _.extend ledger.wallet,
 
