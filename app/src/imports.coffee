@@ -112,9 +112,9 @@
         'utils/validers'
 
         ## Crypto
-        'utils/crypto/aes'
-        'utils/crypto/sha256'
-        'utils/crypto/base58'
+        'crypto/aes'
+        'crypto/sha256'
+        'crypto/base58'
 
         ## Bitcoin
         'utils/bitcoin/bitcoin'
