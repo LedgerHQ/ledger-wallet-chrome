@@ -10,7 +10,8 @@ class @ledger.storage.Store extends EventEmitter
   constructor: (name, keySeparator = '.') ->
     @_name = name
     @_keySeparator = keySeparator
-    @_nameRegex = new RegExp("^#{@_name}\\.")
+    regexSeparator = if keySeparator.match(/\./) then "\\" + keySeparator else keySeparator
+    @_nameRegex = new RegExp("^#{@_name}#{regexSeparator}")
     @_substores = {}
 
   # Gets one or more items from storage.
