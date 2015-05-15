@@ -8,7 +8,7 @@ class ledger.storage.SubStore extends ledger.storage.Store
     @param [String] name
   ###
   constructor: (parentStore, name) ->
-    super name
+    super "__" + name, '_'
     @_parentStore = parentStore
 
   # @see ledger.storage.Store#_raw_get
@@ -27,7 +27,7 @@ class ledger.storage.SubStore extends ledger.storage.Store
 
   # @see ledger.storage.Store#_raw_keys
   _raw_keys: (cb) ->
-    @_parentStore.keys (keys) => cb(_.compact(key for key in keys when key.match(@_nameRegex)))
+    @_parentStore.keys (keys) => cb(_.compact(key for key in keys when key?.match(@_nameRegex)))
 
   # @see ledger.storage.Store#_raw_remove
   _raw_remove: (keys, cb=->) ->

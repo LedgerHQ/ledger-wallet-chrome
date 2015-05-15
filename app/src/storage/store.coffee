@@ -7,8 +7,9 @@
 class @ledger.storage.Store extends EventEmitter
 
   # @param [String] name The store name (for key mangling)
-  constructor: (name) ->
+  constructor: (name, keySeparator = '.') ->
     @_name = name
+    @_keySeparator = keySeparator
     @_nameRegex = new RegExp("^#{@_name}\\.")
     @_substores = {}
 
@@ -106,7 +107,7 @@ class @ledger.storage.Store extends EventEmitter
 
   ## Namespaces methods ##
 
-  _to_ns_key: (key) -> @_name + "." + key
+  _to_ns_key: (key) -> @_name + @_keySeparator + key
   _to_ns_keys: (keys) -> (@_to_ns_key(key) for key in keys)
   _from_ns_key: (ns_key) -> ns_key.replace(@_nameRegex, '')
   _from_ns_keys: (ns_keys) -> _.compact (@_from_ns_key(ns_key) for ns_key in ns_keys when ns_key.match(@_nameRegex))
