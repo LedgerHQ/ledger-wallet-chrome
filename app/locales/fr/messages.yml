@@ -320,6 +320,7 @@ wallet:
       signout: 'VERROUILLER'
       help: 'AIDE'
       account: 'COMPTE'
+      apps: 'APPS'
       settings: "RÉGLAGES"
 
   dashboard:
@@ -578,6 +579,12 @@ wallet:
       disclamer: "Les logs contiennent des événements anonymes qui sont enregistrés et cryptés localement sur votre ordinateur. Ces données ne sont pas envoyées à nos serveurs et ne peuvent être qu'exportés manuellement, sur demande du support Ledger."
 
 apps:
+
+  common:
+    apps: "Applications"
+    coinkite: "Coinkite"
+    bitid: "BitID"
+    
   coinkite:
     top_menu:
       items:

@@ -1,0 +1,15 @@
+<section id="apps">
+  <header>
+    <h1><%= t 'apps.common.apps' %></h1>
+  </header>
+  <div class="sections-container">
+    <a class="panel" href="#openCoinkite">
+      <img src="../assets/images/apps/coinkite_icon.png" />
+      <div class="uppercase-action"><%= t 'apps.common.coinkite' %></div>
+    </a>
+    <a class="panel" href="#openBitID">
+      <i class="fa fa-bitcoin"></i>
+      <div class="uppercase-action"><%= t 'apps.common.bitid' %></div>
+    </a>
+  </div>
+</section>

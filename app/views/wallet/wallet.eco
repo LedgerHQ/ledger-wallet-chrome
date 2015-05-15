@@ -31,6 +31,16 @@
           <div class="selector" />
         </div>
       </li>
+      <li id="apps-item" class="menu-item">
+        <div>
+          <a href="/wallet/apps/index">
+            <img src="../assets/images/wallet/apps_icon.png" />
+            <span><%= t('wallet.top_menu.items.apps') %></span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
       <li id="settings-item" class="menu-item">
         <div>
           <a href="/wallet/settings/index">

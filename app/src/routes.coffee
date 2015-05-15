@@ -104,6 +104,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new WalletReceiveIndexDialogViewController(params)
     dialog.show()
 
+  # Apps
+  route '/wallet/apps/index', (params) ->
+    app.navigate WALLET_LAYOUT, AppsIndexViewController
+
   # Settings
   route '/wallet/settings/index', (params) ->
     dialog = new WalletSettingsIndexDialogViewController()
