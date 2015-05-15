@@ -10,6 +10,7 @@ class @ledger.storage.Store extends EventEmitter
   constructor: (name) ->
     @_name = name
     @_nameRegex = new RegExp("^#{@_name}\\.")
+    @_substores = {}
 
   # Gets one or more items from storage.
   # If keys is empty, retrieve all values in this namespace.
@@ -38,6 +39,13 @@ class @ledger.storage.Store extends EventEmitter
   # @param [Function] cb A callback with removed items.
   remove: (keys, cb) ->
     this._raw_remove this._preprocessKeys(keys), (raw_items) => cb?(@_deprocessItems(raw_items))
+
+  # Gets the substore associated with the given name
+  #
+  # @param [String] name The name of the substore
+  # @return [ledger.storage.SubStore] The substore associated with the given name
+  # @see ledger.storage.SubStore
+  substore: (name) -> @_substores[name] ||= new ledger.storage.SubStore(this, name)
 
   # Removes all items from storage.
   #

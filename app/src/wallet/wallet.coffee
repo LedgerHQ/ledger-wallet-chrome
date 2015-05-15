@@ -232,10 +232,13 @@ class ledger.wallet.Wallet.Account
 _.extend ledger.wallet,
 
   initialize: (dongle, callback=undefined) ->
+    previousLayout = new ledger.wallet.Wallet()
     hdWallet = new ledger.wallet.Wallet()
+    previousLayout.initialize ledger.storage.wallet
     hdWallet.initialize ledger.storage.wallet, () =>
         ledger.wallet.Wallet.instance = hdWallet
         callback?()
+
 
   release: (dongle, callback) ->
     ledger.wallet.Wallet.instance?.release()

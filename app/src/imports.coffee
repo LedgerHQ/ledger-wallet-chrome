@@ -124,6 +124,7 @@
 
         ## Storage
         'storage/store'
+        'storage/substore'
         'storage/chrome_store'
         'storage/secure_store'
         'storage/synced_store'
