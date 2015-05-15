@@ -66,6 +66,12 @@ class ledger.wallet.Wallet
   save: (callback = _.noop) ->
     @_store.set {'accounts': @getAccountsCount()}, callback
 
+  serialize: ->
+    obj = {accounts: @getAccountsCount()}
+    for account in @_accounts
+      obj[account._storeId] = account.serialize()
+    obj
+
   remove: (callback = _.noop) ->
     _.async.each @_accounts, (account, done, hasNext) =>
       account.remove =>
@@ -227,6 +233,8 @@ class ledger.wallet.Wallet.Account
     saveHash[@_storeId] = @_account
     @_store.set saveHash, callback
 
+  serialize: -> _.clone(@_account)
+
   remove: (callback = _.noop) -> @_store.remove([@_storeId], callback)
 
 _.extend ledger.wallet,
@@ -234,11 +242,18 @@ _.extend ledger.wallet,
   initialize: (dongle, callback=undefined) ->
     previousLayout = new ledger.wallet.Wallet()
     hdWallet = new ledger.wallet.Wallet()
-    previousLayout.initialize ledger.storage.wallet
-    hdWallet.initialize ledger.storage.wallet, () =>
-        ledger.wallet.Wallet.instance = hdWallet
-        callback?()
+    previousLayout.initialize ledger.storage.wallet, =>
+      unless previousLayout.isEmpty()
+        ledger.storage.sync.wallet.set previousLayout.serialize(), =>
+          previousLayout.release()
+          ledger.storage.wallet.remove ["accounts", "account_0"], => @_endInitialize(hdWallet, callback)
+      else
+        @_endInitialize(hdWallet, callback)
 
+  _endInitialize: (hdWallet, callback) ->
+    hdWallet.initialize ledger.storage.sync.wallet, () =>
+      ledger.wallet.Wallet.instance = hdWallet
+      callback?()
 
   release: (dongle, callback) ->
     ledger.wallet.Wallet.instance?.release()

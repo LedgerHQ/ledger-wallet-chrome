@@ -6,7 +6,7 @@ class ledger.wallet.Wallet.Cache
 
   initialize: (callback) ->
     cacheLimitSize = 1 << 31 >>> 0
-    @hdwallet._store.get ['cache'], (result) =>
+    ledger.storage.wallet.get ['cache'], (result) =>
       if result.cache?
         @_cache = LRUCache.fromJson(result.cache, cacheLimitSize)
       else
@@ -24,4 +24,4 @@ class ledger.wallet.Wallet.Cache
     for tuple in tuples
       [key, value] = tuple
       @_cache.set key, value
-    @hdwallet._store.set {cache: @_cache.toJSON()}, callback
+    ledger.storage.wallet.set {cache: @_cache.toJSON()}, callback
