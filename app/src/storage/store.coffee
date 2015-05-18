@@ -1,4 +1,4 @@
-@ledger.storage ?= {}
+@ledger.storage = {}
 
 # Base class for every store. This class should not be used (abstract class).
 # Descendant classes should namespace their keys before setting them, in order to allow multiple

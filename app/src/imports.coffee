@@ -110,6 +110,7 @@
         'utils/csv_exporter'
         'utils/completion_closure'
         'utils/validers'
+        'utils/function_lock'
 
         ## Crypto
         'crypto/aes'
@@ -129,6 +130,7 @@
         'storage/secure_store'
         'storage/synced_store'
         'storage/object_store'
+        'storage/memory_store'
         'storage/storage'
 
         ## Data synchronization

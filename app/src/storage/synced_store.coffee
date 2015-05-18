@@ -1,3 +1,8 @@
+
+OperationTypes =
+  SET: 0
+  REMOVE: 1
+
 # A store able to synchronize with a remote crypted store. This store has an extra method in order to order a push or pull
 # operations
 # @event pulled Emitted once the store is pulled from the remote API
@@ -11,41 +16,65 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   # @param [String] key The secure key used to encrypt/decrypt the store
   # @param [Function] syncPushHandler A function used to perform push synchronization operations
   # @param [Function] syncPullHandler A function used to perform pull synchronization operations
-  constructor: (name, addr, key) ->
+  # @param [ledger.storage.Store] auxiliaryStore A store used to save ledger.storage.SyncedStored meta data
+  constructor: (name, addr, key, auxiliaryStore = ledger.storage.wallet) ->
     super(name, key)
     @mergeStrategy = @_overwriteStrategy
     @client = ledger.api.SyncRestClient.instance(addr)
     @throttled_pull = _.throttle _.bind(@._pull,@), @PULL_THROTTLE_DELAY
     @debounced_push = _.debounce _.bind(@._push,@), @PUSH_DEBOUNCE_DELAY
+    @_auxiliaryStore = auxiliaryStore
+    @_changes = []
+    @_unlockMethods = _.lock(this, ['set', 'get', 'remove', 'clear', '_pull'])
     _.defer =>
-      ledger.storage.wallet.get ['__last_sync_md5'], (item) =>
+      @_auxiliaryStore.get ['__last_sync_md5', '__sync_changes'], (item) =>
         @lastMd5 = item.__last_sync_md5
-        @_initConnection()
+        @_changes = item['__sync_changes'].concat(@_changes) if item['__sync_changes']?
+        @_unlockMethods()
+        @throttled_pull()
 
   # Stores one or many item
   #
   # @param [Object] items Items to store
   # @param [Function] cb A callback invoked once the insertion is done
   set: (items, cb) ->
-    super items, =>
-      this.debounced_push()
-      cb?()
+    return cb?() unless items?
+    @_changes.push {type: OperationTypes.SET, key: key, value: value} for key, value of items
+    this.debounced_push()
+    _.defer => cb?()
+
+  get: (keys, cb) ->
+    values = {}
+    handledKeys = []
+    for key in keys when (changes = _.where(@_changes, key: key)).length > 0
+      values[key] = _(changes).last().value if _(changes).last().type is OperationTypes.SET
+      handledKeys.push key
+    keys = _(keys).without(handledKeys...)
+    super keys, (storeValues) ->
+      cb?(_.extend(storeValues, values))
 
   # Removes one or more items from storage.
   #
   # @param [Array|String] key A single key to get, list of keys to get.
   # @param [Function] cb A callback invoked once the removal is done.
   remove: (keys, cb) ->
-    super keys, =>
-      this.debounced_push()
-      cb?()
+    return cb?() unless keys?
+    @_changes.push {type: OperationTypes.REMOVE, key: key} for key in keys
+    this.debounced_push()
+    _.defer => cb?()
 
   clear: (cb) ->
     super(cb)
+    @_changes = {}
     @client.delete_settings()
 
   # @return A promise
   _pull: ->
+    # Get distant store md5
+    # If local md5 and distant md5 are different
+      # -> pull the data
+      # -> merge data
+
     @client.get_settings_md5().then( (md5) =>
       return undefined if md5 == @lastMd5
       @client.get_settings().then (items) =>
@@ -53,14 +82,32 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
           @_setLastMd5(md5)
           @emit('pulled')
           items
-    ).catch( (jqXHR) =>
+    ).catch (jqXHR) =>
       # Data not synced already
       return this._init() if jqXHR.status == 404
       jqXHR
-    )
+
+  _merge: (data) ->
+    # Consistency chain check
+      # if common last consistency sha1 index > consistency chain max size * 3/4
+        # Invalidate changes and overwrite local storage
+      # else
+        # Overwrite local storage and keep changes
 
   # @return A jQuery promise
   _push: ->
+    # return if no changes
+    # Pull data
+    # If no changes
+      # Abort
+    # Else
+      # Update consistency chain
+      # Push
+
+  _applyChanges: ->
+
+
+    ###
     d = Q.defer()
     this._raw_get null, (raw_items) =>
       settings = {}
@@ -73,6 +120,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       , _.bind(d.reject,d)
     , _.bind(d.reject,d)
     d.promise
+    ###
 
   # @return A jQuery promise
   _overwriteStrategy: (items) ->
@@ -131,4 +179,6 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   # Save lastMd5 in settings
   _setLastMd5: (md5) ->
     @lastMd5 = md5
-    ledger.storage.wallet.set("__last_sync_md5": md5)
+    @_auxiliaryStore.set(__last_sync_md5: md5)
+
+  _saveChanges: (callback = undefined) -> @_auxiliaryStore.set __sync_changes: @_changes, callback
