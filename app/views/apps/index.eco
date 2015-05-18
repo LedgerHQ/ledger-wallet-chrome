@@ -5,11 +5,13 @@
   <div class="sections-container">
     <a class="panel" href="#openCoinkite">
       <img src="../assets/images/apps/coinkite_icon.png" />
-      <div class="uppercase-action"><%= t 'apps.common.coinkite' %></div>
+      <div class="title"><%= t 'apps.common.coinkite.title' %></div>
+      <div class="info"><%= t 'apps.common.coinkite.info' %></div>
     </a>
-    <a class="panel" href="#openBitID">
-      <i class="fa fa-bitcoin"></i>
-      <div class="uppercase-action"><%= t 'apps.common.bitid' %></div>
+    <a class="panel" href="#openBitrefill">
+      <img src="../assets/images/apps/bitrefill_icon.png" />
+      <div class="title"><%= t 'apps.common.bitrefill.title' %></div>
+      <div class="info"><%= t 'apps.common.bitrefill.info' %></div>
     </a>
   </div>
 </section>

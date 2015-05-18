@@ -582,8 +582,12 @@ apps:
 
   common:
     apps: "Applications"
-    coinkite: "Coinkite"
-    bitid: "BitID"
+    coinkite:
+      title: "Coinkite"
+      info: "Enable multisignature on your hardware wallet."
+    bitrefill:
+      title: "BitRefill"
+      info: "Top up prepaid mobile phones with Bitcoin."
 
   coinkite:
     top_menu:
