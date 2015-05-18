@@ -1,30 +1,42 @@
 describe "WalletLayoutRecoveryTask", ->
 
-  task = new ledger.tasks.Task('recovery-global-instance')
+  task = new ledger.tasks.WalletLayoutRecoveryTask()
 
   describe " - seed with one empty account", ->
 
-
-    beforeAll ->
+    beforeAll (done) ->
       task?.constructor.stopAllRunningTasks()
       dongle1account = ledger.specs.fixtures.dongles.dongle2
-      dongleInst = new ledger.dongle.MockDongle dongle1account.pin, dongle1account.seed, dongle1account.pairingKeyHex
-      _event = new EventEmitter
-      _event.emit 'connected', dongleInst
+      dongleInst = new ledger.dongle.MockDongle dongle1account.pin, dongle1account.masterSeed, dongle1account.pairingKeyHex
       dongleInst.unlockWithPinCode('0000')
-      task.start()
+      ledger.app.dongle = dongleInst
+      ledger.bitcoin.bitid.getAddress (address) =>
+        bitIdAddress = address.bitcoinAddress.toString(ASCII)
+        dongleInst.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>
+          if not (pubKey?.bitcoinAddress?) or not (bitIdAddress?)
+            logger().error("Fatal error during openStores, missing bitIdAddress and/or pubKey.bitcoinAddress")
+            raise(ledger.errors.new(ledger.errors.UnableToRetrieveBitidAddress))
+            ledger.app.emit 'wallet:initialization:fatal_error'
+            return
+          ledger.storage.openStores bitIdAddress, pubKey.bitcoinAddress.value
+          task.start.bind(task)
+          ledger.wallet.initialize(dongleInst, done)
 
-    it "should have 1 account", (done) ->
-      task.once 'start', (event) ->
-        expect(ledger.wallet.Wallet.instance.isInitialized).toBeTruthy()
-        expect(ledger.wallet.Wallet.instance.getAccount(0)).toBe(typeof 'object')
-        expect(ledger.wallet.Wallet.instance.getAccount(1)).toBeUndefined()
-        expect(ledger.tasks.WalletLayoutRecoveryTask.instance._restoreChronocoinLayout()).toHaveBeenCalled()
-        done()
+
+    fit "should have 1 account", ->
+      ledger.tasks.AddressDerivationTask.instance.onStart()
+
+      #l ledger.wallet.Wallet.instance
+      expect(typeof ledger.wallet.Wallet.instance.getAccount(0)).toBe('object')
+      expect(ledger.wallet.Wallet.instance.getAccount(1)).toBeUndefined()
+      spyOn ledger.tasks.WalletLayoutRecoveryTask.instance, '_restoreChronocoinLayout'
+      expect(ledger.tasks.WalletLayoutRecoveryTask.instance._restoreChronocoinLayout).toHaveBeenCalled()
+
 
     it "should have 0 address in internal and external nodes", ->
       expect(ledger.wallet.Wallet.instance.getAccount(0).getCurrentChangeAddressIndex()).toBe(0)
       expect(ledger.wallet.Wallet.instance.getAccount(0).getCurrentPublicAddressIndex()).toBe(0)
+
 
     afterAll (done) ->
       task.constructor.stopAllRunningTasks()
@@ -37,7 +49,7 @@ describe "WalletLayoutRecoveryTask", ->
     beforeAll ->
       task.constructor.stopAllRunningTasks()
       dongle2accounts = ledger.specs.fixtures.dongles.dongle1
-      dongleInst = new ledger.dongle.MockDongle dongle2accounts.pin, dongle2accounts.seed, dongle2accounts.pairingKeyHex
+      dongleInst = new ledger.dongle.MockDongle dongle2accounts.pin, dongle2accounts.masterSeed, dongle2accounts.pairingKeyHex
       _event = new EventEmitter
       _event.emit 'connected', dongleInst
       dongleInst.unlockWithPinCode('0000')

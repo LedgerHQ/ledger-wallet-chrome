@@ -232,8 +232,9 @@ _.extend ledger.wallet,
   initialize: (dongle, callback=undefined) ->
     hdWallet = new ledger.wallet.Wallet()
     hdWallet.initialize ledger.storage.wallet, () =>
-        ledger.wallet.Wallet.instance = hdWallet
-        callback?()
+      ledger.wallet.Wallet.instance = hdWallet
+      l callback
+      callback?()
 
   release: (dongle, callback) ->
     ledger.wallet.Wallet.instance?.release()

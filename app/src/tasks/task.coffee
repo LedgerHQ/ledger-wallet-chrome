@@ -8,12 +8,15 @@ class ledger.tasks.Task extends EventEmitter
     @taskId = taskId
 
   start: (safe = no) ->
+    l 'start'
     _.defer =>
+      l 'start 1'
       throw "A task with id '#{@taskId}' is already started" if @isRunning() and not safe
       return if @isRunning() and safe
       ledger.tasks.Task.RUNNING_TASKS[@taskId] = @
       @emit 'start', @
       @logger().info "Starting task #{@taskId}"
+      l @onStart
       do @onStart
     @
 

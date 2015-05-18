@@ -4,6 +4,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   @instance: new @()
 
   onStart: () ->
+    l 'ONSTART'
     @once 'bip44:done', =>
       @emit 'done'
       @stopIfNeccessary()
@@ -11,10 +12,13 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       @emit 'fatal_error'
       @stopIfNeccessary()
 
+    l ledger.wallet.Wallet.instance.getAccountsCount()
     if ledger.wallet.Wallet.instance.getAccountsCount() == 0
       @once 'chronocoin:done', => @_restoreBip44Layout()
+      l '_restoreChronocoinLayout'
       @_restoreChronocoinLayout()
     else
+      l '_restoreBip44'
       @_restoreBip44Layout()
 
   onStop: () ->

@@ -9,10 +9,7 @@ class MockLocalStorage
 
 
   get: (key, callback) ->
-    d = ledger.defer(callback)
-    #l '@store[key]', @store[key]
-    d.resolve(@store[key])
-    d.promise
+    callback?(@store[key])
 
 
   getBytesInUse: (keys, callback) ->
@@ -54,18 +51,13 @@ class MockLocalStorage
     callback?()
 
 
+instance = new MockLocalStorage()
 ledger.specs.storage ?= {}
 ledger.specs.storage.inject = ->
-  instance = new MockLocalStorage()
-  @originalChromeStore = chrome.storage.local
-  chrome.storage.local = instance
+  instance.originalChromeStore = chrome.storage.local
+  chrome.storage.local = instance.originalChromeStore
 
 ledger.specs.storage.restore = (callback) ->
-  #l ledger.stm.store
-  #l ledger.sts.store
-  chrome.storage.local = @originalChromeStore
+  chrome.storage.local = instance.originalChromeStore
   callback?()
-
-#ledger.stm = new MockLocalStorage()
-#ledger.sts = new MockSyncStorage()
 

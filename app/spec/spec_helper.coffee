@@ -21,9 +21,9 @@
     @env.addReporter(@htmlReporter)
     require @files, =>
       # Use mock local storage
-      ledger.specs.storage.inject()
+      #ledger.specs.storage.inject()
       # Restore original storage implementation
-      _restoreChromeStore()
+      #_restoreChromeStore()
       d.resolve()
   d.promise
 

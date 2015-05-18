@@ -90,6 +90,7 @@ class ledger.dongle.MockDongle extends EventEmitter
   unlockWithPinCode: (pin, callback=undefined) ->
     Errors.throw(Errors.DongleAlreadyUnlock) if @state isnt States.LOCKED
     d = ledger.defer(callback)
+    l 'unlockWithPinCode'
     if pin is @_pin
       @_setState(States.UNLOCKED)
       @_remainingPinAttempt = 3
@@ -397,6 +398,9 @@ class ledger.dongle.MockDongle extends EventEmitter
         d.reject('Pairing fail -  Invalid status 1 - 6a80')
     d.promise
 
+  # Todo
+  # getStringFirmwareVersion()
+
 
   _generatePairingKeyHex: ->
     pairingKey = crypto.getRandomValues new Uint8Array(16)
@@ -437,7 +441,7 @@ class ledger.dongle.MockDongle extends EventEmitter
       bytesSeed = new ByteString(restoreSeed, HEX)
       if bytesSeed.length != 64
         e('Invalid seed :', restoreSeed)
-    _.defer => @_setState(if isPowerCycle then States.LOCKED else States.DISCONNECTED)
+    if isPowerCycle then @_setState States.LOCKED else _.defer => @_setState States.DISCONNECTED
     d.resolve()
     return d.promise
 
