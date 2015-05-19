@@ -20,5 +20,4 @@ _.mixin
             calls.push functionName: functionName, arguments: arguments
           else
             functions[functionName].apply(thisArg, arguments)
-          return
     unlock

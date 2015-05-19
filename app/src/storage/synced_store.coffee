@@ -3,6 +3,11 @@ OperationTypes =
   SET: 0
   REMOVE: 1
 
+Errors =
+  NoRemoteData: 0
+  NetworkError: 1
+  NoChanges: 2
+
 # A store able to synchronize with a remote crypted store. This store has an extra method in order to order a push or pull
 # operations
 # @event pulled Emitted once the store is pulled from the remote API
@@ -21,11 +26,11 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     super(name, key)
     @mergeStrategy = @_overwriteStrategy
     @client = ledger.api.SyncRestClient.instance(addr)
-    @throttled_pull = _.throttle _.bind(@._pull,@), @PULL_THROTTLE_DELAY
-    @debounced_push = _.debounce _.bind(@._push,@), @PUSH_DEBOUNCE_DELAY
+    @throttled_pull = _.throttle _.bind((-> @._pull()),@), @PULL_THROTTLE_DELAY
+    @debounced_push = _.debounce _.bind((-> @._push()),@), @PUSH_DEBOUNCE_DELAY
     @_auxiliaryStore = auxiliaryStore
     @_changes = []
-    @_unlockMethods = _.lock(this, ['set', 'get', 'remove', 'clear', '_pull'])
+    @_unlockMethods = _.lock(this, ['set', 'get', 'remove', 'clear', '_pull', '_push'])
     _.defer =>
       @_auxiliaryStore.get ['__last_sync_md5', '__sync_changes'], (item) =>
         @lastMd5 = item.__last_sync_md5
@@ -70,22 +75,18 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
 
   # @return A promise
   _pull: ->
+    l 'pull'
     # Get distant store md5
     # If local md5 and distant md5 are different
       # -> pull the data
       # -> merge data
+    @client.get_settings_md5().then (md5) ->
+      l md5
+    .fail (e) ->
+      if e.status is 404
+        throw Errors.NoRemoteData
+      throw Errors.NetworkError
 
-    @client.get_settings_md5().then( (md5) =>
-      return undefined if md5 == @lastMd5
-      @client.get_settings().then (items) =>
-        @mergeStrategy(items).then =>
-          @_setLastMd5(md5)
-          @emit('pulled')
-          items
-    ).catch (jqXHR) =>
-      # Data not synced already
-      return this._init() if jqXHR.status == 404
-      jqXHR
 
   _merge: (data) ->
     # Consistency chain check
@@ -96,6 +97,42 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
 
   # @return A jQuery promise
   _push: ->
+    l 'push 0'
+    return if @_changes.length is 0
+    l 'push 1'
+    hasRemoteData = yes
+    unlockMutableOperations = _.noop
+    pushedData = null
+    @_pull().fail (e) =>
+      l "Before", e
+      throw Errors.NetworkError if e is Errors.NetworkError
+      hasRemoteData = no
+      l 'Continue'
+    .then =>
+      l 1, "args", arguments
+      throw Errors.NoChanges if @_changes.length is 0
+      # Lock mutable operations during the push
+      unlockMutableOperations = _.lock(this, ['set', 'remove', 'clear', '_pull', '_push'])
+      # Create the data to send
+      @_getAllData()
+    .then (data) =>
+      l 2, arguments, hasRemoteData
+      # Create commit hash
+      data = @_applyChanges(data, @_changes)
+      commitHash = ledger.crypto.SHA256.hashString _(data).toJson()
+      data.__hashes = [commitHash].concat(data.__hashes or [])
+      pushedData = data
+      # Jsonify data
+      _(data).toJson()
+    .then (data) => if hasRemoteData then @client.put_settings(data) else @client.post_settings(data)
+    .then () =>
+      # Merge changes into store
+      @_setAllData(pushedData)
+    .fail () =>
+      l arguments
+      do unlockMutableOperations
+      @debounced_push() # Retry later
+
     # return if no changes
     # Pull data
     # If no changes
@@ -104,23 +141,13 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       # Update consistency chain
       # Push
 
-  _applyChanges: ->
-
-
-    ###
-    d = Q.defer()
-    this._raw_get null, (raw_items) =>
-      settings = {}
-      for raw_key, raw_value of raw_items
-        settings[raw_key] = raw_value if raw_key.match(@_nameRegex)
-      @__retryer (ecbr) =>
-        @client.put_settings(settings).catch(ecbr).then (md5) =>
-          @_setLastMd5(md5)
-          d.resolve(md5)
-      , _.bind(d.reject,d)
-    , _.bind(d.reject,d)
-    d.promise
-    ###
+  _applyChanges: (data, changes) ->
+    for change in changes
+      if change.type is OperationTypes.SET
+        data[change.key] = change.value
+      else
+        data = _.omit(change.key)
+    data
 
   # @return A jQuery promise
   _overwriteStrategy: (items) ->
@@ -128,57 +155,34 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     this._raw_set items, _.bind(d.resolve,d)
     d.promise
 
-  # Call fct with ecbr as arg and retry it on fail.
-  # Wait 1 second before retry first time, double until 64 s then.
-  #
-  # @param [Function] fct A function invoked with ecbr, a retry on error callback.
-  # @param [Function] ecb A callback invoked when retry all fail.
-  __retryer: (fct, ecb, wait=1000) ->
-    fct (err) =>
-      if wait <= 64*1000
-        setTimeout (=> @__retryer(fct, ecb, wait*2)), wait
-      else
-        console.error(err)
-        ecb?(err)
-
-  _initConnection: ->
-    @__retryer (ecbr) =>
-      @_pull().then( =>
-        setTimeout =>
-          @pullTimer = setInterval(@throttled_pull, @PULL_INTERVAL_DELAY)
-        , @PULL_INTERVAL_DELAY
-      ).catch (jqXHR) =>
-        # Data not synced already
-        if jqXHR.status == 404
-          this._init().catch(ecbr).then =>
-            setInterval(@throttled_pull, @PULL_INTERVAL_DELAY)
-        else if jqXHR.status == 400
-          console.error("BadRequest during SyncedStore initialization:", jqXHR)
-        else
-          ecbr(jqXHR)
-    ledger.app.dongle.once 'state:changed', =>
-      clearInterval(@pullTimer) if !ledger.app.dongle? || ledger.app.dongle.state != ledger.dongle.States.UNLOCKED
-
-  # @param [Function] cb A callback invoked once init is done. cb()
-  # @param [Function] ecb A callback invoked when init fail. Take $.ajax.fail args.
-  # @return A jQuery promise
-  _init: ->
-    d = Q.defer()
-    this._raw_get null, (raw_items) =>
-      settings = {}
-      for raw_key, raw_value of raw_items
-        settings[raw_key] = raw_value if raw_key.match(@_nameRegex)
-      @__retryer (ecbr) =>
-        @client.post_settings(settings).catch(ecbr).then (md5) =>
-          @_setLastMd5(md5)
-          d.resolve(md5)
-      , _.bind(d.reject,d)
-    , _.bind(d.reject,d)
-    d.promise
-
   # Save lastMd5 in settings
   _setLastMd5: (md5) ->
     @lastMd5 = md5
     @_auxiliaryStore.set(__last_sync_md5: md5)
 
+  _getAllData: ->
+    d = ledger.defer()
+    @_super().keys (keys) =>
+      l keys
+      @_super().get keys, (data) =>
+        l data
+        d.resolve(data)
+    d.promise
+
+  _setAllData: (data) ->
+    d = ledger.defer()
+    @_super().clear =>
+      @_super().set data, => d.resolve()
+    d.promise
+
   _saveChanges: (callback = undefined) -> @_auxiliaryStore.set __sync_changes: @_changes, callback
+  _clearChanges: (callback = undefined ) ->
+    @_changes = []
+    @_saveChanges(callback)
+
+  _super: ->
+    return @_super_ if @_super_?
+    @_super_ = {}
+    for key, value of @constructor.__super__
+      @_super_[key] = if _(value).isFunction() then value.bind(this) else value
+    @_super_

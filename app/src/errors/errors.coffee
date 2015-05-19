@@ -54,6 +54,7 @@ _.extend ledger.errors,
   UnableToRetrieveBitidAddress: 600
   FatalErrorDuringLayoutWalletRecovery: 601
 
+
   DefaultMessages:
     0: "StandardError"
 

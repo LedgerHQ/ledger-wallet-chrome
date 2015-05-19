@@ -111,6 +111,7 @@
         'utils/completion_closure'
         'utils/validers'
         'utils/function_lock'
+        'utils/json'
 
         ## Crypto
         'crypto/aes'

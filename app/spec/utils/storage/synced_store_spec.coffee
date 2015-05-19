@@ -43,5 +43,27 @@ describe "SyncedStore", ->
           expect(result['foo']).toBe(undefined)
           do done
 
-  it "push when there is data on server side", (done) ->
+  it "posts when there is data on server side", (done) ->
     store.client.get_settings_md5.and.callFake -> ledger.defer().reject({status: 404}).promise
+    store.client.post_settings.and.callFake (data) ->
+      data = JSON.parse(data)
+      expect(data['__hashes'][0]).toBe('7a38bf81f383f69433ad6e900d35b3e2385593f76a7b7ab5d4355b8ba41ee24b')
+      expect(data['foo']).toBe('bar')
+      do done
+      ledger.defer().promise
+    store.client.put_settings.and.throwError('Put settings shall not be called')
+    store.set foo: 'bar'
+
+  it "merges and puts when there is data on server side", (done) ->
+    store.client.get_settings_md5.and.callFake -> ledger.defer().resolve({md5: 'f48139f3d9bfdab0b5374212e06f3994'}).promise
+    store.client.post_settings.and.throwError('Post settings shall not be called')
+    store.client.get_settings.and.callFake -> ledger.defer().resolve(settings: {"__hashes":["7a38bf81f383f69433ad6e900d35b3e2385593f76a7b7ab5d4355b8ba41ee24b"],"foo":"bar"}).promise
+    store.client.put_settings.and.callFake (data) ->
+      data = JSON.parse(data)
+      expect(data['__hashes'].length).toBe(2)
+      expect(data['__hashes'][0]).toBe('91442791035d968e103daf9da76fd3766d62d8a92c134bc0f7b29f849bb3a8ab')
+      expect(data['response']).toBe(42)
+      expect(data['foo']).toBe('bar')
+      do done
+      ledger.defer().promise
+    store.set response: 42
