@@ -13,8 +13,8 @@ class MockLocalStorage
 
 
   getBytesInUse: (keys, callback) ->
-    size    = 0
-    keys = [keys]
+    size  = 0
+    keys  = [keys]
     check = (valToCheck) ->
       if typeof valToCheck isnt 'object'
         l valToCheck
@@ -40,10 +40,8 @@ class MockLocalStorage
 
 
   set: (obj, callback) ->
-    d = ledger.defer(callback)
     _.extend @store, obj
-    d.resolve()
-    d.promise
+    callback?()
 
 
   remove: (key, callback) ->
@@ -55,7 +53,7 @@ instance = new MockLocalStorage()
 ledger.specs.storage ?= {}
 ledger.specs.storage.inject = ->
   instance.originalChromeStore = chrome.storage.local
-  chrome.storage.local = instance.originalChromeStore
+  chrome.storage.local         = instance
 
 ledger.specs.storage.restore = (callback) ->
   chrome.storage.local = instance.originalChromeStore

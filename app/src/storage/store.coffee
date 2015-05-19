@@ -7,9 +7,12 @@
 class @ledger.storage.Store extends EventEmitter
 
   # @param [String] name The store name (for key mangling)
-  constructor: (name) ->
+  constructor: (name, keySeparator = '.') ->
     @_name = name
-    @_nameRegex = new RegExp("^#{@_name}\\.")
+    @_keySeparator = keySeparator
+    regexSeparator = if keySeparator.match(/\./) then "\\" + keySeparator else keySeparator
+    @_nameRegex = new RegExp("^#{@_name}#{regexSeparator}")
+    @_substores = {}
 
   # Gets one or more items from storage.
   # If keys is empty, retrieve all values in this namespace.
@@ -38,6 +41,13 @@ class @ledger.storage.Store extends EventEmitter
   # @param [Function] cb A callback with removed items.
   remove: (keys, cb) ->
     this._raw_remove this._preprocessKeys(keys), (raw_items) => cb?(@_deprocessItems(raw_items))
+
+  # Gets the substore associated with the given name
+  #
+  # @param [String] name The name of the substore
+  # @return [ledger.storage.SubStore] The substore associated with the given name
+  # @see ledger.storage.SubStore
+  substore: (name) -> @_substores[name] ||= new ledger.storage.SubStore(this, name)
 
   # Removes all items from storage.
   #
@@ -98,7 +108,7 @@ class @ledger.storage.Store extends EventEmitter
 
   ## Namespaces methods ##
 
-  _to_ns_key: (key) -> @_name + "." + key
+  _to_ns_key: (key) -> @_name + @_keySeparator + key
   _to_ns_keys: (keys) -> (@_to_ns_key(key) for key in keys)
   _from_ns_key: (ns_key) -> ns_key.replace(@_nameRegex, '')
   _from_ns_keys: (ns_keys) -> _.compact (@_from_ns_key(ns_key) for ns_key in ns_keys when ns_key.match(@_nameRegex))
