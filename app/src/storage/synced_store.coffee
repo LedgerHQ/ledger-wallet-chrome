@@ -16,6 +16,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   PULL_INTERVAL_DELAY: ledger.config.syncRestClient.pullIntervalDelay || 10000
   PULL_THROTTLE_DELAY: ledger.config.syncRestClient.pullThrottleDelay || 1000
   PUSH_DEBOUNCE_DELAY: ledger.config.syncRestClient.pushDebounceDelay || 1000
+  HASHES_CHAIN_MAX_SIZE: 20
 
   # @param [String] name The store name
   # @param [String] key The secure key used to encrypt/decrypt the store
@@ -33,7 +34,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     @_unlockMethods = _.lock(this, ['set', 'get', 'remove', 'clear', '_pull', '_push'])
     _.defer =>
       @_auxiliaryStore.get ['__last_sync_md5', '__sync_changes'], (item) =>
-        @lastMd5 = item.__last_sync_md5
+        @_lastMd5 = item.__last_sync_md5
         @_changes = item['__sync_changes'].concat(@_changes) if item['__sync_changes']?
         @_unlockMethods()
         @throttled_pull()
@@ -80,66 +81,82 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     # If local md5 and distant md5 are different
       # -> pull the data
       # -> merge data
-    @client.get_settings_md5().then (md5) ->
-      l md5
-    .fail (e) ->
+    @client.get_settings_md5().then (md5) =>
+      return yes if @_lastMd5 is md5
+      @client.get_settings().then (data) =>
+        @_merge(data)
+    .fail (e) =>
+      l e
       if e.status is 404
         throw Errors.NoRemoteData
       throw Errors.NetworkError
 
-
-  _merge: (data) ->
+  _merge: (remoteData) ->
     # Consistency chain check
-      # if common last consistency sha1 index > consistency chain max size * 3/4
-        # Invalidate changes and overwrite local storage
-      # else
-        # Overwrite local storage and keep changes
+    # if common last consistency sha1 index > consistency chain max size * 3/4
+    # Invalidate changes and overwrite local storage
+    # else
+    # Overwrite local storage and keep changes
+    @_getAllData().then (localData) =>
+      l localData, remoteData
+      remoteHashes = (remoteData['__hashes'] or []).join(' ')
+      localHashes = (localData['__hashes'] or []).join(' ').substr(0, 2 * 64 + 1)
+      if remoteHashes.length is 0 or localHashes.length is 0
+        # Remote data are not using the new format. Just update the current local storage
+        @_setAllData(remoteData)
+      else if (remoteHashes.indexOf(localHashes) > 3 * 4)
+        @_changes = []
+        @_setAllData(remoteData)
+      else if (localData['__hashes'] or []).join(' ').indexOf((remoteData['__hashes'] or []).join(' ').substr(0, 2 * 64 + 1)) != -1
+        # We are up to date do nothing
+        ledger.defer().resolve().promise
+      else
+        [nextCommitHash, nextCommitData] = @_computeCommit(localData, @_changes)
+        if _(remoteData['__hashes']).contains(nextCommitData)
+          # The hash next commit already exists drop the changes
+          @_setAllData(remoteHasheso)
+          @_changes = []
+        else
+          @_setAllData(remoteData)
 
   # @return A jQuery promise
   _push: ->
-    l 'push 0'
+    # return if no changes
+    # Pull data
+    # If no changes
+    # Abort
+    # Else
+    # Update consistency chain
+    # Push
+    l 'Push 0'
     return if @_changes.length is 0
-    l 'push 1'
+    l 'Push 1'
     hasRemoteData = yes
     unlockMutableOperations = _.noop
     pushedData = null
     @_pull().fail (e) =>
-      l "Before", e
       throw Errors.NetworkError if e is Errors.NetworkError
       hasRemoteData = no
-      l 'Continue'
     .then =>
-      l 1, "args", arguments
       throw Errors.NoChanges if @_changes.length is 0
       # Lock mutable operations during the push
       unlockMutableOperations = _.lock(this, ['set', 'remove', 'clear', '_pull', '_push'])
       # Create the data to send
       @_getAllData()
     .then (data) =>
-      l 2, arguments, hasRemoteData
       # Create commit hash
-      data = @_applyChanges(data, @_changes)
-      commitHash = ledger.crypto.SHA256.hashString _(data).toJson()
-      data.__hashes = [commitHash].concat(data.__hashes or [])
-      pushedData = data
+      [commitHash, pushedData] = @_computeCommit(data, @_changes)
       # Jsonify data
-      _(data).toJson()
+      _(pushedData).toJson()
     .then (data) => if hasRemoteData then @client.put_settings(data) else @client.post_settings(data)
-    .then () =>
+    .then (md5) =>
+      @_setLastMd5(md5)
       # Merge changes into store
       @_setAllData(pushedData)
+    .then () => @emit 'pushed', this
     .fail () =>
-      l arguments
       do unlockMutableOperations
       @debounced_push() # Retry later
-
-    # return if no changes
-    # Pull data
-    # If no changes
-      # Abort
-    # Else
-      # Update consistency chain
-      # Push
 
   _applyChanges: (data, changes) ->
     for change in changes
@@ -149,6 +166,12 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         data = _.omit(change.key)
     data
 
+  _computeCommit: (data, changes) ->
+    data = @_applyChanges(data, changes)
+    commitHash = ledger.crypto.SHA256.hashString _(data).toJson()
+    data.__hashes = [commitHash].concat(data.__hashes or [])
+    [commitHash, data]
+
   # @return A jQuery promise
   _overwriteStrategy: (items) ->
     d = Q.defer()
@@ -157,22 +180,23 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
 
   # Save lastMd5 in settings
   _setLastMd5: (md5) ->
-    @lastMd5 = md5
+    @_lastMd5 = md5
     @_auxiliaryStore.set(__last_sync_md5: md5)
 
   _getAllData: ->
     d = ledger.defer()
     @_super().keys (keys) =>
-      l keys
       @_super().get keys, (data) =>
-        l data
         d.resolve(data)
     d.promise
 
   _setAllData: (data) ->
     d = ledger.defer()
     @_super().clear =>
-      @_super().set data, => d.resolve()
+        @_super().set data, =>
+        l 'Resolve setAllData', data
+        @_getAllData().then l
+        d.resolve()
     d.promise
 
   _saveChanges: (callback = undefined) -> @_auxiliaryStore.set __sync_changes: @_changes, callback

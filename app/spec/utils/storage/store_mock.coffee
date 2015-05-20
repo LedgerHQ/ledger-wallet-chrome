@@ -4,6 +4,9 @@ class MockLocalStorage
   originalChromeStore: undefined
   store: {}
 
+  constructor: ->
+    @store = {}
+
   clear: ->
     @store = {}
 
@@ -63,7 +66,7 @@ ledger.specs.storage.inject = ->
 ledger.specs.storage.restore = (callback) ->
   #l ledger.stm.store
   #l ledger.sts.store
-  chrome.storage.local = @originalChromeStore
+  #chrome.storage.local = @originalChromeStore
   callback?()
 
 #ledger.stm = new MockLocalStorage()
