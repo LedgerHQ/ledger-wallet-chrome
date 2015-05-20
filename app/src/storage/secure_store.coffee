@@ -19,8 +19,6 @@ class @ledger.storage.SecureStore extends ledger.storage.ChromeStore
         @_hasCalledKeys = yes
         cb?(@_keysCache)
 
-
-
   _preprocessKey: (key) ->
     @_keysCache.push key unless _(@_keysCache).contains(key)
     super(@_aes.encrypt(key))

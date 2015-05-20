@@ -9,7 +9,7 @@ _.mixin
       return unless lock
       lock = off
       for call in calls
-        functions[call.functionName].apply thisArg, call.arguments
+        call.deferred.resolve(functions[call.functionName].apply(thisArg, call.arguments))
       return
     for functionName in functionNames
       func = thisArg[functionName]
@@ -17,7 +17,9 @@ _.mixin
       do (func, functionName) ->
         thisArg[functionName] = ->
           if lock
-            calls.push functionName: functionName, arguments: arguments
+            deferred = ledger.defer()
+            calls.push functionName: functionName, arguments: arguments, deferred: deferred
+            deferred.promise
           else
             functions[functionName].apply(thisArg, arguments)
     unlock

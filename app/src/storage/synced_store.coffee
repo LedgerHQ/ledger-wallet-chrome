@@ -76,7 +76,6 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
 
   # @return A promise
   _pull: ->
-    l 'pull'
     # Get distant store md5
     # If local md5 and distant md5 are different
       # -> pull the data
@@ -84,9 +83,11 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     @client.get_settings_md5().then (md5) =>
       return yes if @_lastMd5 is md5
       @client.get_settings().then (data) =>
-        @_merge(data)
+        data = @_decrypt(data)
+        @_merge(data).then =>
+          @emit 'pulled'
+          @_setLastMd5(md5)
     .fail (e) =>
-      l e
       if e.status is 404
         throw Errors.NoRemoteData
       throw Errors.NetworkError
@@ -98,13 +99,12 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     # else
     # Overwrite local storage and keep changes
     @_getAllData().then (localData) =>
-      l localData, remoteData
       remoteHashes = (remoteData['__hashes'] or []).join(' ')
       localHashes = (localData['__hashes'] or []).join(' ').substr(0, 2 * 64 + 1)
       if remoteHashes.length is 0 or localHashes.length is 0
         # Remote data are not using the new format. Just update the current local storage
         @_setAllData(remoteData)
-      else if (remoteHashes.indexOf(localHashes) > 3 * 4)
+      else if (remoteHashes.indexOf(localHashes) >= (@HASHES_CHAIN_MAX_SIZE * 3 / 4) * (64 + 1)) or remoteHashes.indexOf(localHashes) is -1
         @_changes = []
         @_setAllData(remoteData)
       else if (localData['__hashes'] or []).join(' ').indexOf((remoteData['__hashes'] or []).join(' ').substr(0, 2 * 64 + 1)) != -1
@@ -128,9 +128,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     # Else
     # Update consistency chain
     # Push
-    l 'Push 0'
     return if @_changes.length is 0
-    l 'Push 1'
     hasRemoteData = yes
     unlockMutableOperations = _.noop
     pushedData = null
@@ -147,7 +145,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       # Create commit hash
       [commitHash, pushedData] = @_computeCommit(data, @_changes)
       # Jsonify data
-      _(pushedData).toJson()
+      @_encryptToJson(pushedData)
     .then (data) => if hasRemoteData then @client.put_settings(data) else @client.post_settings(data)
     .then (md5) =>
       @_setLastMd5(md5)
@@ -193,9 +191,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   _setAllData: (data) ->
     d = ledger.defer()
     @_super().clear =>
-        @_super().set data, =>
-        l 'Resolve setAllData', data
-        @_getAllData().then l
+      @_super().set data, =>
         d.resolve()
     d.promise
 
@@ -203,6 +199,15 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   _clearChanges: (callback = undefined ) ->
     @_changes = []
     @_saveChanges(callback)
+
+  _encryptToJson: (data) ->
+    data = _(data).chain().pairs().sort().object().value()
+    '{' + (JSON.stringify(@_preprocessKey(key)) + ':' + JSON.stringify(@_preprocessValue(value)) for key, value of data).join(',') + '}'
+
+  _decrypt: (data) ->
+    out = {}
+    out[@_deprocessKey(key)] = @_deprocessValue(value) for key, value of data
+    out
 
   _super: ->
     return @_super_ if @_super_?
