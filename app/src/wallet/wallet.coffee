@@ -16,7 +16,6 @@ class ledger.wallet.Wallet
       if accountIndex?
         accountIndex = parseInt(accountIndex.substr(0, accountIndex.length - 1))
         account = @getAccount(accountIndex)
-
     return account if account?
     # Crappy way
     for account in @_accounts
@@ -243,11 +242,15 @@ _.extend ledger.wallet,
     previousLayout = new ledger.wallet.Wallet()
     hdWallet = new ledger.wallet.Wallet()
     previousLayout.initialize ledger.storage.wallet, =>
+      l previousLayout
       unless previousLayout.isEmpty()
         ledger.storage.sync.wallet.set previousLayout.serialize(), =>
           previousLayout.release()
-          ledger.storage.wallet.remove ["accounts", "account_0"], => @_endInitialize(hdWallet, callback)
+          ledger.storage.wallet.remove ["accounts", "account_0"], =>
+            l hdWallet
+            @_endInitialize(hdWallet, callback)
       else
+        l hdWallet
         @_endInitialize(hdWallet, callback)
 
   _endInitialize: (hdWallet, callback) ->

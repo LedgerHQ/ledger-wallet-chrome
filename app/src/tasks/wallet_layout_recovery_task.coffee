@@ -10,12 +10,12 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     @once 'bip44:fatal chronocoin:fatal', =>
       @emit 'fatal_error'
       @stopIfNeccessary()
-
     if ledger.wallet.Wallet.instance.getAccountsCount() == 0
       @once 'chronocoin:done', => @_restoreBip44Layout()
       @_restoreChronocoinLayout()
     else
       @_restoreBip44Layout()
+
 
   onStop: () ->
 
@@ -39,9 +39,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     accountIndex = 0
     recoverAccount = =>
       return @emit 'bip44:done' if accountIndex is 1 # App first version limitiation
-
       account = ledger.wallet.Wallet.instance.getOrCreateAccount(accountIndex)
-
       done = =>
         @emit 'bip44:account:done'
         accountIndex += 1

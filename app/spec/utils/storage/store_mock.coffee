@@ -2,43 +2,43 @@
 class MockLocalStorage
 
   originalChromeStore: undefined
-  store: {}
 
   constructor: ->
-    @store = {}
+    @_store = {}
 
   clear: ->
-    @store = {}
+    @_store = {}
 
 
-  get: (key, callback) ->
-    d = ledger.defer(callback)
-    #l '@store[key]', @store[key]
-    d.resolve(@store[key])
-    d.promise
+  get: (keys, callback) ->
+    keys = [keys] if _(keys).isString()
+    if _(keys).isArray()
+      callback?(_.pick(@_store, keys))
+    else if _(keys).isObject()
+      callback?(_.defaults(_.pick(_.keys(keys)), keys))
+    else
+      callback?(_.clone(@_store))
 
 
   getBytesInUse: (keys, callback) ->
-    size    = 0
-    keys = [keys]
+    size  = 0
+    keys  = [keys]
     check = (valToCheck) ->
       if typeof valToCheck isnt 'object'
-        l valToCheck
         determine null, valToCheck
       else
         # Extract all values of obj
         for key of valToCheck
           determine null, valToCheck[key]
     determine = (key, val) =>
-      value = if val? then val else @store[key]
-      l 'value', value
+      value = if val? then val else @_store[key]
       switch (typeof value)
         when 'boolean' then size += 4
         when 'number' then size += 8
         when 'string' then size += 2 * value.length
         when 'object'
           for k, i of value
-            check @store[keys][k]
+            check @_store[keys][k]
     for key in keys
       determine key
     callback?()
@@ -46,29 +46,22 @@ class MockLocalStorage
 
 
   set: (obj, callback) ->
-    d = ledger.defer(callback)
-    _.extend @store, obj
-    d.resolve()
-    d.promise
-
-
-  remove: (key, callback) ->
-    delete @store[key]
+    _.extend @_store, obj
     callback?()
 
 
+  remove: (key, callback) ->
+    @_store = _(@_store).omit(key)
+    callback?()
+
+
+instance = new MockLocalStorage()
 ledger.specs.storage ?= {}
 ledger.specs.storage.inject = ->
-  instance = new MockLocalStorage()
-  @originalChromeStore = chrome.storage.local
-  chrome.storage.local = instance
+  instance.originalChromeStore = chrome.storage.local
+  chrome.storage.local         = instance
 
 ledger.specs.storage.restore = (callback) ->
-  #l ledger.stm.store
-  #l ledger.sts.store
-  #chrome.storage.local = @originalChromeStore
+  chrome.storage.local = instance.originalChromeStore
   callback?()
-
-#ledger.stm = new MockLocalStorage()
-#ledger.sts = new MockSyncStorage()
 

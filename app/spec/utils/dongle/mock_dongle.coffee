@@ -398,6 +398,10 @@ class ledger.dongle.MockDongle extends EventEmitter
     d.promise
 
 
+  getStringFirmwareVersion: ->
+    '1.0.1'
+
+
   _generatePairingKeyHex: ->
     pairingKey = crypto.getRandomValues new Uint8Array(16)
     @_m2fa.pairingKeyHex = (Convert.toHexByte(v) for v in pairingKey).join('')
@@ -425,7 +429,7 @@ class ledger.dongle.MockDongle extends EventEmitter
     @emit 'state:changed', @state
 
 
-  _setup: (pin, restoreSeed, isPowerCycle,  callback=undefined) ->
+  _setup: (pin, restoreSeed, isPowerCycle, callback=undefined) ->
     d = ledger.defer(callback)
     Errors.throw(Errors.DongleNotBlank) if @state isnt States.BLANK
     [restoreSeed, callback] = [callback, restoreSeed] if ! callback && typeof restoreSeed == 'function'
@@ -437,7 +441,7 @@ class ledger.dongle.MockDongle extends EventEmitter
       bytesSeed = new ByteString(restoreSeed, HEX)
       if bytesSeed.length != 64
         e('Invalid seed :', restoreSeed)
-    _.defer => @_setState(if isPowerCycle then States.LOCKED else States.DISCONNECTED)
+    if isPowerCycle then @_setState States.LOCKED else _.defer => @_setState States.DISCONNECTED
     d.resolve()
     return d.promise
 

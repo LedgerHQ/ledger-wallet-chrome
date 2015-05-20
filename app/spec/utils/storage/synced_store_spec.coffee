@@ -60,9 +60,8 @@ describe "SyncedStore", ->
     store.client.get_settings.and.callFake -> ledger.defer().resolve({"__hashes":["7a38bf81f383f69433ad6e900d35b3e2385593f76a7b7ab5d4355b8ba41ee24b"],"foo":"bar"}).promise
     store.client.put_settings.and.callFake (data) ->
       data = JSON.parse(data)
-      l data
       expect(data['__hashes'].length).toBe(2)
-      expect(data['__hashes'][0]).toBe('91442791035d968e103daf9da76fd3766d62d8a92c134bc0f7b29f849bb3a8ab')
+      expect(data['__hashes'][0]).toBe('64d7027314ccc697e64663e9ae203bc013bbce597b85df03ec9b2b2f7ef5201b')
       expect(data['response']).toBe(42)
       expect(data['foo']).toBe('bar')
       do done
