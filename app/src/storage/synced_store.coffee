@@ -59,6 +59,15 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     super keys, (storeValues) ->
       cb?(_.extend(storeValues, values))
 
+  keys: (cb) ->
+    super (keys) =>
+      for key, keyChanges of _(@_changes).groupBy('key')
+        if _(keyChanges).last().type is OperationTypes.REMOVE
+          keys = _(keys).without(key)
+        else if !_(keys).contains(key)
+          keys.push key
+      cb?(keys)
+
   # Removes one or more items from storage.
   #
   # @param [Array|String] key A single key to get, list of keys to get.
@@ -83,7 +92,9 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     @client.get_settings_md5().then (md5) =>
       return yes if @_lastMd5 is md5
       @client.get_settings().then (data) =>
+        l 'Received', data
         data = @_decrypt(data)
+        l 'Decrypted', data
         @_merge(data).then =>
           @emit 'pulled'
           @_setLastMd5(md5)
@@ -184,6 +195,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   _getAllData: ->
     d = ledger.defer()
     @_super().keys (keys) =>
+      l keys
       @_super().get keys, (data) =>
         d.resolve(data)
     d.promise
