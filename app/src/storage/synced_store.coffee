@@ -32,6 +32,8 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     @_auxiliaryStore = auxiliaryStore
     @_changes = []
     @_unlockMethods = _.lock(this, ['set', 'get', 'remove', 'clear', '_pull', '_push'])
+    @_deferredPull = null
+    @_deferredPush = null
     _.defer =>
       @_auxiliaryStore.get ['__last_sync_md5', '__sync_changes'], (item) =>
         @_lastMd5 = item.__last_sync_md5
@@ -39,11 +41,20 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         @_unlockMethods()
         @throttled_pull()
 
+  pull: ->
+    @throttled_pull()
+    @_deferredPull?.promise or (@_deferredPull = ledger.defer()).promise
+
+  push: ->
+    @debounced_push()
+    @_deferredPush?.promise or (@_deferredPush = ledger.defer()).promise
+
   # Stores one or many item
   #
   # @param [Object] items Items to store
   # @param [Function] cb A callback invoked once the insertion is done
   set: (items, cb) ->
+    l "SET", _.clone(items)
     return cb?() unless items?
     @_changes.push {type: OperationTypes.SET, key: key, value: value} for key, value of items
     this.debounced_push()
@@ -89,7 +100,8 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     # If local md5 and distant md5 are different
       # -> pull the data
       # -> merge data
-    @client.get_settings_md5().then (md5) =>
+    @_deferredPull ?= ledger.defer()
+    p = @client.get_settings_md5().then (md5) =>
       return yes if @_lastMd5 is md5
       @client.get_settings().then (data) =>
         l 'Received', data
@@ -102,6 +114,10 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       if e.status is 404
         throw Errors.NoRemoteData
       throw Errors.NetworkError
+    l 'Resolve', @_deferredPull
+    @_deferredPull.resolve(p)
+    @_deferredPull.promise.fin => @_deferredPull = null
+    p
 
   _merge: (remoteData) ->
     # Consistency chain check
@@ -140,10 +156,11 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     # Update consistency chain
     # Push
     return if @_changes.length is 0
+    @_deferredPush ?= ledger.defer()
     hasRemoteData = yes
     unlockMutableOperations = _.noop
     pushedData = null
-    @_pull().fail (e) =>
+    p = @_pull().fail (e) =>
       throw Errors.NetworkError if e is Errors.NetworkError
       hasRemoteData = no
     .then =>
@@ -163,9 +180,14 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       # Merge changes into store
       @_setAllData(pushedData)
     .then () => @emit 'pushed', this
-    .fail () =>
-      do unlockMutableOperations
+    .fail (e) =>
       @debounced_push() # Retry later
+      throw e
+    .fin ->
+      do unlockMutableOperations
+    @_deferredPush.resolve(p)
+    @_deferredPush.promise.fin => @_deferredPush = null
+    p
 
   _applyChanges: (data, changes) ->
     for change in changes

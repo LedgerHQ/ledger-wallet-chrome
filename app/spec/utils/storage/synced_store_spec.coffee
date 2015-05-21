@@ -102,6 +102,27 @@ describe "SyncedStore", ->
 
 describe "SyncedStore (special case with custom store configurations)", ->
 
+  store = null
+
+  jencrypt = (obj) -> store._encryptToJson(obj)
+  encrypt = (obj) -> JSON.parse(jencrypt(obj))
+  decrypt = (obj) -> store._decrypt(obj)
+  jdecrypt = (json) -> decrypt(JSON.parse(json))
+  setup = (initialSetup) ->
+    d = ledger.defer()
+    store = new ledger.storage.SecureStore(initialSetup.name, initialSetup.key)
+    store.set initialSetup.local, ->
+      memoryStore = new ledger.storage.MemoryStore("specs")
+      memoryStore.set initialSetup.aux, ->
+        store = new ledger.storage.SyncedStore(initialSetup.name, initialSetup.addr, initialSetup.key, memoryStore)
+        store.keys (keys) -> l keys
+        store.client = initialSetup.client or jasmine.createSpyObj('restClient', ['get_settings_md5','get_settings','post_settings','put_settings','delete_settings'])
+        d.resolve store
+    d.promise
+
+  beforeEach ->
+    chrome.storage.local.clear()
+
   it "doesn't pull if data are up to date", (done) ->
     store = new ledger.storage.SyncedStore("synced_store", "specs", "private_key", new ledger.storage.MemoryStore("specs"))
     store.client = jasmine.createSpyObj('restClient', ['get_settings_md5','get_settings','post_settings','put_settings','delete_settings'])
@@ -114,14 +135,87 @@ describe "SyncedStore (special case with custom store configurations)", ->
         expect().toBeUndefined() # Jasmine needs expectations -_-
         do done
 
-  it "has a local store ahead of remote data", (done) ->
-    store = new ledger.storage.SyncedStore("synced_store", "specs", "private_key", new ledger.storage.MemoryStore("specs"))
-    store.client = jasmine.createSpyObj('restClient', ['get_settings_md5','get_settings','post_settings','put_settings','delete_settings'])
-    store.client.get_settings_md5.and.callFake -> ledger.defer().resolve('f48139f3d9bfdab0b5374212e06f3994').promise
-    store._lastMd5 = 'f48139f3d9bfdab0b5374212e06f3994'
-    store._setLastMd5('f48139f3d9bfdab0b5374212e06f3994')
-    store.client.get_settings.and.callFake -> fail("It should not pull settings if already up to date")
-    _.defer ->
-      store._pull().fin ->
-        expect().toBeUndefined() # Jasmine needs expectations -_-
-        do done
+  it "merges correctly when there is already old formatted data", (done) ->
+    done = _.after(2, done)
+    setup
+      name: "synced_store"
+      addr: "specs"
+      key: "private_key"
+      local:
+        foo: '?'
+        ledger: 'wallet'
+      aux:
+       __last_sync_md5: 'f48139f3d9bfdab0b5374212e06f3993'
+    .then (store) ->
+      store.client.get_settings_md5.and.callFake -> ledger.defer().resolve('f48139f3d9bfdab0b5374212e06f3994').promise
+      store.client.get_settings.and.callFake ->
+        d = ledger.defer()
+        setTimeout((-> d.resolve(encrypt("__hashes":["7a38bf81f383f69433ad6e900d35b3e2385593f76a7b7ab5d4355b8ba41ee24b"],"foo":"bar"))) , 200)
+        d.promise
+      store.keys (keys) ->
+        expect(keys).toContain('foo')
+      store.get ['foo'], (result) ->
+        expect(result['foo']).toBe('?')
+        store.pull().then ->
+          store.get ['foo'], (result) ->
+            expect(result['foo']).toBe('bar')
+            do done
+          store.keys (keys) ->
+            expect(keys).toContain('foo')
+            expect(keys).toContain('ledger')
+            do done
+
+  it "merges correctly when there is already data", (done) ->
+    setup
+      name: "synced_store"
+      addr: "specs"
+      key: "private_key"
+      local:
+        foo: '?'
+        ledger: 'wallet'
+        __hashes: ['3b30160dd7a7076243220b73f1de84c0e7cfc376ef27638f26e66d01cbfcb04a']
+      aux:
+        __last_sync_md5: 'f48139f3d9bfdab0b5374212e06f3993'
+    .then (store) ->
+      store.client.get_settings_md5.and.callFake -> ledger.defer().resolve('f48139f3d9bfdab0b5374212e06f3994').promise
+      store.client.get_settings.and.callFake ->
+        d = ledger.defer()
+        setTimeout((-> d.resolve(encrypt("__hashes":["5be384c27ddb5d8279f8d35653503bd331c070cd938da3dc23138331795916e9", "7a38bf81f383f69433ad6e900d35b3e2385593f76a7b7ab5d4355b8ba41ee24b"],"foo":"bar"))) , 200)
+        d.promise
+      store.pull().fin ->
+        store.get ['foo', 'ledger'], (result) ->
+          expect(result['foo']).toBe('bar')
+          expect(result['ledger']).toBeUndefined()
+          do done
+    .done()
+
+  it "doesn't push when the remote store is up to date", (done) ->
+    setup
+      name: "synced_store"
+      addr: "specs"
+      key: "private_key"
+      local:
+        foo: '?'
+        ledger: 'wallet'
+        __hashes: ['3b30160dd7a7076243220b73f1de84c0e7cfc376ef27638f26e66d01cbfcb04a']
+      aux:
+        __last_sync_md5: 'f48139f3d9bfdab0b5374212e06f3993'
+    .then (store) ->
+      store.client.get_settings_md5.and.callFake -> ledger.defer().resolve('f48139f3d9bfdab0b5374212e06f3993').promise
+      store.client.get_settings.and.callFake ->
+        d = ledger.defer()
+        setTimeout((-> d.resolve(encrypt("__hashes":["5be384c27ddb5d8279f8d35653503bd331c070cd938da3dc23138331795916e9", "7a38bf81f383f69433ad6e900d35b3e2385593f76a7b7ab5d4355b8ba41ee24b"],"foo":"bar"))) , 200)
+        d.promise
+      store.client.put_settings.and.callFake -> fail("It pushed data")
+      store.client.post_settings.and.callFake -> fail("It pushed data")
+      store.pull().fin ->
+        store.client.get_settings_md5.and.callFake -> ledger.defer().resolve('f48139f3d9bfdab0b5374212e06f3994').promise
+        store.set foo: 'bar'
+        store.remove ['ledger']
+        store.push()
+        .fail -> _.noop() # Do nothing
+        .fin ->
+          store.get ['foo'], (result) ->
+            expect(result['foo']).toBe('bar')
+            do done
+    .done()
