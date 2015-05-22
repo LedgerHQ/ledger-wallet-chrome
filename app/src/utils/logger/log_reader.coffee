@@ -30,8 +30,9 @@ class @ledger.utils.LogReader extends @ledger.utils.Log
 
 
   _isFileOfMine: (name) ->
-    regex = /^[0-9a-zA-Z]{33}_[\d]{4}_[\d]{2}_[\d]{2}\.log$/
+    regex = /^[0-9a-zA-Z]{25,35}_[\d]{4}_[\d]{2}_[\d]{2}\.log$/
     if name.match(regex)? then true else false
+
 
 
   ###
