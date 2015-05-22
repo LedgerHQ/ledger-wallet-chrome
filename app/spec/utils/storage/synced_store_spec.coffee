@@ -219,3 +219,25 @@ describe "SyncedStore (special case with custom store configurations)", ->
             expect(result['foo']).toBe('bar')
             do done
     .done()
+
+  it "works with substores too!", (done) ->
+    setup
+      name: "synced_store"
+      add: "specs"
+      key: "private_key"
+      local:
+        __preferences_btcUnit: "mBTC"
+        __preferences_currency:"EUR"
+        __i18n_favLang:"fr"
+        __i18n_favLocale:"fr_FR"
+      aux:
+        __last_sync_md5: 'f48139f3d9bfdab0b5374212e06f3993'
+    .then (store) ->
+      store.client.get_settings_md5.and.callFake -> ledger.defer().resolve('f48139f3d9bfdab0b5374212e06f3993').promise
+      store.pull().fin ->
+        store.substore("preferences").keys (keys) ->
+          store.substore("preferences").get keys, (result) ->
+            expect(result['btcUnit']).toBe('mBTC')
+            expect(result['currency']).toBe('EUR')
+            do done
+    .done()
