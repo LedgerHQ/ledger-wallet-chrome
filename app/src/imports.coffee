@@ -76,6 +76,11 @@
         ## Logger
         'utils/logger'
         'utils/apdu_logger'
+        'utils/logger/log'
+        'utils/logger/log_writer'
+        'utils/logger/log_reader'
+        'utils/logger/secure_log_writer'
+        'utils/logger/secure_log_reader'
 
         ## Routes
         'routes'
