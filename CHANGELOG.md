@@ -1,4 +1,8 @@
 # Changelog
+1.3.2
+====
+- Fix a bug during transaction preparation
+
 1.3.0/1.3.1
 ====
 - Add a new user interface to easily contact support
