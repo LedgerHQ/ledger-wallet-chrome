@@ -242,9 +242,12 @@ class ledger.wallet.Transaction
       if validOutputs.length == 0
         $error("Error not enough funds")
         return d.rejectWithError(Errors.NotEnoughFunds)
+      validOutputs = _(validOutputs).uniq no, (i) ->  i['output_index'] +  i['transaction_hash']
       finalOutputs = []
       collectedAmount = new Amount()
       hadNetworkFailure = no
+      $info("Valid outputs: ", validOutputs)
+
       # For each valid outputs we try to get its raw transaction.
       _.async.each validOutputs, (output, done, hasNext) =>
         ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
@@ -254,26 +257,12 @@ class ledger.wallet.Transaction
             output.raw = rawTransaction
             finalOutputs.push(output)
             collectedAmount = collectedAmount.add(Amount.fromSatoshi(output.value))
-
           if collectedAmount.gte(requiredAmount)
             changeAmount = collectedAmount.subtract(requiredAmount)
             fees = fees.add(changeAmount) if changeAmount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
-            # We have reached our required amount. It's time to prepare the transaction
-            transaction = new Transaction(ledger.app.dongle, amount, fees, address, finalOutputs, changePath)
-            d.resolve(transaction)
-          else if hasNext is true
-            # Continue to collect funds
-            done()
-          else if hadNetworkFailure
-            d.rejectWithError(Errors.NetworkError)
-          else
-            output.raw = rawTransaction
-            finalOutputs.push(output)
-            collectedAmount = collectedAmount.add(Amount.fromSatoshi(output.value))
 
-          if collectedAmount.gte(requiredAmount)
-            changeAmount = collectedAmount.subtract(requiredAmount)
-            fees = fees.add(changeAmount) if changeAmount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+            $info("Used outputs: ", finalOutputs)
+
             # We have reached our required amount. It's time to prepare the transaction
             transaction = new Transaction(ledger.app.dongle, amount, fees, address, finalOutputs, changePath)
             d.resolve(transaction)
