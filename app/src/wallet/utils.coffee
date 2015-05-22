@@ -37,6 +37,7 @@ _.extend ledger.wallet,
       if address?
         addresses[path] = address
         callback?(addresses, notFound) unless hasNext is true
+        l 'DONE', done
         do done
         return
 
@@ -46,6 +47,8 @@ _.extend ledger.wallet,
         else
           addresses[path] = result
         callback?(addresses, notFound) unless hasNext
+        l 'DONE', done
         do done
+        return
 
     return

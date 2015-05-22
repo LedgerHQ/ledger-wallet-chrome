@@ -37,3 +37,5 @@ class ledger.storage.SubStore extends ledger.storage.Store
       console.error("chrome.storage.local.remove :", e)
 
   _deprocessValue: (raw_value) -> raw_value
+
+  _processValue: (value) -> value
