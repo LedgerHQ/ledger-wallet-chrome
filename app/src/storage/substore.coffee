@@ -18,8 +18,13 @@ class ledger.storage.SubStore extends ledger.storage.Store
     catch e
       console.error("chrome.storage.local.get :", e)
 
+  set: (items, cb)->
+    l "BEFORE SETS", items
+    super
+
   # @see ledger.storage.Store#_raw_set
   _raw_set: (items, cb=->) ->
+    l "SETS", items
     try
       @_parentStore.set items, cb
     catch e
@@ -38,4 +43,4 @@ class ledger.storage.SubStore extends ledger.storage.Store
 
   _deprocessValue: (raw_value) -> raw_value
 
-  _processValue: (value) -> value
+  _preprocessValue: (value) -> value

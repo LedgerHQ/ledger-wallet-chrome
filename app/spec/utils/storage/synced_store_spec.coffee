@@ -189,6 +189,30 @@ describe "SyncedStore (special case with custom store configurations)", ->
           do done
     .done()
 
+  it "doesn't push when the changes are meaningless", (done) ->
+    setup
+      name: "synced_store"
+      addr: "specs"
+      key: "private_key"
+      local:
+        foo: '?'
+        ledger: 'wallet'
+        __hashes: ['3b30160dd7a7076243220b73f1de84c0e7cfc376ef27638f26e66d01cbfcb04a']
+      aux:
+        __last_sync_md5: 'f48139f3d9bfdab0b5374212e06f3993'
+    .then (store) ->
+      store.client.get_settings_md5.and.callFake -> ledger.defer().resolve('f48139f3d9bfdab0b5374212e06f3993').promise
+      store.client.post_settings.and.callFake -> fail('It should not push meaningless changes')
+      store.client.put_settings.and.callFake -> fail('It should not push meaningless changes')
+      store.pull().fin ->
+        store.set foo: '?'
+        store.push().then ->
+          store.get ['foo', 'ledger'], (result) ->
+            expect(result['foo']).toBe('?')
+            expect(result['ledger']).toBe('wallet')
+            do done
+    .done()
+
   it "doesn't push when the remote store is up to date", (done) ->
     setup
       name: "synced_store"

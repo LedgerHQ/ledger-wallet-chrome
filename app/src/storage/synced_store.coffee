@@ -170,6 +170,14 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       # Create the data to send
       @_getAllData()
     .then (data) =>
+      # Check if the changes are useful or not by hashing the changes without the last commit
+      if data['__hashes']?.length > 0
+        checkData = _.clone(data)
+        checkData['__hashes'] = _(checkData['__hashes']).without(checkData['__hashes'][0])
+        checkData = _(checkData).omit('__hashes') if checkData['__hashes'].length is 0
+        [lastCommitHash, __] = @_computeCommit(checkData, @_changes)
+        l _.clone(data), lastCommitHash
+        throw Errors.NoChanges if lastCommitHash is data['__hashes'][0]
       # Create commit hash
       [commitHash, pushedData] = @_computeCommit(data, @_changes)
       # Jsonify data
@@ -181,6 +189,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       @_setAllData(pushedData)
     .then () => @emit 'pushed', this
     .fail (e) =>
+      return if e is Errors.NoChanges
       @debounced_push() # Retry later
       throw e
     .fin ->
