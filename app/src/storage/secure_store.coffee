@@ -20,7 +20,6 @@ class @ledger.storage.SecureStore extends ledger.storage.ChromeStore
         cb?(@_keysCache)
 
   _preprocessKey: (key) ->
-    @_keysCache.push key unless _(@_keysCache).contains(key) or !key?
     super(@_aes.encrypt(key))
 
   _deprocessKey: (raw_key) ->

@@ -20,6 +20,7 @@ class @ledger.storage.Store extends EventEmitter
   # @param [Array|String] key A single key to get or a list of keys to get.
   # @param [Function] cb Callback with storage items. Should look like (item) ->
   get: (keys, cb) ->
+    keys = [keys] unless _(keys).isArray()
     this._raw_get this._preprocessKeys(keys), (raw_items) => cb(@_deprocessItems(raw_items))
 
   # Stores one or many item
