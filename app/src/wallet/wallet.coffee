@@ -78,6 +78,12 @@ class ledger.wallet.Wallet
           @_store.remove(["accounts"],  callback)
         do done
 
+  _removeAccount: (account, callback) ->
+    if _(@_accounts).contains(account)
+      @_accounts = _(@_accounts).without(account)
+      @save()
+      callback?()
+
   @instance: undefined
 
 class ledger.wallet.Wallet.Account
@@ -161,7 +167,7 @@ class ledger.wallet.Wallet.Account
   notifyPathsAsUsed: (paths) ->
     paths = [paths] unless _.isArray(paths)
     for path in paths
-      path = path.replace("#{@wallet.getRootDerivationPath()}/0'/", '').split('/')
+      path = path.replace("#{@getRootDerivationPath()}/", '').split('/')
       switch path[0]
         when '0' then @_notifyPublicAddressIndexAsUsed parseInt(path[1])
         when '1' then @_notifyChangeAddressIndexAsUsed parseInt(path[1])
@@ -234,7 +240,11 @@ class ledger.wallet.Wallet.Account
 
   serialize: -> _.clone(@_account)
 
-  remove: (callback = _.noop) -> @_store.remove([@_storeId], callback)
+  remove: (callback = _.noop) ->
+    @wallet._removeAccount this
+    @_store.remove([@_storeId], callback)
+
+  isEmpty: -> @getCurrentChangeAddressIndex() is 0 and @getCurrentPublicAddressIndex() is 0
 
 _.extend ledger.wallet,
 

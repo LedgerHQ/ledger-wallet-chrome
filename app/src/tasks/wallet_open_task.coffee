@@ -17,6 +17,13 @@ openStores = (dongle, raise, done) ->
       return
     return
 
+pullStore = (dongle, raise, done) ->
+  ledger.storage.sync.pull().then ->
+    do done
+  .fail ->
+    do done
+  .done()
+
 openHdWallet = (dongle, raise, done) -> ledger.wallet.initialize(dongle, done)
 
 startDerivationTask = (dongle, raise, done) ->
@@ -43,6 +50,12 @@ restoreStructure = (dongle, raise, done) ->
       ledger.app.emit 'wallet:initialization:failed'
       raise ledger.errors.new(ledger.errors.FatalErrorDuringLayoutWalletRecovery)
     ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
+  else if Operation.all().length is 0 and ledger.wallet.Wallet.instance.getAccount(0).getAllAddressesPaths().length isnt 0
+    ledger.app.emit 'wallet:initialization:creation'
+    ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
+    ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary()
+    ledger.tasks.OperationsConsumptionTask.instance.on 'stop', ->
+      done?()
   else
     ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
     done?()
@@ -62,13 +75,14 @@ initializePreferences = (dongle, raise, done) -> ledger.preferences.init done
 
 ProceduresOrder = [
   openStores
+  pullStore
   openHdWallet
   startDerivationTask
   openAddressCache
-  restoreStructure
-  completeLayoutInitialization
   openDatabase
   initializeWalletModel
+  restoreStructure
+  completeLayoutInitialization
   initializePreferences
 ]
 

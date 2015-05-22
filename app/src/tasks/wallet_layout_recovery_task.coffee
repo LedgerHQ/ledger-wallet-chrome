@@ -38,7 +38,10 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   _restoreBip44Layout: () ->
     accountIndex = 0
     recoverAccount = =>
-      return @emit 'bip44:done' if accountIndex is 1 # App first version limitiation
+      if accountIndex > 0 and (previousAccount = ledger.wallet.Wallet.instance.getAccount(accountIndex - 1)).isEmpty()
+        l 'ACCOUNT', previousAccount
+        #previousAccount.remove() if accountIndex > 1
+        return @emit 'bip44:done'
       account = ledger.wallet.Wallet.instance.getOrCreateAccount(accountIndex)
       done = =>
         @emit 'bip44:account:done'
@@ -83,7 +86,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
 
           shiftChange = shiftChange isnt account.getCurrentChangeAddressIndex()
           shiftPublic = shiftPublic isnt account.getCurrentPublicAddressIndex()
-
+          l usedAddresses, usedPaths, publicIndex, changeIndex
           if shiftChange and shiftPublic
             testIndex account.getCurrentPublicAddressIndex(), account.getCurrentChangeAddressIndex()
           else if shiftChange
