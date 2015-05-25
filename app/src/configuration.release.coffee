@@ -13,6 +13,7 @@ _.extend @ledger.config,
     pullThrottleDelay: 1000
     pushDebounceDelay: 1000
   defaultLoggingLevel: "NONE"
+  defaultLoggerDaysMax: 2
   btcshipDebug: false
 
 # Btcship logging

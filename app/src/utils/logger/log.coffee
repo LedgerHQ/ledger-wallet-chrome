@@ -8,7 +8,8 @@ class @ledger.utils.Log
       Constructor
       @param [Number] _daysMax The maximum number of days the logs are preserved
     ###
-  constructor: (@_daysMax = 2) ->
+  constructor: (daysMax = 2) ->
+    @_daysMax = daysMax
     @_daysMax = parseInt(@_daysMax)
     if isNaN @_daysMax
       throw 'The first parameter must be a number'
@@ -66,7 +67,7 @@ class @ledger.utils.Log
       for entry in results
         entries.push entry
       entries = entries.sort()
-      l entries
+      l 'entries', entries
       callback? entries
     , @_errorHandler
 

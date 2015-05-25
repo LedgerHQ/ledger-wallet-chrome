@@ -36,16 +36,15 @@ class @ledger.utils.Logger
   # @return [Q.Promise]
   @logs: (cb) -> @_getLogs(@store())
 
-  @publicLogs: (cb) -> @_getLogs(@_store ?= new ledger.storage.ChromeStore("logs"), cb)
+  @publicLogs: (cb) -> @_getLogs(@_publicReader ?= new ledger.utils.LogReader(ledger.config.defaultLoggerDaysMax), cb)
 
   @privateLogs: (cb) ->
-    return cb?([]) unless ledger.storage.logs?
-    @_getLogs(ledger.storage.logs, cb)
+    return cb?([]) unless ledger.utils.Logger._secureReader?
+    @_getLogs(ledger.utils.Logger._secureReader, cb)
 
-  @_getLogs: (store, cb) ->
+  @_getLogs: (reader, cb) ->
     d = ledger.defer(cb)
-    store.keys (keys) =>
-      store.get keys, (items) => d.resolve(_.values(items))
+    reader.read (lines) -> d.resolve(JSON.parse(line) for line in lines)
     d.promise
 
   # @return [legder.utils.Logger]
@@ -121,17 +120,15 @@ class @ledger.utils.Logger
   @_createStream: ->
     stream = new Stream()
     stream.on "data", =>
-      stream._store ||= ledger.storage.logs
-      return unless stream._store?
+      stream._writer ||= ledger.utils.Logger._secureWriter
+      return unless stream._writer?
       logs = stream.read()
       # Insert logs
       data = {}
       for log in logs
         for key, entry of log
           data[key] = entry
-      stream._store.set data
-      # Clear old
-      @_clear(stream.store)
+      stream._writer.write JSON.stringify(line) for line in _.values data
       stream.close() if @_logStream isnt stream
     stream.open()
     stream
@@ -239,12 +236,12 @@ class @ledger.utils.Logger
     return unless @_areLogsPersistents
     now = new Date()
     log = {}
-    log[now.getTime()] = date: now.toUTCString(), type: msgType,  tag: @_tag, msg: msg
+    entry = date: now.toUTCString(), type: msgType,  tag: @_tag, msg: msg
+    log[now.getTime()] = entry
     if @isPrivateModeEnabled()
       @_privateLogStream().write(log)
     else
-      @clear()
-      @store().set(log)
+      (@constructor._publicWriter ||= new ledger.utils.LogWriter(ledger.config.defaultLoggerDaysMax)).write JSON.stringify(entry)
 
   #################################
   # Protected. Formatting methods

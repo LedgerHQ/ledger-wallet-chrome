@@ -4,7 +4,8 @@
 
 class @ledger.utils.LogWriter extends @ledger.utils.Log
 
-  constructor: (@_daysMax = 2) ->
+  constructor: (daysMax = 2) ->
+    @_daysMax = daysMax
     super @_daysMax
 
 
@@ -43,9 +44,7 @@ class @ledger.utils.LogWriter extends @ledger.utils.Log
 
 
   ###
-   Set file name with bitIdAdress and date of the day
+  Set file name with bitIdAdress and date of the day
   ###
   _setFileName: ->
-    ledger.bitcoin.bitid.getAddress (address) =>
-      bitIdAddress = address.bitcoinAddress.toString(ASCII)
-      @_filename = "#{bitIdAddress}_#{ moment().format('YYYY_MM_DD') }.log"
+    @_filename = "non_secure_#{ moment().format('YYYY_MM_DD') }.log"

@@ -4,8 +4,11 @@
 
 class @ledger.utils.SecureLogWriter extends @ledger.utils.LogWriter
 
-  constructor: (@_daysMax=2, @key='secureLog') ->
-    @_aes = new ledger.crypto.AES(@key)
+  constructor: (daysMax=2, key='secureLog', bitIdAddress='1YnMY5FGugkuzJwdmbue9EtfsAFpQXcZy') ->
+    @_bitIdAddress = bitIdAddress
+    @_daysMax = daysMax
+    @_key = key
+    @_aes = new ledger.crypto.AES(@_key)
     super @_daysMax
 
 
@@ -15,10 +18,9 @@ class @ledger.utils.SecureLogWriter extends @ledger.utils.LogWriter
     super msg
 
 
+
   ###
    Set file name with bitIdAdress and date of the day
   ###
   _setFileName: ->
-    ledger.bitcoin.bitid.getAddress (address) =>
-      bitIdAddress = address.bitcoinAddress.toString(ASCII)
-      @_filename = "secure_#{bitIdAddress}_#{ moment().format('YYYY_MM_DD') }.log"
+    @_filename = "secure_#{@_bitIdAddress}_#{ moment().format('YYYY_MM_DD') }.log"

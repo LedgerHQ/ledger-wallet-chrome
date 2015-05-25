@@ -4,7 +4,8 @@
 
 class @ledger.utils.LogReader extends @ledger.utils.Log
 
-  constructor: (@_daysMax = 2) ->
+  constructor: (daysMax = 2) ->
+    @_daysMax = daysMax
     super @_daysMax
 
 
@@ -15,23 +16,30 @@ class @ledger.utils.LogReader extends @ledger.utils.Log
     @return [Text] A text file at a time
   ###
   read: (callback) ->
+    res = []
+    last = ->
+      callback? _.flatten res
     dirReader = @_fs.root.createReader()
     dirReader.readEntries (results) =>
-      for entry in results
-        if @_isFileOfMine(entry.name)
-          entry.file (file) ->
-            reader = new FileReader()
-            reader.onloadend = (e) ->
-              #l 'Result: ', @result
-              callback? @result
-            reader.readAsText(file)
+      done = _.after results.length, last
+      for entry, i in results
+        do (entry) =>
+          if @_isFileOfMine(entry.name)
+            entry.file (file) ->
+              reader = new FileReader()
+              reader.onloadend = (e) ->
+                res.push(_.compact reader.result.split('\n'))
+                done()
+              reader.readAsText(file)
+          else
+            done()
     , @_errorHandler
 
 
 
   _isFileOfMine: (name) ->
-    regex = /^[0-9a-zA-Z]{25,35}_[\d]{4}_[\d]{2}_[\d]{2}\.log$/
-    if name.match(regex)? then true else false
+    regex = "non_secure_[\\d]{4}_[\\d]{2}_[\\d]{2}\\.log"
+    name.match new RegExp(regex)
 
 
 
@@ -39,6 +47,4 @@ class @ledger.utils.LogReader extends @ledger.utils.Log
   Set file name with bitIdAdress and date of the day
   ###
   _setFileName: ->
-    ledger.bitcoin.bitid.getAddress (address) =>
-      bitIdAddress = address.bitcoinAddress.toString(ASCII)
-      @_filename = "#{bitIdAddress}_#{ moment().format('YYYY_MM_DD') }.log"
+      @_filename = "non_secure_#{ moment().format('YYYY_MM_DD') }.log"
