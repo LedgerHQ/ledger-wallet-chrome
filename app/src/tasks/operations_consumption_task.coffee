@@ -18,7 +18,7 @@ class ledger.tasks.OperationsConsumptionTask extends ledger.tasks.Task
     iterate(0)
 
   retrieveAccountOperations: (hdaccount, callback) ->
-    ledger.wallet.pathsToAddresses hdaccount.getAllAddressesPaths(), (addresses) =>
+    ledger.wallet.pathsToAddresses hdaccount.getAllObservedAddressesPaths(), (addresses) =>
       addresses = _.values addresses
       stream = ledger.api.TransactionsRestClient.instance.createTransactionStream(addresses)
       stream.on 'data', =>

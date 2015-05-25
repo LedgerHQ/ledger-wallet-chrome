@@ -40,7 +40,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     recoverAccount = =>
       if accountIndex > 0 and (previousAccount = ledger.wallet.Wallet.instance.getAccount(accountIndex - 1)).isEmpty()
         l 'ACCOUNT', previousAccount
-        #previousAccount.remove() if accountIndex > 1
+        previousAccount.remove() if accountIndex > 1
         return @emit 'bip44:done'
       account = ledger.wallet.Wallet.instance.getOrCreateAccount(accountIndex)
       done = =>
@@ -59,11 +59,9 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       changeIndex = parseInt changeIndex
       paths = []
       if isRestoringPublicChain
-        for i in [publicIndex...publicIndex + 20]
-          paths.push account.getPublicAddressPath(i)
+        paths = paths.concat(account.getObservedPublicAddressesPaths())
       if isRestoringChangeChain
-        for i in [changeIndex...changeIndex + 20]
-          paths.push account.getChangeAddressPath(i)
+        paths = paths.concat(account.getObservedChangeAddressesPaths())
       ledger.wallet.pathsToAddresses paths, (addresses) =>
         addressesPaths = _.invert addresses
         ledger.api.TransactionsRestClient.instance.getTransactions _.values(addresses), (transactions, error) =>
