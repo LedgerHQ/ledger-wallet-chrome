@@ -9,19 +9,33 @@ class @ledger.utils.LogWriter extends @ledger.utils.Log
     super @_daysMax
 
 
+  write: (msg) ->
+    if @_deferedWrite? and @_deferedWrite.isPending()
+      @_deferedWrite = @_deferedWrite.then =>
+        @_write msg
+    else
+      @_deferedWrite = @_write(msg)
+    return
+
+
   ###
     Write a log file per day
     @param [String] msg The log message to write
   ###
-  write: (msg) ->
+  _write: (msg) ->
+    d = ledger.defer()
+    l 'write', msg
     @_getFileWriter (fileWriter) ->
       fileWriter.onwriteend = (e) ->
         l "Write completed"
+        d.resolve()
       fileWriter.onerror = (e) ->
         l "Write failed"
+        d.resolve()
       blob = new Blob(['\n' + msg], {type:'text/plain'})
       fileWriter.seek(fileWriter.length)
       fileWriter.write(blob)
+    return d.promise
 
 
 
@@ -41,6 +55,7 @@ class @ledger.utils.LogWriter extends @ledger.utils.Log
       , @_errorHandler
     else
       callback? @_writer.writer
+
 
 
   ###

@@ -11,6 +11,7 @@ class @ledger.utils.Log
   constructor: (daysMax = 2) ->
     @_daysMax = daysMax
     @_daysMax = parseInt(@_daysMax)
+    unlock_getFileWriter = _.lock @, ['_getFileWriter', 'write']
     if isNaN @_daysMax
       throw 'The first parameter must be a number'
     _init = (fs) =>
@@ -30,6 +31,8 @@ class @ledger.utils.Log
             if days > @_daysMax or months > 0 or years > 0
               @delete file.name
             # l 'days: ', days, 'months: ', months, 'years: ', years
+          unlock_getFileWriter()
+
     window.webkitRequestFileSystem window.PERSISTENT, 5*1024*1024, _init, @_errorHandler
 
 
