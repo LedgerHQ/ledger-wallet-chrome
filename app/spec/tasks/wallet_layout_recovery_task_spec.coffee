@@ -28,7 +28,7 @@ describe "WalletLayoutRecoveryTask", ->
 
 
 
-  xdescribe " - zero account", ->
+  describe " - zero account", ->
     beforeAll (done) ->
       spyOn(task, '_restoreChronocoinLayout')
       dongle = ledger.specs.fixtures.dongles.dongle2
@@ -72,7 +72,7 @@ describe "WalletLayoutRecoveryTask", ->
       init dongle.pin, dongle.masterSeed, dongle.pairingKeyHex, done
 
     it "should have 2 accounts", ->
-      l 'ledger.wallet.Wallet.instance', ledger.wallet.Wallet.instance.getAccount(1)
+      expect(ledger.wallet.Wallet.instance.getAccountsCount()).toBe(2)
       expect(typeof ledger.wallet.Wallet.instance.getAccount(0)).toBe('object')
       expect(typeof ledger.wallet.Wallet.instance.getAccount(1)).toBe('object')
       expect(ledger.wallet.Wallet.instance.getAccount(2)).toBeUndefined()
