@@ -31,6 +31,9 @@ PreferencesStructure =
   logActive:
     default: true
 
+  discoveryGap:
+    default: 20
+
   confirmationsCount:
     default: ledger.preferences.defaults.Bitcoin.confirmations.one
 
@@ -88,8 +91,11 @@ class ledger.preferences.Preferences extends EventEmitter
   getBlockchainExplorer: -> @_getPreference('blockchainExplorer')
   setBlockchainExplorer: (value) -> @_setPreference('blockchainExplorer', value)
 
-  getConfirmationsCount:  -> @_getPreference 'confirmationsCount'
+  getConfirmationsCount: -> @_getPreference 'confirmationsCount'
   setConfirmationsCount: (value) -> @_setPreference 'confirmationsCount', value
+
+  getDiscoveryGap: -> @_getPreference('discoveryGap')
+  setDiscoveryGap: (value) -> @_setPreference('discoveryGap', value)
 
   ###
     Gets and Sets logging state

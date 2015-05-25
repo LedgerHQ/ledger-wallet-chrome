@@ -61,6 +61,7 @@ ledger.preferences.defaults =
       insight:
         name: 'Insight.is'
         address: 'https://insight.bitpay.com/tx/%s'
+    discoveryGap: 20
 
   # support preferences
   Support:

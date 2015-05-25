@@ -10,10 +10,18 @@ class @OnboardingDeviceOpeningViewController extends @OnboardingViewController
       ledger.app.router.go '/wallet/accounts/0/show'
     else
       @view.currentAction.text t 'onboarding.device.opening.is_opening'
-      ledger.app.on 'wallet:initialized', =>
-        ledger.app.router.go '/wallet/accounts/0/show'
-      ledger.app.on 'wallet:initialization:creation', =>
-        @view.currentAction.text t 'onboarding.device.opening.is_synchronizing'
+      ledger.app.on 'wallet:initialized', @onWalletInitialized
+      ledger.app.on 'wallet:initialization:creation', @onWalletIsSynchronizing
+
 
   openSupport: ->
     window.open t 'application.support_url'
+
+  onWalletInitialized: -> ledger.app.router.go '/wallet/accounts/0/show'
+
+  onWalletIsSynchronizing: -> @view.currentAction.text t 'onboarding.device.opening.is_synchronizing'
+
+  onDetach: ->
+    super
+    ledger.app.off 'wallet:initialized', @onWalletInitialized
+    ledger.app.off 'wallet:initialization:creation', @onWalletIsSynchronizing
