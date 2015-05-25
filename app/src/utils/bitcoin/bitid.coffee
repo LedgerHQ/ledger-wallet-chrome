@@ -17,6 +17,8 @@ _.extend ledger.bitcoin.bitid,
     ledger.errors.throw("Invalid BitId URI") unless url?
     url[1]
 
+  reset: -> @_cache = {}
+
   ###
   @param [String] uri
   @param [String] address
