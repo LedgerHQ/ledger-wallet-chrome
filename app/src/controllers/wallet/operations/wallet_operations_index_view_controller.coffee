@@ -5,6 +5,10 @@ class @WalletOperationsIndexViewController extends ledger.common.ViewController
     operationsList: '#operations_list'
     accountName: '#account_name'
 
+  initialize: ->
+    super
+    @_debouncedUpdateOperations = _.debounce(@_updateOperations, 200, yes)
+
   onAfterRender: ->
     super
     @_updateAccountName()
@@ -26,8 +30,8 @@ class @WalletOperationsIndexViewController extends ledger.common.ViewController
   _listenEvents: ->
     # update operations
     @_updateOperations()
-    ledger.app.on 'wallet:transactions:new wallet:operations:sync:done', @_updateOperations
-    ledger.preferences.instance.on 'currencyActive:changed', @_updateOperations
+    ledger.app.on 'wallet:transactions:new wallet:operations:sync:done', @_debouncedUpdateOperations
+    ledger.preferences.instance.on 'currencyActive:changed', @_debouncedUpdateOperations
 
   _getAccount: () ->
     @_account ?= Account.find(index: 0).first()

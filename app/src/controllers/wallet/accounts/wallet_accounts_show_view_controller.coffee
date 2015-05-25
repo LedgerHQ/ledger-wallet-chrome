@@ -11,6 +11,12 @@ class @WalletAccountsShowViewController extends ledger.common.ViewController
     confirmedBalanceContainer: "#confirmed_balance_container"
     countervalueBalanceContainer: "#countervalue_balance_container"
 
+  initialize: ->
+    super
+    @_debouncedUpdateOperations = _.debounce(@_updateOperations, 200, yes)
+    @_debouncedUpdateBalances = _.debounce(@_updateBalances, 200, yes)
+    @_debouncedUpdateCountervalueVisibility = _.debounce(@_updateCountervalueVisibility, 200, yes)
+
   onAfterRender: ->
     super
     @_updateBalancesLayout()
@@ -35,16 +41,16 @@ class @WalletAccountsShowViewController extends ledger.common.ViewController
   _listenEvents: ->
     # update balance
     @_updateBalances()
-    ledger.app.on 'wallet:balance:changed', @_updateBalances
+    ledger.app.on 'wallet:balance:changed', @_debouncedUpdateBalances
 
     # update operations
     @_updateOperations()
-    ledger.app.on 'wallet:transactions:new wallet:operations:sync:done wallet:operations:new wallet:operations:update', @_updateOperations
-    ledger.preferences.instance.on 'currencyActive:changed', @_updateOperations
+    ledger.app.on 'wallet:transactions:new wallet:operations:sync:done wallet:operations:new wallet:operations:update', @_debouncedUpdateOperations
+    ledger.preferences.instance.on 'currencyActive:changed', @_debouncedUpdateOperations
 
     # settings
     @_updateCountervalueVisibility()
-    ledger.preferences.instance.on 'currencyActive:changed', @_updateCountervalueVisibility
+    ledger.preferences.instance.on 'currencyActive:changed', @_debouncedUpdateCountervalueVisibility
 
   _updateCountervalueVisibility: ->
     hideCountervalue = !ledger.preferences.instance.isCurrencyActive()
