@@ -54,7 +54,6 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   # @param [Object] items Items to store
   # @param [Function] cb A callback invoked once the insertion is done
   set: (items, cb) ->
-    l "SET", _.clone(items)
     return cb?() unless items?
     @_changes.push {type: OperationTypes.SET, key: key, value: value} for key, value of items
     this.debounced_push()
@@ -104,9 +103,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     p = @client.get_settings_md5().then (md5) =>
       return yes if @_lastMd5 is md5
       @client.get_settings().then (data) =>
-        l 'Received', data
         data = @_decrypt(data)
-        l 'Decrypted', data
         @_merge(data).then =>
           @emit 'pulled'
           @_setLastMd5(md5)
@@ -114,7 +111,6 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       if e.status is 404
         throw Errors.NoRemoteData
       throw Errors.NetworkError
-    l 'Resolve', @_deferredPull
     @_deferredPull.resolve(p)
     @_deferredPull.promise.fin => @_deferredPull = null
     p
@@ -176,7 +172,6 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         checkData['__hashes'] = _(checkData['__hashes']).without(checkData['__hashes'][0])
         checkData = _(checkData).omit('__hashes') if checkData['__hashes'].length is 0
         [lastCommitHash, __] = @_computeCommit(checkData, @_changes)
-        l _.clone(data), lastCommitHash
         throw Errors.NoChanges if lastCommitHash is data['__hashes'][0]
       # Create commit hash
       [commitHash, pushedData] = @_computeCommit(data, @_changes)
@@ -226,7 +221,6 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   _getAllData: ->
     d = ledger.defer()
     @_super().keys (keys) =>
-      l keys
       @_super().get keys, (data) =>
         d.resolve(data)
     d.promise
