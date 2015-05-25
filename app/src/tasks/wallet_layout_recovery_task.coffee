@@ -38,8 +38,15 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   _restoreBip44Layout: () ->
     accountIndex = 0
     recoverAccount = =>
+<<<<<<< HEAD
       return @emit 'bip44:done' if accountIndex is 1 # App first version limitiation
 
+=======
+      if accountIndex > 0 and (previousAccount = ledger.wallet.Wallet.instance.getAccount(accountIndex - 1)).isEmpty()
+        l 'ACCOUNT', previousAccount
+        #previousAccount.remove() if accountIndex > 1
+        return @emit 'bip44:done'
+>>>>>>> 0e4d0f0... Fix bitid cache
       account = ledger.wallet.Wallet.instance.getOrCreateAccount(accountIndex)
 
       done = =>
@@ -85,7 +92,10 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
 
           shiftChange = shiftChange isnt account.getCurrentChangeAddressIndex()
           shiftPublic = shiftPublic isnt account.getCurrentPublicAddressIndex()
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0e4d0f0... Fix bitid cache
           if shiftChange and shiftPublic
             testIndex account.getCurrentPublicAddressIndex(), account.getCurrentChangeAddressIndex()
           else if shiftChange
