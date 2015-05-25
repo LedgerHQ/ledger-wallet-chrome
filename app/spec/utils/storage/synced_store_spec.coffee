@@ -14,26 +14,6 @@ describe "SyncedStore", ->
     store.client.get_settings_md5.and.callFake -> Q.defer().promise
     _.defer -> do done
 
-  xit "call debounced push when a value is set", ->
-    spyOn(ledger.storage.SecureStore.prototype, 'set').and.callFake (items, cb) -> cb()
-    spyOn(store, 'debounced_push')
-    store.set()
-
-    expect(ledger.storage.SecureStore.prototype.set).toHaveBeenCalled()
-    expect(store.debounced_push).toHaveBeenCalled()
-
-  xit "call debounced push when a value is removed", ->
-    spyOn(ledger.storage.SecureStore.prototype, 'remove').and.callFake (items, cb) -> cb()
-    spyOn(store, 'debounced_push')
-    store.remove()
-
-    expect(ledger.storage.SecureStore.prototype.remove).toHaveBeenCalled()
-    expect(store.debounced_push).toHaveBeenCalled()
-
-  xit "call client.delete_settings on clear", ->
-    store.clear()
-    expect(store.client.delete_settings).toHaveBeenCalled()
-
   it "returns the value just set", (done) ->
     store.set foo: 'bar', ->
       store.get ['foo'], (result) ->
