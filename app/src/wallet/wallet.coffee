@@ -139,6 +139,24 @@ class ledger.wallet.Wallet.Account
 
   getAllAddressesPaths: () -> @getAllPublicAddressesPaths().concat(@getAllChangeAddressesPaths())
 
+  getObservedPublicAddressesPaths: (gap = ledger.preferences.instance?.getDiscoveryGap() or 20) ->
+    paths = @getAllPublicAddressesPaths()
+    paths.push "#{@getRootDerivationPath()}/0/#{index}" for index in [@getCurrentPublicAddressIndex() + 1...@getCurrentPublicAddressIndex() + gap + 1]
+    paths = _.difference(paths, @_account.excludedPublicPaths)
+    _(paths).compact()
+
+  getObservedChangeAddressesPaths: (gap = ledger.preferences.instance?.getDiscoveryGap() or 20) ->
+    paths = @getAllChangeAddressesPaths()
+    paths.push "#{@getRootDerivationPath()}/1/#{index}" for index in [@getCurrentChangeAddressIndex() + 1...@getCurrentChangeAddressIndex() + gap + 1]
+    paths = _.difference(paths, @_account.excludedPublicPaths)
+    _(paths).compact()
+
+  getObservedAddressesPaths: (type) ->
+    switch type
+      when 'change' then @getObservedChangeAddressesPaths()
+      when 'public' then @getObservedPublicAddressesPaths()
+  getAllObservedAddressesPaths: -> @getObservedChangeAddressesPaths().concat(@getObservedPublicAddressesPaths())
+
   getCurrentPublicAddressIndex: () -> @_account.currentPublicIndex or 0
   getCurrentChangeAddressIndex: () -> @_account.currentChangeIndex or 0
   getCurrentAddressIndex: (type) ->
