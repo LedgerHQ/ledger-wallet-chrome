@@ -40,6 +40,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         @_changes = item['__sync_changes'].concat(@_changes) if item['__sync_changes']?
         @_unlockMethods()
         @throttled_pull()
+        @debounced_push() if @_changes.length > 0
 
   pull: ->
     @throttled_pull()
@@ -172,6 +173,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         checkData['__hashes'] = _(checkData['__hashes']).without(checkData['__hashes'][0])
         checkData = _(checkData).omit('__hashes') if checkData['__hashes'].length is 0
         [lastCommitHash, __] = @_computeCommit(checkData, @_changes)
+        @_clearChanges()
         throw Errors.NoChanges if lastCommitHash is data['__hashes'][0]
       # Create commit hash
       [commitHash, pushedData] = @_computeCommit(data, @_changes)
