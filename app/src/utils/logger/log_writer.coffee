@@ -24,10 +24,9 @@ class @ledger.utils.LogWriter extends @ledger.utils.Log
   ###
   _write: (msg) ->
     d = ledger.defer()
-    l 'write', msg
     @_getFileWriter (fileWriter) ->
       fileWriter.onwriteend = (e) ->
-        l "Write completed"
+        #l "Write completed"
         d.resolve()
       fileWriter.onerror = (e) ->
         l "Write failed"

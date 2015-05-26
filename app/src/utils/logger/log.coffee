@@ -11,11 +11,10 @@ class @ledger.utils.Log
   constructor: (daysMax = 2) ->
     @_daysMax = daysMax
     @_daysMax = parseInt(@_daysMax)
-    unlock_getFileWriter = _.lock @, ['_getFileWriter', 'write']
+    unlockWriter = _.lock @, ['_getFileWriter', 'write', 'read']
     if isNaN @_daysMax
       throw 'The first parameter must be a number'
     _init = (fs) =>
-      l 'Open file system. Create new log file for the day: ' + fs.name
       @_fs = fs
       @_setFileName()
       # Delete old log files
@@ -31,8 +30,7 @@ class @ledger.utils.Log
             if days > @_daysMax or months > 0 or years > 0
               @delete file.name
             # l 'days: ', days, 'months: ', months, 'years: ', years
-          unlock_getFileWriter()
-
+        unlockWriter()
     window.webkitRequestFileSystem window.PERSISTENT, 5*1024*1024, _init, @_errorHandler
 
 
@@ -70,7 +68,7 @@ class @ledger.utils.Log
       for entry in results
         entries.push entry
       entries = entries.sort()
-      l 'entries', entries
+      #l 'entries', entries
       callback? entries
     , @_errorHandler
 

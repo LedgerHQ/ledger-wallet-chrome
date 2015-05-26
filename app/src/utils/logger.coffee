@@ -32,9 +32,6 @@ class @ledger.utils.Logger
 #################################
 # Class methods
 #################################
-  
-  # @return [Q.Promise]
-  @logs: (cb) -> @_getLogs(@store())
 
   @publicLogs: (cb) -> @_getLogs(@_publicReader ?= new ledger.utils.LogReader(ledger.config.defaultLoggerDaysMax), cb)
 
