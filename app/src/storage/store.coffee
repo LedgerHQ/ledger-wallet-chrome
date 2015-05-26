@@ -23,6 +23,10 @@ class @ledger.storage.Store extends EventEmitter
     keys = [keys] unless _(keys).isArray()
     this._raw_get this._preprocessKeys(keys), (raw_items) => cb(@_deprocessItems(raw_items))
 
+  getAll: (cb) ->
+    @keys (keys) =>
+      @get(keys, cb)
+
   # Stores one or many item
   #
   # @param [Object] items Items to store

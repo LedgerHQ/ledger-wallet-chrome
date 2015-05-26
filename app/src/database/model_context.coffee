@@ -54,6 +54,23 @@ class Collection
       @_modelize(view.data())
     view.rematerialize()
 
+  updateSynchronizedProperties: (data) ->
+    synchronizedIndexField = @getModelClass()._synchronizedIndex.field
+    objectDeclarations = _(data).pick (v, key) => key.match("__sync_#{@_collection.name.toLowerCase()}_\\d_#{synchronizedIndexField}")
+    for key, index of objectDeclarations
+      objectNamePattern = "__sync_#{@_collection.name.toLowerCase()}_#{index}_"
+      [object] = @getModelClass().find(_.object([synchronizedIndexField], [index]), @_context).data()
+      synchronizedObject = {}
+      for key, value of data when key.match(objectNamePattern)
+        key = key.replace(objectNamePattern, '')
+        synchronizedObject[key] = value
+      unless object?
+        object = @getModelClass().create(synchronizedObject, @_context)
+      else
+        object.set key, value
+      object.save()
+
+
   query: () ->
     query = @_collection.chain()
     data = query.data
@@ -68,6 +85,7 @@ class Collection
     query
 
   getCollection: () -> @_collection
+  getModelClass: -> ledger.database.Model.AllModelClasses()[@getCollection().name]
 
   _modelize: (data) ->
     return null unless data?
@@ -94,6 +112,7 @@ class ledger.database.contexts.Context extends EventEmitter
       @_collections[collection.name] = new Collection(@_db.getDb().getCollection(collection.name), @)
       @_listenCollectionEvent(@_collections[collection.name])
     @_syncStore.on 'pulled', (@onSyncStorePulled = @onSyncStorePulled.bind(this))
+    @onSyncStorePulled()
     @initialize()
 
   initialize: () ->
@@ -131,6 +150,10 @@ class ledger.database.contexts.Context extends EventEmitter
       @emit "delete:" + data['objType'].toLowerCase(), @_modelize(data)
 
   onSyncStorePulled: ->
+    @_syncStore.getAll (data) =>
+      for name, collection of @_collections
+        collectionData = _(data).pick (v, k) -> k.match("__sync_#{name.toLowerCase()}")?
+        collection.updateSynchronizedProperties(collectionData) unless _(collectionData).isEmpty()
 
   _modelize: (data) -> @getCollection(data['objType'])?._modelize(data)
 

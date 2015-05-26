@@ -152,6 +152,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     # Else
     # Update consistency chain
     # Push
+    l 'PUSH'
     return if @_changes.length is 0
     @_deferredPush ?= ledger.defer()
     hasRemoteData = yes
@@ -173,7 +174,6 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         checkData['__hashes'] = _(checkData['__hashes']).without(checkData['__hashes'][0])
         checkData = _(checkData).omit('__hashes') if checkData['__hashes'].length is 0
         [lastCommitHash, __] = @_computeCommit(checkData, @_changes)
-        @_clearChanges()
         throw Errors.NoChanges if lastCommitHash is data['__hashes'][0]
       # Create commit hash
       [commitHash, pushedData] = @_computeCommit(data, @_changes)
