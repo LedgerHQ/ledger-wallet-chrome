@@ -11,7 +11,8 @@ class @Account extends ledger.database.Model
       else
         -1
 
-  @index 'index'
+  @index 'index', sync: yes
+  @sync 'number'
 
   @fromWalletAccount: (hdAccount) ->
     return null unless hdAccount?
