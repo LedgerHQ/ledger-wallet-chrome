@@ -13,6 +13,11 @@ class ledger.wallet.ExtendedPublicKey
       @_derivationPath += '/'
     @_wallet = wallet
 
+  initializeWithBase58: (xpub58) ->
+    @_xpub58 = xpub58
+    @_hdnode = GlobalContext.bitcoin.HDNode.fromBase58 @_xpub58
+    return
+
   initialize: (callback) ->
     derivationPath = @_derivationPath.substring(0, @_derivationPath.length - 1)
     path = derivationPath.split '/'
@@ -81,7 +86,7 @@ class ledger.wallet.ExtendedPublicKey
     result
 
   getPublicAddress: (path) ->
-    throw 'Extended public key must initialized before it can perform any derivation' unless @_xpub?
+    throw 'Extended public key must initialized before it can perform any derivation' unless @_hdnode?
     throw 'Path should begin by the index of derivation' if isNaN(parseInt(path[0]))
     partialPath = path
 

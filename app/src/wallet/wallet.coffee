@@ -109,7 +109,8 @@ class ledger.wallet.Wallet.Account
     @_store.get [@_storeId], (result) =>
       @_account = result[@_storeId]
       @_initialize()
-      @initializeXpub callback
+      callback?()
+      #@initializeXpub callback
 
   release: () ->
     @wallet = null

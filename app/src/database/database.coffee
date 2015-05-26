@@ -1,7 +1,7 @@
 
 ledger.database ?= {}
 
-class Database extends EventEmitter
+class ledger.database.Database extends EventEmitter
 
   constructor: (name, store) ->
     @_name = name
@@ -67,7 +67,7 @@ _.extend ledger.database,
       callback?()
 
   open: (databaseName, callback) ->
-    db = new Database(databaseName, ledger.storage.databases)
+    db = new ledger.database.Database(databaseName, ledger.storage.databases)
     db.load callback
     db
 

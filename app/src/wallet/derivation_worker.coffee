@@ -85,12 +85,16 @@ registerExtendedPublicKeyForPath = (path) ->
   if ExtendedPublicKeys[path]?
     postResult 'Already registered'
     return
-  ExtendedPublicKeys[path] = new ledger.wallet.ExtendedPublicKey(ledger.app.dongle, path)
-  ExtendedPublicKeys[path].initialize (xpub) =>
-    if xpub?
+  sendCommand 'private:getXpubFromCache', [path], (xpu58, error) =>
+    ExtendedPublicKeys[path] = new ledger.wallet.ExtendedPublicKey(ledger.app.dongle, path)
+    if xpu58?
+      ExtendedPublicKeys[path].initializeWithBase58(xpu58)
       postResult 'registered'
     else
-      postError 'XPub creation error'
+      ExtendedPublicKeys[path].initialize (xpub) =>
+        entry = [path, ExtendedPublicKeys[path].toString()]
+        sendCommand 'private:setXpubCacheEntries', [[entry]], _.noop
+        if xpub? then postResult 'registered' else postError 'Xpub creation error'
 
 getPublicAddress = (path) ->
   address = null

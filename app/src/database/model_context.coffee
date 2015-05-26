@@ -85,17 +85,21 @@ class Collection
 
 class ledger.database.contexts.Context extends EventEmitter
 
-  constructor: (db) ->
+  constructor: (db, syncStore = ledger.storage.sync) ->
     @_db = db
     @_collections = {}
+    @_synchronizedCollections = {}
+    @_syncStore = syncStore
     for collection in @_db.getDb().listCollections()
       @_collections[collection.name] = new Collection(@_db.getDb().getCollection(collection.name), @)
       @_listenCollectionEvent(@_collections[collection.name])
+    @_syncStore.on 'pulled', (@onSyncStorePulled = @onSyncStorePulled.bind(this))
     @initialize()
 
   initialize: () ->
     modelClasses = ledger.database.Model.AllModelClasses()
     for className, modelClass of modelClasses
+      @_synchronizedCollections[className] = modelClass if modelClass._synchronizedIndex?
       collection = @getCollection(className)
       collection.getCollection().DynamicViews = []
       collection.getCollection().ensureIndex(index.field) for index in modelClass._indexes if modelClass.__indexes?
@@ -116,6 +120,7 @@ class ledger.database.contexts.Context extends EventEmitter
     @_db.scheduleFlush()
 
   close: ->
+    @_syncStore.off 'pulled', @onSyncStorePulled
 
   _listenCollectionEvent: (collection) ->
     collection.getCollection().on 'insert', (data) =>
@@ -124,6 +129,8 @@ class ledger.database.contexts.Context extends EventEmitter
       @emit "update:" + data['objType'].toLowerCase(), @_modelize(data)
     collection.getCollection().on 'delete', (data) =>
       @emit "delete:" + data['objType'].toLowerCase(), @_modelize(data)
+
+  onSyncStorePulled: ->
 
   _modelize: (data) -> @getCollection(data['objType'])?._modelize(data)
 

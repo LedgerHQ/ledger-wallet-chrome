@@ -21,3 +21,6 @@ class ledger.storage.MemoryStore extends ledger.storage.Store
     _.defer =>
       @_data = _(@_data).omit(keys)
       cb?()
+
+  extend: (data) ->
+    _.extend(@_data, data)

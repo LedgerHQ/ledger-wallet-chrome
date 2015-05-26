@@ -35,9 +35,15 @@ startDerivationTask = (dongle, raise, done) ->
     done?()
 
 openAddressCache = (dongle, raise, done) ->
-  cache = new ledger.wallet.Wallet.Cache(ledger.wallet.Wallet.instance)
+  cache = new ledger.wallet.Wallet.Cache('cache', ledger.wallet.Wallet.instance)
   cache.initialize =>
     ledger.wallet.Wallet.instance.cache = cache
+    done?()
+
+openXpubCache = (dongle, raise, done) ->
+  cache = new ledger.wallet.Wallet.Cache('xpub_cache', ledger.wallet.Wallet.instance)
+  cache.initialize =>
+    ledger.wallet.Wallet.instance.xpubCache = cache
     done?()
 
 restoreStructure = (dongle, raise, done) ->
@@ -79,6 +85,7 @@ ProceduresOrder = [
   openHdWallet
   startDerivationTask
   openAddressCache
+  openXpubCache
   openDatabase
   initializeWalletModel
   restoreStructure
