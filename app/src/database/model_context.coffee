@@ -22,6 +22,7 @@ class Collection
     @_context.notifyDatabaseChange()
 
   remove: (model) ->
+    return unless model?._object
     model._object = @_collection.remove(model._object)
     @_context.notifyDatabaseChange()
 
@@ -97,7 +98,7 @@ class ledger.database.contexts.Context extends EventEmitter
     for className, modelClass of modelClasses
       collection = @getCollection(className)
       collection.getCollection().DynamicViews = []
-      collection.getCollection().ensureIndex(index) for index in modelClass._indexes if modelClass.__indexes?
+      collection.getCollection().ensureIndex(index.field) for index in modelClass._indexes if modelClass.__indexes?
     try
       new ledger.database.MigrationHandler(@).applyMigrations()
     catch er

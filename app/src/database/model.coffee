@@ -135,7 +135,6 @@ class @ledger.database.Model extends @EventEmitter
   # Called before a model is removed from another model as a many_* relationship
   onRemove: () ->
 
-
   isInserted: () -> if @_object?.meta? then yes else no
 
   isDeleted: () -> @_deleted
@@ -271,6 +270,10 @@ class @ledger.database.Model extends @EventEmitter
     throw 'This methods should only be called once by Model' unless @ is Model
     # Ensure all relationships are bound and consistent between models (each relationship are sets in both directions)
     for ClassName, Class of @AllModelClasses()
+      Class._synchronizedIndex = _(Class._indexes).filter (i) -> i.options?.sync is yes
+      e "Found multiple synchronized indexes in declaration of model #{ClassName}" if Class._synchronizedIndex.length > 1
+      [Class._synchronizedIndex] = Class._synchronizedIndex
+      e "Found synchronized property without any synchronized index. Add @index 'index_name', sync: yes. In the declaration of #{ClassName}" if Class._synchronizedProperties?.length > 0 and not Class._synchronizedIndex
       for relationshipName, relationship of Class._relationships
         InverseClass = window[relationship.Class]
         if InverseClass._relationships? and InverseClass._relationships[relationship.inverse]?.inverse is relationship.name and InverseClass._relationships[relationship.inverse]?.type is relationship.inverseType and InverseClass._relationships[relationship.inverse]?.Class is ClassName
@@ -281,9 +284,13 @@ class @ledger.database.Model extends @EventEmitter
         else
           e "Bad relationship #{relationship.name} <-> #{relationship.inverse}. You must absolutely check for errors for classes #{ClassName} and #{relationship.Class}"
 
-  @index: (field) ->
+  @index: (field, options = {}) ->
     @_indexes ?= []
-    @_indexes.push field
+    @_indexes.push {field, options}
+
+  @sync: (propertyName, options = {}) ->
+    @_synchronizedProperties ?= []
+    @_synchronizedProperties.push {property: propertyName, options}
 
   @init: () ->
     ledger.database.Model._allModelClasses ?= {}
