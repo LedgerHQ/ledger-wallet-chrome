@@ -90,7 +90,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
 
   clear: (cb) ->
     super(cb)
-    @_changes = {}
+    @_clearChanges()
     @client.delete_settings()
 
   # @return A promise
@@ -128,17 +128,17 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         # Remote data are not using the new format. Just update the current local storage
         @_setAllData(remoteData)
       else if (remoteHashes.indexOf(localHashes) >= (@HASHES_CHAIN_MAX_SIZE * 3 / 4) * (64 + 1)) or remoteHashes.indexOf(localHashes) is -1
-        @_changes = []
+        @_clearChanges()
         @_setAllData(remoteData)
       else if (localData['__hashes'] or []).join(' ').indexOf((remoteData['__hashes'] or []).join(' ').substr(0, 2 * 64 + 1)) != -1
         # We are up to date do nothing
-        ledger.defer().resolve().promise
+        @_setAllData(remoteData)
       else
         [nextCommitHash, nextCommitData] = @_computeCommit(localData, @_changes)
         if _(remoteData['__hashes']).contains(nextCommitData)
           # The hash next commit already exists drop the changes
-          @_setAllData(remoteHasheso)
-          @_changes = []
+          @_setAllData(remoteData)
+          @_clearChanges()
         else
           @_setAllData(remoteData)
 
@@ -181,6 +181,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     .then (md5) =>
       @_setLastMd5(md5)
       # Merge changes into store
+      @_clearChanges()
       @_setAllData(pushedData)
     .then () => @emit 'pushed', this
     .fail (e) =>
