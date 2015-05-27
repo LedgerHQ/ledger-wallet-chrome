@@ -12,7 +12,6 @@ class @ledger.utils.SecureLogWriter extends @ledger.utils.LogWriter
     super @_daysMax
 
 
-
   write: (msg) ->
     msg = @_aes.encrypt(msg)
     super msg

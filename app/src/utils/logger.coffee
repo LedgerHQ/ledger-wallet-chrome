@@ -142,7 +142,7 @@ class @ledger.utils.Logger
     @level = Levels.ALL if @level is true
     @level = Levels.NONE if @level is false
     @setPersistentLogsEnabled on
-    @constructor._loggers[tag] = this
+    ledger.utils.Logger._loggers[tag] = this
 
   setPersistentLogsEnabled: (enable) -> @_areLogsPersistents = enable
 
@@ -238,7 +238,7 @@ class @ledger.utils.Logger
     if @isPrivateModeEnabled()
       @_privateLogStream().write(log)
     else
-      (@constructor._publicWriter ||= new ledger.utils.LogWriter(ledger.config.defaultLoggerDaysMax)).write JSON.stringify(entry)
+      (ledger.utils.Logger._publicWriter ||= new ledger.utils.LogWriter(ledger.config.defaultLoggerDaysMax)).write JSON.stringify(entry)
 
   #################################
   # Protected. Formatting methods
@@ -335,7 +335,7 @@ class @ledger.utils.Logger
 
     console[method](args...)
 
-  _privateLogStream: -> @constructor._logStream
+  _privateLogStream: -> ledger.utils.Logger._logStream
 
 # Shortcuts
 if @ledger.isDev

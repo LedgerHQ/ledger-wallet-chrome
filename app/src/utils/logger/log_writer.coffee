@@ -27,12 +27,12 @@ class @ledger.utils.LogWriter extends @ledger.utils.Log
     @_getFileWriter (fileWriter) ->
       fileWriter.onwriteend = (e) ->
         #l "Write completed"
+        fileWriter.seek(fileWriter.length)
         d.resolve()
       fileWriter.onerror = (e) ->
         l "Write failed"
         d.resolve()
       blob = new Blob(['\n' + msg], {type:'text/plain'})
-      fileWriter.seek(fileWriter.length)
       fileWriter.write(blob)
     return d.promise
 
@@ -48,6 +48,7 @@ class @ledger.utils.LogWriter extends @ledger.utils.Log
       @_fs.root.getFile @_filename, {create: true}, (fileEntry) =>
         # Create a FileWriter object for our FileEntry
         fileEntry.createWriter (fileWriter) =>
+          fileWriter.seek(fileWriter.length)
           @_writer = {date: moment().format('YYYY-MM-DD'), writer: fileWriter}
           callback? @_writer.writer
         , @_errorHandler

@@ -5,13 +5,13 @@
 class @ledger.utils.Log
 
   ###
-      Constructor
-      @param [Number] _daysMax The maximum number of days the logs are preserved
-    ###
+    Constructor
+    @param [Number] _daysMax The maximum number of days the logs are preserved
+  ###
   constructor: (daysMax = 2) ->
     @_daysMax = daysMax
     @_daysMax = parseInt(@_daysMax)
-    unlockWriter = _.lock @, ['_getFileWriter', 'write', 'read']
+    unlockWriter = _.lock @, ['constructor', '_getFileWriter', 'write', 'read']
     if isNaN @_daysMax
       throw 'The first parameter must be a number'
     _init = (fs) =>
