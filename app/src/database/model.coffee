@@ -210,7 +210,7 @@ class @ledger.database.Model extends @EventEmitter
     if @getBestIdentifierName() is '$loki'
       context.getCollection(@getCollectionName()).get(id)
     else
-      @find().data()[0]
+      @find(_.object([@getBestIdentifierName()], [id]), context).data()[0]
 
   @findOrCreate: (query, base, context = ledger.database.contexts.main) ->
     if _.isKindOf(base, ledger.database.contexts.Context)
