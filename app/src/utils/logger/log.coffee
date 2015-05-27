@@ -11,7 +11,7 @@ class @ledger.utils.Log
   constructor: (daysMax = 2) ->
     @_daysMax = daysMax
     @_daysMax = parseInt(@_daysMax)
-    unlockWriter = _.lock @, ['constructor', '_getFileWriter', 'write', 'read']
+    unlockWriter = _.lock @, ['_getFileWriter', 'write', 'read']
     if isNaN @_daysMax
       throw 'The first parameter must be a number'
     _init = (fs) =>
