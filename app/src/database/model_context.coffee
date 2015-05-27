@@ -33,7 +33,7 @@ class Collection
   get: (id) -> @_modelize(@_collection.get(id))
 
   getRelationshipView: (object, relationship) ->
-    viewName = "#{relationship.type}_#{relationship.name}_#{relationship.inverse}:#{object.getId()}"
+    viewName = "#{relationship.type}_#{relationship.name}_#{relationship.inverse}:#{object.getBestIdentifier()}"
     collectionName = collectionNameForRelationship(object, relationship)
     view = @_context.getCollection(collectionName).getCollection().getDynamicView(viewName)
     unless view?
@@ -41,7 +41,7 @@ class Collection
       switch relationship.type
         when 'many_one'
           query = {}
-          query["#{relationship.inverse}_id"] = object.getId()
+          query["#{relationship.inverse}_id"] = object.getBestIdentifier()
           view.applyFind(query)
         when 'many_many' then throw 'Not implemented yet'
       if _(relationship.sort).isArray() and relationship.sort.length is 1
@@ -70,6 +70,11 @@ class Collection
         object.set key, value
       object.save()
 
+  _insertSynchronizedProperties: (model) ->
+
+  _updateSynchronizedProperties: (model) ->
+
+  _removeSynchronizedProperties: (model) ->
 
   query: () ->
     query = @_collection.chain()

@@ -15,12 +15,13 @@ describe "Database synchronized properties", ->
 
   it 'updates existing objects', (done) ->
     Account.create({index: 0, name: "My Spec Account"}, context).save()
-    sync.substore('sync_account_0').set index: 0, name: "My Sync Spec Account", ->
-      sync.emit 'pulled'
-      context.on 'update:account insert:account', ->
-        [account] = Account.find(index: 0, context).data()
-        expect(account.get('name')).toBe("My Sync Spec Account")
-        do done
+    context.on 'insert:account', ->
+      sync.substore('sync_account_0').set index: 0, name: "My Sync Spec Account", ->
+        sync.emit 'pulled'
+        context.on 'update:account insert:account', ->
+          [account] = Account.find(index: 0, context).data()
+          expect(account.get('name')).toBe("My Sync Spec Account")
+          do done
 
   it 'creates missing objects', (done) ->
     sync.substore('sync_account_0').set index: 0, name: "My Sync Spec Account", ->
@@ -31,6 +32,7 @@ describe "Database synchronized properties", ->
         do done
 
   it 'creates data on sync store when an object is inserted', (done) ->
+
 
   it 'updates sync store when an object is saved', (done) ->
 

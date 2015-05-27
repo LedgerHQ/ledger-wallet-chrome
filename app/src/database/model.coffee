@@ -5,9 +5,9 @@ resolveRelationship = (object, relationship) ->
     when 'many_one'
       object._collection.getRelationshipView(object, relationship).modelize()
     when 'one_many'
-      Class.findById object.get("#{relationship.name}_id")
+      Class.find(_.object([Class.getBestIdentifierName()], [object.get("#{relationship.name}_id")])).data()[0]
     when 'one_one'
-      Class.findById object.get("#{relationship.name}_id")
+      Class.find(_.object([Class.getBestIdentifierName()], [object.get("#{relationship.name}_id")])).data()[0]
     when 'many_many'
       object._collection.getRelationshipView(object, relationship).modelize()
 
@@ -31,7 +31,13 @@ class @ledger.database.Model extends @EventEmitter
     else
       @_object?[key]
 
-  getId: () -> @_object?['$loki']
+  getId: () -> @getBestIdentifier()
+  getLokiId: -> @_object?['$loki']
+  @getBestIdentifierName: -> @_bestIdentifier
+
+  getBestIdentifierName: -> @constructor.getBestIdentifierName()
+
+  getBestIdentifier: -> @_object?[@constructor.getBestIdentifierName()]
 
   set: (key, value) ->
     @_object ?= {}
@@ -155,16 +161,16 @@ class @ledger.database.Model extends @EventEmitter
       when 'many_one'
         for v in pending.add
           value = @_getModelValue(relationship, v)
-          value.set("#{relationship.inverse}_id", @getId())
+          value.set("#{relationship.inverse}_id", @getBestIdentifier())
           value.save()
       when 'one_many'
         value = @_getModelValue(relationship, pending.add)
-        @_object["#{relationship.name}_id"] = value.getId()
+        @_object["#{relationship.name}_id"] = value.getBestIdentifier()
         @_collection.update this
       when 'one_one'
         value = @_getModelValue(relationship, pending.add)
-        @_object["#{relationship.name}_id"] = value.getId()
-        value.set("#{relationship.inverse}_id", @getId())
+        @_object["#{relationship.name}_id"] = value.getBestIdentifier()
+        value.set("#{relationship.inverse}_id", @getBestIdentifier())
         value.save()
         @_collection.update this
       when 'many_many' then throw 'many:many relationships are not implemented yet'
@@ -181,7 +187,7 @@ class @ledger.database.Model extends @EventEmitter
         @_collection.update this
       when 'one_one'
         value = @get(relationship.name)
-        @_object["#{relationship.name}_id"] = value.getId()
+        @_object["#{relationship.name}_id"] = value.getBestIdentifier()
         value.set("#{relationship.inverse}_id", null)
         value.save()
         @_collection.update this
@@ -200,7 +206,11 @@ class @ledger.database.Model extends @EventEmitter
 
   @create: (base, context = ledger.database.contexts.main) -> new @ context, base
 
-  @findById: (id, context = ledger.database.contexts.main) -> context.getCollection(@getCollectionName()).get(id)
+  @findById: (id, context = ledger.database.contexts.main) ->
+    if @getBestIdentifierName() is '$loki'
+      context.getCollection(@getCollectionName()).get(id)
+    else
+      @find().data()[0]
 
   @findOrCreate: (query, base, context = ledger.database.contexts.main) ->
     if _.isKindOf(base, ledger.database.contexts.Context)
@@ -283,6 +293,14 @@ class @ledger.database.Model extends @EventEmitter
           InverseClass._relationships[relationship.inverse] = name: relationship.inverse, type: relationship.inverseType, inverse:relationship.name, Class: ClassName, inverseType: relationship.type, onDelete: 'nullify'
         else
           e "Bad relationship #{relationship.name} <-> #{relationship.inverse}. You must absolutely check for errors for classes #{ClassName} and #{relationship.Class}"
+
+      Class._bestIdentifier =
+        if Class._synchronizedIndex?
+          Class._synchronizedIndex.field
+        else if (bestId = _(Class._indexes).find((i) -> i.options['unique']? is true))?.length is 1
+          bestId[0]
+        else
+          '$loki'
 
   @index: (field, options = {}) ->
     @_indexes ?= []
