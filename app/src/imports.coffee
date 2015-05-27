@@ -115,6 +115,7 @@
         'utils/csv_exporter'
         'utils/completion_closure'
         'utils/validers'
+        'utils/function_lock'
 
         ## Crypto
         'utils/crypto/aes'
