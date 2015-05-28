@@ -100,6 +100,23 @@ class @ledger.utils.Logger
         csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
         callback?(name: suggestedName, url: csv.url())
 
+  @exportLogsWithZipLink: (callback = undefined) ->
+    now = new Date()
+    suggestedName = "ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
+    csv = new ledger.utils.CsvExporter(suggestedName)
+    @publicLogs (publicLogs) =>
+      @privateLogs (privateLogs) =>
+        csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
+        csv.zipUrl (zipUrl) ->
+          callback?(name: suggestedName, url: zipUrl)
+
+  @downloadLogsWithZipLink: ->
+    @exportLogsWithZipLink (data) ->
+      pom = document.createElement('a')
+      pom.href = data.url
+      pom.setAttribute('download', data.name)
+      pom.click()
+
   @downloadLogsWithLink: ->
     @exportLogsWithLink (data) ->
       pom = document.createElement('a')

@@ -39,9 +39,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     accountIndex = 0
     recoverAccount = =>
       return @emit 'bip44:done' if accountIndex is 1 # App first version limitiation
-
       account = ledger.wallet.Wallet.instance.getOrCreateAccount(accountIndex)
-
       done = =>
         @emit 'bip44:account:done'
         accountIndex += 1
@@ -85,7 +83,6 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
 
           shiftChange = shiftChange isnt account.getCurrentChangeAddressIndex()
           shiftPublic = shiftPublic isnt account.getCurrentPublicAddressIndex()
-
           if shiftChange and shiftPublic
             testIndex account.getCurrentPublicAddressIndex(), account.getCurrentChangeAddressIndex()
           else if shiftChange

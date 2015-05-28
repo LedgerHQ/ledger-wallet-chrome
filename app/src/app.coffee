@@ -125,6 +125,7 @@ require @ledger.imports, ->
     _releaseWallet: (removeDongle = yes) ->
       @emit 'dongle:disconnected'
       @_listenCountervalueEvents(false)
+      ledger.bitcoin.bitid.reset()
       ledger.preferences.close()
       ledger.utils.Logger.updateGlobalLoggersLevel()
       Wallet.releaseWallet()

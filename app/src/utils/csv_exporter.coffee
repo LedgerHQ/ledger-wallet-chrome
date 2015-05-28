@@ -83,3 +83,7 @@ class ledger.utils.CsvExporter
         zipWriter.close(callback)
     , (e) =>
       callback?(null)
+
+  zipUrl: (callback) ->
+    @zip (zip) ->
+      callback?(if zip? then URL.createObjectURL(zip) else null)
