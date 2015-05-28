@@ -174,9 +174,9 @@ class @ledger.utils.Logger
 
   # Return Logger class storage if initialized or undefined.
   # @return [ledger.storage.ChromeStore, undefined]
-  store: -> @constructor.store()
+  store: -> ledger.utils.Logger.store()
 
-  isPrivateModeEnabled: -> @constructor.isPrivateModeEnabled()
+  isPrivateModeEnabled: -> ledger.utils.Logger.isPrivateModeEnabled()
 
   # Sets the log level
   # @param [Boolean] active or not the logger.
@@ -252,6 +252,7 @@ class @ledger.utils.Logger
   # @param [String] msg Message to log.
   # @param [String] msgType Log level.
   _storeLog: (msg, msgType) ->
+    l 'NOT PERSISTENT' unless @_areLogsPersistents
     return unless @_areLogsPersistents
     now = new Date()
     log = {}
