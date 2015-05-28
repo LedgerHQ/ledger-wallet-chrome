@@ -8,7 +8,6 @@ class CurrencyCache
   #chromeStore.get 'ticker_cache', (r) =>
   # _cache = r.ticker_cache?
 
-
   get: () ->
     return @_cache
 
@@ -45,10 +44,10 @@ class ledger.tasks.TickerTask extends ledger.tasks.Task
   _updateTicker: (scheduleNext) ->
     return unless @isRunning()
     @_currenciesRestClient.getAllCurrencies (currencies) =>
-      @_cache.set(currencies)
+      @_cache.set(currencies) if currencies?
       #5 minutes * 60 seconds * 1000 milliseconds = 600000ms
       setTimeout((() => @updateTicker()), 300000) if scheduleNext
-      @emit 'updated', @_cache.get()
+      @emit 'updated', @_cache.get() if currencies?
       #l @_cache.get()
 
   getCache: () ->
