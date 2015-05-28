@@ -82,7 +82,7 @@ class @ledger.storage.Store extends EventEmitter
 
   _preprocessKey: (key) -> @_to_ns_key(key)
   _preprocessKeys: (keys) -> _.flatten([keys]).map((key) => @_preprocessKey(key))
-  _preprocessValue: (value) -> if value.toJson? then value.toJson() else JSON.stringify(value)
+  _preprocessValue: (value) -> if value?.toJson? then value.toJson() else JSON.stringify(value)
   _preprocessItems: (items) ->
     hash = {}
     for key, value of @_hashize(items)

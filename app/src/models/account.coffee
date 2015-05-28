@@ -12,7 +12,6 @@ class @Account extends ledger.database.Model
         -1
 
   @index 'index', sync: yes
-  @sync 'number'
   @sync 'name'
 
   @fromWalletAccount: (hdAccount) ->

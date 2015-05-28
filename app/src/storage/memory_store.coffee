@@ -11,6 +11,7 @@ class ledger.storage.MemoryStore extends ledger.storage.Store
   _raw_set: (items, cb=->) ->
     _.defer =>
       _.extend(@_data, items)
+      @emit 'set', items
       cb?()
 
   # @see ledger.storage.Store#_raw_keys
@@ -20,6 +21,7 @@ class ledger.storage.MemoryStore extends ledger.storage.Store
   _raw_remove: (keys, cb=->) ->
     _.defer =>
       @_data = _(@_data).omit(keys)
+      @emit 'remove', keys
       cb?()
 
   extend: (data) ->

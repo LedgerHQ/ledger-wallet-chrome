@@ -14,20 +14,27 @@ class Collection
   constructor: (collection, context) ->
     @_collection = collection
     @_context = context
+    @_syncSubstores = {}
 
   insert: (model) ->
     model._object ?= {}
     model._object['objType'] = model.getCollectionName()
     model._object = @_collection.insert(model._object)
+    @_insertSynchronizedProperties(model)
     @_context.notifyDatabaseChange()
 
   remove: (model) ->
     return unless model?._object
-    model._object = @_collection.remove(model._object)
+    id = model.getBestIdentifier()
+    model.getBestIdentifier = -> id
+    @_collection.remove(model._object['$loki'])
+    @_removeSynchronizedProperties(model)
+    @_context.emit "delete:" + model._object['objType'].toLowerCase(), model
     @_context.notifyDatabaseChange()
 
   update: (model) ->
     @_collection.update(model._object)
+    @_updateSynchronizedProperties(model)
     @_context.notifyDatabaseChange()
 
   get: (id) -> @_modelize(@_collection.get(id))
@@ -70,11 +77,20 @@ class Collection
         object.set key, value
       object.save()
 
+  _getModelSyncSubstore: (model) -> @_syncSubstores["sync_#{model.getCollectionName().toLowerCase()}_#{model.getBestIdentifier()}"] ||= @_context._syncStore.substore("sync_#{model.getCollectionName().toLowerCase()}_#{model.getBestIdentifier()}")
+
   _insertSynchronizedProperties: (model) ->
+    return unless model.hasSynchronizedProperties()
+    l 'Insert', model.getSynchronizedProperties()
+    @_getModelSyncSubstore(model).set(model.getSynchronizedProperties())
 
   _updateSynchronizedProperties: (model) ->
+    return unless model.hasSynchronizedProperties()
+    @_getModelSyncSubstore(model).set(model.getSynchronizedProperties())
 
   _removeSynchronizedProperties: (model) ->
+    return unless model.hasSynchronizedProperties()
+    @_getModelSyncSubstore(model).remove(model.constructor.getSynchronizedPropertiesNames())
 
   query: () ->
     query = @_collection.chain()
@@ -151,8 +167,7 @@ class ledger.database.contexts.Context extends EventEmitter
       @emit "insert:" + data['objType'].toLowerCase(), @_modelize(data)
     collection.getCollection().on 'update', (data) =>
       @emit "update:" + data['objType'].toLowerCase(), @_modelize(data)
-    collection.getCollection().on 'delete', (data) =>
-      @emit "delete:" + data['objType'].toLowerCase(), @_modelize(data)
+
 
   onSyncStorePulled: ->
     @_syncStore.getAll (data) =>
