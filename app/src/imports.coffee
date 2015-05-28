@@ -405,4 +405,8 @@
           '../spec/m2fa/m2fa_spec'
           '../spec/tasks/address_derivation_task_spec'
           '../spec/wallet/extended_public_key_spec'
+
+          '../spec/utils/logger/log_spec'
+          '../spec/utils/logger/log_writer_spec'
+          '../spec/utils/logger/secure_log_writer_spec'
         ]

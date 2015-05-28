@@ -4,9 +4,8 @@
 
 class @ledger.utils.LogReader extends @ledger.utils.Log
 
-  constructor: (daysMax = 2) ->
-    @_daysMax = daysMax
-    super @_daysMax
+  constructor: (daysMax = 2, fsmode = PERSISTENT) ->
+    super @_daysMax, fsmode
 
 
 
@@ -33,8 +32,9 @@ class @ledger.utils.LogReader extends @ledger.utils.Log
               reader.readAsText(file)
           else
             done()
-    , @_errorHandler
-
+    , (e) =>
+      @_errorHandler(e)
+      callback?()
 
 
   _isFileOfMine: (name) ->

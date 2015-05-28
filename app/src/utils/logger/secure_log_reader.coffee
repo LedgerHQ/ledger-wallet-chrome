@@ -4,12 +4,11 @@
 
 class @ledger.utils.SecureLogReader extends @ledger.utils.LogReader
 
-  constructor: (daysMax=2, key='secureLog', bitIdAddress='1YnMY5FGugkuzJwdmbue9EtfsAFpQXcZy') ->
+  constructor: (key, bitIdAddress, daysMax=2, fsmode=PERSISTENT) ->
     @_bitIdAddress = bitIdAddress
-    @_daysMax = daysMax
     @_key = key
     @_aes = new ledger.crypto.AES(@_key)
-    super @_daysMax
+    super @_daysMax, fsmode
 
 
   read: (callback) ->

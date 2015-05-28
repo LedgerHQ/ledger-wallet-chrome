@@ -4,9 +4,8 @@
 
 class @ledger.utils.LogWriter extends @ledger.utils.Log
 
-  constructor: (daysMax = 2) ->
-    @_daysMax = daysMax
-    super @_daysMax
+  constructor: (daysMax = 2, fsmode = PERSISTENT) ->
+    super @_daysMax, fsmode
 
 
   write: (msg) ->
@@ -46,20 +45,26 @@ class @ledger.utils.LogWriter extends @ledger.utils.Log
     unless @_writer?.date is moment().format('YYYY-MM-DD')
       l 'Create new fileWriter'
       @_fs.root.getFile @_filename, {create: true}, (fileEntry) =>
+        l 'During wr'
         # Create a FileWriter object for our FileEntry
         fileEntry.createWriter (fileWriter) =>
+          l 'during 2'
           fileWriter.seek(fileWriter.length)
           @_writer = {date: moment().format('YYYY-MM-DD'), writer: fileWriter}
           callback? @_writer.writer
-        , @_errorHandler
-      , @_errorHandler
+        , (e) =>
+          @_errorHandler(e)
+          callback?()
+      , (e) =>
+        @_errorHandler(e)
+        callback?()
     else
       callback? @_writer.writer
 
 
 
   ###
-  Set file name with bitIdAdress and date of the day
+    Set file name with bitIdAdress and date of the day
   ###
   _setFileName: ->
     @_filename = "non_secure_#{ moment().format('YYYY_MM_DD') }.log"
