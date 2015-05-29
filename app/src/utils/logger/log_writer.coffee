@@ -14,7 +14,7 @@ class @ledger.utils.LogWriter extends @ledger.utils.Log
         @_write msg
     else
       @_deferedWrite = @_write(msg)
-    return
+    return @_deferedWrite
 
 
   ###
@@ -30,6 +30,7 @@ class @ledger.utils.LogWriter extends @ledger.utils.Log
         d.resolve()
       fileWriter.onerror = (e) ->
         l "Write failed"
+        l arguments
         d.resolve()
       blob = new Blob(['\n' + msg], {type:'text/plain'})
       fileWriter.write(blob)
@@ -44,11 +45,9 @@ class @ledger.utils.LogWriter extends @ledger.utils.Log
   _getFileWriter: (callback) ->
     unless @_writer?.date is moment().format('YYYY-MM-DD')
       l 'Create new fileWriter'
-      @_fs.root.getFile @_filename, {create: true}, (fileEntry) =>
-        l 'During wr'
+      @_fs.root.getFile @_getFileName(), {create: true}, (fileEntry) =>
         # Create a FileWriter object for our FileEntry
         fileEntry.createWriter (fileWriter) =>
-          l 'during 2'
           fileWriter.seek(fileWriter.length)
           @_writer = {date: moment().format('YYYY-MM-DD'), writer: fileWriter}
           callback? @_writer.writer
@@ -66,5 +65,5 @@ class @ledger.utils.LogWriter extends @ledger.utils.Log
   ###
     Set file name with bitIdAdress and date of the day
   ###
-  _setFileName: ->
-    @_filename = "non_secure_#{ moment().format('YYYY_MM_DD') }.log"
+  _getFileName: ->
+    "non_secure_#{ moment().format('YYYY_MM_DD') }.log"

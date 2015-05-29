@@ -30,5 +30,7 @@ class @ledger.utils.SecureLogReader extends @ledger.utils.LogReader
   ###
    Set file name with bitIdAdress and date of the day
   ###
+  ###
   _setFileName: ->
     @_filename = "secure_#{@_bitIdAddress}_#{ moment().format('YYYY_MM_DD') }.log"
+  ###

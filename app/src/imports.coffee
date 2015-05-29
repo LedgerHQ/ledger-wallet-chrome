@@ -407,6 +407,5 @@
           '../spec/wallet/extended_public_key_spec'
 
           '../spec/utils/logger/log_spec'
-          '../spec/utils/logger/log_writer_spec'
-          '../spec/utils/logger/secure_log_writer_spec'
+          '../spec/utils/logger/secure_log_spec'
         ]

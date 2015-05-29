@@ -29,68 +29,80 @@ class @ledger.utils.Log
     @param [Number] _daysMax The maximum number of days the logs are preserved
   ###
   constructor: (daysMax = 2, fsmode = PERSISTENT) ->
+    throw new Error 'Abstract class' if @constructor is ledger.utils.Log
+    @_fsmode = fsmode
     @_daysMax = daysMax
     @_daysMax = parseInt(@_daysMax)
-    unlockWriter = _.lock @, ['_getFileWriter', 'write', 'read', 'deleteAll', 'delete']
+    unlockWriter = _.lock @, ['_getFileWriter', 'write', 'read']
     if isNaN @_daysMax
       throw 'The first parameter must be a number'
     getFs(fsmode)
     .then (fs) =>
       @_fs = fs
-      @_setFileName()
-      # Delete old log files
-      @listDirFiles (files) =>
-        unless _(files).isEmpty()
-          for file in files
-            filedate = file.name.substr(-14, 10)
-            ms = moment(moment().format('YYYY-MM-DD')).diff moment(_.str.dasherize(filedate))
-            days   = moment.duration(ms).days()
-            months = moment.duration(ms).months()
-            years = moment.duration(ms).years()
-            # l 'days: ', days, 'months: ', months, 'years: ', years
-            if days > @_daysMax or months > 0 or years > 0
-              @delete file.name
-            # l 'days: ', days, 'months: ', months, 'years: ', years
-        unlockWriter()
+      @checkDate(fsmode) # Delete old log files
+      .then -> unlockWriter()
+      .done()
     .fail (e) =>
       @_errorHandler(e)
     .done()
+
+
+  checkDate: (fsmode) ->
+    d = ledger.defer()
+    @constructor.listDirFiles fsmode, (files) =>
+      loopFiles = (index, files, defer) =>
+        file = (files || [])[index]
+        return defer.resolve() unless file?
+        filedate = file.name.substr(-14, 10)
+        ms = moment(moment().format('YYYY-MM-DD')).diff moment(_.str.dasherize(filedate))
+        days   = moment.duration(ms).days()
+        months = moment.duration(ms).months()
+        years = moment.duration(ms).years()
+        #l 'days: ', days, 'months: ', months, 'years: ', years
+        if days > @_daysMax or months > 0 or years > 0
+          @constructor.delete fsmode, file.name, ->
+            loopFiles index + 1, files, defer
+        else
+          loopFiles index + 1, files, defer
+      loopFiles 0, files, d
+    d.promise
 
 
   ###
     Delete a file
     @param [String] filename The name of the file
   ###
-  delete: (filename, callback=undefined) ->
-    l 'before DELETE'
-    @_fs.root.getFile filename, {create: false}, (fileEntry) =>
-      l 'DURING DELETE'
-      fileEntry.remove ->
-        l 'AFTER DELETE'
+  @delete: (fsmode, filename, callback=undefined) ->
+    l 'delete'
+    getFs(fsmode).then (fs) =>
+      fs.root.getFile filename, {create: false}, (fileEntry) =>
+        fileEntry.remove ->
+          callback?()
+      , (e) =>
+        l "FileSystem Error. name: #{e.name} // message: #{e.message}"
+        l new Error().stack
         callback?()
-    , (e) =>
-      l 'AFTER DELETE'
-      @_errorHandler(e)
-      callback?()
 
 
   ###
     Delete all files in the root directory
   ###
-  deleteAll: (callback=undefined) ->
-    dirReader = @_fs.root.createReader()
-    dirReader.readEntries (results) =>
-      return callback?() if results.length is 0
-      _.async.each results, (entry, next, hasNext) =>
-        return unless entry?.name?
-        @delete entry.name, =>
-          unless hasNext
-            callback?()
-            return
-          do next
-    , (e) =>
-      @_errorHandler(e)
-      callback?()
+  @deleteAll: (fsmode=PERSISTENT, callback=undefined) ->
+    getFs(fsmode).then (fs) =>
+      dirReader = fs.root.createReader()
+      dirReader.readEntries (results) =>
+        return callback?() if results.length is 0
+        _.async.each results, (entry, next, hasNext) =>
+          return unless entry?.name?
+          @delete fsmode, entry.name, =>
+            unless hasNext
+              callback?()
+              return
+            do next
+      , (e) =>
+        l "FileSystem Error. name: #{e.name} // message: #{e.message}"
+        l new Error().stack
+        callback?()
 
 
 
@@ -98,23 +110,24 @@ class @ledger.utils.Log
     List files in the root directory
     @param [function] callback Callback function to handle an array of file entries
   ###
-  listDirFiles: (callback) ->
-    dirReader = @_fs.root.createReader()
-    entries = []
-    dirReader.readEntries (results) ->
-      for entry in results
-        entries.push entry
-      entries = entries.sort()
-      #l 'entries', entries
-      callback? entries
-    , (e) =>
-      @_errorHandler(e)
-      callback?()
+  @listDirFiles: (fsmode, callback) ->
+    getFs(fsmode).then (fs) =>
+      dirReader = fs.root.createReader()
+      entries = []
+      dirReader.readEntries (results) ->
+        for entry in results
+          entries.push entry
+        entries = entries.sort()
+        #l 'entries', entries
+        callback? entries
+      , (e) =>
+        @_errorHandler(e)
+        callback?()
 
 
-  getFs: getFs
+  @getFs: getFs
 
-  releaseFs: releaseFs
+  @releaseFs: releaseFs
 
 
   _errorHandler: (e) ->
