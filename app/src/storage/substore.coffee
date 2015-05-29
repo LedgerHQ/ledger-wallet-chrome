@@ -18,9 +18,6 @@ class ledger.storage.SubStore extends ledger.storage.Store
     catch e
       console.error("chrome.storage.local.get :", e)
 
-  set: (items, cb)->
-    super
-
   # @see ledger.storage.Store#_raw_set
   _raw_set: (items, cb=->) ->
     try

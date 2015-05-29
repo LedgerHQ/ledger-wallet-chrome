@@ -9,6 +9,9 @@ apduFilter = [
 
 class ledger.utils.ApduLogger extends ledger.utils.Logger
 
+  constructor: ->
+    super
+
   _storeLog: (msg, msgType) ->
     if msg.match(/(=>)/)?
       apdu = msg.substr(if msg.match(/(=> [0-9a-f]{14})/)? then 17 else 3)

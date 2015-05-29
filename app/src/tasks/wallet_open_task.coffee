@@ -13,6 +13,8 @@ openStores = (dongle, raise, done) ->
         ledger.app.emit 'wallet:initialization:fatal_error'
         return
       ledger.storage.openStores bitIdAddress, pubKey.bitcoinAddress.value
+      ledger.utils.Logger._secureWriter = new ledger.utils.SecureLogWriter(pubKey.bitcoinAddress.toString(ASCII), bitIdAddress, ledger.config.defaultLoggerDaysMax)
+      ledger.utils.Logger._secureReader = new ledger.utils.SecureLogReader(pubKey.bitcoinAddress.toString(ASCII), bitIdAddress, ledger.config.defaultLoggerDaysMax)
       done?()
       return
     return

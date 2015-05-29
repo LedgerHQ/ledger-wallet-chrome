@@ -135,6 +135,8 @@ require @ledger.imports, ->
       ledger.tasks.Task.resetAllSingletonTasks()
       ledger.database.contexts.close()
       ledger.database.close()
+      ledger.utils.Logger._secureWriter = null
+      ledger.utils.Logger._secureReader = null
       if removeDongle
         @dongle = null
       else

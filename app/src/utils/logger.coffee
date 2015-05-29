@@ -32,20 +32,16 @@ class @ledger.utils.Logger
 #################################
 # Class methods
 #################################
-  
-  # @return [Q.Promise]
-  @logs: (cb) -> @_getLogs(@store())
 
-  @publicLogs: (cb) -> @_getLogs(@_store ?= new ledger.storage.ChromeStore("logs"), cb)
+  @publicLogs: (cb) -> @_getLogs(@_publicReader ?= new ledger.utils.LogReader(ledger.config.defaultLoggerDaysMax), cb)
 
   @privateLogs: (cb) ->
-    return cb?([]) unless ledger.storage.logs?
-    @_getLogs(ledger.storage.logs, cb)
+    return cb?([]) unless ledger.utils.Logger._secureReader?
+    @_getLogs(ledger.utils.Logger._secureReader, cb)
 
-  @_getLogs: (store, cb) ->
+  @_getLogs: (reader, cb) ->
     d = ledger.defer(cb)
-    store.keys (keys) =>
-      store.get keys, (items) => d.resolve(_.values(items))
+    reader.read (lines) -> d.resolve(JSON.parse(line) for line in lines)
     d.promise
 
   # @return [legder.utils.Logger]
@@ -104,6 +100,28 @@ class @ledger.utils.Logger
         csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
         callback?(name: suggestedName, url: csv.url())
 
+  @exportLogsWithZipLink: (callback = undefined) ->
+    now = new Date()
+    publicSuggestedName = "ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
+    privateSuggestedName = "ledger_wallet_private_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
+    publicCsv = new ledger.utils.CsvExporter(publicSuggestedName)
+    privateCsv = new ledger.utils.CsvExporter(privateSuggestedName)
+    @publicLogs (publicLogs) =>
+      @privateLogs (privateLogs) =>
+        publicCsv.setContent(publicLogs)
+        publicCsv.beginZip (writer) ->
+          privateCsv.setContent(privateLogs)
+          privateCsv.addToZip writer, (writer) ->
+            publicCsv.endZip (zip) ->
+              callback?(name: publicSuggestedName, url: zip.url())
+
+  @downloadLogsWithZipLink: ->
+    @exportLogsWithZipLink (data) ->
+      pom = document.createElement('a')
+      pom.href = data.url
+      pom.setAttribute('download', data.name)
+      pom.click()
+
   @downloadLogsWithLink: ->
     @exportLogsWithLink (data) ->
       pom = document.createElement('a')
@@ -121,17 +139,16 @@ class @ledger.utils.Logger
   @_createStream: ->
     stream = new Stream()
     stream.on "data", =>
-      stream._store ||= ledger.storage.logs
-      return unless stream._store?
+      stream._writer ||= ledger.utils.Logger._secureWriter
+      return unless stream._writer?
       logs = stream.read()
       # Insert logs
-      data = {}
+      data = []
       for log in logs
         for key, entry of log
-          data[key] = entry
-      stream._store.set data
-      # Clear old
-      @_clear(stream.store)
+          data.push entry
+      for line in data
+        stream._writer.write JSON.stringify(line)
       stream.close() if @_logStream isnt stream
     stream.open()
     stream
@@ -148,7 +165,7 @@ class @ledger.utils.Logger
     @level = Levels.ALL if @level is true
     @level = Levels.NONE if @level is false
     @setPersistentLogsEnabled on
-    @constructor._loggers[tag] = this
+    ledger.utils.Logger._loggers[tag] = this
 
   setPersistentLogsEnabled: (enable) -> @_areLogsPersistents = enable
 
@@ -158,9 +175,9 @@ class @ledger.utils.Logger
 
   # Return Logger class storage if initialized or undefined.
   # @return [ledger.storage.ChromeStore, undefined]
-  store: -> @constructor.store()
+  store: -> ledger.utils.Logger.store()
 
-  isPrivateModeEnabled: -> @constructor.isPrivateModeEnabled()
+  isPrivateModeEnabled: -> ledger.utils.Logger.isPrivateModeEnabled()
 
   # Sets the log level
   # @param [Boolean] active or not the logger.
@@ -236,15 +253,16 @@ class @ledger.utils.Logger
   # @param [String] msg Message to log.
   # @param [String] msgType Log level.
   _storeLog: (msg, msgType) ->
+    l 'NOT PERSISTENT' unless @_areLogsPersistents
     return unless @_areLogsPersistents
     now = new Date()
     log = {}
-    log[now.getTime()] = date: now.toUTCString(), type: msgType,  tag: @_tag, msg: msg
+    entry = date: now.toUTCString(), type: msgType,  tag: @_tag, msg: msg
+    log[now.getTime()] = entry
     if @isPrivateModeEnabled()
       @_privateLogStream().write(log)
     else
-      @clear()
-      @store().set(log)
+      (ledger.utils.Logger._publicWriter ||= new ledger.utils.LogWriter(ledger.config.defaultLoggerDaysMax)).write JSON.stringify(entry)
 
   #################################
   # Protected. Formatting methods
@@ -341,7 +359,7 @@ class @ledger.utils.Logger
 
     console[method](args...)
 
-  _privateLogStream: -> @constructor._logStream
+  _privateLogStream: -> ledger.utils.Logger._logStream
 
 # Shortcuts
 if @ledger.isDev

@@ -76,6 +76,11 @@
         ## Logger
         'utils/logger'
         'utils/apdu_logger'
+        'utils/logger/log'
+        'utils/logger/log_writer'
+        'utils/logger/log_reader'
+        'utils/logger/secure_log_writer'
+        'utils/logger/secure_log_reader'
 
         ## Routes
         'routes'
@@ -410,5 +415,10 @@
 
           '../spec/wallet/extended_public_key_spec'
 
+<<<<<<< HEAD
           '../spec/database/sync_properties'
+=======
+          '../spec/utils/logger/log_spec'
+          '../spec/utils/logger/secure_log_spec'
+>>>>>>> master
         ]

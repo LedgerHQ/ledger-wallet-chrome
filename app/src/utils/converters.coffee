@@ -47,7 +47,7 @@ class ledger.converters
     currencies = ledger.tasks.TickerTask.instance.getCache()
 
     # currencyValueBTC is the amount in the given currency for 1 BTC
-    currencyValueBTC = currencies[currency].values[0]['fromBTC'].value || 0
+    currencyValueBTC = currencies[currency]?.values[0]['fromBTC'].value || 0
     val = currencyValueBTC * Math.pow(10, -8)
     currencyValueSatoshi = val * satoshiValue
     ledger.i18n.formatNumber(parseFloat(currencyValueSatoshi.toFixed(2)))
