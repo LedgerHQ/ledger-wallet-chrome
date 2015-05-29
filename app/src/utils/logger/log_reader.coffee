@@ -5,7 +5,6 @@
 class @ledger.utils.LogReader extends @ledger.utils.Log
 
   constructor: (daysMax = 2, fsmode = PERSISTENT) ->
-    @_setFileName()
     super @_daysMax, fsmode
 
 
@@ -41,11 +40,3 @@ class @ledger.utils.LogReader extends @ledger.utils.Log
   _isFileOfMine: (name) ->
     regex = "non_secure_[\\d]{4}_[\\d]{2}_[\\d]{2}\\.log"
     name.match new RegExp(regex)
-
-
-
-  ###
-  Set file name with bitIdAdress and date of the day
-  ###
-  _setFileName: ->
-      @_filename = "non_secure_#{ moment().format('YYYY_MM_DD') }.log"

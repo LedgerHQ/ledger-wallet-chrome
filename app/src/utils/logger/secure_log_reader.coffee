@@ -25,12 +25,3 @@ class @ledger.utils.SecureLogReader extends @ledger.utils.LogReader
   _isFileOfMine: (name) ->
     regex = "secure_#{@_bitIdAddress}_[\\d]{4}_[\\d]{2}_[\\d]{2}\\.log"
     name.match new RegExp(regex)
-
-
-  ###
-   Set file name with bitIdAdress and date of the day
-  ###
-  ###
-  _setFileName: ->
-    @_filename = "secure_#{@_bitIdAddress}_#{ moment().format('YYYY_MM_DD') }.log"
-  ###

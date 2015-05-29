@@ -47,6 +47,9 @@ class @ledger.utils.Log
     .done()
 
 
+  ###
+    Remove old files
+  ###
   checkDate: (fsmode) ->
     d = ledger.defer()
     @constructor.listDirFiles fsmode, (files) =>
@@ -73,7 +76,6 @@ class @ledger.utils.Log
     @param [String] filename The name of the file
   ###
   @delete: (fsmode, filename, callback=undefined) ->
-    l 'delete'
     getFs(fsmode).then (fs) =>
       fs.root.getFile filename, {create: false}, (fileEntry) =>
         fileEntry.remove ->
