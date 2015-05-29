@@ -143,11 +143,12 @@ class @ledger.utils.Logger
       return unless stream._writer?
       logs = stream.read()
       # Insert logs
-      data = {}
+      data = []
       for log in logs
         for key, entry of log
-          data[key] = entry
-      stream._writer.write JSON.stringify(line) for line in _.values data
+          data.push entry
+      for line in data
+        stream._writer.write JSON.stringify(line)
       stream.close() if @_logStream isnt stream
     stream.open()
     stream
