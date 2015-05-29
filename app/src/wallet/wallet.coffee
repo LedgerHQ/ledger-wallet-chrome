@@ -109,7 +109,8 @@ class ledger.wallet.Wallet.Account
     @_store.get [@_storeId], (result) =>
       @_account = result[@_storeId]
       @_initialize()
-      @initializeXpub callback
+      callback?()
+      #@initializeXpub callback
 
   release: () ->
     @wallet = null
@@ -192,13 +193,13 @@ class ledger.wallet.Wallet.Account
     return
 
   _notifyPublicAddressIndexAsUsed: (index) ->
-    logger().info 'Notify public change', index, 'current is', @_account.currentPublicIndex
+    #logger().info 'Notify public change', index, 'current is', @_account.currentPublicIndex
     if index < @_account.currentPublicIndex
-      logger().info 'Index is less than current'
+      #logger().info 'Index is less than current'
       derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
       @_account.excludedPublicPaths = _.without @_account.excludedPublicPaths, derivationPath
     else if index > @_account.currentPublicIndex
-      logger().info 'Index is more than current'
+      #logger().info 'Index is more than current'
       difference =  index - (@_account.currentPublicIndex + 1)
       @_account.excludedPublicPaths ?= []
       for i in [0...difference]
@@ -206,7 +207,7 @@ class ledger.wallet.Wallet.Account
         @_account.excludedPublicPaths.push derivationPath unless _.contains(@_account.excludedPublicPaths, derivationPath)
       @_account.currentPublicIndex = parseInt(index) + 1
     else if index == @_account.currentPublicIndex
-      logger().info 'Index is equal to current'
+      #logger().info 'Index is equal to current'
       @shiftCurrentPublicAddressPath()
     @save()
 

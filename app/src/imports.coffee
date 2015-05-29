@@ -76,6 +76,11 @@
         ## Logger
         'utils/logger'
         'utils/apdu_logger'
+        'utils/logger/log'
+        'utils/logger/log_writer'
+        'utils/logger/log_reader'
+        'utils/logger/secure_log_writer'
+        'utils/logger/secure_log_reader'
 
         ## Routes
         'routes'
@@ -211,6 +216,7 @@
         'models/account'
         'models/operation'
         'models/configuration'
+        'models/account_tag'
 
         ## Dialog Management
         'utils/dialogs'
@@ -408,4 +414,8 @@
           '../spec/tasks/wallet_layout_recovery_task_spec'
 
           '../spec/wallet/extended_public_key_spec'
+
+          '../spec/database/sync_properties'
+          '../spec/utils/logger/log_spec'
+          '../spec/utils/logger/secure_log_spec'
         ]

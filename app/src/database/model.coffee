@@ -5,9 +5,9 @@ resolveRelationship = (object, relationship) ->
     when 'many_one'
       object._collection.getRelationshipView(object, relationship).modelize()
     when 'one_many'
-      Class.findById object.get("#{relationship.name}_id")
+      Class.find(_.object([Class.getBestIdentifierName()], [object.get("#{relationship.name}_id")])).data()[0]
     when 'one_one'
-      Class.findById object.get("#{relationship.name}_id")
+      Class.find(_.object([Class.getBestIdentifierName()], [object.get("#{relationship.name}_id")])).data()[0]
     when 'many_many'
       object._collection.getRelationshipView(object, relationship).modelize()
 
@@ -31,7 +31,13 @@ class @ledger.database.Model extends @EventEmitter
     else
       @_object?[key]
 
-  getId: () -> @_object?['$loki']
+  getId: () -> @getBestIdentifier()
+  getLokiId: -> @_object?['$loki']
+  @getBestIdentifierName: -> @_bestIdentifier
+
+  getBestIdentifierName: -> @constructor.getBestIdentifierName()
+
+  getBestIdentifier: -> @_object?[@constructor.getBestIdentifierName()]
 
   set: (key, value) ->
     @_object ?= {}
@@ -89,9 +95,7 @@ class @ledger.database.Model extends @EventEmitter
   delete: () ->
     if not @_deleted and @onDelete() isnt false
       if @getRelationships()?
-        l 'Check relations ', @getRelationships()
         for relationshipName, relationship of @getRelationships()
-          l relationship
           switch relationship.onDelete
             when 'destroy'
               switch relationship.type
@@ -135,7 +139,6 @@ class @ledger.database.Model extends @EventEmitter
   # Called before a model is removed from another model as a many_* relationship
   onRemove: () ->
 
-
   isInserted: () -> if @_object?.meta? then yes else no
 
   isDeleted: () -> @_deleted
@@ -156,16 +159,16 @@ class @ledger.database.Model extends @EventEmitter
       when 'many_one'
         for v in pending.add
           value = @_getModelValue(relationship, v)
-          value.set("#{relationship.inverse}_id", @getId())
+          value.set("#{relationship.inverse}_id", @getBestIdentifier())
           value.save()
       when 'one_many'
         value = @_getModelValue(relationship, pending.add)
-        @_object["#{relationship.name}_id"] = value.getId()
+        @_object["#{relationship.name}_id"] = value.getBestIdentifier()
         @_collection.update this
       when 'one_one'
         value = @_getModelValue(relationship, pending.add)
-        @_object["#{relationship.name}_id"] = value.getId()
-        value.set("#{relationship.inverse}_id", @getId())
+        @_object["#{relationship.name}_id"] = value.getBestIdentifier()
+        value.set("#{relationship.inverse}_id", @getBestIdentifier())
         value.save()
         @_collection.update this
       when 'many_many' then throw 'many:many relationships are not implemented yet'
@@ -182,7 +185,7 @@ class @ledger.database.Model extends @EventEmitter
         @_collection.update this
       when 'one_one'
         value = @get(relationship.name)
-        @_object["#{relationship.name}_id"] = value.getId()
+        @_object["#{relationship.name}_id"] = value.getBestIdentifier()
         value.set("#{relationship.inverse}_id", null)
         value.save()
         @_collection.update this
@@ -199,9 +202,19 @@ class @ledger.database.Model extends @EventEmitter
         @_commitRemovePendingRelationship(pending, relationship)
     @_pendingRelationships = null
 
-  @create: (base, context = ledger.database.contexts.main) -> new @ context, base
+  @create: (base, context = ledger.database.contexts.main) ->
+    [bestIdentifier] = _(@_indexes).filter (i) => i.options.unique is yes and i.field is @getBestIdentifierName() and i.options.auto is yes
+    (base ||= {})[bestIdentifier.field] = @uniqueId(bestIdentifier.field) if bestIdentifier?
+    new @ context, base
 
-  @findById: (id, context = ledger.database.contexts.main) -> context.getCollection(@getCollectionName()).get(id)
+  @uniqueId: (prefix = "") -> ledger.crypto.SHA256.hashString(prefix + (byte.toString(16) for byte in crypto.getRandomValues(new Uint8Array(32))).join(''))
+
+
+  @findById: (id, context = ledger.database.contexts.main) ->
+    if @getBestIdentifierName() is '$loki'
+      context.getCollection(@getCollectionName()).get(id)
+    else
+      @find(_.object([@getBestIdentifierName()], [id]), context).data()[0]
 
   @findOrCreate: (query, base, context = ledger.database.contexts.main) ->
     if _.isKindOf(base, ledger.database.contexts.Context)
@@ -232,13 +245,16 @@ class @ledger.database.Model extends @EventEmitter
       @_createRelationship(relationshipDeclaration, 'one')
 
   @_createRelationship: (relationshipDeclaration, myType) ->
-    r = if _.isArray(relationshipDeclaration['many']) then relationshipDeclaration['many'] else [relationshipDeclaration['many'], _.str.capitalize(_.singularize(relationshipDeclaration['many']))]
+    if myType is 'many'
+      r = if _.isArray(relationshipDeclaration['many']) then relationshipDeclaration['many'] else [relationshipDeclaration['many'], _.str.capitalize(_.singularize(_.str.camelize(relationshipDeclaration['many'])))]
+    else
+      r = if _.isArray(relationshipDeclaration['one']) then relationshipDeclaration['one'] else [relationshipDeclaration['one'], _.str.capitalize(_.str.camelize(relationshipDeclaration['one']))]
     if relationshipDeclaration['forOne']?
       i = [relationshipDeclaration['forOne'], 'one']
     else if relationshipDeclaration['forMany']?
       i =  [relationshipDeclaration['forMany'], 'many']
     else
-      i = [@name.toLocaleLowerCase(), 'one']
+      i = [_.str.underscored(@name).toLocaleLowerCase(), 'one']
     sort = null
     if relationshipDeclaration['sortBy']?
       sort = relationshipDeclaration['sortBy']
@@ -263,7 +279,15 @@ class @ledger.database.Model extends @EventEmitter
     unless _.contains(['nullify', 'destroy', 'none'], onDelete)
       e "Relationship #{@name}::#{r[0]} delete rule '#{onDelete}' is not valid. Please review this. Should be either 'nullify', 'none' or 'destroy'"
       onDelete = 'nullify'
-    relationship = name: r[0], type: "#{myType}_#{i[1]}", inverse: i[0], Class: r[1], inverseType: "#{i[1]}_#{myType}", sort: sort, onDelete: onDelete
+    relationship = name: r[0], type: "#{myType}_#{i[1]}", inverse: i[0], Class: r[1], inverseType: "#{i[1]}_#{myType}", sort: sort, onDelete: onDelete, sync: relationshipDeclaration.sync
+    try
+      if relationshipDeclaration.sync is true
+        if myType is 'one'
+          @sync "#{relationship.name}_id"
+        else
+          e "Cannot synchronize relationship #{@name}-#{relationship.name}, please synchronize relationship #{relationship.name}-#{@name}"
+    catch er
+      e er
     @_relationships ?= {}
     @_relationships[relationship.name] = relationship
 
@@ -271,19 +295,36 @@ class @ledger.database.Model extends @EventEmitter
     throw 'This methods should only be called once by Model' unless @ is Model
     # Ensure all relationships are bound and consistent between models (each relationship are sets in both directions)
     for ClassName, Class of @AllModelClasses()
+      Class._synchronizedIndex = _(Class._indexes).filter (i) -> i.options?.sync is yes
+      e "Found multiple synchronized indexes in declaration of model #{ClassName}" if Class._synchronizedIndex.length > 1
+      [Class._synchronizedIndex] = Class._synchronizedIndex
+      e "Found synchronized property without any synchronized index. Add @index 'index_name', sync: yes. In the declaration of #{ClassName}" if Class._synchronizedProperties?.length > 0 and not Class._synchronizedIndex
       for relationshipName, relationship of Class._relationships
         InverseClass = window[relationship.Class]
         if InverseClass._relationships? and InverseClass._relationships[relationship.inverse]?.inverse is relationship.name and InverseClass._relationships[relationship.inverse]?.type is relationship.inverseType and InverseClass._relationships[relationship.inverse]?.Class is ClassName
           continue
         else if not InverseClass._relationships?[relationship.inverse]
           InverseClass._relationships ?= {}
+
           InverseClass._relationships[relationship.inverse] = name: relationship.inverse, type: relationship.inverseType, inverse:relationship.name, Class: ClassName, inverseType: relationship.type, onDelete: 'nullify'
         else
           e "Bad relationship #{relationship.name} <-> #{relationship.inverse}. You must absolutely check for errors for classes #{ClassName} and #{relationship.Class}"
 
-  @index: (field) ->
+      Class._bestIdentifier =
+        if Class._synchronizedIndex?
+          Class._synchronizedIndex.field
+        else if (bestId = _(Class._indexes).find((i) -> i.options['unique']? is true))?.length is 1
+          bestId[0]
+        else
+          '$loki'
+
+  @index: (field, options = {}) ->
     @_indexes ?= []
-    @_indexes.push field
+    @_indexes.push {field, options}
+
+  @sync: (propertyName, options = {}) ->
+    @_synchronizedProperties ?= []
+    @_synchronizedProperties.push {property: propertyName, options}
 
   @init: () ->
     ledger.database.Model._allModelClasses ?= {}
@@ -294,6 +335,18 @@ class @ledger.database.Model extends @EventEmitter
   getCollectionName: () -> @constructor.getCollectionName()
 
   @AllModelClasses: () -> @_allModelClasses
+
+  getSynchronizedProperties: ->
+    return {} if not @_object? or not @constructor._synchronizedIndex?
+    object = {}
+    object[@constructor.getBestIdentifierName()] = @_object[@constructor.getBestIdentifierName()]
+    for property in (@constructor._synchronizedProperties or [])
+      object[property.property] = @_object[property.property]
+    object
+
+  @getSynchronizedPropertiesNames: -> (if @_synchronizedIndex? then [@_synchronizedIndex.field] else []).concat (property.property for property in (@_synchronizedProperties or []))
+
+  hasSynchronizedProperties: -> @constructor._synchronizedIndex? and @constructor._synchronizedIndex isnt undefined
 
   serialize: () ->
     json = $.extend {}, @_object

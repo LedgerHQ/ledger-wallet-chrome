@@ -1,4 +1,10 @@
 # Changelog
+
+1.3.3
+====
+- Improve application performances
+- Bug fixes
+
 1.3.2
 ====
 - Fix a bug during transaction preparation

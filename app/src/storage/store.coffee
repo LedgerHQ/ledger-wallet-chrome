@@ -23,6 +23,10 @@ class @ledger.storage.Store extends EventEmitter
     keys = [keys] unless _(keys).isArray()
     this._raw_get this._preprocessKeys(keys), (raw_items) => cb(@_deprocessItems(raw_items))
 
+  getAll: (cb) ->
+    @keys (keys) =>
+      @get(keys, cb)
+
   # Stores one or many item
   #
   # @param [Object] items Items to store
@@ -55,6 +59,7 @@ class @ledger.storage.Store extends EventEmitter
   # @param [Function] cb A callback invoked once the store is cleared.
   clear: (cb) ->
     this._raw_keys (raw_keys) =>
+      raw_keys = _(raw_keys).filter (key) => key.match(@_nameRegex)?
       this._raw_remove raw_keys, (raw_items) => cb?(@_deprocessItems(raw_items))
 
   # Raw get, without processing.
@@ -77,7 +82,7 @@ class @ledger.storage.Store extends EventEmitter
 
   _preprocessKey: (key) -> @_to_ns_key(key)
   _preprocessKeys: (keys) -> _.flatten([keys]).map((key) => @_preprocessKey(key))
-  _preprocessValue: (value) -> if value.toJson? then value.toJson() else JSON.stringify(value)
+  _preprocessValue: (value) -> if value?.toJson? then value.toJson() else JSON.stringify(value)
   _preprocessItems: (items) ->
     hash = {}
     for key, value of @_hashize(items)
@@ -99,7 +104,9 @@ class @ledger.storage.Store extends EventEmitter
       try @_deprocessKey(raw_key) catch e
         undefined
     ).compact().value()
-  _deprocessValue: (raw_value) -> JSON.parse(raw_value)
+  _deprocessValue: (raw_value) ->
+    l "parse", raw_value
+    JSON.parse(raw_value)
   _deprocessItems: (raw_items) ->
     hash = {}
     for raw_key, raw_value of raw_items

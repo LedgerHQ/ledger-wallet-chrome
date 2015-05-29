@@ -125,6 +125,7 @@ require @ledger.imports, ->
     _releaseWallet: (removeDongle = yes) ->
       @emit 'dongle:disconnected'
       @_listenCountervalueEvents(false)
+      ledger.bitcoin.bitid.reset()
       ledger.preferences.close()
       ledger.utils.Logger.updateGlobalLoggersLevel()
       Wallet.releaseWallet()
@@ -134,6 +135,8 @@ require @ledger.imports, ->
       ledger.tasks.Task.resetAllSingletonTasks()
       ledger.database.contexts.close()
       ledger.database.close()
+      ledger.utils.Logger._secureWriter = null
+      ledger.utils.Logger._secureReader = null
       if removeDongle
         @dongle = null
       else

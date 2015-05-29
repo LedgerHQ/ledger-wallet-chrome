@@ -40,6 +40,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         @_changes = item['__sync_changes'].concat(@_changes) if item['__sync_changes']?
         @_unlockMethods()
         @throttled_pull()
+        @debounced_push() if @_changes.length > 0
 
   pull: ->
     @throttled_pull()
@@ -90,7 +91,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
 
   clear: (cb) ->
     super(cb)
-    @_changes = {}
+    @_clearChanges()
     @client.delete_settings()
 
   # @return A promise
@@ -128,17 +129,17 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         # Remote data are not using the new format. Just update the current local storage
         @_setAllData(remoteData)
       else if (remoteHashes.indexOf(localHashes) >= (@HASHES_CHAIN_MAX_SIZE * 3 / 4) * (64 + 1)) or remoteHashes.indexOf(localHashes) is -1
-        @_changes = []
+        @_clearChanges()
         @_setAllData(remoteData)
       else if (localData['__hashes'] or []).join(' ').indexOf((remoteData['__hashes'] or []).join(' ').substr(0, 2 * 64 + 1)) != -1
         # We are up to date do nothing
-        ledger.defer().resolve().promise
+        @_setAllData(remoteData)
       else
         [nextCommitHash, nextCommitData] = @_computeCommit(localData, @_changes)
         if _(remoteData['__hashes']).contains(nextCommitData)
           # The hash next commit already exists drop the changes
-          @_setAllData(remoteHasheso)
-          @_changes = []
+          @_setAllData(remoteData)
+          @_clearChanges()
         else
           @_setAllData(remoteData)
 
@@ -151,7 +152,8 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     # Else
     # Update consistency chain
     # Push
-    return if @_changes.length is 0
+    return ledger.defer().reject(Errors.NoChanges).promise if @_changes.length is 0
+
     @_deferredPush ?= ledger.defer()
     hasRemoteData = yes
     unlockMutableOperations = _.noop
@@ -172,7 +174,9 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
         checkData['__hashes'] = _(checkData['__hashes']).without(checkData['__hashes'][0])
         checkData = _(checkData).omit('__hashes') if checkData['__hashes'].length is 0
         [lastCommitHash, __] = @_computeCommit(checkData, @_changes)
-        throw Errors.NoChanges if lastCommitHash is data['__hashes'][0]
+        if lastCommitHash is data['__hashes'][0]
+          @_clearChanges()
+          throw Errors.NoChanges
       # Create commit hash
       [commitHash, pushedData] = @_computeCommit(data, @_changes)
       # Jsonify data
@@ -181,6 +185,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     .then (md5) =>
       @_setLastMd5(md5)
       # Merge changes into store
+      @_clearChanges()
       @_setAllData(pushedData)
     .then () => @emit 'pushed', this
     .fail (e) =>

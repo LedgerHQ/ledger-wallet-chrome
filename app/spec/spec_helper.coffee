@@ -57,7 +57,6 @@ Do a && for each word in each string, do a || between strings
 _restoreChromeStore = ->
   intervalID = setInterval ->
     if jsApiReporter.status() is 'done'
-      l 'Restore original storage'
       ledger.specs.storage.restore ->
         clearInterval intervalID
   , 1000

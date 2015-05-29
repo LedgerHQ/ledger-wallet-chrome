@@ -13,6 +13,8 @@ openStores = (dongle, raise, done) ->
         ledger.app.emit 'wallet:initialization:fatal_error'
         return
       ledger.storage.openStores bitIdAddress, pubKey.bitcoinAddress.value
+      ledger.utils.Logger._secureWriter = new ledger.utils.SecureLogWriter(pubKey.bitcoinAddress.toString(ASCII), bitIdAddress, ledger.config.defaultLoggerDaysMax)
+      ledger.utils.Logger._secureReader = new ledger.utils.SecureLogReader(pubKey.bitcoinAddress.toString(ASCII), bitIdAddress, ledger.config.defaultLoggerDaysMax)
       done?()
       return
     return
@@ -35,9 +37,15 @@ startDerivationTask = (dongle, raise, done) ->
     done?()
 
 openAddressCache = (dongle, raise, done) ->
-  cache = new ledger.wallet.Wallet.Cache(ledger.wallet.Wallet.instance)
+  cache = new ledger.wallet.Wallet.Cache('cache', ledger.wallet.Wallet.instance)
   cache.initialize =>
     ledger.wallet.Wallet.instance.cache = cache
+    done?()
+
+openXpubCache = (dongle, raise, done) ->
+  cache = new ledger.wallet.Wallet.Cache('xpub_cache', ledger.wallet.Wallet.instance)
+  cache.initialize =>
+    ledger.wallet.Wallet.instance.xpubCache = cache
     done?()
 
 restoreStructure = (dongle, raise, done) ->
@@ -79,6 +87,7 @@ ProceduresOrder = [
   openHdWallet
   startDerivationTask
   openAddressCache
+  openXpubCache
   openDatabase
   initializeWalletModel
   restoreStructure

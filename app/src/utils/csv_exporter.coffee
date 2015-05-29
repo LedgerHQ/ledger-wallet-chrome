@@ -83,3 +83,22 @@ class ledger.utils.CsvExporter
         zipWriter.close(callback)
     , (e) =>
       callback?(null)
+
+  beginZip: (callback) ->
+    zip.createWriter new zip.BlobWriter("application/zip"), (zipWriter) =>
+      @_zipWriter = zipWriter
+      @addToZip(zipWriter, callback)
+
+  endZip: (callback) ->
+    @_zipWriter.close (blob) ->
+      blob.url = -> URL.createObjectURL(this)
+      callback?(blob)
+
+  addToZip: (zipWriter, callback) ->
+    suggestedName = "#{@_defaultFileName}.csv"
+    zipWriter.add suggestedName, new zip.BlobReader(@blob()), =>
+      callback?(zipWriter)
+
+  zipUrl: (callback) ->
+    @zip (zip) ->
+      callback?(if zip? then URL.createObjectURL(zip) else null)

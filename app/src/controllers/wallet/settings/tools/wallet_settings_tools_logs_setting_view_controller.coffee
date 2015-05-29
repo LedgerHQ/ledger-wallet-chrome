@@ -14,7 +14,7 @@ class @WalletSettingsToolsLogsSettingViewController extends WalletSettingsSettin
     @_updateExportLogsRowAlpha()
 
   exportLogs: ->
-    ledger.utils.Logger.downloadLogsWithLink()
+    ledger.utils.Logger.downloadLogsWithZipLink()
 
   _updateSwitchState: ->
       # update switch state

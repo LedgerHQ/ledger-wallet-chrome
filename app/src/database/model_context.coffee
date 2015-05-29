@@ -14,25 +14,33 @@ class Collection
   constructor: (collection, context) ->
     @_collection = collection
     @_context = context
+    @_syncSubstores = {}
 
   insert: (model) ->
     model._object ?= {}
     model._object['objType'] = model.getCollectionName()
     model._object = @_collection.insert(model._object)
+    @_insertSynchronizedProperties(model)
     @_context.notifyDatabaseChange()
 
   remove: (model) ->
-    model._object = @_collection.remove(model._object)
+    return unless model?._object
+    id = model.getBestIdentifier()
+    model.getBestIdentifier = -> id
+    @_collection.remove(model._object['$loki'])
+    @_removeSynchronizedProperties(model)
+    @_context.emit "delete:" + model._object['objType'].toLowerCase(), model
     @_context.notifyDatabaseChange()
 
   update: (model) ->
     @_collection.update(model._object)
+    @_updateSynchronizedProperties(model)
     @_context.notifyDatabaseChange()
 
   get: (id) -> @_modelize(@_collection.get(id))
 
   getRelationshipView: (object, relationship) ->
-    viewName = "#{relationship.type}_#{relationship.name}_#{relationship.inverse}:#{object.getId()}"
+    viewName = "#{relationship.type}_#{relationship.name}_#{relationship.inverse}:#{object.getBestIdentifier()}"
     collectionName = collectionNameForRelationship(object, relationship)
     view = @_context.getCollection(collectionName).getCollection().getDynamicView(viewName)
     unless view?
@@ -40,7 +48,7 @@ class Collection
       switch relationship.type
         when 'many_one'
           query = {}
-          query["#{relationship.inverse}_id"] = object.getId()
+          query["#{relationship.inverse}_id"] = object.getBestIdentifier()
           view.applyFind(query)
         when 'many_many' then throw 'Not implemented yet'
       if _(relationship.sort).isArray() and relationship.sort.length is 1
@@ -52,6 +60,41 @@ class Collection
     view.modelize = =>
       @_modelize(view.data())
     view.rematerialize()
+
+  updateSynchronizedProperties: (data) ->
+    synchronizedIndexField = @getModelClass()._synchronizedIndex.field
+    objectDeclarations = _(data).pick (v, key) => key.match("__sync_#{_.str.underscored(@_collection.name).toLowerCase()}_\\d_#{synchronizedIndexField}")
+    for key, index of objectDeclarations
+      objectNamePattern = "__sync_#{_.str.underscored(@_collection.name).toLowerCase()}_#{index}_"
+      l objectNamePattern
+      [object] = @getModelClass().find(_.object([synchronizedIndexField], [index]), @_context).data()
+      synchronizedObject = {}
+      for key, value of data when key.match(objectNamePattern)
+        key = key.replace(objectNamePattern, '')
+        synchronizedObject[key] = value
+      unless object?
+        object = @getModelClass().create(synchronizedObject, @_context)
+      else
+        object.set key, value
+      l object
+      object.save()
+
+  _getModelSyncSubstore: (model) -> @_syncSubstores["sync_#{_.str.underscored(model.getCollectionName()).toLowerCase()}_#{model.getBestIdentifier()}"] ||= @_context._syncStore.substore("sync_#{_.str.underscored(model.getCollectionName()).toLowerCase()}_#{model.getBestIdentifier()}")
+
+  _insertSynchronizedProperties: (model) -> @_updateSynchronizedProperties(model)
+
+  _updateSynchronizedProperties: (model) ->
+    return unless model.hasSynchronizedProperties()
+    dataToSet = {}
+    dataToRemove = {}
+    for key, value of model.getSynchronizedProperties()
+      (if value? then dataToSet else dataToRemove)[key] = value
+    @_getModelSyncSubstore(model).set(dataToSet)
+    @_getModelSyncSubstore(model).remove(_(dataToRemove).keys())
+
+  _removeSynchronizedProperties: (model) ->
+    return unless model.hasSynchronizedProperties()
+    @_getModelSyncSubstore(model).remove(model.constructor.getSynchronizedPropertiesNames())
 
   query: () ->
     query = @_collection.chain()
@@ -67,6 +110,7 @@ class Collection
     query
 
   getCollection: () -> @_collection
+  getModelClass: -> ledger.database.Model.AllModelClasses()[@getCollection().name]
 
   _modelize: (data) ->
     return null unless data?
@@ -84,20 +128,25 @@ class Collection
 
 class ledger.database.contexts.Context extends EventEmitter
 
-  constructor: (db) ->
+  constructor: (db, syncStore = ledger.storage.sync) ->
     @_db = db
     @_collections = {}
+    @_synchronizedCollections = {}
+    @_syncStore = syncStore
     for collection in @_db.getDb().listCollections()
       @_collections[collection.name] = new Collection(@_db.getDb().getCollection(collection.name), @)
       @_listenCollectionEvent(@_collections[collection.name])
+    @_syncStore.on 'pulled', (@onSyncStorePulled = @onSyncStorePulled.bind(this))
+    @onSyncStorePulled()
     @initialize()
 
   initialize: () ->
     modelClasses = ledger.database.Model.AllModelClasses()
     for className, modelClass of modelClasses
+      @_synchronizedCollections[className] = modelClass if modelClass._synchronizedIndex?
       collection = @getCollection(className)
       collection.getCollection().DynamicViews = []
-      collection.getCollection().ensureIndex(index) for index in modelClass._indexes if modelClass.__indexes?
+      collection.getCollection().ensureIndex(index.field) for index in modelClass._indexes if modelClass.__indexes?
     try
       new ledger.database.MigrationHandler(@).applyMigrations()
     catch er
@@ -115,14 +164,20 @@ class ledger.database.contexts.Context extends EventEmitter
     @_db.scheduleFlush()
 
   close: ->
+    @_syncStore.off 'pulled', @onSyncStorePulled
 
   _listenCollectionEvent: (collection) ->
     collection.getCollection().on 'insert', (data) =>
       @emit "insert:" + data['objType'].toLowerCase(), @_modelize(data)
     collection.getCollection().on 'update', (data) =>
       @emit "update:" + data['objType'].toLowerCase(), @_modelize(data)
-    collection.getCollection().on 'delete', (data) =>
-      @emit "delete:" + data['objType'].toLowerCase(), @_modelize(data)
+
+
+  onSyncStorePulled: ->
+    @_syncStore.getAll (data) =>
+      for name, collection of @_collections
+        collectionData = _(data).pick (v, k) -> k.match("__sync_#{name.toLowerCase()}")?
+        collection.updateSynchronizedProperties(collectionData) unless _(collectionData).isEmpty()
 
   _modelize: (data) -> @getCollection(data['objType'])?._modelize(data)
 
