@@ -104,7 +104,9 @@ class @ledger.storage.Store extends EventEmitter
       try @_deprocessKey(raw_key) catch e
         undefined
     ).compact().value()
-  _deprocessValue: (raw_value) -> JSON.parse(raw_value)
+  _deprocessValue: (raw_value) ->
+    l "parse", raw_value
+    JSON.parse(raw_value)
   _deprocessItems: (raw_items) ->
     hash = {}
     for raw_key, raw_value of raw_items

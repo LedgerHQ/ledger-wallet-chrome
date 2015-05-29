@@ -203,7 +203,7 @@ class @ledger.database.Model extends @EventEmitter
     @_pendingRelationships = null
 
   @create: (base, context = ledger.database.contexts.main) ->
-    [bestIdentifier] = _(@_indexes).filter (i) -> i.options.unique is yes and i.field is @getBestIdentifier() and i.options.auto is yes
+    [bestIdentifier] = _(@_indexes).filter (i) => i.options.unique is yes and i.field is @getBestIdentifierName() and i.options.auto is yes
     (base ||= {})[bestIdentifier.field] = @uniqueId(bestIdentifier.field) if bestIdentifier?
     new @ context, base
 

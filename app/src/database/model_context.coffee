@@ -63,9 +63,10 @@ class Collection
 
   updateSynchronizedProperties: (data) ->
     synchronizedIndexField = @getModelClass()._synchronizedIndex.field
-    objectDeclarations = _(data).pick (v, key) => key.match("__sync_#{@_collection.name.toLowerCase()}_\\d_#{synchronizedIndexField}")
+    objectDeclarations = _(data).pick (v, key) => key.match("__sync_#{_.str.underscored(@_collection.name).toLowerCase()}_\\d_#{synchronizedIndexField}")
     for key, index of objectDeclarations
-      objectNamePattern = "__sync_#{@_collection.name.toLowerCase()}_#{index}_"
+      objectNamePattern = "__sync_#{_.str.underscored(@_collection.name).toLowerCase()}_#{index}_"
+      l objectNamePattern
       [object] = @getModelClass().find(_.object([synchronizedIndexField], [index]), @_context).data()
       synchronizedObject = {}
       for key, value of data when key.match(objectNamePattern)
@@ -75,18 +76,21 @@ class Collection
         object = @getModelClass().create(synchronizedObject, @_context)
       else
         object.set key, value
+      l object
       object.save()
 
-  _getModelSyncSubstore: (model) -> @_syncSubstores["sync_#{model.getCollectionName().toLowerCase()}_#{model.getBestIdentifier()}"] ||= @_context._syncStore.substore("sync_#{model.getCollectionName().toLowerCase()}_#{model.getBestIdentifier()}")
+  _getModelSyncSubstore: (model) -> @_syncSubstores["sync_#{_.str.underscored(model.getCollectionName()).toLowerCase()}_#{model.getBestIdentifier()}"] ||= @_context._syncStore.substore("sync_#{_.str.underscored(model.getCollectionName()).toLowerCase()}_#{model.getBestIdentifier()}")
 
-  _insertSynchronizedProperties: (model) ->
-    return unless model.hasSynchronizedProperties()
-    l 'Insert', model.getSynchronizedProperties()
-    @_getModelSyncSubstore(model).set(model.getSynchronizedProperties())
+  _insertSynchronizedProperties: (model) -> @_updateSynchronizedProperties(model)
 
   _updateSynchronizedProperties: (model) ->
     return unless model.hasSynchronizedProperties()
-    @_getModelSyncSubstore(model).set(model.getSynchronizedProperties())
+    dataToSet = {}
+    dataToRemove = {}
+    for key, value of model.getSynchronizedProperties()
+      (if value? then dataToSet else dataToRemove)[key] = value
+    @_getModelSyncSubstore(model).set(dataToSet)
+    @_getModelSyncSubstore(model).remove(_(dataToRemove).keys())
 
   _removeSynchronizedProperties: (model) ->
     return unless model.hasSynchronizedProperties()

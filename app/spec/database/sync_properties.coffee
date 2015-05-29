@@ -17,7 +17,7 @@ describe "Database synchronized properties", ->
     context.on 'insert:account', ->
       sync.substore('sync_account_0').set index: 0, name: "My Sync Spec Account", ->
         sync.emit 'pulled'
-        context.on 'update:account insert:account', ->
+        context.on 'update:account', ->
           [account] = Account.find(index: 0, context).data()
           expect(account.get('name')).toBe("My Sync Spec Account")
           do done
@@ -56,5 +56,18 @@ describe "Database synchronized properties", ->
         do done
     Account.create(index: 0, name: "My Greatest Account", context).save()
 
+  it 'pushes sync relations', (done) ->
+    afterSave = ->
+      sync.getAll (data) ->
+        l data
+        expect(data['__sync_account_0_name']).toBe('My tagged account')
+        accountTagId = data['__sync_account_0_account_tag_id']
+        expect(accountTagId).not.toBeUndefined()
+        expect(data["__sync_account_tag_#{accountTagId}_name"]).toBe("My accounted tag")
+        expect(data["__sync_account_tag_#{accountTagId}_color"]).toBe("#FF0000")
+        do done
+    sync.on 'set', _.debounce(afterSave, 50)
+    account = Account.create(index: 0, name: "My tagged account", context).save()
+    account.set('account_tag', AccountTag.create(name: "My accounted tag", color: "#FF0000", context).save()).save()
+
   it 'restores relationships', (done) ->
-    sync.substore('sync_')
