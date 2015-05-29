@@ -51,10 +51,10 @@ describe "Database synchronized properties", ->
     sync.once 'set', (ev, items) ->
       Account.findById(0, context).delete()
       sync.once 'remove', (ev, items...) ->
-
         expect(items).toContain('sync.__sync_account_0_index')
         expect(items).toContain('sync.__sync_account_0_name')
         do done
     Account.create(index: 0, name: "My Greatest Account", context).save()
 
   it 'restores relationships', (done) ->
+    sync.substore('sync_')

@@ -10,6 +10,7 @@ class @Account extends ledger.database.Model
         1
       else
         -1
+  @has one: 'account_tag', forMany: 'accounts', onDelete: 'nullify', sync: yes
 
   @index 'index', sync: yes
   @sync 'name'

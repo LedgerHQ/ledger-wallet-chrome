@@ -95,9 +95,7 @@ class @ledger.database.Model extends @EventEmitter
   delete: () ->
     if not @_deleted and @onDelete() isnt false
       if @getRelationships()?
-        l 'Check relations ', @getRelationships()
         for relationshipName, relationship of @getRelationships()
-          l relationship
           switch relationship.onDelete
             when 'destroy'
               switch relationship.type
@@ -204,7 +202,13 @@ class @ledger.database.Model extends @EventEmitter
         @_commitRemovePendingRelationship(pending, relationship)
     @_pendingRelationships = null
 
-  @create: (base, context = ledger.database.contexts.main) -> new @ context, base
+  @create: (base, context = ledger.database.contexts.main) ->
+    [bestIdentifier] = _(@_indexes).filter (i) -> i.options.unique is yes and i.field is @getBestIdentifier() and i.options.auto is yes
+    (base ||= {})[bestIdentifier.field] = @uniqueId(bestIdentifier.field) if bestIdentifier?
+    new @ context, base
+
+  @uniqueId: (prefix = "") -> ledger.crypto.SHA256.hashString(prefix + (byte.toString(16) for byte in crypto.getRandomValues(new Uint8Array(32))).join(''))
+
 
   @findById: (id, context = ledger.database.contexts.main) ->
     if @getBestIdentifierName() is '$loki'
@@ -241,13 +245,16 @@ class @ledger.database.Model extends @EventEmitter
       @_createRelationship(relationshipDeclaration, 'one')
 
   @_createRelationship: (relationshipDeclaration, myType) ->
-    r = if _.isArray(relationshipDeclaration['many']) then relationshipDeclaration['many'] else [relationshipDeclaration['many'], _.str.capitalize(_.singularize(relationshipDeclaration['many']))]
+    if myType is 'many'
+      r = if _.isArray(relationshipDeclaration['many']) then relationshipDeclaration['many'] else [relationshipDeclaration['many'], _.str.capitalize(_.singularize(_.str.camelize(relationshipDeclaration['many'])))]
+    else
+      r = if _.isArray(relationshipDeclaration['one']) then relationshipDeclaration['one'] else [relationshipDeclaration['one'], _.str.capitalize(_.str.camelize(relationshipDeclaration['one']))]
     if relationshipDeclaration['forOne']?
       i = [relationshipDeclaration['forOne'], 'one']
     else if relationshipDeclaration['forMany']?
       i =  [relationshipDeclaration['forMany'], 'many']
     else
-      i = [@name.toLocaleLowerCase(), 'one']
+      i = [_.str.underscored(@name).toLocaleLowerCase(), 'one']
     sort = null
     if relationshipDeclaration['sortBy']?
       sort = relationshipDeclaration['sortBy']
@@ -272,7 +279,15 @@ class @ledger.database.Model extends @EventEmitter
     unless _.contains(['nullify', 'destroy', 'none'], onDelete)
       e "Relationship #{@name}::#{r[0]} delete rule '#{onDelete}' is not valid. Please review this. Should be either 'nullify', 'none' or 'destroy'"
       onDelete = 'nullify'
-    relationship = name: r[0], type: "#{myType}_#{i[1]}", inverse: i[0], Class: r[1], inverseType: "#{i[1]}_#{myType}", sort: sort, onDelete: onDelete
+    relationship = name: r[0], type: "#{myType}_#{i[1]}", inverse: i[0], Class: r[1], inverseType: "#{i[1]}_#{myType}", sort: sort, onDelete: onDelete, sync: relationshipDeclaration.sync
+    try
+      if relationshipDeclaration.sync is true
+        if myType is 'one'
+          @sync "#{relationship.name}_id"
+        else
+          e "Cannot synchronize relationship #{@name}-#{relationship.name}, please synchronize relationship #{relationship.name}-#{@name}"
+    catch er
+      e er
     @_relationships ?= {}
     @_relationships[relationship.name] = relationship
 
@@ -290,6 +305,7 @@ class @ledger.database.Model extends @EventEmitter
           continue
         else if not InverseClass._relationships?[relationship.inverse]
           InverseClass._relationships ?= {}
+
           InverseClass._relationships[relationship.inverse] = name: relationship.inverse, type: relationship.inverseType, inverse:relationship.name, Class: ClassName, inverseType: relationship.type, onDelete: 'nullify'
         else
           e "Bad relationship #{relationship.name} <-> #{relationship.inverse}. You must absolutely check for errors for classes #{ClassName} and #{relationship.Class}"
