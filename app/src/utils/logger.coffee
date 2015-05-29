@@ -102,13 +102,18 @@ class @ledger.utils.Logger
 
   @exportLogsWithZipLink: (callback = undefined) ->
     now = new Date()
-    suggestedName = "ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
-    csv = new ledger.utils.CsvExporter(suggestedName)
+    publicSuggestedName = "ledger_wallet_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
+    privateSuggestedName = "ledger_wallet_private_logs_#{now.getFullYear()}#{_.str.lpad(now.getMonth() + 1, 2, '0')}#{now.getDate()}"
+    publicCsv = new ledger.utils.CsvExporter(publicSuggestedName)
+    privateCsv = new ledger.utils.CsvExporter(privateSuggestedName)
     @publicLogs (publicLogs) =>
       @privateLogs (privateLogs) =>
-        csv.setContent _.sortBy((publicLogs || []).concat(privateLogs || []), (log) -> log.date)
-        csv.zipUrl (zipUrl) ->
-          callback?(name: suggestedName, url: zipUrl)
+        publicCsv.setContent(publicLogs)
+        publicCsv.beginZip (writer) ->
+          privateCsv.setContent(privateLogs)
+          privateCsv.addToZip writer, (writer) ->
+            publicCsv.endZip (zip) ->
+              callback?(name: publicSuggestedName, url: zip.url())
 
   @downloadLogsWithZipLink: ->
     @exportLogsWithZipLink (data) ->
@@ -169,9 +174,9 @@ class @ledger.utils.Logger
 
   # Return Logger class storage if initialized or undefined.
   # @return [ledger.storage.ChromeStore, undefined]
-  store: -> @constructor.store()
+  store: -> ledger.utils.Logger.store()
 
-  isPrivateModeEnabled: -> @constructor.isPrivateModeEnabled()
+  isPrivateModeEnabled: -> ledger.utils.Logger.isPrivateModeEnabled()
 
   # Sets the log level
   # @param [Boolean] active or not the logger.
@@ -247,6 +252,7 @@ class @ledger.utils.Logger
   # @param [String] msg Message to log.
   # @param [String] msgType Log level.
   _storeLog: (msg, msgType) ->
+    l 'NOT PERSISTENT' unless @_areLogsPersistents
     return unless @_areLogsPersistents
     now = new Date()
     log = {}
