@@ -58,7 +58,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     return cb?() unless items?
     @_changes.push {type: OperationTypes.SET, key: key, value: value} for key, value of items
     this.debounced_push()
-    _.defer => cb?()
+    @_saveChanges -> cb?()
 
   get: (keys, cb) ->
     values = {}
@@ -179,6 +179,8 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
           throw Errors.NoChanges
       # Create commit hash
       [commitHash, pushedData] = @_computeCommit(data, @_changes)
+      l "DATA", data
+      l "PUSHED DATA", pushedData
       # Jsonify data
       @_encryptToJson(pushedData)
     .then (data) => if hasRemoteData then @client.put_settings(data) else @client.post_settings(data)
@@ -186,6 +188,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       @_setLastMd5(md5)
       # Merge changes into store
       @_clearChanges()
+      l "PUSHED DATA"
       @_setAllData(pushedData)
     .then () => @emit 'pushed', this
     .fail (e) =>
@@ -203,11 +206,12 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       if change.type is OperationTypes.SET
         data[change.key] = change.value
       else
-        data = _.omit(change.key)
+        data = _.omit(data, change.key)
     data
 
   _computeCommit: (data, changes) ->
     data = @_applyChanges(data, changes)
+    l "APPLY CHANGES ", changes, data
     commitHash = ledger.crypto.SHA256.hashString _(data).toJson()
     data.__hashes = [commitHash].concat(data.__hashes or [])
     [commitHash, data]

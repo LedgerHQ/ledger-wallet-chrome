@@ -64,19 +64,19 @@ class Collection
   updateSynchronizedProperties: (data) ->
     synchronizedIndexField = @getModelClass()._synchronizedIndex.field
     objectDeclarations = _(data).pick (v, key) => key.match("__sync_#{_.str.underscored(@_collection.name).toLowerCase()}_\\d_#{synchronizedIndexField}")
+    existingsIds = []
     for key, index of objectDeclarations
       objectNamePattern = "__sync_#{_.str.underscored(@_collection.name).toLowerCase()}_#{index}_"
-      l objectNamePattern
       [object] = @getModelClass().find(_.object([synchronizedIndexField], [index]), @_context).data()
       synchronizedObject = {}
+      existingsIds.push index
       for key, value of data when key.match(objectNamePattern)
         key = key.replace(objectNamePattern, '')
         synchronizedObject[key] = value
       unless object?
         object = @getModelClass().create(synchronizedObject, @_context)
       else
-        object.set key, value
-      l object
+        object.set k, v for k, v of synchronizedObject
       object.save()
 
   _getModelSyncSubstore: (model) -> @_syncSubstores["sync_#{_.str.underscored(model.getCollectionName()).toLowerCase()}_#{model.getBestIdentifier()}"] ||= @_context._syncStore.substore("sync_#{_.str.underscored(model.getCollectionName()).toLowerCase()}_#{model.getBestIdentifier()}")

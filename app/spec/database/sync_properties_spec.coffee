@@ -71,3 +71,8 @@ describe "Database synchronized properties", ->
     account.set('account_tag', AccountTag.create(name: "My accounted tag", color: "#FF0000", context).save()).save()
 
   it 'restores relationships', (done) ->
+
+
+  it 'deletes relationships', (done) ->
+
+  it "does'nt delete newly created relationships", (done) ->

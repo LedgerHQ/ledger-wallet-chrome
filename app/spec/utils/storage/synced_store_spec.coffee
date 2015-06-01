@@ -95,8 +95,8 @@ describe "SyncedStore (special case with custom store configurations)", ->
       memoryStore = new ledger.storage.MemoryStore("specs")
       memoryStore.set initialSetup.aux, ->
         store = new ledger.storage.SyncedStore(initialSetup.name, initialSetup.addr, initialSetup.key, memoryStore)
-        store.keys (keys) -> l keys
         store.client = initialSetup.client or jasmine.createSpyObj('restClient', ['get_settings_md5','get_settings','post_settings','put_settings','delete_settings'])
+        store.client.get_settings_md5.and.callFake -> ledger.defer().resolve(initialSetup.md5).promise
         d.resolve store
     d.promise
 
@@ -121,6 +121,7 @@ describe "SyncedStore (special case with custom store configurations)", ->
       name: "synced_store"
       addr: "specs"
       key: "private_key"
+      md5: 'f48139f3d9bfdab0b5374212e06f3994'
       local:
         foo: '?'
         ledger: 'wallet'
@@ -150,6 +151,7 @@ describe "SyncedStore (special case with custom store configurations)", ->
       name: "synced_store"
       addr: "specs"
       key: "private_key"
+      md5: 'f48139f3d9bfdab0b5374212e06f3994'
       local:
         foo: '?'
         ledger: 'wallet'
@@ -174,6 +176,7 @@ describe "SyncedStore (special case with custom store configurations)", ->
       name: "synced_store"
       addr: "specs"
       key: "private_key"
+      md5: 'f48139f3d9bfdab0b5374212e06f3993'
       local:
         foo: '?'
         ledger: 'wallet'
@@ -198,6 +201,7 @@ describe "SyncedStore (special case with custom store configurations)", ->
       name: "synced_store"
       addr: "specs"
       key: "private_key"
+      md5: 'f48139f3d9bfdab0b5374212e06f3993'
       local:
         foo: '?'
         ledger: 'wallet'
@@ -229,6 +233,7 @@ describe "SyncedStore (special case with custom store configurations)", ->
       name: "synced_store"
       add: "specs"
       key: "private_key"
+      md5: 'f48139f3d9bfdab0b5374212e06f3993'
       local:
         __preferences_btcUnit: "mBTC"
         __preferences_currency:"EUR"

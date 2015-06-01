@@ -283,6 +283,7 @@ _.extend ledger.wallet,
         @_endInitialize(hdWallet, callback)
 
   _endInitialize: (hdWallet, callback) ->
+    ledger.storage.sync.wallet.getAll (r) -> l "Sync", r
     hdWallet.initialize ledger.storage.sync.wallet, () =>
       ledger.wallet.Wallet.instance = hdWallet
       callback?()
