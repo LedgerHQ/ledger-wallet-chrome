@@ -106,7 +106,7 @@ class @ledger.utils.Logger
         callback?(name: suggestedName, url: csv.url())
 
   @exportLogsWithZipLink: (callback = undefined) ->
-    @exportsLogsToZip ({name, zip}) ->
+    @exportLogsToZip ({name, zip}) ->
       callback?(name: name, url: zip.url())
 
   @downloadLogsWithZipLink: ->
