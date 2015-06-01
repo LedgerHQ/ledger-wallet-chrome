@@ -415,7 +415,7 @@
 
           '../spec/wallet/extended_public_key_spec'
 
-          '../spec/database/sync_properties'
+          '../spec/database/sync_properties_spec'
           '../spec/utils/logger/log_spec'
           '../spec/utils/logger/secure_log_spec'
         ]
