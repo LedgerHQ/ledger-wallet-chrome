@@ -340,11 +340,11 @@ gulp.task 'build', (cb) ->
     [__, currentBranch] = stdout.match /\*\s*(.+)\s/
     return console.error("Unable to retrieve current branch") unless currentBranch?
     tag = args[1] or currentBranch
-    git.checkout tag, ->
+    git.checkout tag, quiet: yes, ->
       tasks.clean()
       COMPILATION_MODE = DEBUG_MODE
       tasks.compile().then ->
-        git.checkout currentBranch, ->
+        git.checkout currentBranch, quiet: yes, ->
           cb()
 
 
