@@ -13,9 +13,9 @@ class @WalletAccountsShowViewController extends ledger.common.ViewController
 
   initialize: ->
     super
-    @_debouncedUpdateOperations = _.debounce(@_updateOperations, 200, yes)
-    @_debouncedUpdateBalances = _.debounce(@_updateBalances, 200, yes)
-    @_debouncedUpdateCountervalueVisibility = _.debounce(@_updateCountervalueVisibility, 200, yes)
+    @_debouncedUpdateOperations = _.debounce(@_updateOperations, 200)
+    @_debouncedUpdateBalances = _.debounce(@_updateBalances, 200)
+    @_debouncedUpdateCountervalueVisibility = _.debounce(@_updateCountervalueVisibility, 200)
 
   onAfterRender: ->
     super
