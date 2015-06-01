@@ -229,13 +229,19 @@ class @ledger.database.Model extends @EventEmitter
     object = @create base, context unless object?
     object
 
+  @chain: (context = ledger.database.contexts.main) -> context.getCollection(@getCollectionName()).query()
+
   @find: (query, context = ledger.database.contexts.main) ->
-    chain = context.getCollection(@getCollectionName()).query()
+    chain = @chain(context)
     chain.find(query) if query?
     chain
 
-  @all: (context = ledger.database.contexts.main) -> context.getCollection(@getCollectionName()).query().data()
+  @where: (filterFunction, context = ledger.database.contexts.main) ->
+    chain = @chain(context)
+    chain.where(filterFunction) if filterFunction?
+    chain
 
+  @all: (context = ledger.database.contexts.main) -> context.getCollection(@getCollectionName()).query().data()
 
   # Relationship creator
   @has: (relationshipDeclaration) ->

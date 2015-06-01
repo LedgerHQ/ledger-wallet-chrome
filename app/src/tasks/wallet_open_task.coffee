@@ -47,9 +47,6 @@ openXpubCache = (dongle, raise, done) ->
     done?()
 
 restoreStructure = (dongle, raise, done) ->
-  l "1 - ", ledger.wallet.Wallet.instance.isEmpty()
-  l "2 - ", Operation.all().length is 0 and ledger.wallet.Wallet.instance.getAccount(0).getAllAddressesPaths().length isnt 0
-  l "3 - ", yes
   if ledger.wallet.Wallet.instance.isEmpty()
     ledger.app.emit 'wallet:initialization:creation'
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'done', () =>
