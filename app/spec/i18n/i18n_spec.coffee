@@ -1,6 +1,15 @@
 describe "Internationalization and Localization -", ->
   i18n = ledger.i18n
-  chromeStore = new ledger.storage.ChromeStore('i18n')
+  chromeStore = {}
+  originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
+
+  beforeAll ->
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000
+
+  beforeEach ->
+    ledger.storage.sync = new ledger.storage.MemoryStore('i18n')
+    chromeStore = new ledger.storage.ChromeStore('i18n')
+
 
   describe "Test setFavLangByUI() - ", ->
 
@@ -12,7 +21,7 @@ describe "Internationalization and Localization -", ->
       i18n.setFavLangByUI('en')
       res = ''
       call = () ->
-        d = Q.defer()
+        d = ledger.defer()
         chromeStore.get '__i18n_favLang', (r) ->
           if Array.isArray(r.__i18n_favLang)
             r.i18n_favLang = r.__i18n_favLang[0]
@@ -29,7 +38,7 @@ describe "Internationalization and Localization -", ->
       i18n.setFavLangByUI('fr')
       res = ''
       call = () ->
-        d = Q.defer()
+        d = ledger.defer()
         ledger.storage.sync.get '__i18n_favLang', (r) ->
           if Array.isArray(r.__i18n_favLang)
             r.i18n_favLang = r.__i18n_favLang[0]
@@ -58,7 +67,7 @@ describe "Internationalization and Localization -", ->
       i18n.setLocaleByUI('zh-tw')
       res = ''
       call = () ->
-        d = Q.defer()
+        d = ledger.defer()
         chromeStore.get '__i18n_favLocale', (r) ->
           if Array.isArray(r.__i18n_favLocale)
             r.__i18n_favLang = r.__i18n_favLocale[0]
@@ -75,7 +84,7 @@ describe "Internationalization and Localization -", ->
       i18n.setLocaleByUI('fr-CA')
       res = ''
       call = () ->
-        d = Q.defer()
+        d = ledger.defer()
         ledger.storage.sync.get '__i18n_favLocale', (r) ->
           if Array.isArray(r.__i18n_favLocale)
             r.i18n_favLocale = r.__i18n_favLocale[0]
@@ -92,20 +101,11 @@ describe "Internationalization and Localization -", ->
   # This test can be launch only one time - Need app restart
   describe "Check lang and locale memory and stores values after full initialization", ->
 
-    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
-
-    beforeEach (done) ->
-      ledger.storage.sync.clear ->
-        chrome.storage.local.clear -> done()
-    #originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
-    #jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
-
-
     it "should set two chars tag lang and four chars tag locale", (done) ->
-      i18n.loadUserBrowserAcceptLangs = () ->
+      spyOn(i18n, 'loadUserBrowserAcceptLangs').and.callFake ->
+        d = ledger.defer()
         i18n.browserAcceptLanguages = ['be', 'fr-CA', 'zh-tw', 'fr']
-        Q()
+        d.resolve().promise
       i18n.init ->
         expect(i18n.favLang.memoryValue).toBe('fr')
         expect(i18n.favLang.chromeStoreValue).toBe('fr')
@@ -115,11 +115,13 @@ describe "Internationalization and Localization -", ->
         expect(i18n.favLocale.syncStoreValue).toBe('fr-CA')
         done()
 
+
     # Should be 'fr' if it is the first supported language in the browserAcceptLanguages array
     it "should set two chars tag lang and locale", (done) ->
-      i18n.loadUserBrowserAcceptLangs = () ->
+      spyOn(i18n, 'loadUserBrowserAcceptLangs').and.callFake ->
+        d = ledger.defer()
         i18n.browserAcceptLanguages = ['zh', 'fr', 'en-GB', 'it']
-        Q()
+        d.resolve().promise
       i18n.init ->
         expect(i18n.favLang.memoryValue).toBe('fr')
         expect(i18n.favLang.chromeStoreValue).toBe('fr')
@@ -130,9 +132,10 @@ describe "Internationalization and Localization -", ->
         done()
 
     it "should fallback to browser UI lang - chrome.i18n.getUILanguage()", (done) ->
-      i18n.loadUserBrowserAcceptLangs = () ->
+      spyOn(i18n, 'loadUserBrowserAcceptLangs').and.callFake ->
+        d = ledger.defer()
         i18n.browserAcceptLanguages = ['dfr', 'huj', 'jla', 'dede', 'lp']
-        Q()
+        d.resolve().promise
       i18n.init ->
         expect(i18n.favLang.memoryValue).toBe(chrome.i18n.getUILanguage())
         expect(i18n.favLang.chromeStoreValue).toBe(chrome.i18n.getUILanguage())
@@ -143,32 +146,17 @@ describe "Internationalization and Localization -", ->
         done()
 
     it "should have sync store set", (done) ->
-      i18n.loadUserBrowserAcceptLangs = () ->
+      spyOn(i18n, 'loadUserBrowserAcceptLangs').and.callFake ->
+        d = ledger.defer()
         i18n.browserAcceptLanguages = ['be', 'fr-CA', 'zh-tw', 'fr']
-        Q()
+        d.resolve().promise
       i18n.init ->
         expect(i18n.favLang.syncStoreIsSet).toBe(true)
         expect(i18n.favLocale.syncStoreIsSet).toBe(true)
         done()
 
 
-    afterEach (done) ->
-      ledger.storage.sync.clear ->
-        chrome.storage.local.clear -> done()
-      i18n.favLang =
-        memoryValue: undefined
-        syncStoreValue: undefined
-        chromeStoreValue: undefined
-        syncStoreIsSet: undefined
-        chromeStoreIsSet: undefined
-        storesAreSync: undefined
-
-      i18n.favLocale =
-        memoryValue: undefined
-        syncStoreValue: undefined
-        chromeStoreValue: undefined
-        syncStoreIsSet: undefined
-        chromeStoreIsSet: undefined
-        storesAreSync: undefined
+    afterEach ->
+      chrome.storage.local.clear()
 
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
