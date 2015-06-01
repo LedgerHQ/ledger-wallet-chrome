@@ -2,6 +2,17 @@ describe "Unit Formatters -", ->
 
   formatters = ledger.formatters
 
+  beforeAll ->
+    ledger.preferences.instance ?= {}
+    ledger.preferences.instance.getLocale = jasmine.createSpyObj('prefs', ['getLocale'])
+    spyOn(ledger.preferences.instance, "getLocale").and.callFake ->
+      "en_GB"
+
+    ###
+    spyOn(formatters, "getBtcUnit").and.callFake ->
+      "BTC"
+    ###
+
   it "should return a String", ->
     res = formatters.formatUnit(1000, 'BTC', -1)
     expect(res).toEqual( jasmine.any(String) )
