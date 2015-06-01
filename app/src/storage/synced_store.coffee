@@ -179,8 +179,6 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
           throw Errors.NoChanges
       # Create commit hash
       [commitHash, pushedData] = @_computeCommit(data, @_changes)
-      l "DATA", data
-      l "PUSHED DATA", pushedData
       # Jsonify data
       @_encryptToJson(pushedData)
     .then (data) => if hasRemoteData then @client.put_settings(data) else @client.post_settings(data)
@@ -188,7 +186,6 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       @_setLastMd5(md5)
       # Merge changes into store
       @_clearChanges()
-      l "PUSHED DATA"
       @_setAllData(pushedData)
     .then () => @emit 'pushed', this
     .fail (e) =>
@@ -211,7 +208,6 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
 
   _computeCommit: (data, changes) ->
     data = @_applyChanges(data, changes)
-    l "APPLY CHANGES ", changes, data
     commitHash = ledger.crypto.SHA256.hashString _(data).toJson()
     data.__hashes = [commitHash].concat(data.__hashes or [])
     [commitHash, data]
