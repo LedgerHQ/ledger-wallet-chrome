@@ -20,8 +20,9 @@ class ledger.storage.MemoryStore extends ledger.storage.Store
   # @see ledger.storage.Store#_raw_remove
   _raw_remove: (keys, cb=->) ->
     _.defer =>
+      deletedKeys = _(@_data).chain().keys().intersection(keys).value()
       @_data = _(@_data).omit(keys)
-      @emit 'remove', keys
+      @emit 'remove', deletedKeys if deletedKeys.length > 0
       cb?()
 
   extend: (data) ->

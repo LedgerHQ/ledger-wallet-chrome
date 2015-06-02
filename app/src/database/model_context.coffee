@@ -17,6 +17,7 @@ class Collection
     @_syncSubstores = {}
 
   insert: (model) ->
+    l 'INSERTING ', model, new Error().stack
     model._object ?= {}
     model._object['objType'] = model.getCollectionName()
     model._object = @_collection.insert(model._object)
@@ -24,6 +25,7 @@ class Collection
     @_context.notifyDatabaseChange()
 
   remove: (model) ->
+    l 'REMOVING ', model, new Error().stack
     return unless model?._object
     id = model.getBestIdentifier()
     model.getBestIdentifier = -> id
@@ -33,6 +35,7 @@ class Collection
     @_context.notifyDatabaseChange()
 
   update: (model) ->
+    l 'UPDATING ', model, new Error().stack
     @_collection.update(model._object)
     @_updateSynchronizedProperties(model)
     @_context.notifyDatabaseChange()
@@ -73,6 +76,8 @@ class Collection
       for key, value of data when key.match(objectNamePattern)
         key = key.replace(objectNamePattern, '')
         synchronizedObject[key] = value
+      l 'Update ', @getModelClass().name, ' ID ', index, ' with ', synchronizedObject, ' already have ', object
+      @_context._syncStore.getAll(l)
       unless object?
         object = @getModelClass().create(synchronizedObject, @_context)
       else
