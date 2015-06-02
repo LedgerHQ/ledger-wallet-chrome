@@ -83,7 +83,6 @@ describe 'Database synchronized properties', ->
       __sync_account_tag_auniqueid_color: "#FF0000"
     , ->
         afterSave = _.after 2, _.once ->
-          l 'Got', Account.findById(1, context)
           expect(Account.findById(1, context).get('account_tag').get('name')).toBe('My Rich Tag')
           expect(Account.findById(1, context).get('account_tag').get('color')).toBe("#FF0000")
           expect(Account.findById(1, context).get('name')).toBe("My poor account")
@@ -91,6 +90,18 @@ describe 'Database synchronized properties', ->
         context.on 'insert:account insert:account_tag', afterSave
         sync.emit 'pulled'
 
-  xit 'deletes relationships', (done) ->
+  it 'deletes relationships', (done) ->
+    Account.create(index: 0, name: 'Account 0').save()
+    Account.create(index: 1, name: 'Account 1').save()
+    Account.findById(0).set('account_tag', AccountTag.create(name: 'AccountTag').save()).save()
+    afterSave = ->
+      sync.set
+        __sync_account_1_index: 1
+        __sync_account_1_name: 'Account 1'
+      , ->
+        l "Salut"
+    _.delay afterSave, 50
+
 
   xit "does'nt delete newly created relationships", (done) ->
+

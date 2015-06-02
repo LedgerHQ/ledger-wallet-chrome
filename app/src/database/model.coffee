@@ -352,7 +352,8 @@ class @ledger.database.Model extends @EventEmitter
 
   @getSynchronizedPropertiesNames: -> (if @_synchronizedIndex? then [@_synchronizedIndex.field] else []).concat (property.property for property in (@_synchronizedProperties or []))
 
-  hasSynchronizedProperties: -> @constructor._synchronizedIndex? and @constructor._synchronizedIndex isnt undefined
+  @hasSynchronizedProperties: -> @_synchronizedIndex? and @_synchronizedIndex isnt undefined
+  hasSynchronizedProperties: -> @constructor.hasSynchronizedProperties()
 
   serialize: () ->
     json = $.extend {}, @_object

@@ -17,7 +17,6 @@ class Collection
     @_syncSubstores = {}
 
   insert: (model) ->
-    l 'INSERTING ', model, new Error().stack
     model._object ?= {}
     model._object['objType'] = model.getCollectionName()
     model._object = @_collection.insert(model._object)
@@ -25,7 +24,6 @@ class Collection
     @_context.notifyDatabaseChange()
 
   remove: (model) ->
-    l 'REMOVING ', model, new Error().stack
     return unless model?._object
     id = model.getBestIdentifier()
     model.getBestIdentifier = -> id
@@ -35,7 +33,6 @@ class Collection
     @_context.notifyDatabaseChange()
 
   update: (model) ->
-    l 'UPDATING ', model, new Error().stack
     @_collection.update(model._object)
     @_updateSynchronizedProperties(model)
     @_context.notifyDatabaseChange()
@@ -71,7 +68,7 @@ class Collection
     existingsIds = []
     for key, index of objectDeclarations
       [__, objectId] = key.match("^__sync_#{_.str.underscored(@_collection.name).toLowerCase()}_([a-zA-Z0-9]+)_#{synchronizedIndexField}")
-      l objectId
+      existingsIds.push objectId
       objectNamePattern = "__sync_#{_.str.underscored(@_collection.name).toLowerCase()}_#{objectId}_"
       [object] = @getModelClass().find(_.object([synchronizedIndexField], [index]), @_context).data()
       synchronizedObject = {}
@@ -86,6 +83,9 @@ class Collection
       else
         object.set k, v for k, v of synchronizedObject
       object.save()
+    # Remove objects not present in sync store
+    @getModelClass().where((i) => !_.contains(existingsIds, i[@getModelClass().getBestIdentifierName()])).remove()
+    return
 
   _getModelSyncSubstore: (model) -> @_syncSubstores["sync_#{_.str.underscored(model.getCollectionName()).toLowerCase()}_#{model.getBestIdentifier()}"] ||= @_context._syncStore.substore("sync_#{_.str.underscored(model.getCollectionName()).toLowerCase()}_#{model.getBestIdentifier()}")
 
@@ -145,8 +145,8 @@ class ledger.database.contexts.Context extends EventEmitter
       @_collections[collection.name] = new Collection(@_db.getDb().getCollection(collection.name), @)
       @_listenCollectionEvent(@_collections[collection.name])
     @_syncStore.on 'pulled', (@onSyncStorePulled = @onSyncStorePulled.bind(this))
-    @onSyncStorePulled()
     @initialize()
+    @onSyncStorePulled()
 
   initialize: () ->
     modelClasses = ledger.database.Model.AllModelClasses()
@@ -184,8 +184,13 @@ class ledger.database.contexts.Context extends EventEmitter
   onSyncStorePulled: ->
     @_syncStore.getAll (data) =>
       for name, collection of @_collections
+        continue unless collection.getModelClass().hasSynchronizedProperties()
         collectionData = _(data).pick (v, k) -> k.match("__sync_#{_.str.underscored(name).toLowerCase()}")?
-        collection.updateSynchronizedProperties(collectionData) unless _(collectionData).isEmpty()
+        unless _(collectionData).isEmpty()
+          collection.updateSynchronizedProperties(collectionData)
+        else
+          # delete all
+          collection.getModelClass().find().remove()
 
   _modelize: (data) -> @getCollection(data['objType'])?._modelize(data)
 
