@@ -84,7 +84,7 @@ class Collection
         object.set k, v for k, v of synchronizedObject
       object.save()
     # Remove objects not present in sync store
-    @getModelClass().where((i) => !_.contains(existingsIds, i[@getModelClass().getBestIdentifierName()])).remove()
+    @getModelClass().where(((i) => !_.contains(existingsIds, i[@getModelClass().getBestIdentifierName()])), @_context).remove()
     return
 
   _getModelSyncSubstore: (model) -> @_syncSubstores["sync_#{_.str.underscored(model.getCollectionName()).toLowerCase()}_#{model.getBestIdentifier()}"] ||= @_context._syncStore.substore("sync_#{_.str.underscored(model.getCollectionName()).toLowerCase()}_#{model.getBestIdentifier()}")
@@ -190,7 +190,9 @@ class ledger.database.contexts.Context extends EventEmitter
           collection.updateSynchronizedProperties(collectionData)
         else
           # delete all
-          collection.getModelClass().find().remove()
+          l "Delete all", name
+          l collection.getModelClass().chain(this).count()
+          l collection.getModelClass().chain(this).remove()
 
   _modelize: (data) -> @getCollection(data['objType'])?._modelize(data)
 

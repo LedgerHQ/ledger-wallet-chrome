@@ -61,6 +61,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     @_saveChanges -> cb?()
 
   get: (keys, cb) ->
+    keys = [keys] unless _(keys).isArray()
     values = {}
     handledKeys = []
     for key in keys when (changes = _.where(@_changes, key: key)).length > 0
