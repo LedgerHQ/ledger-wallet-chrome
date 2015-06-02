@@ -63,7 +63,6 @@ describe 'Database synchronized properties', ->
   it 'pushes sync relations', (done) ->
     afterSave = ->
       sync.getAll (data) ->
-        l data
         expect(data['__sync_account_0_name']).toBe('My tagged account')
         accountTagId = data['__sync_account_0_account_tag_id']
         expect(accountTagId).not.toBeUndefined()
@@ -74,8 +73,23 @@ describe 'Database synchronized properties', ->
     account = Account.create(index: 0, name: "My tagged account", context).save()
     account.set('account_tag', AccountTag.create(name: "My accounted tag", color: "#FF0000", context).save()).save()
 
-  xit 'restores relationships', (done) ->
-
+  it 'restores relationships when data database is empty', (done) ->
+    sync.set
+      __sync_account_0_name: "My poor account"
+      __sync_account_0_index: 1
+      __sync_account_0_account_tag_id: "auniqueid"
+      __sync_account_tag_auniqueid_uid: 'auniqueid'
+      __sync_account_tag_auniqueid_name: 'My Rich Tag'
+      __sync_account_tag_auniqueid_color: "#FF0000"
+    , ->
+        afterSave = _.after 2, _.once ->
+          l 'Got', Account.findById(1, context)
+          expect(Account.findById(1, context).get('account_tag').get('name')).toBe('My Rich Tag')
+          expect(Account.findById(1, context).get('account_tag').get('color')).toBe("#FF0000")
+          expect(Account.findById(1, context).get('name')).toBe("My poor account")
+          do done
+        context.on 'insert:account insert:account_tag', afterSave
+        sync.emit 'pulled'
 
   xit 'deletes relationships', (done) ->
 
