@@ -5,9 +5,9 @@ resolveRelationship = (object, relationship) ->
     when 'many_one'
       object._collection.getRelationshipView(object, relationship).modelize()
     when 'one_many'
-      Class.find(_.object([Class.getBestIdentifierName()], [object.get("#{relationship.name}_id")])).data()[0]
+      Class.find(_.object([Class.getBestIdentifierName()], [object.get("#{relationship.name}_id")]), object._context).data()[0]
     when 'one_one'
-      Class.find(_.object([Class.getBestIdentifierName()], [object.get("#{relationship.name}_id")])).data()[0]
+      Class.find(_.object([Class.getBestIdentifierName()], [object.get("#{relationship.name}_id")]), object._context).data()[0]
     when 'many_many'
       object._collection.getRelationshipView(object, relationship).modelize()
 
@@ -204,7 +204,7 @@ class @ledger.database.Model extends @EventEmitter
 
   @create: (base, context = ledger.database.contexts.main) ->
     [bestIdentifier] = _(@_indexes).filter (i) => i.options.unique is yes and i.field is @getBestIdentifierName() and i.options.auto is yes
-    (base ||= {})[bestIdentifier.field] = @uniqueId(bestIdentifier.field) if bestIdentifier?
+    (base ||= {})[bestIdentifier.field] ?= @uniqueId(bestIdentifier.field) if bestIdentifier?
     new @ context, base
 
   @uniqueId: (prefix = "") -> ledger.crypto.SHA256.hashString(prefix + (byte.toString(16) for byte in crypto.getRandomValues(new Uint8Array(32))).join(''))
@@ -229,13 +229,19 @@ class @ledger.database.Model extends @EventEmitter
     object = @create base, context unless object?
     object
 
+  @chain: (context = ledger.database.contexts.main) -> context.getCollection(@getCollectionName()).query()
+
   @find: (query, context = ledger.database.contexts.main) ->
-    chain = context.getCollection(@getCollectionName()).query()
+    chain = @chain(context)
     chain.find(query) if query?
     chain
 
-  @all: (context = ledger.database.contexts.main) -> context.getCollection(@getCollectionName()).query().data()
+  @where: (filterFunction, context = ledger.database.contexts.main) ->
+    chain = @chain(context)
+    chain.where(filterFunction) if filterFunction?
+    chain
 
+  @all: (context = ledger.database.contexts.main) -> context.getCollection(@getCollectionName()).query().data()
 
   # Relationship creator
   @has: (relationshipDeclaration) ->

@@ -1,3 +1,5 @@
+args = process.argv.splice(3, process.argv.length - 3)
+
 # Load all required libraries.
 Q               = require 'q'
 gulp            = require 'gulp'
@@ -28,6 +30,7 @@ concat          = require 'gulp-concat'
 tap             = require 'gulp-tap'
 _               = require 'underscore'
 _.str           = require 'underscore.string'
+git             = require 'gulp-git'
 
 
 class BuildMode
@@ -100,6 +103,9 @@ ensureDistDir = () -> ensureDirectoryExists 'dist'
 ensureSignatureDir = () -> ensureDirectoryExists('signature')
 
 tasks =
+
+  clean: () ->
+    del.sync ['build/', 'release/']
 
   less: () ->
     gulp.src 'app/assets/css/**/*.less'
@@ -327,6 +333,21 @@ gulp.task 'compile', ->
   tasks.compile()
 
 gulp.task 'default', ['debug']
+
+gulp.task 'build', (cb) ->
+  git.exec args: 'branch', (err, stdout) ->
+    return console.error("Unable to retrieve current branch") unless stdout?
+    [__, currentBranch] = stdout.match /\*\s*(.+)\s/
+    return console.error("Unable to retrieve current branch") unless currentBranch?
+    tag = args[1] or currentBranch
+    git.checkout tag, quiet: yes, ->
+      tasks.clean()
+      COMPILATION_MODE = DEBUG_MODE
+      tasks.compile().then ->
+        git.checkout currentBranch, quiet: yes, ->
+          cb()
+
+
 
 gulp.task 'debug:clean', (cb) ->
   del.sync ['build/']

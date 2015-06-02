@@ -58,7 +58,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     return cb?() unless items?
     @_changes.push {type: OperationTypes.SET, key: key, value: value} for key, value of items
     this.debounced_push()
-    _.defer => cb?()
+    @_saveChanges -> cb?()
 
   get: (keys, cb) ->
     values = {}
@@ -203,7 +203,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       if change.type is OperationTypes.SET
         data[change.key] = change.value
       else
-        data = _.omit(change.key)
+        data = _.omit(data, change.key)
     data
 
   _computeCommit: (data, changes) ->

@@ -1,4 +1,4 @@
-describe "Database synchronized properties", ->
+describe 'Database synchronized properties', ->
 
   store = null
   sync = null
@@ -14,13 +14,15 @@ describe "Database synchronized properties", ->
       do done
 
   it 'updates existing objects', (done) ->
-    context.on 'insert:account', ->
+    onDbSaved = _.after 2, _.once ->
       sync.substore('sync_account_0').set index: 0, name: "My Sync Spec Account", ->
         sync.emit 'pulled'
         context.on 'update:account', ->
           [account] = Account.find(index: 0, context).data()
           expect(account.get('name')).toBe("My Sync Spec Account")
           do done
+    context.on 'insert:account', onDbSaved
+    sync.on 'set', onDbSaved
     Account.create({index: 0, name: "My Spec Account"}, context).save()
 
   it 'creates missing objects', (done) ->
@@ -48,18 +50,19 @@ describe "Database synchronized properties", ->
     Account.create(index: 0, name: "My Greatest Account", context).save()
 
   it 'deletes data from sync store when an object is deleted', (done) ->
-    sync.once 'set', (ev, items) ->
+    onDbSaved = _.after 2, _.once ->
       Account.findById(0, context).delete()
-      sync.once 'remove', (ev, items...) ->
+      sync.on 'remove', (ev, items...) ->
         expect(items).toContain('sync.__sync_account_0_index')
         expect(items).toContain('sync.__sync_account_0_name')
         do done
+    context.on 'insert:account', onDbSaved
+    sync.on 'set', onDbSaved
     Account.create(index: 0, name: "My Greatest Account", context).save()
 
   it 'pushes sync relations', (done) ->
     afterSave = ->
       sync.getAll (data) ->
-        l data
         expect(data['__sync_account_0_name']).toBe('My tagged account')
         accountTagId = data['__sync_account_0_account_tag_id']
         expect(accountTagId).not.toBeUndefined()
@@ -70,4 +73,24 @@ describe "Database synchronized properties", ->
     account = Account.create(index: 0, name: "My tagged account", context).save()
     account.set('account_tag', AccountTag.create(name: "My accounted tag", color: "#FF0000", context).save()).save()
 
-  it 'restores relationships', (done) ->
+  it 'restores relationships when data database is empty', (done) ->
+    sync.set
+      __sync_account_0_name: "My poor account"
+      __sync_account_0_index: 1
+      __sync_account_0_account_tag_id: "auniqueid"
+      __sync_account_tag_auniqueid_uid: 'auniqueid'
+      __sync_account_tag_auniqueid_name: 'My Rich Tag'
+      __sync_account_tag_auniqueid_color: "#FF0000"
+    , ->
+        afterSave = _.after 2, _.once ->
+          l 'Got', Account.findById(1, context)
+          expect(Account.findById(1, context).get('account_tag').get('name')).toBe('My Rich Tag')
+          expect(Account.findById(1, context).get('account_tag').get('color')).toBe("#FF0000")
+          expect(Account.findById(1, context).get('name')).toBe("My poor account")
+          do done
+        context.on 'insert:account insert:account_tag', afterSave
+        sync.emit 'pulled'
+
+  xit 'deletes relationships', (done) ->
+
+  xit "does'nt delete newly created relationships", (done) ->
