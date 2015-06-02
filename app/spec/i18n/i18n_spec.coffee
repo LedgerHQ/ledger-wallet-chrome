@@ -98,14 +98,12 @@ describe "Internationalization and Localization -", ->
       .done()
 
 
-  # This test can be launch only one time - Need app restart
   describe "Check lang and locale memory and stores values after full initialization", ->
 
     it "should set two chars tag lang and four chars tag locale", (done) ->
       spyOn(i18n, 'loadUserBrowserAcceptLangs').and.callFake ->
-        d = ledger.defer()
         i18n.browserAcceptLanguages = ['be', 'fr-CA', 'zh-tw', 'fr']
-        d.resolve().promise
+        ledger.defer().resolve().promise
       i18n.init ->
         expect(i18n.favLang.memoryValue).toBe('fr')
         expect(i18n.favLang.chromeStoreValue).toBe('fr')
@@ -119,9 +117,8 @@ describe "Internationalization and Localization -", ->
     # Should be 'fr' if it is the first supported language in the browserAcceptLanguages array
     it "should set two chars tag lang and locale", (done) ->
       spyOn(i18n, 'loadUserBrowserAcceptLangs').and.callFake ->
-        d = ledger.defer()
         i18n.browserAcceptLanguages = ['zh', 'fr', 'en-GB', 'it']
-        d.resolve().promise
+        ledger.defer().resolve().promise
       i18n.init ->
         expect(i18n.favLang.memoryValue).toBe('fr')
         expect(i18n.favLang.chromeStoreValue).toBe('fr')
@@ -133,9 +130,8 @@ describe "Internationalization and Localization -", ->
 
     it "should fallback to browser UI lang - chrome.i18n.getUILanguage()", (done) ->
       spyOn(i18n, 'loadUserBrowserAcceptLangs').and.callFake ->
-        d = ledger.defer()
         i18n.browserAcceptLanguages = ['dfr', 'huj', 'jla', 'dede', 'lp']
-        d.resolve().promise
+        ledger.defer().resolve().promise
       i18n.init ->
         expect(i18n.favLang.memoryValue).toBe(chrome.i18n.getUILanguage())
         expect(i18n.favLang.chromeStoreValue).toBe(chrome.i18n.getUILanguage())
@@ -147,9 +143,8 @@ describe "Internationalization and Localization -", ->
 
     it "should have sync store set", (done) ->
       spyOn(i18n, 'loadUserBrowserAcceptLangs').and.callFake ->
-        d = ledger.defer()
         i18n.browserAcceptLanguages = ['be', 'fr-CA', 'zh-tw', 'fr']
-        d.resolve().promise
+        ledger.defer().resolve().promise
       i18n.init ->
         expect(i18n.favLang.syncStoreIsSet).toBe(true)
         expect(i18n.favLocale.syncStoreIsSet).toBe(true)
