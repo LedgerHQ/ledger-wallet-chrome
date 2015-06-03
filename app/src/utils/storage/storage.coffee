@@ -6,6 +6,7 @@
   ledger.storage.wallet = new ledger.storage.SecureStore 'ledger.wallet.' + bitIdAddress, passphrase
   ledger.storage.databases = new ledger.storage.SecureStore 'ledger.database.' + bitIdAddress, passphrase
   ledger.storage.logs = new ledger.storage.SecureStore 'ledger.logs' + bitIdAddress, passphrase
+  ledger.storage.logs.clear() # TODO: Remove this later (Crappy 'fix' for slow logger)
 
 @ledger.storage.closeStores = () ->
   ledger.storage.sync = null
