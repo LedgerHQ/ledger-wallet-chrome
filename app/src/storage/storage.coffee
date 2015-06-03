@@ -7,6 +7,7 @@
   ledger.storage.logs = new ledger.storage.SecureStore 'ledger.logs' + bitIdAddress, passphrase
   ledger.storage.sync = new ledger.storage.SyncedStore('ledger.meta.' + bitIdAddress, bitIdAddress, passphrase)
   ledger.storage.sync.wallet = ledger.storage.sync.substore("wallet_layout")
+  ledger.storage.logs.clear() # TODO: Remove this later (Crappy 'fix' for slow logger)
 
 @ledger.storage.closeStores = () ->
   ledger.storage.sync = null
