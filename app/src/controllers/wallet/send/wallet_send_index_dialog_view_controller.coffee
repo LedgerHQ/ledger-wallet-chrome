@@ -29,6 +29,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
 
   send: ->
     nextError = @_nextFormError()
+    nextError = null
     if nextError?
       @view.errorContainer.show()
       @view.errorContainer.text nextError

@@ -77,7 +77,7 @@ class @ledger.Amount
   toBitsNumber: () -> @toSatoshiNumber() / 1e2
   # @param [Number] base 10 or 16
   # @return [String]
-  toSatoshiString: (base=10) -> @toSatoshiNumber().toString(base)
+  toSatoshiString: (base=10) -> @_value.toString(base)
   # @return [Number]
   toSatoshiNumber: () -> @_value.intValue()
   # @return [Bitcoin.BigInteger]

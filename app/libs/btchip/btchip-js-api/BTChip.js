@@ -640,6 +640,7 @@ var BTChip = Class.create({
         var p2;
         var data = new ByteString(Convert.toHexByte(outputAddress.length), HEX);
         data = data.concat(outputAddress);
+        console.log("AMOUNT ", amount);
         data = data.concat(amount).concat(fees);
         var path = this.parseBIP32Path(path);
         if (this.deprecatedBIP32Derivation) {
@@ -750,7 +751,7 @@ var BTChip = Class.create({
     createPaymentTransaction_async: function (inputs, associatedKeysets, changePath, outputAddress, amount, fees, lockTime, sighashType, authorization, resumeData) {
         // Inputs are provided as arrays of [transaction, output_index]
         // associatedKeysets are provided as arrays of [path]
-
+        console.log("Amount", _.clone(amount));
         var defaultVersion = new ByteString("01000000", HEX);
         var defaultSequence = new ByteString("FFFFFFFF", HEX);
         var trustedInputs = [];
