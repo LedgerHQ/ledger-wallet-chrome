@@ -145,7 +145,6 @@ class ledger.wallet.Transaction
     if not @amount? or not @fees? or not @recipientAddress?
       Errors.throw('Transaction must me initialized before preparation')
     d = ledger.defer(callback)
-    l "Final prepare", @amount
     @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
     .progress (progress) =>
       currentStep = progress.currentPublicKey + progress.currentSignTransaction + progress.currentTrustedInput + progress.currentHashOutputBase58 + progress.currentUntrustedHash
