@@ -1,4 +1,9 @@
 # Changelog
+1.3.5
+====
+- Fix a bug when sending more than 20BTC
+- Minor application performances improvement
+- Fix a minor bug due to Chrome 43
 
 1.3.3/1.3.4
 ====
