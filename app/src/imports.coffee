@@ -336,6 +336,7 @@
 
         ## i18n
         'i18n/i18n'
+        'i18n/i18n_formatters'
         'i18n/i18n_languages'
 
         ## Preferences

@@ -54,14 +54,15 @@ class MockLocalStorage
     @_store = _(@_store).omit(key)
     callback?()
 
-
-instance = new MockLocalStorage()
+mock = null
 ledger.specs.storage ?= {}
-ledger.specs.storage.inject = ->
-  instance.originalChromeStore = chrome.storage.local
-  chrome.storage.local         = instance
+ledger.specs.storage.inject    = (callback) ->
+  mock = new MockLocalStorage()
+  mock.originalChromeStore     = chrome.storage.local
+  chrome.storage.local         = mock
+  callback?()
 
 ledger.specs.storage.restore = (callback) ->
-  chrome.storage.local = instance.originalChromeStore
+  chrome.storage.local = mock.originalChromeStore
   callback?()
 
