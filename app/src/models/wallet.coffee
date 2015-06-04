@@ -34,7 +34,21 @@ class @Wallet extends ledger.database.Model
     if @instance.isInserted()
       callback?()
     else
-      @instance.add('accounts', {index: 0, name: t 'common.default_account_name'}).save()
-      callback?()
+      firstAccount = Account.all()[0]
+      finalize = (account) =>
+        @instance.add('accounts', account).save()
+        callback?()
+      return finalize(firstAccount) if firstAccount?
+      ledger.storage.sync.pull().then =>
+        onDatabaseSynchronized = ->
+          firstAccount = Account.findOrCreate(index: 0, {index: 0, name: t 'common.default_account_name'}).save()
+          finalize(firstAccount)
+        onDatabaseSynchronized = _.once(onDatabaseSynchronized)
+        ledger.database.contexts.main.once 'synchronized', onDatabaseSynchronized
+        _.delay(onDatabaseSynchronized, 5000)
+      .fail =>
+        firstAccount = Account.findOrCreate(index: 0, {index: 0, name: t 'common.default_account_name'}).save()
+        finalize(firstAccount)
+      .done()
 
   @releaseWallet: () ->

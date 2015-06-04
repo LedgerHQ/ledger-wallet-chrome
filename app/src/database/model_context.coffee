@@ -195,6 +195,7 @@ class ledger.database.contexts.Context extends EventEmitter
           # delete all
           l "Delete all", name, data
           l collection.getModelClass().chain(this).remove()
+      @emit 'synchronized'
 
   _modelize: (data) -> @getCollection(data['objType'])?._modelize(data)
 

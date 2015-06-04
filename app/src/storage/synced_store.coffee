@@ -28,11 +28,11 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     @_secureStore = new ledger.storage.SecureStore(name, key)
     @mergeStrategy = @_overwriteStrategy
     @client = ledger.api.SyncRestClient.instance(addr)
-    @throttled_pull = _.throttle _.bind((-> @._pull()),@), @PULL_THROTTLE_DELAY
+    @throttled_pull = _.throttle _.bind((-> @._pull()),@), @PULL_THROTTLE_DELAY, trailing: no
     @debounced_push = _.debounce _.bind((-> @._push()),@), @PUSH_DEBOUNCE_DELAY
     @_auxiliaryStore = auxiliaryStore
     @_changes = []
-    @_unlockMethods = _.lock(this, ['set', 'get', 'remove', 'clear', '_pull', '_push'])
+    @_unlockMethods = _.lock(this, ['set', 'get', 'remove', 'clear', 'pull', 'push'])
     @_deferredPull = null
     @_deferredPush = null
     _.defer =>
@@ -160,20 +160,16 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     hasRemoteData = yes
     unlockMutableOperations = _.noop
     pushedData = null
-    p = @_pull().fail (e) =>
-      l 1
+    p = @pull().fail (e) =>
       throw Errors.NetworkError if e is Errors.NetworkError
       hasRemoteData = no
     .then =>
-      l 2
       throw Errors.NoChanges if @_changes.length is 0
       # Lock mutable operations during the push
-      l "Time to lock"
-      unlockMutableOperations = _.lock(this, ['set', 'remove', 'clear', '_pull', '_push'])
+      unlockMutableOperations = _.lock(this, ['set', 'remove', 'clear', 'pull', 'push'])
       # Create the data to send
       @_getAllData()
     .then (data) =>
-      l 3
       # Check if the changes are useful or not by hashing the changes without the last commit
       if data['__hashes']?.length > 0
         checkData = _.clone(data)
@@ -189,7 +185,6 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
       @_encryptToJson(pushedData)
     .then (data) => if hasRemoteData then @client.put_settings(data) else @client.post_settings(data)
     .then (md5) =>
-      l 4
       @_setLastMd5(md5)
       # Merge changes into store
       @_clearChanges()
@@ -197,10 +192,8 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     .then () => @emit 'pushed', this
     .then () => do unlockMutableOperations
     .fail (e) =>
-      l 5
-      return if e is Errors.NoChanges
       do unlockMutableOperations
-      l "Retry", e
+      return if e is Errors.NoChanges
       @debounced_push() # Retry later
       throw e
     @_deferredPush.resolve(p)
