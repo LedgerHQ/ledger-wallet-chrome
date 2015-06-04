@@ -24,9 +24,9 @@ class ledger.database.MigrationHandler
     Configuration.getInstance(@context).setCurrentApplicationVersion(manifestVersion)
 
   performMigrations: (fromVersion, toVersion) ->
-    for migration in migrations
-      if (migration.from is fromVersion or migration.from is '*') and (migration.to is toVersion or migration.to is '*')
-        migration.apply(@context)
+    for migration in @_migrations
+      if fromVersion.match(migration.from) and toVersion.match(migration.to)
+        migration.apply @context
 
 
 migrations = [
@@ -37,12 +37,11 @@ migrations = [
 
 migrate_from_1_0_3_x_to_1_4_x = (context) ->
   # Force to save every sync properties on the sync store
-  if (account = Account.findById(0))?
+  if (account = Account.findById(0, context))?
     l "Account", account, account.get('operations')
-    for operation in Operation.all()
+    for operation in Operation.all(context)
       operation.set('account', account).save()
-    account.set('wallet', Wallet.findById(1))
-    account.save()
+    account.set('wallet', Wallet.findById(1, context)).save()
     l "After Account", account, account.get('operations')
 
   for Model in ledger.database.Model.AllModelClasses()
