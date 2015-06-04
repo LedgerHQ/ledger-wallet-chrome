@@ -14,7 +14,7 @@ class ledger.database.MigrationHandler
       else
         new RegExp(versionMatcher.replace(/\./g, '\\.').replace(/\*/g, '.*'))
 
-    @_migrations = (from: versionMatcherToRegex(migration.from), to: versionMatcherToRegex(migration.to), apply: migration.apply for migration in migrations)
+    @_migrations = ({from: versionMatcherToRegex(migration.from), to: versionMatcherToRegex(migration.to), apply: migration.apply} for migration in migrations)
 
   applyMigrations: () ->
     configurationVersion = Configuration.getInstance(@context).getCurrentApplicationVersion()
@@ -24,6 +24,7 @@ class ledger.database.MigrationHandler
     Configuration.getInstance(@context).setCurrentApplicationVersion(manifestVersion)
 
   performMigrations: (fromVersion, toVersion) ->
+    l @_migrations, migrations
     for migration in @_migrations
       if fromVersion.match(migration.from) and toVersion.match(migration.to)
         migration.apply @context
@@ -32,7 +33,7 @@ class ledger.database.MigrationHandler
 migrations = [
   # {from: 'unknown', to: '1.0.6', apply: -> l 'MIGRATION 1'}
   # {from: 'unknown', to: '*', apply: -> l 'MIGRATION 2'}
-  {from: '1.[0-3].*', to: '1.4.*', apply: migrate_from_1_0_3_x_to_1_4_x}
+  {from: '1.[0-3].*', to: '1.4.*', apply: (context) -> migrate_from_1_0_3_x_to_1_4_x(context)}
 ]
 
 migrate_from_1_0_3_x_to_1_4_x = (context) ->
