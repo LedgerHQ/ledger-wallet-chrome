@@ -15,6 +15,7 @@ describe 'Database synchronized properties', ->
 
   it 'updates existing objects', (done) ->
     onDbSaved = _.after 2, _.once ->
+      l "Update called"
       sync.substore('sync_account_0').set index: 0, name: "My Sync Spec Account", ->
         sync.emit 'pulled'
         context.on 'update:account', ->
@@ -90,18 +91,25 @@ describe 'Database synchronized properties', ->
         context.on 'insert:account insert:account_tag', afterSave
         sync.emit 'pulled'
 
-  xit 'deletes relationships', (done) ->
-    Account.create(index: 0, name: 'Account 0').save()
-    Account.create(index: 1, name: 'Account 1').save()
-    Account.findById(0).set('account_tag', AccountTag.create(name: 'AccountTag').save()).save()
+  it 'deletes relationships', (done) ->
+    Account.create(index: 0, name: 'Account 0', context).save()
+    Account.create(index: 1, name: 'Account 1', context).save()
+    Account.findById(0, context).set('account_tag', AccountTag.create(name: 'AccountTag', context).save()).save()
     afterSave = ->
-      sync.set
-        __sync_account_1_index: 1
-        __sync_account_1_name: 'Account 1'
-      , ->
-        l "Salut"
-    _.delay afterSave, 50
+      sync.clear ->
+        sync.set
+          __sync_account_1_index: 1
+          __sync_account_1_name: 'Account 1'
+        , ->
+          sync.emit 'pulled'
+          _.delay ->
+            expect(Account.all(context).length).toBe(1)
+            expect(AccountTag.all(context).length).toBe(0)
+            expect(Account.findById(1, context)).not.toBeUndefined()
+            expect(Account.findById(1, context).get('name')).toBe('Account 1')
+            do done
+          , 50
+    sync.once 'set', ->
+      _.delay(afterSave, 50)
 
-
-  xit "does'nt delete newly created relationships", (done) ->
 
