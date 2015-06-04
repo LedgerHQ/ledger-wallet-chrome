@@ -58,9 +58,8 @@ class @ledger.storage.Store extends EventEmitter
   #
   # @param [Function] cb A callback invoked once the store is cleared.
   clear: (cb) ->
-    this._raw_keys (raw_keys) =>
-      raw_keys = _(raw_keys).filter (key) => key.match(@_nameRegex)?
-      this._raw_remove raw_keys, (raw_items) => cb?(@_deprocessItems(raw_items))
+    @keys (keys) =>
+      @remove(keys, cb)
 
   # Raw get, without processing.
   # @see ledger.storage.Store#get

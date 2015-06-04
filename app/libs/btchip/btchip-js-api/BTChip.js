@@ -750,7 +750,6 @@ var BTChip = Class.create({
     createPaymentTransaction_async: function (inputs, associatedKeysets, changePath, outputAddress, amount, fees, lockTime, sighashType, authorization, resumeData) {
         // Inputs are provided as arrays of [transaction, output_index]
         // associatedKeysets are provided as arrays of [path]
-
         var defaultVersion = new ByteString("01000000", HEX);
         var defaultSequence = new ByteString("FFFFFFFF", HEX);
         var trustedInputs = [];

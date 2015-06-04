@@ -84,7 +84,7 @@ class Collection
         object.set k, v for k, v of synchronizedObject
       object.save()
     # Remove objects not present in sync store
-    @getModelClass().where((i) => !_.contains(existingsIds, i[@getModelClass().getBestIdentifierName()])).remove()
+    @getModelClass().where(((i) => !_.contains(existingsIds, i[@getModelClass().getBestIdentifierName()])), @_context).remove()
     return
 
   _getModelSyncSubstore: (model) -> @_syncSubstores["sync_#{_.str.underscored(model.getCollectionName()).toLowerCase()}_#{model.getBestIdentifier()}"] ||= @_context._syncStore.substore("sync_#{_.str.underscored(model.getCollectionName()).toLowerCase()}_#{model.getBestIdentifier()}")
@@ -115,6 +115,7 @@ class Collection
       @_modelize(d[d.length - 1])
     query.all = query.data
     query.count = () -> data.call(query).length
+    query.remove = -> object.delete() for object in query.all()
     query
 
   getCollection: () -> @_collection
@@ -146,7 +147,6 @@ class ledger.database.contexts.Context extends EventEmitter
       @_listenCollectionEvent(@_collections[collection.name])
     @_syncStore.on 'pulled', (@onSyncStorePulled = @onSyncStorePulled.bind(this))
     @initialize()
-    @onSyncStorePulled()
 
   initialize: () ->
     modelClasses = ledger.database.Model.AllModelClasses()
@@ -182,15 +182,19 @@ class ledger.database.contexts.Context extends EventEmitter
 
 
   onSyncStorePulled: ->
+    l "PULLED"
     @_syncStore.getAll (data) =>
       for name, collection of @_collections
+        l "Collection ", name
         continue unless collection.getModelClass().hasSynchronizedProperties()
+        l "Collection confirm ", name
         collectionData = _(data).pick (v, k) -> k.match("__sync_#{_.str.underscored(name).toLowerCase()}")?
         unless _(collectionData).isEmpty()
           collection.updateSynchronizedProperties(collectionData)
         else
           # delete all
-          collection.getModelClass().find().remove()
+          l "Delete all", name, data
+          l collection.getModelClass().chain(this).remove()
 
   _modelize: (data) -> @getCollection(data['objType'])?._modelize(data)
 

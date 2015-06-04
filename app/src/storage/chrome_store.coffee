@@ -1,3 +1,5 @@
+getChromeVersion = -> getChromeVersion.version ||= +navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)[2]
+
 # A store able to keep persistently data with the chrome storage API
 class @ledger.storage.ChromeStore extends ledger.storage.Store
 
@@ -12,7 +14,11 @@ class @ledger.storage.ChromeStore extends ledger.storage.Store
   # @see ledger.storage.Store#_raw_set
   _raw_set: (items, cb=->) ->
     try
-      chrome.storage.local.set(items, cb)
+      if getChromeVersion() >= 42
+        chrome.storage.local.set(items)
+        _.defer(cb)
+      else
+        chrome.storage.local.set(items, cb)
     catch e
       console.error("chrome.storage.local.set :", e)
 
@@ -26,6 +32,10 @@ class @ledger.storage.ChromeStore extends ledger.storage.Store
   # @see ledger.storage.Store#_raw_remove
   _raw_remove: (keys, cb=->) ->
     try
-      chrome.storage.local.remove(keys, cb)
+      if getChromeVersion() >= 42
+        chrome.storage.local.remove(keys)
+        _.defer(cb)
+      else
+        chrome.storage.local.remove(keys, cb)
     catch e
       console.error("chrome.storage.local.remove :", e)
