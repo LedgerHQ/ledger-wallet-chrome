@@ -64,7 +64,6 @@ class Collection
   updateSynchronizedProperties: (data) ->
     synchronizedIndexField = @getModelClass()._synchronizedIndex.field
     objectDeclarations = _(data).pick (v, key) => key.match("^__sync_#{_.str.underscored(@_collection.name).toLowerCase()}_[a-zA-Z0-9]+_#{synchronizedIndexField}")
-    l "Declaration", @getModelClass().name, objectDeclarations
     existingsIds = []
     for key, index of objectDeclarations
       [__, objectId] = key.match("^__sync_#{_.str.underscored(@_collection.name).toLowerCase()}_([a-zA-Z0-9]+)_#{synchronizedIndexField}")
@@ -76,7 +75,6 @@ class Collection
       for key, value of data when key.match(objectNamePattern)
         key = key.replace(objectNamePattern, '')
         synchronizedObject[key] = value
-      l 'Update ', @getModelClass().name, ' ID ', objectId, ' with ', synchronizedObject, ' already have ', object
       @_context._syncStore.getAll(l)
       unless object?
         object = @getModelClass().create(synchronizedObject, @_context)
@@ -182,19 +180,16 @@ class ledger.database.contexts.Context extends EventEmitter
 
 
   onSyncStorePulled: ->
-    l "PULLED"
     @_syncStore.getAll (data) =>
       for name, collection of @_collections
-        l "Collection ", name
         continue unless collection.getModelClass().hasSynchronizedProperties()
-        l "Collection confirm ", name
         collectionData = _(data).pick (v, k) -> k.match("__sync_#{_.str.underscored(name).toLowerCase()}")?
         unless _(collectionData).isEmpty()
           collection.updateSynchronizedProperties(collectionData)
         else
           # delete all
-          l "Delete all", name, data
           l collection.getModelClass().chain(this).remove()
+      @emit 'synchronized'
 
   _modelize: (data) -> @getCollection(data['objType'])?._modelize(data)
 

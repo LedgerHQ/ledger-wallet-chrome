@@ -81,13 +81,13 @@ initializePreferences = (dongle, raise, done) -> ledger.preferences.init done
 
 ProceduresOrder = [
   openStores
-  pullStore
   openHdWallet
   startDerivationTask
   openAddressCache
   openXpubCache
   openDatabase
   initializeWalletModel
+  pullStore
   restoreStructure
   completeLayoutInitialization
   initializePreferences

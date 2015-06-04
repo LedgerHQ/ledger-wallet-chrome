@@ -36,6 +36,7 @@ class ledger.wallet.Wallet
 
   initialize: (store, callback) ->
     @_store = store
+    #@_store.getAll -> l "Wallet", arguments
     @_store.get ['accounts'], (result) =>
       @_accounts = []
       return callback?() unless result.accounts?
@@ -283,7 +284,6 @@ _.extend ledger.wallet,
         @_endInitialize(hdWallet, callback)
 
   _endInitialize: (hdWallet, callback) ->
-    ledger.storage.sync.wallet.getAll (r) -> l "Sync", r
     hdWallet.initialize ledger.storage.sync.wallet, () =>
       ledger.wallet.Wallet.instance = hdWallet
       callback?()

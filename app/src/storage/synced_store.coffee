@@ -11,7 +11,7 @@ Errors =
 # A store able to synchronize with a remote crypted store. This store has an extra method in order to order a push or pull
 # operations
 # @event pulled Emitted once the store is pulled from the remote API
-class ledger.storage.SyncedStore extends ledger.storage.SecureStore
+class ledger.storage.SyncedStore extends ledger.storage.Store
 
   PULL_INTERVAL_DELAY: ledger.config.syncRestClient.pullIntervalDelay || 10000
   PULL_THROTTLE_DELAY: ledger.config.syncRestClient.pullThrottleDelay || 1000
@@ -24,14 +24,15 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
   # @param [Function] syncPullHandler A function used to perform pull synchronization operations
   # @param [ledger.storage.Store] auxiliaryStore A store used to save ledger.storage.SyncedStored meta data
   constructor: (name, addr, key, auxiliaryStore = ledger.storage.wallet) ->
-    super(name, key)
+    super(name)
+    @_secureStore = new ledger.storage.SecureStore(name, key)
     @mergeStrategy = @_overwriteStrategy
     @client = ledger.api.SyncRestClient.instance(addr)
-    @throttled_pull = _.throttle _.bind((-> @._pull()),@), @PULL_THROTTLE_DELAY
+    @throttled_pull = _.throttle _.bind((-> @._pull()),@), @PULL_THROTTLE_DELAY, trailing: no
     @debounced_push = _.debounce _.bind((-> @._push()),@), @PUSH_DEBOUNCE_DELAY
     @_auxiliaryStore = auxiliaryStore
     @_changes = []
-    @_unlockMethods = _.lock(this, ['set', 'get', 'remove', 'clear', '_pull', '_push'])
+    @_unlockMethods = _.lock(this, ['set', 'get', 'remove', 'clear', 'pull', 'push'])
     @_deferredPull = null
     @_deferredPush = null
     _.defer =>
@@ -68,11 +69,11 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       values[key] = _(changes).last().value if _(changes).last().type is OperationTypes.SET
       handledKeys.push key
     keys = _(keys).without(handledKeys...)
-    super keys, (storeValues) ->
+    @_secureStore.get keys, (storeValues) ->
       cb?(_.extend(storeValues, values))
 
   keys: (cb) ->
-    super (keys) =>
+    @_secureStore.keys (keys) =>
       for key, keyChanges of _(@_changes).groupBy('key')
         if _(keyChanges).last().type is OperationTypes.REMOVE
           keys = _(keys).without(key)
@@ -91,7 +92,7 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     _.defer => cb?()
 
   clear: (cb) ->
-    super(cb)
+    @_secureStore.clear cb
     @_clearChanges()
     @client.delete_settings()
 
@@ -159,13 +160,13 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     hasRemoteData = yes
     unlockMutableOperations = _.noop
     pushedData = null
-    p = @_pull().fail (e) =>
+    p = @pull().fail (e) =>
       throw Errors.NetworkError if e is Errors.NetworkError
       hasRemoteData = no
     .then =>
       throw Errors.NoChanges if @_changes.length is 0
       # Lock mutable operations during the push
-      unlockMutableOperations = _.lock(this, ['set', 'remove', 'clear', '_pull', '_push'])
+      unlockMutableOperations = _.lock(this, ['set', 'remove', 'clear', 'pull', 'push'])
       # Create the data to send
       @_getAllData()
     .then (data) =>
@@ -189,12 +190,12 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
       @_clearChanges()
       @_setAllData(pushedData)
     .then () => @emit 'pushed', this
+    .then () => do unlockMutableOperations
     .fail (e) =>
+      do unlockMutableOperations
       return if e is Errors.NoChanges
       @debounced_push() # Retry later
       throw e
-    .fin ->
-      do unlockMutableOperations
     @_deferredPush.resolve(p)
     @_deferredPush.promise.fin => @_deferredPush = null
     p
@@ -226,15 +227,15 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
 
   _getAllData: ->
     d = ledger.defer()
-    @_super().keys (keys) =>
-      @_super().get keys, (data) =>
+    @_secureStore.keys (keys) =>
+      @_secureStore.get keys, (data) =>
         d.resolve(data)
     d.promise
 
   _setAllData: (data) ->
     d = ledger.defer()
-    @_super().clear =>
-      @_super().set data, =>
+    @_secureStore.clear =>
+      @_secureStore.set data, =>
         d.resolve()
     d.promise
 
@@ -251,10 +252,3 @@ class ledger.storage.SyncedStore extends ledger.storage.SecureStore
     out = {}
     out[@_deprocessKey(key)] = @_deprocessValue(value) for key, value of data
     out
-
-  _super: ->
-    return @_super_ if @_super_?
-    @_super_ = {}
-    for key, value of @constructor.__super__
-      @_super_[key] = if _(value).isFunction() then value.bind(this) else value
-    @_super_

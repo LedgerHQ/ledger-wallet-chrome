@@ -82,7 +82,7 @@ class @ledger.database.Model extends @EventEmitter
     @
 
   save: () ->
-    return unless @hasChange()
+    return @ unless @hasChange()
     if @isInserted() and @onUpdate() isnt false
       @_commitPendingRelationships()
       @_collection.update this
