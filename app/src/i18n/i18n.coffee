@@ -228,10 +228,13 @@ class ledger.i18n
 
   ###
     Set user locale (region) into memory and both stores by UI
+    @example Set a locale
+      ledger.i18n.setLocaleByUI('en-GB')
     @param [String] tag Codified (BCP 47) language tag - Official list here : http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
   ###
-  @setLocaleByUI: (tag) =>
+  @setLocaleByUI: (locale) =>
     d = ledger.defer()
+    tag = _.str.replace(locale, '_', '-')
     @chromeStore.set {__i18n_favLocale: tag}, =>
       ledger.storage.sync.set {__i18n_favLocale: tag}, =>
         _.extend @favLocale,

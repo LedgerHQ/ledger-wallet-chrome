@@ -8,7 +8,7 @@ describe "Internationalization and Localization -", ->
 
   beforeEach ->
     ledger.storage.sync = new ledger.storage.MemoryStore('i18n')
-    chromeStore = new ledger.storage.ChromeStore('i18n')
+    chromeStore = i18n.chromeStore
 
 
   describe "Test setFavLangByUI() - ", ->
