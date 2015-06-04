@@ -1,12 +1,21 @@
 describe "AddressDerivationTask", ->
 
-  ###
-    Config de test
-    ledger.app.donglesManager.createDongle('0000', 'af5920746fad1e40b2a8c7080ee40524a335f129cb374d4c6f82fd6bf3139b17191cb8c38b8e37f4003768b103479947cab1d4f68d908ae520cfe71263b2a0cd', 'a26d9f9187c250beb7be79f9eb8ff249')
-  ###
   addrDerivationInstance = ledger.tasks.AddressDerivationTask.instance
 
+  init = (pin, seed, pairingKey, callback) ->
+    chrome.storage.local.clear()
+    addrDerivationInstance.start()
+    dongleInst = new ledger.dongle.MockDongle pin, seed, pairingKey
+    ledger.app.dongle = dongleInst
+    dongleInst.unlockWithPinCode '0000', callback
+
+
+  beforeAll (done) ->
+    dongle = ledger.specs.fixtures.dongles.dongle1
+    init dongle.pin, dongle.masterSeed, dongle.pairingKeyHex, done
+
   it "should get public address", (done) ->
-    addrDerivationInstance.getPublicAddress "44'/0'/0'/0", (addr) ->
-      expect(addr).toBe('19H1wRZdk17o3pUL2NsXqGLVTDk6DvsvyF')
-      done()
+    addrDerivationInstance.registerExtendedPublicKeyForPath "44'/0'/0'", ->
+      addrDerivationInstance.getPublicAddress "44'/0'/0'/0", (addr) ->
+        expect(addr).toBe('19H1wRZdk17o3pUL2NsXqGLVTDk6DvsvyF')
+        done()

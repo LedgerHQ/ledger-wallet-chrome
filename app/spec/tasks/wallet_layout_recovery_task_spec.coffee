@@ -1,15 +1,19 @@
-originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
-
-
 describe "WalletLayoutRecoveryTask", ->
 
-  task = new ledger.tasks.WalletLayoutRecoveryTask()
-  task?.constructor.stopAllRunningTasks()
+  originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
+  mockTask = null
+  dongleInst = null
+  addrDerivationInstance = ledger.tasks.AddressDerivationTask.instance
 
-  init = (pin, seed, pairingKey, done) ->
+  beforeAll ->
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 40000
+
+
+  init = (pin, seed, pairingKey, callback) ->
+    ledger.tasks.Task.stopAllRunningTasks()
     chrome.storage.local.clear()
-    ledger.tasks.AddressDerivationTask.instance.start()
+    mockTask = new ledger.tasks.WalletLayoutRecoveryTask()
+    addrDerivationInstance.start()
     dongleInst = new ledger.dongle.MockDongle pin, seed, pairingKey
     ledger.app.dongle = dongleInst
     dongleInst.unlockWithPinCode('0000')
@@ -23,25 +27,28 @@ describe "WalletLayoutRecoveryTask", ->
           return
         ledger.storage.openStores bitIdAddress, pubKey.bitcoinAddress.value
         ledger.wallet.initialize dongleInst, ->
-          task.start()
-          task.on 'stop', -> done()
+          cache = new ledger.wallet.Wallet.Cache('xpub_cache', ledger.wallet.Wallet.instance)
+          cache.initialize =>
+            ledger.wallet.Wallet.instance.xpubCache = cache
+          mockTask.start()
+          mockTask.on 'stop', -> callback?()
 
 
 
   describe " - zero account", ->
     beforeAll (done) ->
-      spyOn(task, '_restoreChronocoinLayout')
       dongle = ledger.specs.fixtures.dongles.dongle2
-      init dongle.pin, dongle.masterSeed, dongle.pairingKeyHex, done
+      init dongle.pin, dongle.masterSeed, dongle.pairingKeyHex, ->
+        spyOn(mockTask, '_restoreChronocoinLayout')
+        done()
 
     it "should call restoreChronocoinLayout", (done) ->
-      expect(task._restoreChronocoinLayout).toHaveBeenCalled()
+      expect(mockTask._restoreChronocoinLayout).toHaveBeenCalled()
       done()
 
     afterAll ->
-      task.constructor.stopAllRunningTasks()
       chrome.storage.local.clear()
-      @dongleInst = null
+      dongleInst = null
 
 
 
@@ -50,54 +57,49 @@ describe "WalletLayoutRecoveryTask", ->
       dongle = ledger.specs.fixtures.dongles.dongle2
       init dongle.pin, dongle.masterSeed, dongle.pairingKeyHex, done
 
-    it "should have 1 account", ->
+    it "should have 1 account", (done) ->
       expect(typeof ledger.wallet.Wallet.instance.getAccount(0)).toBe('object')
       expect(ledger.wallet.Wallet.instance.getAccount(1)).toBeUndefined()
+      done()
 
-    it "should have 0 address in internal and external nodes", ->
+    it "should have 0 address in internal and external nodes", (done) ->
       expect(ledger.wallet.Wallet.instance.getAccount(0).getCurrentChangeAddressIndex()).toBe(0)
       expect(ledger.wallet.Wallet.instance.getAccount(0).getCurrentPublicAddressIndex()).toBe(0)
+      done()
 
     afterAll ->
-      task.constructor.stopAllRunningTasks()
       chrome.storage.local.clear()
-      @dongleInst = null
+      dongleInst = null
 
 
 
   describe " - seed with two accounts", ->
     beforeAll (done) ->
-      #spyOn(task, '_restoreBip44Layout')
+      #spyOn(mockTask, '_restoreBip44Layout')
       dongle = ledger.specs.fixtures.dongles.dongle1
       init dongle.pin, dongle.masterSeed, dongle.pairingKeyHex, done
 
-    it "should have 2 accounts", ->
+    it "should have 2 accounts", (done) ->
       expect(ledger.wallet.Wallet.instance.getAccountsCount()).toBe(2)
       expect(typeof ledger.wallet.Wallet.instance.getAccount(0)).toBe('object')
       expect(typeof ledger.wallet.Wallet.instance.getAccount(1)).toBe('object')
       expect(ledger.wallet.Wallet.instance.getAccount(2)).toBeUndefined()
-      #expect(task._restoreBip44Layout).toHaveBeenCalled()
+      #expect(mockTask._restoreBip44Layout).toHaveBeenCalled()
+      done()
 
-    it "first account should have 7 addresses in internal nodes and 31 in external nodes", ->
+    it "first account should have 7 addresses in internal nodes and 31 in external nodes", (done) ->
       expect(ledger.wallet.Wallet.instance.getAccount(0).getCurrentChangeAddressIndex()).toBe(7)
       expect(ledger.wallet.Wallet.instance.getAccount(0).getCurrentPublicAddressIndex()).toBe(31)
+      done()
 
-    it "should have importedChangePaths and importedPublicPaths", ->
+    it "should have importedChangePaths and importedPublicPaths", (done) ->
       expect(ledger.wallet.Wallet.instance.getAccount(0).getAllChangeAddressesPaths()).toContain("0'/1/0")
       expect(ledger.wallet.Wallet.instance.getAccount(0).getAllPublicAddressesPaths()).toContain("0'/0/0")
+      done()
 
     afterAll ->
       chrome.storage.local.clear()
-      task.constructor.stopAllRunningTasks()
-      @dongleInst = null
+      dongleInst = null
 
 
-  afterAll ->
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
-
-
-
-
-
-
-
