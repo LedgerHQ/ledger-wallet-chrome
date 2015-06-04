@@ -38,10 +38,12 @@ migrations = [
 migrate_from_1_0_3_x_to_1_4_x = (context) ->
   # Force to save every sync properties on the sync store
   if (account = Account.findById(0))?
+    l "Account", account, account.get('operations')
     for operation in Operation.all()
-      account.add('operations', operation)
+      operation.set('account', account).save()
     account.set('wallet', Wallet.findById(1))
     account.save()
+    l "After Account", account, account.get('operations')
 
   for Model in ledger.database.Model.AllModelClasses()
     if Model.hasSynchronizedProperties()
