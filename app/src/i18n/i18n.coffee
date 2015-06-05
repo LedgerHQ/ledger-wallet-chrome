@@ -30,6 +30,7 @@ class ledger.i18n
     User favorite language and region (Locale)
   ###
   @favLocale:
+
     memoryValue: undefined
     syncStoreValue: undefined
     chromeStoreValue: undefined

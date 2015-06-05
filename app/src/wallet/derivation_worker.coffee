@@ -104,7 +104,8 @@ getPublicAddress = (path) ->
     if _.str.startsWith(derivationPath, "#{parentDerivationPath}/")
       derivationPath = derivationPath.replace("#{parentDerivationPath}/", '')
       address =  xpub.getPublicAddress(derivationPath)
-      break
+      postResult address
+      return
 
   # No result from cache perform the derivation on the chip
   unless address?
@@ -116,8 +117,7 @@ getPublicAddress = (path) ->
         postResult address
       else
         postError "Unable to derive path '#{path}'"
-  else
-    postResult address
+
 
 @onmessage = (event) =>
   {command, parameters, queryId} = event.data

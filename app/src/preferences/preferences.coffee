@@ -63,7 +63,10 @@ class ledger.preferences.Preferences extends EventEmitter
       preference.storeKey = @_prefIdToStoreKey(prefId)
       preference.getter = defaultGetter.bind(preference) unless preference.getter?
       preference.setter = defaultSetter.bind(preference) unless preference.setter?
-    ledger.storage.sync.on 'pulled', => @_updatePreferences(on, _.noop)
+    ledger.storage.sync.on 'pulled', =>
+      ledger.i18n.updateMemoryValueFromStore('favLang')
+      ledger.i18n.updateMemoryValueFromStore('favLocale')
+      @_updatePreferences(on, _.noop)
 
   init: (callback) -> @_updatePreferences(off, callback)
 
