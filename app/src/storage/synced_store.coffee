@@ -217,7 +217,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
   _computeCommit: (data, changes) ->
     data = @_applyChanges(data, changes)
     commitHash = ledger.crypto.SHA256.hashString _(data).toJson()
-    data.__hashes = [commitHash].concat(data.__hashes or [])
+    data.__hashes = [commitHash].concat(data.__hashes.slice(0, @HASHES_CHAIN_MAX_SIZE - 1) or [])
     [commitHash, data]
 
   # @return A jQuery promise
