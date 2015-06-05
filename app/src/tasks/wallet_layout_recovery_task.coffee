@@ -43,7 +43,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     recoverAccount = =>
       if accountIndex > 0 and (previousAccount = ledger.wallet.Wallet.instance.getAccount(accountIndex - 1)).isEmpty()
         l 'ACCOUNT', previousAccount
-        #previousAccount.remove() if accountIndex > 1
+        previousAccount.remove() if accountIndex > 1
         return @emit 'bip44:done'
       account = ledger.wallet.Wallet.instance.getOrCreateAccount(accountIndex)
       done = =>

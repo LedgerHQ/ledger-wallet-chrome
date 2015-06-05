@@ -108,8 +108,9 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     p = @client.get_settings_md5().then (md5) =>
       return yes if @_lastMd5 is md5
       @client.get_settings().then (data) =>
-        l "Decrypt", data
+        l "Decrypt", _.clone(data)
         data = Try(=> @_decrypt(data)).getOrElse({})
+        l "After decrypt", data
         @_merge(data).then =>
           @_setLastMd5(md5)
           @emit 'pulled'
