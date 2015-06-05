@@ -44,10 +44,12 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
         @debounced_push() if @_changes.length > 0
 
   pull: ->
+    l 'Request pull', new Error().stack
     @throttled_pull()
     @_deferredPull?.promise or (@_deferredPull = ledger.defer()).promise
 
   push: ->
+    l 'Request push', new Error().stack
     @debounced_push()
     @_deferredPush?.promise or (@_deferredPush = ledger.defer()).promise
 
@@ -106,13 +108,15 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     p = @client.get_settings_md5().then (md5) =>
       return yes if @_lastMd5 is md5
       @client.get_settings().then (data) =>
-        data = @_decrypt(data)
+        l "Decrypt", data
+        data = Try(=> @_decrypt(data)).getOrElse({})
         @_merge(data).then =>
           @_setLastMd5(md5)
           @emit 'pulled'
     .fail (e) =>
       if e.status is 404
         throw Errors.NoRemoteData
+      l "Pull failed", e
       throw Errors.NetworkError
     @_deferredPull.resolve(p)
     @_deferredPull.promise.fin => @_deferredPull = null
@@ -194,7 +198,8 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     .fail (e) =>
       do unlockMutableOperations
       return if e is Errors.NoChanges
-      @debounced_push() # Retry later
+      l "Failed push ", e
+      @push() # Retry later
       throw e
     @_deferredPush.resolve(p)
     @_deferredPush.promise.fin => @_deferredPush = null

@@ -13,6 +13,7 @@ describe "WalletLayoutRecoveryTask", ->
     ledger.tasks.Task.stopAllRunningTasks()
     chrome.storage.local.clear()
     mockTask = new ledger.tasks.WalletLayoutRecoveryTask()
+    spyOn(mockTask, '_restoreChronocoinLayout').and.callThrough()
     addrDerivationInstance.start()
     dongleInst = new ledger.dongle.MockDongle pin, seed, pairingKey
     ledger.app.dongle = dongleInst
@@ -39,12 +40,11 @@ describe "WalletLayoutRecoveryTask", ->
     beforeAll (done) ->
       dongle = ledger.specs.fixtures.dongles.dongle2
       init dongle.pin, dongle.masterSeed, dongle.pairingKeyHex, ->
-        spyOn(mockTask, '_restoreChronocoinLayout')
         done()
 
-    it "should call restoreChronocoinLayout", (done) ->
+    it "should call restoreChronocoinLayout", ->
       expect(mockTask._restoreChronocoinLayout).toHaveBeenCalled()
-      done()
+      expect(ledger.wallet.Wallet.instance.getAccountsCount()).toBe(1)
 
     afterAll ->
       chrome.storage.local.clear()

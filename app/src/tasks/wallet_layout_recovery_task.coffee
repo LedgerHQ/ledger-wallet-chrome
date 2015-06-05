@@ -4,6 +4,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   @instance: new @()
 
   onStart: () ->
+    l "Starting task"
     @once 'bip44:done', =>
       @emit 'done'
       @stopIfNeccessary()
@@ -20,6 +21,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   onStop: () ->
 
   _restoreChronocoinLayout: () ->
+    l '_restoreChronocoinLayout'
     dongle = ledger.app.dongle
     dongle.getPublicAddress "0'/0/0", (publicAddress) =>
       dongle.getPublicAddress "0'/1/0", (changeAddress) =>
@@ -36,6 +38,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
           @emit 'chronocoin:done'
 
   _restoreBip44Layout: () ->
+    l '_restoreBip44Layout'
     accountIndex = 0
     recoverAccount = =>
       if accountIndex > 0 and (previousAccount = ledger.wallet.Wallet.instance.getAccount(accountIndex - 1)).isEmpty()
@@ -52,6 +55,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     do recoverAccount
 
   _restoreBip44AccountChainsLayout: (account, done) ->
+    l '_restoreBip44AccountChainsLayout', account
     isRestoringChangeChain = yes
     isRestoringPublicChain = yes
     testIndex = (publicIndex, changeIndex) =>
