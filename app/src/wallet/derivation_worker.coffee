@@ -112,12 +112,12 @@ getPublicAddress = (path) ->
       @_derivationPath
       if publicKey?
        address = publicKey?.bitcoinAddress?.value
-
-  if address?
-    postResult address
+      if address?
+        postResult address
+      else
+        postError "Unable to derive path '#{path}'"
   else
-    postError "Unable to derive path '#{path}'"
-
+    postResult address
 
 @onmessage = (event) =>
   {command, parameters, queryId} = event.data

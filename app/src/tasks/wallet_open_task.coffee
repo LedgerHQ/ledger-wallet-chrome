@@ -46,22 +46,28 @@ openXpubCache = (dongle, raise, done) ->
     ledger.wallet.Wallet.instance.xpubCache = cache
     done?()
 
+refreshHdWallet = (dongle, raise, done) ->
+  ledger.wallet.Wallet.instance.initialize ledger.storage.sync.wallet, done
+
 restoreStructure = (dongle, raise, done) ->
   if ledger.wallet.Wallet.instance.isEmpty()
+    l "Create Wallet"
     ledger.app.emit 'wallet:initialization:creation'
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'done', () =>
-      done?()
+      done?(operation_consumption: yes)
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'fatal_error', () =>
-      ledger.storage.local.clear()
       ledger.app.emit 'wallet:initialization:failed'
       raise ledger.errors.new(ledger.errors.FatalErrorDuringLayoutWalletRecovery)
     ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
   else if Operation.all().length is 0 and ledger.wallet.Wallet.instance.getAccount(0).getAllAddressesPaths().length isnt 0
+    l "Restore wallet"
+    for accountIndex in [0...ledger.wallet.Wallet.instance.getAccountsCount()]
+      ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.Wallet.instance.getRootDerivationPath()}/#{accountIndex}'", _.noop
     ledger.app.emit 'wallet:initialization:creation'
-    ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
     ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary()
     ledger.tasks.OperationsConsumptionTask.instance.on 'stop', ->
-      done?()
+      ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
+      done?(operation_consumption: yes)
   else
     ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
     done?()
@@ -88,6 +94,7 @@ ProceduresOrder = [
   openDatabase
   initializeWalletModel
   pullStore
+  refreshHdWallet
   restoreStructure
   completeLayoutInitialization
   initializePreferences
@@ -114,13 +121,14 @@ class ledger.tasks.WalletOpenTask extends ledger.tasks.Task
       @_completion.failure(error)
       raise.next = _.noop
       @stopIfNeccessary()
-
+    result = _({})
     _.async.each @steps, (step, next, hasNext) =>
       return unless @isRunning()
       raise.next = next
-      step ledger.app.dongle, raise, =>
+      step ledger.app.dongle, raise, (r) =>
+        result.extend(r)
         do raise.next
-        @_completion.success(this) unless hasNext
+        @_completion.success(result.value()) unless hasNext
 
   onStop: ->
     @_completion.failure(ledger.errors.new(ledger.errors.InterruptedTask)) unless @_completion.isCompleted()

@@ -4,6 +4,7 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
   @instance: new @()
 
   onStart: () ->
+    l 'Operation synchronization'
     Operation.pendingRawTransactionStream().on 'data', => @flushPendingOperationsStream()
     @flushPendingOperationsStream()
     @synchronizeConfirmationNumbers()
