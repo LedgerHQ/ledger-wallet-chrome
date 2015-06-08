@@ -218,7 +218,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
       if e is Errors.NoChanges
         @_clearChanges()
         return
-      l "Failed push ", e
+      $info "Failed push ", e
       @push() # Retry later
       throw e
     @_deferredPush.resolve(p)
