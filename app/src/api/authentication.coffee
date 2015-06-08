@@ -31,7 +31,7 @@ class AuthenticatedHttpClient extends @HttpClient
   # Tries to recover from an usafe call (i.e. a call performed without being sure that the current auth token is valid)
   _recoverUnsafeCallFailure: (request, deferred, error) ->
     [jqXHR, textStatus, errorThrown] = error
-    if jqXHR.statusCode() is 403 or jqXHR.statusCode() is 401
+    if jqXHR.status is 403 or jqXHR.status is 401
       @_authenticateAndPerfomSafeCall(request, deferred)
     else
       @_reportFailure(request, deferred, error)
@@ -72,7 +72,7 @@ class AuthenticatedHttpClient extends @HttpClient
   isAuthenticated: -> if @_authToken? then yes else no
 
   _authenticate: () ->
-    return @authenticationPromise if @authenticationPromise?
+    return @authenticationPromise if @authenticationPromise? and !@authenticationPromise.isFulfilled()
     d = ledger.defer()
     @authenticationPromise = d.promise
     @_performAuthenticate(d)
@@ -82,20 +82,23 @@ class AuthenticatedHttpClient extends @HttpClient
     bitidAddress = null
     deferred.retryNumber ?= 3
     ledger.bitcoin.bitid.getAddress()
-    .fail (error) => deferred.rejectWithError([null, "Unable to get bitId address", error])
+    .fail (error) => throw [null, "Unable to get bitId address", error]
     .then (address) =>
       bitidAddress = address.bitcoinAddress.value
       @_client.jqAjax(type: "GET", url: "bitid/authenticate/#{bitidAddress}", dataType: 'json')
-    .fail (jqXHR, statusText, errorThrown) =>
-      if deferred.retryNumber-- > 0 then @_performAuthenticate(deferred) else deferred.reject([jqXHR, statusText, errorThrown])
     .then (data) => ledger.bitcoin.bitid.signMessage(data['message'])
-    .fail (error) => deferred.reject([null, "Unable to sign message", error])
+    .fail (error) =>
+      throw error if _.isArray(error) and error.length is 3
+      throw [null, "Unable to sign message", error]
     .then (signature) => @_client.jqAjax(type: "POST", url: 'bitid/authenticate', data: {address: bitidAddress, signature: signature}, contentType: 'application/json', dataType: 'json')
-    .fail (error) =>  if deferred.retryNumber-- > 0 then @_performAuthenticate(deferred) else deferred.reject(error)
     .then (data) =>
       @_authToken = data['token']
       ledger.app.emit 'wallet:authenticated'
       deferred.resolve()
+    .fail (error) =>
+      if deferred.retryNumber-- > 0 then @_performAuthenticate(deferred) else deferred.reject(error)
+    .done()
+
 
   getAuthToken: (callback = null) ->
     d = ledger.defer(callback)
