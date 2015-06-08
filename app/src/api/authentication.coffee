@@ -31,7 +31,7 @@ class AuthenticatedHttpClient extends @HttpClient
   # Tries to recover from an usafe call (i.e. a call performed without being sure that the current auth token is valid)
   _recoverUnsafeCallFailure: (request, deferred, error) ->
     [jqXHR, textStatus, errorThrown] = error
-    if jqXHR.statusCode() is 403
+    if jqXHR.statusCode() is 403 or jqXHR.statusCode() is 401
       @_authenticateAndPerfomSafeCall(request, deferred)
     else
       @_reportFailure(request, deferred, error)
