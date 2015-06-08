@@ -26,7 +26,6 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
   constructor: (name, addr, key, auxiliaryStore = ledger.storage.wallet) ->
     super(name)
     @_secureStore = new ledger.storage.SecureStore(name, key)
-    @_aes = @_secureStore._aes
     @mergeStrategy = @_overwriteStrategy
     @client = ledger.api.SyncRestClient.instance(addr)
     @throttled_pull = _.throttle _.bind((-> @._pull()),@), @PULL_THROTTLE_DELAY, trailing: no
@@ -255,9 +254,9 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
 
   _encryptToJson: (data) ->
     data = _(data).chain().pairs().sort().object().value()
-    '{' + (JSON.stringify(@_aes.encrypt(key)) + ':' + JSON.stringify(@_aes.encrypt(value)) for key, value of data).join(',') + '}'
+    '{' + (JSON.stringify(@_secureStore._preprocessKey(key)) + ':' + JSON.stringify(@_secureStore._preprocessValue(value)) for key, value of data).join(',') + '}'
 
   _decrypt: (data) ->
     out = {}
-    out[@_aes.decrypt(key)] = @_aes.decrypt(value) for key, value of data
+    out[@_secureStore._deprocessKey(key)] = @_secureStore._deprocessValue(value) for key, value of data
     out
