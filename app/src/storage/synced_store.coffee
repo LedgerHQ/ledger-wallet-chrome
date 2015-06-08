@@ -197,6 +197,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
       @_getAllData()
     .then (data) =>
       # Check if the changes are useful or not by hashing the changes without the last commit
+      $info 'Changes to apply', @_changes
       throw Errors.NoChanges unless @_areChangesMeaningful(data, @_changes)
       # Create commit hash
       [commitHash, pushedData] = @_computeCommit(data, @_changes)
@@ -251,8 +252,8 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
       checkData['__hashes'] = _(checkData['__hashes']).without(checkData['__hashes'][0])
       checkData = _(checkData).omit('__hashes') if checkData['__hashes'].length is 0
       [lastCommitHash, __] = @_computeCommit(checkData, changes)
-      return lastCommitHash is data['__hashes'][0]
-    no
+      return lastCommitHash isnt data['__hashes'][0]
+    yes
 
   # Save lastMd5 in settings
   _setLastMd5: (md5) ->
