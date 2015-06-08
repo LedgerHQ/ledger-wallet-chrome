@@ -8,6 +8,9 @@ Errors =
   NetworkError: 1
   NoChanges: 2
 
+$logger = -> ledger.utils.Logger.getLoggerByTag('SyncedStore')
+$info = (args...) -> $logger().info(args...)
+
 # A store able to synchronize with a remote crypted store. This store has an extra method in order to order a push or pull
 # operations
 # @event pulled Emitted once the store is pulled from the remote API
@@ -39,6 +42,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
       @_auxiliaryStore.get ['__last_sync_md5', '__sync_changes'], (item) =>
         @_lastMd5 = item.__last_sync_md5
         @_changes = item['__sync_changes'].concat(@_changes) if item['__sync_changes']?
+        $info 'Initialize store: ', md5: @_lastMd5, changes: @_changes, init: item
         @_unlockMethods()
         @throttled_pull()
         @debounced_push() if @_changes.length > 0
@@ -106,13 +110,16 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
       # -> merge data
     @_deferredPull ?= ledger.defer()
     p = @client.get_settings_md5().then (md5) =>
+      $info 'Remote md5: ', md5, ', local md5', md5
       return yes if @_lastMd5 is md5
       @client.get_settings().then (data) =>
         l "Decrypt", _.clone(data)
+        $info 'PULL, before decrypt ', data
         data = Try(=> @_decrypt(data))
-        l "After decrypt", data
+        $info 'PULL, after decrypt ', data.getOrElse("Unable to decrypt data")
         return if data.isFailure()
         data = data.getValue()
+        $info 'Changes before merge', @_changes
         @_merge(data).then =>
           @_setLastMd5(md5)
           @emit 'pulled'
@@ -132,24 +139,30 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     # else
     # Overwrite local storage and keep changes
     @_getAllData().then (localData) =>
+      $info 'Data before merge ', localData # TODO: Remove in production
       remoteHashes = (remoteData['__hashes'] or []).join(' ')
       localHashes = (localData['__hashes'] or []).join(' ').substr(0, 2 * 64 + 1)
       if remoteHashes.length is 0 or localHashes.length is 0
         # Remote data are not using the new format. Just update the current local storage
+        $info 'Merge scenario 1', remoteHashes, localHashes
         @_setAllData(remoteData)
       else if (remoteHashes.indexOf(localHashes) >= (@HASHES_CHAIN_MAX_SIZE * 3 / 4) * (64 + 1)) or remoteHashes.indexOf(localHashes) is -1
+        $info 'Merge scenario 2', remoteHashes, localHashes
         @_clearChanges()
         @_setAllData(remoteData)
       else if (localData['__hashes'] or []).join(' ').indexOf((remoteData['__hashes'] or []).join(' ').substr(0, 2 * 64 + 1)) != -1
+        $info 'Merge scenario 3', remoteHashes, localHashes
         # We are up to date do nothing
         @_setAllData(remoteData)
       else
         [nextCommitHash, nextCommitData] = @_computeCommit(localData, @_changes)
         if _(remoteData['__hashes']).contains(nextCommitData)
+          $info 'Merge scenario 4', remoteHashes, localHashes, nextCommitHash
           # The hash next commit already exists drop the changes
           @_setAllData(remoteData)
           @_clearChanges()
         else
+          $info 'Merge scenario 5', remoteHashes, localHashes
           @_setAllData(remoteData)
 
   # @return A jQuery promise
@@ -167,7 +180,13 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     hasRemoteData = yes
     unlockMutableOperations = _.noop
     pushedData = null
-    p = @pull().fail (e) =>
+    p = @_getAllData()
+    .then (data) =>
+      throw Errors.NoChanges unless @_areChangesMeaningful(data, @_changes)
+    .then () =>
+      @pull()
+    .fail (e) =>
+      throw Errors.NoChanges if e is Errors.NoChanges
       throw Errors.NetworkError if e is Errors.NetworkError
       hasRemoteData = no
     .then =>
@@ -178,29 +197,27 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
       @_getAllData()
     .then (data) =>
       # Check if the changes are useful or not by hashing the changes without the last commit
-      if data['__hashes']?.length > 0
-        checkData = _.clone(data)
-        checkData['__hashes'] = _(checkData['__hashes']).without(checkData['__hashes'][0])
-        checkData = _(checkData).omit('__hashes') if checkData['__hashes'].length is 0
-        [lastCommitHash, __] = @_computeCommit(checkData, @_changes)
-        if lastCommitHash is data['__hashes'][0]
-          @_clearChanges()
-          throw Errors.NoChanges
+      throw Errors.NoChanges unless @_areChangesMeaningful(data, @_changes)
       # Create commit hash
       [commitHash, pushedData] = @_computeCommit(data, @_changes)
+      $info 'Push ', commitHash, ' -> ', pushedData, ' Local data ', data, ' Changes ', @_changes
       # Jsonify data
       @_encryptToJson(pushedData)
     .then (data) => if hasRemoteData then @client.put_settings(data) else @client.post_settings(data)
     .then (md5) =>
       @_setLastMd5(md5)
       # Merge changes into store
+      $info 'Clear changes and sets', pushedData
       @_clearChanges()
       @_setAllData(pushedData)
     .then () => @emit 'pushed', this
     .then () => do unlockMutableOperations
     .fail (e) =>
-      do unlockMutableOperations
-      return if e is Errors.NoChanges
+      $info 'Push failed due to ', e
+      _.defer => do unlockMutableOperations
+      if e is Errors.NoChanges
+        @_clearChanges()
+        return
       l "Failed push ", e
       @push() # Retry later
       throw e
@@ -227,6 +244,15 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     d = Q.defer()
     this._raw_set items, _.bind(d.resolve,d)
     d.promise
+
+  _areChangesMeaningful: (data, changes) ->
+    if data['__hashes']?.length > 0
+      checkData = _.clone(data)
+      checkData['__hashes'] = _(checkData['__hashes']).without(checkData['__hashes'][0])
+      checkData = _(checkData).omit('__hashes') if checkData['__hashes'].length is 0
+      [lastCommitHash, __] = @_computeCommit(checkData, changes)
+      return lastCommitHash is data['__hashes'][0]
+    no
 
   # Save lastMd5 in settings
   _setLastMd5: (md5) ->
