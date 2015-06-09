@@ -29,7 +29,6 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
   constructor: (name, addr, key, auxiliaryStore = ledger.storage.wallet) ->
     super(name)
     @_secureStore = new ledger.storage.SecureStore(name, key)
-    @mergeStrategy = @_overwriteStrategy
     @client = ledger.api.SyncRestClient.instance(addr)
     @throttled_pull = _.throttle _.bind((-> @._pull()),@), @PULL_THROTTLE_DELAY, trailing: no
     @debounced_push = _.debounce _.bind((-> @._push()),@), @PUSH_DEBOUNCE_DELAY
@@ -239,12 +238,6 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     commitHash = ledger.crypto.SHA256.hashString _(data).toJson()
     data.__hashes = [commitHash].concat(data.__hashes or []).slice(0, @HASHES_CHAIN_MAX_SIZE)
     [commitHash, data]
-
-  # @return A jQuery promise
-  _overwriteStrategy: (items) ->
-    d = Q.defer()
-    this._raw_set items, _.bind(d.resolve,d)
-    d.promise
 
   _areChangesMeaningful: (data, changes) ->
     if data['__hashes']?.length > 0

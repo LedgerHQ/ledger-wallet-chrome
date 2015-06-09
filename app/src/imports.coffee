@@ -117,6 +117,8 @@
         'utils/validers'
         'utils/function_lock'
         'utils/json'
+        'utils/promise/debounce'
+        'utils/promise/throttle'
 
         ## Crypto
         'crypto/aes'
