@@ -31,6 +31,7 @@ tap             = require 'gulp-tap'
 _               = require 'underscore'
 _.str           = require 'underscore.string'
 git             = require 'gulp-git'
+ext_replace     = require 'gulp-ext-replace'
 
 
 class BuildMode
@@ -47,21 +48,18 @@ COMPILATION_MODE = DEBUG_MODE
 i18n = () ->
   through2.obj (file, encoding, callback) ->
     i18nContent = {}
-    json = JSON.parse(file.contents.toString(encoding))
-    json.application.name = "#{json.application.name} (#{COMPILATION_MODE.Name})" if COMPILATION_MODE.MangleVersion is true and json.application?.name?
 
-    # Format the 'json' object to be suitable for chrome.i18n
-    flatify = (json, path = '') ->
-      for key, value of json
-        if typeof value is "object"
-          flatify(value, "#{path}#{key}_")
-        else
-          i18nContent[path + key] = {message: value, description: "Description for #{path + key} = #{value}"}
+    lines = file.contents.toString(encoding).split '\n'
 
-    flatify json
+    for line in lines
+      match = line.match '(.+)[ ]?=[ ]?(.*)'
+      if match
+        [__, key, value] = match
+        key = key.replace(/\./g, '_').trim()
+        i18nContent[key] = {message: value, description: "Description for #{key} = #{value}"}
+
     # Insert the newly created content
     file.contents = new Buffer(JSON.stringify(i18nContent), encoding)
-
     @push file
     callback()
 
@@ -154,11 +152,11 @@ tasks =
     .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/"
 
   translate: () ->
-    gulp.src 'app/locales/**/!(es)/*.yml'
+    gulp.src 'app/locales/**/!(es)/*.properties'
     .pipe plumber()
     .pipe changed "#{COMPILATION_MODE.BuildDir}/_locales"
-    .pipe yaml()
     .pipe i18n()
+    .pipe ext_replace('.json')
     .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/_locales"
 
   buildLangFile: () ->
