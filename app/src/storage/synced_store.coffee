@@ -30,8 +30,8 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     super(name)
     @_secureStore = new ledger.storage.SecureStore(name, key)
     @client = ledger.api.SyncRestClient.instance(addr)
-    @throttled_pull = _.throttle _.bind((-> @._pull()),@), @PULL_THROTTLE_DELAY, trailing: no
-    @debounced_push = _.debounce _.bind((-> @._push()),@), @PUSH_DEBOUNCE_DELAY
+    @_throttled_pull = ledger.utils.promise.throttle _.bind((-> @._pull()),@), @PULL_THROTTLE_DELAY
+    @_debounced_push = ledger.utils.promise.debounce _.bind((-> @._push()),@), @PUSH_DEBOUNCE_DELAY
     @_auxiliaryStore = auxiliaryStore
     @_changes = []
     @_unlockMethods = _.lock(this, ['set', 'get', 'remove', 'clear', 'pull', 'push'])
@@ -43,18 +43,16 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
         @_changes = item['__sync_changes'].concat(@_changes) if item['__sync_changes']?
         $info 'Initialize store: ', md5: @_lastMd5, changes: @_changes, init: item
         @_unlockMethods()
-        @throttled_pull()
-        @debounced_push() if @_changes.length > 0
+        @pull()
+        @push() if @_changes.length > 0
 
   pull: ->
     l 'Request pull', new Error().stack
-    @throttled_pull()
-    @_deferredPull?.promise or (@_deferredPull = ledger.defer()).promise
+    @_throttled_pull()
 
   push: ->
     l 'Request push', new Error().stack
-    @debounced_push()
-    @_deferredPush?.promise or (@_deferredPush = ledger.defer()).promise
+    @_debounced_push()
 
   # Stores one or many item
   #
@@ -63,7 +61,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
   set: (items, cb) ->
     return cb?() unless items?
     @_changes.push {type: OperationTypes.SET, key: key, value: value} for key, value of items
-    this.debounced_push()
+    @_debounced_push()
     @_saveChanges -> cb?()
 
   get: (keys, cb) ->
@@ -93,7 +91,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
   remove: (keys, cb) ->
     return cb?() unless keys?
     @_changes.push {type: OperationTypes.REMOVE, key: key} for key in keys
-    this.debounced_push()
+    @_debounced_push()
     _.defer => cb?()
 
   clear: (cb) ->
@@ -107,8 +105,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     # If local md5 and distant md5 are different
       # -> pull the data
       # -> merge data
-    @_deferredPull ?= ledger.defer()
-    p = @client.get_settings_md5().then (md5) =>
+    @client.get_settings_md5().then (md5) =>
       $info 'Remote md5: ', md5, ', local md5', md5
       return yes if @_lastMd5 is md5
       @client.get_settings().then (data) =>
@@ -127,9 +124,6 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
         throw Errors.NoRemoteData
       l "Pull failed", e
       throw Errors.NetworkError
-    @_deferredPull.resolve(p)
-    @_deferredPull.promise.fin => @_deferredPull = null
-    p
 
   _merge: (remoteData) ->
     # Consistency chain check
@@ -175,11 +169,10 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     # Push
     return ledger.defer().reject(Errors.NoChanges).promise if @_changes.length is 0
 
-    @_deferredPush ?= ledger.defer()
     hasRemoteData = yes
     unlockMutableOperations = _.noop
     pushedData = null
-    p = @_getAllData()
+    @_getAllData()
     .then (data) =>
       throw Errors.NoChanges unless @_areChangesMeaningful(data, @_changes)
     .then () =>
@@ -221,9 +214,6 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
       $info "Failed push ", e
       @push() # Retry later
       throw e
-    @_deferredPush.resolve(p)
-    @_deferredPush.promise.fin => @_deferredPush = null
-    p
 
   _applyChanges: (data, changes) ->
     for change in changes

@@ -10,7 +10,7 @@ _.extend ledger.utils.promise,
     onTimeoutExpired = -> deferred.resolve(func(args...))
     (a...) ->
       args = a
-      if deferred? and !deferred.isFulfilled()
+      if deferred? and !deferred.promise.isFulfilled()
         clearTimeout(timeout)
       else
         deferred = ledger.defer()
