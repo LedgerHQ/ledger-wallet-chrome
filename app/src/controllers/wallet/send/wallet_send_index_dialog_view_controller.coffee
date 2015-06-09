@@ -50,7 +50,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
         params = {address: data}
       else
         params = ledger.managers.schemes.bitcoin.parseURI data
-      @view.amountInput.val params.amount if params?.amount?
+      if params?.amount?
+        @view.amountInput.val(ledger.formatters.formatUnit(ledger.formatters.fromBtcToSatoshi(params.amount), ledger.preferences.instance.getBtcUnit()))
       @view.receiverInput.val params.address if params?.address?
       @_updateTotalInput()
     dialog.show()
