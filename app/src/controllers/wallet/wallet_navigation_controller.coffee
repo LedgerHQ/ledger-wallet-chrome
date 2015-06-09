@@ -80,6 +80,7 @@ class @WalletNavigationController extends ledger.common.NavigationController
       _.defer @_updateReloadIconState
     ledger.app.on 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done', @_onSynchronizationStateChanged
     ledger.tasks.OperationsSynchronizationTask.instance.on 'start stop', @_onSynchronizationStateChanged
+    ledger.storage.sync.pull()
     @_updateReloadIconState()
 
   _onSynchronizationStateChanged: ->
