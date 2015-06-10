@@ -28,7 +28,7 @@ describe "Secure Log Writer/Reader", ->
   it "should encrypt correctly", (done) ->
     slw.write "date lorem ipsum blabla msg outing to bla - test"
     slw.write "nawak nawak double nawak bitcoin will spread the world !"
-    .then ->
+    slw.getFlushPromise().then ->
       ledger.utils.Log.getFs(TEMPORARY).then (fs) ->
         dirReader = fs.root.createReader()
         dirReader.readEntries (files) =>

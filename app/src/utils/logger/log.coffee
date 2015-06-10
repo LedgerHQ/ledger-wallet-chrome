@@ -9,7 +9,7 @@ getFs = (fsmode) ->
   return ledger.defer().resolve(globalFs[fsmode]).promise if globalFs[fsmode]?
   return deferedGetFs[fsmode].promise if deferedGetFs[fsmode]?
   deferedGetFs[fsmode] = ledger.defer()
-  window.webkitRequestFileSystem fsmode, 5*1024*1024,
+  webkitRequestFileSystem fsmode, 5*1024*1024,
     (fs) ->
       globalFs[fsmode] = fs
       deferedGetFs[fsmode].resolve fs
