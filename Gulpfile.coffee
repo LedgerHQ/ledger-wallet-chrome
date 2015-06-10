@@ -45,33 +45,36 @@ RELEASE_MODE = new BuildMode('release', 'release', no)
 
 COMPILATION_MODE = DEBUG_MODE
 
+parsePropertiesFile = (fileContent) ->
+  out = {}
+  lines = fileContent.split '\n'
+  for line in lines
+    if match = line.match '([a-zA-Z0-9\._-]+)[ ]?=[ ]?(.*)'
+      [__, key, value] = match
+      out[key] = value
+  out
+
 i18n = () ->
   through2.obj (file, encoding, callback) ->
     i18nContent = {}
 
-    lines = file.contents.toString(encoding).split '\n'
-
-    for line in lines
-      match = line.match '(.+)[ ]?=[ ]?(.*)'
-      if match
-        [__, key, value] = match
-        key = key.replace(/\./g, '_').trim()
-        i18nContent[key] = {message: value, description: "Description for #{key} = #{value}"}
+    content = parsePropertiesFile(file.contents.toString(encoding))
+    for key, value of content
+      key = key.replace(/\./g, '_')
+      i18nContent[key] = {message: value, description: "Description for #{key}"}
 
     # Insert the newly created content
     file.contents = new Buffer(JSON.stringify(i18nContent), encoding)
     @push file
     callback()
 
-
 buildLangFilePlugin = () ->
   through2.obj (chunk, encoding, callback) ->
     languages = {}
 
     tag = chunk.relative.substring(0, chunk.relative.indexOf("/"))
-    langFile = JSON.parse(chunk.contents.toString(encoding))
-
-    languages = "window.ledger.i18n.Languages['" + tag + "'] = " + "'" + langFile.language.name + "';"
+    langFile = parsePropertiesFile(chunk.contents.toString(encoding))
+    languages = "window.ledger.i18n.Languages['" + tag + "'] = " + "'" + langFile['language.name'] + "';"
 
     chunk.contents = new Buffer(JSON.stringify(languages), encoding)
 
@@ -160,9 +163,8 @@ tasks =
     .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/_locales"
 
   buildLangFile: () ->
-    gulp.src 'app/locales/**/!(es)/*.yml'
+    gulp.src 'app/locales/**/!(es)/*.properties'
     .pipe plumber()
-    .pipe yaml()
     .pipe buildLangFilePlugin()
     .pipe tap (file, t) ->
       file.contents = new Buffer file.contents.toString().replace(/^"|"$/g, '')
