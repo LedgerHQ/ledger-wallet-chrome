@@ -33,7 +33,7 @@ class @ledger.utils.Log
     @_fsmode = fsmode
     @_daysMax = daysMax
     @_daysMax = parseInt(@_daysMax)
-    unlockWriter = _.lock @, ['_getFileWriter', 'write', 'read']
+    unlockWriter = _.lock @, ['_getFileWriter', '_flush', 'read']
     if isNaN @_daysMax
       throw 'The first parameter must be a number'
     getFs(fsmode)

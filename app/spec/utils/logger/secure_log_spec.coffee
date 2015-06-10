@@ -13,12 +13,11 @@ describe "Secure Log Writer/Reader", ->
       slw = new ledger.utils.SecureLogWriter('test_key', '1YnMY5FGugkuzJwdmbue9EtfsAFpQXcZy', 2, TEMPORARY)
       do done
 
-  it "should write in correct order", (done) ->
-    promise = null
+  it "should write secure in correct order", (done) ->
     for str in [0...50]
       line = "date lorem ipsum blabla msg outing to bla - test #{str}"
-      promise = slw.write line
-    promise.then ->
+      slw.write line
+    slw.getFlushPromise().then ->
       slr.read (logs) ->
         for log, i in logs
           expect(log).toBe("date lorem ipsum blabla msg outing to bla - test #{i}")
