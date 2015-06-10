@@ -3,7 +3,7 @@ ledger.utils.promise = {} unless ledger.utils.promise?
 
 _.extend ledger.utils.promise,
 
-  throttle: (func, wait, {immediate}) ->
+  throttle: (func, wait, {immediate} = {}) ->
     deferred = null
     args = undefined
     immediate ?= no
