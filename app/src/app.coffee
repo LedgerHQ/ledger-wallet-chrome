@@ -58,7 +58,7 @@ require @ledger.imports, ->
     onDongleConnected: (dongle) ->
       if @isInWalletMode() and not dongle.isInBootloaderMode()
         @performDongleAttestation()
-        ledger.tasks.TickerTask.instance.start()
+        ledger.tasks.TickerTask.instance.startIfNeccessary()
 
     onDongleCertificationDone: (dongle, error) ->
       return unless @isInWalletMode()
