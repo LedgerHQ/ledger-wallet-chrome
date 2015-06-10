@@ -33,8 +33,8 @@ describe "SyncedStore", ->
         expect(keys).toContain('foo')
         do done
 
-  it "doesn't return remove keys", (done) ->
-    store._super().set foo: 'bar', ledger: 'wallet', ->
+  it "doesn't return removed keys", (done) ->
+    store._secureStore.set foo: 'bar', ledger: 'wallet', ->
       store.remove ['foo'], ->
         store.keys (keys) ->
           expect(keys).toContain('ledger')
@@ -143,7 +143,7 @@ describe "SyncedStore (special case with custom store configurations)", ->
             do done
           store.keys (keys) ->
             expect(keys).toContain('foo')
-            expect(keys).toContain('ledger')
+            expect(keys).not.toContain('ledger')
             do done
 
   it "merges correctly when there is already data", (done) ->

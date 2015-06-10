@@ -11,6 +11,8 @@ describe "Unit Formatters -", ->
     ledger.preferences.instance.getBtcUnit.and.callFake ->
       "BTC"
 
+  afterAll ->
+    delete ledger.preferences.instance
 
   it "should return a String", ->
     res = formatters.formatUnit(1000, 'BTC', -1)
