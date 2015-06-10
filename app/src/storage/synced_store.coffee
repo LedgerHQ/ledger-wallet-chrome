@@ -30,7 +30,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     super(name)
     @_secureStore = new ledger.storage.SecureStore(name, key)
     @client = ledger.api.SyncRestClient.instance(addr)
-    @_throttled_pull = ledger.utils.promise.throttle _.bind((-> @._pull()),@), @PULL_THROTTLE_DELAY
+    @_throttled_pull = ledger.utils.promise.throttle _.bind((-> @._pull()),@), @PULL_THROTTLE_DELAY, immediate: yes
     @_debounced_push = ledger.utils.promise.debounce _.bind((-> @._push()),@), @PUSH_DEBOUNCE_DELAY
     @_auxiliaryStore = auxiliaryStore
     @_changes = []
