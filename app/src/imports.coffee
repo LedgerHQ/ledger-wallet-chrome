@@ -74,6 +74,7 @@
         'configuration'
 
         ## Logger
+        'utils/logger/html5FS_worker_proxy'
         'utils/logger'
         'utils/apdu_logger'
         'utils/logger/log'

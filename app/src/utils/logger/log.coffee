@@ -1,10 +1,13 @@
-
+###
 @ledger ?= {}
 @ledger.utils ?= {}
 
 deferedGetFs = {}
 globalFs = {}
+###
 
+
+###
 getFs = (fsmode) ->
   return ledger.defer().resolve(globalFs[fsmode]).promise if globalFs[fsmode]?
   return deferedGetFs[fsmode].promise if deferedGetFs[fsmode]?
@@ -20,7 +23,7 @@ getFs = (fsmode) ->
 releaseFs = ->
   deferedGetFs = {}
   globalFs = {}
-
+###
 
 class @ledger.utils.Log
 
