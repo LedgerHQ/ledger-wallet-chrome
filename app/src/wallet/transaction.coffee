@@ -234,10 +234,10 @@ class ledger.wallet.Transaction
     $info("Inputs paths: ", inputsPath)
     $info("Change path: ", changePath)
 
-    ledger.app.dongle.getPublicAddress changePath, (key) ->
-      ledger.tasks.AddressDerivationTask.instance.getPublicAddress changePath, (address, error) ->
-        if key.bitcoinAddress.toString(ASCII) is address
-          $error("Error change derivation error #{changePath} ", key.bitcoinAddress.toString(ASCII), " <> ", address)
+    ledger.app.dongle.getPublicAddress changePath, (dongleChangeAddress) ->
+      ledger.tasks.AddressDerivationTask.instance.getPublicAddress changePath, (workerChangeaddress, error) ->
+        if dongleChangeAddress.bitcoinAddress.toString(ASCII) isnt workerChangeaddress
+          $error("Error change derivation error #{changePath} ", dongleChangeAddress.bitcoinAddress.toString(ASCII), " <> ", workerChangeaddress)
           return d.rejectWithError(Errors.ChangeDerivationError)
         ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
           if error?

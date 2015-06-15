@@ -32,7 +32,7 @@ class ledger.database.MigrationHandler
 migrations = [
   # {from: 'unknown', to: '1.0.6', apply: -> l 'MIGRATION 1'}
   # {from: 'unknown', to: '*', apply: -> l 'MIGRATION 2'}
-  {from: '1.[0-3].*', to: '1.4.*', apply: (context) -> migrate_from_1_0_3_x_to_1_4_x(context)}
+  {from: '1.[0-3].[0-5]', to: '*', apply: (context) -> migrate_from_1_0_3_x_to_1_4_x(context)}
 ]
 
 migrate_from_1_0_3_x_to_1_4_x = (context) ->
