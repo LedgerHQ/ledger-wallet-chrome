@@ -58,7 +58,7 @@ require @ledger.imports, ->
     onDongleConnected: (dongle) ->
       if @isInWalletMode() and not dongle.isInBootloaderMode()
         @performDongleAttestation()
-        ledger.tasks.TickerTask.instance.start()
+        ledger.tasks.TickerTask.instance.startIfNeccessary()
 
     onDongleCertificationDone: (dongle, error) ->
       return unless @isInWalletMode()
@@ -79,9 +79,11 @@ require @ledger.imports, ->
       @emit 'dongle:unlocked', @dongle
       @emit 'wallet:initializing'
       ledger.tasks.WalletOpenTask.instance.startIfNeccessary()
-      ledger.tasks.WalletOpenTask.instance.onComplete (__, error) =>
+      ledger.tasks.WalletOpenTask.instance.onComplete (result, error) =>
+        l "OPEN RESULT", result, error
         if error?
           # TODO: Handle wallet opening fatal error
+          l "Raise", error
         else
           @_listenPreferencesEvents()
           @_listenCountervalueEvents(true)
@@ -89,9 +91,9 @@ require @ledger.imports, ->
           @emit 'wallet:initialized'
           _.defer =>
             Wallet.instance.retrieveAccountsBalances()
-            ledger.tasks.TransactionObserverTask.instance.start()
-            ledger.tasks.OperationsSynchronizationTask.instance.start()
-            ledger.tasks.OperationsConsumptionTask.instance.start()
+            ledger.tasks.TransactionObserverTask.instance.startIfNeccessary()
+            ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() unless result.operation_consumption
+            ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary() unless result.operation_consumption
 
     onDongleIsDisconnected: (dongle) ->
       @emit 'dongle:disconnected'

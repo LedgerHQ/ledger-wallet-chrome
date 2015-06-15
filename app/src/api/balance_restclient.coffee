@@ -5,7 +5,7 @@ class ledger.api.BalanceRestClient extends ledger.api.RestClient
 
   getAccountBalance: (account, callback) ->
     account = ledger.wallet.Wallet.instance.getAccount(account) unless _.isKindOf(account, ledger.wallet.Wallet.Account)
-    addressesPaths = account.getAllAddressesPaths()
+    addressesPaths = account.getAllObservedAddressesPaths()
     accountBalance = {total: 0, confirmed: 0, unconfirmed: 0}
     ledger.wallet.pathsToAddresses addressesPaths, (addresses) =>
       _.async.eachBatch _.values(addresses), 200, (addresses, done, hasNext) =>

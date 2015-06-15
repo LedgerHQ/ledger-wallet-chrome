@@ -32,6 +32,16 @@ class ledger.tasks.AddressDerivationTask extends ledger.tasks.Task
       ledger.wallet.Wallet.instance?.cache?.set parameters[0]
       @_worker.postMessage command: command, queryId: queryId, result: 'success', error: undefined
 
+    @_vents.on 'private:getXpubFromCache', (ev, data) =>
+      {command, queryId, parameters} = data
+      xpub = ledger.wallet.Wallet.instance?.xpubCache.get parameters[0]
+      @_worker.postMessage command: command, queryId: queryId, result: xpub, error: undefined
+
+    @_vents.on 'private:setXpubCacheEntries', (ev, data) =>
+      {command, queryId, parameters} = data
+      ledger.wallet.Wallet.instance?.xpubCache.set parameters[0]
+      @_worker.postMessage command: command, queryId: queryId, result: 'success', error: undefined
+
   onStop: () ->
     @_worker.terminate()
 

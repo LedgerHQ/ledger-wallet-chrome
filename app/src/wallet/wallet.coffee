@@ -1,5 +1,7 @@
 @ledger.wallet ?= {}
 
+logger = -> ledger.utils.Logger.getLoggerByTag("WalletLayout")
+
 class ledger.wallet.Wallet
 
   getAccount: (accountIndex) -> @_accounts[accountIndex]
@@ -14,7 +16,6 @@ class ledger.wallet.Wallet
       if accountIndex?
         accountIndex = parseInt(accountIndex.substr(0, accountIndex.length - 1))
         account = @getAccount(accountIndex)
-
     return account if account?
     # Crappy way
     for account in @_accounts
@@ -35,6 +36,7 @@ class ledger.wallet.Wallet
 
   initialize: (store, callback) ->
     @_store = store
+    #@_store.getAll -> l "Wallet", arguments
     @_store.get ['accounts'], (result) =>
       @_accounts = []
       return callback?() unless result.accounts?
@@ -64,6 +66,25 @@ class ledger.wallet.Wallet
   save: (callback = _.noop) ->
     @_store.set {'accounts': @getAccountsCount()}, callback
 
+  serialize: ->
+    obj = {accounts: @getAccountsCount()}
+    for account in @_accounts
+      obj[account._storeId] = account.serialize()
+    obj
+
+  remove: (callback = _.noop) ->
+    _.async.each @_accounts, (account, done, hasNext) =>
+      account.remove =>
+        unless hasNext
+          @_store.remove(["accounts"],  callback)
+        do done
+
+  _removeAccount: (account, callback) ->
+    if _(@_accounts).contains(account)
+      @_accounts = _(@_accounts).without(account)
+      @save()
+      callback?()
+
   @instance: undefined
 
 class ledger.wallet.Wallet.Account
@@ -89,7 +110,8 @@ class ledger.wallet.Wallet.Account
     @_store.get [@_storeId], (result) =>
       @_account = result[@_storeId]
       @_initialize()
-      @initializeXpub callback
+      callback?()
+      #@initializeXpub callback
 
   release: () ->
     @wallet = null
@@ -119,6 +141,24 @@ class ledger.wallet.Wallet.Account
 
   getAllAddressesPaths: () -> @getAllPublicAddressesPaths().concat(@getAllChangeAddressesPaths())
 
+  getObservedPublicAddressesPaths: (gap = ledger.preferences.instance?.getDiscoveryGap() or 20) ->
+    paths = @getAllPublicAddressesPaths()
+    paths.push "#{@getRootDerivationPath()}/0/#{index}" for index in [@getCurrentPublicAddressIndex() + 1...@getCurrentPublicAddressIndex() + gap + 1]
+    paths = _.difference(paths, @_account.excludedPublicPaths)
+    _(paths).compact()
+
+  getObservedChangeAddressesPaths: (gap = ledger.preferences.instance?.getDiscoveryGap() or 20) ->
+    paths = @getAllChangeAddressesPaths()
+    paths.push "#{@getRootDerivationPath()}/1/#{index}" for index in [@getCurrentChangeAddressIndex() + 1...@getCurrentChangeAddressIndex() + gap + 1]
+    paths = _.difference(paths, @_account.excludedPublicPaths)
+    _(paths).compact()
+
+  getObservedAddressesPaths: (type) ->
+    switch type
+      when 'change' then @getObservedChangeAddressesPaths()
+      when 'public' then @getObservedPublicAddressesPaths()
+  getAllObservedAddressesPaths: -> @getObservedChangeAddressesPaths().concat(@getObservedPublicAddressesPaths())
+
   getCurrentPublicAddressIndex: () -> @_account.currentPublicIndex or 0
   getCurrentChangeAddressIndex: () -> @_account.currentChangeIndex or 0
   getCurrentAddressIndex: (type) ->
@@ -147,20 +187,20 @@ class ledger.wallet.Wallet.Account
   notifyPathsAsUsed: (paths) ->
     paths = [paths] unless _.isArray(paths)
     for path in paths
-      path = path.replace("#{@wallet.getRootDerivationPath()}/0'/", '').split('/')
+      path = path.replace("#{@getRootDerivationPath()}/", '').split('/')
       switch path[0]
         when '0' then @_notifyPublicAddressIndexAsUsed parseInt(path[1])
         when '1' then @_notifyChangeAddressIndexAsUsed parseInt(path[1])
     return
 
   _notifyPublicAddressIndexAsUsed: (index) ->
-    l 'Notify public change', index, 'current is', @_account.currentPublicIndex
+    #logger().info 'Notify public change', index, 'current is', @_account.currentPublicIndex
     if index < @_account.currentPublicIndex
-      l 'Index is less than current'
+      #logger().info 'Index is less than current'
       derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
       @_account.excludedPublicPaths = _.without @_account.excludedPublicPaths, derivationPath
     else if index > @_account.currentPublicIndex
-      l 'Index is more than current'
+      #logger().info 'Index is more than current'
       difference =  index - (@_account.currentPublicIndex + 1)
       @_account.excludedPublicPaths ?= []
       for i in [0...difference]
@@ -168,8 +208,8 @@ class ledger.wallet.Wallet.Account
         @_account.excludedPublicPaths.push derivationPath unless _.contains(@_account.excludedPublicPaths, derivationPath)
       @_account.currentPublicIndex = parseInt(index) + 1
     else if index == @_account.currentPublicIndex
-        l 'Index is equal to current'
-        @shiftCurrentPublicAddressPath()
+      #logger().info 'Index is equal to current'
+      @shiftCurrentPublicAddressPath()
     @save()
 
   _notifyChangeAddressIndexAsUsed: (index) ->
@@ -188,7 +228,7 @@ class ledger.wallet.Wallet.Account
     @save()
 
   shiftCurrentPublicAddressPath: (callback) ->
-    l 'shift public'
+    logger().info 'shift public'
     index = @_account.currentPublicIndex
     index = 0 unless index?
     index = parseInt(index) if _.isString(index)
@@ -197,7 +237,7 @@ class ledger.wallet.Wallet.Account
     ledger.app.dongle?.getPublicAddress @getCurrentPublicAddressPath(), callback
 
   shiftCurrentChangeAddressPath: (callback) ->
-    l 'shift change'
+    logger().info 'shift change'
     index = @_account.currentChangeIndex
     index = 0 unless index?
     index = parseInt(index) if _.isString(index)
@@ -218,13 +258,35 @@ class ledger.wallet.Wallet.Account
     saveHash[@_storeId] = @_account
     @_store.set saveHash, callback
 
+  serialize: -> _.clone(@_account)
+
+  remove: (callback = _.noop) ->
+    @wallet._removeAccount this
+    @_store.remove([@_storeId], callback)
+
+  isEmpty: -> @getCurrentChangeAddressIndex() is 0 and @getCurrentPublicAddressIndex() is 0
+
 _.extend ledger.wallet,
 
   initialize: (dongle, callback=undefined) ->
+    previousLayout = new ledger.wallet.Wallet()
     hdWallet = new ledger.wallet.Wallet()
-    hdWallet.initialize ledger.storage.wallet, () =>
-        ledger.wallet.Wallet.instance = hdWallet
-        callback?()
+    previousLayout.initialize ledger.storage.wallet, =>
+      l previousLayout
+      unless previousLayout.isEmpty()
+        ledger.storage.sync.wallet.set previousLayout.serialize(), =>
+          previousLayout.release()
+          ledger.storage.wallet.remove ["accounts", "account_0"], =>
+            l hdWallet
+            @_endInitialize(hdWallet, callback)
+      else
+        l hdWallet
+        @_endInitialize(hdWallet, callback)
+
+  _endInitialize: (hdWallet, callback) ->
+    hdWallet.initialize ledger.storage.sync.wallet, () =>
+      ledger.wallet.Wallet.instance = hdWallet
+      callback?()
 
   release: (dongle, callback) ->
     ledger.wallet.Wallet.instance?.release()

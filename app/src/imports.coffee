@@ -116,11 +116,14 @@
         'utils/completion_closure'
         'utils/validers'
         'utils/function_lock'
+        'utils/json'
+        'utils/promise/debounce'
+        'utils/promise/throttle'
 
         ## Crypto
-        'utils/crypto/aes'
-        'utils/crypto/sha256'
-        'utils/crypto/base58'
+        'crypto/aes'
+        'crypto/sha256'
+        'crypto/base58'
 
         ## Bitcoin
         'utils/bitcoin/bitcoin'
@@ -129,12 +132,14 @@
         'utils/bitcoin/bitid'
 
         ## Storage
-        'utils/storage/store'
-        'utils/storage/chrome_store'
-        'utils/storage/secure_store'
-        'utils/storage/synced_store'
-        'utils/storage/object_store'
-        'utils/storage/storage'
+        'storage/store'
+        'storage/substore'
+        'storage/chrome_store'
+        'storage/secure_store'
+        'storage/synced_store'
+        'storage/object_store'
+        'storage/memory_store'
+        'storage/storage'
 
         ## Data synchronization
 
@@ -213,6 +218,7 @@
         'models/account'
         'models/operation'
         'models/configuration'
+        'models/account_tag'
 
         ## Dialog Management
         'utils/dialogs'
@@ -332,6 +338,7 @@
 
         ## i18n
         'i18n/i18n'
+        'i18n/i18n_formatters'
         'i18n/i18n_languages'
 
         ## Preferences
@@ -376,10 +383,13 @@
         'controllers/apps/coinkite/cosign/apps_coinkite_cosign_signing_dialog_view_controller'
 
         # Specs
-        '../spec/spec_helper'
-
         '../spec/utils/dongle/mock_dongle_manager'
         '../spec/utils/dongle/mock_dongle'
+        '../spec/utils/storage/store_mock'
+
+        '../spec/fixtures/fixtures_dongle'
+
+        '../spec/spec_helper'
       ]
 
       specs:
@@ -395,7 +405,6 @@
           '../spec/api/synced_rest_client_spec'
           '../spec/utils/storage/synced_store_spec'
           '../spec/utils/bitcoin/bip39_spec'
-
           '../spec/utils/formatters_spec'
           '../spec/utils/converters_spec'
 
@@ -403,9 +412,13 @@
 
           '../spec/m2fa/client_spec'
           '../spec/m2fa/m2fa_spec'
+
           '../spec/tasks/address_derivation_task_spec'
+          '../spec/tasks/wallet_layout_recovery_task_spec'
+
           '../spec/wallet/extended_public_key_spec'
 
+          '../spec/database/sync_properties_spec'
           '../spec/utils/logger/log_spec'
           '../spec/utils/logger/secure_log_spec'
         ]

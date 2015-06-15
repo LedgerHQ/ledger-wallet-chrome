@@ -9,8 +9,8 @@ class @WalletApiAddressesDialogViewController extends ledger.common.DialogViewCo
 
   onAfterRender: ->
     super
-    @account_id = parseInt(@params.account_id) || 1
-    @account = Account.find({"id": @account_id}).first()
+    @account_id = parseInt(@params.account_id) || 0
+    @account = Account.findById(@account_id)
     @count = parseInt(@params.count) || 1
     @view.count.text @count
     if @account

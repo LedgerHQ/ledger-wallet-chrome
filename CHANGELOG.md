@@ -1,4 +1,9 @@
 # Changelog
+1.3.6
+====
+- Fix preferences synchronization
+- Bug fixes
+
 1.3.5
 ====
 - Fix a bug when sending more than 20BTC

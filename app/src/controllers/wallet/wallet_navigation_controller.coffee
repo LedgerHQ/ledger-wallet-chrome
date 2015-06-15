@@ -77,6 +77,7 @@ class @WalletNavigationController extends ledger.common.NavigationController
       Wallet.instance.retrieveAccountsBalances()
       ledger.tasks.TickerTask.instance.updateTicker()
       ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary()
+      ledger.storage.sync.pull()
       _.defer @_updateReloadIconState
     ledger.app.on 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done', @_onSynchronizationStateChanged
     ledger.tasks.OperationsSynchronizationTask.instance.on 'start stop', @_onSynchronizationStateChanged

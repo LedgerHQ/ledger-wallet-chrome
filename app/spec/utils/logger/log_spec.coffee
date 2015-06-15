@@ -15,11 +15,10 @@ describe "Log Writer/Reader", ->
 
 
   it "should write in correct order", (done) ->
-    promise = null
     for str in [0...50]
       line = "date lorem ipsum blabla msg outing to bla - test #{str}"
-      promise = lw.write line
-    promise.then ->
+      lw.write line
+    lw.getFlushPromise().then ->
       lr.read (logs) ->
         for log, i in logs
           expect(log).toBe("date lorem ipsum blabla msg outing to bla - test #{i}")

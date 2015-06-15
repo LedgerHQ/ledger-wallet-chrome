@@ -233,44 +233,50 @@ class ledger.wallet.Transaction
     $info("Address: ", address)
     $info("Inputs paths: ", inputsPath)
     $info("Change path: ", changePath)
-    ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
-      if error?
-        $error("Error during unspents outputs gathering", error)
-        return d.rejectWithError(Errors.NetworkError, error)
-      # Collect each valid outputs and sort them by desired priority
-      validOutputs = _(output for output in outputs when output.paths.length > 0).sortBy (output) ->  -output['confirmatons']
-      if validOutputs.length == 0
-        $error("Error not enough funds")
-        return d.rejectWithError(Errors.NotEnoughFunds)
-      validOutputs = _(validOutputs).uniq no, (i) ->  i['output_index'] +  i['transaction_hash']
-      finalOutputs = []
-      collectedAmount = new Amount()
-      hadNetworkFailure = no
-      $info("Valid outputs: ", validOutputs)
 
-      # For each valid outputs we try to get its raw transaction.
-      _.async.each validOutputs, (output, done, hasNext) =>
-        ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
+    ledger.app.dongle.getPublicAddress changePath, (dongleChangeAddress) ->
+      ledger.tasks.AddressDerivationTask.instance.getPublicAddress changePath, (workerChangeaddress, error) ->
+        if dongleChangeAddress.bitcoinAddress.toString(ASCII) isnt workerChangeaddress
+          $error("Error change derivation error #{changePath} ", dongleChangeAddress.bitcoinAddress.toString(ASCII), " <> ", workerChangeaddress)
+          return d.rejectWithError(Errors.ChangeDerivationError)
+        ledger.api.UnspentOutputsRestClient.instance.getUnspentOutputsFromPaths inputsPath, (outputs, error) ->
           if error?
-            hadNetworkFailure = yes
-          else
-            output.raw = rawTransaction
-            finalOutputs.push(output)
-            collectedAmount = collectedAmount.add(Amount.fromSatoshi(output.value))
-          if collectedAmount.gte(requiredAmount)
-            changeAmount = collectedAmount.subtract(requiredAmount)
-            fees = fees.add(changeAmount) if changeAmount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+            $error("Error during unspents outputs gathering", error)
+            return d.rejectWithError(Errors.NetworkError, error)
+          # Collect each valid outputs and sort them by desired priority
+          validOutputs = _(output for output in outputs when output.paths.length > 0).sortBy (output) ->  -output['confirmatons']
+          if validOutputs.length == 0
+            $error("Error not enough funds")
+            return d.rejectWithError(Errors.NotEnoughFunds)
+          validOutputs = _(validOutputs).uniq no, (i) ->  i['output_index'] +  i['transaction_hash']
+          finalOutputs = []
+          collectedAmount = new Amount()
+          hadNetworkFailure = no
+          $info("Valid outputs: ", validOutputs)
 
-            $info("Used outputs: ", finalOutputs)
+          # For each valid outputs we try to get its raw transaction.
+          _.async.each validOutputs, (output, done, hasNext) =>
+            ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
+              if error?
+                hadNetworkFailure = yes
+              else
+                output.raw = rawTransaction
+                finalOutputs.push(output)
+                collectedAmount = collectedAmount.add(Amount.fromSatoshi(output.value))
+              if collectedAmount.gte(requiredAmount)
+                changeAmount = collectedAmount.subtract(requiredAmount)
+                fees = fees.add(changeAmount) if changeAmount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
 
-            # We have reached our required amount. It's time to prepare the transaction
-            transaction = new Transaction(ledger.app.dongle, amount, fees, address, finalOutputs, changePath)
-            d.resolve(transaction)
-          else if hasNext is true
-            # Continue to collect funds
-            done()
-          else if hadNetworkFailure
-            d.rejectWithError(Errors.NetworkError)
-          else
-            d.rejectWithError(Errors.NotEnoughFunds)
+                $info("Used outputs: ", finalOutputs)
+
+                # We have reached our required amount. It's time to prepare the transaction
+                transaction = new Transaction(ledger.app.dongle, amount, fees, address, finalOutputs, changePath)
+                d.resolve(transaction)
+              else if hasNext is true
+                # Continue to collect funds
+                done()
+              else if hadNetworkFailure
+                d.rejectWithError(Errors.NetworkError)
+              else
+                d.rejectWithError(Errors.NotEnoughFunds)
     d.promise

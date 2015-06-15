@@ -1,4 +1,4 @@
-@ledger.storage ?= {}
+@ledger.storage = {}
 
 # Base class for every store. This class should not be used (abstract class).
 # Descendant classes should namespace their keys before setting them, in order to allow multiple
@@ -7,9 +7,12 @@
 class @ledger.storage.Store extends EventEmitter
 
   # @param [String] name The store name (for key mangling)
-  constructor: (name) ->
+  constructor: (name, keySeparator = '.') ->
     @_name = name
-    @_nameRegex = new RegExp("^#{@_name}\\.")
+    @_keySeparator = keySeparator
+    regexSeparator = if keySeparator.match(/\./) then "\\" + keySeparator else keySeparator
+    @_nameRegex = new RegExp("^#{@_name}#{regexSeparator}")
+    @_substores = {}
 
   # Gets one or more items from storage.
   # If keys is empty, retrieve all values in this namespace.
@@ -17,7 +20,12 @@ class @ledger.storage.Store extends EventEmitter
   # @param [Array|String] key A single key to get or a list of keys to get.
   # @param [Function] cb Callback with storage items. Should look like (item) ->
   get: (keys, cb) ->
+    keys = [keys] unless _(keys).isArray()
     this._raw_get this._preprocessKeys(keys), (raw_items) => cb(@_deprocessItems(raw_items))
+
+  getAll: (cb) ->
+    @keys (keys) =>
+      @get(keys, cb)
 
   # Stores one or many item
   #
@@ -38,6 +46,13 @@ class @ledger.storage.Store extends EventEmitter
   # @param [Function] cb A callback with removed items.
   remove: (keys, cb) ->
     this._raw_remove this._preprocessKeys(keys), (raw_items) => cb?(@_deprocessItems(raw_items))
+
+  # Gets the substore associated with the given name
+  #
+  # @param [String] name The name of the substore
+  # @return [ledger.storage.SubStore] The substore associated with the given name
+  # @see ledger.storage.SubStore
+  substore: (name) -> @_substores[name] ||= new ledger.storage.SubStore(this, name)
 
   # Removes all items from storage.
   #
@@ -66,7 +81,7 @@ class @ledger.storage.Store extends EventEmitter
 
   _preprocessKey: (key) -> @_to_ns_key(key)
   _preprocessKeys: (keys) -> _.flatten([keys]).map((key) => @_preprocessKey(key))
-  _preprocessValue: (value) -> if value.toJson? then value.toJson() else JSON.stringify(value)
+  _preprocessValue: (value) -> if value?.toJson? then value.toJson() else JSON.stringify(value)
   _preprocessItems: (items) ->
     hash = {}
     for key, value of @_hashize(items)
@@ -88,7 +103,8 @@ class @ledger.storage.Store extends EventEmitter
       try @_deprocessKey(raw_key) catch e
         undefined
     ).compact().value()
-  _deprocessValue: (raw_value) -> JSON.parse(raw_value)
+  _deprocessValue: (raw_value) ->
+    JSON.parse(raw_value)
   _deprocessItems: (raw_items) ->
     hash = {}
     for raw_key, raw_value of raw_items
@@ -98,7 +114,7 @@ class @ledger.storage.Store extends EventEmitter
 
   ## Namespaces methods ##
 
-  _to_ns_key: (key) -> @_name + "." + key
+  _to_ns_key: (key) -> @_name + @_keySeparator + key
   _to_ns_keys: (keys) -> (@_to_ns_key(key) for key in keys)
   _from_ns_key: (ns_key) -> ns_key.replace(@_nameRegex, '')
   _from_ns_keys: (ns_keys) -> _.compact (@_from_ns_key(ns_key) for ns_key in ns_keys when ns_key.match(@_nameRegex))

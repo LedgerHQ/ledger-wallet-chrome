@@ -21,18 +21,21 @@ class ledger.dongle.MockDongleManager extends EventEmitter
     @dongleInstance.id = @_dongles.length + 1
     @dongleInstance.deviceId = @dongleInstance.id
     @_dongles.push(@dongleInstance)
-    #@emit 'connecting', @dongleInstance
-    #@emit 'connected', @dongleInstance
-    @dongleInstance.once 'state:locked', (event) => @emit 'connected', @dongleInstance
+    if @dongleInstance.state is 'locked'
+      @emit 'connected', @dongleInstance
+    @dongleInstance.once 'state:locked', (event) =>
+      @emit 'connected', @dongleInstance
     @dongleInstance.once 'state:blank', (event) => @emit 'connected', @dongleInstance
     @dongleInstance.once 'forged', (event) => @emit 'forged', @dongleInstance
     @dongleInstance.once 'state:disconnected', (event) =>
       @_dongles.pop()
       l @
       @emit 'disconnected', @dongleInstance
+    @dongleInstance
 
   # Simulates Remove/Put the dongle
   powerCycle: (delay, cb) ->
+    l 'powerCycle'
     @emit 'disconnect', @dongleInstance
     @dongleInstance.disconnect()
     ledger.tasks.TickerTask.instance.stop()

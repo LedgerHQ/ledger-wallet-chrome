@@ -2,9 +2,9 @@
 _.async =
   each: (array, callback) ->
     index = 0
-    return callback?(no, "Invalid array") unless array instanceof Array
+    return callback?(undefined, _.noop, no, 0, 0) unless array instanceof Array
     length = array.length
-    return callback?(no, "Empty array") if ! length
+    return callback?(undefined, _.noop, no, 0, 0) if ! length
     done = ->
       return if index >= length
       index += 1

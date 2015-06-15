@@ -57,7 +57,7 @@ class @Api
     ledger.app.router.go '/wallet/api/operations', {account_id: data.account_id}
 
   @exportOperations: (account_id) ->
-    account = Account.find({"id": account_id}).first()
+    account = Account.findById(account_id)
     operations = []
     for operation in account.get('operations')
       operations.push(operation.serialize())
@@ -67,7 +67,7 @@ class @Api
     ledger.app.router.go '/wallet/api/addresses', {account_id: data.account_id, count: data.count}
 
   @exportNewAddresses: (account_id, count) ->
-    account = Account.find({"id": account_id}).first().getWalletAccount()
+    account = Account.findById(account_id).getWalletAccount()
     current = account.getCurrentPublicAddressIndex()
     ledger.wallet.pathsToAddresses _(_.range(current, current + count)).map((i) ->
       account.getRootDerivationPath() + '/0/' + i

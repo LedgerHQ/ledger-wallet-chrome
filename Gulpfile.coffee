@@ -1,3 +1,5 @@
+args = process.argv.splice(3, process.argv.length - 3)
+
 # Load all required libraries.
 Q               = require 'q'
 gulp            = require 'gulp'
@@ -28,6 +30,8 @@ concat          = require 'gulp-concat'
 tap             = require 'gulp-tap'
 _               = require 'underscore'
 _.str           = require 'underscore.string'
+git             = require 'gulp-git'
+ext_replace     = require 'gulp-ext-replace'
 
 
 class BuildMode
@@ -41,36 +45,36 @@ RELEASE_MODE = new BuildMode('release', 'release', no)
 
 COMPILATION_MODE = DEBUG_MODE
 
+parsePropertiesFile = (fileContent) ->
+  out = {}
+  lines = fileContent.split '\n'
+  for line in lines
+    if match = line.match '([a-zA-Z0-9\._-]+)[ ]?=[ ]?(.*)'
+      [__, key, value] = match
+      out[key] = value
+  out
+
 i18n = () ->
   through2.obj (file, encoding, callback) ->
     i18nContent = {}
-    json = JSON.parse(file.contents.toString(encoding))
-    json.application.name = "#{json.application.name} (#{COMPILATION_MODE.Name})" if COMPILATION_MODE.MangleVersion is true and json.application?.name?
 
-    # Format the 'json' object to be suitable for chrome.i18n
-    flatify = (json, path = '') ->
-      for key, value of json
-        if typeof value is "object"
-          flatify(value, "#{path}#{key}_")
-        else
-          i18nContent[path + key] = {message: value, description: "Description for #{path + key} = #{value}"}
+    content = parsePropertiesFile(file.contents.toString(encoding))
+    for key, value of content
+      key = key.replace(/\./g, '_')
+      i18nContent[key] = {message: value.replace(/\\:/g, ':'), description: "Description for #{key}"}
 
-    flatify json
     # Insert the newly created content
     file.contents = new Buffer(JSON.stringify(i18nContent), encoding)
-
     @push file
     callback()
-
 
 buildLangFilePlugin = () ->
   through2.obj (chunk, encoding, callback) ->
     languages = {}
 
     tag = chunk.relative.substring(0, chunk.relative.indexOf("/"))
-    langFile = JSON.parse(chunk.contents.toString(encoding))
-
-    languages = "window.ledger.i18n.Languages['" + tag + "'] = " + "'" + langFile.language.name + "';"
+    langFile = parsePropertiesFile(chunk.contents.toString(encoding))
+    languages = "window.ledger.i18n.Languages['" + tag + "'] = " + "'" + langFile['language.name'] + "';"
 
     chunk.contents = new Buffer(JSON.stringify(languages), encoding)
 
@@ -100,6 +104,9 @@ ensureDistDir = () -> ensureDirectoryExists 'dist'
 ensureSignatureDir = () -> ensureDirectoryExists('signature')
 
 tasks =
+
+  clean: () ->
+    del.sync ['build/', 'release/']
 
   less: () ->
     gulp.src 'app/assets/css/**/*.less'
@@ -148,17 +155,16 @@ tasks =
     .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/"
 
   translate: () ->
-    gulp.src 'app/locales/**/!(es)/*.yml'
+    gulp.src 'app/locales/**/!(es)/*.properties'
     .pipe plumber()
     .pipe changed "#{COMPILATION_MODE.BuildDir}/_locales"
-    .pipe yaml()
     .pipe i18n()
+    .pipe ext_replace('.json')
     .pipe gulp.dest "#{COMPILATION_MODE.BuildDir}/_locales"
 
   buildLangFile: () ->
-    gulp.src 'app/locales/**/!(es)/*.yml'
+    gulp.src 'app/locales/**/!(es)/*.properties'
     .pipe plumber()
-    .pipe yaml()
     .pipe buildLangFilePlugin()
     .pipe tap (file, t) ->
       file.contents = new Buffer file.contents.toString().replace(/^"|"$/g, '')
@@ -327,6 +333,21 @@ gulp.task 'compile', ->
   tasks.compile()
 
 gulp.task 'default', ['debug']
+
+gulp.task 'build', (cb) ->
+  git.exec args: 'branch', (err, stdout) ->
+    return console.error("Unable to retrieve current branch") unless stdout?
+    [__, currentBranch] = stdout.match /\*\s*(.+)\s/
+    return console.error("Unable to retrieve current branch") unless currentBranch?
+    tag = args[1] or currentBranch
+    git.checkout tag, quiet: yes, ->
+      tasks.clean()
+      COMPILATION_MODE = DEBUG_MODE
+      tasks.compile().then ->
+        git.checkout currentBranch, quiet: yes, ->
+          cb()
+
+
 
 gulp.task 'debug:clean', (cb) ->
   del.sync ['build/']

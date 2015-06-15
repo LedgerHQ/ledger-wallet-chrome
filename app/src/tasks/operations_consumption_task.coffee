@@ -4,26 +4,31 @@ class ledger.tasks.OperationsConsumptionTask extends ledger.tasks.Task
   @instance: new @()
 
   onStart: () ->
+    l 'Start consumer'
     iterate = (accountIndex) =>
+      l 'Iteration accountIndex', accountIndex
+      return @stopIfNeccessary() if accountIndex >= Wallet.instance.get('accounts').length
+      l 'Iterating consumer', Wallet.instance, Wallet.instance.get('accounts'), Wallet.instance.get('accounts').length
       if accountIndex >= ledger.wallet.Wallet.instance.getAccountsCount()
         ledger.app.emit 'wallet:operations:sync:done'
         return
       hdaccount = ledger.wallet.Wallet.instance?.getAccount(accountIndex)
+      l 'Retrieve account operations'
       @retrieveAccountOperations hdaccount, =>
-        accountIndex += 1
-        if accountIndex < Wallet.instance.get('accounts').length
-          iterate()
-        else
-          @stopIfNeccessary()
+        l 'Iterating consumer call next'
+        iterate(accountIndex + 1)
     iterate(0)
 
   retrieveAccountOperations: (hdaccount, callback) ->
-    ledger.wallet.pathsToAddresses hdaccount.getAllAddressesPaths(), (addresses) =>
+    l 'Retrieve account', hdaccount, hdaccount.getAllObservedAddressesPaths()
+    ledger.wallet.pathsToAddresses hdaccount.getAllObservedAddressesPaths(), (addresses) =>
+      l "Retrieved addresses", addresses
       addresses = _.values addresses
       stream = ledger.api.TransactionsRestClient.instance.createTransactionStream(addresses)
       stream.on 'data', =>
         return unless @isRunning()
         account = Account.fromWalletAccount hdaccount
+        l 'Add transaction', account
         for transaction in stream.read()
           account.addRawTransactionAndSave transaction
 

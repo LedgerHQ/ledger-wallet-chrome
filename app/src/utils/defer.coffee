@@ -1,4 +1,4 @@
-@legder ?= {}
+@ledger ?= {}
 
 @ledger.defer = (arg=undefined, args...) ->
   isCallback = typeof arg == 'function' && args.length == 0

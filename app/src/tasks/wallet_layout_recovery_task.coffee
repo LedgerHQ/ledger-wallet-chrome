@@ -4,22 +4,24 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   @instance: new @()
 
   onStart: () ->
+    l "Starting task"
     @once 'bip44:done', =>
       @emit 'done'
       @stopIfNeccessary()
     @once 'bip44:fatal chronocoin:fatal', =>
       @emit 'fatal_error'
       @stopIfNeccessary()
-
     if ledger.wallet.Wallet.instance.getAccountsCount() == 0
       @once 'chronocoin:done', => @_restoreBip44Layout()
       @_restoreChronocoinLayout()
     else
       @_restoreBip44Layout()
 
+
   onStop: () ->
 
   _restoreChronocoinLayout: () ->
+    l '_restoreChronocoinLayout'
     dongle = ledger.app.dongle
     dongle.getPublicAddress "0'/0/0", (publicAddress) =>
       dongle.getPublicAddress "0'/1/0", (changeAddress) =>
@@ -36,9 +38,13 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
           @emit 'chronocoin:done'
 
   _restoreBip44Layout: () ->
+    l '_restoreBip44Layout'
     accountIndex = 0
     recoverAccount = =>
-      return @emit 'bip44:done' if accountIndex is 1 # App first version limitiation
+      if accountIndex > 0 and (previousAccount = ledger.wallet.Wallet.instance.getAccount(accountIndex - 1)).isEmpty()
+        l 'ACCOUNT', previousAccount
+        previousAccount.remove() if accountIndex > 1
+        return @emit 'bip44:done'
       account = ledger.wallet.Wallet.instance.getOrCreateAccount(accountIndex)
       done = =>
         @emit 'bip44:account:done'
@@ -49,6 +55,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     do recoverAccount
 
   _restoreBip44AccountChainsLayout: (account, done) ->
+    l '_restoreBip44AccountChainsLayout', account
     isRestoringChangeChain = yes
     isRestoringPublicChain = yes
     testIndex = (publicIndex, changeIndex) =>
@@ -56,11 +63,9 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       changeIndex = parseInt changeIndex
       paths = []
       if isRestoringPublicChain
-        for i in [publicIndex...publicIndex + 20]
-          paths.push account.getPublicAddressPath(i)
+        paths = paths.concat(account.getObservedPublicAddressesPaths())
       if isRestoringChangeChain
-        for i in [changeIndex...changeIndex + 20]
-          paths.push account.getChangeAddressPath(i)
+        paths = paths.concat(account.getObservedChangeAddressesPaths())
       ledger.wallet.pathsToAddresses paths, (addresses) =>
         addressesPaths = _.invert addresses
         ledger.api.TransactionsRestClient.instance.getTransactions _.values(addresses), (transactions, error) =>

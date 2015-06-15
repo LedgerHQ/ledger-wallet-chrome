@@ -39,4 +39,3 @@ class ledger.storage.SubStore extends ledger.storage.Store
   _deprocessValue: (raw_value) -> raw_value
 
   _preprocessValue: (value) -> value
-

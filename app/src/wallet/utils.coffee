@@ -47,5 +47,6 @@ _.extend ledger.wallet,
           addresses[path] = result
         callback?(addresses, notFound) unless hasNext
         do done
+        return
 
     return
