@@ -31,6 +31,7 @@ _.extend ledger.errors,
   SignatureError: 301
   TransactionNotInitialized: 302
   DustTransaction: 303
+  ChangeDerivationError: 304
 
   # Firmware update errors
   UnableToRetrieveVersion: 400

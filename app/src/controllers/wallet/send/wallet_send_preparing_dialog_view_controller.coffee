@@ -14,6 +14,7 @@ class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewC
           when ledger.errors.NetworkError then 'network_no_response'
           when ledger.errors.NotEnoughFunds then 'unsufficient_balance'
           when ledger.errors.DustTransaction then 'dust_transaction'
+          when ledger.errors.ChangeDerivationError then 'change_derivation_error'
         @dismiss =>
           errorMessage = switch reason
             when 'dust_transaction' then _.str.sprintf(t("common.errors." + reason), ledger.formatters.formatValue(ledger.wallet.Transaction.MINIMUM_OUTPUT_VALUE))
