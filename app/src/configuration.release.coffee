@@ -2,6 +2,13 @@
 @ledger.isProd = ledger.env == "prod"
 @ledger.isDev = ledger.env == "dev"
 
+@ledger.bitcoin.Networks =
+  testnet: btctest
+  btc: btc
+  litecoin: litecoin
+  dogecoin: dogecoin
+  zetacoin: zetacoin
+
 @ledger.config ?= {}
 _.extend @ledger.config,
   m2fa:
