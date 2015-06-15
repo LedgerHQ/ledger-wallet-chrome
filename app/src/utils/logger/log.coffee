@@ -9,7 +9,7 @@ getFs = (fsmode) ->
   return ledger.defer().resolve(globalFs[fsmode]).promise if globalFs[fsmode]?
   return deferedGetFs[fsmode].promise if deferedGetFs[fsmode]?
   deferedGetFs[fsmode] = ledger.defer()
-  window.webkitRequestFileSystem fsmode, 5*1024*1024,
+  webkitRequestFileSystem fsmode, 5*1024*1024,
     (fs) ->
       globalFs[fsmode] = fs
       deferedGetFs[fsmode].resolve fs
@@ -33,7 +33,7 @@ class @ledger.utils.Log
     @_fsmode = fsmode
     @_daysMax = daysMax
     @_daysMax = parseInt(@_daysMax)
-    unlockWriter = _.lock @, ['_getFileWriter', 'write', 'read']
+    unlockWriter = _.lock @, ['_getFileWriter', '_flush', 'read']
     if isNaN @_daysMax
       throw 'The first parameter must be a number'
     getFs(fsmode)
