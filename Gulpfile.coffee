@@ -61,7 +61,7 @@ i18n = () ->
     content = parsePropertiesFile(file.contents.toString(encoding))
     for key, value of content
       key = key.replace(/\./g, '_')
-      i18nContent[key] = {message: value, description: "Description for #{key}"}
+      i18nContent[key] = {message: value.replace(/\\:/g, ':'), description: "Description for #{key}"}
 
     # Insert the newly created content
     file.contents = new Buffer(JSON.stringify(i18nContent), encoding)
