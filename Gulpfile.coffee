@@ -43,7 +43,7 @@ configuration =
 configuration.flavors = [configuration.mode, configuration.network].concat(argv['flavor'])
 
 checkoutAndRun = (script, conf = configuration) ->
-  require('./compilation/script-git-setup')(conf).then -> require("./compilation/#{script}")(conf)
+  require('./compilation/script-git-setup')(conf).then -> 12 #require("./compilation/#{script}")(conf)
   .then -> require('./compilation/script-git-finalize')(conf)
 
 gulp.task 'build', -> checkoutAndRun('script-build')

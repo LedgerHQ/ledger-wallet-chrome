@@ -1,4 +1,4 @@
-
+git
 singletons = {}
 
 class ledger.tasks.BalanceTask extends ledger.tasks.Task
