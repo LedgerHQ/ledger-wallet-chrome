@@ -7,9 +7,11 @@ module.exports = (configuration) ->
   git.exec args: 'branch', (err, stdout) ->
     return defer.reject("Unable to retrieve current branch") unless stdout?
     [__, configuration.currentBranch] = stdout.match /\*\s*(.+)\s/
-    return defer.reject("Unable to retrieve current branch") unless currentBranch?
-    tag = args[1] or currentBranch
+    return defer.reject("Unable to retrieve current branch") unless configuration.currentBranch?
     git.exec args: 'stash', (err, stdout) ->
-      git.checkout tag, quiet: yes, ->
-        defer.resolve()
+      return defer.reject(err) if err
+      console.log err
+      console.log stdout
+      #git.checkout tag, quiet: yes, ->
+      #  defer.resolve()
   defer.promise
