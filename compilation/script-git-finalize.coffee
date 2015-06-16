@@ -5,12 +5,10 @@ module.exports = (configuration) ->
   git = require 'gulp-git'
   defer = Q.defer()
 
-  checkoutBack = ->
-    git.checkout configuration.currentBranch, quiet: yes, ->
+  git.checkout configuration.currentBranch, quiet: yes, ->
+    if configuration.isStashed
+      git.exec args: 'stash pop', -> defer.resolve()
+    else
       defer.resolve()
-  if configuration.isStashed
-    git.exec args: 'stash pop', -> checkoutBack()
-  else
-    checkoutBack()
 
   defer.promise
