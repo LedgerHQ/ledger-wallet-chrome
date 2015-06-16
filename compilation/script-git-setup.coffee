@@ -12,6 +12,10 @@ module.exports = (configuration) ->
       return defer.reject(err) if err
       configuration.isStashed = stdout.match(/HEAD/)?
       git.checkout configuration.tag, quiet: yes, (err) ->
-        return defer.reject("Unable to checkout on tag #{configuration.tag}") if err?
-        defer.resolve()
+        if err?
+          git.exec args: 'fetch', (err, stdout) ->
+            git.checkout configuration.tag, quiet: yes, (err) ->
+              defer.reject("Unable to checkout on tag #{configuration.tag}") if err?
+        else
+          defer.resolve()
   defer.promise
