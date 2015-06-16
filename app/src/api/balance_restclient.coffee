@@ -10,7 +10,7 @@ class ledger.api.BalanceRestClient extends ledger.api.RestClient
     ledger.wallet.pathsToAddresses addressesPaths, (addresses) =>
       _.async.eachBatch _.values(addresses), 200, (addresses, done, hasNext) =>
         @http().get
-          url: "blockchain/addresses/#{addresses.join(',')}"
+          url: "blockchain/#{ledger.config.network.ticker}/addresses/#{addresses.join(',')}"
           onSuccess: (addressesBalances) ->
             for addressBalance in addressesBalances
               accountBalance.total += parseInt(addressBalance.total.balance)

@@ -5,7 +5,7 @@ class ledger.api.UnspentOutputsRestClient extends ledger.api.RestClient
     addresses = (address for address in addresses when Bitcoin.Address.validate(address) is true)
     query = _(addresses).join(',')
     @http().get
-      url: "blockchain/addresses/#{query}/unspents"
+      url: "blockchain/#{ledger.config.network.ticker}/addresses/#{query}/unspents"
       onSuccess: (response) =>
         callback?(response)
       onError: @networkErrorCallback(callback)
