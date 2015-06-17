@@ -36,7 +36,6 @@ class ledger.wallet.Wallet
 
   initialize: (store, callback) ->
     @_store = store
-    #@_store.getAll -> l "Wallet", arguments
     @_store.get ['accounts'], (result) =>
       @_accounts = []
       return callback?() unless result.accounts?
@@ -272,15 +271,12 @@ _.extend ledger.wallet,
     previousLayout = new ledger.wallet.Wallet()
     hdWallet = new ledger.wallet.Wallet()
     previousLayout.initialize ledger.storage.wallet, =>
-      l previousLayout
       unless previousLayout.isEmpty()
         ledger.storage.sync.wallet.set previousLayout.serialize(), =>
           previousLayout.release()
           ledger.storage.wallet.remove ["accounts", "account_0"], =>
-            l hdWallet
             @_endInitialize(hdWallet, callback)
       else
-        l hdWallet
         @_endInitialize(hdWallet, callback)
 
   _endInitialize: (hdWallet, callback) ->

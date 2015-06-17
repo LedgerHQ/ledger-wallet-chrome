@@ -414,6 +414,7 @@
           '../spec/m2fa/m2fa_spec'
 
           '../spec/tasks/address_derivation_task_spec'
+          '../spec/tasks/balance_task_spec'
           '../spec/tasks/ticker_task_spec'
           '../spec/tasks/wallet_layout_recovery_task_spec'
 
