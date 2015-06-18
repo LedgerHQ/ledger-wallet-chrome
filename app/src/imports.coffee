@@ -71,6 +71,7 @@
         '../libs/btchip/ucrypt/ecdh'
 
         ## Application configuration
+        'build'
         'configuration'
 
         ## Logger
