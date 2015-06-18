@@ -388,6 +388,7 @@
         '../spec/utils/storage/store_mock'
 
         '../spec/fixtures/fixtures_dongle'
+        '../spec/fixtures/fixtures_transactions'
 
         '../spec/spec_helper'
       ]
@@ -418,6 +419,7 @@
           '../spec/tasks/operations_consumption_task_spec'
           '../spec/tasks/ticker_task_spec'
           '../spec/tasks/wallet_layout_recovery_task_spec'
+          '../spec/tasks/wallet_open_task_spec'
 
           '../spec/wallet/extended_public_key_spec'
 

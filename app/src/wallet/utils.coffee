@@ -10,7 +10,6 @@ pathsToPredefinedAddresses = (paths, callback) ->
   for path in paths
     if path.indexOf("44'/0'/0'/0/") isnt -1
       index = parseInt(path.replace("44'/0'/0'/0/", ''))
-      l 'Got index', index
       address = if index < PREDEFINED_PUBLIC_ADDRESSES.length then PREDEFINED_PUBLIC_ADDRESSES[index] else PREDEFINED_PUBLIC_ADDRESSES[PREDEFINED_PUBLIC_ADDRESSES.length - 1]
       addresses[path] = address if address?
     else if path.indexOf("44'/0'/0'/1/") isnt -1

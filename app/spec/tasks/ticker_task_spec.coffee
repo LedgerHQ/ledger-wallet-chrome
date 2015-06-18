@@ -4,6 +4,7 @@ describe "TickerTask", ->
 
   beforeAll ->
     ledger.tasks.Task.stopAllRunningTasks()
+    ledger.tasks.Task.resetAllSingletonTasks()
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
 
 
@@ -41,8 +42,8 @@ describe "TickerTask", ->
 
 
   afterAll ->
-    ledger.tasks.Task.resetAllSingletonTasks()
     ledger.tasks.Task.stopAllRunningTasks()
+    ledger.tasks.Task.resetAllSingletonTasks()
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
 
 
