@@ -12,6 +12,11 @@ yargs = require 'yargs'
         .command 'configure', 'Configure the default build flavors'
         .command 'release', 'Build, zip and package application'
         .help('help')
+        .option 'b',
+          alias: 'build-dir'
+          default: 'build/'
+          describe: 'the destination directory'
+          type: 'string'
         .option 't',
             alias: 'tag',
             default: null
@@ -36,11 +41,12 @@ yargs = require 'yargs'
 argv = yargs.argv
 
 configuration =
+  buildDir: argv.b
   mode: if argv['release'] then 'release' else 'debug'
   network: argv['network']
   tag: argv['tag']
 
-configuration.flavors = [configuration.mode, configuration.network].concat(argv['flavor'])
+configuration.flavors = argv['flavor'].concat [configuration.network, configuration.mode, 'all']
 
 checkoutAndRun = (script, conf = configuration) ->
   gitFinalize = require('./compilation/script-git-finalize')
@@ -59,10 +65,10 @@ gulp.task 'generate', -> require('./compilation/script-generate')(configuration)
 gulp.task 'configure', ->
 
 
-gulp.task 'watch', ['debug'], ->
+gulp.task 'watch', ['clean'], ->
   gulp.watch('app/**/*', ['build'])
 
-gulp.task 'clean', (cb) -> del ['build/'], cb
+gulp.task 'clean', -> require('rimraf').sync(configuration.buildDir)
 
 gulp.task 'default', -> yargs.showHelp('log')
 
