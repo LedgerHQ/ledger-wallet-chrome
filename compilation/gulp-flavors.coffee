@@ -31,14 +31,16 @@ flushStream = ({flavors, merge} = {merge: yes}, done) ->
     files = _(files).sortBy('___flavorPriority')
     {cwd, base} = files[0]
     if files.length is 1
-      @push new File(cwd: cwd, base: base, path: path, contents: files[0].contents)
+      @push new File(cwd: cwd, base: base, path: path, contents: files[0].contents, stat: files[0].stat)
     else if merge is no
-      @push new File(cwd: cwd, base: base, path: path, contents: files[files.length - 1].contents)
+      @push new File(cwd: cwd, base: base, path: path, contents: files[files.length - 1].contents, stat: files[0].stat)
     else
       buffer = ''
+      stat = files[0]
       for file in files
         buffer += file.contents.toString() + gutil.linefeed
-      @push new File(cwd: cwd, base: base, path: path, contents: new Buffer(buffer))
+        stat = file.stat if file.stat.mtime > stat.mtime
+      @push new File(cwd: cwd, base: cwd, path: path, contents: new Buffer(buffer), stat: stat)
   do done
 
 module.exports = (configuration) -> through.obj(_.partial(transformStream, configuration), _.partial(flushStream, configuration))
