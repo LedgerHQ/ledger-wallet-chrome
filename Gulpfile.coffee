@@ -1,5 +1,6 @@
 gulp  = require 'gulp'
-
+runSequence = require 'run-sequence'
+Q = require 'q'
 yargs = require 'yargs'
         .usage 'Usage: $0 <command> [commands] [options]'
         .command 'build', 'Build the application'
@@ -55,13 +56,14 @@ checkoutAndRun = (script, conf = configuration) ->
   require('./compilation/script-git-setup')(conf).then -> task(conf)
   .then -> gitFinalize(conf)
 
-gulp.task 'build', -> checkoutAndRun('script-build')
-gulp.task 'zip', -> checkoutAndRun('script-zip')
-gulp.task 'package', -> checkoutAndRun('script-package')
-gulp.task 'release', -> checkoutAndRun('script-release')
+taskQueue = Q()
 
-gulp.task 'doc', -> require('./compilation/script-doc')(configuration)
-gulp.task 'generate', -> require('./compilation/script-generate')(configuration)
+gulp.task 'build', -> taskQueue = taskQueue.then -> checkoutAndRun('script-build')
+gulp.task 'zip', ->  taskQueue = taskQueue.then -> checkoutAndRun('script-zip')
+gulp.task 'package', -> taskQueue = taskQueue.then -> checkoutAndRun('script-package')
+
+gulp.task 'doc', ->  taskQueue = taskQueue.then -> require('./compilation/script-doc')(configuration)
+gulp.task 'generate', ->  taskQueue = taskQueue.then -> require('./compilation/script-generate')(configuration)
 
 gulp.task 'configure', ->
 
@@ -69,8 +71,6 @@ gulp.task 'configure', ->
 gulp.task 'watch', ['clean'], ->
   gulp.watch('app/**/*', ['build'])
 
-gulp.task 'clean', -> require('rimraf').sync(configuration.buildDir)
+gulp.task 'clean', ->  taskQueue = taskQueue.then -> require('rimraf').sync(configuration.buildDir)
 
 gulp.task 'default', -> yargs.showHelp('log')
-
-console.log require('./compilation/script-git-setup')

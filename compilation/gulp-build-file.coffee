@@ -11,7 +11,6 @@ transformStream = (configuraton, file, encoding, done) ->
   do done
 
 flushStream = (configuration, done) ->
-  console.log process.cwd()
   template = fs.readFileSync 'compilation/build.coffee.template', "utf-8"
   buildFileContent = Eco.render(template, configuration)
   @push new File(cwd: '', base: '', path: "src/build.coffee", contents: new Buffer(buildFileContent))

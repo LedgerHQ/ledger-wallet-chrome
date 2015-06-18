@@ -1,5 +1,4 @@
 
-build = require './script-build'
 archiver = require 'archiver'
 zip = archiver 'zip'
 fs = require 'fs'
@@ -19,11 +18,7 @@ keygen = (dir) ->
     fs.writeFileSync keyPath, key.exportKey('pkcs1-private-pem')
   keyPath
 
-buildAndPackage = (configuration) ->
-  build(configuration).then ->
-    buildAndPackage.package(configuration)
-
-buildAndPackage.package = (configuration) ->
+module.exports = (configuration) ->
   defer = Q.defer()
   ensureDistDir()
   ensureSignatureDir()
@@ -39,8 +34,7 @@ buildAndPackage.package = (configuration) ->
     .then (crxBuffer) ->
       manifest = require "../#{configuration.buildDir}/manifest.json"
       fs.writeFileSync("dist/ledger-wallet-#{manifest.version}.crx", crxBuffer)
-      crx.destroy()
       defer.resolve()
+      crx.destroy()
+      return
   defer.promise
-
-module.exports = buildAndPackage

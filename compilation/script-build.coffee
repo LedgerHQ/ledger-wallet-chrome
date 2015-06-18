@@ -28,8 +28,6 @@ createBuildFile = require './gulp-build-file'
 
 module.exports = (configuration) ->
 
-  console.log(configuration)
-
   tasks =
 
     less: () ->
