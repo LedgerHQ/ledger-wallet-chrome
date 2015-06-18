@@ -45,6 +45,7 @@ configuration =
   mode: if argv['release'] then 'release' else 'debug'
   network: argv['network']
   tag: argv['tag']
+  time: new Date().getTime()
 
 configuration.flavors = argv['flavor'].concat [configuration.network, configuration.mode, 'all']
 

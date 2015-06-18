@@ -6,19 +6,13 @@ Q               = require 'q'
 less            = require 'gulp-less'
 coffee          = require 'gulp-coffee'
 yaml            = require 'gulp-yaml'
-Yaml            = require 'js-yaml'
-Eco             = require 'eco'
 eco             = require 'gulp-eco'
-del             = require 'del'
 sourcemaps      = require 'gulp-sourcemaps'
 uglify          = require 'gulp-uglify'
 minifyCss       = require 'gulp-minify-css'
 changed         = require 'gulp-changed'
 plumber         = require 'gulp-plumber'
 rename          = require 'gulp-rename'
-through2        = require 'through2'
-glob            = require 'glob'
-fs              = require 'fs'
 path            = require 'path'
 join            = path.join
 resolve         = path.resolve
@@ -29,6 +23,8 @@ _               = require 'underscore'
 _.str           = require 'underscore.string'
 ext_replace     = require 'gulp-ext-replace'
 flavors         = require './gulp-flavors'
+{i18n, buildLangFilePlugin} = require './gulp-i18n'
+createBuildFile = require './gulp-build-file'
 
 module.exports = (configuration) ->
 
@@ -39,6 +35,7 @@ module.exports = (configuration) ->
     less: () ->
       gulp.src 'app/assets/css/**/*.less'
       .pipe plumber()
+      .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe changed "#{configuration.buildDir}/assets/css"
       .pipe less()
       .pipe gulp.dest "#{configuration.buildDir}/assets/css"
@@ -52,23 +49,27 @@ module.exports = (configuration) ->
     images: () ->
       gulp.src 'app/assets/images/**/*'
       .pipe plumber()
+      .pipe flavors(flavors: configuration.flavors, merge: no)
       .pipe changed "#{configuration.buildDir}/assets/images"
       .pipe gulp.dest "#{configuration.buildDir}/assets/images"
 
     fonts: () ->
       gulp.src 'app/assets/fonts/**/*'
       .pipe plumber()
+      .pipe flavors(flavors: configuration.flavors, merge: no)
       .pipe changed "#{configuration.buildDir}/assets/fonts"
       .pipe gulp.dest "#{configuration.buildDir}/assets/fonts"
 
     html: () ->
       gulp.src 'app/views/**/*.html'
+      .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe plumber()
       .pipe changed "#{configuration.buildDir}/views"
       .pipe gulp.dest "#{configuration.buildDir}/views"
 
     eco: () ->
       gulp.src 'app/views/**/*.eco'
+      .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe plumber()
       .pipe changed "#{configuration.buildDir}/views"
       .pipe eco({basePath: 'app/views/'})
@@ -77,14 +78,15 @@ module.exports = (configuration) ->
     manifest: () ->
       gulp.src 'app/manifest.yml'
       .pipe plumber()
+      .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe changed "#{configuration.buildDir}/"
       .pipe yaml if configuration.mode is 'debug' then space: 1 else null
-      .pipe releaseManifest()
       .pipe gulp.dest "#{configuration.buildDir}/"
 
     translate: () ->
       gulp.src 'app/locales/**/!(es)/*.properties'
       .pipe plumber()
+      .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe changed "#{configuration.buildDir}/_locales"
       .pipe i18n()
       .pipe ext_replace('.json')
@@ -93,6 +95,7 @@ module.exports = (configuration) ->
     buildLangFile: () ->
       gulp.src 'app/locales/**/!(es)/*.properties'
       .pipe plumber()
+      .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe buildLangFilePlugin()
       .pipe tap (file, t) ->
         file.contents = new Buffer file.contents.toString().replace(/^"|"$/g, '')
@@ -117,9 +120,9 @@ module.exports = (configuration) ->
       .pipe gulp.dest "#{configuration.buildDir}/public"
 
     coffee: () ->
-      console.log("Flavors", configuration.flavors)
       stream = gulp.src 'app/**/*.coffee'
       .pipe plumber()
+      .pipe createBuildFile(configuration)
       .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe changed "#{configuration.buildDir}/"
       stream  = stream.pipe sourcemaps.init() if configuration.mode is 'debug'
@@ -127,28 +130,7 @@ module.exports = (configuration) ->
       stream = stream.pipe sourcemaps.write '/' if configuration.mode is 'debug'
       stream.pipe gulp.dest "#{configuration.buildDir}/"
 
-    mergeJsons: ->
-
-    mergeCoffescript: ->
-
-    mergeCss: ->
-
-    mergeImages: ->
-
     createBuildFile: ->
-
-    finalize: () ->
-      pattern = "#{configuration.buildDir}/**/*.#{COMPILATION_MODE.Name}.*"
-      antiMode = if configuration.mode is 'debug' then 'release' else 'debug'
-      antipattern = "#{configuration.buildDir}/**/*.#{antimode}.*"
-      del.sync [antipattern]
-      gulp.src [pattern, "!#{configuration.buildDir}/**/*.map"]
-      .pipe rename (path) ->
-        {basename} = path
-        basename = basename.slice(0, basename.lastIndexOf(".#{COMPILATION_MODE.Name}"))
-        path.basename = basename
-        path
-      .pipe gulp.dest "#{configuration.buildDir}/"
 
     minify: () ->
       gulp.src "#{configuration.buildDir}/**/*.css"
@@ -166,27 +148,23 @@ module.exports = (configuration) ->
       promise.promise
 
     compile: () ->
-      promise = Q.defer()
       run = [
         tasks.js
         tasks.coffee
-        #tasks.public
-        #tasks.translate
-        #tasks.manifest
-        #tasks.eco
-        #tasks.images
-        #tasks.fonts
-        #tasks.html
-        #tasks.less
-        #tasks.buildLangFile
-        #tasks.regions
+        tasks.public
+        tasks.translate
+        tasks.manifest
+        tasks.eco
+        tasks.images
+        tasks.fonts
+        tasks.html
+        tasks.less
+        tasks.buildLangFile
+        tasks.regions
       ]
       run = (tasks.promisify(task()) for task in run)
       Q.all(run).then ->
-        ##tasks.promisify(tasks.finalize()).then ->
-          #promise.resolve()
-          #if COMPILATION_MODE is DEBUG_MODE then promise.resolve()
-          #else
-          #  Q.all([tasks.promisify(tasks.minify())]).then(promise.resolve)
+        if configuration.mode is 'release'
+          Q.all([tasks.promisify(tasks.minify()), task.promisify(task.uglify())])
 
   tasks.compile()
