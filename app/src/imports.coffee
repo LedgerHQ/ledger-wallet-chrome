@@ -72,7 +72,7 @@
         '../libs/btchip/ucrypt/ecdh'
 
         ## Application configuration
-        'utils/bitcoin/networks'
+        'bitcoin/networks'
         'configuration'
 
         ## Logger
@@ -128,10 +128,10 @@
         'crypto/base58'
 
         ## Bitcoin
-        'utils/bitcoin/bitcoin'
-        'utils/bitcoin/bip39_wordlist'
-        'utils/bitcoin/bip39'
-        'utils/bitcoin/bitid'
+        'bitcoin/bitcoin'
+        'bitcoin/bip39_wordlist'
+        'bitcoin/bip39'
+        'bitcoin/bitid'
 
         ## Storage
         'storage/store'
