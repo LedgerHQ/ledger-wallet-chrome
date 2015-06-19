@@ -8,3 +8,5 @@ ledger.build.Mode = '<%- @mode %>'
 ledger.build.Network = '<%- @network %>'
 ledger.build.Flavors = <%- JSON.stringify(@flavors) %>
 ledger.build.Time = <%- @time %>
+ledger.build.Commit = '<%- @commit %>'
+ledger.build.Version = '<%- @version %>'
