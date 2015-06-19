@@ -39,7 +39,9 @@ describe "OperationsConsumptionTask", ->
                    ledger.specs.fixtures.dongle1_transactions.tx3,
                    ledger.specs.fixtures.dongle1_transactions.tx4]
 
-            ledger.specs.fixtures.dongle1_transactions.tx4.confirmations += 10
+            # Change confirmation count
+            ledger.specs.fixtures.dongle1_transactions.tx1.confirmations = 999999999999
+            ledger.specs.fixtures.dongle1_transactions.tx4.confirmations = 2
             _.async.each txs, (item, next) ->
               acc.addRawTransactionAndSave(item, next)
               # Check task update by changing number of confirmations
@@ -47,7 +49,7 @@ describe "OperationsConsumptionTask", ->
 
 
   beforeEach (done) ->
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 200000
     ledger.tasks.Task.stopAllRunningTasks()
     ledger.tasks.Task.resetAllSingletonTasks()
     # Launch init()
@@ -59,23 +61,27 @@ describe "OperationsConsumptionTask", ->
     ledger.tasks.OperationsConsumptionTask.instance.start()
     ledger.tasks.OperationsConsumptionTask.instance.on 'stop', ->
       ops = Operation.all() # 17 ops
-      l ops
-      l ops[i]._object, i for v, i in ops
-      expect(ops).toBe('?')
+      hashes = []
+      hashes.push ops[i].get('hash') for v, i in ops
+      expect(ops.length >= 17).toBe(true)
+      expect(hashes).toContain('d1c90810c08827e26e33a9a7e5a37703d3cb55b155f3c6900f88743fe9e91421')
+      expect(hashes).toContain('41b961f740f2577d8a489dc1ab34ae985e6b0f17e790705e3bc33a7d94dbb248')
+      expect(hashes).toContain('655636fe8d36af2b082a8656bd2d15332a1fc4e5109aaf7f322b8ff250c84edc')
+      expect(hashes).toContain('1cb013db58c896d9ddb919c3938ae6be6672ed47a9c69a1b56375c2a62be1d03')
+      done()
+
+  it "should update confirmation count", (done) ->
+    ledger.tasks.OperationsConsumptionTask.instance.start()
+    ledger.tasks.OperationsConsumptionTask.instance.on 'stop', ->
+      ops = Operation.all()
+      expect(ops[3].get('confirmations') >= 30848).toBe(true)
+      expect(ops[0].get('confirmations') >= 30845 and ops[0]._object.confirmations isnt 999999999999).toBe(true)
       done()
 
 
-  ###
-  it "no expec", (done) ->
-    ledger.tasks.OperationsConsumptionTask.instance.on 'wallet:operations:sync:done', ->
-      l 'wallet:operations:sync:done'
-      expect('toHaveBeenCalled').toBe('toHaveBeenCalled')
-      done()
-  ###
-
-  afterEach ->
+  afterEach (done) ->
     [ledger.storage.databases, ledger.storage.wallet, ledger.storage.sync, ledger.storage.sync.wallet].forEach (that) -> that.clear()
     ledger.tasks.Task.stopAllRunningTasks()
     ledger.tasks.Task.resetAllSingletonTasks()
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
-
+    done()
