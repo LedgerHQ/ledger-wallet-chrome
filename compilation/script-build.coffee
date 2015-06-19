@@ -34,7 +34,7 @@ module.exports = (configuration) ->
       gulp.src 'app/assets/css/**/*.less'
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
-      .pipe changed "#{configuration.buildDir}/assets/css"
+      .pipe changed "#{configuration.buildDir}/assets/css", extension: '.css', hasChanged: changed.compareSha1Digest
       .pipe less()
       .pipe gulp.dest "#{configuration.buildDir}/assets/css"
 
@@ -69,7 +69,7 @@ module.exports = (configuration) ->
       gulp.src 'app/views/**/*.eco'
       .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe plumber()
-      .pipe changed "#{configuration.buildDir}/views"
+      .pipe changed "#{configuration.buildDir}/views", extension: '.js', hasChanged: changed.compareSha1Digest
       .pipe eco({basePath: 'app/views/'})
       .pipe gulp.dest "#{configuration.buildDir}/views"
 
@@ -77,7 +77,7 @@ module.exports = (configuration) ->
       gulp.src 'app/manifest.yml'
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
-      .pipe changed "#{configuration.buildDir}/"
+      .pipe changed "#{configuration.buildDir}/", extension: '.json', hasChanged: changed.compareSha1Digest
       .pipe yaml if configuration.mode is 'debug' then space: 1 else null
       .pipe gulp.dest "#{configuration.buildDir}/"
 
@@ -85,7 +85,7 @@ module.exports = (configuration) ->
       gulp.src 'app/locales/**/!(es)/*.properties'
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
-      .pipe changed "#{configuration.buildDir}/_locales"
+      .pipe changed "#{configuration.buildDir}/_locales", extension: '.json', hasChanged: changed.compareSha1Digest
       .pipe i18n()
       .pipe ext_replace('.json')
       .pipe gulp.dest "#{configuration.buildDir}/_locales"
@@ -120,15 +120,13 @@ module.exports = (configuration) ->
     coffee: () ->
       stream = gulp.src 'app/**/*.coffee'
       .pipe plumber()
-      .pipe createBuildFile(configuration)
       .pipe flavors(flavors: configuration.flavors, merge: yes)
-      .pipe changed "#{configuration.buildDir}/"
+      .pipe changed "#{configuration.buildDir}/", extension: '.js'
+      .pipe createBuildFile(configuration)
       stream  = stream.pipe sourcemaps.init() if configuration.mode is 'debug'
       stream = stream.pipe coffee()
       stream = stream.pipe sourcemaps.write '/' if configuration.mode is 'debug'
       stream.pipe gulp.dest "#{configuration.buildDir}/"
-
-    createBuildFile: ->
 
     minify: () ->
       gulp.src "#{configuration.buildDir}/**/*.css"

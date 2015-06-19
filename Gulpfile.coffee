@@ -96,7 +96,7 @@ gulp.task 'configure', ->
 gulp.task 'reset', ->
   fs.writeFileSync "./.compilation_preferences.json", JSON.stringify(defaultPreferences)
 
-gulp.task 'watch', ['clean'], ->
+gulp.task 'watch', ['build'], ->
   gulp.watch('app/**/*', ['build'])
 
 gulp.task 'clean', ->  taskQueue = taskQueue.then -> require('rimraf').sync(configuration.buildDir)
