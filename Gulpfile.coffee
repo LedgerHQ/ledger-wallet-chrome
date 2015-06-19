@@ -1,7 +1,8 @@
 gulp  = require 'gulp'
 Q = require 'q'
-
+git = require 'gulp-git'
 fs = require 'fs'
+yml = require 'js-yaml'
 
 defaultPreferences =
   build_dir: 'build/'
@@ -55,6 +56,9 @@ yargs = require 'yargs'
           alias: 'flavor'
           default: preferences.flavors
           type: 'array'
+        .option 'l',
+          alias: 'label'
+          type: 'string'
         .strict()
 argv = yargs.argv
 
@@ -73,7 +77,13 @@ checkoutAndRun = (script, conf = configuration) ->
   require('./compilation/script-git-setup')(conf).then -> task(conf)
   .then -> gitFinalize(conf)
 
-taskQueue = Q()
+defer = Q.defer()
+git.exec args: 'rev-parse HEAD', quiet: yes, (err, stdout) ->
+  configuration.commit = stdout
+  configuration.version = yml.safeLoad(fs.readFileSync('app/manifest.yml', 'utf8'))['version']
+  defer.resolve()
+
+taskQueue = defer.promise
 
 gulp.task 'build', -> taskQueue = taskQueue.then -> checkoutAndRun('script-build')
 gulp.task 'zip', ->  taskQueue = taskQueue.then -> checkoutAndRun('script-zip')

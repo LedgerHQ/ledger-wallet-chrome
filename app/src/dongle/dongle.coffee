@@ -317,8 +317,8 @@ class @ledger.dongle.Dongle extends EventEmitter
       @_btchip.setupNew_async(
         BTChip.MODE_WALLET,
         BTChip.FEATURE_DETERMINISTIC_SIGNATURE | BTChip.FEATURE_NO_2FA_P2SH,
-        BTChip.VERSION_BITCOIN_MAINNET,
-        BTChip.VERSION_BITCOIN_P2SH_MAINNET,
+        ledger.config.network.version.regular,
+        ledger.config.network.version.P2SH,
         new ByteString(pin, ASCII),
         undefined,
         BTChip.QWERTY_KEYMAP_NEW,
