@@ -16,7 +16,7 @@ _.extend @ledger.config,
   defaultLoggerDaysMax: 2
   btcshipDebug: false
 
-# Btcship logging
+# Btchip logging
 @DEBUG = ledger.config.btcshipDebug
 
 Q.longStackSupport = true

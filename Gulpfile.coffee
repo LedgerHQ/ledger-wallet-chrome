@@ -1,5 +1,4 @@
 gulp  = require 'gulp'
-runSequence = require 'run-sequence'
 Q = require 'q'
 
 fs = require 'fs'
