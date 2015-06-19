@@ -9,3 +9,4 @@ doc/
 dist/
 *.log
 signature/
+.compilation_preferences.json

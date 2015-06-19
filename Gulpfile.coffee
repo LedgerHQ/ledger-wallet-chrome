@@ -1,6 +1,22 @@
 gulp  = require 'gulp'
 runSequence = require 'run-sequence'
 Q = require 'q'
+
+fs = require 'fs'
+
+defaultPreferences =
+  build_dir: 'build/'
+  tag: null
+  debug: yes
+  release: no
+  flavors: []
+  network: 'bitcoin'
+
+unless fs.existsSync('./.compilation_preferences.json')
+  fs.writeFileSync "./.compilation_preferences.json", JSON.stringify(defaultPreferences)
+
+preferences = require './.compilation_preferences'
+
 yargs = require 'yargs'
         .usage 'Usage: $0 <command> [commands] [options]'
         .command 'build', 'Build the application'
@@ -10,33 +26,34 @@ yargs = require 'yargs'
         .command 'clean', 'Clean files'
         .command 'doc', 'Create the documentation'
         .command 'generate', 'Compute generated files (i.e. Firmware update manifest file)'
-        .command 'configure', 'Configure the default build flavors'
+        .command 'configure', 'Configure default compilation flags'
+        .example '$0 configure --release --network testnet', 'set the default build mode to "release" with the "testnet" network'
         .command 'release', 'Build, zip and package application'
         .help('help')
         .option 'b',
           alias: 'build-dir'
-          default: 'build/'
+          default: preferences.build_dir
           describe: 'the destination directory'
           type: 'string'
         .option 't',
             alias: 'tag',
-            default: null
+            default: preferences.tag
             describe: 'the git tag of the Chrome Application version to build',
             type: 'string'
         .option 'd',
           alias: 'debug'
-          default: yes
+          default: preferences.debug
           type: 'boolean'
         .option 'r',
           alias: 'release'
-          default: no
+          default: preferences.release
           type: 'boolean'
         .option 'n',
           alias: 'network'
-          default: 'bitcoin'
+          default: preferences.network
         .option 'f',
           alias: 'flavor'
-          default: []
+          default: preferences.flavors
           type: 'array'
         .strict()
 argv = yargs.argv
@@ -66,7 +83,15 @@ gulp.task 'doc', ->  taskQueue = taskQueue.then -> require('./compilation/script
 gulp.task 'generate', ->  taskQueue = taskQueue.then -> require('./compilation/script-generate')(configuration)
 
 gulp.task 'configure', ->
-
+  taskQueue = taskQueue.then ->
+    newPreferences =
+      build_dir: configuration.buildDir
+      tag: configuration.tag
+      debug: configuration.mode is 'debug'
+      release: configuration.mode is 'release'
+      flavors: argv['flavor']
+      network: configuration.network
+    fs.writeFileSync "./.compilation_preferences.json", JSON.stringify(newPreferences)
 
 gulp.task 'watch', ['clean'], ->
   gulp.watch('app/**/*', ['build'])
