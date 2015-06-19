@@ -72,6 +72,7 @@
         '../libs/btchip/ucrypt/ecdh'
 
         ## Application configuration
+        'utils/bitcoin/networks'
         'configuration'
 
         ## Logger

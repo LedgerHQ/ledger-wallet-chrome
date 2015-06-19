@@ -6,4 +6,5 @@ _.extend @ledger.config,
     Disconnected:
       Enabled: 'ALL'
       Disabled: 'ALL'
+
 Q.longStackSupport = true

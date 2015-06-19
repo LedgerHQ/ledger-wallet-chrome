@@ -22,6 +22,7 @@ _.extend @ledger.config,
     Disconnected:
       Enabled: 'ALL'
       Disabled: 'ALL'
+  network: ledger.bitcoin.Networks[ledger.build.Network]
 
 Q.longStackSupport = true
 
