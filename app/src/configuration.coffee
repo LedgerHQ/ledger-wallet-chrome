@@ -1,4 +1,4 @@
-console.log ledger.build.Mode
+
 @ledger.env = if ledger.build.Mode is 'debug' then 'dev' else 'prod'
 @ledger.isProd = ledger.env == "prod"
 @ledger.isDev = ledger.env == "dev"

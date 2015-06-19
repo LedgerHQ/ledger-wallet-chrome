@@ -7,5 +7,3 @@ _.extend @ledger.config,
       Enabled: 'ALL'
       Disabled: 'ALL'
 Q.longStackSupport = true
-
-console.log("Config ", ledger.config.defaultLoggingLevel.Connected.Enabled)
