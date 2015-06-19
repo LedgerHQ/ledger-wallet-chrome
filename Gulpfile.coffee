@@ -56,6 +56,9 @@ yargs = require 'yargs'
           alias: 'flavor'
           default: preferences.flavors
           type: 'array'
+        .option 'l',
+          alias: 'label'
+          type: 'string'
         .strict()
 argv = yargs.argv
 
