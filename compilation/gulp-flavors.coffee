@@ -26,6 +26,8 @@ transformStream = ({flavors, merge} = {merge: yes}, file, encoding, done) ->
   do done
 
 flushStream = ({flavors, merge} = {merge: yes}, done) ->
+  @_plugingPrivate ||= {}
+  files = (@_plugingPrivate._files ||= {})
   for path, files of @_plugingPrivate._files
     continue if files.length is 0
     files = _(files).sortBy('___flavorPriority')

@@ -25,6 +25,7 @@ ext_replace     = require 'gulp-ext-replace'
 flavors         = require './gulp-flavors'
 {i18n, buildLangFilePlugin} = require './gulp-i18n'
 createBuildFile = require './gulp-build-file'
+cached          = require 'gulp-cached'
 
 module.exports = (configuration) ->
 
@@ -34,6 +35,7 @@ module.exports = (configuration) ->
       gulp.src 'app/assets/css/**/*.less'
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
+      .pipe cached('less')
       .pipe changed "#{configuration.buildDir}/assets/css", extension: '.css', hasChanged: changed.compareSha1Digest
       .pipe less()
       .pipe gulp.dest "#{configuration.buildDir}/assets/css"
@@ -69,6 +71,7 @@ module.exports = (configuration) ->
       gulp.src 'app/views/**/*.eco'
       .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe plumber()
+      .pipe cached('eco')
       .pipe changed "#{configuration.buildDir}/views", extension: '.js', hasChanged: changed.compareSha1Digest
       .pipe eco({basePath: 'app/views/'})
       .pipe gulp.dest "#{configuration.buildDir}/views"
@@ -93,6 +96,7 @@ module.exports = (configuration) ->
     buildLangFile: () ->
       gulp.src 'app/locales/**/!(es)/*.properties'
       .pipe plumber()
+      .pipe cached('lang-file')
       .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe buildLangFilePlugin()
       .pipe tap (file, t) ->
@@ -121,6 +125,7 @@ module.exports = (configuration) ->
       stream = gulp.src 'app/**/*.coffee'
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
+      .pipe cached('coffee')
       .pipe changed "#{configuration.buildDir}/", extension: '.js'
       .pipe createBuildFile(configuration)
       stream  = stream.pipe sourcemaps.init() if configuration.mode is 'debug'
