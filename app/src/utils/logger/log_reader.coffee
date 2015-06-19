@@ -21,6 +21,7 @@ class @ledger.utils.LogReader extends @ledger.utils.Log
     @checkDate(@_fsmode).then =>
       dirReader = @_fs.root.createReader()
       dirReader.readEntries (files) =>
+        files = _.sortBy files, 'name'
         loopFiles = (index, files) =>
           file = (files || [])[index]
           return last() unless file?
