@@ -1,5 +1,6 @@
 @ledger =
       imports: [
+        'build'
         '../libs/jquery-2.1.1.min'
         '../libs/jquery.color'
         '../libs/underscore-min'
@@ -71,7 +72,6 @@
         '../libs/btchip/ucrypt/ecdh'
 
         ## Application configuration
-        'build'
         'configuration'
 
         ## Logger
