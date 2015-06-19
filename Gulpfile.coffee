@@ -27,6 +27,7 @@ yargs = require 'yargs'
         .command 'doc', 'Create the documentation'
         .command 'generate', 'Compute generated files (i.e. Firmware update manifest file)'
         .command 'configure', 'Configure default compilation flags'
+        .command 'reset', 'Reset to the default compilation flags'
         .example '$0 configure --release --network testnet', 'set the default build mode to "release" with the "testnet" network'
         .command 'release', 'Build, zip and package application'
         .help('help')
@@ -92,6 +93,9 @@ gulp.task 'configure', ->
       flavors: argv['flavor']
       network: configuration.network
     fs.writeFileSync "./.compilation_preferences.json", JSON.stringify(newPreferences)
+
+gulp.task 'reset', ->
+  fs.writeFileSync "./.compilation_preferences.json", JSON.stringify(defaultPreferences)
 
 gulp.task 'watch', ['clean'], ->
   gulp.watch('app/**/*', ['build'])
