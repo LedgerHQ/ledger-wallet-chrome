@@ -30,7 +30,7 @@ class ledger.wallet.ExtendedPublicKey
         lastChild = path[path.length - 1].split('\'')
         childnum = parseInt(lastChild[0]) if lastChild.length is 1
         childnum = (0x80000000 | parseInt(lastChild)) >>> 0
-        @_xpub = @_createXPUB depth, fingerprint, childnum, nodeData.chainCode, publicKey, yes
+        @_xpub = @_createXPUB depth, fingerprint, childnum, nodeData.chainCode, publicKey, no
         @_xpub58 = @_encodeBase58Check @_xpub
         @_hdnode = GlobalContext.bitcoin.HDNode.fromBase58 @_xpub58
         callback?(@)
