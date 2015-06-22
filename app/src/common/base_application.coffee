@@ -199,8 +199,8 @@ class ledger.common.application.BaseApplication extends @EventEmitter
       (Try => @onDongleIsInBootloaderMode(dongle)).printError()
 
   notifyDongleIsUnlocked: () ->
-    DongleLogger().info('Dongle unlocked', dongle.id)
-    (Try => @onDongleIsUnlocked(dongle)).printError()
+    DongleLogger().info('Dongle unlocked', @dongle.id)
+    (Try => @onDongleIsUnlocked(@dongle)).printError()
 
 
   onConnectingDongle: (device) ->
