@@ -3,7 +3,6 @@ describe "WalletLayoutRecoveryTask", ->
   originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
   mockTask = null
   dongleInst = null
-  addrDerivationInstance = ledger.tasks.AddressDerivationTask.instance
 
   beforeAll ->
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 40000
@@ -11,10 +10,11 @@ describe "WalletLayoutRecoveryTask", ->
 
   init = (pin, seed, pairingKey, callback) ->
     ledger.tasks.Task.stopAllRunningTasks()
+    ledger.tasks.Task.resetAllSingletonTasks()
+    ledger.tasks.AddressDerivationTask.instance.start()
     chrome.storage.local.clear()
     mockTask = new ledger.tasks.WalletLayoutRecoveryTask()
     spyOn(mockTask, '_restoreChronocoinLayout').and.callThrough()
-    addrDerivationInstance.start()
     dongleInst = new ledger.dongle.MockDongle pin, seed, pairingKey
     ledger.app.dongle = dongleInst
     dongleInst.unlockWithPinCode('0000')
@@ -47,6 +47,7 @@ describe "WalletLayoutRecoveryTask", ->
       expect(ledger.wallet.Wallet.instance.getAccountsCount()).toBe(1)
 
     afterAll ->
+      ledger.tasks.Task.resetAllSingletonTasks()
       chrome.storage.local.clear()
       dongleInst = null
 
@@ -68,6 +69,7 @@ describe "WalletLayoutRecoveryTask", ->
       done()
 
     afterAll ->
+      ledger.tasks.Task.resetAllSingletonTasks()
       chrome.storage.local.clear()
       dongleInst = null
 
@@ -98,6 +100,7 @@ describe "WalletLayoutRecoveryTask", ->
       done()
 
     afterAll ->
+      ledger.tasks.Task.resetAllSingletonTasks()
       chrome.storage.local.clear()
       dongleInst = null
 

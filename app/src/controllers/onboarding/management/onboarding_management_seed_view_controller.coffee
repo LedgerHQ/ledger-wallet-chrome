@@ -9,7 +9,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     continueButton: '#continue_button'
     actionsContainer: "#actions_container"
   navigation:
-    continueUrl: '/onboarding/management/summary'
+    continueUrl: null
 
   initialize: ->
     super
@@ -17,11 +17,20 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       @params.mnemonicPhrase = Bip39.generateMnemonicPhrase(Bip39.DEFAULT_PHRASE_LENGTH)
 
   navigationContinueParams: ->
-    wallet_mode: @params.wallet_mode
-    back: @representativeUrl()
-    pin: @params.pin
-    rootUrl: @params.rootUrl
-    seed: Bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
+    hash =
+      pin: @params.pin
+    if @params.wallet_mode == 'create'
+      hash.mnemonicPhrase = @params.mnemonicPhrase
+    else
+      hash.seed = Bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
+    hash
+
+  navigateContinue: ->
+    if @params.wallet_mode == 'create'
+      @navigation.continueUrl = '/onboarding/management/seedconfirmation'
+    else
+      @navigation.continueUrl = '/onboarding/management/summary'
+    super
 
   onAfterRender: ->
     super

@@ -4,8 +4,9 @@
 ###
 class CurrencyCache
 
-  _cache: {}
-  _chromeStore: new ledger.storage.ChromeStore('ticker')
+  constructor: ->
+    @_cache = {}
+    @_chromeStore = new ledger.storage.ChromeStore('ticker')
 
   get: -> @_cache
 
@@ -49,7 +50,7 @@ class ledger.tasks.TickerTask extends ledger.tasks.Task
 
   getCacheAsync: (callback=undefined) ->
     if @_cache.isCacheEmpty()
-      @once 'updated', (event, data) => callback?(data)
+      @once 'updated', (event, data) => callback? @getCache()
       @_updateTicker no
     else
-      callback?(@_cache.get())
+      callback? @getCache()

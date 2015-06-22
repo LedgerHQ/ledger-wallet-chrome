@@ -42,3 +42,6 @@ describe "Currency converters", ->
     res = converters.satoshiToCurrency(9999999, 'EUR')
     expect(res).toBe('25.00')
     done()
+
+  afterEach ->
+    ledger.tasks.Task.resetAllSingletonTasks()

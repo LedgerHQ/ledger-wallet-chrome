@@ -317,8 +317,8 @@ class @ledger.dongle.Dongle extends EventEmitter
       @_btchip.setupNew_async(
         BTChip.MODE_WALLET,
         BTChip.FEATURE_DETERMINISTIC_SIGNATURE | BTChip.FEATURE_NO_2FA_P2SH,
-        BTChip.VERSION_BITCOIN_MAINNET,
-        BTChip.VERSION_BITCOIN_P2SH_MAINNET,
+        ledger.config.network.version.regular,
+        ledger.config.network.version.P2SH,
         new ByteString(pin, ASCII),
         undefined,
         BTChip.QWERTY_KEYMAP_NEW,
@@ -345,8 +345,6 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
   getPublicAddress: (path, callback=undefined) ->
-    #l path
-    #l new Error().stack
     Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
     _btchipQueue.enqueue "getPublicAddress", =>
       d = ledger.defer(callback)

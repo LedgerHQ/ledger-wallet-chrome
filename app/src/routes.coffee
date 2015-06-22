@@ -80,6 +80,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/management/pin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementPinViewController
 
+  route '/onboarding/management/seedconfirmation', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingManagementSeedconfirmationViewController
+
   route '/onboarding/management/seed', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementSeedViewController
 

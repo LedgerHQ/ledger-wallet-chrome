@@ -1,5 +1,7 @@
 @ledger =
       imports: [
+        'build'
+        '../libs/base64'
         '../libs/jquery-2.1.1.min'
         '../libs/jquery.color'
         '../libs/underscore-min'
@@ -71,6 +73,7 @@
         '../libs/btchip/ucrypt/ecdh'
 
         ## Application configuration
+        'bitcoin/networks'
         'configuration'
 
         ## Logger
@@ -126,10 +129,11 @@
         'crypto/base58'
 
         ## Bitcoin
-        'utils/bitcoin/bitcoin'
-        'utils/bitcoin/bip39_wordlist'
-        'utils/bitcoin/bip39'
-        'utils/bitcoin/bitid'
+        'bitcoin/bitcoin'
+        'bitcoin/bip39_wordlist'
+        'bitcoin/bip39'
+        'bitcoin/bitid'
+        'bitcoin/utils'
 
         ## Storage
         'storage/store'
@@ -323,6 +327,7 @@
         'controllers/onboarding/management/onboarding_management_pin_view_controller'
         'controllers/onboarding/management/onboarding_management_pin_confirmation_view_controller'
         'controllers/onboarding/management/onboarding_management_seed_view_controller'
+        'controllers/onboarding/management/onboarding_management_seed_confirmation_view_controller'
         'controllers/onboarding/management/onboarding_management_summary_view_controller'
         'controllers/onboarding/management/onboarding_management_provisioning_view_controller'
         'controllers/onboarding/management/onboarding_management_done_view_controller'
@@ -388,6 +393,7 @@
         '../spec/utils/storage/store_mock'
 
         '../spec/fixtures/fixtures_dongle'
+        '../spec/fixtures/fixtures_transactions'
 
         '../spec/spec_helper'
       ]
@@ -414,7 +420,13 @@
           '../spec/m2fa/m2fa_spec'
 
           '../spec/tasks/address_derivation_task_spec'
+          '../spec/tasks/balance_task_spec'
+          '../spec/tasks/operations_consumption_task_spec'
+          '../spec/tasks/ticker_task_spec'
           '../spec/tasks/wallet_layout_recovery_task_spec'
+          '../spec/tasks/wallet_open_task_spec'
+
+          '../spec/dongle/derivation_spec'
 
           '../spec/wallet/extended_public_key_spec'
 

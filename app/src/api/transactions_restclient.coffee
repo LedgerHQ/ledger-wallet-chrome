@@ -4,7 +4,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
 
   getRawTransaction: (transactionHash, callback) ->
     @http().get
-      url: "blockchain/transactions/#{transactionHash}/hex"
+      url: "blockchain/#{ledger.config.network.ticker}/transactions/#{transactionHash}/hex"
       onSuccess: (response) ->
         callback?(response.hex)
       onError: @networkErrorCallback(callback)
@@ -17,7 +17,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     transactions = []
     _.async.eachBatch addresses, batchSize, (batch, done, hasNext, batchIndex, batchCount) =>
       @http().get
-        url: "blockchain/addresses/#{batch.join(',')}/transactions"
+        url: "blockchain/#{ledger.config.network.ticker}/addresses/#{batch.join(',')}/transactions"
         onSuccess: (response) ->
           transactions = transactions.concat(response)
           callback(transactions) unless hasNext
@@ -29,7 +29,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     stream.onOpen = =>
       _.async.eachBatch addresses, 200, (batch, done, hasNext) =>
         @http().get
-          url: "blockchain/addresses/#{batch.join(',')}/transactions"
+          url: "blockchain/#{ledger.config.network.ticker}/addresses/#{batch.join(',')}/transactions"
           onSuccess: (transactions) ->
             stream.write(transaction) for transaction in transactions
             stream.close() unless hasNext
@@ -41,7 +41,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
 
   postTransaction: (transaction, callback) ->
     @http().post
-      url: "blockchain/pushtx",
+      url: "blockchain/#{ledger.config.network.ticker}/pushtx",
       data: {tx: transaction.getSignedTransaction()}
       onSuccess: (response) ->
         transaction.setHash(response.transaction_hash)
@@ -50,7 +50,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
 
   postTransactionHex: (txHex, callback) ->
     @http().post
-      url: "blockchain/pushtx",
+      url: "blockchain/#{ledger.config.network.ticker}/pushtx",
       data: {tx: txHex}
       onSuccess: (response) ->
         callback?(response.transaction_hash)
@@ -60,7 +60,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     outTransactions = []
     _.async.each transactions, (transaction, done, hasNext) =>
       @http().get
-        url: "blockchain/transactions/#{transaction.get('hash')}"
+        url: "blockchain/#{ledger.config.network.ticker}/transactions/#{transaction.get('hash')}"
         onSuccess: (response) =>
           outTransactions.push response
           callback? outTransactions unless hasNext

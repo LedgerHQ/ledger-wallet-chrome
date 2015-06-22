@@ -10,7 +10,6 @@ pathsToPredefinedAddresses = (paths, callback) ->
   for path in paths
     if path.indexOf("44'/0'/0'/0/") isnt -1
       index = parseInt(path.replace("44'/0'/0'/0/", ''))
-      l 'Got index', index
       address = if index < PREDEFINED_PUBLIC_ADDRESSES.length then PREDEFINED_PUBLIC_ADDRESSES[index] else PREDEFINED_PUBLIC_ADDRESSES[PREDEFINED_PUBLIC_ADDRESSES.length - 1]
       addresses[path] = address if address?
     else if path.indexOf("44'/0'/0'/1/") isnt -1
@@ -50,3 +49,15 @@ _.extend ledger.wallet,
         return
 
     return
+
+  checkSetup: (dongle, seed, pin, callback = undefined ) ->
+    ledger.defer(callback)
+    .resolve do ->
+      dongle.lock()
+      dongle.unlockWithPinCode(pin)
+      .then ->
+        node = bitcoin.HDNode.fromSeedHex(seed, ledger.config.network.bitcoinjs)
+        address = node.deriveHardened(44).deriveHardened(0).deriveHardened(0).derive(0).derive(0).pubKey.getAddress().toString()
+        dongle.getPublicAddress("44'/0'/0'/0/0").then (result) ->
+          throw new Error("Invalid Seed") if address isnt result.bitcoinAddress.toString(ASCII)
+    .promise

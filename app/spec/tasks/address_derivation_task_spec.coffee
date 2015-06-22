@@ -19,3 +19,7 @@ describe "AddressDerivationTask", ->
       addrDerivationInstance.getPublicAddress "44'/0'/0'/0", (addr) ->
         expect(addr).toBe('19H1wRZdk17o3pUL2NsXqGLVTDk6DvsvyF')
         done()
+
+
+  afterAll ->
+    ledger.tasks.Task.resetAllSingletonTasks()

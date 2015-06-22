@@ -19,3 +19,12 @@ _.extend ledger.specs.fixtures,
       mnemonic: 'forest zebra delay attend prevent lab game secret cattle open degree among cigar wolf wagon catch invest glare tumble unit crumble tower skull tribe'
       pairingKey: 'a26d9f9187c250beb7be79f9eb8ff249'
       pin: '0000'
+
+
+    # Bitcoin TestNet
+    bitcoin_testnet:
+      id: 3
+      masterSeed: 'a637bca4c37332ed60a6cb2869ebd9f78e7d3c76541b49c57e532968b7f2c7689c774231bfb0bff49659b1390212af5ab6702bec5fed46b23be6f2bcb6c7f6cf'
+      mnemonic: 'frost crew jaguar leisure design essence father badge ozone bleak able slot flash jazz uncle pledge flat piano toast loud rose panda tunnel deny'
+      pairingKey: 'a26d9f9187c250beb7be79f9eb8ff249'
+      pin: '0000'

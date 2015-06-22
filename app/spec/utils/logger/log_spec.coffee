@@ -55,10 +55,12 @@ describe "Log Writer/Reader", ->
     ledger.utils.Log.getFs(TEMPORARY).then (fs) ->
       filesIteration fs, 0, files, ->
         lr.read (resLogs) ->
-          # Checking
+          # Should be 3 files * 10 messages
           expect(resLogs.length).toBe(30)
+
+          # Check files content and order (the older on the top)
           i = 0
-          for file in [0...3]
+          for file in [2..0]
             for data in [0...10]
               expect(resLogs[i++]).toBe("file #{file}_random data #{data}")
           done()
