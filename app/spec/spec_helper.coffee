@@ -1,5 +1,39 @@
 @ledger.specs ||= {}
 
+class EventReporter extends @EventEmitter
+
+  promise: -> (@_defer = ledger.defer()).promise
+
+  jasmineStarted: (result) ->
+    @_results = []
+    @emit 'jasmine:started'
+
+  suiteStarted: (result) ->
+    @emit 'suite:started', result
+
+  specStarted: (result) ->
+    @emit 'spec:started'
+
+  specDone: (result) ->
+    @_results.push result
+    @emit 'spec:done', result
+
+  suiteDone: (result) ->
+    @_results.push result
+    @emit 'suite:done', result
+
+  jasmineDone: ->
+    failures = (result for result in @_results when result.failedExpectations.length > 0)
+    failed = failures.length > 0
+    if failed
+      @_defer.reject(failures)
+    else
+      @_defer.resolve(@_results)
+    @emit (if failed then 'jasmine:failed' else 'jasmine:succeed')
+    @emit 'jasmine:done', failed
+
+
+
 ###
 @param [Array<String>, String] filter Do a && for each word in each string, do a || between strings
 ###
@@ -18,7 +52,9 @@
       createTextNode: -> document.createTextNode.apply(document, arguments)
       timer: new jasmine.Timer()
     )
+
     @env.addReporter(@htmlReporter)
+    @env.addReporter(ledger.specs.reporters.events)
     require @files, =>
       # Use mock local storage
       ledger.specs.storage.inject ->
@@ -28,13 +64,33 @@
   d.promise
 
 @ledger.specs.run = () ->
+  promise = ledger.specs.reporters.events.promise()
   render "spec_runner", {}, (html) =>
     ledger.app._navigationControllerSelector().html(html)
     @htmlReporter.initialize()
     @env.execute()
+  promise
 
 @ledger.specs.initAndRun = (filters...) ->
   @init(filters...).then => @run()
+
+@ledger.specs.initAndRunUntilItFails = (filters...) ->
+  d = ledger.defer()
+  ledger.specs.initAndRunUntilItFails.iteration = 0
+  initAndRun = =>
+    @init(filters...)
+    .then => @run()
+    .then =>
+      ledger.specs.initAndRunUntilItFails.iteration += 1
+      initAndRun()
+
+  initAndRun().fail (failures) ->
+    d.resolve(failures)
+
+  d.promise
+
+@ledger.specs.reporters ||= {}
+@ledger.specs.reporters.events = new EventReporter()
 
 ###
 Do a && for each word in each string, do a || between strings

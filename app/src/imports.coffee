@@ -425,6 +425,8 @@
           '../spec/tasks/wallet_layout_recovery_task_spec'
           '../spec/tasks/wallet_open_task_spec'
 
+          '../spec/dongle/derivation_spec'
+
           '../spec/wallet/extended_public_key_spec'
 
           '../spec/database/sync_properties_spec'
