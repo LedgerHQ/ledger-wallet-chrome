@@ -36,6 +36,6 @@ class @OnboardingViewController extends ledger.common.ViewController
   bindWindow: ->
     if @view.continueButton? and @view.continueButton.length == 1
       $(window).on 'keyup', (e) =>
-        if(e.keyCode == 13)
-          if(!@view.continueButton.hasClass 'disabled')
+        if (e.keyCode == 13)
+          if (!@view.continueButton.hasClass 'disabled')
             @view.continueButton.click()

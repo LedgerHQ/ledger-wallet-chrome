@@ -1,0 +1,25 @@
+<div id="content-container">
+  <div class="title-container">
+    <div class="titles">
+      <div class="page-title"><%= t 'onboarding.management.create_my_wallet' %></div>
+      <div class="page-subtitle"><%= t 'application.name' %></div>
+    </div>
+  </div>
+  <div class="greyed-container detailed">
+    <div class="index">
+      x.
+    </div>
+    <div class="texts">
+      <span class="black-title"><%- t 'onboarding.management.seed_confirmation.confirm_your_seed' %></span>
+      <div class="black-indication"><%= t 'onboarding.management.seed_confirmation.associated_words' %></div>
+    </div>
+  </div>
+  <div class="page-content-container">
+    <div id="seed_container"></div>
+    <div id="invalid_label"><span class="invalid-indication"><%= t 'onboarding.management.seed_confirmation.invalid_recovery_words' %></span></div>
+  </div>
+  <div class="navigation-container">
+    <a class="back" href="#navigateRoot" id="back_button"><i class="fa fa-angle-left"></i> <%= t 'onboarding.management.cancel' %></a>
+    <a class="continue" href="#navigateContinue" id="continue_button"><%= t 'onboarding.management.continue' %> <i class="fa fa-angle-right"></i></a>
+  </div>
+</div
