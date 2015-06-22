@@ -7,7 +7,7 @@
   </div>
   <div class="greyed-container detailed">
     <div class="index">
-      2.
+      <%= @params.step %>.
     </div>
     <div class="texts">
       <span class="black-title"><%= if @params.wallet_mode == 'create' then t 'onboarding.management.pin.choose_your' else t 'onboarding.management.pin.choose_your_new' %></span>

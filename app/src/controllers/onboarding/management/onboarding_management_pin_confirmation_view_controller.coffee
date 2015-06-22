@@ -13,10 +13,7 @@ class @OnboardingManagementPinconfirmationViewController extends @OnboardingView
     @_updateUI no
 
   navigationContinueParams: ->
-    wallet_mode: @params.wallet_mode
-    back: @representativeUrl()
     pin: @params.pin
-    rootUrl: @params.rootUrl
 
   _listenEvents: ->
     @view.pinCode.on 'change', =>

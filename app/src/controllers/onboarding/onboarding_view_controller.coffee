@@ -17,6 +17,21 @@ class @OnboardingViewController extends ledger.common.ViewController
   navigationContinueParams: ->
     undefined
 
+  _defaultNavigationBackParams: ->
+    {}
+
+  _defaultNavigationContinueParams: ->
+    wallet_mode: @params.wallet_mode
+    rootUrl: @params.rootUrl
+    back: @representativeUrl()
+    step: parseInt(@params.step) + 1
+
+  _finalNavigationBackParams: ->
+    _.extend(@_defaultNavigationBackParams(), @navigationBackParams())
+
+  _finalNavigationContinueParams: ->
+    _.extend(@_defaultNavigationContinueParams(), @navigationContinueParams())
+
   navigateRoot: ->
     dialog = new CommonDialogsConfirmationDialogViewController()
     dialog.setMessageLocalizableKey 'onboarding.management.cancel_wallet_configuration'
@@ -25,10 +40,10 @@ class @OnboardingViewController extends ledger.common.ViewController
     dialog.show()
 
   navigateBack: ->
-    ledger.app.router.go @params.back, @navigationBackParams()
+    ledger.app.router.go @params.back, @_finalNavigationBackParams()
 
   navigateContinue: ->
-    ledger.app.router.go @navigation.continueUrl, @navigationContinueParams()
+    ledger.app.router.go @navigation.continueUrl, @_finalNavigationContinueParams()
 
   unbindWindow: ->
     $(window).unbind 'keyup', null

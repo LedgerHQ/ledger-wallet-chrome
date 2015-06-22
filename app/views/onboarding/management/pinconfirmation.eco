@@ -7,7 +7,7 @@
   </div>
   <div class="greyed-container detailed">
     <div class="index">
-      3.
+      <%= @params.step %>.
     </div>
     <div class="texts">
       <span class="black-title"><%= t 'onboarding.management.pin_confirmation.confirm_your' %></span>

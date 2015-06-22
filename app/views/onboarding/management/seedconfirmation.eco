@@ -7,7 +7,7 @@
   </div>
   <div class="greyed-container detailed">
     <div class="index">
-      x.
+      <%= @params.step %>.
     </div>
     <div class="texts">
       <span class="black-title"><%- t 'onboarding.management.seed_confirmation.confirm_your_seed' %></span>

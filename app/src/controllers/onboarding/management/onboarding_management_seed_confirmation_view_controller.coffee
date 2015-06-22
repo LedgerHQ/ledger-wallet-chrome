@@ -24,7 +24,7 @@ class @OnboardingManagementSeedconfirmationViewController extends @OnboardingVie
       else
         num = generator()
         randomIndexes.push num if not _.contains(randomIndexes, num)
-    @params.randomIndexes = randomIndexes
+    @params.randomIndexes = _.sortBy(randomIndexes, (num) -> num)
 
   onAfterRender: ->
     super
@@ -40,10 +40,7 @@ class @OnboardingManagementSeedconfirmationViewController extends @OnboardingVie
       @view.invalidLabel.fadeIn(250)
 
   navigationContinueParams: ->
-    wallet_mode: @params.wallet_mode
-    back: @representativeUrl()
     pin: @params.pin
-    rootUrl: @params.rootUrl
     seed: Bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
 
   _generateInputs: ->
@@ -71,7 +68,7 @@ class @OnboardingManagementSeedconfirmationViewController extends @OnboardingVie
 
   _listenEvents: ->
     for input in @view.inputs
-      input.on 'keydown', =>
+      input.on 'keydown paste', =>
         _.defer => @_updateUI()
 
   _updateUI: (animated = yes) ->
