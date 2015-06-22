@@ -18,10 +18,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
 
   navigationContinueParams: ->
     hash =
-      wallet_mode: @params.wallet_mode
-      back: @representativeUrl()
       pin: @params.pin
-      rootUrl: @params.rootUrl
     if @params.wallet_mode == 'create'
       hash.mnemonicPhrase = @params.mnemonicPhrase
     else
