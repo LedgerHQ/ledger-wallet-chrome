@@ -166,6 +166,6 @@ module.exports = (configuration) ->
       run = (tasks.promisify(task()) for task in run)
       Q.all(run).then ->
         if configuration.mode is 'release'
-          Q.all([tasks.promisify(tasks.minify()), task.promisify(task.uglify())])
+          Q.all([tasks.promisify(tasks.minify()), tasks.promisify(tasks.uglify())])
 
   tasks.compile()
