@@ -1,7 +1,7 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000000
 describe 'Hardware and Software derivations', ->
 
-  PinCode = '1234'
+  PinCode = '0000'
 
   it 'compute the same address', (done) ->
     ledger.app.dongle.lock()
