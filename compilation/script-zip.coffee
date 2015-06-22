@@ -9,5 +9,5 @@ module.exports = (configuration) ->
   manifest = require "../#{configuration.buildDir}/manifest.json"
   output = fs.createWriteStream "dist/SNAPSHOT-#{manifest.version}.zip"
   zip.pipe output
-  zip.bulk [expand: true, cwd: 'release', src: ['**']]
+  zip.bulk [expand: true, cwd: configuration.buildDir, src: ['**']]
   zip.finalize()
