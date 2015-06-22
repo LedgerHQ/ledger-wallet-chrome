@@ -1,6 +1,7 @@
 @ledger =
       imports: [
         'build'
+        '../libs/base64'
         '../libs/jquery-2.1.1.min'
         '../libs/jquery.color'
         '../libs/underscore-min'
@@ -132,6 +133,7 @@
         'bitcoin/bip39_wordlist'
         'bitcoin/bip39'
         'bitcoin/bitid'
+        'bitcoin/utils'
 
         ## Storage
         'storage/store'

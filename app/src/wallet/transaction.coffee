@@ -202,8 +202,15 @@ class ledger.wallet.Transaction
       progressCallback?({currentStep, stepsCount, percent})
     .then (@_signedRawTransaction) =>
       @_isValidated = yes
+      tx = ledger.bitcoin.decodeTransaction(@getSignedTransaction())
       $info("Raw TX: ", @getSignedTransaction())
-      _.defer => d.resolve(@)
+      ledger.wallet.pathsToAddresses [@changePath], (addresses) ->
+        changeAddress = _(addresses).chain().values().first().value()
+        if _(tx.outs).some((output) -> output.address.toString() is changeAddress)
+          $error("Error change derivation error in raw tx")
+          return d.rejectWithError(Errors.ChangeDerivationError)
+        else
+          _.defer => d.resolve(@)
     .catch (error) =>
       _.defer => d.rejectWithError(Errors.SignatureError, error)
     .done()
