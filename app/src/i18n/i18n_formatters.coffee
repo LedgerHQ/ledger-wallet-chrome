@@ -16,7 +16,7 @@ _.extend ledger.i18n,
     key = @translations[@favLang.memoryValue][messageId] or @translations['en'][messageId]
     if not key? or not key['message']?
       return messageId
-    res = @translations[@favLang.memoryValue][messageId]['message']
+    res = key['message']
     return res if res? and res.length > 0
     return messageId
 
