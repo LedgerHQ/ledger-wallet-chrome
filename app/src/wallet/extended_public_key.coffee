@@ -30,7 +30,7 @@ class ledger.wallet.ExtendedPublicKey
         lastChild = path[path.length - 1].split('\'')
         childnum = parseInt(lastChild[0]) if lastChild.length is 1
         childnum = (0x80000000 | parseInt(lastChild)) >>> 0
-        @_xpub = @_createXPUB depth, fingerprint, childnum, nodeData.chainCode, publicKey, no
+        @_xpub = @_createXPUB depth, fingerprint, childnum, nodeData.chainCode, publicKey, ledger.config.network.name
         @_xpub58 = @_encodeBase58Check @_xpub
         @_hdnode = GlobalContext.bitcoin.HDNode.fromBase58 @_xpub58
         callback?(@)
@@ -50,8 +50,8 @@ class ledger.wallet.ExtendedPublicKey
     else
       finalize 0
 
-  _createXPUB: (depth, fingerprint, childnum, chainCode, publicKey, testnet = no) ->
-    magic = if testnet then  "043587CF" else "0488B21E"
+  _createXPUB: (depth, fingerprint, childnum, chainCode, publicKey, network) ->
+    magic = if network is 'testnet' then  "043587CF" else "0488B21E"
     xpub = new ByteString magic, HEX
     xpub = xpub.concat new ByteString(_.str.lpad(depth.toString(16), 2, '0'), HEX)
     xpub = xpub.concat new ByteString(_.str.lpad(fingerprint.toString(16), 8, '0'), HEX)

@@ -9,7 +9,7 @@ class @Api
 
   @listener: (event) ->
     data = event.data
-    if data.command != 'has_session'
+    if data.command != 'has_session' and jsApiReporter?.status() isnt 'started'
       chrome.app.window.current().show()
     switch data.command
       when 'has_session'

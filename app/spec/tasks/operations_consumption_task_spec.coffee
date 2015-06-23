@@ -49,7 +49,7 @@ describe "OperationsConsumptionTask", ->
 
 
   beforeEach (done) ->
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 200000
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 300000
     ledger.tasks.Task.stopAllRunningTasks()
     ledger.tasks.Task.resetAllSingletonTasks()
     # Launch init()
