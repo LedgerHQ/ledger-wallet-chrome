@@ -1,0 +1,10 @@
+<div id="search_header">
+  <label class="large-text-input">Search:</label>
+  <input id="filter" type="text" class="spec-large-text-input" placeholder="filter" />
+  <div class="right-action-panel">
+    <a href="#runSelectedSpecs" class="uppercase-action">Run selected</a>
+  </div>
+</div>
+<div id="suites_tree">
+
+</div>

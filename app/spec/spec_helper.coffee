@@ -32,11 +32,10 @@ class EventReporter extends @EventEmitter
     @emit (if failed then 'jasmine:failed' else 'jasmine:succeed')
     @emit 'jasmine:done', failed
 
-
-
 ###
 @param [Array<String>, String] filter Do a && for each word in each string, do a || between strings
 ###
+
 @ledger.specs.init = (filters...) ->
   d = Q.defer()
   require ledger.specs.jasmine, =>

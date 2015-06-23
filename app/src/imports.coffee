@@ -396,6 +396,10 @@
         '../spec/fixtures/fixtures_transactions'
 
         '../spec/spec_helper'
+        '../spec/spec_navigation_controller'
+        '../spec/spec_view_controller'
+        '../spec/spec_index_view_controller'
+
       ]
 
       specs:

@@ -209,6 +209,7 @@ require @ledger.imports, ->
   @ONBOARDING_LAYOUT = 'OnboardingNavigationController'
   @UPDATE_LAYOUT = 'UpdateNavigationController'
   @COINKITE_LAYOUT = 'AppsCoinkiteNavigationController'
+  @SPECS_LAYOUT = 'SpecNavigationController'
 
   ledger.database.Model.commitRelationship()
 

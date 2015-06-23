@@ -1,0 +1,42 @@
+<div class="main-container">
+  <div id="wallet_top_menu" class="top-main-menu">
+    <ul class="left">
+      <li id="index-item" class="menu-item selected">
+        <div>
+          <a href="/spec/index">
+            <img src="../assets/images/wallet/dashboard_icon.png" />
+            <span>Index</span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
+      <li id="run-all-item" class="menu-item">
+        <div>
+          <a href="/specs/run_all">
+            <img src="../assets/images/wallet/send_icon.png" />
+            <span>Run All</span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
+      <li id="result-item" class="menu-item">
+        <div>
+          <a href="/specs/result">
+            <img src="../assets/images/wallet/receive_icon.png" />
+            <span>Result</span>
+          </a>
+          <div class="spacer" />
+          <div class="selector" />
+        </div>
+      </li>
+    </ul>
+    <div class="right">
+      <a class="reload-icon" id="reload_icon">
+        <img src="../assets/images/wallet/reload_icon.png" />
+      </a>
+    </div>
+  </div>
+  <div id="navigation_controller_content"></div>
+</div>
