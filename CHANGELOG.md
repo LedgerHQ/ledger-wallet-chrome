@@ -1,4 +1,11 @@
 # Changelog
+
+1.3.7
+=====
+- Add seed confirmation page in onboarding flow
+- Add security checks after dongle signature
+- Add dongle consistency check after provisioning
+
 1.3.6
 ====
 - Fix preferences synchronization

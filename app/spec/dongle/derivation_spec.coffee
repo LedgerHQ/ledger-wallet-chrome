@@ -1,3 +1,4 @@
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000000
 describe 'Hardware and Software derivations', ->
 
   PinCode = '0000'

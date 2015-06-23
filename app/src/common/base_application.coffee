@@ -193,13 +193,14 @@ class ledger.common.application.BaseApplication extends @EventEmitter
       _.defer => (Try => @onDongleIsDisconnected(dongle)).printError()
     dongle.once 'state:error', =>
       (Try => @onDongleNeedsUnplug(dongle)).printError()
-    dongle.once 'state:unlocked', =>
-      DongleLogger().info('Dongle unlocked', dongle.id)
-      (Try => @onDongleIsUnlocked(dongle)).printError()
     (Try => @onDongleConnected(dongle)).printError()
     if dongle.isInBootloaderMode()
       DongleLogger().info('Dongle is Bootloader mode', dongle.id)
       (Try => @onDongleIsInBootloaderMode(dongle)).printError()
+
+  notifyDongleIsUnlocked: () ->
+    DongleLogger().info('Dongle unlocked', @dongle.id)
+    (Try => @onDongleIsUnlocked(@dongle)).printError()
 
 
   onConnectingDongle: (device) ->

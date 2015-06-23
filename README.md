@@ -8,7 +8,7 @@ To prepare your build environment, follow these steps:
     * `npm install -g gulp`
     * `npm install`
 
-To build the application, go to the repo root directory then enter `gulp clean release package`. This will create a crx file into the
+To build the application, go to the repo root directory then enter `gulp clean build package --release`. This will create a crx file into the
 dist directory.
 
 To install the application on Chrome, go to chrome extensions page ([chrome://extensions](chrome://extensions)), then drag and drop the crx file into the page.

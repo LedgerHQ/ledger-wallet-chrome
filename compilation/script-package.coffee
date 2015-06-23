@@ -22,7 +22,7 @@ module.exports = (configuration) ->
   defer = Q.defer()
   ensureDistDir()
   ensureSignatureDir()
-  crx = new ChromeExtension(rootDirectory: 'release')
+  crx = new ChromeExtension(rootDirectory: configuration.buildDir)
   keypath = keygen('signature/')
   fs.readFile keypath, (err, data) ->
     crx.privateKey = data

@@ -206,7 +206,7 @@ class ledger.wallet.Transaction
       $info("Raw TX: ", @getSignedTransaction())
       ledger.wallet.pathsToAddresses [@changePath], (addresses) ->
         changeAddress = _(addresses).chain().values().first().value()
-        if _(tx.outs).some((output) -> output.address.toString() is changeAddress)
+        if !_(tx.outs).some((output) -> output.address.toString() is changeAddress)
           $error("Error change derivation error in raw tx")
           return d.rejectWithError(Errors.ChangeDerivationError)
         else

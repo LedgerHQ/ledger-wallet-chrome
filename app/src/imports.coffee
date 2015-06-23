@@ -327,6 +327,7 @@
         'controllers/onboarding/management/onboarding_management_pin_view_controller'
         'controllers/onboarding/management/onboarding_management_pin_confirmation_view_controller'
         'controllers/onboarding/management/onboarding_management_seed_view_controller'
+        'controllers/onboarding/management/onboarding_management_seed_confirmation_view_controller'
         'controllers/onboarding/management/onboarding_management_summary_view_controller'
         'controllers/onboarding/management/onboarding_management_provisioning_view_controller'
         'controllers/onboarding/management/onboarding_management_done_view_controller'

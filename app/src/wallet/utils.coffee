@@ -48,3 +48,15 @@ _.extend ledger.wallet,
         return
 
     return
+
+  checkSetup: (dongle, seed, pin, callback = undefined ) ->
+    ledger.defer(callback)
+    .resolve do ->
+      dongle.lock()
+      dongle.unlockWithPinCode(pin)
+      .then ->
+        node = bitcoin.HDNode.fromSeedHex(seed, ledger.config.network.bitcoinjs)
+        address = node.deriveHardened(44).deriveHardened(0).deriveHardened(0).derive(0).derive(0).pubKey.getAddress().toString()
+        dongle.getPublicAddress("44'/0'/0'/0/0").then (result) ->
+          throw new Error("Invalid Seed") if address isnt result.bitcoinAddress.toString(ASCII)
+    .promise
