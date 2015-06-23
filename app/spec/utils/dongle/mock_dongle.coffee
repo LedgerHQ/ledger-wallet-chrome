@@ -435,7 +435,6 @@ class ledger.dongle.MockDongle extends EventEmitter
     [restoreSeed, callback] = [callback, restoreSeed] if ! callback && typeof restoreSeed == 'function'
     Throw new Error('Setup need a seed') if not restoreSeed?
     @_pin = pin
-    debugger
     @_masterNode = bitcoin.HDNode.fromSeedHex restoreSeed, ledger.config.network.bitcoinjs
     # Validate seed
     if restoreSeed?
@@ -449,9 +448,7 @@ class ledger.dongle.MockDongle extends EventEmitter
 
   _getNodeFromPath: (path) ->
     path = path.split('/')
-    debugger
     node = @_masterNode
-    l 'NODEEEEEEE', node
     for item in path
       [index, hardened] = item.split "'"
       node  = if hardened? then node.deriveHardened parseInt(index) else node = node.derive index
