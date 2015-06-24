@@ -1,4 +1,7 @@
 # Changelog
+1.3.8
+=====
+- Fix a bug in transaction validation
 
 1.3.7
 =====
