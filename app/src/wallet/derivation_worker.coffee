@@ -1,6 +1,7 @@
 try
   importScripts(
       '../utils/logger.js'
+      '../../libs/btchip/lib/q.js'
       '../../libs/bitcoinjs-min.js'
       '../../libs/btchip/lib/bitcoinjs-min.js'
       'extended_public_key.js'
@@ -18,6 +19,9 @@ try
       '../../libs/underscore.string.min.js'
       '../utils/object.js'
       '../utils/amount.js'
+      '../bitcoin/networks.js'
+      '../build.js'
+      '../configuration.js'
   )
 catch er
   console.error er

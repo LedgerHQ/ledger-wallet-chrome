@@ -1,0 +1,5 @@
+<div <%if @isSuite: %>style="margin-top: 5px"<% end%>>
+  <span style="display: inline-block;width: <%= @depth * 20 %>px;height: 20px"></span>
+  <input type="checkbox" <%if @isSelected: %>checked<% end %> data-href="#toggleSpec(id=<%= @id %>)" />
+  <a href="#runSpec(id=<%= @id %>)" class="action-link"><%= @name %></a>
+</div>

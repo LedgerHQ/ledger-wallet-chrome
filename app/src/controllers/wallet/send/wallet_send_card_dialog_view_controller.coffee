@@ -56,7 +56,6 @@ class @WalletSendCardDialogViewController extends ledger.common.DialogViewContro
       @view.validationSubtitle.text t 'wallet.send.card.address_to_validate'
 
   _updateValidableIndication: ->
-    console.log("_updateValidableIndication=",@_validationDetails)
     return if @_validationDetails.localizedIndexes.length == 0
     index = @_validationDetails.localizedIndexes[0]
     value = @_validationDetails.localizedString.slice(0, index)
@@ -69,7 +68,6 @@ class @WalletSendCardDialogViewController extends ledger.common.DialogViewContro
     @view.validationIndication.html value
 
   _buildValidableSettings: (validationDetails) ->
-    console.log("validationDetails=", validationDetails)
     string = ''
     indexes = []
     decal = 0
@@ -92,5 +90,4 @@ class @WalletSendCardDialogViewController extends ledger.common.DialogViewContro
     string += validationDetails.recipientsAddress.text
     indexes = indexes.concat _.map(validationDetails.recipientsAddress.indexes, (num) => num + decal)
     r = {localizedString: string, localizedIndexes: indexes}
-    console.log("_buildValidableSettings=", r)
     r

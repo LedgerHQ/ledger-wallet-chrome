@@ -11,6 +11,8 @@ describe "AddressDerivationTask", ->
 
 
   beforeAll (done) ->
+    ledger.tasks.Task.stopAllRunningTasks()
+    ledger.tasks.Task.resetAllSingletonTasks()
     dongle = ledger.specs.fixtures.dongles.dongle1
     init dongle.pin, dongle.masterSeed, dongle.pairingKeyHex, done
 
@@ -22,4 +24,5 @@ describe "AddressDerivationTask", ->
 
 
   afterAll ->
+    ledger.tasks.Task.stopAllRunningTasks()
     ledger.tasks.Task.resetAllSingletonTasks()

@@ -9,8 +9,9 @@ describe "BalanceTask", ->
     dongleInst.unlockWithPinCode '0000', callback
 
   beforeEach (done) ->
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 300000 # Cache is not used, please wait...
     ledger.tasks.Task.stopAllRunningTasks()
+    ledger.tasks.Task.resetAllSingletonTasks()
     ledger.storage.databases = new ledger.storage.MemoryStore("databases")
     ledger.storage.wallet = new ledger.storage.MemoryStore("wallet")
     ledger.storage.sync = new ledger.storage.MemoryStore("sync")
@@ -37,7 +38,7 @@ describe "BalanceTask", ->
       done()
 
 
-  afterAll ->
+  afterEach ->
     ledger.tasks.Task.stopAllRunningTasks()
     ledger.tasks.Task.resetAllSingletonTasks()
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout

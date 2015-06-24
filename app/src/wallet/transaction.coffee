@@ -145,6 +145,7 @@ class ledger.wallet.Transaction
     if not @amount? or not @fees? or not @recipientAddress?
       Errors.throw('Transaction must me initialized before preparation')
     d = ledger.defer(callback)
+    l "Prepare", @_btInputs, @_btcAssociatedKeyPath
     @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
     .progress (progress) =>
       currentStep = progress.currentPublicKey + progress.currentSignTransaction + progress.currentTrustedInput + progress.currentHashOutputBase58 + progress.currentUntrustedHash
@@ -204,13 +205,14 @@ class ledger.wallet.Transaction
       @_isValidated = yes
       tx = ledger.bitcoin.decodeTransaction(@getSignedTransaction())
       $info("Raw TX: ", @getSignedTransaction())
-      ledger.wallet.pathsToAddresses [@changePath], (addresses) ->
+      ledger.wallet.pathsToAddresses [@changePath], (addresses) =>
         changeAddress = _(addresses).chain().values().first().value()
-        if !_(tx.outs).some((output) -> output.address.toString() is changeAddress)
-          $error("Error change derivation error in raw tx")
-          return d.rejectWithError(Errors.ChangeDerivationError)
-        else
+        result = ledger.bitcoin.verifyRawTx(@getSignedTransaction(), @inputs, @amount, @fees, @recipientAddress, changeAddress)
+        if result.isSuccess()
           _.defer => d.resolve(@)
+        else
+          $error("Invalid signed tx ", result.getError().message)
+          return d.rejectWithError(Errors.ChangeDerivationError)
     .catch (error) =>
       _.defer => d.rejectWithError(Errors.SignatureError, error)
     .done()

@@ -449,7 +449,6 @@ class ledger.dongle.MockDongle extends EventEmitter
   _getNodeFromPath: (path) ->
     path = path.split('/')
     node = @_masterNode
-    l 'NODEEEEEEE', node
     for item in path
       [index, hardened] = item.split "'"
       node  = if hardened? then node.deriveHardened parseInt(index) else node = node.derive index
