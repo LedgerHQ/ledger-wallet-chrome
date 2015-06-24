@@ -55,6 +55,11 @@ _.extend ledger.errors,
   UnableToRetrieveBitidAddress: 600
   FatalErrorDuringLayoutWalletRecovery: 601
 
+  # Transaction verification
+  ChangeAddressNotFound: 701
+  InvalidChangeAmount: 702
+  RecipientAddressNotFound: 703
+  InvalidRecipientAmount: 704
 
   DefaultMessages:
     0: "StandardError"
