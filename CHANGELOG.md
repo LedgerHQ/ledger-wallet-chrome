@@ -36,6 +36,7 @@
 - Fix error 407 during update
 - Add getNewAddresses API method
 - New dongle management
+- Add security card lock
 - Bugs fixes
 
 1.2.0
