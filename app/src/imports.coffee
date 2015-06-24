@@ -248,6 +248,7 @@
         'controllers/wallet/operations/wallet_operations_index_view_controller'
 
         # Accounts
+        'controllers/wallet/accounts/wallet_accounts_index_view_controller'
         'controllers/wallet/accounts/wallet_accounts_show_view_controller'
 
         # Send

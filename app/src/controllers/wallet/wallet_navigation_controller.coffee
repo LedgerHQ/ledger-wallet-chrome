@@ -6,7 +6,8 @@ class @WalletNavigationController extends ledger.common.NavigationController
 #    '/wallet/receive/': '#receive-item'
 #    '/wallet/accounts/': '#accounts-item'
 #    '/wallet/signout/': '#signout-item'
-    '/wallet/accounts/': '#account-item'
+    '/wallet/accounts/index' : '#accounts-item'
+    '/wallet/dashboard/index': '#dashboard-item'
   }
   view:
     balanceValue: '#balance_value'
