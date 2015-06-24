@@ -2,7 +2,7 @@
   <label class="large-text-input">Search:</label>
   <input id="filter" type="text" class="spec-large-text-input" placeholder="filter" />
   <div class="right-action-panel">
-    <a href="#runSelectedSpecs" class="uppercase-action">Run selected</a>
+    <a href="#runSelectedSpecs" class="uppercase-action">Run selected</a> | <a href="#runAllSpecs" class="uppercase-action">Run All</a> | <a href="#runLast" class="uppercase-action">Run last</a>
   </div>
 </div>
 <div id="suites_tree">

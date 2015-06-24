@@ -3,19 +3,9 @@
     <ul class="left">
       <li id="index-item" class="menu-item selected">
         <div>
-          <a href="/spec/index">
+          <a href="/specs/index">
             <img src="../assets/images/wallet/dashboard_icon.png" />
             <span>Index</span>
-          </a>
-          <div class="spacer" />
-          <div class="selector" />
-        </div>
-      </li>
-      <li id="run-all-item" class="menu-item">
-        <div>
-          <a href="/specs/run_all">
-            <img src="../assets/images/wallet/send_icon.png" />
-            <span>Run All</span>
           </a>
           <div class="spacer" />
           <div class="selector" />

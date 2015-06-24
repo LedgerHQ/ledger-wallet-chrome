@@ -7,6 +7,7 @@ class @SpecIndexViewController extends ledger.specs.ViewController
   initialize: ->
     super
     @_selectedSpecs = []
+    @renderSuitesNodes = _.debounce(@renderSuitesNodes, 200)
 
   onBeforeRender: ->
     super
@@ -14,23 +15,31 @@ class @SpecIndexViewController extends ledger.specs.ViewController
 
   onAfterRender: ->
     super
-    @renderSuitesNodes = _.debounce(@renderSuitesNodes, 200)
+    @_renderSuitesNodes()
     @view.filter.on 'input', @renderSuitesNodes
-    @renderSuitesNodes()
 
-  renderSuitesNodes: ->
+  renderSuitesNodes: -> @_renderSuitesNodes()
+
+  _renderSuitesNodes: ->
     filter = @view.filter.val()
     filteredResult = @_filterSpecs(filter, @topSuite) or {children: []}
     @_renderNode(filteredResult).then (html) =>
       @view.suitesTree.html(html)
 
-  onDetach: ->
-    super
-    @view.filter.off 'input', @renderSuitesNodes
+  runSpec: ({id}) -> @parentViewController.launchSpecs(@_findSpecById(id)?.getFullName())
 
-  runSpec: ({id}) ->
+  runSelectedSpecs: () ->
+    filters = (@_findSpecById(selectedSpec).getFullName() for selectedSpec in @_selectedSpecs)
+    @parentViewController.launchSpecs(filters...)
 
-  runSelectedSpec: () ->
+  _findSpecById: (id) ->
+    findSpecByIdInNode = (node) ->
+      return node if node.id is id
+      return null unless node.children?
+      for child in node.children
+        n = findSpecByIdInNode(child, id)
+        return n if n?
+    findSpecByIdInNode(@topSuite)
 
   toggleSpec: ({id}) ->
     if _.contains(@_selectedSpecs, id)

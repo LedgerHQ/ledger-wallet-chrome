@@ -219,5 +219,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
     window.open t 'application.support_coinkite_url'
 
   ## Specs
+
   route '/specs/index', ->
     app.navigate SPECS_LAYOUT, SpecIndexViewController
+
+  route '/specs/result', ->
+    app.navigate SPECS_LAYOUT, SpecResultViewController

@@ -238,3 +238,5 @@ class ledger.common.application.BaseApplication extends @EventEmitter
   onCommandFirmwareUpdate: ->
 
   onCommandExportLogs: ->
+
+  onCommandRunSpecs: ->

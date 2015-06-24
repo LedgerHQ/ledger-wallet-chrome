@@ -399,6 +399,7 @@
         '../spec/spec_navigation_controller'
         '../spec/spec_view_controller'
         '../spec/spec_index_view_controller'
+        '../spec/spec_result_view_controller'
 
       ]
 
