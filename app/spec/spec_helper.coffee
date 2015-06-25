@@ -2,27 +2,36 @@
 
 class EventReporter extends @EventEmitter
 
+  constructor: ->
+    @_isJasmineDone = yes
+
   promise: -> (@_defer = ledger.defer()).promise
 
   jasmineStarted: (result) ->
     @_results = []
+    @_isJasmineDone = no
     @emit 'jasmine:started'
 
   suiteStarted: (result) ->
+    @_lastSuite = result
     @emit 'suite:started', result
 
   specStarted: (result) ->
+    @_lastSpec = result
     @emit 'spec:started'
 
   specDone: (result) ->
+    @_lastSpec = null
     @_results.push result
     @emit 'spec:done', result
 
   suiteDone: (result) ->
+    @_lastSuite = null
     @_results.push result
     @emit 'suite:done', result
 
   jasmineDone: ->
+    @_isJasmineDone = yes
     failures = (result for result in @_results when result.failedExpectations.length > 0)
     failed = failures.length > 0
     if failed
@@ -32,11 +41,16 @@ class EventReporter extends @EventEmitter
     @emit (if failed then 'jasmine:failed' else 'jasmine:succeed')
     @emit 'jasmine:done', failed
 
+  isJasmineDone: -> @_isJasmineDone
+  getLastSuite: -> @_lastSuite
+  getLastSpec: -> @_lastSpec
 
+ledger.specs.renderingNode = $('<div></div>')[0]
 
 ###
 @param [Array<String>, String] filter Do a && for each word in each string, do a || between strings
 ###
+
 @ledger.specs.init = (filters...) ->
   d = Q.defer()
   require ledger.specs.jasmine, =>
@@ -47,7 +61,7 @@ class EventReporter extends @EventEmitter
     @htmlReporter = new jasmine.HtmlReporter(
       env: @env
       onRaiseExceptionsClick: -> queryString.setParam("catch", !env.catchingExceptions())
-      getContainer: -> document.getElementById("jasmine-container")
+      getContainer: -> ledger.specs.renderingNode
       createElement: -> document.createElement.apply(document, arguments)
       createTextNode: -> document.createTextNode.apply(document, arguments)
       timer: new jasmine.Timer()
@@ -63,12 +77,13 @@ class EventReporter extends @EventEmitter
         d.resolve()
   d.promise
 
-@ledger.specs.run = () ->
+@ledger.specs.run = (routeToResult = yes) ->
   promise = ledger.specs.reporters.events.promise()
-  render "spec_runner", {}, (html) =>
-    ledger.app._navigationControllerSelector().html(html)
-    @htmlReporter.initialize()
-    @env.execute()
+  #render "spec_runner", {}, (html) =>
+  #  ledger.app._navigationControllerSelector().html(html)
+  @htmlReporter.initialize()
+  @env.execute()
+  ledger.app.router.go '/specs/result' if routeToResult
   promise
 
 @ledger.specs.initAndRun = (filters...) ->
@@ -88,6 +103,8 @@ class EventReporter extends @EventEmitter
     d.resolve(failures)
 
   d.promise
+
+ledger.specs.go = -> ledger.app.router.go '/specs/index'
 
 @ledger.specs.reporters ||= {}
 @ledger.specs.reporters.events = new EventReporter()

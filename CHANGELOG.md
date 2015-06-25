@@ -1,4 +1,7 @@
 # Changelog
+1.3.8
+=====
+- Fix a bug in transaction validation
 
 1.3.7
 =====
@@ -33,6 +36,7 @@
 - Fix error 407 during update
 - Add getNewAddresses API method
 - New dongle management
+- Add security card lock
 - Bugs fixes
 
 1.2.0

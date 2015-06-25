@@ -7,7 +7,7 @@ class @OnboardingDeviceOpeningViewController extends @OnboardingViewController
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@select('div.greyed-container')[0])
     if Wallet.instance?.isInitialized
-      ledger.app.router.go '/wallet/accounts/0/show'
+      ledger.app.router.go '/wallet/dashboard/index'
     else
       @view.currentAction.text t 'onboarding.device.opening.is_opening'
       ledger.app.on 'wallet:initialized', @onWalletInitialized
@@ -17,7 +17,7 @@ class @OnboardingDeviceOpeningViewController extends @OnboardingViewController
   openSupport: ->
     window.open t 'application.support_url'
 
-  onWalletInitialized: -> ledger.app.router.go '/wallet/accounts/0/show'
+  onWalletInitialized: -> ledger.app.router.go '/wallet/dashboard/index'
 
   onWalletIsSynchronizing: -> @view.currentAction.text t 'onboarding.device.opening.is_synchronizing'
 

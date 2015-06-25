@@ -93,7 +93,14 @@ ledger.router.pluggedWalletRoutesExceptions = [
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementProvisioningViewController
 
   ## Wallet
+  # Dashboard
+  route 'wallet/dashboard/index', ->
+    app.navigate WALLET_LAYOUT, WalletDashboardIndexViewController
+
   # Accounts
+  route 'wallet/accounts/index', ->
+    app.navigate WALLET_LAYOUT, WalletAccountsIndexViewController
+
   route '/wallet/accounts/{id}/show', (params) ->
     app.navigate WALLET_LAYOUT, WalletAccountsShowViewController
 
@@ -218,3 +225,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/apps/coinkite/help/index', (params) ->
     window.open t 'application.support_coinkite_url'
 
+  ## Specs
+
+  route '/specs/index', ->
+    app.navigate SPECS_LAYOUT, SpecIndexViewController
+
+  route '/specs/result', ->
+    app.navigate SPECS_LAYOUT, SpecResultViewController

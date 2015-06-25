@@ -162,7 +162,7 @@ class ledger.common.application.BaseApplication extends @EventEmitter
         else
           url = parser.pathname + parser.search + parser.hash
         self.router.go url
-        return no
+        return if $(this).prop('tagName') is 'INPUT' then yes else no
       yes
 
   _listenDongleEvents: () ->
@@ -186,7 +186,7 @@ class ledger.common.application.BaseApplication extends @EventEmitter
   connectDongle: (dongle) ->
     @dongle = dongle
     @_dongleAttestationLock = off
-    DongleLogger().info("Connected", dongle.id)
+    DongleLogger().info("Connected", dongle.id, dongle.getStringFirmwareVersion())
     dongle.once 'state:disconnected', =>
       DongleLogger().info('Disconnected', dongle.id)
       @dongle = null
@@ -238,3 +238,5 @@ class ledger.common.application.BaseApplication extends @EventEmitter
   onCommandFirmwareUpdate: ->
 
   onCommandExportLogs: ->
+
+  onCommandRunSpecs: ->

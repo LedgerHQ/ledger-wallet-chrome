@@ -1,0 +1,32 @@
+@import "../wallet/wallet";
+@import (reference) "../constants";
+@import (reference) "../mixins";
+
+.spec-large-text-input {
+  .large-text-input;
+  text-align: left;
+  margin-left: @metrics-very-small-padding;
+}
+
+.action-link {
+  .text(@color-action-purple);
+  text-decoration: none;
+
+  &:hover {
+    color: darken(@color-action-purple, 20);
+  }
+}
+
+.header-action-link {
+  .text(@color-action-purple);
+  font-size: @font-size-large;
+
+  &:hover {
+    color: darken(@color-action-purple, 20);
+  }
+}
+
+#navigation_controller_content {
+  overflow: scroll;
+  width: 100%;
+}

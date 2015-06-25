@@ -1,0 +1,3 @@
+<% for account in @accounts: %>
+  <a href="/wallet/accounts/<%= account.id %>/show"><%= account.name %></a>
+<% end %>

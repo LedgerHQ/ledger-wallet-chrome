@@ -80,10 +80,9 @@ require @ledger.imports, ->
       @emit 'wallet:initializing'
       ledger.tasks.WalletOpenTask.instance.startIfNeccessary()
       ledger.tasks.WalletOpenTask.instance.onComplete (result, error) =>
-        l "OPEN RESULT", result, error
         if error?
           # TODO: Handle wallet opening fatal error
-          l "Raise", error
+          e "Raise", error
         else
           @_listenPreferencesEvents()
           @_listenCountervalueEvents(true)
@@ -209,6 +208,7 @@ require @ledger.imports, ->
   @ONBOARDING_LAYOUT = 'OnboardingNavigationController'
   @UPDATE_LAYOUT = 'UpdateNavigationController'
   @COINKITE_LAYOUT = 'AppsCoinkiteNavigationController'
+  @SPECS_LAYOUT = 'SpecNavigationController'
 
   ledger.database.Model.commitRelationship()
 

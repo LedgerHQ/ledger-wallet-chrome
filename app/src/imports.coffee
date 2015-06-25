@@ -248,6 +248,7 @@
         'controllers/wallet/operations/wallet_operations_index_view_controller'
 
         # Accounts
+        'controllers/wallet/accounts/wallet_accounts_index_view_controller'
         'controllers/wallet/accounts/wallet_accounts_show_view_controller'
 
         # Send
@@ -396,6 +397,11 @@
         '../spec/fixtures/fixtures_transactions'
 
         '../spec/spec_helper'
+        '../spec/spec_navigation_controller'
+        '../spec/spec_view_controller'
+        '../spec/spec_index_view_controller'
+        '../spec/spec_result_view_controller'
+
       ]
 
       specs:
