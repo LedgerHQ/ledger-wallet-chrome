@@ -1,4 +1,4 @@
-class @WalletNavigationController extends ledger.common.NavigationController
+class @WalletNavigationController extends ledger.common.ActionBarNavigationController
 
   _menuItemBaseUrl: {
 #    '/wallet/dashboard/': '#dashboard-item'
@@ -54,22 +54,6 @@ class @WalletNavigationController extends ledger.common.NavigationController
             menuItem.addClass 'selected'
         break
 
-
-  updateActionBar: ->
-    @_updateBreadcrumbs(ledger.application.router.currentUrl)
-
-  _updateBreadcrumbs: (url) ->
-    return unless url?
-    breadcrumbs = $('#breadcrumbs')
-    return if breadcrumbs.length == 0
-    $('breadcrumbs').empty()
-    breadcrumbs.html(url)
-    fragmentedUrl = url.split('/')
-    fragmentedUrl.splice(0, 2)
-    fragmentedUrl.splice(fragmentedUrl.length - 1, 1) if fragmentedUrl[fragmentedUrl.length - 1] == 'index'
-
-  _updateViewControllerActions: ->
-
   _listenBalanceEvents: ->
     # fetch balances
     @_updateBalanceValue()
@@ -116,3 +100,22 @@ class @WalletNavigationController extends ledger.common.NavigationController
       @view.currencyContainer.attr 'data-countervalue', Wallet.instance.getBalance().wallet.total
     else
       @view.currencyContainer.text t('wallet.top_menu.balance')
+
+  getActionBarDrawer: ->
+    @_actionBarDrawer ||= _.extend new ledger.common.ActionBarNavigationController.ActionBar.Drawer(),
+      createBreadcrumbPartView: (title, url, position) =>
+        view = $("<span>#{t(title)}</span>")
+        view.addClass("breadcrumb-root") if position is 0
+        view
+
+      createBreadcrumbSeparatorView: (position) => $("<span>&nbsp;&nbsp;>&nbsp;&nbsp;</span>")
+
+      createActionView: (title, icon, url, position) => null
+
+      createActionSeparatorView: (position) => null
+
+      getActionBarHolderView: => @select('.action-bar-holder')
+
+      getBreadCrumbHolderView: => @select('.breadcrumb-holder')
+
+      getActionsHolderView: => @select('.actions-holder')

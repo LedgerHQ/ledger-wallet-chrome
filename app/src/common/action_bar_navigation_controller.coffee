@@ -3,7 +3,20 @@
 ###
 class ledger.common.ActionBarNavigationController extends ledger.common.NavigationController
 
+  push: (viewController) ->
+    super viewController
+    @updateActionBar()
+
+  onAfterRender: ->
+    super
+    @updateActionBar()
+
   updateActionBar: ->
+    l 'Action bar update'
+    unless @topViewController().getActionBarDeclaration?
+      @getActionBar().hide()
+      return
+    @getActionBar().show()
     declaration = @topViewController().getActionBarDeclaration()
     actionBar = @getActionBar().edit()
     actionBar.clearAll()
@@ -52,7 +65,7 @@ class ledger.common.ActionBarNavigationController.ActionBar
     if position isnt -1
       @_actions = @_actions.slice(0, position).concat([action]).concat(@_actions.slice(position))
     else
-      @_actionBar.push action
+      @_actions.push action
     @invalidate()
 
   addBreadcrumbPart: (title, url, position = -1) ->
@@ -60,7 +73,7 @@ class ledger.common.ActionBarNavigationController.ActionBar
     if position isnt -1
       @_breadcrumb = @_breadcrumb.slice(0, position).concat([part]).concat(@_breadcrumb.slice(position))
     else
-      @_actionBar.push part
+      @_breadcrumb.push part
     @invalidate()
 
   removeAction: (action) ->
@@ -95,7 +108,7 @@ class ledger.common.ActionBarNavigationController.ActionBar
     @
 
   _invalidate: ->
-    @_drawer?.draw @_breadcrumb, @_actionBar
+    @_drawer?.draw @_breadcrumb, @_actions
 
   edit: ->
     @_isInEditMode = yes
@@ -105,6 +118,12 @@ class ledger.common.ActionBarNavigationController.ActionBar
     @_isInEditMode = no
     @_invalidate()
     @
+
+  hide: ->
+    # TODO
+
+  show: ->
+    # TODO
 
 class ledger.common.ActionBarNavigationController.ActionBar.Drawer
 
@@ -153,3 +172,6 @@ class ledger.common.ActionBarNavigationController.ActionBar.Drawer
         @_actionsNodes.push node
         @getActionsHolderView()?.append(node)
     return
+
+  hide: ->
+    # TODO hide

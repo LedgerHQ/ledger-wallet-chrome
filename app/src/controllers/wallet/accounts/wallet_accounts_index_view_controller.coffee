@@ -1,4 +1,4 @@
-class @WalletAccountsIndexViewController extends ledger.common.ViewController
+class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewController
 
   onBeforeRender: ->
     super

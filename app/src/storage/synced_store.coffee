@@ -106,7 +106,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
       # -> pull the data
       # -> merge data
     @client.get_settings_md5().then (md5) =>
-      $info 'Remote md5: ', md5, ', local md5', md5
+      $info 'Remote md5: ', md5, ', local md5', @_lastMd5
       return yes if @_lastMd5 is md5
       @client.get_settings().then (data) =>
         l "Decrypt", _.clone(data)
@@ -132,7 +132,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     # else
     # Overwrite local storage and keep changes
     @_getAllData().then (localData) =>
-      $info 'Data before merge ', localData # TODO: Remove in production
+      $info 'Data before merge ', localData
       remoteHashes = (remoteData['__hashes'] or []).join(' ')
       localHashes = (localData['__hashes'] or []).join(' ').substr(0, 2 * 64 + 1)
       if remoteHashes.length is 0 or localHashes.length is 0

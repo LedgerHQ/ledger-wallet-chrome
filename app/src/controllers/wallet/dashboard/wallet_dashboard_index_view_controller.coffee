@@ -1,4 +1,4 @@
-class @WalletDashboardIndexViewController extends ledger.common.ViewController
+class @WalletDashboardIndexViewController extends ledger.common.ActionBarViewController
 
   showOperation: (params) ->
     dialog = new WalletOperationsDetailDialogViewController(params)

@@ -75,5 +75,9 @@
       </a>
     </div>
   </div>
+  <div class="action-bar-holder">
+    <div class="breadcrumb-holder"></div>
+    <div class="actions-holder"></div>
+  </div>
   <div id="navigation_controller_content"></div>
 </div>

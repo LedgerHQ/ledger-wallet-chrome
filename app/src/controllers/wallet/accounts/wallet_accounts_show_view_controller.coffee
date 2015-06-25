@@ -1,4 +1,4 @@
-class @WalletAccountsShowViewController extends ledger.common.ViewController
+class @WalletAccountsShowViewController extends ledger.common.ActionBarViewController
 
   view:
     confirmedBalanceSubtitle: '#confirmed_balance_subtitle'
@@ -11,11 +11,17 @@ class @WalletAccountsShowViewController extends ledger.common.ViewController
     confirmedBalanceContainer: "#confirmed_balance_container"
     countervalueBalanceContainer: "#countervalue_balance_container"
 
+  breadcrumb: [
+    { title: 'wallet.breadcrumb.accounts' }
+  ]
+
   initialize: ->
     super
     @_debouncedUpdateOperations = _.debounce(@_updateOperations, 200)
     @_debouncedUpdateBalances = _.debounce(@_updateBalances, 200)
     @_debouncedUpdateCountervalueVisibility = _.debounce(@_updateCountervalueVisibility, 200)
+    @breadcrumb = _.clone(@breadcrumb)
+    @breadcrumb.push title: @_getAccount().get('name'), url: @routedUrl
 
   onAfterRender: ->
     super
