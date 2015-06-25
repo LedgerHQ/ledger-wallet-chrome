@@ -21,13 +21,13 @@ class @WalletNavigationController extends ledger.common.NavigationController
   _onRoutedUrl: (event, data) ->
     {url} = data
     @updateMenu url
-    ##@updateBreadcrumbs url
+    ##@_updateBreadcrumbs url
 
   onAfterRender: () ->
     super
     url = ledger.application.router.currentUrl
     @updateMenu url
-    ##@updateBreadcrumbs url
+    ##@_updateBreadcrumbs url
     @_listenBalanceEvents()
     @_listenSynchronizationEvents()
     @_listenCountervalueEvents()
@@ -54,7 +54,11 @@ class @WalletNavigationController extends ledger.common.NavigationController
             menuItem.addClass 'selected'
         break
 
-  updateBreadcrumbs: (url) ->
+
+  updateActionBar: ->
+    @_updateBreadcrumbs(ledger.application.router.currentUrl)
+
+  _updateBreadcrumbs: (url) ->
     return unless url?
     breadcrumbs = $('#breadcrumbs')
     return if breadcrumbs.length == 0
@@ -63,6 +67,8 @@ class @WalletNavigationController extends ledger.common.NavigationController
     fragmentedUrl = url.split('/')
     fragmentedUrl.splice(0, 2)
     fragmentedUrl.splice(fragmentedUrl.length - 1, 1) if fragmentedUrl[fragmentedUrl.length - 1] == 'index'
+
+  _updateViewControllerActions: ->
 
   _listenBalanceEvents: ->
     # fetch balances

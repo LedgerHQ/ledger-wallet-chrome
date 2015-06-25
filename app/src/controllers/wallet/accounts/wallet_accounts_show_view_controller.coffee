@@ -34,7 +34,7 @@ class @WalletAccountsShowViewController extends ledger.common.ViewController
       @view.operationsList.html html
 
   _updateBalances: ->
-    total = Wallet.instance.getBalance().wallet.total
+    total = @_getAccount().get('total_balance')
     @view.confirmedBalance.text ledger.formatters.fromValue(total)
     @view.countervalueBalance.attr 'data-countervalue', total
 
@@ -67,5 +67,6 @@ class @WalletAccountsShowViewController extends ledger.common.ViewController
     if ledger.formatters.symbolIsFirst() then @view.confirmedBalanceContainer.addClass 'inverted' else @view.confirmedBalanceContainer.removeClass 'inverted'
 
   _getAccount: () ->
-    @_account ?= Account.find(index: 0).first()
+    @_accountId ||= +@routedUrl.match(/wallet\/accounts\/(\d+)\/show/)[1]
+    @_account ?= Account.find(index: @_accountId).first()
     @_account
