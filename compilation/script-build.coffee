@@ -96,7 +96,6 @@ module.exports = (configuration) ->
     buildLangFile: () ->
       gulp.src 'app/locales/**/!(es)/*.properties'
       .pipe plumber()
-      .pipe cached('lang-file')
       .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe buildLangFilePlugin()
       .pipe tap (file, t) ->

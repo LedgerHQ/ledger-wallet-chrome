@@ -35,7 +35,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @view.errorContainer.text nextError
     else
       @view.errorContainer.hide()
-      dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress()
+      dialog = new WalletSendPreparingDialogViewController account_id: @_getAccount().getId(), amount: @_transactionAmount(), address: @_receiverBitcoinAddress()
       @getDialog().push dialog
 
   openScanner: ->
@@ -81,3 +81,5 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     fees = ledger.preferences.instance.getMiningFee()
     val = ledger.Amount.fromSatoshi(@_transactionAmount()).add(fees).toString()
     @view.totalInput.text ledger.formatters.formatValue(val) + ' ' + _.str.sprintf(t('wallet.send.index.transaction_fees_text'), ledger.formatters.formatValue(fees))
+
+  _getAccount: -> @_account ||= Account.findById(+@params.account_id or 0)
