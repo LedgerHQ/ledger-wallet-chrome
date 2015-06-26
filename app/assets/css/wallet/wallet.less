@@ -30,3 +30,28 @@ section {
     }
   }
 }
+
+.action-bar-holder {
+
+  display: flex;
+  padding: 19px @metrics-medium-padding;
+  background-color: @color-extra-light-grey;
+  border-bottom: solid 1px @color-very-light-grey;
+  justify-content: space-between;
+
+  span {
+    .uppercase-action();
+
+    &.breadcrumb-root {
+      font-weight: @font-weight-semibold;
+    }
+
+  }
+
+  .actions-holder {
+    span {
+      margin-left: @metrics-medium-padding;
+    }
+  }
+
+}

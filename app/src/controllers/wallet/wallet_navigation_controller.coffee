@@ -1,4 +1,4 @@
-class @WalletNavigationController extends ledger.common.NavigationController
+class @WalletNavigationController extends ledger.common.ActionBarNavigationController
 
   _menuItemBaseUrl: {
 #    '/wallet/dashboard/': '#dashboard-item'
@@ -21,13 +21,13 @@ class @WalletNavigationController extends ledger.common.NavigationController
   _onRoutedUrl: (event, data) ->
     {url} = data
     @updateMenu url
-    ##@updateBreadcrumbs url
+    ##@_updateBreadcrumbs url
 
   onAfterRender: () ->
     super
     url = ledger.application.router.currentUrl
     @updateMenu url
-    ##@updateBreadcrumbs url
+    ##@_updateBreadcrumbs url
     @_listenBalanceEvents()
     @_listenSynchronizationEvents()
     @_listenCountervalueEvents()
@@ -53,16 +53,6 @@ class @WalletNavigationController extends ledger.common.NavigationController
           else
             menuItem.addClass 'selected'
         break
-
-  updateBreadcrumbs: (url) ->
-    return unless url?
-    breadcrumbs = $('#breadcrumbs')
-    return if breadcrumbs.length == 0
-    $('breadcrumbs').empty()
-    breadcrumbs.html(url)
-    fragmentedUrl = url.split('/')
-    fragmentedUrl.splice(0, 2)
-    fragmentedUrl.splice(fragmentedUrl.length - 1, 1) if fragmentedUrl[fragmentedUrl.length - 1] == 'index'
 
   _listenBalanceEvents: ->
     # fetch balances
@@ -110,3 +100,26 @@ class @WalletNavigationController extends ledger.common.NavigationController
       @view.currencyContainer.attr 'data-countervalue', Wallet.instance.getBalance().wallet.total
     else
       @view.currencyContainer.text t('wallet.top_menu.balance')
+
+  getActionBarDrawer: ->
+    @_actionBarDrawer ||= _.extend new ledger.common.ActionBarNavigationController.ActionBar.Drawer(),
+      createBreadcrumbPartView: (title, url, position) =>
+        view = $("<span>#{t(title)}</span>")
+        view.addClass("breadcrumb-root") if position is 0
+        view.attr('data-href', url) if not _.isEmpty(url) and position isnt 0
+        view
+
+      createBreadcrumbSeparatorView: (position) => $("<span>&nbsp;&nbsp;>&nbsp;&nbsp;</span>")
+
+      createActionView: (title, icon, url, position) =>
+        view = $("<span><i class=\"fa #{icon}\"></i> #{t(title)}</span>")
+        view.attr('data-href', url)
+        view
+
+      createActionSeparatorView: (position) => null
+
+      getActionBarHolderView: => @select('.action-bar-holder')
+
+      getBreadCrumbHolderView: => @select('.breadcrumb-holder')
+
+      getActionsHolderView: => @select('.actions-holder')

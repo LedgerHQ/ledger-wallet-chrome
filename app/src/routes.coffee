@@ -105,13 +105,13 @@ ledger.router.pluggedWalletRoutesExceptions = [
     app.navigate WALLET_LAYOUT, WalletAccountsShowViewController
 
   # Send
-  route '/wallet/send/index', (params = {}) ->
-    dialog = new WalletSendIndexDialogViewController({ amount: params["?params"]?.amount, address: params["?params"]?.address})
+  route '/wallet/send/index:?params:', (params = {}) ->
+    dialog = new WalletSendIndexDialogViewController(params["?params"] or {})
     dialog.show()
 
   # Receive
-  route '/wallet/receive/index', (params) ->
-    dialog = new WalletReceiveIndexDialogViewController(params)
+  route '/wallet/receive/index:?params:', (params = {}) ->
+    dialog = new WalletReceiveIndexDialogViewController(params["?params"] or {})
     dialog.show()
 
   # Settings

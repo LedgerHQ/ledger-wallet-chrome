@@ -66,8 +66,6 @@ class @Account extends ledger.database.Model
 
 
 
-
-
   addRawTransactionAndSave: (rawTransaction, callback = _.noop) ->
     hdAccount = ledger.wallet.Wallet.instance?.getAccount(@get('index'))
     ledger.wallet.pathsToAddresses hdAccount.getAllPublicAddressesPaths(), (publicAddresses) =>

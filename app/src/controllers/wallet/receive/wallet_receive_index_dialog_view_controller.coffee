@@ -6,7 +6,7 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
 
   initialize: ->
     super
-    @params.address = ledger.wallet.Wallet.instance.getAccount(0).getCurrentPublicAddress()
+    @params.address = @_getAccount().getWalletAccount().getCurrentPublicAddress()
 
   onAfterRender: ->
     super
@@ -44,3 +44,5 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
     uri = "bitcoin:" + @params.address
     uri += "?amount=#{@params.amount}" if @params.amount?.length > 0
     uri
+
+  _getAccount: -> @_account ||= Account.findById(+@params.account_id or 0)

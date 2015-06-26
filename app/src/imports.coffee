@@ -197,6 +197,8 @@
         'database/migrations'
         'common/view_controller'
         'common/navigation_controller'
+        'common/action_bar_view_controller'
+        'common/action_bar_navigation_controller'
 
         ## Dongle
         'dongle/dongle'
