@@ -15,6 +15,11 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     { title: 'wallet.breadcrumb.accounts'}
   ]
 
+  actions: [
+    { title: 'wallet.accounts.show.operations.action', icon: 'fa-reorder', url: '/wallet/accounts/:account_id:/operations'}
+    { title: 'wallet.accounts.show.operations.settings', icon: 'fa-cog', url: '#openSettings'}
+  ]
+
   initialize: ->
     super
     @_debouncedUpdateOperations = _.debounce(@_updateOperations, 200)
@@ -22,6 +27,8 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     @_debouncedUpdateCountervalueVisibility = _.debounce(@_updateCountervalueVisibility, 200)
     @breadcrumb = _.clone(@breadcrumb)
     @breadcrumb.push title: @_getAccount().get('name'), url: @routedUrl
+    @actions = _.clone(@actions)
+    @actions[0].url = "/wallet/accounts/#{@_getAccount().get('index')}/operations"
 
   onAfterRender: ->
     super
@@ -33,10 +40,13 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     dialog = new WalletOperationsDetailDialogViewController(params)
     dialog.show()
 
+  openSettings: ->
+    # TODO: Open settings action
+
   _updateOperations: ->
     operations = @_getAccount().get 'operations'
     @view.emptyContainer.hide() if operations.length > 0
-    render 'wallet/operations/operations_table', {operations: operations.slice(0, 7)}, (html) =>
+    render 'wallet/operations/operations_table', {operations: operations.slice(0, 5)}, (html) =>
       @view.operationsList.html html
 
   _updateBalances: ->

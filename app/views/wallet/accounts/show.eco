@@ -17,8 +17,8 @@
         <td class="align-right">
           <div class="action-bar">
             <div class="left-spacer"></div>
-            <a class="action-rounded-button" href="/wallet/send/index"><%= t 'wallet.accounts.show.detail.send' %></a>
-            <a class="action-rounded-button" href="/wallet/receive/index"><%= t 'wallet.accounts.show.detail.receive' %></a>
+            <a class="action-rounded-button" href="/wallet/send/index?account_id=<%= @_getAccount().get('index') %>"><%= t 'wallet.accounts.show.detail.send' %></a>
+            <a class="action-rounded-button" href="/wallet/receive/index?account_id=<%= @_getAccount().get('index') %>"><%= t 'wallet.accounts.show.detail.receive' %></a>
           </div>
         </td>
       </tr>
