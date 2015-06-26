@@ -11,7 +11,7 @@ class ledger.wallet.Wallet
     account = null
     # Easy way
     if _.str.startsWith(derivationPath, "44'")
-      parts = derivationPath.split(',')
+      parts = derivationPath.split('/')
       accountIndex = parts[2]
       if accountIndex?
         accountIndex = parseInt(accountIndex.substr(0, accountIndex.length - 1))
