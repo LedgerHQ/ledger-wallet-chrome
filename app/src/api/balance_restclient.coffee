@@ -3,12 +3,14 @@ class ledger.api.BalanceRestClient extends ledger.api.RestClient
 
   @instance: new @
 
+  DefaultBatchSize: 20
+
   getAccountBalance: (account, callback) ->
     account = ledger.wallet.Wallet.instance.getAccount(account) unless _.isKindOf(account, ledger.wallet.Wallet.Account)
     addressesPaths = account.getAllObservedAddressesPaths()
     accountBalance = {total: 0, confirmed: 0, unconfirmed: 0}
     ledger.wallet.pathsToAddresses addressesPaths, (addresses) =>
-      _.async.eachBatch _.values(addresses), 200, (addresses, done, hasNext) =>
+      _.async.eachBatch _.values(addresses), @DefaultBatchSize, (addresses, done, hasNext) =>
         @http().get
           url: "blockchain/#{ledger.config.network.ticker}/addresses/#{addresses.join(',')}"
           onSuccess: (addressesBalances) ->
