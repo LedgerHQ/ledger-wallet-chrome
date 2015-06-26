@@ -111,7 +111,10 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
 
       createBreadcrumbSeparatorView: (position) => $("<span>&nbsp;&nbsp;>&nbsp;&nbsp;</span>")
 
-      createActionView: (title, icon, url, position) => null
+      createActionView: (title, icon, url, position) =>
+        view = $("<span><i class=\"fa #{icon}\"></i> #{t(title)}</span>")
+        view.attr('data-href', url)
+        view
 
       createActionSeparatorView: (position) => null
 
