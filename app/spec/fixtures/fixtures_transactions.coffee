@@ -3,6 +3,7 @@ ledger.specs.fixtures ?= {}
 _.extend ledger.specs.fixtures,
 
   dongle1_transactions:
+    # "44'/0'/0'/0/6"
     tx1:
       "hash": "aa1a80314f077bd2c0e335464f983eef56dfeb0eb65c99464a0e5dbe2c25b7dc",
       "block_hash": "000000000000000006c18384552d198dc53dcdd63964d9887693f684ca0aeeb6",
@@ -49,6 +50,7 @@ _.extend ledger.specs.fixtures,
       "inputs_length": 1,
       "outputs_length": 2
 
+    # "44'/0'/0'/0/1"
     tx2:
       "hash": "a863b9a56c40c194c11eb9db9f3ea1f6ab472b02cc57679c50d16b4151c8a6e5",
       "block_hash": "00000000000000000d89f88366661b880e96aba60d083daac990fd21dd97fa5e",
@@ -95,6 +97,7 @@ _.extend ledger.specs.fixtures,
       "inputs_length": 1,
       "outputs_length": 2
 
+    # "44'/0'/0'/0/3"
     tx3:
       "hash": "e43810f91bf8aa66f8558437d532410a0f62f3d3ee45417b6f6335ffcdb6c721",
       "block_hash": "00000000000000000d89f88366661b880e96aba60d083daac990fd21dd97fa5e",
@@ -141,6 +144,7 @@ _.extend ledger.specs.fixtures,
       "inputs_length": 1,
       "outputs_length": 2
 
+    # "44'/0'/0'/0/2"
     tx4:
       "hash": "4e23da1b1438939bc4f71bd6d8ec34a99bad83c3a68de6d8e278cdf306b48016",
       "block_hash": "00000000000000000d89f88366661b880e96aba60d083daac990fd21dd97fa5e",
@@ -187,6 +191,7 @@ _.extend ledger.specs.fixtures,
       "inputs_length": 1,
       "outputs_length": 2
 
+    # "44'/0'/0'/0/0"
     tx5:
       "hash": "0b577adc127339768ca109550d3242e5a6a55367b376748d8f6f2b54cd7057e3",
       "block_hash": "00000000000000001447d39f0d7a400879038d950d88ef4b2c24f4383446b071",
