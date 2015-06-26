@@ -132,6 +132,11 @@ section {
   color: @color-dark-grey;
   text-transform: uppercase;
 
+  &[data-href]:hover {
+    color: darken(@color-dark-grey, 15%);
+    cursor: pointer;
+  }
+
   a& {
     text-decoration: none;
 

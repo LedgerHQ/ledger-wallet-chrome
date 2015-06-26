@@ -12,7 +12,7 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     countervalueBalanceContainer: "#countervalue_balance_container"
 
   breadcrumb: [
-    { title: 'wallet.breadcrumb.accounts' }
+    { title: 'wallet.breadcrumb.accounts'}
   ]
 
   initialize: ->
