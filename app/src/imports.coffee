@@ -397,6 +397,7 @@
 
         '../spec/fixtures/fixtures_dongle'
         '../spec/fixtures/fixtures_transactions'
+        '../spec/fixtures/fixtures_blocks'
 
         '../spec/spec_helper'
         '../spec/spec_navigation_controller'
