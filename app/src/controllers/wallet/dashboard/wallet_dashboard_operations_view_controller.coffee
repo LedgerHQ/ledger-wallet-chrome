@@ -1,4 +1,4 @@
-class @WalletOperationsIndexViewController extends ledger.common.ActionBarViewController
+class @WalletDashboardOperationsViewController extends ledger.common.ActionBarViewController
 
   view:
     emptyContainer: "#empty_container"
@@ -11,7 +11,6 @@ class @WalletOperationsIndexViewController extends ledger.common.ActionBarViewCo
 
   onAfterRender: ->
     super
-    @_updateAccountName()
     @_listenEvents()
 
   onDetach: ->
@@ -24,20 +23,13 @@ class @WalletOperationsIndexViewController extends ledger.common.ActionBarViewCo
     dialog.show()
 
   _updateOperations: ->
-    operations = @_getAccount().get 'operations'
+    operations = Operation.all()
     @view.emptyContainer.hide() if operations.length > 0
     render 'wallet/operations/operations_table', {operations: operations}, (html) =>
       @view.operationsList.html html
-
-  _updateAccountName: ->
-    @view.accountName.text(_.str.sprintf(t('wallet.operations.index.title_with_account_name'), @_getAccount().get('name')))
 
   _listenEvents: ->
     # update operations
     @_updateOperations()
     ledger.app.on 'wallet:transactions:new wallet:operations:sync:done', @_debouncedUpdateOperations
     ledger.preferences.instance.on 'currencyActive:changed', @_debouncedUpdateOperations
-
-  _getAccount: () ->
-    @_account ?= Account.find(index: 0).first()
-    @_account

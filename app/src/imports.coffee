@@ -244,6 +244,7 @@
 
         # Dashboard
         'controllers/wallet/dashboard/wallet_dashboard_index_view_controller'
+        'controllers/wallet/dashboard/wallet_dashboard_operations_view_controller'
 
         # Operations
         'controllers/wallet/operations/wallet_operations_detail_dialog_view_controller'

@@ -80,7 +80,6 @@ class ledger.i18n
   @loadTranslationFiles: =>
     Q.all(@_loadTranslationFile(tag) for tag of @Languages)
 
-
   ###
     Fetch translation file
     @param [String] tag Codified language tag
@@ -95,7 +94,6 @@ class ledger.i18n
         ledger.i18n.translations[tag] = data
         d.resolve()
     d.promise
-
 
   ###
      Check if i18nValueName is set into syncStore OR chromeStore and set store value in memory for further checking
