@@ -44,12 +44,11 @@ describe "OperationsConsumptionTask", ->
             ledger.specs.fixtures.dongle1_transactions.tx4.confirmations = 2
             _.async.each txs, (item, next) ->
               acc.addRawTransactionAndSave(item, next)
-              # Check task update by changing number of confirmations
               callback?()
 
 
   beforeEach (done) ->
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 300000
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 400000
     ledger.tasks.Task.stopAllRunningTasks()
     ledger.tasks.Task.resetAllSingletonTasks()
     # Launch init()
