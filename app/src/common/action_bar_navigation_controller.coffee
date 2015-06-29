@@ -131,11 +131,11 @@ class ledger.common.ActionBarNavigationController.ActionBar.Drawer
     @_breadcrumbNodes = []
     @_actionsNodes = []
 
-  createBreadcrumbPartView: (title, url, position) -> null
+  createBreadcrumbPartView: (title, url, position, length) -> null
 
   createBreadcrumbSeparatorView: (position) -> null
 
-  createActionView: (title, icon, url, position) -> null
+  createActionView: (title, icon, url, position, length) -> null
 
   createActionSeparatorView: (position) -> null
 
@@ -156,7 +156,7 @@ class ledger.common.ActionBarNavigationController.ActionBar.Drawer
         if separatorNode?
           @_breadcrumbNodes.push separatorNode
           @getBreadCrumbHolderView()?.append(separatorNode)
-      node = @createBreadcrumbPartView(breadcrumbPart.title, breadcrumbPart.url, index)
+      node = @createBreadcrumbPartView(breadcrumbPart.title, breadcrumbPart.url, index, breadcrumb.length)
       if node?
         @_breadcrumbNodes.push node
         @getBreadCrumbHolderView()?.append(node)
@@ -167,7 +167,7 @@ class ledger.common.ActionBarNavigationController.ActionBar.Drawer
         if separatorNode?
           @_actionsNodes.push separatorNode
           @getActionsHolderView()?.append(separatorNode)
-      node = @createActionView(action.title, action.icon, action.url, index)
+      node = @createActionView(action.title, action.icon, action.url, index, actions.length)
       if node?
         @_actionsNodes.push node
         @getActionsHolderView()?.append(node)
