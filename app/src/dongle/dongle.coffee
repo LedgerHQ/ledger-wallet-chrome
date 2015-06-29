@@ -115,7 +115,7 @@ class @ledger.dongle.Dongle extends EventEmitter
   disconnect: () -> @_setState(States.DISCONNECTED)
 
   # @return [String] Firmware version, 1.0.0 for example.
-  getStringFirmwareVersion: -> @firmwareVersion.byteAt(1) + "." + @firmwareVersion.byteAt(2) + "." + @firmwareVersion.byteAt(3)
+  getStringFirmwareVersion: -> Try(=> @firmwareVersion.byteAt(1) + "." + @firmwareVersion.byteAt(2) + "." + @firmwareVersion.byteAt(3)).getOrElse('unknown')
   
   # @return [Integer] Firmware version, 0x20010000010f for example.
   getIntFirmwareVersion: ->
