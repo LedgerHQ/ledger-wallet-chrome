@@ -1,13 +1,11 @@
 class @WalletNavigationController extends ledger.common.ActionBarNavigationController
 
   _menuItemBaseUrl: {
-#    '/wallet/dashboard/': '#dashboard-item'
 #    '/wallet/send/': '#send-item'
 #    '/wallet/receive/': '#receive-item'
 #    '/wallet/accounts/': '#accounts-item'
 #    '/wallet/signout/': '#signout-item'
     '/wallet/accounts/index' : '#accounts-item'
-    '/wallet/dashboard/index': '#dashboard-item'
   }
   view:
     balanceValue: '#balance_value'
