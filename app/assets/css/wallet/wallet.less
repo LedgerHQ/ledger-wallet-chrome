@@ -32,12 +32,12 @@ section {
 }
 
 .action-bar-holder {
-
   display: flex;
-  padding: 19px @metrics-medium-padding;
+  padding: @metrics-small-padding @metrics-medium-padding;
   background-color: @color-extra-light-grey;
   border-bottom: solid 1px @color-very-light-grey;
   justify-content: space-between;
+  flex-shrink: 0;
 
   span {
     .uppercase-action();
@@ -45,7 +45,6 @@ section {
     &.breadcrumb-root {
       font-weight: @font-weight-semibold;
     }
-
   }
 
   .actions-holder {
