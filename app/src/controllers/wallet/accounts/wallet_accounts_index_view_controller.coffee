@@ -2,7 +2,7 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
 
   actions: [
     {title: 'wallet.accounts.index.actions.add_account', icon: 'fa-plus', url: '#addAccount'}
-    {title: 'wallet.accounts.index.actions.manage_tags', icon: 'fa-tag', url: '#manageTags'}
+    {title: 'wallet.accounts.index.actions.see_all_operations', icon: 'fa-bars', url: '/wallet/accounts/alloperations'}
   ]
 
   onBeforeRender: ->

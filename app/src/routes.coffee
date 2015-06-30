@@ -93,13 +93,6 @@ ledger.router.pluggedWalletRoutesExceptions = [
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementProvisioningViewController
 
   ## Wallet
-  # Dashboard
-  route 'wallet/dashboard/index', ->
-    app.navigate WALLET_LAYOUT, WalletDashboardIndexViewController
-
-  route 'wallet/dashboard/operations', ->
-    app.navigate WALLET_LAYOUT, WalletDashboardOperationsViewController
-
   # Accounts
   route 'wallet/accounts/index', ->
     app.navigate WALLET_LAYOUT, WalletAccountsIndexViewController
