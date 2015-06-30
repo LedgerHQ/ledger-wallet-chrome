@@ -51,7 +51,7 @@ describe "OperationsConsumptionTask", ->
 
 
   beforeEach (done) ->
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 200000
     ledger.tasks.Task.stopAllRunningTasks()
     ledger.tasks.Task.resetAllSingletonTasks()
     # Launch init()
@@ -61,7 +61,6 @@ describe "OperationsConsumptionTask", ->
 
   afterEach (done) ->
     [ledger.storage.databases, ledger.storage.wallet, ledger.storage.sync, ledger.storage.sync.wallet].forEach (that) -> that.clear()
-    ledger.wallet.Wallet.instance.release()
     ledger.tasks.Task.stopAllRunningTasks()
     ledger.tasks.Task.resetAllSingletonTasks()
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout

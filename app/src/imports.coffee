@@ -433,10 +433,10 @@
           '../spec/tasks/address_derivation_task_spec'
           '../spec/tasks/balance_task_spec'
           '../spec/tasks/operations_consumption_task_spec'
+          '../spec/tasks/operations_synchronization_task_spec'
           '../spec/tasks/ticker_task_spec'
           '../spec/tasks/transaction_observer_task_spec'
           '../spec/tasks/wallet_layout_recovery_task_spec'
-          '../spec/tasks/wallet_open_task_spec'
 
           '../spec/dongle/derivation_spec'
 

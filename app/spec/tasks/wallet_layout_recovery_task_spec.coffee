@@ -5,7 +5,9 @@ describe "WalletLayoutRecoveryTask", ->
   dongleInst = null
 
   beforeAll ->
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 40000
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000
+  afterAll ->
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
 
 
   init = (pin, seed, pairingKey, callback) ->
@@ -37,7 +39,7 @@ describe "WalletLayoutRecoveryTask", ->
 
 
   describe " - zero account", ->
-    beforeAll (done) ->
+    beforeEach (done) ->
       dongle = ledger.specs.fixtures.dongles.dongle2
       init dongle.pin, dongle.masterSeed, dongle.pairingKeyHex, ->
         done()
@@ -46,15 +48,17 @@ describe "WalletLayoutRecoveryTask", ->
       expect(mockTask._restoreChronocoinLayout).toHaveBeenCalled()
       expect(ledger.wallet.Wallet.instance.getAccountsCount()).toBe(1)
 
-    afterAll ->
+    afterEach (done) ->
+      ledger.tasks.Task.stopAllRunningTasks()
       ledger.tasks.Task.resetAllSingletonTasks()
       chrome.storage.local.clear()
       dongleInst = null
+      _.defer -> done()
 
 
 
   describe " - seed with one empty account", ->
-    beforeAll (done) ->
+    beforeEach (done) ->
       dongle = ledger.specs.fixtures.dongles.dongle2
       init dongle.pin, dongle.masterSeed, dongle.pairingKeyHex, done
 
@@ -68,15 +72,17 @@ describe "WalletLayoutRecoveryTask", ->
       expect(ledger.wallet.Wallet.instance.getAccount(0).getCurrentPublicAddressIndex()).toBe(0)
       done()
 
-    afterAll ->
+    afterEach (done) ->
+      ledger.tasks.Task.stopAllRunningTasks()
       ledger.tasks.Task.resetAllSingletonTasks()
       chrome.storage.local.clear()
       dongleInst = null
+      _.defer -> done()
 
 
 
   describe " - seed with two accounts", ->
-    beforeAll (done) ->
+    beforeEach (done) ->
       #spyOn(mockTask, '_restoreBip44Layout')
       dongle = ledger.specs.fixtures.dongles.dongle1
       init dongle.pin, dongle.masterSeed, dongle.pairingKeyHex, done
@@ -99,10 +105,9 @@ describe "WalletLayoutRecoveryTask", ->
       expect(ledger.wallet.Wallet.instance.getAccount(0).getAllPublicAddressesPaths()).toContain("0'/0/0")
       done()
 
-    afterAll ->
+    afterEach (done) ->
+      ledger.tasks.Task.stopAllRunningTasks()
       ledger.tasks.Task.resetAllSingletonTasks()
       chrome.storage.local.clear()
       dongleInst = null
-
-
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
+      _.defer -> done()

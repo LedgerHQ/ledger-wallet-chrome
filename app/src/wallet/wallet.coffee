@@ -110,7 +110,6 @@ class ledger.wallet.Wallet.Account
       @_account = result[@_storeId]
       @_initialize()
       callback?()
-      #@initializeXpub callback
 
   release: () ->
     @wallet = null
@@ -233,7 +232,8 @@ class ledger.wallet.Wallet.Account
     index = parseInt(index) if _.isString(index)
     @_account.currentPublicIndex = index + 1
     @save()
-    ledger.wallet.pathsToAddresses [@getCurrentPublicAddressPath()], callback
+    ledger.wallet.pa
+    ledger.app.dongle?.getPublicAddress @getCurrentPublicAddressPath(), callback
 
   shiftCurrentChangeAddressPath: (callback) ->
     logger().info 'shift change'
@@ -242,7 +242,7 @@ class ledger.wallet.Wallet.Account
     index = parseInt(index) if _.isString(index)
     @_account.currentChangeIndex = index + 1
     @save()
-    ledger.wallet.pathsToAddresses [@getCurrentChangeAddressPath()], callback
+    ledger.app.dongle?.getPublicAddress @getCurrentChangeAddressPath(), callback
 
   importPublicAddressPath: (addressPath) ->
     @_account.importedPublicPaths ?= []
