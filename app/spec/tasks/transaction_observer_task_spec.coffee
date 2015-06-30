@@ -2,44 +2,48 @@ describe "TransactionObserverTask", ->
 
   originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
   originalWS = null
-  dongleInst = null
   account = null
 
   init = (pin, seed, pairingKey, callback) ->
     dongleInst = new ledger.dongle.MockDongle pin, seed, pairingKey
     ledger.app.dongle = dongleInst
-    dongleInst.unlockWithPinCode '0000', callback
+    dongleInst.unlockWithPinCode '0000', ->
+      ledger.tasks.AddressDerivationTask.instance.start()
+      ledger.storage.databases = new ledger.storage.MemoryStore("databases")
+      ledger.storage.wallet = new ledger.storage.MemoryStore("wallet")
+      ledger.storage.sync = new ledger.storage.MemoryStore("sync")
+      ledger.storage.sync.wallet = ledger.storage.sync.substore("wallet_layout")
+      ledger.wallet.initialize dongleInst, ->
+        cache = new ledger.wallet.Wallet.Cache('ops_cache', ledger.wallet.Wallet.instance)
+        cache.initialize ->
+          ledger.wallet.Wallet.instance.cache = cache
+          xcache = new ledger.wallet.Wallet.Cache('xpub_cache', ledger.wallet.Wallet.instance)
+          xcache.initialize ->
+            ledger.wallet.Wallet.instance.xpubCache = xcache
+            # Init DB
+            ledger.database.init ->
+              ledger.database.contexts.open()
+              Wallet.instance = Wallet.findOrCreate(1, {id: 1}).save()
+              account = Account.findOrCreate(index: 0).save()
+              account.set('wallet', Wallet.instance).save()
+              ledger.wallet.Wallet.instance.createAccount()
+              _.defer ->
+                ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "44'/0'/0'", ->
+                  ledger.wallet.Wallet.instance.getOrCreateAccount(0).notifyPathsAsUsed(["44'/0'/0'/0/6"])
+                  ledger.wallet.pathsToAddresses ["44'/0'/0'/0/6"], ->
+                    callback?()
+
 
   beforeEach (done) ->
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
+    ledger.tasks.Task.stopAllRunningTasks()
+    ledger.tasks.Task.resetAllSingletonTasks()
     originalWS = window.WebSocket
     window.WebSocket = class WebSocket
     window.WebSocket.prototype = jasmine.createSpyObj 'ws', ['send', 'close']
-
-    ledger.tasks.Task.stopAllRunningTasks()
-    ledger.tasks.AddressDerivationTask.instance.start()
-    ledger.storage.databases = new ledger.storage.MemoryStore("databases")
-    ledger.storage.wallet = new ledger.storage.MemoryStore("wallet")
-    ledger.storage.sync = new ledger.storage.MemoryStore("sync")
-    ledger.storage.sync.wallet = ledger.storage.sync.substore("wallet_layout")
-    ledger.wallet.initialize dongleInst, ->
-      cache = new ledger.wallet.Wallet.Cache('ops_cache', ledger.wallet.Wallet.instance)
-      cache.initialize ->
-        ledger.wallet.Wallet.instance.cache = cache
-        cache = new ledger.wallet.Wallet.Cache('xpub_cache', ledger.wallet.Wallet.instance)
-        cache.initialize ->
-          ledger.wallet.Wallet.instance.xpubCache = cache
-
-          ledger.database.init ->
-            ledger.database.contexts.open()
-            Wallet.instance = Wallet.findOrCreate(1, {id: 1}).save()
-            account = Account.findOrCreate(index: 0).save()
-            account.set('wallet', Wallet.instance).save()
-            ledger.wallet.Wallet.instance.createAccount()
-            dongle = ledger.specs.fixtures.dongles.dongle1
-            init dongle.pin, dongle.masterSeed, dongle.pairingKeyHex, ->
-              ledger.wallet.Wallet.instance.getOrCreateAccount(0).notifyPathsAsUsed(["44'/0'/0'/0/6"])
-              ledger.wallet.pathsToAddresses ["44'/0'/0'/0/6"], done
+    # Launch init()
+    dongle = ledger.specs.fixtures.dongles.dongle1
+    init dongle.pin, dongle.masterSeed, dongle.pairingKeyHex, done
 
 
   afterEach (done) ->
@@ -48,7 +52,7 @@ describe "TransactionObserverTask", ->
     ledger.tasks.Task.stopAllRunningTasks()
     ledger.tasks.Task.resetAllSingletonTasks()
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
-    done()
+    _.defer -> done()
 
 
 
