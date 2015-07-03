@@ -1,0 +1,2 @@
+class @WalletDialogsAddaccountDialogViewController extends ledger.common.DialogViewController
+

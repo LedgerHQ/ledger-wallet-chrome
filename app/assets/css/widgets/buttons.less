@@ -1,6 +1,6 @@
 @import (reference) "../constants";
 
-.rounded-button(@color) {
+._rounded-button(@color) {
   font-size: @font-size-large;
   text-transform: uppercase;
   border-radius: @border-radius-default-value;
@@ -25,11 +25,27 @@
   }
 }
 .action-rounded-button {
-  .rounded-button(@color-action-green);
+  ._rounded-button(@color-action-green);
 }
 .cancel-rounded-button {
-  .rounded-button(@color-light-grey);
+  ._rounded-button(@color-light-grey);
 }
 .important-rounded-button {
-  .rounded-button(@color-invalid-red);
+  ._rounded-button(@color-invalid-red);
+}
+
+._small-rounded-button {
+  padding: 0 8px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  font-size: @font-size-very-small;
+  letter-spacing: 0;
+  font-weight: @font-weight-regular;
+  border-radius: 8px;
+}
+
+.small-action-rounded-button {
+  .action-rounded-button;
+  ._small-rounded-button;
 }

@@ -106,7 +106,6 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/wallet/accounts/{id}', (params) ->
     app.router.go "/wallet/accounts/#{params['id']}/show"
 
-
   # Send
   route '/wallet/send/index:?params:', (params = {}) ->
     dialog = new WalletSendIndexDialogViewController(params["?params"] or {})
@@ -126,9 +125,6 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/wallet/help/index', (params) ->
     dialog = new CommonDialogsHelpDialogViewController()
     dialog.show()
-
-  # Operations
-
 
   ## Firmware Update
   route '/update/index', (params) ->

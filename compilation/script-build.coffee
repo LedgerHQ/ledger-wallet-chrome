@@ -35,7 +35,7 @@ module.exports = (configuration) ->
       gulp.src 'app/assets/css/**/*.less'
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
-      .pipe cached('less')
+      #.pipe cached('less')
       .pipe changed "#{configuration.buildDir}/assets/css", extension: '.css', hasChanged: changed.compareSha1Digest
       .pipe less()
       .pipe gulp.dest "#{configuration.buildDir}/assets/css"

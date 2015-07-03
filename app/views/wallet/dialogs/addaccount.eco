@@ -1,0 +1,40 @@
+<section id="dialogs_addaccount_dialog">
+  <header>
+    <h1><%= t 'wallet.dialogs.addaccount.add_an_account' %></h1>
+  </header>
+  <div class="large-table">
+    <div class="header top">
+      <div class="uppercase-section-column stretchable"><%= t 'wallet.dialogs.addaccount.new_account' %></div>
+    </div>
+    <div class="row middle" id="exchange_rate_row">
+      <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.addaccount.name' %></div>
+      <input class="small-text-input" placeholder="<%= t 'wallet.dialogs.addaccount.account_name' %>" value="" />
+    </div>
+    <div class="row bottom" id="exchange_rate_row">
+      <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.addaccount.color' %></div>
+      <i class="fa fa-circle small-dot"></i>
+      <div class="small-grey-select">
+        <select id="currencies_select">
+          <option class="test" value="test">Coucou</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="large-table" id="hidden_accounts_table">
+    <div class="header top">
+      <div class="uppercase-section-column stretchable"><%= t 'wallet.dialogs.addaccount.hidden_accounts' %></div>
+    </div>
+    <div class="row middle" id="exchange_rate_row">
+      <i class="fa fa-circle small-dot"></i>
+      <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.addaccount.name' %></div>
+      <div class="regular-grey-text-small">0.000 BTC</div>
+      <a class="small-action-rounded-button"><%= t 'common.show' %></a>
+    </div>
+  </div>
+  <div id="error_container">This is a test</div>
+</section>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a href="#dismiss" class="cancel-rounded-button"><%= t 'common.cancel' %></a>
+  <a href="#dismiss" class="action-rounded-button"><%= t 'common.add' %></a>
+</div>

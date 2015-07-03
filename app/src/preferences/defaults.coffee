@@ -78,3 +78,22 @@ ledger.preferences.defaults =
       other:
         value: 'other'
         localization: 'common.help.other_tag'
+
+  # accounts preferences
+  Accounts:
+    colors:
+      turquoise:
+        localization: "common.colors.turquoise"
+        hex: "#5CACC4"
+      orange:
+        localization: "common.colors.orange"
+        hex: "#FCB653"
+      olive:
+        localization: "common.colors.olive"
+        hex: "#CEE879"
+      cherry:
+        localization: "common.colors.cherry"
+        hex: "#FF5254"
+      forest:
+        localization: "common.colors.forest"
+        hex: "#8CD19D"
