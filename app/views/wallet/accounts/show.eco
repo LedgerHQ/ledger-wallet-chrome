@@ -6,9 +6,9 @@
   <table>
     <thead>
       <tr>
-        <td class="fit-content" id="confirmed_balance_subtitle"><%= t 'wallet.accounts.show.detail.balance' %></td>
-        <td class="fit-content countervalue-balance" id="countervalue_balance_subtitle"><%= t 'wallet.accounts.show.detail.countervalue' %></td>
-        <td class="align-right"><%= t 'wallet.accounts.show.detail.actions' %></td>
+        <td class="fit-content" id="confirmed_balance_subtitle"><%= t 'wallet.defaults.operations.balance' %></td>
+        <td class="fit-content countervalue-balance" id="countervalue_balance_subtitle"><%= t 'wallet.defaults.operations.countervalue' %></td>
+        <td class="align-right"><%= t 'wallet.accounts.show.actions' %></td>
       </tr>
     </thead>
     <tbody>
@@ -18,8 +18,8 @@
         <td class="align-right">
           <div class="action-bar">
             <div class="left-spacer"></div>
-            <a class="action-rounded-button" href="/wallet/send/index?account_id=<%= @_getAccount().get('index') %>"><%= t 'wallet.accounts.show.detail.send' %></a>
-            <a class="action-rounded-button" href="/wallet/receive/index?account_id=<%= @_getAccount().get('index') %>"><%= t 'wallet.accounts.show.detail.receive' %></a>
+            <a class="action-rounded-button" href="/wallet/send/index?account_id=<%= @_getAccount().get('index') %>"><%= t 'common.send' %></a>
+            <a class="action-rounded-button" href="/wallet/receive/index?account_id=<%= @_getAccount().get('index') %>"><%= t 'common.receive' %></a>
           </div>
         </td>
       </tr>
@@ -28,8 +28,8 @@
 </section>
 <section id="operations">
   <header>
-    <h1><%= t 'wallet.accounts.show.operations.title' %></h1>
+    <h1><%= t 'wallet.accounts.show.last_operations' %></h1>
   </header>
-  <div class="empty-container" id="empty_container"><%= t 'wallet.accounts.show.operations.no_operations' %></div>
+  <div class="empty-container" id="empty_container"><%= t 'wallet.defaults.operations.no_operations' %></div>
   <table id="operations_list"></table>
 </section>

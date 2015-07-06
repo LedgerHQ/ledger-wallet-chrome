@@ -20,7 +20,7 @@ class @WalletAccountsOperationsViewController extends ledger.common.ActionBarVie
     ledger.preferences.instance.off 'currencyActive:changed', @_debouncedUpdateOperations
 
   showOperation: (params) ->
-    dialog = new WalletOperationsDetailDialogViewController(params)
+    dialog = new WalletDialogsOperationdetailDialogViewController(params)
     dialog.show()
 
   _updateOperations: ->
@@ -30,7 +30,7 @@ class @WalletAccountsOperationsViewController extends ledger.common.ActionBarVie
       @view.operationsList.html html
 
   _updateAccountName: ->
-    @view.accountName.text(_.str.sprintf(t('wallet.operations.index.title_with_account_name'), @_getAccount().get('name')))
+    @view.accountName.text(_.str.sprintf(t('wallet.accounts.operations.all_account_operations'), @_getAccount().get('name')))
 
   _listenEvents: ->
     # update operations

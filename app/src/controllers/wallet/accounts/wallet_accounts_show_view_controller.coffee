@@ -16,8 +16,8 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
   ]
 
   actions: [
-    { title: 'wallet.accounts.show.operations.action', icon: 'fa-reorder', url: '/wallet/accounts/:account_id:/operations'}
-    { title: 'wallet.accounts.show.operations.settings', icon: 'fa-cog', url: '#openSettings'}
+    { title: 'wallet.accounts.show.actions.see_all_operations', icon: 'fa-reorder', url: '/wallet/accounts/:account_id:/operations'}
+    { title: 'wallet.accounts.show.actions.account_settings', icon: 'fa-cog', url: '#openSettings'}
   ]
 
   initialize: ->
@@ -37,7 +37,7 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     @_listenEvents()
 
   showOperation: (params) ->
-    dialog = new WalletOperationsDetailDialogViewController(params)
+    dialog = new WalletDialogsOperationdetailDialogViewController(params)
     dialog.show()
 
   openSettings: ->

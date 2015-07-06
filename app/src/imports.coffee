@@ -245,10 +245,7 @@
         # Dialogs
         '/controllers/wallet/dialogs/wallet_dialogs_addaccount_dialog_view_controller'
         '/controllers/wallet/dialogs/wallet_dialogs_accountsettings_dialog_view_controller'
-
-        # Operations
-        'controllers/wallet/operations/wallet_operations_detail_dialog_view_controller'
-        'controllers/wallet/operations/wallet_operations_index_view_controller'
+        '/controllers/wallet/dialogs/wallet_dialogs_operationdetail_dialog_view_controller'
 
         # Accounts
         'controllers/wallet/accounts/wallet_accounts_index_view_controller'

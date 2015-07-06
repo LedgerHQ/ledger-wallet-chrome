@@ -1,14 +1,14 @@
 <% if @operations.length > 0: %>
 <thead>
 <tr>
-    <td class="fit-content"><%= t 'wallet.accounts.show.operations.time' %></td>
+    <td class="fit-content"><%= t 'wallet.defaults.operations.time' %></td>
     <td class="fit-content align-right padding-right-very-small"></td>
-    <td><%= t 'wallet.accounts.show.operations.bitcoin_address' %></td>
+    <td><%= t 'wallet.defaults.operations.bitcoin_address' %></td>
     <td></td>
   <% if ledger.preferences.instance.isCurrencyActive(): %>
-    <td class="fit-content align-right padding-right-medium"><%= t 'wallet.accounts.show.operations.countervalue' %></td>
+    <td class="fit-content align-right padding-right-medium"><%= t 'wallet.defaults.operations.countervalue' %></td>
   <% end %>
-  <td class="fit-content align-right"><%= t 'wallet.accounts.show.operations.amount' %></td>
+  <td class="fit-content align-right"><%= t 'wallet.defaults.operations.amount' %></td>
 </tr>
 </thead>
 <tbody>
@@ -16,7 +16,7 @@
 <tr class="<%= if @operations[@operations.length - 1] == operation then 'no-border' %>"
     data-href="#showOperation(operationId=<%= operation.getId() %>)">
     <td class="fit-content regular-grey-text"><%= ledger.i18n.formatDateTime(new Date(operation.get('time'))) %></td>
-    <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= if operation.get('type') == 'reception' then t 'wallet.accounts.show.operations.sender' else t 'wallet.accounts.show.operations.receiver' %></td>
+    <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= if operation.get('type') == 'reception' then t 'wallet.defaults.operations.sender' else t 'wallet.defaults.operations.receiver' %></td>
     <td class="selectable">
         <%= if operation.get('type') == 'reception' then operation.get('senders')[0] else operation.get('recipients')[0] %>
         <% if operation.get('type') == 'reception': %>
@@ -29,7 +29,7 @@
         <% end %>
         <% end %>
     </td>
-    <td class="fit-content regular-grey-text-small"><%= if !ledger.preferences.instance.isConfirmationCountReached(operation.get('confirmations')) then t('wallet.accounts.show.operations.unconfirmed').toLowerCase() %></td>
+    <td class="fit-content regular-grey-text-small"><%= if !ledger.preferences.instance.isConfirmationCountReached(operation.get('confirmations')) then t('wallet.defaults.operations.unconfirmed').toLowerCase() %></td>
     <% if ledger.preferences.instance.isCurrencyActive(): %>
       <td class="fit-content align-right padding-right-medium regular-grey-text" data-countervalue="<%= if operation.get('type') == 'reception' then '+' else '-' %><%= operation.get('total_value')%>"></td>
     <% end %>

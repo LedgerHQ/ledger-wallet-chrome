@@ -1,11 +1,11 @@
 <section id="operation_detail_dialog">
   <header>
-    <h1><%= t 'wallet.operations.detail.title' %></h1>
+    <h1><%= t 'wallet.dialogs.operationdetail.operation_detail' %></h1>
   </header>
   <table class="no-table-head">
     <tbody>
       <tr>
-        <td class="row-title"><%= t 'wallet.operations.detail.amount' %></td>
+        <td class="row-title"><%= t 'wallet.defaults.operations.amount' %></td>
         <% if @operation.get('type') == 'reception': %>
           <td class="align-right">
             <span class="regular-valid-text"><%= if ledger.formatters.symbolIsFirst() then ledger.formatters.getUnitSymbol() + ' ' %>+<%= ledger.formatters.fromValue(@operation.get('total_value')) %><%= if !ledger.formatters.symbolIsFirst() then ' ' + ledger.formatters.getUnitSymbol() %></span>
@@ -13,13 +13,13 @@
           <% else: %>
           <td class="align-right">
             <span class="regular-invalid-text"><%= if ledger.formatters.symbolIsFirst() then ledger.formatters.getUnitSymbol() + ' ' %>-<%= ledger.formatters.fromValue(@operation.get('total_value')) %><%= if !ledger.formatters.symbolIsFirst() then ' ' + ledger.formatters.getUnitSymbol() %></span>
-            <span class="regular-grey-text-small"><%= _.str.sprintf t('wallet.operations.detail.transaction_fees_text'), ledger.formatters.formatValue(@operation.get('fees')) %></span>
+            <span class="regular-grey-text-small"><%= _.str.sprintf t('wallet.dialogs.operationdetail.transaction_fees_text'), ledger.formatters.formatValue(@operation.get('fees')) %></span>
           </td>
         <% end %>
       </tr>
       <% if ledger.preferences.instance.isCurrencyActive(): %>
       <tr>
-        <td class="row-title"><%= t 'wallet.operations.detail.countervalue' %></td>
+        <td class="row-title"><%= t 'wallet.defaults.operations.countervalue' %></td>
         <% if @operation.get('type') == 'reception': %>
           <td class="align-right">
             <span class="regular-grey-text" data-countervalue="+<%= @operation.get('total_value') %>"></span>
@@ -27,38 +27,38 @@
           <% else: %>
           <td class="align-right">
             <span class="regular-grey-text" data-countervalue="-<%= @operation.get('total_value') %>"></span>
-            <span class="regular-grey-text-small"><%= _.str.sprintf t('wallet.operations.detail.transaction_fees_text'), ledger.converters.satoshiToCurrencyFormatted(@operation.get('fees')) %></span>
+            <span class="regular-grey-text-small"><%= _.str.sprintf t('wallet.dialogs.operationdetail.transaction_fees_text'), ledger.converters.satoshiToCurrencyFormatted(@operation.get('fees')) %></span>
           </td>
         <% end %>
       </tr>
       <% end %>
       <tr>
-        <td class="row-title"><%= t 'wallet.operations.detail.account' %></td>
+        <td class="row-title"><%= t 'wallet.defaults.operations.account' %></td>
         <td class="align-right">
           <i class="fa fa-circle small-dot" id="color_circle"></i>
           <%- @operation.get('account').get('name') %>
         </td>
       </tr>
       <tr>
-        <td class="row-title"><%= t 'wallet.operations.detail.time' %></td>
+        <td class="row-title"><%= t 'wallet.defaults.operations.time' %></td>
         <td class="align-right"><%= ledger.i18n.formatDateTime(new Date(@operation.get('time'))) %></td>
       </tr>
       <tr>
-        <td class="row-title"><%= t 'wallet.operations.detail.status' %></td>
+        <td class="row-title"><%= t 'wallet.defaults.operations.status' %></td>
         <% if !ledger.preferences.instance.isConfirmationCountReached(@operation.get('confirmations')): %>
           <td class="align-right regular-grey-text">
-            <%= t 'wallet.operations.detail.unconfirmed' %>
+            <%= t 'wallet.defaults.operations.unconfirmed' %>
             <span class="regular-grey-text-small">(<%= @operation.get('confirmations') %>)</span>
           </td>
         <% else: %>
           <td class="align-right regular-valid-text">
-            <%= t 'wallet.operations.detail.confirmed' %>
+            <%= t 'wallet.defaults.operations.confirmed' %>
             <span class="regular-grey-text-small">(<%= @operation.get('confirmations') %>)</span>
           </td>
         <% end %>
       </tr>
       <tr>
-        <td class="row-title top-aligned"><%= t 'wallet.operations.detail.sender' %></td>
+        <td class="row-title top-aligned"><%= t 'wallet.defaults.operations.sender' %></td>
         <td class="align-right" id="operation_inputs">
           <% for input in @operation.get('senders'): %>
           <%= input %><br />
@@ -66,7 +66,7 @@
         </td>
       </tr>
       <tr>
-        <td class="row-title top-aligned"><%= t 'wallet.operations.detail.receiver' %></td>
+        <td class="row-title top-aligned"><%= t 'wallet.defaults.operations.receiver' %></td>
         <td class="align-right" id="operation_outputs">
           <% for output in @operation.get('recipients'): %>
           <%= output %><br />
@@ -74,7 +74,7 @@
         </td>
       </tr>
       <tr class="no-border">
-        <td class="row-title optional"><%= t 'wallet.operations.detail.identifier' %></td>
+        <td class="row-title optional"><%= t 'wallet.defaults.operations.identifier' %></td>
         <td class="align-right regular-grey-text-small" id="operation_identifier"><%= @operation.get('hash') %></td>
       </tr>
     </tbody>

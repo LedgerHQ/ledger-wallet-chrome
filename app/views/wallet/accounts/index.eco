@@ -1,3 +1,15 @@
-<% for account in @accounts: %>
-  <a href="/wallet/accounts/<%= account.id %>/show"><%= account.name %></a>
-<% end %>
+<section id="quicklook">
+  <header>
+    <h1><%= t 'wallet.accounts.index.quicklook' %></h1>
+  </header>
+  <% for account in @accounts: %>
+    <a href="/wallet/accounts/<%= account.id %>/show"><%= account.name %></a>
+  <% end %>
+</section>
+<section id="operations">
+  <header>
+    <h1><%= t 'wallet.accounts.index.last_operations' %></h1>
+  </header>
+  <div class="empty-container" id="empty_container"><%= t 'wallet.accounts.show.operations.no_operations' %></div>
+  <table id="operations_list"></table>
+</section>

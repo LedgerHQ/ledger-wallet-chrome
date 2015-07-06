@@ -2,6 +2,6 @@
   <header>
     <h1 id="account_name"></h1>
   </header>
-  <div class="empty-container" id="empty_container"><%= t 'wallet.operations.index.no_operations' %></div>
+  <div class="empty-container" id="empty_container"><%= t 'wallet.defaults.operations.no_operations' %></div>
   <table id="operations_list"></table>
 </section>
