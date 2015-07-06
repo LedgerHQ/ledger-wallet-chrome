@@ -1,13 +1,11 @@
 class @WalletNavigationController extends ledger.common.ActionBarNavigationController
 
   _menuItemBaseUrl: {
-#    '/wallet/dashboard/': '#dashboard-item'
 #    '/wallet/send/': '#send-item'
 #    '/wallet/receive/': '#receive-item'
 #    '/wallet/accounts/': '#accounts-item'
 #    '/wallet/signout/': '#signout-item'
     '/wallet/accounts/index' : '#accounts-item'
-    '/wallet/dashboard/index': '#dashboard-item'
   }
   view:
     balanceValue: '#balance_value'
@@ -103,16 +101,16 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
 
   getActionBarDrawer: ->
     @_actionBarDrawer ||= _.extend new ledger.common.ActionBarNavigationController.ActionBar.Drawer(),
-      createBreadcrumbPartView: (title, url, position) =>
+      createBreadcrumbPartView: (title, url, position, length) =>
         view = $("<span>#{t(title)}</span>")
         view.addClass("breadcrumb-root") if position is 0
-        view.attr('data-href', url) if not _.isEmpty(url) and position isnt 0
+        view.attr('data-href', url) if not _.isEmpty(url) and position isnt 0 and position < length - 1
         view
 
       createBreadcrumbSeparatorView: (position) => $("<span>&nbsp;&nbsp;>&nbsp;&nbsp;</span>")
 
-      createActionView: (title, icon, url, position) =>
-        view = $("<span><i class=\"fa #{icon}\"></i> #{t(title)}</span>")
+      createActionView: (title, icon, url, position, length) =>
+        view = $("<span><i class=\"fa #{icon}\"></i>#{t(title)}</span>")
         view.attr('data-href', url)
         view
 

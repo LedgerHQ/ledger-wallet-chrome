@@ -93,13 +93,6 @@ ledger.router.pluggedWalletRoutesExceptions = [
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementProvisioningViewController
 
   ## Wallet
-  # Dashboard
-  route 'wallet/dashboard/index', ->
-    app.navigate WALLET_LAYOUT, WalletDashboardIndexViewController
-
-  route 'wallet/dashboard/operations', ->
-    app.navigate WALLET_LAYOUT, WalletDashboardOperationsViewController
-
   # Accounts
   route 'wallet/accounts/index', ->
     app.navigate WALLET_LAYOUT, WalletAccountsIndexViewController
@@ -112,7 +105,6 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   route '/wallet/accounts/{id}', (params) ->
     app.router.go "/wallet/accounts/#{params['id']}/show"
-
 
   # Send
   route '/wallet/send/index:?params:', (params = {}) ->
@@ -133,9 +125,6 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/wallet/help/index', (params) ->
     dialog = new CommonDialogsHelpDialogViewController()
     dialog.show()
-
-  # Operations
-
 
   ## Firmware Update
   route '/update/index', (params) ->

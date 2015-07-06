@@ -242,9 +242,9 @@
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller'
 
-        # Dashboard
-        'controllers/wallet/dashboard/wallet_dashboard_index_view_controller'
-        'controllers/wallet/dashboard/wallet_dashboard_operations_view_controller'
+        # Dialogs
+        '/controllers/wallet/dialogs/wallet_dialogs_addaccount_dialog_view_controller'
+        '/controllers/wallet/dialogs/wallet_dialogs_accountsettings_dialog_view_controller'
 
         # Operations
         'controllers/wallet/operations/wallet_operations_detail_dialog_view_controller'
@@ -433,10 +433,10 @@
           '../spec/tasks/address_derivation_task_spec'
           '../spec/tasks/balance_task_spec'
           '../spec/tasks/operations_consumption_task_spec'
+          '../spec/tasks/operations_synchronization_task_spec'
           '../spec/tasks/ticker_task_spec'
           '../spec/tasks/transaction_observer_task_spec'
           '../spec/tasks/wallet_layout_recovery_task_spec'
-          '../spec/tasks/wallet_open_task_spec'
 
           '../spec/dongle/derivation_spec'
 

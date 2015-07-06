@@ -38,7 +38,9 @@ describe "BalanceTask", ->
       done()
 
 
-  afterEach ->
+  afterEach (done) ->
+    [ledger.storage.databases, ledger.storage.wallet, ledger.storage.sync, ledger.storage.sync.wallet].forEach (that) -> that.clear()
     ledger.tasks.Task.stopAllRunningTasks()
     ledger.tasks.Task.resetAllSingletonTasks()
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
+    _.defer -> done()

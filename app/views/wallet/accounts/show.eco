@@ -1,6 +1,7 @@
 <section id="account">
   <header>
-    <h1 id="account_name"></h1>Salut
+    <i class="fa fa-circle small-dot" id="color_circle"></i>
+    <h1 id="account_name"></h1>
   </header>
   <table>
     <thead>
@@ -28,7 +29,6 @@
 <section id="operations">
   <header>
     <h1><%= t 'wallet.accounts.show.operations.title' %></h1>
-    <a href="/wallet/accounts/0/operations" class="uppercase-action"><i class="fa fa-reorder"/><%= t 'wallet.accounts.show.operations.action' %></a>
   </header>
   <div class="empty-container" id="empty_container"><%= t 'wallet.accounts.show.operations.no_operations' %></div>
   <table id="operations_list"></table>

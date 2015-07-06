@@ -1,7 +1,6 @@
 class @SpecNavigationController extends ledger.common.NavigationController
 
   _menuItemBaseUrl: {
-#    '/wallet/dashboard/': '#dashboard-item'
 #    '/wallet/send/': '#send-item'
 #    '/wallet/receive/': '#receive-item'
 #    '/wallet/accounts/': '#accounts-item'
