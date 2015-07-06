@@ -88,12 +88,12 @@ ledger.preferences.defaults =
       orange:
         localization: "common.colors.orange"
         hex: "#FCB653"
-      olive:
-        localization: "common.colors.olive"
-        hex: "#CEE879"
       cherry:
         localization: "common.colors.cherry"
         hex: "#FF5254"
+      olive:
+        localization: "common.colors.olive"
+        hex: "#CEE879"
       forest:
         localization: "common.colors.forest"
         hex: "#8CD19D"

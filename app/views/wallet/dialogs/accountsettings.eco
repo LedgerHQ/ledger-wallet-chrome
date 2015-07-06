@@ -8,22 +8,21 @@
     </div>
     <div class="row middle" id="exchange_rate_row">
       <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.accountsettings.name' %></div>
-      <input class="small-text-input" placeholder="<%= t 'wallet.dialogs.accountsettings.account_name' %>" value="" />
+      <input class="small-text-input" placeholder="<%= t 'wallet.dialogs.accountsettings.account_name' %>" value="" id="account_name_input" />
     </div>
     <div class="row bottom" id="exchange_rate_row">
       <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.accountsettings.color' %></div>
-      <i class="fa fa-circle small-dot"></i>
       <div class="small-grey-select">
-        <select id="currencies_select">
-          <option class="test" value="test">Coucou</option>
-        </select>
+        <select id="colors_select"></select>
       </div>
+      <i class="fa fa-square medium-square" id="color_square"></i>
     </div>
   </div>
-  <div id="error_container">This is a test</div>
+  <div id="error_container"></div>
 </section>
 <div class="dialog-actions-bar">
   <a href="#hideAccount" class="uppercase-action"><%= t 'wallet.dialogs.accountsettings.hide_account' %></a>
   <div class="left-spacer"></div>
   <a href="#dismiss" class="cancel-rounded-button"><%= t 'common.close' %></a>
+  <a href="#saveAccount" class="action-rounded-button"><%= t 'common.save' %></a>
 </div>
