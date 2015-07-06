@@ -41,7 +41,7 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     dialog.show()
 
   openSettings: ->
-    # TODO: Open settings action
+    (new WalletDialogsAccountsettingsDialogViewController(accountIndex: @_getAccount().get('index'))).show()
 
   _updateOperations: ->
     operations = @_getAccount().get 'operations'

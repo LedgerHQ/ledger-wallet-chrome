@@ -12,6 +12,7 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
       # TODO: select current option
     @_updateAccountColorSquare()
     @_updateErrorContainerText()
+    @_updateUIAccordingToAccount()
     @_listenEvents()
 
   onShow: ->
@@ -54,5 +55,11 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
       @view.errorContainer.text('')
       @view.errorContainer.hide()
 
+  _updateUIAccordingToAccount: ->
+    @view.accountNameInput.val(@_getAccount().get('name'))
+
   _accountName: ->
     return _.str.trim @view.accountNameInput.val()
+
+  _getAccount: ->
+    Account.find(index: @params.accountIndex).first()
