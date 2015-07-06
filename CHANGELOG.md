@@ -1,4 +1,8 @@
 # Changelog
+1.3.10
+====
+- Fix a bug during transaction validation
+
 1.3.9
 =====
 - Fix a bug during firmware update
