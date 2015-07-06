@@ -33,6 +33,13 @@
       </tr>
       <% end %>
       <tr>
+        <td class="row-title"><%= t 'wallet.operations.detail.account' %></td>
+        <td class="align-right">
+          <i class="fa fa-circle small-dot" id="color_circle"></i>
+          <%- @operation.get('account').get('name') %>
+        </td>
+      </tr>
+      <tr>
         <td class="row-title"><%= t 'wallet.operations.detail.time' %></td>
         <td class="align-right"><%= ledger.i18n.formatDateTime(new Date(@operation.get('time'))) %></td>
       </tr>
@@ -76,5 +83,5 @@
 <div class="dialog-actions-bar">
   <a class="cancel-rounded-button" href="#openBlockchain"><i class="fa fa-search"></i></a>
   <div class="left-spacer"></div>
-  <a class="cancel-rounded-button" href="#dismiss"><%= t 'wallet.operations.detail.close' %></a>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.close' %></a>
 </div>
