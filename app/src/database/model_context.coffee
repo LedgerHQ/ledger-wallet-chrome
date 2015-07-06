@@ -188,7 +188,7 @@ class ledger.database.contexts.Context extends EventEmitter
           collection.updateSynchronizedProperties(collectionData)
         else
           # delete all
-          l collection.getModelClass().chain(this).remove()
+          collection.getModelClass().chain(this).remove()
       @emit 'synchronized'
 
   _modelize: (data) -> @getCollection(data['objType'])?._modelize(data)

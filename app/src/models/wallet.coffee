@@ -3,6 +3,7 @@ class @Wallet extends ledger.database.Model
 
   #@hasMany accounts: 'Account'
   @has many: 'accounts', sortBy: 'index', onDelete: 'destroy'
+  @index 'id', sync: yes
 
   @instance: undefined
 
@@ -35,20 +36,21 @@ class @Wallet extends ledger.database.Model
       callback?()
     else
       firstAccount = Account.all()[0]
-      finalize = (account) =>
-        @instance.add('accounts', account).save()
+      finalize =  =>
+        for account in Account.all()
+          @instance.add('accounts', account).save()
         callback?()
       return finalize(firstAccount) if firstAccount?
       ledger.storage.sync.pull().then =>
         onDatabaseSynchronized = ->
           firstAccount = Account.findOrCreate(index: 0, {index: 0, name: t 'common.default_account_name'}).save()
-          finalize(firstAccount)
+          do finalize
         onDatabaseSynchronized = _.once(onDatabaseSynchronized)
         ledger.database.contexts.main.once 'synchronized', onDatabaseSynchronized
         _.delay(onDatabaseSynchronized, 5000)
       .fail =>
         firstAccount = Account.findOrCreate(index: 0, {index: 0, name: t 'common.default_account_name'}).save()
-        finalize(firstAccount)
+        do finalize
       .done()
 
   @releaseWallet: () ->
