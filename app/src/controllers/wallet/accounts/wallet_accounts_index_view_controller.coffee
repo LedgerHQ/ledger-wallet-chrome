@@ -10,3 +10,6 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
     @accounts =
       for account in Account.all()
         id: account.get('index'), name: account.get('name')
+
+  addAccount: ->
+    (new WalletDialogsAddaccountDialogViewController()).show()

@@ -79,7 +79,6 @@ class ledger.common.application.BaseApplication extends @EventEmitter
     Reloads the currently displayed view controller and css files.
   ###
   reloadUi: (reloadViewTemplates = no) ->
-    l reloadViewTemplates
     if reloadViewTemplates
       $('link').each (_, link) ->
         if link.href? && link.href.length > 0

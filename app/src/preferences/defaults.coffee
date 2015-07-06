@@ -97,3 +97,10 @@ ledger.preferences.defaults =
       forest:
         localization: "common.colors.forest"
         hex: "#8CD19D"
+
+    applyColorsToSelect: (select, optionCallback) ->
+      colors = ledger.preferences.defaults.Accounts.colors
+      for colorName, color of colors
+        option = $("<option></option>").text(t(color.localization)).attr('value', color.hex)
+        optionCallback?(option)
+        select.append(option)
