@@ -244,6 +244,7 @@
 
         # Dialogs
         '/controllers/wallet/dialogs/wallet_dialogs_addaccount_dialog_view_controller'
+        '/controllers/wallet/dialogs/wallet_dialogs_accountsettings_dialog_view_controller'
 
         # Operations
         'controllers/wallet/operations/wallet_operations_detail_dialog_view_controller'

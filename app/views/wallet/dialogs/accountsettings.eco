@@ -1,0 +1,29 @@
+<section id="dialogs_accountsettings_dialog">
+  <header>
+    <h1><%= t 'wallet.dialogs.accountsettings.account_settings' %></h1>
+  </header>
+  <div class="large-table">
+    <div class="header top">
+      <div class="uppercase-section-column stretchable"><%= t 'wallet.dialogs.accountsettings.settings' %></div>
+    </div>
+    <div class="row middle" id="exchange_rate_row">
+      <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.accountsettings.name' %></div>
+      <input class="small-text-input" placeholder="<%= t 'wallet.dialogs.accountsettings.account_name' %>" value="" />
+    </div>
+    <div class="row bottom" id="exchange_rate_row">
+      <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.accountsettings.color' %></div>
+      <i class="fa fa-circle small-dot"></i>
+      <div class="small-grey-select">
+        <select id="currencies_select">
+          <option class="test" value="test">Coucou</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div id="error_container">This is a test</div>
+</section>
+<div class="dialog-actions-bar">
+  <a href="#hideAccount" class="uppercase-action"><%= t 'wallet.dialogs.accountsettings.hide_account' %></a>
+  <div class="left-spacer"></div>
+  <a href="#dismiss" class="cancel-rounded-button"><%= t 'common.close' %></a>
+</div>
