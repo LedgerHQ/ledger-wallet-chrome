@@ -35,8 +35,7 @@
       <tr>
         <td class="row-title"><%= t 'wallet.defaults.operations.account' %></td>
         <td class="align-right">
-          <i class="fa fa-circle small-dot" id="color_circle"></i>
-          <%- @operation.get('account').get('name') %>
+          <i class="fa fa-circle small-dot" id="color_circle"></i><%- @operation.get('account').get('name') %>
         </td>
       </tr>
       <tr>

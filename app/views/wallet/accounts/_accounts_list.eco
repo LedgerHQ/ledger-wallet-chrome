@@ -1,0 +1,19 @@
+<% for account in @accounts: %>
+  <a href="/wallet/accounts/<%= account.index %>/show" class="panel freeform">
+    <i class="fa fa-circle small-dot"></i>
+    <div class="regular-text name"><%= account.name %></div>
+    <div class="balance">
+      <% if ledger.formatters.symbolIsFirst(): %>
+      <div class="regular-text"><%= ledger.formatters.getUnitSymbol() %>&nbsp;</div>
+      <div class="bold-regular-text"><%= ledger.formatters.fromValue(account.balance) %></div>
+      <% else: %>
+      <div class="bold-regular-text"><%= ledger.formatters.fromValue(account.balance) %></div>
+      <div class="regular-text">&nbsp;<%= ledger.formatters.getUnitSymbol() %></div>
+      <% end %>
+    </div>
+    <% if ledger.preferences.instance.isCurrencyActive(): %>
+    <div class="regular-grey-text countervalue" data-countervalue="<%= account.balance %>"></div>
+    <% end %>
+    <i class="fa fa-angle-right regular-grey-text arrow"></i>
+  </a>
+<% end %>

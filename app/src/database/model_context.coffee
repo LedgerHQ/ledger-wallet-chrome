@@ -103,17 +103,23 @@ class Collection
     @_getModelSyncSubstore(model).remove(model.constructor.getSynchronizedPropertiesNames())
 
   query: () ->
-    query = @_collection.chain()
-    data = query.data
+    @_wrapQuery(@_collection.chain())
+
+  _wrapQuery: (query) ->
+    return query if query._wrapped is true
+    {data, sort, limit, first, count, remove, simpleSort} = query
     query.data = () =>
       @_modelize(data.call(query))
     query.first = () => @_modelize(data.call(query)[0])
-    query.first = () =>
+    query.last = () =>
       d = data.call(query)
       @_modelize(d[d.length - 1])
     query.all = query.data
     query.count = () -> data.call(query).length
     query.remove = -> object.delete() for object in query.all()
+    query.sort = () => @_wrapQuery(sort.apply(query, arguments))
+    query.limit = () => @_wrapQuery(limit.apply(query, arguments))
+    query._wrapped = true
     query
 
   getCollection: () -> @_collection

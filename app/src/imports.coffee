@@ -221,8 +221,8 @@
 
         ## Models
         'models/wallet'
-        'models/account'
         'models/operation'
+        'models/account'
         'models/configuration'
         'models/account_tag'
 

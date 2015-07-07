@@ -23,12 +23,13 @@ class @Operation extends ledger.database.Model
       else super key
 
   @all: (context = ledger.database.contexts.main) ->
-    @find({}, context).sort (a, b) ->
-      d = b.time - a.time
-      if d is 0
-        if a.type > b.type then 1 else -1
-      else if d > 0
-        1
-      else
-        -1
-    .data()
+    @find({}, context).sort(@defaultSort).data()
+
+  @defaultSort: (a, b) ->
+    d = b.time - a.time
+    if d is 0
+      if a.type > b.type then 1 else -1
+    else if d > 0
+      1
+    else
+      -1

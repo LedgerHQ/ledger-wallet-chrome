@@ -46,7 +46,7 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
   _updateOperations: ->
     operations = @_getAccount().get 'operations'
     @view.emptyContainer.hide() if operations.length > 0
-    render 'wallet/accounts/operations_table', {operations: operations.slice(0, 5)}, (html) =>
+    render 'wallet/accounts/_operations_table', {operations: operations.slice(0, 5)}, (html) =>
       @view.operationsList.html html
 
   _updateBalances: ->
@@ -67,6 +67,9 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     # settings
     @_updateCountervalueVisibility()
     ledger.preferences.instance.on 'currencyActive:changed', @_debouncedUpdateCountervalueVisibility
+
+    # listen accounts
+    ledger.database.contexts.main.on 'update:account insert:account remove:account', @_updateAccountName
 
   _updateCountervalueVisibility: ->
     hideCountervalue = !ledger.preferences.instance.isCurrencyActive()
