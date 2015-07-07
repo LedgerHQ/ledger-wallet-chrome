@@ -49,7 +49,7 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
         1
       else
         -1
-    .limit(5).data()
+    .limit(6).data()
     @view.emptyContainer.hide() if operations.length > 0
     render 'wallet/accounts/_operations_table', {operations: operations, showAccounts: true}, (html) =>
       @view.operationsList.html html
