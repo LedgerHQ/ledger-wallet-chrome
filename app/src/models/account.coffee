@@ -9,6 +9,7 @@ class @Account extends ledger.database.Model
   @index 'index', sync: yes
   @sync 'name'
   @sync 'color'
+  @sync 'hidden'
 
   @fromWalletAccount: (hdAccount) ->
     return null unless hdAccount?
