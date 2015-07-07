@@ -224,7 +224,6 @@
         'models/operation'
         'models/account'
         'models/configuration'
-        'models/account_tag'
 
         ## Dialog Management
         'utils/dialogs'
