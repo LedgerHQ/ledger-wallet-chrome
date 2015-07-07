@@ -251,6 +251,7 @@
         'controllers/wallet/accounts/wallet_accounts_index_view_controller'
         'controllers/wallet/accounts/wallet_accounts_show_view_controller'
         'controllers/wallet/accounts/wallet_accounts_operations_view_controller'
+        'controllers/wallet/accounts/wallet_accounts_alloperations_view_controller'
 
         # Send
         'controllers/wallet/send/wallet_send_index_dialog_view_controller'
