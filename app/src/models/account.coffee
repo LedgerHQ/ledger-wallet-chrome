@@ -3,7 +3,6 @@ class @Account extends ledger.database.Model
   @has
     many: 'operations', onDelete: 'destroy'
     sortBy: Operation.defaultSort
-  @has one: 'account_tag', forMany: 'accounts', onDelete: 'nullify', sync: yes
   @has one: 'wallet', forMany: 'accounts', onDelete: 'nullify', sync: yes
 
   @index 'index', sync: yes
