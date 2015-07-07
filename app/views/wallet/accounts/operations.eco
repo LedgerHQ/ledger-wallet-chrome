@@ -1,5 +1,6 @@
 <section id="operations">
   <header>
+    <i class="fa fa-circle small-dot" id="color_circle"></i>
     <h1 id="account_name"></h1>
   </header>
   <div class="empty-container" id="empty_container"><%= t 'wallet.defaults.operations.no_operations' %></div>

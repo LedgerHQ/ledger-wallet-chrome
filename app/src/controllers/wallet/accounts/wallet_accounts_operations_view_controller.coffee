@@ -4,6 +4,7 @@ class @WalletAccountsOperationsViewController extends ledger.common.ActionBarVie
     emptyContainer: "#empty_container"
     operationsList: '#operations_list'
     accountName: '#account_name'
+    colorCircle: "#color_circle"
 
   initialize: ->
     super
@@ -31,6 +32,7 @@ class @WalletAccountsOperationsViewController extends ledger.common.ActionBarVie
 
   _updateAccountName: ->
     @view.accountName.text(_.str.sprintf(t('wallet.accounts.operations.all_account_operations'), @_getAccount().get('name')))
+    @view.colorCircle.css('color', @_getAccount().get('color'))
 
   _listenEvents: ->
     # update operations

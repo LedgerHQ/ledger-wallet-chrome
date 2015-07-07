@@ -1,6 +1,6 @@
 <% for account in @accounts: %>
   <a href="/wallet/accounts/<%= account.index %>/show" class="panel freeform">
-    <i class="fa fa-circle small-dot"></i>
+    <i class="fa fa-circle small-dot" style="color: <%= account.color %>"></i>
     <div class="regular-text name"><%= account.name %></div>
     <div class="balance">
       <% if ledger.formatters.symbolIsFirst(): %>

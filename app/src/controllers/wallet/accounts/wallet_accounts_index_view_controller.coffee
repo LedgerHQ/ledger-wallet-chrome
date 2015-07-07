@@ -57,7 +57,7 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
   _updateAccounts: ->
     accounts =
       for account in Account.all()
-        index: account.get('index'), name: account.get('name'), balance: account.get('total_balance')
+        index: account.get('index'), name: account.get('name'), balance: account.get('total_balance'), color: account.get('color')
     accounts = _.sortBy accounts, (account) => account.index
     render 'wallet/accounts/_accounts_list', {accounts: accounts}, (html) =>
       @view.accountsList.html html

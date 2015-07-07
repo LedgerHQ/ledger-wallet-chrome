@@ -10,6 +10,7 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     accountName: '#account_name'
     confirmedBalanceContainer: "#confirmed_balance_container"
     countervalueBalanceContainer: "#countervalue_balance_container"
+    colorCircle: '#color_circle'
 
   breadcrumb: [
     { title: 'wallet.breadcrumb.accounts'}
@@ -80,6 +81,7 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
   _updateAccountName: ->
     account = @_getAccount()
     @view.accountName.text account.get 'name'
+    @view.colorCircle.css('color', account.get('color'))
 
   _updateBalancesLayout: ->
     # invert layout if needed

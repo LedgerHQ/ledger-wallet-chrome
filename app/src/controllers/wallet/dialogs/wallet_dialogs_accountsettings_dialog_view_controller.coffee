@@ -9,7 +9,7 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
   onAfterRender: ->
     super
     ledger.preferences.defaults.Accounts.applyColorsToSelect @view.colorsSelect, (option) =>
-      # TODO: select current option
+      option.attr('selected', true) if @_getAccount().get('color') == option.val()
     @_updateAccountColorSquare()
     @_updateErrorContainerText()
     @_updateUIAccordingToAccount()
@@ -23,7 +23,7 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
     # check that fields are filled-in
     if @_checkCurrentFormError() is false
       # save account
-      @_getAccount().set('name', @_accountName()).save()
+      @_getAccount().set('name', @_accountName()).set('color', @view.colorsSelect.val()).save()
       @dismiss()
 
   deleteAccount: ->
