@@ -22,7 +22,8 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
   saveAccount: ->
     # check that fields are filled-in
     if @_checkCurrentFormError() is false
-      # TODO: save account
+      # save account
+      @_getAccount().set('name', @_accountName()).save()
       @dismiss()
 
   deleteAccount: ->
