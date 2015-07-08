@@ -35,6 +35,18 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @view.errorContainer.text nextError
     else
       @view.errorContainer.hide()
+
+      # check transactions fees
+
+
+      # warn if wrong
+#      dialog = new CommonDialogsConfirmationDialogViewController()
+#      dialog.setMessageLocalizableKey 'common.errors.going_to_firmware_update'
+#      dialog.once 'click:negative', => // click yes
+#      dialog.once 'click:positive', => // click no - default button
+#      dialog.show()
+
+      # push next dialog
       dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress()
       @getDialog().push dialog
 
