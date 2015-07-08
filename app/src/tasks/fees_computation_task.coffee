@@ -67,6 +67,6 @@ class ledger.tasks.FeesComputationTask extends ledger.tasks.Task
 
 class ledger.tasks.FeesComputationTask.Fee
 
-  constructor: (@value, @level)->
+  constructor: (@value, @level) ->
 
-  isBeyondDefaultValue: -> @value.gt(@level.defaultValue)
+  isBeyondDefaultValue: -> @value > @level.defaultValue
