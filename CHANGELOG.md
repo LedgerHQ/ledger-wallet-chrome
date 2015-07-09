@@ -1,6 +1,6 @@
 # Changelog
 
-1.3.12
+1.3.12/1.3.13
 ===
 - Use dynamic transaction fees instead of fixed fees
 - Fix a UI bug in the transaction dialog
