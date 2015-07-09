@@ -170,6 +170,7 @@
         'api/m2fa_restclient'
         'api/currencies_restclient'
         'api/groove_restclient'
+        'api/fees_restclient'
 
         ## Tasks
         'tasks/task'
@@ -181,6 +182,7 @@
         'tasks/address_derivation_task'
         'tasks/ticker_task'
         'tasks/wallet_open_task'
+        'tasks/fees_computation_task'
 
         ## Wallet
         'wallet/utils'
@@ -349,6 +351,7 @@
         'i18n/i18n_languages'
 
         ## Preferences
+        'preferences/fees'
         'preferences/defaults'
         'preferences/preferences'
 

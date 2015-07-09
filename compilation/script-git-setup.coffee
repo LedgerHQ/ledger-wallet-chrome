@@ -1,6 +1,6 @@
 
 module.exports = (configuration) ->
-  Q = require 'q'
+  Q = require 'Q'
   return Q() unless configuration.tag?
   git = require 'gulp-git'
   defer = Q.defer()

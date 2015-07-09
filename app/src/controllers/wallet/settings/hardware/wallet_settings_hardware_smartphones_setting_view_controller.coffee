@@ -16,6 +16,8 @@ class @WalletSettingsHardwareSmartphonesSettingViewController extends WalletSett
     secureScreens = @_smartphonesGroups[params.index]
     dialog = new CommonDialogsConfirmationDialogViewController()
     dialog.setMessageLocalizableKey 'common.errors.deleting_this_paired_smartphone'
+    dialog.positiveLocalizableKey = 'common.no'
+    dialog.negativeLocalizableKey = 'common.yes'
     dialog.once 'click:negative', =>
       ledger.m2fa.PairedSecureScreen.removePairedSecureScreensFromSyncedStore secureScreens, =>
         @rerender()

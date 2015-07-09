@@ -1,8 +1,7 @@
 gulp  = require 'gulp'
 
 # Load all required libraries.
-Q               = require 'q'
-
+Q               = require 'Q'
 less            = require 'gulp-less'
 coffee          = require 'gulp-coffee'
 yaml            = require 'gulp-yaml'

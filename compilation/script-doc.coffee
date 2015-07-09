@@ -1,5 +1,5 @@
 {exec} = require 'child_process'
-Q = require 'q'
+Q = require 'Q'
 
 module.exports = () ->
   defer = Q.defer()

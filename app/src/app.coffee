@@ -15,6 +15,7 @@ require @ledger.imports, ->
       ledger.i18n.init =>
         ledger.preferences.defaults.init =>
           @router.go('/') if @setExecutionMode(@Modes.Wallet)
+          ledger.tasks.FeesComputationTask.instance.startIfNeccessary()
 
     ###
       Sets the execution mode of the application. In Wallet mode, the application handles the wallets state by starting services,

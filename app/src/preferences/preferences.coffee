@@ -20,7 +20,7 @@ PreferencesStructure =
     default: 'USD'
 
   miningFee:
-    default: ledger.preferences.defaults.Bitcoin.fees.normal.value
+    default: ledger.preferences.defaults.Bitcoin.fees.fast.value
 
   blockchainExplorer:
     default: _.keys(ledger.preferences.defaults.Bitcoin.explorers)[0]
