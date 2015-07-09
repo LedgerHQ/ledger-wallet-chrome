@@ -41,15 +41,7 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
     ledger.database.contexts.main.on 'update:account insert:account remove:account', @_debouncedUpdateOperations
 
   _updateOperations: ->
-    operations = Operation.chain().sort (a, b) ->
-      d = b.time - a.time
-      if d is 0
-        if a.type > b.type then 1 else -1
-      else if d > 0
-        1
-      else
-        -1
-    .limit(6).data()
+    operations = Operation.chain().sort(Operation.defaultSort).limit(6).data()
     @view.emptyContainer.hide() if operations.length > 0
     render 'wallet/accounts/_operations_table', {operations: operations, showAccounts: true}, (html) =>
       @view.operationsList.html html

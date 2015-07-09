@@ -106,8 +106,8 @@ class Collection
     @_wrapQuery(@_collection.chain())
 
   _wrapQuery: (query) ->
-    return if query._
-    {data, sort, limit, first, count, remove, simpleSort} = query
+    return query if query._wrapped
+    {data, sort, limit, simpleSort} = query
     query.data = () =>
       @_modelize(data.call(query))
     query.first = () => @_modelize(data.call(query)[0])
@@ -117,8 +117,9 @@ class Collection
     query.all = query.data
     query.count = () -> data.call(query).length
     query.remove = -> object.delete() for object in query.all()
-#    query.sort = () => @_wrapQuery(sort.apply(query, arguments))
-#    query.limit = () => @_wrapQuery(limit.apply(query, arguments))
+    query.sort = () => @_wrapQuery(sort.apply(query, arguments))
+    query.limit = () => @_wrapQuery(limit.apply(query, arguments))
+    query.simpleSort = () => @_wrapQuery(simpleSort.apply(query, arguments))
     query._wrapped = true
     query
 
