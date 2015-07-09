@@ -48,10 +48,12 @@ class ledger.tasks.FeesComputationTask extends ledger.tasks.Task
   update: -> @_update(no)
 
   getFeesForLevel: (level) ->
-    value = _([1..level.numberOfBlock]).chain().map((i) => @_fees["#{i}"]).find((v) -> v <= level.defaultValue).value() or @_fees["#{level.numberOfBlock}"]
+    value = @_fees["#{level.numberOfBlock}"] or level.defaultValue
     new @constructor.Fee(value, level)
 
-  getFeesForPreferredLevel: -> @getFeesForLevel(ledger.preferences.fees.getLevelFromId(ledger.preferences.instance.getMiningFee()))
+  getFeesForLevelId: (levelId) -> @getFeesForLevel(ledger.preferences.fees.getLevelFromId(levelId))
+
+  getFeesForPreferredLevel: -> @getFeesForLevelId(ledger.preferences.instance.getMiningFee())
 
   _update: (scheduleNext) ->
     return unless @isRunning()
