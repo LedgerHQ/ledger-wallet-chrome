@@ -3,7 +3,7 @@ glob = require 'glob'
 _ = require 'underscore'
 _.str = require 'underscore.string'
 fs = require 'fs'
-Q = require 'q'
+Q = require 'Q'
 Yaml = require 'js-yaml'
 Eco = require 'eco'
 
