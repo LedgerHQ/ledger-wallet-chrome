@@ -72,3 +72,4 @@ class ledger.tasks.FeesComputationTask.Fee
   constructor: (@value, @level) ->
 
   isBeyondDefaultValue: -> @value > @level.defaultValue
+  isBeyondMaxValue: -> @value > ledger.preferences.fees.MaxValue

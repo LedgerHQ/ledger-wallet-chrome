@@ -20,5 +20,7 @@ _.extend ledger.preferences.fees,
       numberOfBlock: 6
       defaultValue: 1000
 
+  MaxValue: 50000
+
 
   getLevelFromId: (id) -> _(ledger.preferences.fees.Levels).find (l) -> l.id is id
