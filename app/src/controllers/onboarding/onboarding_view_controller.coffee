@@ -35,6 +35,8 @@ class @OnboardingViewController extends ledger.common.ViewController
   navigateRoot: ->
     dialog = new CommonDialogsConfirmationDialogViewController()
     dialog.setMessageLocalizableKey 'onboarding.management.cancel_wallet_configuration'
+    dialog.positiveLocalizableKey = 'common.no'
+    dialog.negativeLocalizableKey = 'common.yes'
     dialog.once 'click:negative', =>
       ledger.app.router.go @params.rootUrl
     dialog.show()

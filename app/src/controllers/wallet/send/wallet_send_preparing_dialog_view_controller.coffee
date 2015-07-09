@@ -7,7 +7,7 @@ class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewC
     super
     # fetch amount
     account = Account.find(index: 0).first()
-    account.createTransaction amount: @params.amount, fees: ledger.preferences.instance.getMiningFee(), address: @params.address, (transaction, error) =>
+    account.createTransaction amount: @params.amount, fees: @params.fees, address: @params.address, (transaction, error) =>
       return if not @isShown()
       if error?
         reason = switch error.code

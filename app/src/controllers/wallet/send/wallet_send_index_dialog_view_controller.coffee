@@ -3,21 +3,26 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
   view:
     amountInput: '#amount_input'
     sendButton: '#send_button'
-    totalInput: '#total_input'
+    totalLabel: '#total_label'
     errorContainer: '#error_container'
     receiverInput: '#receiver_input'
     openScannerButton: '#open_scanner_button'
+    feesSelect: '#fees_select'
 
   onAfterRender: () ->
     super
+
+    # apply params
     if @params.amount?
       @view.amountInput.val @params.amount
     if @params.address?
       @view.receiverInput.val @params.address
+    # configure view
     @view.amountInput.amountInput(ledger.preferences.instance.getBitcoinUnitMaximumDecimalDigitsCount())
     @view.errorContainer.hide()
-    do @_updateTotalInput
-    do @_listenEvents
+    @_updateFeesSelect()
+    @_updateTotalLabel()
+    @_listenEvents()
 
   onShow: ->
     super
@@ -29,26 +34,31 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
 
   send: ->
     nextError = @_nextFormError()
-    nextError = null
     if nextError?
       @view.errorContainer.show()
       @view.errorContainer.text nextError
     else
       @view.errorContainer.hide()
 
+      pushDialogBlock = (fees) =>
+        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees
+        @getDialog().push dialog
+
       # check transactions fees
-
-
-      # warn if wrong
-#      dialog = new CommonDialogsConfirmationDialogViewController()
-#      dialog.setMessageLocalizableKey 'common.errors.going_to_firmware_update'
-#      dialog.once 'click:negative', => // click yes
-#      dialog.once 'click:positive', => // click no - default button
-#      dialog.show()
-
-      # push next dialog
-      dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress()
-      @getDialog().push dialog
+      if +@view.feesSelect.val() > ledger.preferences.fees.MaxValue
+        # warn if wrong
+        dialog = new CommonDialogsConfirmationDialogViewController()
+        dialog.showsCancelButton = yes
+        dialog.restrainsDialogWidth = no
+        dialog.negativeText = _.str.sprintf(t('wallet.send.index.no_use'), ledger.formatters.formatValue(ledger.preferences.fees.MaxValue))
+        dialog.positiveLocalizableKey = 'common.yes'
+        dialog.message = _.str.sprintf(t('common.errors.fees_too_high'), ledger.formatters.formatValue(@view.feesSelect.val()))
+        dialog.once 'click:positive', => pushDialogBlock(@view.feesSelect.val())
+        dialog.once 'click:negative', => pushDialogBlock(ledger.preferences.fees.MaxValue)
+        dialog.show()
+      else
+        # push next dialog
+        pushDialogBlock(@view.feesSelect.val())
 
   openScanner: ->
     dialog = new CommonDialogsQrcodeDialogViewController
@@ -65,15 +75,16 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       if params?.amount?
         @view.amountInput.val(ledger.formatters.formatUnit(ledger.formatters.fromBtcToSatoshi(params.amount), ledger.preferences.instance.getBtcUnit()))
       @view.receiverInput.val params.address if params?.address?
-      @_updateTotalInput()
+      @_updateTotalLabel()
     dialog.show()
 
   _listenEvents: ->
     @view.amountInput.on 'keydown', =>
-      _.defer =>
-        @_updateTotalInput yes
+      _.defer => @_updateTotalLabel()
     @view.openScannerButton.on 'click', =>
       @openScanner()
+    @view.feesSelect.on 'change', =>
+      @_updateTotalLabel()
 
   _receiverBitcoinAddress: ->
     _.str.trim(@view.receiverInput.val())
@@ -89,7 +100,21 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       return t 'common.errors.invalid_receiver_address'
     undefined
 
-  _updateTotalInput: ->
-    fees = ledger.preferences.instance.getMiningFee()
+  _updateFeesSelectAndTotalLabel: ->
+    @_updateFeesSelect()
+    @_updateTotalLabel()
+
+  _updateFeesSelect: ->
+    @view.feesSelect.empty()
+    for id in _.sortBy(_.keys(ledger.preferences.defaults.Bitcoin.fees), (id) -> ledger.preferences.defaults.Bitcoin.fees[id].value).reverse()
+      fee = ledger.preferences.defaults.Bitcoin.fees[id]
+      text = t(fee.localization)
+      node = $("<option></option>").text(text).attr('value', ledger.tasks.FeesComputationTask.instance.getFeesForLevelId(fee.value.toString()).value)
+      if fee.value == ledger.preferences.instance.getMiningFee()
+        node.attr 'selected', true
+      @view.feesSelect.append node
+
+  _updateTotalLabel: ->
+    fees = @view.feesSelect.val()
     val = ledger.Amount.fromSatoshi(@_transactionAmount()).add(fees).toString()
-    @view.totalInput.text ledger.formatters.formatValue(val) + ' ' + _.str.sprintf(t('wallet.send.index.transaction_fees_text'), ledger.formatters.formatValue(fees))
+    @view.totalLabel.text ledger.formatters.formatValue(val) + ' ' + _.str.sprintf(t('wallet.send.index.transaction_fees_text'), ledger.formatters.formatValue(fees))

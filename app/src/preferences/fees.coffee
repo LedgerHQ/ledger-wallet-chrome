@@ -9,7 +9,6 @@ _.extend ledger.preferences.fees,
       numberOfBlock: 1
       defaultValue: 20000
 
-
     Normal:
       id: '10000'
       numberOfBlock: 3
