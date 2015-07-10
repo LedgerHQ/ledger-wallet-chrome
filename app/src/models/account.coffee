@@ -16,7 +16,8 @@ class @Account extends ledger.database.Model
 
   @create: (base, context) ->
     throw "Wrong account base object for creation. Index must be a number" if _.isNaN(+base['index'])
-    ledger.wallet.Wallet.instance.getOrCreateAccount(+base['index'])
+    ledger.wallet.Wallet.instance.getOrCreateAccount(+base['index']).save()
+    ledger.wallet.Wallet.instance.save()
     super(base, context)
 
   getWalletAccount: () -> ledger.wallet.Wallet.instance.getAccount(@get('index'))

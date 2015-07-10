@@ -183,6 +183,7 @@
         'tasks/ticker_task'
         'tasks/wallet_open_task'
         'tasks/fees_computation_task'
+        'tasks/account_manager_task'
 
         ## Wallet
         'wallet/utils'
