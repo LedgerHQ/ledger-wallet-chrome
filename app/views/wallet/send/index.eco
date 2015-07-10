@@ -5,20 +5,29 @@
   <table class="no-table-head">
     <tbody>
       <tr id="amount_row">
-        <td class="row-title"><%= t 'wallet.send.index.amount' %></td>
+        <td class="row-title"><%= t 'wallet.defaults.operations.amount' %></td>
         <td class="align-right">
-          <input id="amount_input" class="large-text-input" placeholder="<%= t 'wallet.send.index.amount_placeholder' %>" value=""/>
+          <input id="amount_input" class="large-text-input" placeholder="<%= t 'wallet.defaults.operations.amount' %>" value=""/>
           <label class="large-text-input"><%= ledger.formatters.getUnitSymbol() %></label>
         </td>
       </tr>
       <tr>
         <td class="row-title"><%= t 'wallet.send.index.receiver_address' %></td>
         <td class="align-right">
-          <input class="text-input" placeholder="<%= t 'wallet.send.index.receiver_address_placeholder' %>" id="receiver_input" value=""/>
+          <input class="text-input" placeholder="<%= t 'wallet.defaults.operations.bitcoin_address' %>" id="receiver_input" value=""/>
         </td>
       </tr>
       <tr>
-        <td class="row-title"><%= t 'wallet.send.index.transaction_fees' %></td>
+        <td class="row-title"><%= t 'wallet.send.index.account_to_debit' %></td>
+        <td class="align-right">
+          <div class="regular-select">
+            <select id="accounts_select"></select>
+          </div>
+          <i class="fa fa-square medium-square" id="color_square"></i>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title"><%= t 'wallet.defaults.operations.transaction_fees' %></td>
         <td class="align-right">
           <div class="small-grey-select">
             <select id="fees_select">

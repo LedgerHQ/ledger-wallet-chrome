@@ -8,6 +8,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     receiverInput: '#receiver_input'
     openScannerButton: '#open_scanner_button'
     feesSelect: '#fees_select'
+    accountsSelect: '#accounts_select'
+    colorSquare: '#color_square'
 
   onAfterRender: () ->
     super
@@ -17,11 +19,14 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @view.amountInput.val @params.amount
     if @params.address?
       @view.receiverInput.val @params.address
+
     # configure view
     @view.amountInput.amountInput(ledger.preferences.instance.getBitcoinUnitMaximumDecimalDigitsCount())
     @view.errorContainer.hide()
     @_updateFeesSelect()
     @_updateTotalLabel()
+    @_updateAccountsSelect()
+    @_updateColorSquare()
     @_listenEvents()
 
   onShow: ->
@@ -41,7 +46,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @view.errorContainer.hide()
 
       pushDialogBlock = (fees) =>
-        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees
+        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount()
         @getDialog().push dialog
 
       # check transactions fees
@@ -85,6 +90,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @openScanner()
     @view.feesSelect.on 'change', =>
       @_updateTotalLabel()
+    @view.accountsSelect.on 'change', =>
+      @_updateColorSquare()
 
   _receiverBitcoinAddress: ->
     _.str.trim(@view.receiverInput.val())
@@ -99,10 +106,6 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     else if not Bitcoin.Address.validate @_receiverBitcoinAddress()
       return t 'common.errors.invalid_receiver_address'
     undefined
-
-  _updateFeesSelectAndTotalLabel: ->
-    @_updateFeesSelect()
-    @_updateTotalLabel()
 
   _updateFeesSelect: ->
     @view.feesSelect.empty()
@@ -119,4 +122,15 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     val = ledger.Amount.fromSatoshi(@_transactionAmount()).add(fees).toString()
     @view.totalLabel.text ledger.formatters.formatValue(val) + ' ' + _.str.sprintf(t('wallet.send.index.transaction_fees_text'), ledger.formatters.formatValue(fees))
 
-  _getAccount: -> @_account ||= Account.findById(+@params.account_id or 0)
+  _updateAccountsSelect: ->
+    accounts = Account.displayableAccounts()
+    for account in accounts
+      option = $('<option></option>').text(account.name + ' (' + ledger.formatters.formatValue(account.balance) + ')').val(account.index)
+      option.attr('selected', true) if @params.account_id? and account.index is +@params.account_id
+      @view.accountsSelect.append option
+
+  _updateColorSquare: ->
+    @view.colorSquare.css('color', @_selectedAccount().get('color'))
+
+  _selectedAccount: ->
+    Account.find(index: parseInt(@view.accountsSelect.val())).first()
