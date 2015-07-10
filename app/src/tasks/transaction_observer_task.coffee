@@ -20,6 +20,8 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
       switch data.payload.type
         when 'new-transaction'
           transaction = data.payload.transaction
+          l "Incoming tx", transaction
+          # Ensure all observable addresses are in the cache before handling the transaction
           @_handleTransactionIO(transaction, transaction.inputs)
           @_handleTransactionIO(transaction, transaction.outputs)
         when 'new-block'
@@ -29,6 +31,7 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
   _handleTransactionIO: (transaction, io) ->
     found = no
     if io?
+      failedAddresses = []
       for input in io
         continue unless input.addresses?
         for address in input.addresses
@@ -45,7 +48,22 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
               ledger.app.emit 'wallet:operations:new'
             else
               @logger().warn "Failed to retrieve an account for #{derivation} ", transaction
+          else
+            # Attempts to discover another account
+           failedAddresses.push address
+      @_attemptAccountDiscovery(transaction, failedAddresses) if failedAddresses.length > 0
     found
+
+  _attemptAccountDiscovery: (transaction, addresses) ->
+    return unless ledger.preferences.instance?
+    wallet = ledger.wallet.Wallet.instance
+    indexes = wallet.getNextAccountIndexes(ledger.preferences.instance.getAccountDiscoveryGap())
+    paths = _.flatten(wallet.getGhostAccount(index).getAllObservedAddressesPaths() for index in indexes)
+    l "Attempt ", transaction
+    l paths
+    ledger.wallet.pathsToAddresses paths, (addresses) ->
+      l addresses
+      l paths
 
   _handleNewBlock: (block) ->
     @logger().trace 'Receive new block'

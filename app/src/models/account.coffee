@@ -14,10 +14,21 @@ class @Account extends ledger.database.Model
     return null unless hdAccount?
     @find(index: hdAccount.index).first()
 
+  @create: (base, context) ->
+    throw "Wrong account base object for creation. Index must be a number" if _.isNaN(+base['index'])
+    ledger.wallet.Wallet.instance.getOrCreateAccount(+base['index'])
+    super(base, context)
+
   getWalletAccount: () -> ledger.wallet.Wallet.instance.getAccount(@get('index'))
 
   serialize: () ->
     $.extend super, { root_path: @getWalletAccount().getRootDerivationPath() }
+
+  # Fast getters
+
+  isHidden: -> @get 'hidden' or no
+
+  isDeletable: -> @get('operations').length is 0
 
   ## Balance management
 

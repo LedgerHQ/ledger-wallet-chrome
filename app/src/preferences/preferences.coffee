@@ -34,6 +34,9 @@ PreferencesStructure =
   discoveryGap:
     default: 20
 
+  accountDiscoveryGap:
+    default: 1
+
   confirmationsCount:
     default: ledger.preferences.defaults.Bitcoin.confirmations.one
 
@@ -99,6 +102,9 @@ class ledger.preferences.Preferences extends EventEmitter
 
   getDiscoveryGap: -> @_getPreference('discoveryGap')
   setDiscoveryGap: (value) -> @_setPreference('discoveryGap', value)
+
+  getAccountDiscoveryGap: -> @_getPreference('accountDiscoveryGap')
+  setAccountDiscoveryGap: (value) -> @_setPreference('accountDiscoveryGap', value)
 
   ###
     Gets and Sets logging state
