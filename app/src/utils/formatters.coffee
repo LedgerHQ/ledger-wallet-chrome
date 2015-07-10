@@ -112,6 +112,25 @@ class ledger.formatters
 
 
   ###
+    This method converts Satoshi to BTC according to BIP0021
+
+    @param [Number] value An input value in satoshi
+    @return [String] The formatted value
+  ###
+  @fromSatoshiToBIP0021: (value) ->
+    satoshis = new Bitcoin.BigInteger(value.toString())
+    result = satoshis.divideAndRemainder(new Bitcoin.BigInteger('100000000'))
+    value = result[0].toString()
+    fractionalPart = result[1]
+
+    if fractionalPart.compareTo(Bitcoin.BigInteger.ZERO)
+      fractionalPart = _.str.lpad(fractionalPart.toString(), 8, '0')
+      fractionalPart = fractionalPart.replace(/\.?0+$/, '')
+      value += '.' + fractionalPart.toString()
+    value
+
+
+  ###
     This method converts Satoshi to mBTC
 
     @param [Number] value An input value in Satoshi
