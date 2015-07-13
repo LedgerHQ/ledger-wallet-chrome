@@ -36,7 +36,7 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
     window.open 'mailto:?body=' + @_receivingAddress()
 
   print: ->
-    @renderedSelector.print()
+    window.print()
 
   _listenEvents: ->
     @view.amountInput.on 'keydown', (e) =>
