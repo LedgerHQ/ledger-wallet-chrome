@@ -6,9 +6,11 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
     accountsList: '#accounts_list'
 
   actions: [
-    {title: 'wallet.accounts.index.actions.add_account', icon: 'fa-plus', url: '#addAccount'}
     {title: 'wallet.accounts.index.actions.see_all_operations', icon: 'fa-bars', url: '/wallet/accounts/alloperations'}
   ]
+
+  _addAccountAction: {title: 'wallet.accounts.index.actions.add_account', icon: 'fa-plus', url: '#addAccount'}
+
 
   initialize: ->
     super
@@ -50,3 +52,9 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
     accounts = Account.displayableAccounts()
     render 'wallet/accounts/_accounts_list', {accounts: accounts}, (html) =>
       @view.accountsList.html html
+
+    # update action
+    @actions.shift() if @actions.indexOf(@_addAccountAction) == 0
+    if no #TODO: plug account method
+      @actions.unshift @_addAccountAction
+    @parentViewController.updateActionBar()
