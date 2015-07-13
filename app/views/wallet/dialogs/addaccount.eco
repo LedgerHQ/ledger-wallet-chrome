@@ -6,11 +6,11 @@
     <div class="header top">
       <div class="uppercase-section-column stretchable"><%= t 'wallet.dialogs.addaccount.new_account' %></div>
     </div>
-    <div class="row middle" id="exchange_rate_row">
+    <div class="row middle">
       <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.addaccount.name' %></div>
       <input class="small-text-input" placeholder="<%= t 'wallet.dialogs.addaccount.account_name' %>" value="" id="account_name_input" />
     </div>
-    <div class="row bottom" id="exchange_rate_row">
+    <div class="row bottom">
       <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.addaccount.color' %></div>
       <div class="small-grey-select">
         <select id="colors_select"></select>
@@ -22,7 +22,7 @@
     <div class="header top">
       <div class="uppercase-section-column stretchable"><%= t 'wallet.dialogs.addaccount.hidden_accounts' %></div>
     </div>
-    <div class="row middle" id="exchange_rate_row">
+    <div class="row middle">
       <i class="fa fa-circle small-dot"></i>
       <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.addaccount.name' %></div>
       <div class="regular-grey-text-small">0.000 BTC</div>
