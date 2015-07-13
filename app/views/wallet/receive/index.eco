@@ -11,6 +11,15 @@
           <label class="large-text-input optional"><%= ledger.formatters.getUnitSymbol() %></label>
         </td>
       </tr>
+      <tr>
+        <td class="row-title"><%= t 'wallet.receive.index.account_to_credit' %></td>
+        <td class="align-right">
+          <div class="regular-select">
+            <select id="accounts_select"></select>
+          </div>
+          <i class="fa fa-square medium-square" id="color_square"></i>
+        </td>
+      </tr>
       <tr class="no-border">
         <td class="row-title"><%= t 'wallet.receive.index.receiver_address' %></td>
         <td class="align-right" id="receiver_address"></td>

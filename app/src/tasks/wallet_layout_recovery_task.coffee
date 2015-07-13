@@ -37,9 +37,10 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
 
   _restoreBip44Layout: () ->
     accountIndex = 0
+    numberOfEmptyAccount = 0
     recoverAccount = =>
-      if accountIndex > 0 and (previousAccount = ledger.wallet.Wallet.instance.getAccount(accountIndex - 1)).isEmpty()
-        previousAccount.remove() if accountIndex > 1
+      numberOfEmptyAccount += 1 if accountIndex > 0 and (ledger.wallet.Wallet.instance.getAccount(accountIndex - 1)).isEmpty()
+      if numberOfEmptyAccount >= (ledger.preferences.instance?.getAccountDiscoveryGap() or ledger.config.defaultAccountDiscoveryGap)
         return @emit 'bip44:done'
       account = ledger.wallet.Wallet.instance.getOrCreateAccount(accountIndex)
       done = =>

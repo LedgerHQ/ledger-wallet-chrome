@@ -129,7 +129,9 @@ class ledger.tasks.WalletOpenTask extends ledger.tasks.Task
       step ledger.app.dongle, raise, (r) =>
         result.extend(r)
         do raise.next
-        @_completion.success(result.value()) unless hasNext
+        unless hasNext
+          @_completion.success(result.value())
+          @stopIfNeccessary()
 
   onStop: ->
     @_completion.failure(ledger.errors.new(ledger.errors.InterruptedTask)) unless @_completion.isCompleted()

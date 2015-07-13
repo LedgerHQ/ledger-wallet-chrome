@@ -23,6 +23,8 @@ _.extend @ledger.config,
       Enabled: 'ALL'
       Disabled: 'ALL'
   network: ledger.bitcoin.Networks[ledger.build.Network]
+  defaultAddressDiscoveryGap: 20
+  defaultAccountDiscoveryGap: 1
 
 Q.longStackSupport = true
 

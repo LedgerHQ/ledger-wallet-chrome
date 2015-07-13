@@ -20,7 +20,18 @@ class @Account extends ledger.database.Model
     ledger.wallet.Wallet.instance.save()
     super(base, context)
 
+  @displayableAccounts: ->
+    accounts =
+      for account in Account.all()
+        index: account.get('index'), name: account.get('name'), balance: account.get('total_balance'), color: account.get('color')
+    _.sortBy accounts, (account) => account.index
+
   getWalletAccount: () -> ledger.wallet.Wallet.instance.getAccount(@get('index'))
+
+  get: (key) ->
+    val = super(key)
+    return val or 0 if key is 'total_balance'
+    return val
 
   serialize: () ->
     $.extend super, { root_path: @getWalletAccount().getRootDerivationPath() }

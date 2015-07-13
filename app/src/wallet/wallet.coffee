@@ -35,6 +35,7 @@ class ledger.wallet.Wallet
     account
 
   getOrCreateAccount: (id) ->
+    l "getOrCreateAccount(#{id}) ", new Error().stack
     return @getAccount(id) if @getAccount(id)
     do @createAccount
 
@@ -74,6 +75,11 @@ class ledger.wallet.Wallet
     count = 0
     for account in @_accounts when account?
       count += 1
+    count
+
+  getNonEmptyAccountsCount: ->
+    count = 0
+    count += 1 for account in @_accounts when !account?.isEmpty()
     count
 
   save: (callback = _.noop) ->
@@ -153,13 +159,13 @@ class ledger.wallet.Wallet.Account
 
   getAllAddressesPaths: () -> @getAllPublicAddressesPaths().concat(@getAllChangeAddressesPaths())
 
-  getObservedPublicAddressesPaths: (gap = ledger.preferences.instance?.getDiscoveryGap() or 20) ->
+  getObservedPublicAddressesPaths: (gap = ledger.preferences.instance?.getDiscoveryGap() or ledger.config.defaultAddressDiscoveryGap) ->
     paths = @getAllPublicAddressesPaths()
     paths.push "#{@getRootDerivationPath()}/0/#{index}" for index in [@getCurrentPublicAddressIndex() + 1...@getCurrentPublicAddressIndex() + gap + 1]
     paths = _.difference(paths, @_account.excludedPublicPaths)
     _(paths).compact()
 
-  getObservedChangeAddressesPaths: (gap = ledger.preferences.instance?.getDiscoveryGap() or 20) ->
+  getObservedChangeAddressesPaths: (gap = ledger.preferences.instance?.getDiscoveryGap() or ledger.config.defaultAddressDiscoveryGap) ->
     paths = @getAllChangeAddressesPaths()
     paths.push "#{@getRootDerivationPath()}/1/#{index}" for index in [@getCurrentChangeAddressIndex() + 1...@getCurrentChangeAddressIndex() + gap + 1]
     paths = _.difference(paths, @_account.excludedPublicPaths)
