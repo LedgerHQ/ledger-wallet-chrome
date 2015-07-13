@@ -22,7 +22,7 @@ class @WalletDialogsAddaccountDialogViewController extends ledger.common.DialogV
     if @_checkCurrentFormError() is false
       # create account
       account = Account.create(index: ledger.wallet.Wallet.instance.getNextAccountIndex(), name: @_accountName(), color: @view.colorsSelect.val()).save()
-      Wallet.instance.add('account', account)
+      Wallet.instance.add('accounts', account).save()
       @dismiss()
 
   showAccount: (params) ->

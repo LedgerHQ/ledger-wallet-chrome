@@ -18,6 +18,7 @@ class @Account extends ledger.database.Model
     throw "Wrong account base object for creation. Index must be a number" if _.isNaN(+base['index'])
     ledger.wallet.Wallet.instance.getOrCreateAccount(+base['index']).save()
     ledger.wallet.Wallet.instance.save()
+    ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.Wallet.instance.getRootDerivationPath()}/#{+base['index']}'", _.noop
     super(base, context)
 
   @displayableAccounts: ->
