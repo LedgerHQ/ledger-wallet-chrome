@@ -19,13 +19,11 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
   _onRoutedUrl: (event, data) ->
     {url} = data
     @updateMenu url
-    ##@_updateBreadcrumbs url
 
   onAfterRender: () ->
     super
     url = ledger.application.router.currentUrl
     @updateMenu url
-    ##@_updateBreadcrumbs url
     @_listenBalanceEvents()
     @_listenSynchronizationEvents()
     @_listenCountervalueEvents()
@@ -82,6 +80,8 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
       @view.reloadIcon.removeClass 'spinning'
 
   _isSynchronizationRunning: ->
+    l "Running ", ledger.tasks.OperationsConsumptionTask.instance.isRunning()
+    l "TASK", _.clone(ledger.tasks.Task.RUNNING_TASKS)
     return ledger.tasks.OperationsConsumptionTask.instance.isRunning()
 
   _listenCountervalueEvents: ->

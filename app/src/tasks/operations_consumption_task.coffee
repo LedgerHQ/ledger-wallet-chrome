@@ -5,8 +5,8 @@ class ledger.tasks.OperationsConsumptionTask extends ledger.tasks.Task
 
   onStart: () ->
     iterate = (accountIndex) =>
-      return @stopIfNeccessary() if accountIndex >= Wallet.instance.get('accounts').length
       if accountIndex >= ledger.wallet.Wallet.instance.getAccountsCount()
+        @stopIfNeccessary()
         ledger.app.emit 'wallet:operations:sync:done'
         return
       hdaccount = ledger.wallet.Wallet.instance?.getAccount(accountIndex)

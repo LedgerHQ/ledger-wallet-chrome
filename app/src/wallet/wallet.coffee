@@ -4,10 +4,6 @@ logger = -> ledger.utils.Logger.getLoggerByTag("WalletLayout")
 
 class ledger.wallet.Wallet
 
-  constructor: ->
-    @_ghostAccounts = {}
-    @_ghostStore = new ledger.storage.MemoryStore("ghost")
-
   getAccount: (accountIndex) -> @_accounts[accountIndex]
 
   getAccountFromDerivationPath: (derivationPath) ->
@@ -39,11 +35,9 @@ class ledger.wallet.Wallet
     return @getAccount(id) if @getAccount(id)
     do @createAccount
 
-  getGhostAccount: (index) -> @_ghostAccounts[index] ||= new ledger.wallet.Wallet.Account(@, index, @_ghostStore)
-
   getNextAccountIndex: -> @getNextAccountIndexes(1)[0]
 
-  getNextAccountIndexes: (numberOfIndex) -> index for index in [0...@_accounts.length + numberOfIndex] when @_accounts[index]? is false
+  getNextAccountIndexes: (numberOfIndex) -> index for index in [0...@_accounts.length + numberOfIndex] when @_accounts[index]? is false or @_accounts[index].isEmpty()
 
   initialize: (store, callback) ->
     @_store = store
