@@ -23,6 +23,6 @@
 <div class="dialog-actions-bar">
   <a href="#hideAccount" class="uppercase-action"><%= t 'wallet.dialogs.accountsettings.hide_account' %></a>
   <div class="left-spacer"></div>
-  <a href="#dismiss" class="cancel-rounded-button"><%= t 'common.close' %></a>
+  <a href="#dismiss" class="cancel-rounded-button"><%= t 'common.cancel' %></a>
   <a href="#saveAccount" class="action-rounded-button"><%= t 'common.save' %></a>
 </div>

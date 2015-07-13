@@ -22,7 +22,7 @@
     <% if @showAccounts is true: %>
       <td class="fit-content regular-text">
         <i class="fa fa-circle small-dot" style="color: <%= operation.get('account').get('color') %>"></i>
-        <%= operation.get('account').get('name') %>
+        <span><%= operation.get('account').get('name') %></span>
       </td>
     <% end %>
     <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= if operation.get('type') == 'reception' then t 'wallet.defaults.operations.sender' else t 'wallet.defaults.operations.receiver' %></td>
