@@ -4,7 +4,7 @@
   </header>
   <div class="large-table">
     <div class="header top">
-      <div class="uppercase-section-column stretchable"><%= t 'wallet.dialogs.accountsettings.settings' %></div>
+      <div class="uppercase-section-column stretchable"><%= t 'wallet.dialogs.accountsettings.properties' %></div>
     </div>
     <div class="row middle">
       <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.accountsettings.name' %></div>
