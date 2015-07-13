@@ -32,7 +32,7 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
     # TODO: delete account
 
   exportXPub: ->
-    # TODO: show dialog
+    (new WalletDialogsXpubDialogViewController(account_id: @_getAccount().get('index'))).show()
 
   _listenEvents: ->
     @view.colorsSelect.on 'change', @_updateAccountColorSquare
@@ -68,4 +68,4 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
     return _.str.trim @view.accountNameInput.val()
 
   _getAccount: ->
-    Account.find(index: @params.accountIndex).first()
+    @_account ||= Account.find(index: @params.account_id).first()

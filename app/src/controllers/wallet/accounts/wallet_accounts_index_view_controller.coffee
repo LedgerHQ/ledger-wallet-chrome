@@ -42,6 +42,21 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
     ledger.database.contexts.main.on 'update:account insert:account remove:account', @_debouncedUpdateAccounts
     ledger.database.contexts.main.on 'update:account insert:account remove:account', @_debouncedUpdateOperations
 
+  onDetach: ->
+    # listen balance
+    ledger.app.off 'wallet:balance:changed', @_debouncedUpdateAccounts
+
+    # listen operations
+    ledger.app.off 'wallet:transactions:new wallet:operations:sync:done wallet:operations:new wallet:operations:update', @_debouncedUpdateOperations
+    ledger.preferences.instance.off 'currencyActive:changed', @_debouncedUpdateOperations
+
+    # listen preferences
+    ledger.preferences.instance.off 'currencyActive:changed', @_debouncedUpdateAccounts
+
+    # listen accounts
+    ledger.database.contexts.main.off 'update:account insert:account remove:account', @_debouncedUpdateAccounts
+    ledger.database.contexts.main.off 'update:account insert:account remove:account', @_debouncedUpdateOperations
+
   _updateOperations: ->
     operations = Operation.chain().sort(Operation.defaultSort).limit(6).data()
     @view.emptyContainer.hide() if operations.length > 0
@@ -54,7 +69,7 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
       @view.accountsList.html html
 
     # update action
-    @actions.shift() if @actions.indexOf(@_addAccountAction) == 0
-    if no #TODO: plug account method
-      @actions.unshift @_addAccountAction
+    @actions.pop() if @actions.indexOf(@_addAccountAction) == 1
+    if yes #TODO: plug account method
+      @actions.push @_addAccountAction
     @parentViewController.updateActionBar()

@@ -47,7 +47,6 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
       @_updateReceiverAddress()
 
   _updateQrCode: () ->
-    l @_bitcoinAddressUri()
     @view.qrcode.makeCode(@_bitcoinAddressUri());
 
   _updateReceiverAddress: ->
