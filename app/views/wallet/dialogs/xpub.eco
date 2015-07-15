@@ -1,0 +1,14 @@
+<section id="dialogs_xpub_dialog">
+  <header>
+    <h1><%= t 'wallet.dialogs.xpub.extended_public_key' %></h1>
+  </header>
+  <div id="code_container" class="regular-code-text selectable">coucou</div>
+  <div id="qrcode_container"></div>
+  <div class="regular-grey-text-small"><%= t 'wallet.dialogs.xpub.qrcode' %></div>
+</section>
+<div class="dialog-actions-bar">
+  <a href="#email" class="action-rounded-button"><%= t 'common.send_by_email' %></a>
+  <a href="#print" class="action-rounded-button"><%= t 'common.print' %></a>
+  <div class="left-spacer"></div>
+  <a href="#dismiss" class="cancel-rounded-button"><%= t 'common.close' %></a>
+</div>

@@ -5,11 +5,13 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
     colorSquare: '#color_square'
     errorContainer: '#error_container'
     accountNameInput: '#account_name_input'
+    rootPathLabel: '#root_path_label'
 
   onAfterRender: ->
     super
     ledger.preferences.defaults.Accounts.applyColorsToSelect @view.colorsSelect, (option) =>
       option.attr('selected', true) if @_getAccount().get('color') == option.val()
+    @view.rootPathLabel.text @_getAccount().getWalletAccount().getRootDerivationPath()
     @_updateAccountColorSquare()
     @_updateErrorContainerText()
     @_updateUIAccordingToAccount()
@@ -28,6 +30,9 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
 
   deleteAccount: ->
     # TODO: delete account
+
+  exportXPub: ->
+    (new WalletDialogsXpubDialogViewController(account_id: @_getAccount().get('index'))).show()
 
   _listenEvents: ->
     @view.colorsSelect.on 'change', @_updateAccountColorSquare
@@ -63,4 +68,4 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
     return _.str.trim @view.accountNameInput.val()
 
   _getAccount: ->
-    Account.find(index: @params.accountIndex).first()
+    @_account ||= Account.find(index: @params.account_id).first()

@@ -36,7 +36,7 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
     window.open 'mailto:?body=' + @_receivingAddress()
 
   print: ->
-    @renderedSelector.print()
+    window.print()
 
   _listenEvents: ->
     @view.amountInput.on 'keydown', (e) =>
@@ -47,7 +47,6 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
       @_updateReceiverAddress()
 
   _updateQrCode: () ->
-    l @_bitcoinAddressUri()
     @view.qrcode.makeCode(@_bitcoinAddressUri());
 
   _updateReceiverAddress: ->
