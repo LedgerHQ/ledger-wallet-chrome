@@ -21,6 +21,8 @@ class @Account extends ledger.database.Model
     ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.Wallet.instance.getRootDerivationPath()}/#{+base['index']}'", _.noop
     super(base, context)
 
+  @getRemainingAccountCreation: (context = ledger.database.contexts.main) -> ledger.wallet.Wallet.instance.getAccountsCount() - Account.all(context).length
+
   @displayableAccounts: ->
     accounts =
       for account in Account.all()
@@ -33,6 +35,16 @@ class @Account extends ledger.database.Model
     val = super(key)
     return val or 0 if key is 'total_balance'
     return val
+
+  getExtendedPublicKey: (callback) ->
+    d = ledger.defer(callback)
+    hdAccount = @getWalletAccount()
+    if (xpub = ledger.wallet.Wallet.instance?.xpubCache.get(hdAccount.getRootDerivationPath()))?
+      d.resolve(xpub)
+    else
+      new ledger.wallet.ExtendedPublicKey(ledger.app.dongle, hdAccount.getRootDerivationPath()).initialize (xpub, error) =>
+        unless error then d.resolve(xpub.toString()) else d.reject(error)
+    d.promise
 
   serialize: () ->
     $.extend super, { root_path: @getWalletAccount().getRootDerivationPath() }
