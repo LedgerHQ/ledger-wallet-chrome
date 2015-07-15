@@ -6,8 +6,9 @@ class @WalletDialogsXpubDialogViewController extends ledger.common.DialogViewCon
   _xpub: null
 
   show: ->
-    @_xpub = "salut"
-    super
+    @_getAccount().getExtendedPublicKey (xpub) =>
+      @_xpub = xpub
+      super
 
   onAfterRender: ->
     super
