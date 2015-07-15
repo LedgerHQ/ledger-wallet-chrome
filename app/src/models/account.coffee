@@ -23,9 +23,9 @@ class @Account extends ledger.database.Model
 
   @getRemainingAccountCreation: (context = ledger.database.contexts.main) -> ledger.wallet.Wallet.instance.getAccountsCount() - Account.all(context).length
 
-  @displayableAccounts: ->
+  @displayableAccounts: (context = ledger.database.contexts.main) ->
     accounts =
-      for account in Account.all()
+      for account in Account.find(hidden: {$ne: yes}, context).simpleSort('index').data()
         index: account.get('index'), name: account.get('name'), balance: account.get('total_balance'), color: account.get('color')
     _.sortBy accounts, (account) => account.index
 

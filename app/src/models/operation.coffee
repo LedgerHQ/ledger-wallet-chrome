@@ -8,6 +8,10 @@ class @Operation extends ledger.database.Model
     @_pendingRawTransactionStream ?= new Stream().open()
     @_pendingRawTransactionStream
 
+  @displayableOperationsChain: (context = ledger.database.contexts.main) ->
+    accountIds = _(Account.displayableAccounts(context)).map (a) -> a.index
+    Operation.find(account_id: {$in: accountIds}).sort(@defaultSort)
+
   serialize: () ->
     json = super
     delete json['uid']
