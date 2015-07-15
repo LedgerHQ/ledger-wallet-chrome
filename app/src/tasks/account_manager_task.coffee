@@ -34,10 +34,12 @@ class ledger.tasks.AccountManagerTask extends ledger.tasks.Task
           wallet.add('accounts', Account.findById(index)).save()
         else
           @_addAccount(index)
+          ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary()
 
   _addAccount: (index) ->
     unless Account.findById(+index)?
       account = Account.create({index: index, name: "Recovered ##{index}", hidden: false, color: "#FF0000"}).save()
+      l "Inserting", _.clone(account), " in ", _.clone(Wallet.instance)
       Wallet.instance.add('accounts', account).save()
 
   onStop: ->
