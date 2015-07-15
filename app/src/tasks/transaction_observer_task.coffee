@@ -55,6 +55,7 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
 
   _attemptAccountDiscovery: (transaction, addresses) ->
     return unless ledger.preferences.instance?
+    return
     wallet = ledger.wallet.Wallet.instance
     indexes = wallet.getNextAccountIndexes(ledger.preferences.instance.getAccountDiscoveryGap() or ledger.config.defaultAccountDiscoveryGap)
     paths = _.flatten(wallet.getAccount(index).getAllObservedAddressesPaths() for index in indexes when wallet.getAccount(index)?)

@@ -62,13 +62,14 @@ restoreStructure = (dongle, raise, done) ->
     ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
   else if Operation.all().length is 0 and ledger.wallet.Wallet.instance.getAccount(0).getAllAddressesPaths().length isnt 0
     l "Restore wallet"
-    for accountIndex in [0...ledger.wallet.Wallet.instance.getAccountsCount()]
-      ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.Wallet.instance.getRootDerivationPath()}/#{accountIndex}'", _.noop
-    ledger.app.emit 'wallet:initialization:creation'
-    ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary()
-    ledger.tasks.OperationsConsumptionTask.instance.on 'stop', ->
-      ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
-      done?(operation_consumption: yes)
+    ledger.wallet.Wallet.instance.initialize ledger.storage.sync, =>
+      for accountIndex in [0...ledger.wallet.Wallet.instance.getAccountsCount()]
+        ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.Wallet.instance.getRootDerivationPath()}/#{accountIndex}'", _.noop
+      ledger.app.emit 'wallet:initialization:creation'
+      ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary()
+      ledger.tasks.OperationsConsumptionTask.instance.on 'stop', ->
+        ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
+        done?(operation_consumption: yes)
   else
     ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
     done?()

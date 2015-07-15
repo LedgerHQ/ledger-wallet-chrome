@@ -27,6 +27,10 @@ _.extend ledger.wallet,
     # throw error unless dongle is plugged and unlocked
     ledger.dongle.unlocked()
 
+    if _.isEmpty(paths)
+      ledger.utils.Logger.getLoggerByTag('WalletUtils').warn("Attempts to derive empty paths ", new Error().stack)
+      return callback?({})
+
     addresses = {}
     notFound = []
     _.async.each paths, (path, done, hasNext) ->
