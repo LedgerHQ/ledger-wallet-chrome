@@ -123,6 +123,7 @@
         'utils/json'
         'utils/promise/debounce'
         'utils/promise/throttle'
+        'utils/math'
 
         ## Crypto
         'crypto/aes'
