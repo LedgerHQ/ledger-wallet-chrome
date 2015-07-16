@@ -31,7 +31,7 @@ class @Wallet extends ledger.database.Model
   ## Lifecyle
 
   @initializeWallet: (callback) ->
-    @instance = @findOrCreate(1, {id: 1})
+    @instance = @findOrCreate(1, {id: 1}).save()
     if @instance.isInserted()
       callback?()
     else

@@ -22,13 +22,12 @@ class ledger.tasks.Task extends EventEmitter
     @
 
   stop: (safe = no) ->
-    _.defer =>
-      throw "The task '#{@taskId}' is not running" if not @isRunning() and not safe
-      return if not @isRunning()
-      ledger.tasks.Task.RUNNING_TASKS = _.omit(ledger.tasks.Task.RUNNING_TASKS, @taskId)
-      @logger().info "Stopping task #{@taskId}"
-      do @onStop
-      @emit 'stop', @
+    throw "The task '#{@taskId}' is not running" if not @isRunning() and not safe
+    return if not @isRunning()
+    ledger.tasks.Task.RUNNING_TASKS = _.omit(ledger.tasks.Task.RUNNING_TASKS, @taskId)
+    @logger().info "Stopping task #{@taskId}"
+    do @onStop
+    @emit 'stop', @
     @
 
   logger: -> @_logger ||= ledger.utils.Logger.getLoggerByTag(@constructor.name)

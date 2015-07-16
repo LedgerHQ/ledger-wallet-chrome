@@ -7,6 +7,7 @@
         '../libs/underscore-min'
         '../libs/underscore.string.min'
         '../libs/underscore.inflection'
+        '../libs/highland'
         '../libs/signals.min'
         '../libs/crossroads.min'
         '../libs/spin.min'
