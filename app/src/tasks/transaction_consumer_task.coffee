@@ -120,7 +120,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     @private
   ###
   _extendTransaction: (err, transaction, push, next) ->
-    @_getAddressCache().then =>
+    @_getAddressCache().then (cache) =>
 
       transaction
 

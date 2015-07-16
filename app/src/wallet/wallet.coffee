@@ -39,6 +39,12 @@ class ledger.wallet.Wallet
 
   getNextAccountIndexes: (numberOfIndex) -> index for index in [0...@_accounts.length + numberOfIndex] when @_accounts[index]? is false or @_accounts[index].isEmpty()
 
+  getAllObservedAddressesPaths: ->
+    paths = []
+    for account in @_accounts
+     paths = paths.concat(account.getAllObservedAddressesPaths())
+    paths
+
   initialize: (store, callback) ->
     @_store = store
     @_store.get ['accounts'], (result) =>
