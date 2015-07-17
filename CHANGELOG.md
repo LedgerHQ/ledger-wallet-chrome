@@ -1,4 +1,7 @@
 # Changelog
+1.3.14
+===
+- Allow all Chrome application to use the API
 
 1.3.12/1.3.13
 ===
