@@ -34,6 +34,10 @@ startDerivationTask = (dongle, raise, done) ->
       ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{hdWallet.getRootDerivationPath()}/#{accountIndex}'", _.noop
     done?()
 
+startTransactionConsumerTask = (dongle, raise, done) ->
+  ledger.tasks.TransactionConsumerTask.instance.startIfNeccessary()
+  do done
+
 openAddressCache = (dongle, raise, done) ->
   cache = new ledger.wallet.Wallet.Cache('cache', ledger.wallet.Wallet.instance)
   cache.initialize =>
@@ -93,6 +97,7 @@ ProceduresOrder = [
   openXpubCache
   openDatabase
   initializeWalletModel
+  startTransactionConsumerTask
   pullStore
   refreshHdWallet
   restoreStructure

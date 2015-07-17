@@ -31,7 +31,6 @@ class ledger.wallet.Wallet
     account
 
   getOrCreateAccount: (id) ->
-    l "getOrCreateAccount(#{id}) ", new Error().stack
     return @getAccount(id) if @getAccount(id)
     do @createAccount
 
@@ -203,13 +202,14 @@ class ledger.wallet.Wallet.Account
   getCurrentPublicAddress: () -> @wallet.cache?.get(@getCurrentPublicAddressPath())
 
   notifyPathsAsUsed: (paths) ->
+    hasDiscoveredNewPaths = no
     paths = [paths] unless _.isArray(paths)
     for path in paths
       path = path.replace("#{@getRootDerivationPath()}/", '').split('/')
       switch path[0]
-        when '0' then @_notifyPublicAddressIndexAsUsed parseInt(path[1])
-        when '1' then @_notifyChangeAddressIndexAsUsed parseInt(path[1])
-    return
+        when '0' then hasDiscoveredNewPaths = @_notifyPublicAddressIndexAsUsed(parseInt(path[1])) or hasDiscoveredNewPaths
+        when '1' then hasDiscoveredNewPaths = @_notifyChangeAddressIndexAsUsed(parseInt(path[1])) or hasDiscoveredNewPaths
+    hasDiscoveredNewPaths
 
   _notifyPublicAddressIndexAsUsed: (index) ->
     #logger().info 'Notify public change', index, 'current is', @_account.currentPublicIndex

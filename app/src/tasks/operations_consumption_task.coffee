@@ -4,41 +4,23 @@ class ledger.tasks.OperationsConsumptionTask extends ledger.tasks.Task
   @instance: new @()
 
   onStart: () ->
-    iterate = (accountIndex) =>
-      return @stopIfNeccessary() if accountIndex >= Wallet.instance.get('accounts').length
-      if accountIndex >= ledger.wallet.Wallet.instance.getAccountsCount()
+    clearTimeout(@_scheduledStart)
+    @_retryNumber ||= 0
+    stream = ledger.api.TransactionsRestClient.instance.createTransactionStreamForAllObservedPaths()
+      .stopOnError (err) ->
         @stopIfNeccessary()
-        _.defer -> ledger.app.emit 'wallet:operations:sync:done'
-        return
-      hdaccount = ledger.wallet.Wallet.instance?.getAccount(accountIndex)
-      @retrieveAccountOperations hdaccount, =>
-        iterate(accountIndex + 1)
-    iterate(0)
+        ledger.app.emit 'wallet:operations:sync:failed', err
+        @_retryNumber = Math.min(@_retryNumber + 1, 12)
+        @_scheduledStart = _.delay (=> @startIfNeccessary()), ledger.math.fibonacci(@_retryNumber) * 500
 
-  retrieveAccountOperations: (hdaccount, callback) ->
-    l "RETRIEVE ALL FOR ", hdaccount.getAllObservedAddressesPaths(), _.clone(hdaccount._account)
-    ledger.wallet.pathsToAddresses hdaccount.getAllObservedAddressesPaths(), (addresses) =>
-      l "GOT ADDRESSES ", addresses
-      addresses = _.values addresses
-      stream = ledger.api.TransactionsRestClient.instance.createTransactionStream(addresses)
-      stream.on 'data', =>
-        return unless @isRunning()
-        account = Account.fromWalletAccount hdaccount
-        for transaction in stream.read()
-          account.addRawTransactionAndSave transaction
+    ledger.tasks.TransactionConsumerTask.instance.pushTransactionsFromStream(stream)
+    stream.observe().done =>
+      @stopIfNeccessary()
+      _.defer -> ledger.app.emit 'wallet:operations:sync:done'
 
-      stream.on 'close', =>
-        l "Stream at end", _.clone(stream), " [DONE]"
-        return unless @isRunning()
-        if stream.hasError()
-          ledger.app.emit 'wallet:operations:sync:failed'
-          _.delay @retrieveAccountOperations(hdaccount, callback), 1000
-        else
-          callback?()
-
-      stream.open()
-
-  onStop: () ->
+  onStop: ->
+    super
 
   @reset: () ->
+    clearTimeout(@instance._scheduledStart)
     @instance = new @

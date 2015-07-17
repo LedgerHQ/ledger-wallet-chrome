@@ -58,12 +58,25 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
 
   constructor: ->
     super 'global_transaction_consumer'
-    @_input = highland()
-    @_stream = @_input
-      .consume(@_extendTransaction.bind(@))
+
+    safe = (f) ->
+      (err, i, push, next) ->
+        if err?
+          push(err)
+          return do next
+        return push(null, ledger.stream.nil) if i is ledger.stream.nil
+        f(err, i, push, next)
+
+
+    @_input = ledger.stream()
+    @_stream = ledger.stream(@_input)
+      .consume(safe(@_extendTransaction.bind(@)))
       .filter(@_filterTransaction.bind(@))
-      .consume(@_updateLayout.bind(@))
-      .consume(@_updateDatabase.bind(@))
+      .consume(safe(@_updateLayout.bind(@)))
+      .consume(safe(@_updateDatabase.bind(@)))
+
+    @_errorInput = ledger.stream()
+    @_errorStream = ledger.stream(@_errorInput)
 
   ###
     Push a single json formatted transaction into the stream.
@@ -74,6 +87,10 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
       return
     @_input.write(transaction)
     @
+
+  pushTransactionsFromStream: (stream) ->
+    stream.each (transaction) =>
+      @pushTransaction(transaction)
 
   ###
     Push an array of json formatted transactions into the stream.
@@ -86,17 +103,25 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     @
 
   ###
-    Get a forked version of the transaction stream
+    Get an observable version of the transaction stream
   ###
-  fork: -> @_stream.fork()
+  observe: -> @_stream.fork()
+
+  ###
+    Get an observable version of the error stream
+  ###
+  errorStream: -> @_errorStream.observe()
 
   onStart: ->
     super
+    @_input.resume()
     @_stream.resume()
-    @_stream.each(@_updateLayout.bind(@)).each(@_updateDatabase.bind(@))
+    l "Started with ", @_input
 
   onStop: ->
     super
+    debugger
+    @_input.end()
     @_stream.pause()
     @_stream.end()
 
@@ -121,24 +146,37 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
   ###
   _extendTransaction: (err, transaction, push, next) ->
     @_getAddressCache().then (cache) =>
-
-      transaction
-
+      for io in transaction.inputs.concat(transaction.outputs)
+        io.paths = (cache[address] for address in io.addresses)
+      push null, transaction
+      do next
+    .done()
 
   ###
     Filters transactions depending if they belong to the wallet or not.
     @private
   ###
   _filterTransaction: (transaction) ->
-    !_(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().isEmpty().value()
+    !_(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().compact().isEmpty().value()
 
   _updateLayout: (err, transaction, push, next) ->
+    if err?
+      push(err)
+      return do next
+    return push(null, ledger.stream.nil) if transaction is ledger.stream.nil
+
     # Notify to the layout that the path is used
+    l "Update layout with ", transaction
+    do next
 
   _updateDatabase: (err, transaction, push, next) ->
+    if err?
+      push(err)
+      return do next
+    return push(null, ledger.stream.nil) if transaction is ledger.stream.nil
+
     # Parse and create operations depending of the transaction. Also create missing accounts
-
-
+    do next
 
   @instance: new @
 

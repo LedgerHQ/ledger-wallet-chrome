@@ -21,37 +21,37 @@ pathsToPredefinedAddresses = (paths, callback) ->
 _.extend ledger.wallet,
 
   pathsToAddresses: (paths, callback = undefined) ->
-    # Uncomment for debugging with predefined addresses
-    # return pathsToPredefinedAddresses(paths, callback)
+    ledger.wallet.pathsToAddressesStream(paths)
+      .stopOnError (err) ->
+        callback?(err)
+      .toArray (array) ->
+        callback(_.object(array)) if callback?
+    return
 
-    # throw error unless dongle is plugged and unlocked
+  ###
+    Derives the given paths and return a stream of path -> address pairs
+    @param (Array|Stream)
+  ###
+  pathsToAddressesStream: (paths) ->
     ledger.dongle.unlocked()
-
     if _.isEmpty(paths)
       ledger.utils.Logger.getLoggerByTag('WalletUtils').warn("Attempts to derive empty paths ", new Error().stack)
-      return callback?({})
-
-    addresses = {}
-    notFound = []
-    _.async.each paths, (path, done, hasNext) ->
-      # Hit the cache first
-      address = ledger.wallet.Wallet.instance?.cache?.get(path)
-      if address?
-        addresses[path] = address
-        callback?(addresses, notFound) unless hasNext is true
-        do done
-        return
-
-      ledger.tasks.AddressDerivationTask.instance.getPublicAddress path, (result, error) ->
-        if error?
-          notFound.push path
-        else
-          addresses[path] = result
-        callback?(addresses, notFound) unless hasNext
-        do done
-        return
-
-    return
+      return highland([])
+    ledger.stream(paths).consume (err, path, push, next) ->
+      if path is ledger.stream.nil
+        push(null, ledger.stream.nil)
+      else
+        # Hit the cache first
+        address = ledger.wallet.Wallet.instance?.cache?.get(path)
+        if address?
+          push(null, [path, address])
+          return do next
+        ledger.tasks.AddressDerivationTask.instance.getPublicAddress path, (result, error) ->
+          if error?
+            push(new Error("Fail to derive path #{path}"))
+          else
+            push(null, [path, address])
+          do next
 
   checkSetup: (dongle, seed, pin, callback = undefined ) ->
     ledger.defer(callback)
