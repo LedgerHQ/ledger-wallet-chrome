@@ -167,6 +167,11 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
 
     # Notify to the layout that the path is used
     l "Update layout with ", transaction
+
+    needsNotify = no
+    for path in _(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().value()
+      needsNotify = ledger.wallet.Wallet.instance.getAccountFromDerivationPath(path).notifyPathsAsUsed(path) or needsNotify
+    @_notifyNewPathAreAvailable() if needsNotify
     do next
 
   _updateDatabase: (err, transaction, push, next) ->

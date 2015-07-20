@@ -202,13 +202,17 @@ class ledger.wallet.Wallet.Account
   getCurrentPublicAddress: () -> @wallet.cache?.get(@getCurrentPublicAddressPath())
 
   notifyPathsAsUsed: (paths) ->
-    hasDiscoveredNewPaths = no
     paths = [paths] unless _.isArray(paths)
+    return no if @getAllAddressesPaths()
+    allPaths = @getAllAddressesPaths()
+    hasDiscoveredNewPaths = no
     for path in paths
+      continue if _(allPaths).contains(path)
       path = path.replace("#{@getRootDerivationPath()}/", '').split('/')
       switch path[0]
-        when '0' then hasDiscoveredNewPaths = @_notifyPublicAddressIndexAsUsed(parseInt(path[1])) or hasDiscoveredNewPaths
-        when '1' then hasDiscoveredNewPaths = @_notifyChangeAddressIndexAsUsed(parseInt(path[1])) or hasDiscoveredNewPaths
+        when '0' then @_notifyPublicAddressIndexAsUsed(parseInt(path[1]))
+        when '1' then @_notifyChangeAddressIndexAsUsed(parseInt(path[1]))
+      hasDiscoveredNewPaths = _(allPaths).contains(path) or hasDiscoveredNewPaths
     hasDiscoveredNewPaths
 
   _notifyPublicAddressIndexAsUsed: (index) ->

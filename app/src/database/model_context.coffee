@@ -187,7 +187,6 @@ class ledger.database.contexts.Context extends EventEmitter
     collection.getCollection().on 'update', (data) =>
       @emit "update:" + _.str.underscored(data['objType']).toLowerCase(), @_modelize(data)
 
-
   onSyncStorePulled: ->
     @_syncStore.getAll (data) =>
       for name, collection of @_collections
