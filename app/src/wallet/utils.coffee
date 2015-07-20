@@ -50,7 +50,7 @@ _.extend ledger.wallet,
           if error?
             push([path])
           else
-            push(null, [path, address])
+            push(null, [path, result])
           do next
 
   checkSetup: (dongle, seed, pin, callback = undefined ) ->

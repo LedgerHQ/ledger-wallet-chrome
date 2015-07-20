@@ -54,7 +54,7 @@ refreshHdWallet = (dongle, raise, done) ->
   ledger.wallet.Wallet.instance.initialize ledger.storage.sync.wallet, done
 
 restoreStructure = (dongle, raise, done) ->
-  if ledger.wallet.Wallet.instance.isEmpty()
+  if ledger.wallet.Wallet.instance.isEmpty() or true
     ledger.app.emit 'wallet:initialization:creation'
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'done', () =>
       ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary()

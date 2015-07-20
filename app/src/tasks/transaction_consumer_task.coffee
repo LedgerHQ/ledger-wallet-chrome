@@ -97,10 +97,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     Push an array of json formatted transactions into the stream.
   ###
   pushTransactions: (transactions) ->
-    isPaused = @_input.paused
-    @_input.pause() unless isPaused
-    @pushTransactions(transaction) for transaction in transactions
-    @_input.resume() unless isPaused
+    @pushTransaction(transaction) for transaction in transactions
     @
 
   ###
@@ -136,6 +133,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     @_cachePromise ||= do => @_requestDerivations()
 
   _notifyNewPathAreAvailable: ->
+    l "TIME TO FETCH"
     return unless @_cachePromise?
     @_cachePromise = null
     @_getAddressCache()
@@ -171,7 +169,9 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     @private
   ###
   _filterTransaction: (transaction) ->
-    !_(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().compact().isEmpty().value()
+    accepted = !_(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().compact().isEmpty().value()
+    l "Transaction filter", accepted, transaction
+    accepted
 
   _updateLayout: (err, transaction, push, next) ->
     # Notify to the layout that the path is used
@@ -179,7 +179,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
 
     for path in _(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().compact().value()
       l "Notify used ", path
-      needsNotify = ledger.wallet.Wallet.instance.getAccountFromDerivationPath(path).notifyPathsAsUsed(path) or needsNotify
+      needsNotify = ledger.wallet.Wallet.instance.getAccountFromDerivationPath(path).notifyPathsAsUsed([path]) or needsNotify
 
     @_notifyNewPathAreAvailable() if needsNotify # Clear and fetch the cache
     push null, transaction
@@ -192,7 +192,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     l "Transaction ", transaction
     pulled = no
     ledger.stream(accounts).consume (err, account, push, next) ->
-      return push(ledger.stream.nil) if account is ledger.stream.nil
+      return push(null, ledger.stream.nil) if account is ledger.stream.nil
       l "Account", account
       createAccount = =>
         databaseAccount = Account.findById(account.index)
@@ -200,6 +200,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
           # Create account
           push null, Account.recoverAccount(account.index, Wallet.instance)
           do next
+          l "HEY OK SEE NEXT 0.1"
         else if !databaseAccount?
           # No account found. Try to pull before recovering
           ledger.database.contexts.main.refresh().then ->
@@ -210,9 +211,12 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
           # We already have the account
           push null, databaseAccount
           do next
+          l "HEY OK SEE NEXT 2"
       createAccount()
+      return
     .consume (err, account, push, next) ->
-      return push(ledger.stream.nil) if account is ledger.stream.nil
+      return push(null, ledger.stream.nil) if account is ledger.stream.nil
+      l "Time to add operations"
       inputs = transaction.inputs
       #Filter outputs to remove potential change address
       outputs = _(transaction.outputs).filter((out) -> !_(out.nodes).find((n) -> if n? then n[1] is 1 else no)?)
@@ -225,8 +229,10 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
       unless _(outputs).chain().find().isEmpty().value()
         Operation.fromReception(tx)
         #account.add('operations', Operation.fromReception(tx).save()).save()
+      l "HEY OK SEE NEXT 2"
       do next
     .done ->
+      "Done perform next"
       push null, transaction
       do next
 

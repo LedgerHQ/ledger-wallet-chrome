@@ -35,68 +35,49 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
             ledger.wallet.Wallet.instance.createAccount()
           @emit 'chronocoin:done'
 
-  _restoreBip44Layout: () ->
-    accountIndex = 0
+  _restoreBip44Layout: ->
+    wallet = ledger.wallet.Wallet.instance
     numberOfEmptyAccount = 0
-    recoverAccount = =>
-      numberOfEmptyAccount += 1 if accountIndex > 0 and (ledger.wallet.Wallet.instance.getAccount(accountIndex - 1)).isEmpty()
-      if numberOfEmptyAccount >= (ledger.preferences.instance?.getAccountDiscoveryGap() or ledger.config.defaultAccountDiscoveryGap)
-        return @emit 'bip44:done'
-      account = ledger.wallet.Wallet.instance.getOrCreateAccount(accountIndex)
-      done = =>
+    accountGap = ledger.preferences.instance?.getAccountDiscoveryGap() or ledger.config.defaultAccountDiscoveryGap
+    restoreAccount = (index) =>
+      @_restoreBip44LayoutAccount(wallet.getOrCreateAccount(index)).then (isEmpty) =>
         @emit 'bip44:account:done'
-        accountIndex += 1
-        do recoverAccount
-      ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.Wallet.instance.getRootDerivationPath()}/#{accountIndex}'", _.noop
-      @_restoreBip44AccountChainsLayout account, => do done
-    do recoverAccount
+        numberOfEmptyAccount += 1 if isEmpty
+        if numberOfEmptyAccount >= accountGap
+          l 'Restore done at', index
+          @emit 'bip44:done'
+        else
+          l 'Continue restoring ', index + 1
+          restoreAccount(index + 1)
+        return
+      .fail (err) =>
+        @emit 'bip44:fatal', err
+    restoreAccount(0)
 
-  _restoreBip44AccountChainsLayout: (account, done) ->
-    isRestoringChangeChain = yes
-    isRestoringPublicChain = yes
-    testIndex = (publicIndex, changeIndex) =>
-      publicIndex = parseInt publicIndex
-      changeIndex = parseInt changeIndex
-      paths = []
-      if isRestoringPublicChain
-        paths = paths.concat(account.getObservedPublicAddressesPaths())
-      if isRestoringChangeChain
-        paths = paths.concat(account.getObservedChangeAddressesPaths())
-      ledger.wallet.pathsToAddresses paths, (addresses) =>
-        addressesPaths = _.invert addresses
-        ledger.api.TransactionsRestClient.instance.getTransactions _.values(addresses), (transactions, error) =>
-          return @emit 'bip44:fatal' if error?
-          usedAddresses = []
-          select = (array) -> _.select array, ((i) -> if addressesPaths[i]? then yes else no)
+  _restoreBip44LayoutAccount: (account) ->
+    # Request until there is no tx
+    @_requestUntilReturnsEmpty("#{account.getRootDerivationPath()}/0", account.getCurrentPublicAddressIndex()).then (isEmpty) =>
+      if isEmpty
+        yes
+      else
+        @_requestUntilReturnsEmpty("#{account.getRootDerivationPath()}/1", account.getCurrentChangeAddressIndex()).then =>
+          no
 
-          for transaction in transactions
-            Operation.pendingRawTransactionStream().write(transaction)
-            for input in transaction.inputs
-              usedAddresses = usedAddresses.concat(select(input.addresses))
-            for output in transaction.outputs
-              usedAddresses = usedAddresses.concat(select(output.addresses))
-
-          shiftChange = account.getCurrentChangeAddressIndex()
-          shiftPublic = account.getCurrentPublicAddressIndex()
-
-          usedPaths = _.unique((addressesPaths[usedAddress] for usedAddress in usedAddresses))
-          account.notifyPathsAsUsed _.values(usedPaths)
-
-          shiftChange = shiftChange isnt account.getCurrentChangeAddressIndex()
-          shiftPublic = shiftPublic isnt account.getCurrentPublicAddressIndex()
-          if shiftChange and shiftPublic
-            testIndex account.getCurrentPublicAddressIndex(), account.getCurrentChangeAddressIndex()
-          else if shiftChange
-            isRestoringPublicChain = no
-            testIndex account.getCurrentPublicAddressIndex(), account.getCurrentChangeAddressIndex()
-          else if shiftPublic
-            isRestoringChangeChain = no
-            testIndex account.getCurrentPublicAddressIndex(), account.getCurrentChangeAddressIndex()
-          else
-            do done
-
-    testIndex account.getCurrentPublicAddressIndex(), account.getCurrentChangeAddressIndex()
-
+  _requestUntilReturnsEmpty: (root, index) ->
+    d = ledger.defer()
+    gap = ledger.preferences.instance?.getDiscoveryGap() or ledger.config.defaultAddressDiscoveryGap
+    paths = ("#{root}/#{i}" for i in [index...index + gap])
+    ledger.wallet.pathsToAddresses paths, (addresses) =>
+      addresses = _.values(addresses)
+      ledger.api.TransactionsRestClient.instance.getTransactions addresses, (transactions) =>
+        l "Received tx", transactions
+        if transactions.length is 0
+          d.resolve(index is 0)
+        else
+          ledger.tasks.TransactionConsumerTask.instance.pushTransactions(transactions)
+          d.resolve(@_requestUntilReturnsEmpty(root, index + gap))
+      return
+    d.promise
 
   @reset: () ->
     @instance = new @

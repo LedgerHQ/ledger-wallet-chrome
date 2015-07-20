@@ -25,15 +25,16 @@ class ledger.wallet.Wallet
 
   getAccountFromAddress: (address) -> @getAccountFromDerivationPath(@cache?.getDerivationPath(address))
 
-  createAccount: () ->
-    account = new ledger.wallet.Wallet.Account(@, @getNextAccountIndex(), @_store)
+  createAccount: (id = undefined) ->
+    account = new ledger.wallet.Wallet.Account(@, id or @getNextAccountIndex(), @_store)
     @_accounts.push account
     do @save
+    ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath(account.getRootDerivationPath(), _.noop)
     account
 
   getOrCreateAccount: (id) ->
     return @getAccount(id) if @getAccount(id)
-    do @createAccount
+    @createAccount(id)
 
   getNextAccountIndex: -> @getNextAccountIndexes(1)[0]
 
@@ -160,15 +161,11 @@ class ledger.wallet.Wallet.Account
   getAllAddressesPaths: () -> @getAllPublicAddressesPaths().concat(@getAllChangeAddressesPaths())
 
   getObservedPublicAddressesPaths: (gap = ledger.preferences.instance?.getDiscoveryGap() or ledger.config.defaultAddressDiscoveryGap) ->
-    paths = @getAllPublicAddressesPaths()
-    paths.push "#{@getRootDerivationPath()}/0/#{index}" for index in [@getCurrentPublicAddressIndex() + 1...@getCurrentPublicAddressIndex() + gap + 1]
-    paths = _.difference(paths, @_account.excludedPublicPaths)
+    paths = ("#{@getRootDerivationPath()}/0/#{index}" for index in [0...@getCurrentPublicAddressIndex() + gap + 1])
     _(paths).compact()
 
   getObservedChangeAddressesPaths: (gap = ledger.preferences.instance?.getDiscoveryGap() or ledger.config.defaultAddressDiscoveryGap) ->
-    paths = @getAllChangeAddressesPaths()
-    paths.push "#{@getRootDerivationPath()}/1/#{index}" for index in [@getCurrentChangeAddressIndex() + 1...@getCurrentChangeAddressIndex() + gap + 1]
-    paths = _.difference(paths, @_account.excludedPublicPaths)
+    paths = ("#{@getRootDerivationPath()}/1/#{index}" for index in [0...@getCurrentChangeAddressIndex() + gap + 1])
     _(paths).compact()
 
   getObservedAddressesPaths: (type) ->
@@ -203,8 +200,8 @@ class ledger.wallet.Wallet.Account
   getCurrentPublicAddress: () -> @wallet.cache?.get(@getCurrentPublicAddressPath())
 
   notifyPathsAsUsed: (paths) ->
+    l "Notify paths", paths
     paths = [paths] unless _.isArray(paths)
-    return no if @getAllAddressesPaths()
     allPaths = @getAllAddressesPaths()
     hasDiscoveredNewPaths = no
     for path in paths
@@ -213,17 +210,17 @@ class ledger.wallet.Wallet.Account
       switch path[0]
         when '0' then @_notifyPublicAddressIndexAsUsed(parseInt(path[1]))
         when '1' then @_notifyChangeAddressIndexAsUsed(parseInt(path[1]))
-      hasDiscoveredNewPaths = _(allPaths).contains(path) or hasDiscoveredNewPaths
+      hasDiscoveredNewPaths = yes
     hasDiscoveredNewPaths
 
   _notifyPublicAddressIndexAsUsed: (index) ->
     #logger().info 'Notify public change', index, 'current is', @_account.currentPublicIndex
     if index < @_account.currentPublicIndex
-      #logger().info 'Index is less than current'
+      logger().info 'Index is less than current'
       derivationPath = "#{@wallet.getRootDerivationPath()}/#{@index}'/0/#{index}"
       @_account.excludedPublicPaths = _.without @_account.excludedPublicPaths, derivationPath
     else if index > @_account.currentPublicIndex
-      #logger().info 'Index is more than current'
+      logger().info 'Index is more than current'
       difference =  index - (@_account.currentPublicIndex + 1)
       @_account.excludedPublicPaths ?= []
       for i in [0...difference]
@@ -231,7 +228,7 @@ class ledger.wallet.Wallet.Account
         @_account.excludedPublicPaths.push derivationPath unless _.contains(@_account.excludedPublicPaths, derivationPath)
       @_account.currentPublicIndex = parseInt(index) + 1
     else if index == @_account.currentPublicIndex
-      #logger().info 'Index is equal to current'
+      logger().info 'Index is equal to current'
       @shiftCurrentPublicAddressPath()
     @save()
 
