@@ -126,18 +126,11 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
   _requestDerivations: ->
     d = ledger.defer()
     ledger.wallet.pathsToAddresses ledger.wallet.Wallet.instance.getAllObservedAddressesPaths(), (addresses) ->
+      l "REQUEST DERIVATION ", ledger.wallet.Wallet.instance.getAllObservedAddressesPaths()
       d.resolve(_.invert(addresses))
     d.promise
 
-  _getAddressCache: ->
-    @_cachePromise ||= do => @_requestDerivations()
-
-  _notifyNewPathAreAvailable: ->
-    l "TIME TO FETCH"
-    return unless @_cachePromise?
-    @_cachePromise = null
-    @_getAddressCache()
-    return
+  _getAddressCache: -> @_requestDerivations()
 
   ###
     Extends the given transaction with derivation paths and related accounts
@@ -146,7 +139,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
   _extendTransaction: (err, transaction, push, next) ->
     wallet = ledger.wallet.Wallet.instance
     @_getAddressCache().then (cache) =>
-      l cache
+      l "IN CACHE ", cache
       for io in transaction.inputs.concat(transaction.outputs)
         io.paths = []
         io.accounts = []
@@ -175,13 +168,11 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
 
   _updateLayout: (err, transaction, push, next) ->
     # Notify to the layout that the path is used
-    needsNotify = no
 
     for path in _(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().compact().value()
       l "Notify used ", path
-      needsNotify = ledger.wallet.Wallet.instance.getAccountFromDerivationPath(path).notifyPathsAsUsed([path]) or needsNotify
+      ledger.wallet.Wallet.instance.getAccountFromDerivationPath(path).notifyPathsAsUsed([path])
 
-    @_notifyNewPathAreAvailable() if needsNotify # Clear and fetch the cache
     push null, transaction
     do next
 
@@ -203,6 +194,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
           l "HEY OK SEE NEXT 0.1"
         else if !databaseAccount?
           # No account found. Try to pull before recovering
+
           ledger.database.contexts.main.refresh().then ->
             pulled = yes
             createAccount()
