@@ -191,10 +191,8 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
           # Create account
           push null, Account.recoverAccount(account.index, Wallet.instance)
           do next
-          l "HEY OK SEE NEXT 0.1"
         else if !databaseAccount?
           # No account found. Try to pull before recovering
-
           ledger.database.contexts.main.refresh().then ->
             pulled = yes
             createAccount()
