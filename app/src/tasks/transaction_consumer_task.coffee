@@ -62,6 +62,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     safe = (f) ->
       (err, i, push, next) ->
         if err?
+          e err
           push(err)
           return do next
         return push(null, ledger.stream.nil) if i is ledger.stream.nil
@@ -141,13 +142,26 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     return
 
   ###
-    Extends the given transaction with derivation paths
+    Extends the given transaction with derivation paths and related accounts
     @private
   ###
   _extendTransaction: (err, transaction, push, next) ->
+    wallet = ledger.wallet.Wallet.instance
     @_getAddressCache().then (cache) =>
+      l cache
       for io in transaction.inputs.concat(transaction.outputs)
-        io.paths = (cache[address] for address in io.addresses)
+        io.paths = []
+        io.accounts = []
+        io.nodes = []
+        for address in io.addresses
+          path = cache[address]
+          io.paths.push path
+          io.accounts.push (if path? then wallet.getOrCreateAccountFromDerivationPath(path) else undefined)
+          if path?
+            [__, accountIndex, node, index] = path.match("#{wallet.getRootDerivationPath()}/(\\d+)'/(0|1)/(\\d+)")
+            io.nodes.push [+accountIndex, +node, +index]
+          else
+            io.nodes.push undefined
       push null, transaction
       do next
     .done()
@@ -160,28 +174,61 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     !_(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().compact().isEmpty().value()
 
   _updateLayout: (err, transaction, push, next) ->
-    if err?
-      push(err)
-      return do next
-    return push(null, ledger.stream.nil) if transaction is ledger.stream.nil
-
     # Notify to the layout that the path is used
-    l "Update layout with ", transaction
-
     needsNotify = no
-    for path in _(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().value()
+
+    for path in _(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().compact().value()
+      l "Notify used ", path
       needsNotify = ledger.wallet.Wallet.instance.getAccountFromDerivationPath(path).notifyPathsAsUsed(path) or needsNotify
-    @_notifyNewPathAreAvailable() if needsNotify
+
+    @_notifyNewPathAreAvailable() if needsNotify # Clear and fetch the cache
+    push null, transaction
     do next
 
   _updateDatabase: (err, transaction, push, next) ->
-    if err?
-      push(err)
-      return do next
-    return push(null, ledger.stream.nil) if transaction is ledger.stream.nil
-
     # Parse and create operations depending of the transaction. Also create missing accounts
-    do next
+    accounts = _(transaction.inputs.concat(transaction.outputs)).chain().map((io) -> io.accounts).flatten().compact().value()
+    l "Accounts ", accounts
+    l "Transaction ", transaction
+    pulled = no
+    ledger.stream(accounts).consume (err, account, push, next) ->
+      return push(ledger.stream.nil) if account is ledger.stream.nil
+      l "Account", account
+      createAccount = =>
+        databaseAccount = Account.findById(account.index)
+        if !databaseAccount? and pulled
+          # Create account
+          push null, Account.recoverAccount(account.index, Wallet.instance)
+          do next
+        else if !databaseAccount?
+          # No account found. Try to pull before recovering
+          ledger.database.contexts.main.refresh().then ->
+            pulled = yes
+            createAccount()
+          .done()
+        else
+          # We already have the account
+          push null, databaseAccount
+          do next
+      createAccount()
+    .consume (err, account, push, next) ->
+      return push(ledger.stream.nil) if account is ledger.stream.nil
+      inputs = transaction.inputs
+      #Filter outputs to remove potential change address
+      outputs = _(transaction.outputs).filter((out) -> !_(out.nodes).find((n) -> if n? then n[1] is 1 else no)?)
+      tx = _.clone(transaction)
+      tx.inputs = inputs
+      tx.outputs = outputs
+      unless _(inputs).chain().find().isEmpty().value()
+        Operation.fromSend(tx)
+        #account.add('operations', Operation.fromSend(tx).save()).save()
+      unless _(outputs).chain().find().isEmpty().value()
+        Operation.fromReception(tx)
+        #account.add('operations', Operation.fromReception(tx).save()).save()
+      do next
+    .done ->
+      push null, transaction
+      do next
 
   @instance: new @
 

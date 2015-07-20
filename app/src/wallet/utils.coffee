@@ -23,9 +23,9 @@ _.extend ledger.wallet,
   pathsToAddresses: (paths, callback = undefined) ->
     ledger.wallet.pathsToAddressesStream(paths)
       .stopOnError (err) ->
-        callback?(err)
+        callback?([], err)
       .toArray (array) ->
-        callback(_.object(array)) if callback?
+        callback(_.object(array), []) if callback?
     return
 
   ###
@@ -48,7 +48,7 @@ _.extend ledger.wallet,
           return do next
         ledger.tasks.AddressDerivationTask.instance.getPublicAddress path, (result, error) ->
           if error?
-            push(new Error("Fail to derive path #{path}"))
+            push([path])
           else
             push(null, [path, address])
           do next

@@ -12,6 +12,12 @@ class @Operation extends ledger.database.Model
     accountIds = _(Account.displayableAccounts(context)).map (a) -> a.index
     Operation.find(account_id: {$in: accountIds}).sort(@defaultSort)
 
+  @fromSend: (tx) ->
+    l "Sended transaction ", tx
+
+  @fromReception: (tx) ->
+    l "Received transaction ", tx
+
   serialize: () ->
     json = super
     delete json['uid']

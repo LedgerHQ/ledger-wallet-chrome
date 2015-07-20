@@ -15,7 +15,7 @@ class @Account extends ledger.database.Model
     @find(index: hdAccount.index).first()
 
   @create: (base, context) ->
-    throw "Wrong account base object for creation. Index must be a number" if _.isNaN(+base['index'])
+    throw new Error("Wrong account base object for creation. Index must be a number") if _.isNaN(+base['index'])
     ledger.wallet.Wallet.instance.getOrCreateAccount(+base['index']).save()
     ledger.wallet.Wallet.instance.save()
     ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.Wallet.instance.getRootDerivationPath()}/#{+base['index']}'", _.noop
@@ -28,6 +28,12 @@ class @Account extends ledger.database.Model
       for account in Account.find(hidden: {$ne: yes}, context).simpleSort('index').data()
         index: account.get('index'), name: account.get('name'), balance: account.get('total_balance'), color: account.get('color')
     _.sortBy accounts, (account) => account.index
+
+  @recoverAccount: (index, wallet) ->
+    l "Inserting ", index
+    account = Account.create({index: index, name: "Recovered ##{index}", hidden: false, color: "#FF0000"}).save()
+    l "Inserting", _.clone(account), " in ", _.clone(wallet)
+    wallet.add('accounts', account).save()
 
   getWalletAccount: () -> ledger.wallet.Wallet.instance.getAccount(@get('index'))
 

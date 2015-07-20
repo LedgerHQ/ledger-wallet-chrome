@@ -119,6 +119,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
         @_merge(data).then =>
           @_setLastMd5(md5)
           @emit 'pulled'
+          yes
     .fail (e) =>
       if e.status is 404
         throw Errors.NoRemoteData

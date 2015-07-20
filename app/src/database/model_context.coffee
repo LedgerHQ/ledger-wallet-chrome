@@ -199,6 +199,17 @@ class ledger.database.contexts.Context extends EventEmitter
           collection.getModelClass().chain(this).remove()
       @emit 'synchronized'
 
+  refresh: ->
+    d = ledger.defer()
+    ledger.storage.sync.pull().then (uptodate) =>
+      return d.resolve(no) if uptodate is yes
+      @once 'synchronized', ->
+        d.resolve(yes)
+    .fail () ->
+      d.resolve(no)
+    .done()
+    d.promise
+
   _modelize: (data) -> @getCollection(data['objType'])?._modelize(data)
 
 _.extend ledger.database.contexts,
