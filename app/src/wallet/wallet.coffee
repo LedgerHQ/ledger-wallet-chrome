@@ -6,16 +6,17 @@ class ledger.wallet.Wallet
 
   getAccount: (accountIndex) -> @_accounts[accountIndex]
 
-  getAccountFromDerivationPath: (derivationPath) ->
+  getAccountFromDerivationPath: (derivationPath) -> @_getAccountFromDerivationPath(derivationPath, @getAccount)
+
+  getOrCreateAccountFromDerivationPath: (derivationPath) -> @_getAccountFromDerivationPath(derivationPath, @getOrCreateAccount)
+
+  _getAccountFromDerivationPath: (derivationPath, getter) ->
     return null unless derivationPath?
     account = null
     # Easy way
-    if _.str.startsWith(derivationPath, "44'")
-      parts = derivationPath.split('/')
-      accountIndex = parts[2]
-      if accountIndex?
-        accountIndex = parseInt(accountIndex.substr(0, accountIndex.length - 1))
-        account = @getAccount(accountIndex)
+    if match = derivationPath.match("#{@getRootDerivationPath()}/(\\d+)'/(0|1)/(\\d+)")
+      [__, accountIndex] = match
+      account = getter.call(this, +accountIndex)
     return account if account?
     # Crappy way
     for account in @_accounts
