@@ -211,23 +211,21 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
       return
     .consume (err, account, push, next) ->
       return push(null, ledger.stream.nil) if account is ledger.stream.nil
-      l "Time to add operations"
       inputs = transaction.inputs
-      #Filter outputs to remove potential change address
-      outputs = _(transaction.outputs).filter((out) -> !_(out.nodes).find((n) -> if n? then n[1] is 1 else no)?)
+      outputs = transaction.outputs
       tx = _.clone(transaction)
       tx.inputs = inputs
       tx.outputs = outputs
-      unless _(inputs).chain().find().isEmpty().value()
-        Operation.fromSend(tx)
-        #account.add('operations', Operation.fromSend(tx).save()).save()
-      unless _(outputs).chain().find().isEmpty().value()
-        Operation.fromReception(tx)
-        #account.add('operations', Operation.fromReception(tx).save()).save()
-      l "HEY OK SEE NEXT 2"
+      if _(inputs).chain().some((i) -> _(i.accounts).some((a) -> a?.index is account.getId())).value()
+        operation = Operation.fromSend(tx, account)
+        ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
+        operation.save()
+      if _(outputs).chain().some((o) -> _(o.accounts).some((a) -> a?.index is account.getId()) and !_(o.nodes).chain().compact().every((n) -> n[1] is 1).value()).value()
+        operation = Operation.fromReception(tx, account)
+        ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
+        operation.save()
       do next
     .done ->
-      l "Done perform next"
       push null, transaction
       do next
 

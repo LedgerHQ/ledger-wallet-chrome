@@ -29,12 +29,10 @@ class @Account extends ledger.database.Model
     _.sortBy accounts, (account) => account.index
 
   @recoverAccount: (index, wallet) ->
-    l "Inserting ", index
     if index is 0
       account = Account.create({index: 0, name: t('common.default_account_name'), hidden: false, color: ledger.preferences.defaults.Accounts.firstAccountColor}).save()
     else
       account = Account.create({index: index, name: _.str.sprintf(t("common.default_recovered_account_name"), index), hidden: false, color: ledger.preferences.defaults.Accounts.recoveredAccountColor}).save()
-    l "Inserting", _.clone(account), " in ", _.clone(wallet)
     wallet.add('accounts', account).save()
 
   getWalletAccount: () -> ledger.wallet.Wallet.instance.getAccount(@get('index'))

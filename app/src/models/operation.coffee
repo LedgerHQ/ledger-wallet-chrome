@@ -14,11 +14,40 @@ class @Operation extends ledger.database.Model
 
   @fromSend: (tx, account) ->
     l "Sended transaction ", tx
+    index = account.getId()
+    uid = "sending#{tx.hash}_#{index}"
+
+    inputs = _(tx.inputs).filter((i) -> _(i.nodes).some((n) -> n?[0] is index))
+    value = _(inputs).reduce(((m, i) -> m.add(i.value)), ledger.Amount.fromSatoshi(0))
+
+    changeOutputs = _(tx.outputs).filter((o) -> _(o.nodes).some((n) -> n?[1] is 1 and n?[0] is index))
+    changeValue = _(changeOutputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
+
+    l "GOT ", value.toString(), changeValue.toString(), inputs, changeOutputs
+
+    @_createOperationFromTransaction(uid, "sending", tx, value.subtract(tx.fees).subtract(changeValue), account)
 
   @fromReception: (tx, account) ->
     l "Received transaction ", tx
+    index = account.getId()
+    uid = "reception_#{tx.hash}_#{index}"
+    outputs = _(tx.outputs).filter((o) -> _(o.nodes).some((n) -> n?[1] isnt 1 and n?[0] is index))
+    value = _(outputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
+    @_createOperationFromTransaction(uid, "reception", tx, value, account)
 
-  @_createOperationFromTransaction: (id, type, tx, account) ->
+  @_createOperationFromTransaction: (uid, type, tx, value, account) ->
+
+    @findOrCreate(uid: uid)
+      .set 'hash', tx['hash']
+      .set 'fees', tx['fees']
+      .set 'time', (new Date(tx['chain_received_at'] or new Date().getTime())).getTime()
+      .set 'type', type
+      .set 'value', value.toString()
+      .set 'confirmations', tx['confirmations']
+      .set 'senders', _(tx.inputs).chain().map((i) -> i.addresses).flatten().value()
+      .set 'recipients', _(tx.outputs).chain().filter((o) -> !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
+      .set 'account', account
+
 
 
   serialize: () ->
