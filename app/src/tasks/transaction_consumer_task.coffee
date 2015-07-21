@@ -178,7 +178,13 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
 
   _updateDatabase: (err, transaction, push, next) ->
     # Parse and create operations depending of the transaction. Also create missing accounts
-    accounts = _(transaction.inputs.concat(transaction.outputs)).chain().map((io) -> io.accounts).flatten().compact().value()
+    accounts = _(transaction.inputs.concat(transaction.outputs))
+      .chain()
+      .map((io) -> io.accounts)
+      .flatten()
+      .compact()
+      .uniq((a) -> a.index)
+    .value()
     l "Accounts ", accounts
     l "Transaction ", transaction
     pulled = no
@@ -201,7 +207,6 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
           # We already have the account
           push null, databaseAccount
           do next
-          l "HEY OK SEE NEXT 2"
       createAccount()
       return
     .consume (err, account, push, next) ->
@@ -222,7 +227,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
       l "HEY OK SEE NEXT 2"
       do next
     .done ->
-      "Done perform next"
+      l "Done perform next"
       push null, transaction
       do next
 

@@ -12,11 +12,14 @@ class @Operation extends ledger.database.Model
     accountIds = _(Account.displayableAccounts(context)).map (a) -> a.index
     Operation.find(account_id: {$in: accountIds}).sort(@defaultSort)
 
-  @fromSend: (tx) ->
+  @fromSend: (tx, account) ->
     l "Sended transaction ", tx
 
-  @fromReception: (tx) ->
+  @fromReception: (tx, account) ->
     l "Received transaction ", tx
+
+  @_createOperationFromTransaction: (id, type, tx, account) ->
+
 
   serialize: () ->
     json = super

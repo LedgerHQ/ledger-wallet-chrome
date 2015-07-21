@@ -81,6 +81,7 @@ ledger.preferences.defaults =
 
   # accounts preferences
   Accounts:
+    firstAccountColor: '#5CACC4'
     recoveredAccountColor: '#cccccc'
     colors:
       turquoise:
