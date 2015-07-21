@@ -200,7 +200,6 @@ class ledger.wallet.Wallet.Account
   getCurrentPublicAddress: () -> @wallet.cache?.get(@getCurrentPublicAddressPath())
 
   notifyPathsAsUsed: (paths) ->
-    l "Notify paths", paths
     paths = [paths] unless _.isArray(paths)
     allPaths = @getAllAddressesPaths()
     hasDiscoveredNewPaths = no

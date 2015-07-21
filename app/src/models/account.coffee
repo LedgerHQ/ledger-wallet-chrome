@@ -33,9 +33,9 @@ class @Account extends ledger.database.Model
       account = Account.create({index: 0, name: t('common.default_account_name'), hidden: false, color: ledger.preferences.defaults.Accounts.firstAccountColor}).save()
     else
       account = Account.create({index: index, name: _.str.sprintf(t("common.default_recovered_account_name"), index), hidden: false, color: ledger.preferences.defaults.Accounts.recoveredAccountColor}).save()
-    wallet.add('accounts', account).save()
+    account.set('wallet', wallet).save()
 
-  getWalletAccount: () -> ledger.wallet.Wallet.instance.getAccount(@get('index'))
+  getWalletAccount: -> ledger.wallet.Wallet.instance.getAccount(@get('index'))
 
   get: (key) ->
     val = super(key)

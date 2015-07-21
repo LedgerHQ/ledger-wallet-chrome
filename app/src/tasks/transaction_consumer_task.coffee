@@ -114,11 +114,9 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     super
     @_input.resume()
     @_stream.resume()
-    l "Started with ", @_input
 
   onStop: ->
     super
-    debugger
     @_input.end()
     @_stream.pause()
     @_stream.end()
@@ -126,7 +124,6 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
   _requestDerivations: ->
     d = ledger.defer()
     ledger.wallet.pathsToAddresses ledger.wallet.Wallet.instance.getAllObservedAddressesPaths(), (addresses) ->
-      l "REQUEST DERIVATION ", ledger.wallet.Wallet.instance.getAllObservedAddressesPaths()
       d.resolve(_.invert(addresses))
     d.promise
 
@@ -139,7 +136,6 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
   _extendTransaction: (err, transaction, push, next) ->
     wallet = ledger.wallet.Wallet.instance
     @_getAddressCache().then (cache) =>
-      l "IN CACHE ", cache
       for io in transaction.inputs.concat(transaction.outputs)
         io.paths = []
         io.accounts = []
@@ -162,15 +158,12 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     @private
   ###
   _filterTransaction: (transaction) ->
-    accepted = !_(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().compact().isEmpty().value()
-    l "Transaction filter", accepted, transaction
-    accepted
+    !_(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().compact().isEmpty().value()
 
   _updateLayout: (err, transaction, push, next) ->
     # Notify to the layout that the path is used
 
     for path in _(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().compact().value()
-      l "Notify used ", path
       ledger.wallet.Wallet.instance.getAccountFromDerivationPath(path).notifyPathsAsUsed([path])
 
     push null, transaction
@@ -185,12 +178,9 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
       .compact()
       .uniq((a) -> a.index)
     .value()
-    l "Accounts ", accounts
-    l "Transaction ", transaction
     pulled = no
     ledger.stream(accounts).consume (err, account, push, next) ->
       return push(null, ledger.stream.nil) if account is ledger.stream.nil
-      l "Account", account
       createAccount = =>
         databaseAccount = Account.findById(account.index)
         if !databaseAccount? and pulled

@@ -99,9 +99,7 @@ class Collection
     @_getModelSyncSubstore(model).remove(_(dataToRemove).keys())
 
   _removeSynchronizedProperties: (model) ->
-    l "Attempt removal", model
     return unless model.hasSynchronizedProperties()
-    l "Remove from",  @_getModelSyncSubstore(model), model.constructor.getSynchronizedPropertiesNames()
     @_getModelSyncSubstore(model).remove(model.constructor.getSynchronizedPropertiesNames())
 
   query: () ->

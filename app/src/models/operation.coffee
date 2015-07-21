@@ -13,7 +13,6 @@ class @Operation extends ledger.database.Model
     Operation.find(account_id: {$in: accountIds}).sort(@defaultSort)
 
   @fromSend: (tx, account) ->
-    l "Sended transaction ", tx
     index = account.getId()
     uid = "sending#{tx.hash}_#{index}"
 
@@ -22,13 +21,9 @@ class @Operation extends ledger.database.Model
 
     changeOutputs = _(tx.outputs).filter((o) -> _(o.nodes).some((n) -> n?[1] is 1 and n?[0] is index))
     changeValue = _(changeOutputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
-
-    l "GOT ", value.toString(), changeValue.toString(), inputs, changeOutputs
-
     @_createOperationFromTransaction(uid, "sending", tx, value.subtract(tx.fees).subtract(changeValue), account)
 
   @fromReception: (tx, account) ->
-    l "Received transaction ", tx
     index = account.getId()
     uid = "reception_#{tx.hash}_#{index}"
     outputs = _(tx.outputs).filter((o) -> _(o.nodes).some((n) -> n?[1] isnt 1 and n?[0] is index))
@@ -36,7 +31,6 @@ class @Operation extends ledger.database.Model
     @_createOperationFromTransaction(uid, "reception", tx, value, account)
 
   @_createOperationFromTransaction: (uid, type, tx, value, account) ->
-
     @findOrCreate(uid: uid)
       .set 'hash', tx['hash']
       .set 'fees', tx['fees']
