@@ -19,54 +19,10 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
       return unless data?.payload?.type?
       switch data.payload.type
         when 'new-transaction'
-          transaction = data.payload.transaction
-          # Ensure all observable addresses are in the cache before handling the transaction
-          @_handleTransactionIO(transaction, transaction.inputs)
-          @_handleTransactionIO(transaction, transaction.outputs)
+          ledger.tasks.TransactionConsumerTask.instance.pushTransaction(data.payload.transaction)
         when 'new-block'
           @_handleNewBlock data.payload.block
     @newTransactionStream.onclose = => @_listenNewTransactions() if @isRunning()
-
-  _handleTransactionIO: (transaction, io) ->
-    found = no
-    if io?
-      failedAddresses = []
-      for input in io
-        continue unless input.addresses?
-        for address in input.addresses
-          derivation = ledger.wallet.Wallet.instance?.cache?.getDerivationPath(address)
-          if derivation?
-            @logger().info "New transaction on #{derivation}"
-            account = ledger.wallet.Wallet.instance?.getAccountFromDerivationPath(derivation)
-            if account?
-              @logger().info 'Add transaction'
-              account.notifyPathsAsUsed(derivation)
-              Account.fromWalletAccount(account)?.addRawTransactionAndSave transaction
-              Wallet.instance?.retrieveAccountsBalances()
-              ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
-              ledger.app.emit 'wallet:operations:new'
-            else
-              @logger().warn "Failed to retrieve an account for #{derivation} ", transaction
-          else
-            # Attempts to discover another account
-           failedAddresses.push address
-      @_attemptAccountDiscovery(transaction, failedAddresses) if failedAddresses.length > 0
-    found
-
-  _attemptAccountDiscovery: (transaction, addresses) ->
-    return unless ledger.preferences.instance?
-    return
-    wallet = ledger.wallet.Wallet.instance
-    indexes = wallet.getNextAccountIndexes(ledger.preferences.instance.getAccountDiscoveryGap() or ledger.config.defaultAccountDiscoveryGap)
-    paths = _.flatten(wallet.getAccount(index).getAllObservedAddressesPaths() for index in indexes when wallet.getAccount(index)?)
-    ledger.wallet.pathsToAddresses paths, (addresses) ->
-      for address in addresses
-        derivation = ledger.wallet.Wallet.instance?.cache?.getDerivationPath(address)
-        matchResult = derivation?.match("#{wallet.getRootDerivationPath()}/(\\d+)'/\\d+/\\d+")
-        if matchResult?
-          [__, accountIndex] = matchResult
-          @emit "discovered:account", {transaction, address, accountIndex: +accountIndex}
-
 
   _handleNewBlock: (block) ->
     @logger().trace 'Receive new block'

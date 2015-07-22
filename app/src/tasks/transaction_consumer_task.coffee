@@ -62,7 +62,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     safe = (f) ->
       (err, i, push, next) ->
         if err?
-          e err
+          ledger.utils.Logger.getLoggerByTag("TransactionStream").error("An error occured", err)
           push(err)
           return do next
         return push(null, ledger.stream.nil) if i is ledger.stream.nil
@@ -140,7 +140,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
         io.paths = []
         io.accounts = []
         io.nodes = []
-        for address in io.addresses
+        for address in (io.addresses or [])
           path = cache[address]
           io.paths.push path
           io.accounts.push (if path? then wallet.getOrCreateAccountFromDerivationPath(path) else undefined)
@@ -150,6 +150,9 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
           else
             io.nodes.push undefined
       push null, transaction
+      do next
+    .fail (err) ->
+      push err
       do next
     .done()
 

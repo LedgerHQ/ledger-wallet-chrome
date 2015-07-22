@@ -241,7 +241,7 @@ class @ledger.database.Model extends @EventEmitter
     chain.where(filterFunction) if filterFunction?
     chain
 
-  @all: (context = ledger.database.contexts.main) -> @chain().data()
+  @all: (context = ledger.database.contexts.main) -> @chain(context).data()
 
   # Relationship creator
   @has: (relationshipDeclaration) ->

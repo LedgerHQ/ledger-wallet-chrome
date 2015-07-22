@@ -4,10 +4,6 @@ class @Operation extends ledger.database.Model
 
   @index 'uid'
 
-  @pendingRawTransactionStream: () ->
-    @_pendingRawTransactionStream ?= new Stream().open()
-    @_pendingRawTransactionStream
-
   @displayableOperationsChain: (context = ledger.database.contexts.main) ->
     accountIds = _(Account.displayableAccounts(context)).map (a) -> a.index
     Operation.find(account_id: {$in: accountIds}).sort(@defaultSort)
@@ -41,8 +37,6 @@ class @Operation extends ledger.database.Model
       .set 'senders', _(tx.inputs).chain().map((i) -> i.addresses).flatten().value()
       .set 'recipients', _(tx.outputs).chain().filter((o) -> !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
       .set 'account', account
-
-
 
   serialize: () ->
     json = super
