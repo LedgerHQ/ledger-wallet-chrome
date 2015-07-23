@@ -70,6 +70,6 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
 
     # update action
     @actions.pop() if @actions.indexOf(@_addAccountAction) == 1
-    if yes #TODO: plug account method
+    if Account.isAbleToCreateAccount()
       @actions.push @_addAccountAction
     @parentViewController.updateActionBar()

@@ -6,6 +6,10 @@ class @WalletDialogsAddaccountDialogViewController extends ledger.common.DialogV
     errorContainer: '#error_container'
     accountNameInput: '#account_name_input'
 
+  onBeforeRender: ->
+    super
+    @hiddenAccounts = Account.hiddenAccounts()
+
   onAfterRender: ->
     super
     ledger.preferences.defaults.Accounts.applyColorsToSelect(@view.colorsSelect)
@@ -26,7 +30,7 @@ class @WalletDialogsAddaccountDialogViewController extends ledger.common.DialogV
       @dismiss()
 
   showAccount: (params) ->
-    l 'show', params
+    Account.findById(+params["id"]).set('hidden', false).save()
     @dismiss()
 
   _listenEvents: ->

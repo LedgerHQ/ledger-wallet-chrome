@@ -26,6 +26,12 @@ class @Account extends ledger.database.Model
         index: account.get('index'), name: account.get('name'), balance: account.get('total_balance'), color: account.get('color')
     _.sortBy accounts, (account) => account.index
 
+  @hiddenAccounts: (context = ledger.database.contexts.main) ->
+    accounts =
+      for account in Account.find(hidden: yes, context).simpleSort('index').data()
+        index: account.get('index'), name: account.get('name'), balance: account.get('total_balance'), color: account.get('color')
+    _.sortBy accounts, (account) => account.index
+
   @recoverAccount: (index, wallet) ->
     if index is 0
       account = Account.create({index: 0, name: t('common.default_account_name'), hidden: false, color: ledger.preferences.defaults.Accounts.firstAccountColor}).save()
@@ -89,7 +95,7 @@ class @Account extends ledger.database.Model
 
   isDeletable: -> @getWalletAccount().isEmpty()
 
-  @isAbleToCreateAccount: -> @chain().count() < ledger.wallet.Wallet.instance.getAccountsCount
+  @isAbleToCreateAccount: -> @chain().count() < ledger.wallet.Wallet.instance.getAccountsCount()
 
   ## Operations
 

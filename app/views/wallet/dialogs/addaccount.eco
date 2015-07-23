@@ -18,17 +18,21 @@
       <i class="fa fa-square medium-square" id="color_square"></i>
     </div>
   </div>
-  <div class="large-table" id="hidden_accounts_table">
-    <div class="header top">
-      <div class="uppercase-section-column stretchable"><%= t 'wallet.dialogs.addaccount.hidden_accounts' %></div>
+  <% if @hiddenAccounts.length > 0: %>
+    <div class="large-table" id="hidden_accounts_table">
+      <div class="header top">
+        <div class="uppercase-section-column stretchable"><%= t 'wallet.dialogs.addaccount.hidden_accounts' %></div>
+      </div>
+      <% for account, index in @hiddenAccounts: %>
+        <div class="row <% if index + 1< @hiddenAccounts.length: %>bottom<% else: %>middle<% end %>">
+          <i class="fa fa-circle small-dot" style="color: <%= account.color %>"></i>
+          <div class="regular-text-small stretchable"><%= account.name %></div>
+          <div class="regular-grey-text-small"><%= if ledger.formatters.symbolIsFirst() then ledger.formatters.getUnitSymbol() %> <%= ledger.formatters.fromValue(account.balance) %><%= if !ledger.formatters.symbolIsFirst() then ' ' + ledger.formatters.getUnitSymbol() %></div>
+          <a href="#showAccount(id=<%= account.index %>)" class="small-action-rounded-button"><%= t 'common.show' %></a>
+        </div>
+      <% end %>
     </div>
-    <div class="row middle">
-      <i class="fa fa-circle small-dot"></i>
-      <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.addaccount.name' %></div>
-      <div class="regular-grey-text-small">0.000 BTC</div>
-      <a href="#showAccount(id=0)" class="small-action-rounded-button"><%= t 'common.show' %></a>
-    </div>
-  </div>
+  <% end %>
   <div id="error_container"></div>
 </section>
 <div class="dialog-actions-bar">

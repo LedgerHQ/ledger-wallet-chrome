@@ -28,8 +28,11 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
       @_getAccount().set('name', @_accountName()).set('color', @view.colorsSelect.val()).save()
       @dismiss()
 
-  deleteAccount: ->
-    # TODO: delete account
+  hideAccount: ->
+    if @_getAccount().isDeletable()
+      @_getAccount().delete()
+    else
+      @_getAccount().set('hidden', yes)
 
   exportXPub: ->
     (new WalletDialogsXpubDialogViewController(account_id: @_getAccount().get('index'))).show()

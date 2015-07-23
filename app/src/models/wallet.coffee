@@ -20,7 +20,7 @@ class @Wallet extends ledger.database.Model
         unconfirmed: ledger.Amount.fromSatoshi(0)
       accounts: []
 
-    for account in @get('accounts')
+    for account in @get('accounts') when !account.isHidden()
       continue if not account.get('total_balance')? or not account.get('unconfirmed_balance')?
       balance.wallet.total = balance.wallet.total.add(account.get('total_balance'))
       balance.wallet.unconfirmed = balance.wallet.unconfirmed.add(account.get('unconfirmed_balance'))
