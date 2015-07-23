@@ -15,7 +15,7 @@ class @WalletAccountsAlloperationsViewController extends ledger.common.ActionBar
   onDetach: ->
     super
     ledger.app.off 'wallet:transactions:new wallet:operations:sync:done', @_debouncedUpdateOperations
-    ledger.preferences.instance.off 'currencyActive:changed', @_debouncedUpdateOperations
+    ledger.preferences.instance?.off 'currencyActive:changed', @_debouncedUpdateOperations
 
   showOperation: (params) ->
     dialog = new WalletDialogsOperationdetailDialogViewController(params)
