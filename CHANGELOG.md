@@ -1,4 +1,8 @@
 # Changelog
+1.3.16
+===
+- Fix transaction parsing
+
 1.3.15
 ===
 - Force firmware update for devices running Ledger OS 1.0.0

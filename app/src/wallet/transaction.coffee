@@ -163,6 +163,7 @@ class ledger.wallet.Transaction
       @authorizationPaired = @_resumeData.authorizationPaired
       d.resolve(@)
     .fail (error) =>
+      e "GOT ERROR", error
       d.rejectWithError(Errors.SignatureError)
     .done()
     d.promise
