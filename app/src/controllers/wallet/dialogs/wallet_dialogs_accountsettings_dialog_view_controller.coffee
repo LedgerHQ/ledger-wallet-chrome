@@ -7,6 +7,13 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
     accountNameInput: '#account_name_input'
     rootPathLabel: '#root_path_label'
 
+  onBeforeRender: ->
+    super
+    if Account.displayableAccounts().length > 1
+      @_deleteMode = if @_getAccount().isDeletable() then 'delete' else 'hide'
+    else
+      @_deleteMode = 'none'
+
   onAfterRender: ->
     super
     ledger.preferences.defaults.Accounts.applyColorsToSelect @view.colorsSelect, (option) =>
@@ -33,6 +40,9 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
       @_getAccount().delete()
     else
       @_getAccount().set('hidden', yes)
+    @dismiss()
+    ledger.app.router.go '/wallet/accounts/index'
+
 
   exportXPub: ->
     (new WalletDialogsXpubDialogViewController(account_id: @_getAccount().get('index'))).show()

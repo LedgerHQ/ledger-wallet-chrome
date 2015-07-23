@@ -2,6 +2,7 @@
   <header>
     <h1><%= t 'wallet.dialogs.addaccount.add_an_account' %></h1>
   </header>
+  <% if Account.isAbleToCreateAccount(): %>
   <div class="large-table">
     <div class="header top">
       <div class="uppercase-section-column stretchable"><%= t 'wallet.dialogs.addaccount.new_account' %></div>
@@ -18,6 +19,7 @@
       <i class="fa fa-square medium-square" id="color_square"></i>
     </div>
   </div>
+  <% end %>
   <% if @hiddenAccounts.length > 0: %>
     <div class="large-table" id="hidden_accounts_table">
       <div class="header top">

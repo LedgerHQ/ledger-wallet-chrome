@@ -34,7 +34,11 @@
   <div id="error_container"></div>
 </section>
 <div class="dialog-actions-bar">
-  <a href="#hideAccount" class="uppercase-action"><%= t 'wallet.dialogs.accountsettings.hide_account' %></a>
+  <% if @_deleteMode == 'hide': %>
+    <a href="#hideAccount" class="uppercase-action"><%= t 'wallet.dialogs.accountsettings.hide_account' %></a>
+  <% else if @_deleteMode == 'delete': %>
+    <a href="#hideAccount" class="uppercase-action"><%= t 'wallet.dialogs.accountsettings.delete_account' %></a>
+  <% end %>
   <div class="left-spacer"></div>
   <a href="#dismiss" class="cancel-rounded-button"><%= t 'common.cancel' %></a>
   <a href="#saveAccount" class="action-rounded-button"><%= t 'common.save' %></a>

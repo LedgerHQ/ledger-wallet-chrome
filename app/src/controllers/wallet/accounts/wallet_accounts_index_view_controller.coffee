@@ -70,6 +70,6 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
 
     # update action
     @actions.pop() if @actions.indexOf(@_addAccountAction) == 1
-    if Account.isAbleToCreateAccount()
+    if Account.isAbleToCreateAccount() or Account.hiddenAccounts().length > 0
       @actions.push @_addAccountAction
     @parentViewController.updateActionBar()

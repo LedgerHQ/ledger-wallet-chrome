@@ -204,7 +204,7 @@ class ledger.wallet.Wallet.Account
     allPaths = @getAllAddressesPaths()
     hasDiscoveredNewPaths = no
     for path in paths
-      continue if _(allPaths).contains(path)
+      continue if _(allPaths).contains(path) and path isnt @getCurrentPublicAddressPath() and path isnt @getCurrentChangeAddressPath()
       path = path.replace("#{@getRootDerivationPath()}/", '').split('/')
       switch path[0]
         when '0' then @_notifyPublicAddressIndexAsUsed(parseInt(path[1]))
