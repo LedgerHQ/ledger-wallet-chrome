@@ -80,8 +80,6 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
       @view.reloadIcon.removeClass 'spinning'
 
   _isSynchronizationRunning: ->
-    l "Running ", ledger.tasks.OperationsConsumptionTask.instance.isRunning()
-    l "TASK", _.clone(ledger.tasks.Task.RUNNING_TASKS)
     return ledger.tasks.OperationsConsumptionTask.instance.isRunning()
 
   _listenCountervalueEvents: ->

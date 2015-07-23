@@ -12,7 +12,6 @@ class ledger.common.ActionBarNavigationController extends ledger.common.Navigati
     @updateActionBar()
 
   updateActionBar: ->
-    l 'Action bar update'
     unless @topViewController().getActionBarDeclaration?
       @getActionBar().hide()
       return

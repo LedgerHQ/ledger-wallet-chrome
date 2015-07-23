@@ -16,14 +16,14 @@ class @Wallet extends ledger.database.Model
   getBalance: () ->
     balance =
       wallet:
-        total: 0
-        unconfirmed: 0
+        total: ledger.Amount.fromSatoshi(0)
+        unconfirmed: ledger.Amount.fromSatoshi(0)
       accounts: []
 
     for account in @get('accounts')
       continue if not account.get('total_balance')? or not account.get('unconfirmed_balance')?
-      balance.wallet.total += account.get('total_balance')
-      balance.wallet.unconfirmed += account.get('unconfirmed_balance')
+      balance.wallet.total = balance.wallet.total.add(account.get('total_balance'))
+      balance.wallet.unconfirmed = balance.wallet.unconfirmed.add(account.get('unconfirmed_balance'))
       balance.accounts.push total: account.get('total_balance'), unconfirmed: account.get('unconfirmed_balance')
 
     balance

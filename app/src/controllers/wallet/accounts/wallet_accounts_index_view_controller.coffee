@@ -48,14 +48,14 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
 
     # listen operations
     ledger.app.off 'wallet:transactions:new wallet:operations:sync:done wallet:operations:new wallet:operations:update', @_debouncedUpdateOperations
-    ledger.preferences.instance.off 'currencyActive:changed', @_debouncedUpdateOperations
+    ledger.preferences.instance?.off 'currencyActive:changed', @_debouncedUpdateOperations
 
     # listen preferences
-    ledger.preferences.instance.off 'currencyActive:changed', @_debouncedUpdateAccounts
+    ledger.preferences.instance?.off 'currencyActive:changed', @_debouncedUpdateAccounts
 
     # listen accounts
-    ledger.database.contexts.main.off 'update:account insert:account remove:account', @_debouncedUpdateAccounts
-    ledger.database.contexts.main.off 'update:account insert:account remove:account', @_debouncedUpdateOperations
+    ledger.database.contexts.main?.off 'update:account insert:account remove:account', @_debouncedUpdateAccounts
+    ledger.database.contexts.main?.off 'update:account insert:account remove:account', @_debouncedUpdateOperations
 
   _updateOperations: ->
     operations = Operation.displayableOperationsChain().limit(6).data()

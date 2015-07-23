@@ -10,15 +10,13 @@ class @Account extends ledger.database.Model
   @sync 'color'
   @sync 'hidden'
 
+  constructor: ->
+    super
+    @retrieveBalance = _.debounce(@retrieveBalance.bind(@), 200)
+
   @fromWalletAccount: (hdAccount) ->
     return null unless hdAccount?
     @find(index: hdAccount.index).first()
-
-  @create: (base, context) ->
-    throw new Error("Wrong account base object for creation. Index must be a number") if _.isNaN(+base['index'])
-    ledger.wallet.Wallet.instance.getOrCreateAccount(+base['index']).save()
-    ledger.wallet.Wallet.instance.save()
-    super(base, context)
 
   @getRemainingAccountCreation: (context = ledger.database.contexts.main) -> ledger.wallet.Wallet.instance.getAccountsCount() - Account.all(context).length
 
@@ -39,7 +37,8 @@ class @Account extends ledger.database.Model
 
   get: (key) ->
     val = super(key)
-    return val or 0 if key is 'total_balance'
+    if key is 'total_balance' or key is 'unconfirmed_balance'
+      return if val? then ledger.Amount.fromSatoshi(val) else ledger.Amount.fromSatoshi(0)
     return val
 
   getExtendedPublicKey: (callback) ->
@@ -64,7 +63,33 @@ class @Account extends ledger.database.Model
   ## Balance management
 
   retrieveBalance: () ->
-    ledger.tasks.BalanceTask.get(@get('index')).startIfNeccessary()
+    totalBalance = @get 'total_balance'
+    unconfirmedBalance = @get 'unconfirmed_balance'
+    @set 'total_balance', @getBalanceFromOperations().toString()
+    @set 'unconfirmed_balance', @getUnconfirmedBalanceFromOperations().toString()
+
+    if ledger.Amount.fromSatoshi(totalBalance or 0).neq(@get('total_balance') or 0) or ledger.Amount.fromSatoshi(unconfirmedBalance or 0).neq(@get('unconfirmed_balance') or 0)
+      ledger.app.emit "wallet:balance:changed", @get('wallet').getBalance()
+    else
+      ledger.app.emit "wallet:balance:unchanged", @get('wallet').getBalance()
+
+  getBalanceFromOperations: ->
+    total = ledger.Amount.fromSatoshi(0)
+    for operation in @get('operations')
+      total = if operation.get('type') is 'reception' then total.add(operation.get('value')) else total.subtract(operation.get('value')).subtract(operation.get('fees'))
+    total
+
+  getUnconfirmedBalanceFromOperations: ->
+    total = ledger.Amount.fromSatoshi(0)
+    for operation in @get('operations') when operation.get('confirmations') > 0
+      total = if operation.get('type') is 'reception' then total.add(operation.get('value')) else total.subtract(operation.get('value')).subtract(operation.get('fees'))
+    total
+
+  ## Add/Remove/Hidden
+
+  isDeletable: -> @getWalletAccount().isEmpty()
+
+  @isAbleToCreateAccount: -> @chain().count() < ledger.wallet.Wallet.instance.getAccountsCount
 
   ## Operations
 

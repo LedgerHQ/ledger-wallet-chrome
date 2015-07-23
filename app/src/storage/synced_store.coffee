@@ -46,13 +46,9 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
         @pull()
         @push() if @_changes.length > 0
 
-  pull: ->
-    l 'Request pull', new Error().stack
-    @_throttled_pull()
+  pull: -> @_throttled_pull()
 
-  push: ->
-    l 'Request push', new Error().stack
-    @_debounced_push()
+  push: -> @_debounced_push()
 
   # Stores one or many item
   #
@@ -109,7 +105,6 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
       $info 'Remote md5: ', md5, ', local md5', @_lastMd5
       return yes if @_lastMd5 is md5
       @client.get_settings().then (data) =>
-        l "Decrypt", _.clone(data)
         $info 'PULL, before decrypt ', data
         data = Try(=> @_decrypt(data))
         $info 'PULL, after decrypt ', data.getOrElse("Unable to decrypt data")
@@ -123,7 +118,6 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     .fail (e) =>
       if e.status is 404
         throw Errors.NoRemoteData
-      l "Pull failed", e
       throw Errors.NetworkError
 
   _merge: (remoteData) ->

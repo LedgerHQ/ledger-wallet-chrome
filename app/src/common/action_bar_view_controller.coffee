@@ -22,7 +22,6 @@ class ledger.common.ActionBarViewController extends ledger.common.ViewController
         if previousPart? and parts[index + 1]? and modelNames.contains(previousPart)
           ModelClass = models[_.str.capitalize(_.str.camelize(_.singularize(previousPart)))]
           instance = ModelClass.findById(if _.isNaN(+part) then part else +part)
-          l "Got ", ModelClass, (if _.isNaN(+part) then part else +part), instance
           if instance?
             title = instance.get('name') or instance.get('title') or instance.get('label')
             ids.push(index)
@@ -30,5 +29,4 @@ class ledger.common.ActionBarViewController extends ledger.common.ViewController
           title = t("#{parts[0]}.breadcrumb" + ('.' + i for i, j in parts.slice(1, index + 1) when !ids.contains(j + 1)).join(''))
         url = '/' + (i for i in parts.slice(0, index + 1)).join('/')
         breadcrumb.push {title, url} unless index is 0
-    l {breadcrumb, actions}
     {breadcrumb, actions}
