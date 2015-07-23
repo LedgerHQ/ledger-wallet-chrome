@@ -405,13 +405,18 @@ var BTChip = Class.create({
         var notify = function () {
           deferred.notify({inputIndex: notifyInputIndex, outputIndex: notifyOutputIndex, inputsCount: notifyInputsCount, outputsCount: notifyOutputsCount});
         };
-        var processScriptBlocks = function (script) {
+        var processScriptBlocks = function (script, sequence) {
             var internalPromise = Q.defer();
             var scriptBlocks = [];
             var offset = 0;
             while (offset != script.length) {
                 var blockSize = (script.length - offset > 251 ? 251 : script.length - offset);
-                scriptBlocks.push(script.bytes(offset, blockSize));
+                if ((offset + blockSize) != script.length) {
+                    scriptBlocks.push(script.bytes(offset, blockSize));
+                }
+                else {
+                    scriptBlocks.push(script.bytes(offset, blockSize).concat(sequence));
+                }
                 offset += blockSize;
             }
             async.eachSeries(
@@ -439,7 +444,7 @@ var BTChip = Class.create({
                         // iteration (eachSeries) ended
                         notify();
                         // deferred.notify("input");
-                        processScriptBlocks(input['script'].concat(input['sequence'])).then(function (result) {
+                        processScriptBlocks(input['script'], input['sequence']).then(function (result) {
                             finishedCallback();
                         }).fail(function (err) {
                             deferred.reject(err);
