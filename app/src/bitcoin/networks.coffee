@@ -12,7 +12,7 @@ ledger.bitcoin.Networks =
   testnet:
     name: 'testnet'
     ticker: 'btctest'
-    bip44_coin_type: '0'
+    bip44_coin_type: '1'
     version:
       regular: 111
       P2SH: 196
