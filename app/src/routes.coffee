@@ -109,6 +109,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/wallet/accounts/{id}', (params) ->
     app.router.go "/wallet/accounts/#{params['id']}/show"
 
+  route '/wallet/accounts', ->
+    app.router.go "/wallet/accounts/index"
+
   # Send
   route '/wallet/send/index:?params:', (params = {}) ->
     dialog = new WalletSendIndexDialogViewController(params["?params"] or {})

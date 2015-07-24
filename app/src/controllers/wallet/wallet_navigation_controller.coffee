@@ -102,7 +102,8 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
       createBreadcrumbPartView: (title, url, position, length) =>
         view = $("<span>#{t(title)}</span>")
         view.addClass("breadcrumb-root") if position is 0
-        view.attr('data-href', url) if not _.isEmpty(url) and position isnt 0 and position < length - 1
+        url += "/index" if position is 0
+        view.attr('data-href', url) if not _.isEmpty(url) and position < length - 1 and @topViewController().routedUrl isnt url
         view
 
       createBreadcrumbSeparatorView: (position) => $("<span>&nbsp;&nbsp;>&nbsp;&nbsp;</span>")

@@ -13,7 +13,7 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     colorCircle: '#color_circle'
 
   breadcrumb: [
-    { title: 'wallet.breadcrumb.accounts'}
+    { title: 'wallet.breadcrumb.accounts', url: '/wallet/accounts'}
   ]
 
   actions: [
