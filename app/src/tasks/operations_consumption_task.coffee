@@ -7,7 +7,7 @@ class ledger.tasks.OperationsConsumptionTask extends ledger.tasks.Task
     clearTimeout(@_scheduledStart)
     @_retryNumber ||= 0
     stream = ledger.api.TransactionsRestClient.instance.createTransactionStreamForAllObservedPaths()
-      .stopOnError (err) ->
+      .stopOnError (err) =>
         @stopIfNeccessary()
         ledger.app.emit 'wallet:operations:sync:failed', err
         @_retryNumber = Math.min(@_retryNumber + 1, 12)
@@ -17,6 +17,11 @@ class ledger.tasks.OperationsConsumptionTask extends ledger.tasks.Task
     stream.observe().done =>
       @stopIfNeccessary()
       _.defer -> ledger.app.emit 'wallet:operations:sync:done'
+
+  startIfNeccessary: ->
+    l "START", new Error().stack
+    super
+
 
   onStop: ->
     super

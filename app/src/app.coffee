@@ -108,11 +108,7 @@ require @ledger.imports, ->
 
     _listenAppEvents: () ->
       @on 'wallet:operations:sync:failed', =>
-        return unless @isInWalletMode()
-        _.delay =>
-          ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary() if @dongle?
-          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() if @dongle?
-        , 500
+
 
       @on 'wallet:operations:sync:done', =>
 
