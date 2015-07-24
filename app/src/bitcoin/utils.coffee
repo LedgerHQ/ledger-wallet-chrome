@@ -55,6 +55,7 @@ _.extend ledger.bitcoin,
         script: varchar bytes
 
     tx.lock_time = u32 bytes
+    io.address?.version = ledger.config.network.version.regular for io in tx.outs
     tx
 
   verifyRawTx: (tx, inputs, amount, fees, recipientAddress, changeAddress) ->
