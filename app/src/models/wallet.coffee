@@ -48,3 +48,5 @@ class @Wallet extends ledger.database.Model
     # Ensure every account is bound to the wallet
     for account in Account.all()
       account.set('wallet', this).save()
+      unless account.get('color')?
+        account.set('color', ledger.preferences.defaults.Accounts.firstAccountColor).save()
