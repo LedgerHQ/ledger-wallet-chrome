@@ -7,10 +7,8 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
 
   actions: [
     {title: 'wallet.accounts.index.actions.see_all_operations', icon: 'fa-bars', url: '/wallet/accounts/alloperations'}
+    {title: 'wallet.accounts.index.actions.add_account', icon: 'fa-plus', url: '#addAccount'}
   ]
-
-  _addAccountAction: {title: 'wallet.accounts.index.actions.add_account', icon: 'fa-plus', url: '#addAccount'}
-
 
   initialize: ->
     super
@@ -23,7 +21,15 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
     @_updateOperations()
     @_listenEvents()
 
-  addAccount: -> (new WalletDialogsAddaccountDialogViewController()).show()
+  addAccount: ->
+    if !Account.isAbleToCreateAccount() and Account.hiddenAccounts().length is 0
+      new CommonDialogsMessageDialogViewController(
+        kind: 'fail',
+        title: t('common.errors.cannot_create_account.title'),
+        subtitle: _.str.sprintf(t('common.errors.cannot_create_account.subtitle'), Account.chain().simpleSort('index').last().get('name'))
+      ).show()
+    else
+      (new WalletDialogsAddaccountDialogViewController()).show()
 
   showOperation: (params) -> (new WalletDialogsOperationdetailDialogViewController(params)).show()
 
@@ -67,9 +73,3 @@ class @WalletAccountsIndexViewController extends ledger.common.ActionBarViewCont
     accounts = Account.displayableAccounts()
     render 'wallet/accounts/_accounts_list', {accounts: accounts}, (html) =>
       @view.accountsList.html html
-
-    # update action
-    @actions.pop() if @actions.indexOf(@_addAccountAction) == 1
-    if Account.isAbleToCreateAccount() or Account.hiddenAccounts().length > 0
-      @actions.push @_addAccountAction
-    @parentViewController.updateActionBar()
