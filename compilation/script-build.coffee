@@ -25,6 +25,7 @@ flavors         = require './gulp-flavors'
 {i18n, buildLangFilePlugin} = require './gulp-i18n'
 createBuildFile = require './gulp-build-file'
 cached          = require 'gulp-cached'
+slash           = require 'gulp-slash'
 
 module.exports = (configuration) ->
 
@@ -32,6 +33,7 @@ module.exports = (configuration) ->
 
     less: () ->
       gulp.src 'app/assets/css/**/*.less'
+      .pipe slash()
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe cached('less')
@@ -41,12 +43,14 @@ module.exports = (configuration) ->
 
     css: () ->
       gulp.src 'app/assets/css/**/*.css'
+      .pipe slash()
       .pipe plumber()
       .pipe changed "#{configuration.buildDir}/assets/css"
       .pipe gulp.dest "#{configuration.buildDir}/assets/css"
 
     images: () ->
       gulp.src 'app/assets/images/**/*'
+      .pipe slash()
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: no)
       .pipe changed "#{configuration.buildDir}/assets/images"
@@ -54,6 +58,7 @@ module.exports = (configuration) ->
 
     fonts: () ->
       gulp.src 'app/assets/fonts/**/*'
+      .pipe slash()
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: no)
       .pipe changed "#{configuration.buildDir}/assets/fonts"
@@ -61,6 +66,7 @@ module.exports = (configuration) ->
 
     html: () ->
       gulp.src 'app/views/**/*.html'
+      .pipe slash()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe plumber()
       .pipe changed "#{configuration.buildDir}/views"
@@ -68,6 +74,7 @@ module.exports = (configuration) ->
 
     eco: () ->
       gulp.src 'app/views/**/*.eco'
+      .pipe slash()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe plumber()
       .pipe cached('eco')
@@ -77,6 +84,7 @@ module.exports = (configuration) ->
 
     manifest: () ->
       gulp.src 'app/manifest.yml'
+      .pipe slash()
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe changed "#{configuration.buildDir}/", extension: '.json', hasChanged: changed.compareSha1Digest
@@ -85,6 +93,7 @@ module.exports = (configuration) ->
 
     translate: () ->
       gulp.src 'app/locales/**/!(es)/*.properties'
+      .pipe slash()
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe changed "#{configuration.buildDir}/_locales", extension: '.json', hasChanged: changed.compareSha1Digest
@@ -94,6 +103,7 @@ module.exports = (configuration) ->
 
     buildLangFile: () ->
       gulp.src 'app/locales/**/!(es)/*.properties'
+      .pipe slash()
       .pipe plumber()
       .pipe cached('lang-file')
       .pipe flavors(flavors: configuration.flavors, merge: yes)
@@ -105,23 +115,27 @@ module.exports = (configuration) ->
 
     regions: () ->
       gulp.src 'app/src/i18n/regions.yml'
+      .pipe slash()
       .pipe yaml()
       .pipe gulp.dest "#{configuration.buildDir}/src/i18n"
 
     js: () ->
       gulp.src 'app/**/*.js'
+      .pipe slash()
       .pipe plumber()
       .pipe changed "#{configuration.buildDir}/"
       .pipe gulp.dest "#{configuration.buildDir}/"
 
     public: () ->
       gulp.src 'app/public/**/*'
+      .pipe slash()
       .pipe plumber()
       .pipe changed "#{configuration.buildDir}/public"
       .pipe gulp.dest "#{configuration.buildDir}/public"
 
     coffee: () ->
       stream = gulp.src 'app/**/*.coffee'
+      .pipe slash()
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe cached('coffee')
@@ -134,11 +148,13 @@ module.exports = (configuration) ->
 
     minify: () ->
       gulp.src "#{configuration.buildDir}/**/*.css"
+      .pipe slash()
       .pipe minifyCss()
       .pipe gulp.dest("#{configuration.buildDir}/")
 
     uglify: () ->
       gulp.src "#{configuration.buildDir}/**/*(!.min).js"
+      .pipe slash()
       .pipe uglify mangle: false
       .pipe gulp.dest("#{configuration.buildDir}/")
 

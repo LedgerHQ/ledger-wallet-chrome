@@ -38,6 +38,7 @@
     "underscore.string": "^3.0.3",
     "rimraf": "latest",
     "gulp-util": "latest",
-    "gulp-cached": "latest"
+    "gulp-cached": "latest",
+    "gulp-slash": "latest"
   }
 }
