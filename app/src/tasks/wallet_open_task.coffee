@@ -57,6 +57,7 @@ restoreStructure = (dongle, raise, done) ->
   if ledger.wallet.Wallet.instance.isEmpty()
     ledger.app.emit 'wallet:initialization:creation'
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'done', () =>
+      Account.recoverAccount(0, Wallet.instance) if Account.chain().count() is 0
       ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary()
       done?(operation_consumption: yes)
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'fatal_error', () =>

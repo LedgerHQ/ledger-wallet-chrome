@@ -203,6 +203,7 @@ class ledger.wallet.Wallet.Account
     paths = [paths] unless _.isArray(paths)
     allPaths = @getAllAddressesPaths()
     hasDiscoveredNewPaths = no
+    wasEmpty = @isEmpty()
     for path in paths
       continue if _(allPaths).contains(path) and path isnt @getCurrentPublicAddressPath() and path isnt @getCurrentChangeAddressPath()
       path = path.replace("#{@getRootDerivationPath()}/", '').split('/')
@@ -210,6 +211,8 @@ class ledger.wallet.Wallet.Account
         when '0' then @_notifyPublicAddressIndexAsUsed(parseInt(path[1]))
         when '1' then @_notifyChangeAddressIndexAsUsed(parseInt(path[1]))
       hasDiscoveredNewPaths = yes
+    if wasEmpty is true and @isEmpty() is false
+      @wallet.createAccount()
     hasDiscoveredNewPaths
 
   _notifyPublicAddressIndexAsUsed: (index) ->
