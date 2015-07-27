@@ -54,4 +54,4 @@ class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewC
     else
       cardBlock(transaction)
 
-  _getAccount: -> @_account ||= Account.findById(+@params.account_id or 0)
+  _getAccount: -> @_account ||= @params.account
