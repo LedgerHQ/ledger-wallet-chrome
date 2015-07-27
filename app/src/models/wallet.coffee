@@ -9,6 +9,10 @@ class @Wallet extends ledger.database.Model
 
   ## Global Balance management
 
+  constructor: ->
+    super
+    @_onCreateAccount = @_onCreateAccount.bind(this)
+
   retrieveAccountsBalances: () ->
     for account in @get('accounts')
       account.retrieveBalance()
@@ -32,6 +36,15 @@ class @Wallet extends ledger.database.Model
 
   @initializeWallet: (callback) ->
     @instance = @findOrCreate(1, {id: 1}).save()
+    @instance._onCreateAccount()
+    ledger.database.contexts.main?.on 'insert:account', @instance._onCreateAccount
     callback?()
 
   @releaseWallet: () ->
+    ledger.database.contexts.main?.off 'insert:account', @instance._onCreateAccount
+
+
+  _onCreateAccount: ->
+    # Ensure every account is bound to the wallet
+    for account in Account.all()
+      account.set('wallet', this).save()
