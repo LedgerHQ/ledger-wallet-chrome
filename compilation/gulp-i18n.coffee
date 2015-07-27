@@ -1,5 +1,6 @@
 
 through2 = require 'through2'
+Path = require 'path'
 
 parsePropertiesFile = (fileContent) ->
   out = {}
@@ -28,7 +29,7 @@ buildLangFilePlugin = () ->
   through2.obj (chunk, encoding, callback) ->
     languages = {}
 
-    tag = chunk.relative.substring(0, chunk.relative.indexOf("/"))
+    tag = chunk.relative.substring(0, chunk.relative.indexOf(Path.sep))
     langFile = parsePropertiesFile(chunk.contents.toString(encoding))
     languages = "window.ledger.i18n.Languages['" + tag + "'] = " + "'" + langFile['language.name'] + "';"
 
