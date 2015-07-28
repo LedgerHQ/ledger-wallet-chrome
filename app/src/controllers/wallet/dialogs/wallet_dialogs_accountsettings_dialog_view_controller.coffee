@@ -39,7 +39,7 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
     if @_getAccount().isDeletable()
       @_getAccount().delete()
     else
-      @_getAccount().set('hidden', yes)
+      @_getAccount().set('hidden', yes).save()
     @dismiss()
     ledger.app.router.go '/wallet/accounts/index'
 
