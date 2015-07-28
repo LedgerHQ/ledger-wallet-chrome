@@ -8,7 +8,7 @@
     </div>
     <div class="row middle">
       <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.accountsettings.name' %></div>
-      <input class="small-text-input" placeholder="<%= t 'wallet.dialogs.accountsettings.account_name' %>" value="" id="account_name_input" />
+      <input class="small-text-input" placeholder="<%= t 'wallet.dialogs.accountsettings.account_name' %>" value="" id="account_name_input" maxlength="30"  />
     </div>
     <div class="row bottom">
       <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.accountsettings.color' %></div>
