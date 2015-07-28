@@ -12,9 +12,7 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     countervalueBalanceContainer: "#countervalue_balance_container"
     colorCircle: '#color_circle'
 
-  breadcrumb: [
-    { title: 'wallet.breadcrumb.accounts', url: '/wallet/accounts'}
-  ]
+  breadcrumb: null
 
   actions: [
     { title: 'wallet.accounts.show.actions.see_all_operations', icon: 'fa-reorder', url: '/wallet/accounts/:account_id:/operations'}
@@ -26,10 +24,9 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     @_debouncedUpdateOperations = _.debounce(@_updateOperations, 200)
     @_debouncedUpdateBalances = _.debounce(@_updateBalances, 200)
     @_debouncedUpdateCountervalueVisibility = _.debounce(@_updateCountervalueVisibility, 200)
-    @breadcrumb = _.clone(@breadcrumb)
-    @breadcrumb.push title: @_getAccount().get('name'), url: @routedUrl
     @actions = _.clone(@actions)
     @actions[0].url = "/wallet/accounts/#{@_getAccount().get('index')}/operations"
+    @_updateBreadcrumb()
 
   onAfterRender: ->
     super
@@ -43,6 +40,11 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
 
   openSettings: ->
     (new WalletDialogsAccountsettingsDialogViewController(account_id: @_getAccount().get('index'))).show()
+
+  _updateBreadcrumb: ->
+    @breadcrumb = [{ title: 'wallet.breadcrumb.accounts', url: '/wallet/accounts'}]
+    @breadcrumb.push title: @_getAccount().get('name'), url: @routedUrl
+    @parentViewController?.updateActionBar()
 
   _updateOperations: ->
     operations = @_getAccount().get 'operations'
@@ -82,6 +84,7 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     account = @_getAccount()
     @view.accountName.text account.get 'name'
     @view.colorCircle.css('color', account.get('color'))
+    @_updateBreadcrumb()
 
   _updateBalancesLayout: ->
     # invert layout if needed
