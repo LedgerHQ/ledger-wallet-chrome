@@ -36,12 +36,16 @@ class @WalletDialogsAccountsettingsDialogViewController extends ledger.common.Di
       @dismiss()
 
   hideAccount: ->
-    if @_getAccount().isDeletable()
-      @_getAccount().delete()
-    else
-      @_getAccount().set('hidden', yes).save()
-    @dismiss()
-    ledger.app.router.go '/wallet/accounts/index'
+    hide = !@_getAccount().isDeletable()
+    new CommonDialogsConfirmationDialogViewController(
+      message: if hide then 'wallet.dialogs.accountsettings.hide_confirmation' else 'wallet.dialogs.accountsettings.delete_confirmation'
+    ).show().once 'click:positive', =>
+      if hide
+        @_getAccount().set('hidden', yes).save()
+      else
+        @_getAccount().delete()
+      @dismiss()
+      ledger.app.router.go '/wallet/accounts/index'
 
 
   exportXPub: ->
