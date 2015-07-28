@@ -27,7 +27,7 @@ class @WalletAccountsOperationsViewController extends ledger.common.ActionBarVie
   _updateOperations: ->
     operations = @_getAccount().get 'operations'
     @view.emptyContainer.hide() if operations.length > 0
-    render 'wallet/accounts/_operations_table', {operations: operations}, (html) =>
+    render 'wallet/accounts/_operations_table', {operations: operations, showAddresses: true}, (html) =>
       @view.operationsList.html html
 
   _updateAccountName: ->
