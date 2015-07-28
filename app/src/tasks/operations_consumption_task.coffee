@@ -18,11 +18,6 @@ class ledger.tasks.OperationsConsumptionTask extends ledger.tasks.Task
       @stopIfNeccessary()
       _.defer -> ledger.app.emit 'wallet:operations:sync:done'
 
-  startIfNeccessary: ->
-    l "START", new Error().stack
-    super
-
-
   onStop: ->
     super
 
