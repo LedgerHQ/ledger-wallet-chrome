@@ -41,6 +41,20 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
   openSettings: ->
     (new WalletDialogsAccountsettingsDialogViewController(account_id: @_getAccount().get('index'))).show()
 
+  onDetach: ->
+    # update balance
+    ledger.app.off 'wallet:balance:changed', @_debouncedUpdateBalances
+
+    # update operations
+    ledger.app.off 'wallet:transactions:new wallet:operations:sync:done wallet:operations:new wallet:operations:update', @_debouncedUpdateOperations
+    ledger.preferences.instance?.off 'currencyActive:changed', @_debouncedUpdateOperations
+
+    # settings
+    ledger.preferences.instance?.off 'currencyActive:changed', @_debouncedUpdateCountervalueVisibility
+
+    # listen accounts
+    ledger.database.contexts.main.off 'update:account insert:account remove:account', @_updateAccountName
+
   _updateBreadcrumb: ->
     @breadcrumb = [{ title: 'wallet.breadcrumb.accounts', url: '/wallet/accounts'}]
     @breadcrumb.push title: @_getAccount().get('name'), url: @routedUrl
