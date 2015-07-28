@@ -11,6 +11,12 @@ class @CommonDialogsConfirmationDialogViewController extends ledger.common.Dialo
   showsCancelButton: no
   restrainsDialogWidth: yes
 
+  constructor: ({message, positiveText, negativeText}) ->
+    super
+    @setMessageLocalizableKey(message) if message?
+    @positiveLocalizableKey = positiveText if positiveText?
+    @negativeLocalizableKey = negativeText if negativeText?
+
   clickPositive: ->
     @emit 'click:positive'
     do @dismiss
