@@ -11,7 +11,7 @@ resolve         = path.resolve
 Q = require 'Q'
 
 keygen = (dir) ->
-  dir = resolve __dirname, dir
+  dir = resolve dir
   keyPath = join dir, "key.pem"
   unless fs.existsSync keyPath
     key = new rsa b: 1024
