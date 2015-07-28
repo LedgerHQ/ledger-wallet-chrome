@@ -50,6 +50,14 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
             menuItem.addClass 'selected'
         break
 
+  onDetach: ->
+    super
+    ledger.app.off 'wallet:balance:changed', @_updateBalanceValue
+    ledger.app.off 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done', @_onSynchronizationStateChanged
+    ledger.tasks.OperationsSynchronizationTask.instance.off 'start stop', @_onSynchronizationStateChanged
+    ledger.preferences.instance?.off 'currencyActive:changed', @_updateCountervalue
+    ledger.app.off 'wallet:balance:changed', @_updateCountervalue
+
   _listenBalanceEvents: ->
     # fetch balances
     @_updateBalanceValue()
