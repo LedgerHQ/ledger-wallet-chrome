@@ -7,7 +7,7 @@
       <tr id="amount_row">
         <td class="row-title optional"><%= t 'wallet.defaults.operations.amount' %></td>
         <td class="align-right">
-          <input id="amount_input" class="large-text-input optional" placeholder="<%= t 'wallet.receive.index.amount_placeholder' %>"/>
+          <input id="amount_input" class="large-text-input optional" placeholder="<%= t 'wallet.defaults.operations.amount' %>"/>
           <label class="large-text-input optional"><%= ledger.formatters.getUnitSymbol() %></label>
         </td>
       </tr>

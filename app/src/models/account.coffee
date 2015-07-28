@@ -47,6 +47,11 @@ class @Account extends ledger.database.Model
       return if val? then ledger.Amount.fromSatoshi(val) else ledger.Amount.fromSatoshi(0)
     return val
 
+  set: (key, value) ->
+    if key is 'hidden'
+      _.defer -> ledger.app.emit 'wallet:balance:changed', Wallet.instance.getBalance()
+    super(key, value)
+
   getExtendedPublicKey: (callback) ->
     d = ledger.defer(callback)
     hdAccount = @getWalletAccount()
