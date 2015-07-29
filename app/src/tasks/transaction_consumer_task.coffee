@@ -151,8 +151,8 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
             io.nodes.push undefined
       push null, transaction
       do next
-    .fail (err) ->
-      push err
+    .fail (error) ->
+      push {error, transaction}
       do next
     .done()
 
