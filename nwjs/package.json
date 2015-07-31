@@ -1,0 +1,12 @@
+{
+  "name": "Ledger Wallet",
+  "main": "../build/views/layout.html",
+  "window": {
+    "title": "Ledger Wallet",
+    "toolbar": true,
+    "width": 1000,
+    "height": 640,
+    "min_width": 1000,
+    "min_height": 640
+  }
+}

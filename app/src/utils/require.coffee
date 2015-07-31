@@ -1,3 +1,8 @@
+
+@old ||= {}
+
+@old.require = @require
+
 require_script = (url, callback) ->
   script = document.createElement('script')
   script.type = 'text/javascript'

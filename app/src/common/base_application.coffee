@@ -31,7 +31,7 @@ class ledger.common.application.BaseApplication extends @EventEmitter
     @_listenDongleEvents()
     @_listenXhr()
     @onStart()
-    @donglesManager.start()
+    #@donglesManager.start()
 
   ###
     Reloads the whole application.
@@ -133,7 +133,7 @@ class ledger.common.application.BaseApplication extends @EventEmitter
   _navigationControllerSelector: -> $('#controllers_container')
 
   _listenCommands: ->
-    chrome.commands.onCommand.addListener (command) =>
+    chrome?.commands?.onCommand?.addListener (command) =>
       switch command
         when 'reload-page' then @reloadUi(yes)
         when 'reload-application' then do @reload

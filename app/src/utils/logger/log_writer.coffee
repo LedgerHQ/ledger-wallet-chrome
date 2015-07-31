@@ -9,25 +9,19 @@ class @ledger.utils.LogWriter extends @ledger.utils.Log
     @_flush = ledger.utils.promise.throttle @_flush.bind(@), 2000
     super @_daysMax, fsmode
 
-
-
   ###
     Write a log file per day
     @param [String] msg The log message to write
   ###
   write: (msg) ->
     @_blobArr.push('\n' + msg)
-    @_flushPromise = @_flush()
+    #@_flushPromise = @_flush()
     return
-
-
 
   ###
   ###
   getFlushPromise: ->
     @_flushPromise
-
-
 
   ###
   ###

@@ -47,7 +47,6 @@ class ledger.i18n
 
   @init: (cb) =>
     @chromeStore = new ledger.storage.ChromeStore('i18n')
-
     @loadTranslationFiles()
     .then => @initBrowserAcceptLanguages()
     .then => Q.all([@initStoreValues('favLang'), @initStoreValues('favLocale')])
@@ -86,7 +85,7 @@ class ledger.i18n
   ###
   @_loadTranslationFile: (tag) ->
     d = ledger.defer()
-    url = '/_locales/' + tag + '/messages.json'
+    url = '../_locales/' + tag + '/messages.json'
     $.ajax
       dataType: "json",
       url: url,
@@ -176,8 +175,12 @@ class ledger.i18n
   @initBrowserAcceptLanguages: =>
     d = ledger.defer()
     # Get user favorite languages with regions set in browser prefs and store into @browserAcceptLanguages
-    chrome.i18n.getAcceptLanguages (requestedLocales) =>
-      @browserAcceptLanguages = _.map requestedLocales, (obj) -> obj
+    if chrome?.i18n?.getAcceptLanguages?
+      chrome.i18n.getAcceptLanguages (requestedLocales) =>
+        @browserAcceptLanguages = _.map requestedLocales, (obj) -> obj
+        d.resolve()
+    else
+      @browserAcceptLanguages = [navigator.language]
       d.resolve()
     d.promise
 
@@ -189,7 +192,7 @@ class ledger.i18n
     d = ledger.defer()
     done = false
     # Load user language of his Chrome browser UI version into browserUiLang
-    browserUiLang = chrome.i18n.getUILanguage()
+    browserUiLang = chrome?.i18n?.getUILanguage() or navigator.language
     for tag in @browserAcceptLanguages
       # Take the first tag that is part of our supported languages (@Languages)
       if tag.substr(0, 2) in Object.keys(@Languages) and not done
@@ -272,3 +275,5 @@ class ledger.i18n
             storesAreSync: true
         d.resolve()
     d.promise
+
+@moment = global.moment if global?.moment? and !@moment?

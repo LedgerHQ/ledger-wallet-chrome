@@ -14,3 +14,25 @@
   ledger.storage.wallet = null
   ledger.storage.databases = null
   ledger.storage.logs = null
+
+
+unless chrome?.storage?.local?
+  ((@chrome ||= {}).storage ||= {}).local ||= {}
+
+  _.extend chrome.storage.local,
+
+    get: (keys, cb) ->
+      result = {}
+      result[k] = v for k, v of localStorage when keys is null or _(keys).contains(k)
+      _.defer -> cb?(result)
+
+    set: (data, cb) ->
+      localStorage.setItem(k, v) for k, v of data
+      _.defer -> cb?(data)
+
+    remove: (keys, cb) ->
+      localStorage.setItem(k) for k in keys
+
+    clear: ->
+      localStorage.removeItem(k) for k in localStorage
+

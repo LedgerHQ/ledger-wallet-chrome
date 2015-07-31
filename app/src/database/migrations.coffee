@@ -19,7 +19,7 @@ class ledger.database.MigrationHandler
   applyMigrations: () ->
     configurationVersion = Configuration.getInstance(@context).getCurrentApplicationVersion()
     configurationVersion ?= 'unknown'
-    manifestVersion = chrome.runtime.getManifest().version
+    manifestVersion = ledger.runtime.getManifest().version
     @performMigrations configurationVersion, manifestVersion
     Configuration.getInstance(@context).setCurrentApplicationVersion(manifestVersion)
 
