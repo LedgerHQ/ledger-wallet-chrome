@@ -31,7 +31,7 @@ class ledger.common.application.BaseApplication extends @EventEmitter
     @_listenDongleEvents()
     @_listenXhr()
     @onStart()
-    #@donglesManager.start()
+    @donglesManager.start()
 
   ###
     Reloads the whole application.

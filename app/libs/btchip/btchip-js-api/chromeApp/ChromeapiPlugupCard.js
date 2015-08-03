@@ -99,7 +99,7 @@ var ChromeapiPlugupCard = Class.extend(Card, {
 				padding += "00";
 			}
 			return result.concat(new ByteString(padding, HEX));
-		}		
+		}
 
 		var currentObject = this;
 		if (!(apdu instanceof ByteString)) {

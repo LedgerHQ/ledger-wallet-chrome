@@ -73,6 +73,11 @@
         '../libs/btchip/ucrypt/des'
         '../libs/btchip/ucrypt/ecdh'
 
+        # NWJS
+        'nwjs/hid'
+        'nwjs/usb'
+        'nwjs/runtime'
+
         ## Application configuration
         'bitcoin/networks'
         'configuration'

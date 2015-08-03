@@ -1,5 +1,5 @@
 {
-  "name": "Ledger Wallet",
+  "name": "ledger-wallet-nwjs",
   "main": "../build/views/layout.html",
   "window": {
     "title": "Ledger Wallet",
@@ -8,5 +8,9 @@
     "height": 640,
     "min_width": 1000,
     "min_height": 640
+  },
+  "dependencies": {
+    "ledger-api": "git+https://github.com/LedgerHQ/ledger-node-js-api.git",
+    "usb": "latest"
   }
 }

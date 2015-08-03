@@ -33,3 +33,5 @@ _.str.parseObjectPath = (string) ->
     path.index = parseInt _.str.clean(matches[2])
   path.next = null
   rootPath.next
+
+_.str.hashCode = (s) -> s.split("").reduce(((a , b) -> a = ((a << 5) - a) + b.charCodeAt(0) ; a & a), 0)
