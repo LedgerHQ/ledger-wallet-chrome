@@ -87,6 +87,11 @@ section {
       white-space: nowrap;
     }
 
+    tr td.stretch-content {
+      width: 100%;
+      white-space: nowrap;
+    }
+
     tr td:last-child {
       padding-right: 0px;
     }
@@ -132,7 +137,7 @@ section {
   color: @color-dark-grey;
   text-transform: uppercase;
 
-  a& {
+  a&, &[data-href] {
     text-decoration: none;
 
     &:hover {
@@ -249,6 +254,10 @@ a {
   line-height: 30px;
   letter-spacing: -0.5px;
 }
+.regular-code-text {
+  font-family: "Courier", "Courier New", "Lucida Console", "Monaco", monospace;
+  line-height: 20px;
+}
 
 // icons
 .uppercase-action {
@@ -293,6 +302,10 @@ a {
   font-weight: @font-weight-light;
   letter-spacing: -0.8px;
 }
+.small-text-input {
+  .text-input;
+  font-size: @font-size-very-small;
+}
 .textarea-input {
   border: 0;
   background-color: transparent;
@@ -306,7 +319,7 @@ a {
   border-radius: @border-radius-default-value;
   background-color: @color-white;
   outline: none;
-  font-family: 'Open Sans';
+  font-family: @font-family-name;
   font-size: @font-size-small;
   resize: none;
   padding: @metrics-almost-small-padding @metrics-small-padding;

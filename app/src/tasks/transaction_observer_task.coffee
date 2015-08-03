@@ -11,42 +11,18 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
   _listenNewTransactions: () ->
     @newTransactionStream = new WebSocket "wss://ws.chain.com/v2/notifications"
     @newTransactionStream.onopen = () =>
-      @newTransactionStream.send JSON.stringify type: "new-transaction", block_chain: "bitcoin"
-      @newTransactionStream.send JSON.stringify type: "new-block", block_chain: "bitcoin"
+      @newTransactionStream.send JSON.stringify type: "new-transaction", block_chain: ledger.config.network.ws_chain
+      @newTransactionStream.send JSON.stringify type: "new-block", block_chain: ledger.config.network.ws_chain
 
     @newTransactionStream.onmessage = (event) =>
       data = JSON.parse(event.data)
       return unless data?.payload?.type?
       switch data.payload.type
         when 'new-transaction'
-          transaction = data.payload.transaction
-          @_handleTransactionIO(transaction, transaction.inputs)
-          @_handleTransactionIO(transaction, transaction.outputs)
+          ledger.tasks.TransactionConsumerTask.instance.pushTransaction(data.payload.transaction)
         when 'new-block'
           @_handleNewBlock data.payload.block
     @newTransactionStream.onclose = => @_listenNewTransactions() if @isRunning()
-
-  _handleTransactionIO: (transaction, io) ->
-    found = no
-    if io?
-      for input in io
-        continue unless input.addresses?
-        for address in input.addresses
-          derivation = ledger.wallet.Wallet.instance?.cache?.getDerivationPath(address)
-          if derivation?
-            @logger().info "New transaction on #{derivation}"
-            account = ledger.wallet.Wallet.instance?.getAccountFromDerivationPath(derivation)
-            if account?
-              @logger().info 'Add transaction'
-              account.notifyPathsAsUsed(derivation)
-              Account.fromWalletAccount(account)?.addRawTransactionAndSave transaction
-              Wallet.instance?.retrieveAccountsBalances()
-              ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
-              ledger.app.emit 'wallet:operations:new'
-              ledger.app.emit 'wallet:operations:new'
-            else
-              @logger().warn "Failed to retrieve an account for #{derivation} ", transaction
-    found
 
   _handleNewBlock: (block) ->
     @logger().trace 'Receive new block'

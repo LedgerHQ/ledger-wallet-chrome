@@ -3,10 +3,15 @@ class @Wallet extends ledger.database.Model
 
   #@hasMany accounts: 'Account'
   @has many: 'accounts', sortBy: 'index', onDelete: 'destroy'
+  @index 'id', sync: yes
 
   @instance: undefined
 
   ## Global Balance management
+
+  constructor: ->
+    super
+    @_onCreateAccount = @_onCreateAccount.bind(this)
 
   retrieveAccountsBalances: () ->
     for account in @get('accounts')
@@ -15,14 +20,14 @@ class @Wallet extends ledger.database.Model
   getBalance: () ->
     balance =
       wallet:
-        total: 0
-        unconfirmed: 0
+        total: ledger.Amount.fromSatoshi(0)
+        unconfirmed: ledger.Amount.fromSatoshi(0)
       accounts: []
 
-    for account in @get('accounts')
+    for account in @get('accounts') when !account.isHidden()
       continue if not account.get('total_balance')? or not account.get('unconfirmed_balance')?
-      balance.wallet.total += account.get('total_balance')
-      balance.wallet.unconfirmed += account.get('unconfirmed_balance')
+      balance.wallet.total = balance.wallet.total.add(account.get('total_balance'))
+      balance.wallet.unconfirmed = balance.wallet.unconfirmed.add(account.get('unconfirmed_balance'))
       balance.accounts.push total: account.get('total_balance'), unconfirmed: account.get('unconfirmed_balance')
 
     balance
@@ -30,25 +35,18 @@ class @Wallet extends ledger.database.Model
   ## Lifecyle
 
   @initializeWallet: (callback) ->
-    @instance = @findOrCreate(1, {id: 1})
-    if @instance.isInserted()
-      callback?()
-    else
-      firstAccount = Account.all()[0]
-      finalize = (account) =>
-        @instance.add('accounts', account).save()
-        callback?()
-      return finalize(firstAccount) if firstAccount?
-      ledger.storage.sync.pull().then =>
-        onDatabaseSynchronized = ->
-          firstAccount = Account.findOrCreate(index: 0, {index: 0, name: t 'common.default_account_name'}).save()
-          finalize(firstAccount)
-        onDatabaseSynchronized = _.once(onDatabaseSynchronized)
-        ledger.database.contexts.main.once 'synchronized', onDatabaseSynchronized
-        _.delay(onDatabaseSynchronized, 5000)
-      .fail =>
-        firstAccount = Account.findOrCreate(index: 0, {index: 0, name: t 'common.default_account_name'}).save()
-        finalize(firstAccount)
-      .done()
+    @instance = @findOrCreate(1, {id: 1}).save()
+    @instance._onCreateAccount()
+    ledger.database.contexts.main?.on 'insert:account', @instance._onCreateAccount
+    callback?()
 
   @releaseWallet: () ->
+    ledger.database.contexts.main?.off 'insert:account', @instance._onCreateAccount
+
+
+  _onCreateAccount: ->
+    # Ensure every account is bound to the wallet
+    for account in Account.all()
+      account.set('wallet', this).save()
+      unless account.get('color')?
+        account.set('color', ledger.preferences.defaults.Accounts.firstAccountColor).save()

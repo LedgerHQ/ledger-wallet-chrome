@@ -1,0 +1,44 @@
+<section id="dialogs_addaccount_dialog">
+  <header>
+    <h1><%= t 'wallet.dialogs.addaccount.add_an_account' %></h1>
+  </header>
+  <% if Account.isAbleToCreateAccount(): %>
+  <div class="large-table">
+    <div class="header top">
+      <div class="uppercase-section-column stretchable"><%= t 'wallet.dialogs.addaccount.new_account' %></div>
+    </div>
+    <div class="row middle">
+      <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.addaccount.name' %></div>
+      <input class="small-text-input" placeholder="<%= t 'wallet.dialogs.addaccount.account_name' %>" value="" id="account_name_input" maxlength="30" />
+    </div>
+    <div class="row bottom">
+      <div class="regular-text-small stretchable"><%= t 'wallet.dialogs.addaccount.color' %></div>
+      <div class="small-grey-select">
+        <select id="colors_select"></select>
+      </div>
+      <i class="fa fa-square medium-square" id="color_square"></i>
+    </div>
+  </div>
+  <% end %>
+  <% if @hiddenAccounts.length > 0: %>
+    <div class="large-table" id="hidden_accounts_table">
+      <div class="header top">
+        <div class="uppercase-section-column stretchable"><%= t 'wallet.dialogs.addaccount.hidden_accounts' %></div>
+      </div>
+      <% for account, index in @hiddenAccounts: %>
+        <div class="row <% if index + 1< @hiddenAccounts.length: %>bottom<% else: %>middle<% end %>">
+          <i class="fa fa-circle small-dot" style="color: <%= account.color %>"></i>
+          <div class="regular-text-small stretchable"><%= account.name %></div>
+          <div class="regular-grey-text-small"><%= if ledger.formatters.symbolIsFirst() then ledger.formatters.getUnitSymbol() %> <%= ledger.formatters.fromValue(account.balance) %><%= if !ledger.formatters.symbolIsFirst() then ' ' + ledger.formatters.getUnitSymbol() %></div>
+          <a href="#showAccount(id=<%= account.index %>)" class="small-action-rounded-button"><%= t 'common.show' %></a>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+  <div id="error_container"></div>
+</section>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a href="#dismiss" class="cancel-rounded-button"><%= t 'common.cancel' %></a>
+  <a href="#addAccount" class="action-rounded-button"><%= t 'common.add' %></a>
+</div>

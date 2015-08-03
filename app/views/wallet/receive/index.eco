@@ -5,10 +5,19 @@
   <table class="no-table-head">
     <tbody>
       <tr id="amount_row">
-        <td class="row-title optional"><%= t 'wallet.receive.index.amount' %></td>
+        <td class="row-title optional"><%= t 'wallet.defaults.operations.amount' %></td>
         <td class="align-right">
-          <input id="amount_input" class="large-text-input optional" placeholder="<%= t 'wallet.receive.index.amount_placeholder' %>"/>
+          <input id="amount_input" class="large-text-input optional" placeholder="<%= t 'wallet.defaults.operations.amount' %>"/>
           <label class="large-text-input optional"><%= ledger.formatters.getUnitSymbol() %></label>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title"><%= t 'wallet.receive.index.account_to_credit' %></td>
+        <td class="align-right">
+          <div class="regular-select">
+            <select id="accounts_select"></select>
+          </div>
+          <i class="fa fa-circle small-dot" id="color_square"></i>
         </td>
       </tr>
       <tr class="no-border">
@@ -25,9 +34,8 @@
   </div>
 </section>
 <div class="dialog-actions-bar">
-  <a class="action-rounded-button" href="#mail"><%= t 'wallet.receive.index.send_by_email' %></a>
-  <a class="action-rounded-button" href="#print"><%= t 'wallet.receive.index.print' %></a>
+  <a class="action-rounded-button" href="#mail"><%= t 'common.send_by_email' %></a>
+  <a class="action-rounded-button" href="#print"><%= t 'common.print' %></a>
   <div class="left-spacer"></div>
-  <a class="cancel-rounded-button" href="#dismiss"><%= t 'wallet.receive.index.close' %></a>
-
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.close' %></a>
 </div>

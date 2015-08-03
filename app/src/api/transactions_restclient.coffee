@@ -26,20 +26,25 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
           do done
         onError: @networkErrorCallback(callback)
 
+  createTransactionStreamForAllObservedPaths: ->
+    addresses = ledger.wallet.pathsToAddressesStream(ledger.wallet.Wallet.instance.getAllObservedAddressesPaths()).map (e) -> e[1]
+    @createTransactionStream(addresses)
+
   createTransactionStream: (addresses) ->
-    stream = new Stream()
-    stream.onOpen = =>
-      _.async.eachBatch addresses, @DefaultBatchSize, (batch, done, hasNext) =>
+    highland(addresses)
+      .batch(@DefaultBatchSize)
+      .consume (err, batch, push, next) =>
+        return push null, batch if batch is ledger.stream.nil
         @http().get
           url: "blockchain/#{ledger.config.network.ticker}/addresses/#{batch.join(',')}/transactions"
           onSuccess: (transactions) ->
-            stream.write(transaction) for transaction in transactions
-            stream.close() unless hasNext
-            do done
-          onError: =>
-            stream.error 'Network Error'
-            stream.close()
-    stream
+            push(null, transaction) for transaction in transactions
+            do next
+          onError: (err) =>
+            push(err)
+            do next
+        .done()
+        return
 
   postTransaction: (transaction, callback) ->
     @http().post

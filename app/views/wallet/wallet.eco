@@ -1,11 +1,11 @@
 <div class="main-container">
   <div id="wallet_top_menu" class="top-main-menu">
     <ul class="left">
-      <li id="account-item" class="menu-item selected">
+      <li id="accounts-item" class="menu-item">
         <div>
-          <a href="/wallet/accounts/0/show">
-            <img src="../assets/images/wallet/dashboard_icon.png" />
-            <span><%= t('wallet.top_menu.items.account') %></span>
+          <a href="/wallet/accounts/index">
+            <img src="../assets/images/wallet/accounts_icon.png" />
+            <span><%= t('wallet.top_menu.items.accounts') %></span>
           </a>
           <div class="spacer" />
           <div class="selector" />
@@ -64,6 +64,10 @@
         <img src="../assets/images/wallet/reload_icon.png" />
       </a>
     </div>
+  </div>
+  <div class="action-bar-holder">
+    <div class="breadcrumb-holder"></div>
+    <div class="actions-holder"></div>
   </div>
   <div id="navigation_controller_content"></div>
 </div>

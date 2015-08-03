@@ -1,7 +1,7 @@
 gulp  = require 'gulp'
 
 # Load all required libraries.
-Q               = require 'Q'
+Q               = require 'q'
 less            = require 'gulp-less'
 coffee          = require 'gulp-coffee'
 yaml            = require 'gulp-yaml'
@@ -36,7 +36,7 @@ module.exports = (configuration) ->
       .pipe slash()
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
-      .pipe cached('less')
+      #.pipe cached('less')
       .pipe changed "#{configuration.buildDir}/assets/css", extension: '.css', hasChanged: changed.compareSha1Digest
       .pipe less()
       .pipe gulp.dest "#{configuration.buildDir}/assets/css"
@@ -105,7 +105,6 @@ module.exports = (configuration) ->
       gulp.src 'app/locales/**/!(es)/*.properties'
       .pipe slash()
       .pipe plumber()
-      .pipe cached('lang-file')
       .pipe flavors(flavors: configuration.flavors, merge: yes)
       .pipe buildLangFilePlugin()
       .pipe tap (file, t) ->

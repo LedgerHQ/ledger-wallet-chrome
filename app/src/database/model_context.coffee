@@ -103,17 +103,24 @@ class Collection
     @_getModelSyncSubstore(model).remove(model.constructor.getSynchronizedPropertiesNames())
 
   query: () ->
-    query = @_collection.chain()
-    data = query.data
+    @_wrapQuery(@_collection.chain())
+
+  _wrapQuery: (query) ->
+    return query if query._wrapped
+    {data, sort, limit, simplesort} = query
     query.data = () =>
       @_modelize(data.call(query))
     query.first = () => @_modelize(data.call(query)[0])
-    query.first = () =>
+    query.last = () =>
       d = data.call(query)
       @_modelize(d[d.length - 1])
     query.all = query.data
     query.count = () -> data.call(query).length
     query.remove = -> object.delete() for object in query.all()
+    query.sort = () => @_wrapQuery(sort.apply(query, arguments))
+    query.limit = () => @_wrapQuery(limit.apply(query, arguments))
+    query.simpleSort = () => @_wrapQuery(simplesort.apply(query, arguments))
+    query._wrapped = true
     query
 
   getCollection: () -> @_collection
@@ -178,7 +185,6 @@ class ledger.database.contexts.Context extends EventEmitter
     collection.getCollection().on 'update', (data) =>
       @emit "update:" + _.str.underscored(data['objType']).toLowerCase(), @_modelize(data)
 
-
   onSyncStorePulled: ->
     @_syncStore.getAll (data) =>
       for name, collection of @_collections
@@ -188,8 +194,19 @@ class ledger.database.contexts.Context extends EventEmitter
           collection.updateSynchronizedProperties(collectionData)
         else
           # delete all
-          l collection.getModelClass().chain(this).remove()
+          collection.getModelClass().chain(this).remove()
       @emit 'synchronized'
+
+  refresh: ->
+    d = ledger.defer()
+    ledger.storage.sync.pull().then (uptodate) =>
+      return d.resolve(no) if uptodate is yes
+      @once 'synchronized', ->
+        d.resolve(yes)
+    .fail () ->
+      d.resolve(no)
+    .done()
+    d.promise
 
   _modelize: (data) -> @getCollection(data['objType'])?._modelize(data)
 

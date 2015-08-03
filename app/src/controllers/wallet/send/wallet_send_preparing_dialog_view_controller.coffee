@@ -6,7 +6,7 @@ class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewC
   initialize: ->
     super
     # fetch amount
-    account = Account.find(index: 0).first()
+    account = @_getAccount()
     account.createTransaction amount: @params.amount, fees: @params.fees, address: @params.address, (transaction, error) =>
       return if not @isShown()
       if error?
@@ -53,3 +53,5 @@ class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewC
           mobileBlock(transaction, groups[0])
     else
       cardBlock(transaction)
+
+  _getAccount: -> @_account ||= @params.account

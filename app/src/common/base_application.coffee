@@ -85,6 +85,10 @@ class ledger.common.application.BaseApplication extends @EventEmitter
           cleanHref = link.href
           cleanHref = cleanHref.replace(/\?[0-9]*/i, '')
           link.href = cleanHref + '?' + (new Date).getTime()
+      $('script').each (_, script) ->
+        if script.src.match /\/views\//
+          $(script).remove()
+      window.JST = {}
     @_navigationController.rerender()
     dialog.rerender() for dialog in ledger.dialogs.manager.getAllDialogs()
 
@@ -201,7 +205,6 @@ class ledger.common.application.BaseApplication extends @EventEmitter
   notifyDongleIsUnlocked: () ->
     DongleLogger().info('Dongle unlocked', @dongle.id)
     (Try => @onDongleIsUnlocked(@dongle)).printError()
-
 
   onConnectingDongle: (device) ->
       @dongle = dongle

@@ -1,0 +1,23 @@
+@import (reference) "../constants";
+
+._marker {
+  &:last-child {
+    margin-left: @metrics-very-small-padding;
+  }
+
+  &:first-child {
+    margin-right: @metrics-very-small-padding;
+  }
+}
+
+.small-dot {
+  ._marker;
+  font-size: 8px;
+  vertical-align: inherit;
+}
+
+.medium-square {
+  ._marker;
+  font-size: 10px;
+  vertical-align: inherit;
+}

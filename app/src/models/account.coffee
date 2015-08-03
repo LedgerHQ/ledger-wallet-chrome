@@ -2,32 +2,105 @@ class @Account extends ledger.database.Model
   do @init
   @has
     many: 'operations', onDelete: 'destroy'
-    sortBy: (a, b) ->
-      d = b.time - a.time
-      if d is 0
-        if a.type > b.type then 1 else -1
-      else if d > 0
-        1
-      else
-        -1
-  @has one: 'account_tag', forMany: 'accounts', onDelete: 'nullify', sync: yes
+    sortBy: Operation.defaultSort
+  @has one: 'wallet', forMany: 'accounts', onDelete: 'nullify', sync: yes
 
   @index 'index', sync: yes
   @sync 'name'
+  @sync 'color'
+  @sync 'hidden'
+
+  constructor: ->
+    super
+    @retrieveBalance = _.debounce(@retrieveBalance.bind(@), 200)
 
   @fromWalletAccount: (hdAccount) ->
     return null unless hdAccount?
     @find(index: hdAccount.index).first()
 
-  getWalletAccount: () -> ledger.wallet.Wallet.instance.getAccount(@get('index'))
+  @getRemainingAccountCreation: (context = ledger.database.contexts.main) -> ledger.wallet.Wallet.instance.getAccountsCount() - Account.all(context).length
+
+  @displayableAccounts: (context = ledger.database.contexts.main) ->
+    accounts =
+      for account in Account.find(hidden: {$ne: yes}, context).simpleSort('index').data()
+        index: account.get('index'), name: account.get('name'), balance: account.get('total_balance'), color: account.get('color')
+    _.sortBy accounts, (account) => account.index
+
+  @hiddenAccounts: (context = ledger.database.contexts.main) ->
+    accounts =
+      for account in Account.find(hidden: yes, context).simpleSort('index').data()
+        index: account.get('index'), name: account.get('name'), balance: account.get('total_balance'), color: account.get('color')
+    _.sortBy accounts, (account) => account.index
+
+  @recoverAccount: (index, wallet) ->
+    if index is 0
+      account = Account.create({index: 0, name: t('common.default_account_name'), hidden: false, color: ledger.preferences.defaults.Accounts.firstAccountColor}).save()
+    else
+      account = Account.create({index: index, name: _.str.sprintf(t("common.default_recovered_account_name"), index), hidden: false, color: ledger.preferences.defaults.Accounts.recoveredAccountColor}).save()
+    account.set('wallet', wallet).save()
+
+  getWalletAccount: -> ledger.wallet.Wallet.instance.getAccount(@get('index'))
+
+  get: (key) ->
+    val = super(key)
+    if key is 'total_balance' or key is 'unconfirmed_balance'
+      return if val? then ledger.Amount.fromSatoshi(val) else ledger.Amount.fromSatoshi(0)
+    return val
+
+  set: (key, value) ->
+    if key is 'hidden'
+      _.defer -> ledger.app.emit 'wallet:balance:changed', Wallet.instance.getBalance()
+    super(key, value)
+
+  getExtendedPublicKey: (callback) ->
+    d = ledger.defer(callback)
+    hdAccount = @getWalletAccount()
+    if (xpub = ledger.wallet.Wallet.instance?.xpubCache.get(hdAccount.getRootDerivationPath()))?
+      d.resolve(xpub)
+    else
+      new ledger.wallet.ExtendedPublicKey(ledger.app.dongle, hdAccount.getRootDerivationPath()).initialize (xpub, error) =>
+        unless error then d.resolve(xpub.toString()) else d.reject(error)
+    d.promise
 
   serialize: () ->
     $.extend super, { root_path: @getWalletAccount().getRootDerivationPath() }
 
+  # Fast getters
+
+  isHidden: -> @get 'hidden' or no
+
+  isDeletable: -> @get('operations').length is 0
+
   ## Balance management
 
   retrieveBalance: () ->
-    ledger.tasks.BalanceTask.get(@get('index')).startIfNeccessary()
+    totalBalance = @get 'total_balance'
+    unconfirmedBalance = @get 'unconfirmed_balance'
+    @set 'total_balance', @getBalanceFromOperations().toString()
+    @set 'unconfirmed_balance', @getUnconfirmedBalanceFromOperations().toString()
+
+    if ledger.Amount.fromSatoshi(totalBalance or 0).neq(@get('total_balance') or 0) or ledger.Amount.fromSatoshi(unconfirmedBalance or 0).neq(@get('unconfirmed_balance') or 0)
+      ledger.app.emit "wallet:balance:changed", @get('wallet').getBalance()
+    else
+      ledger.app.emit "wallet:balance:unchanged", @get('wallet').getBalance()
+
+  getBalanceFromOperations: ->
+    total = ledger.Amount.fromSatoshi(0)
+    for operation in @get('operations')
+      total = if operation.get('type') is 'reception' then total.add(operation.get('value')) else total.subtract(operation.get('value')).subtract(operation.get('fees'))
+    total
+
+  getUnconfirmedBalanceFromOperations: ->
+    total = ledger.Amount.fromSatoshi(0)
+    for operation in @get('operations') when operation.get('confirmations') > 0
+      total = if operation.get('type') is 'reception' then total.add(operation.get('value')) else total.subtract(operation.get('value')).subtract(operation.get('fees'))
+    total
+
+  ## Add/Remove/Hidden
+
+  isDeletable: -> @getWalletAccount().isEmpty()
+
+  @isAbleToCreateAccount: -> @chain().count() < ledger.wallet.Wallet.instance.getAccountsCount()
 
   ## Operations
 
@@ -63,8 +136,6 @@ class @Account extends ledger.database.Model
             callback?(changePath)
           else
             @_createTransactionGetChangeAddressPath(changeIndex + 1, callback)
-
-
 
 
 

@@ -24,6 +24,7 @@ class @WalletSettingsHardwareSmartphonesSettingViewController extends WalletSett
     dialog.show()
 
   render: (selector) ->
+    return unless ledger.app.dongle?
     # get out if firmware does not support mobile second factor
     if ledger.app.dongle.getIntFirmwareVersion() < ledger.dongle.Firmware.V_LW_1_0_0
       return

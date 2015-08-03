@@ -46,13 +46,9 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
         @pull()
         @push() if @_changes.length > 0
 
-  pull: ->
-    l 'Request pull', new Error().stack
-    @_throttled_pull()
+  pull: -> @_throttled_pull()
 
-  push: ->
-    l 'Request push', new Error().stack
-    @_debounced_push()
+  push: -> @_debounced_push()
 
   # Stores one or many item
   #
@@ -106,10 +102,9 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
       # -> pull the data
       # -> merge data
     @client.get_settings_md5().then (md5) =>
-      $info 'Remote md5: ', md5, ', local md5', md5
+      $info 'Remote md5: ', md5, ', local md5', @_lastMd5
       return yes if @_lastMd5 is md5
       @client.get_settings().then (data) =>
-        l "Decrypt", _.clone(data)
         $info 'PULL, before decrypt ', data
         data = Try(=> @_decrypt(data))
         $info 'PULL, after decrypt ', data.getOrElse("Unable to decrypt data")
@@ -119,10 +114,10 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
         @_merge(data).then =>
           @_setLastMd5(md5)
           @emit 'pulled'
+          yes
     .fail (e) =>
       if e.status is 404
         throw Errors.NoRemoteData
-      l "Pull failed", e
       throw Errors.NetworkError
 
   _merge: (remoteData) ->
@@ -132,7 +127,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     # else
     # Overwrite local storage and keep changes
     @_getAllData().then (localData) =>
-      $info 'Data before merge ', localData # TODO: Remove in production
+      $info 'Data before merge ', localData
       remoteHashes = (remoteData['__hashes'] or []).join(' ')
       localHashes = (localData['__hashes'] or []).join(' ').substr(0, 2 * 64 + 1)
       if remoteHashes.length is 0 or localHashes.length is 0

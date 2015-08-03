@@ -120,6 +120,8 @@ class @ledger.dialogs.DialogsController
 
     dialog._containerSelector = @_selector.find("#dialog_container_#{dialog._id}")
     dialog._containerSelector.addClass("clickable") if dialog.isCancellable()
+    dialog._containerSelector.css('opacity', '0.6')
+    dialog._containerSelector.animate {opacity: 1}, 400, 'smooth'
     container = dialog._containerSelector
     container.addClass('display')
     container.on 'click', (e) =>

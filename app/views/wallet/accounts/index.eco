@@ -1,0 +1,13 @@
+<section id="quicklook">
+  <header>
+    <h1><%= t 'wallet.accounts.index.quicklook' %></h1>
+  </header>
+  <div class="accounts-list" id="accounts_list"></div>
+</section>
+<section id="operations">
+  <header>
+    <h1><%= t 'wallet.accounts.index.last_operations' %></h1>
+  </header>
+  <div class="empty-container" id="empty_container"><%= t 'wallet.defaults.operations.no_operations' %></div>
+  <table id="operations_list"></table>
+</section>

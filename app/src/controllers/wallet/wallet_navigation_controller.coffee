@@ -1,12 +1,11 @@
-class @WalletNavigationController extends ledger.common.NavigationController
+class @WalletNavigationController extends ledger.common.ActionBarNavigationController
 
   _menuItemBaseUrl: {
-#    '/wallet/dashboard/': '#dashboard-item'
 #    '/wallet/send/': '#send-item'
 #    '/wallet/receive/': '#receive-item'
 #    '/wallet/accounts/': '#accounts-item'
 #    '/wallet/signout/': '#signout-item'
-    '/wallet/accounts/': '#account-item'
+    '/wallet/accounts/index' : '#accounts-item'
   }
   view:
     balanceValue: '#balance_value'
@@ -20,13 +19,11 @@ class @WalletNavigationController extends ledger.common.NavigationController
   _onRoutedUrl: (event, data) ->
     {url} = data
     @updateMenu url
-    ##@updateBreadcrumbs url
 
   onAfterRender: () ->
     super
     url = ledger.application.router.currentUrl
     @updateMenu url
-    ##@updateBreadcrumbs url
     @_listenBalanceEvents()
     @_listenSynchronizationEvents()
     @_listenCountervalueEvents()
@@ -53,15 +50,13 @@ class @WalletNavigationController extends ledger.common.NavigationController
             menuItem.addClass 'selected'
         break
 
-  updateBreadcrumbs: (url) ->
-    return unless url?
-    breadcrumbs = $('#breadcrumbs')
-    return if breadcrumbs.length == 0
-    $('breadcrumbs').empty()
-    breadcrumbs.html(url)
-    fragmentedUrl = url.split('/')
-    fragmentedUrl.splice(0, 2)
-    fragmentedUrl.splice(fragmentedUrl.length - 1, 1) if fragmentedUrl[fragmentedUrl.length - 1] == 'index'
+  onDetach: ->
+    super
+    ledger.app.off 'wallet:balance:changed', @_updateBalanceValue
+    ledger.app.off 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done', @_onSynchronizationStateChanged
+    ledger.tasks.OperationsSynchronizationTask.instance.off 'start stop', @_onSynchronizationStateChanged
+    ledger.preferences.instance?.off 'currencyActive:changed', @_updateCountervalue
+    ledger.app.off 'wallet:balance:changed', @_updateCountervalue
 
   _listenBalanceEvents: ->
     # fetch balances
@@ -109,3 +104,27 @@ class @WalletNavigationController extends ledger.common.NavigationController
       @view.currencyContainer.attr 'data-countervalue', Wallet.instance.getBalance().wallet.total
     else
       @view.currencyContainer.text t('wallet.top_menu.balance')
+
+  getActionBarDrawer: ->
+    @_actionBarDrawer ||= _.extend new ledger.common.ActionBarNavigationController.ActionBar.Drawer(),
+      createBreadcrumbPartView: (title, url, position, length) =>
+        view = $("<span>#{t(title)}</span>")
+        view.addClass("breadcrumb-root") if position is 0
+        url += "/index" if position is 0
+        view.attr('data-href', url) if not _.isEmpty(url) and position < length - 1 and @topViewController().routedUrl isnt url
+        view
+
+      createBreadcrumbSeparatorView: (position) => $("<span>&nbsp;&nbsp;>&nbsp;&nbsp;</span>")
+
+      createActionView: (title, icon, url, position, length) =>
+        view = $("<span><i class=\"fa #{icon}\"></i>#{t(title)}</span>")
+        view.attr('data-href', url)
+        view
+
+      createActionSeparatorView: (position) => null
+
+      getActionBarHolderView: => @select('.action-bar-holder')
+
+      getBreadCrumbHolderView: => @select('.breadcrumb-holder')
+
+      getActionsHolderView: => @select('.actions-holder')

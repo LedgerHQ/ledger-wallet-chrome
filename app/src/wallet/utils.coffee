@@ -21,33 +21,37 @@ pathsToPredefinedAddresses = (paths, callback) ->
 _.extend ledger.wallet,
 
   pathsToAddresses: (paths, callback = undefined) ->
-    # Uncomment for debugging with predefined addresses
-    # return pathsToPredefinedAddresses(paths, callback)
-
-    # throw error unless dongle is plugged and unlocked
-    ledger.dongle.unlocked()
-
-    addresses = {}
-    notFound = []
-    _.async.each paths, (path, done, hasNext) ->
-      # Hit the cache first
-      address = ledger.wallet.Wallet.instance?.cache?.get(path)
-      if address?
-        addresses[path] = address
-        callback?(addresses, notFound) unless hasNext is true
-        do done
-        return
-
-      ledger.tasks.AddressDerivationTask.instance.getPublicAddress path, (result, error) ->
-        if error?
-          notFound.push path
-        else
-          addresses[path] = result
-        callback?(addresses, notFound) unless hasNext
-        do done
-        return
-
+    ledger.wallet.pathsToAddressesStream(paths)
+      .stopOnError (err) ->
+        callback?([], err)
+      .toArray (array) ->
+        callback(_.object(array), []) if callback?
     return
+
+  ###
+    Derives the given paths and return a stream of path -> address pairs
+    @param (Array|Stream)
+  ###
+  pathsToAddressesStream: (paths) ->
+    ledger.dongle.unlocked()
+    if _.isEmpty(paths)
+      ledger.utils.Logger.getLoggerByTag('WalletUtils').warn("Attempts to derive empty paths ", new Error().stack)
+      return highland([])
+    ledger.stream(paths).consume (err, path, push, next) ->
+      if path is ledger.stream.nil
+        push(null, ledger.stream.nil)
+      else
+        # Hit the cache first
+        address = ledger.wallet.Wallet.instance?.cache?.get(path)
+        if address?
+          push(null, [path, address])
+          return do next
+        ledger.tasks.AddressDerivationTask.instance.getPublicAddress path, (result, error) ->
+          if error?
+            push([path])
+          else
+            push(null, [path, result])
+          do next
 
   checkSetup: (dongle, seed, pin, callback = undefined ) ->
     ledger.defer(callback)
@@ -56,7 +60,7 @@ _.extend ledger.wallet,
       dongle.unlockWithPinCode(pin)
       .then ->
         node = bitcoin.HDNode.fromSeedHex(seed, ledger.config.network.bitcoinjs)
-        address = node.deriveHardened(44).deriveHardened(0).deriveHardened(0).derive(0).derive(0).pubKey.getAddress().toString()
-        dongle.getPublicAddress("44'/0'/0'/0/0").then (result) ->
+        address = node.deriveHardened(44).deriveHardened(+ledger.config.network.bip44_coin_type).deriveHardened(0).derive(0).derive(0).getAddress().toString()
+        dongle.getPublicAddress("44'/#{ledger.config.network.bip44_coin_type}'/0'/0/0").then (result) ->
           throw new Error("Invalid Seed") if address isnt result.bitcoinAddress.toString(ASCII)
     .promise

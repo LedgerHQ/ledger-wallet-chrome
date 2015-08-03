@@ -128,7 +128,6 @@ class ledger.dongle.MockDongle extends EventEmitter
     d = ledger.defer(callback)
     Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
     res = @getPublicAddressSync(path)
-    ledger.wallet.Wallet.instance?.cache?.set [[path, res.bitcoinAddress.value]]
     _.defer -> d.resolve(res)
     return d.promise
 

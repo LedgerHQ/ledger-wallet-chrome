@@ -313,7 +313,6 @@ class @ledger.dongle.Dongle extends EventEmitter
           e('Invalid seed :', restoreSeed)
           return d.reject().promise
 
-      l("Setup in progress ... please wait")
       @_btchip.setupNew_async(
         BTChip.MODE_WALLET,
         BTChip.FEATURE_DETERMINISTIC_SIGNATURE | BTChip.FEATURE_NO_2FA_P2SH,

@@ -5,14 +5,24 @@
   <table class="no-table-head">
     <tbody>
       <tr>
-        <td class="row-title"><%= t 'wallet.operations.detail.amount' %></td>
+        <td class="row-title"><%= t 'wallet.defaults.operations.amount' %></td>
         <td class="align-right" id="operation_amount">
           <span class="regular-text"><%= ledger.formatters.formatValue(@amount) %></span>
         </td>
       </tr>
       <tr>
-        <td class="row-title top-aligned"><%= t 'wallet.operations.detail.receiver' %></td>
+        <td class="row-title top-aligned"><%= t 'wallet.defaults.operations.receiver' %></td>
         <td class="align-right"><%= @address %></td>
+      </tr>
+      <tr id="change_amount" style="display: none">
+        <td class="row-title"><%= t 'wallet.defaults.operations.amount' %></td>
+        <td class="align-right">
+          <span class="regular-text"><%= ledger.formatters.formatValue(@amount2) %></span>
+        </td>
+      </tr>
+      <tr id="change_address" style="display: none">
+        <td class="row-title top-aligned"><%= t 'wallet.defaults.operations.receiver' %></td>
+        <td class="align-right"><%= @address2 %></td>
       </tr>
       <tr class="no-border spacer50">
         <td colspan="2" class="regular-text"><%- t 'apps.coinkite.cosign.show.note' %></td>

@@ -4,7 +4,7 @@ helpers =
 
 @render = (template, params, callback) =>
   template = template.substr(1) if _.string.startsWith(template, '/')
-  if JST?[template]?
+  if window.JST?[template]?
     context = _.extend(params, helpers)
     _.defer => callback?(JST[template](context))
   else

@@ -1,4 +1,4 @@
-class @WalletAccountsShowViewController extends ledger.common.ViewController
+class @WalletAccountsShowViewController extends ledger.common.ActionBarViewController
 
   view:
     confirmedBalanceSubtitle: '#confirmed_balance_subtitle'
@@ -10,12 +10,23 @@ class @WalletAccountsShowViewController extends ledger.common.ViewController
     accountName: '#account_name'
     confirmedBalanceContainer: "#confirmed_balance_container"
     countervalueBalanceContainer: "#countervalue_balance_container"
+    colorCircle: '#color_circle'
+
+  breadcrumb: null
+
+  actions: [
+    { title: 'wallet.accounts.show.actions.see_all_operations', icon: 'fa-reorder', url: '/wallet/accounts/:account_id:/operations'}
+    { title: 'wallet.accounts.show.actions.account_settings', icon: 'fa-cog', url: '#openSettings'}
+  ]
 
   initialize: ->
     super
     @_debouncedUpdateOperations = _.debounce(@_updateOperations, 200)
     @_debouncedUpdateBalances = _.debounce(@_updateBalances, 200)
     @_debouncedUpdateCountervalueVisibility = _.debounce(@_updateCountervalueVisibility, 200)
+    @actions = _.clone(@actions)
+    @actions[0].url = "/wallet/accounts/#{@_getAccount().get('index')}/operations"
+    @_updateBreadcrumb()
 
   onAfterRender: ->
     super
@@ -24,17 +35,39 @@ class @WalletAccountsShowViewController extends ledger.common.ViewController
     @_listenEvents()
 
   showOperation: (params) ->
-    dialog = new WalletOperationsDetailDialogViewController(params)
+    dialog = new WalletDialogsOperationdetailDialogViewController(params)
     dialog.show()
+
+  openSettings: ->
+    (new WalletDialogsAccountsettingsDialogViewController(account_id: @_getAccount().get('index'))).show()
+
+  onDetach: ->
+    # update balance
+    ledger.app.off 'wallet:balance:changed', @_debouncedUpdateBalances
+
+    # update operations
+    ledger.app.off 'wallet:transactions:new wallet:operations:sync:done wallet:operations:new wallet:operations:update', @_debouncedUpdateOperations
+    ledger.preferences.instance?.off 'currencyActive:changed', @_debouncedUpdateOperations
+
+    # settings
+    ledger.preferences.instance?.off 'currencyActive:changed', @_debouncedUpdateCountervalueVisibility
+
+    # listen accounts
+    ledger.database.contexts.main.off 'update:account insert:account remove:account', @_updateAccountName
+
+  _updateBreadcrumb: ->
+    @breadcrumb = [{ title: 'wallet.breadcrumb.accounts', url: '/wallet/accounts'}]
+    @breadcrumb.push title: @_getAccount().get('name'), url: @routedUrl
+    @parentViewController?.updateActionBar()
 
   _updateOperations: ->
     operations = @_getAccount().get 'operations'
     @view.emptyContainer.hide() if operations.length > 0
-    render 'wallet/operations/operations_table', {operations: operations.slice(0, 7)}, (html) =>
+    render 'wallet/accounts/_operations_table', {operations: operations.slice(0, 6), showAddresses: true}, (html) =>
       @view.operationsList.html html
 
   _updateBalances: ->
-    total = Wallet.instance.getBalance().wallet.total
+    total = @_getAccount().get('total_balance')
     @view.confirmedBalance.text ledger.formatters.fromValue(total)
     @view.countervalueBalance.attr 'data-countervalue', total
 
@@ -52,6 +85,9 @@ class @WalletAccountsShowViewController extends ledger.common.ViewController
     @_updateCountervalueVisibility()
     ledger.preferences.instance.on 'currencyActive:changed', @_debouncedUpdateCountervalueVisibility
 
+    # listen accounts
+    ledger.database.contexts.main.on 'update:account insert:account remove:account', @_updateAccountName
+
   _updateCountervalueVisibility: ->
     hideCountervalue = !ledger.preferences.instance.isCurrencyActive()
     if hideCountervalue then @view.countervalueBalanceContainer.hide() else @view.countervalueBalanceContainer.show()
@@ -61,11 +97,14 @@ class @WalletAccountsShowViewController extends ledger.common.ViewController
   _updateAccountName: ->
     account = @_getAccount()
     @view.accountName.text account.get 'name'
+    @view.colorCircle.css('color', account.get('color'))
+    @_updateBreadcrumb()
 
   _updateBalancesLayout: ->
     # invert layout if needed
     if ledger.formatters.symbolIsFirst() then @view.confirmedBalanceContainer.addClass 'inverted' else @view.confirmedBalanceContainer.removeClass 'inverted'
 
   _getAccount: () ->
-    @_account ?= Account.find(index: 0).first()
+    @_accountId ||= +@routedUrl.match(/wallet\/accounts\/(\d+)\/show/)[1]
+    @_account ?= Account.find(index: @_accountId).first()
     @_account

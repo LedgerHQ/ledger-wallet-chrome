@@ -30,7 +30,7 @@ require @ledger.imports, ->
       return false if newMode is @_currentMode
       @_currentMode = newMode
       if @isInFirmwareUpdateMode()
-        @_releaseWallet(no)
+        _.defer => @_releaseWallet(no)
         ledger.utils.Logger.setGlobalLoggersPersistentLogsEnabled(off)
         ledger.utils.Logger.updateGlobalLoggersLevel()
       else
@@ -81,10 +81,9 @@ require @ledger.imports, ->
       @emit 'wallet:initializing'
       ledger.tasks.WalletOpenTask.instance.startIfNeccessary()
       ledger.tasks.WalletOpenTask.instance.onComplete (result, error) =>
-        l "OPEN RESULT", result, error
         if error?
           # TODO: Handle wallet opening fatal error
-          l "Raise", error
+          e "Raise", error
         else
           @_listenPreferencesEvents()
           @_listenCountervalueEvents(true)
@@ -109,11 +108,7 @@ require @ledger.imports, ->
 
     _listenAppEvents: () ->
       @on 'wallet:operations:sync:failed', =>
-        return unless @isInWalletMode()
-        _.delay =>
-          ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary() if @dongle?
-          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() if @dongle?
-        , 500
+
 
       @on 'wallet:operations:sync:done', =>
 
@@ -128,22 +123,23 @@ require @ledger.imports, ->
     _releaseWallet: (removeDongle = yes) ->
       @emit 'dongle:disconnected'
       @_listenCountervalueEvents(false)
-      ledger.bitcoin.bitid.reset()
-      ledger.preferences.close()
-      ledger.utils.Logger.updateGlobalLoggersLevel()
-      Wallet.releaseWallet()
-      ledger.storage.closeStores()
-      ledger.wallet.release(@dongle)
-      ledger.tasks.Task.stopAllRunningTasks()
-      ledger.tasks.Task.resetAllSingletonTasks()
-      ledger.database.contexts.close()
-      ledger.database.close()
-      ledger.utils.Logger._secureWriter = null
-      ledger.utils.Logger._secureReader = null
-      if removeDongle
-        @dongle = null
-      else
-        @dongle?.lock()
+      _.defer =>
+        ledger.bitcoin.bitid.reset()
+        ledger.preferences.close()
+        ledger.utils.Logger.updateGlobalLoggersLevel()
+        Wallet.releaseWallet()
+        ledger.storage.closeStores()
+        ledger.wallet.release(@dongle)
+        ledger.tasks.Task.stopAllRunningTasks()
+        ledger.tasks.Task.resetAllSingletonTasks()
+        ledger.database.contexts.close()
+        ledger.database.close()
+        ledger.utils.Logger._secureWriter = null
+        ledger.utils.Logger._secureReader = null
+        if removeDongle
+          @dongle = null
+        else
+          @dongle?.lock()
       ledger.dialogs.manager.dismissAll(no)
       @router.go '/onboarding/device/plug' if @isInWalletMode()
 

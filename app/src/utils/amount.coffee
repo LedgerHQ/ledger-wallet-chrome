@@ -60,6 +60,7 @@ class @ledger.Amount
   gte: (amount) -> @compare(amount) >= 0
   # @return [Boolean]
   eq: (amount) -> @compare(amount) == 0
+  neq: (amount) -> !@eq(amount)
   # @return [Boolean]
   equals: (amount) -> @eq(amount)
 

@@ -1,4 +1,6 @@
 
+ledger.stream = highland
+
 class @Stream extends EventEmitter
 
   @Type:

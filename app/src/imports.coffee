@@ -7,6 +7,7 @@
         '../libs/underscore-min'
         '../libs/underscore.string.min'
         '../libs/underscore.inflection'
+        '../libs/highland'
         '../libs/signals.min'
         '../libs/crossroads.min'
         '../libs/spin.min'
@@ -122,6 +123,7 @@
         'utils/json'
         'utils/promise/debounce'
         'utils/promise/throttle'
+        'utils/math'
 
         ## Crypto
         'crypto/aes'
@@ -174,7 +176,6 @@
 
         ## Tasks
         'tasks/task'
-        'tasks/balance_task'
         'tasks/wallet_layout_recovery_task'
         'tasks/transaction_observer_task'
         'tasks/operations_synchronization_task'
@@ -183,6 +184,7 @@
         'tasks/ticker_task'
         'tasks/wallet_open_task'
         'tasks/fees_computation_task'
+        'tasks/transaction_consumer_task'
 
         ## Wallet
         'wallet/utils'
@@ -199,6 +201,8 @@
         'database/migrations'
         'common/view_controller'
         'common/navigation_controller'
+        'common/action_bar_view_controller'
+        'common/action_bar_navigation_controller'
 
         ## Dongle
         'dongle/dongle'
@@ -221,10 +225,9 @@
 
         ## Models
         'models/wallet'
-        'models/account'
         'models/operation'
+        'models/account'
         'models/configuration'
-        'models/account_tag'
 
         ## Dialog Management
         'utils/dialogs'
@@ -242,15 +245,17 @@
         ## Wallet controllers
         'controllers/wallet/wallet_navigation_controller'
 
-        # Dashboard
-        'controllers/wallet/dashboard/wallet_dashboard_index_view_controller'
-
-        # Operations
-        'controllers/wallet/operations/wallet_operations_detail_dialog_view_controller'
-        'controllers/wallet/operations/wallet_operations_index_view_controller'
+        # Dialogs
+        '/controllers/wallet/dialogs/wallet_dialogs_addaccount_dialog_view_controller'
+        '/controllers/wallet/dialogs/wallet_dialogs_accountsettings_dialog_view_controller'
+        '/controllers/wallet/dialogs/wallet_dialogs_operationdetail_dialog_view_controller'
+        '/controllers/wallet/dialogs/wallet_dialogs_xpub_dialog_view_controller'
 
         # Accounts
+        'controllers/wallet/accounts/wallet_accounts_index_view_controller'
         'controllers/wallet/accounts/wallet_accounts_show_view_controller'
+        'controllers/wallet/accounts/wallet_accounts_operations_view_controller'
+        'controllers/wallet/accounts/wallet_accounts_alloperations_view_controller'
 
         # Send
         'controllers/wallet/send/wallet_send_index_dialog_view_controller'
@@ -397,6 +402,7 @@
 
         '../spec/fixtures/fixtures_dongle'
         '../spec/fixtures/fixtures_transactions'
+        '../spec/fixtures/fixtures_blocks'
 
         '../spec/spec_helper'
         '../spec/spec_navigation_controller'
@@ -430,10 +436,10 @@
           '../spec/tasks/address_derivation_task_spec'
           '../spec/tasks/balance_task_spec'
           '../spec/tasks/operations_consumption_task_spec'
+          '../spec/tasks/operations_synchronization_task_spec'
           '../spec/tasks/ticker_task_spec'
           '../spec/tasks/transaction_observer_task_spec'
           '../spec/tasks/wallet_layout_recovery_task_spec'
-          '../spec/tasks/wallet_open_task_spec'
 
           '../spec/dongle/derivation_spec'
 

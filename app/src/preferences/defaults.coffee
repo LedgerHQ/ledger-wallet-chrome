@@ -78,3 +78,31 @@ ledger.preferences.defaults =
       other:
         value: 'other'
         localization: 'common.help.other_tag'
+
+  # accounts preferences
+  Accounts:
+    firstAccountColor: '#5CACC4'
+    recoveredAccountColor: '#cccccc'
+    colors:
+      turquoise:
+        localization: "common.colors.turquoise"
+        hex: "#5CACC4"
+      orange:
+        localization: "common.colors.orange"
+        hex: "#FCB653"
+      cherry:
+        localization: "common.colors.cherry"
+        hex: "#FF5254"
+      olive:
+        localization: "common.colors.olive"
+        hex: "#CEE879"
+      forest:
+        localization: "common.colors.forest"
+        hex: "#8CD19D"
+
+    applyColorsToSelect: (select, optionCallback) ->
+      colors = ledger.preferences.defaults.Accounts.colors
+      for colorName, color of colors
+        option = $("<option></option>").text(t(color.localization)).attr('value', color.hex)
+        optionCallback?(option)
+        select.append(option)

@@ -1,0 +1,40 @@
+@import (reference) "../../constants";
+
+section#quicklook {
+  > .accounts-list {
+    display: flex;
+    margin-top: @metrics-medium-padding;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: @metrics-almost-small-padding;
+
+    > .panel {
+      display: flex;
+      width: 48.8%;
+      height: 40px;
+      align-items: center;
+      margin-top: @metrics-very-small-padding;
+
+      &:nth-child(-n+2) {
+        margin-top: 0;
+      }
+
+      > .name {
+        flex-grow: 1;
+      }
+
+      > .countervalue, .arrow {
+        margin-left: @metrics-small-padding;
+      }
+
+      > .countervalue {
+        white-space: nowrap;
+      }
+
+      > .balance {
+        display: flex;
+        flex-direction: row;
+      }
+    }
+  }
+}

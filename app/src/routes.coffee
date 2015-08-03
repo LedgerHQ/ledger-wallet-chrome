@@ -94,17 +94,32 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   ## Wallet
   # Accounts
+  route 'wallet/accounts/index', ->
+    app.navigate WALLET_LAYOUT, WalletAccountsIndexViewController
+
+  route '/wallet/accounts/alloperations', (params) ->
+    app.navigate WALLET_LAYOUT, WalletAccountsAlloperationsViewController
+
   route '/wallet/accounts/{id}/show', (params) ->
     app.navigate WALLET_LAYOUT, WalletAccountsShowViewController
 
+  route '/wallet/accounts/{id}/operations', (params) ->
+    app.navigate WALLET_LAYOUT, WalletAccountsOperationsViewController
+
+  route '/wallet/accounts/{id}', (params) ->
+    app.router.go "/wallet/accounts/#{params['id']}/show"
+
+  route '/wallet/accounts', ->
+    app.router.go "/wallet/accounts/index"
+
   # Send
-  route '/wallet/send/index', (params = {}) ->
-    dialog = new WalletSendIndexDialogViewController({ amount: params["?params"]?.amount, address: params["?params"]?.address})
+  route '/wallet/send/index:?params:', (params = {}) ->
+    dialog = new WalletSendIndexDialogViewController(params["?params"] or {})
     dialog.show()
 
   # Receive
-  route '/wallet/receive/index', (params) ->
-    dialog = new WalletReceiveIndexDialogViewController(params)
+  route '/wallet/receive/index:?params:', (params = {}) ->
+    dialog = new WalletReceiveIndexDialogViewController(params["?params"] or {})
     dialog.show()
 
   # Settings
@@ -116,10 +131,6 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/wallet/help/index', (params) ->
     dialog = new CommonDialogsHelpDialogViewController()
     dialog.show()
-
-  # Operations
-  route '/wallet/accounts/{id}/operations', (params) ->
-    app.navigate WALLET_LAYOUT, WalletOperationsIndexViewController
 
   ## Firmware Update
   route '/update/index', (params) ->

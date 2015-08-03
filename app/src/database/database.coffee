@@ -24,6 +24,7 @@ class ledger.database.Database extends EventEmitter
       @_migrateDbJsonToLoki125(value) for key, value of json when !key.match(/^(__version)$/)
 
   _migrateDbJsonToLoki125: (dbJson) ->
+    return unless dbJson? and ['collections']?
     for collection in dbJson['collections']
       for item in collection['data']
         item['$loki'] = item['id'] if item['id']
