@@ -1,4 +1,10 @@
 # Changelog
+1.4.0
+===
+- New multi-accounts feature
+- Performance improvements
+- Bug fixes
+
 1.3.16
 ===
 - Fix transaction parsing
