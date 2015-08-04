@@ -51,7 +51,7 @@ class ledger.wallet.ExtendedPublicKey
       finalize 0
 
   _createXPUB: (depth, fingerprint, childnum, chainCode, publicKey, network) ->
-    magic = if network is 'testnet' then  "043587CF" else "0488B21E"
+    magic = if ledger?.config?.network? then  ledger.config.network.bitcoinjs.bip32.public else "0488B21E"
     xpub = new ByteString magic, HEX
     xpub = xpub.concat new ByteString(_.str.lpad(depth.toString(16), 2, '0'), HEX)
     xpub = xpub.concat new ByteString(_.str.lpad(fingerprint.toString(16), 8, '0'), HEX)
