@@ -1,9 +1,9 @@
 <div id="content-container">
   <div class="logo-container">
-    <img src="../../assets/images/onboarding/large_logo.png" width="256" height="156">
+    <img src="../assets/images/onboarding/large_logo.png" width="256" height="156">
   </div>
   <div class="greyed-container">
-    <img src="../../assets/images/common/large_<%= if @params.serious? and @params.serious == yes then 'error' else 'fail' %>.png" width="50" height="50" />
+    <img src="../assets/images/common/large_<%= if @params.serious? and @params.serious == yes then 'error' else 'fail' %>.png" width="50" height="50" />
     <div class="black-title"><%= @params.error %></div>
     <% if @params.message?: %>
     <div class="black-indication"><%= @params.message %></div>

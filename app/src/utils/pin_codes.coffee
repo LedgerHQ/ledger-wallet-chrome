@@ -370,6 +370,9 @@ class ledger.pin_codes.PinCode extends EventEmitter
 
   # @private
   _setDigitClassEnabled: (digit, className, enabled) ->
+    # NWJS Hack
+    ledger.nwjs?.helpers.fixCss(/\.pincode > div\.filled/)
+
     if enabled == on
       $(digit).addClass(className)
     else

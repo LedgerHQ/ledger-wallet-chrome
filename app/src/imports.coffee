@@ -77,6 +77,7 @@
         'nwjs/hid'
         'nwjs/usb'
         'nwjs/runtime'
+        'nwjs/helpers'
 
         ## Application configuration
         'bitcoin/networks'

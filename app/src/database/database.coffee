@@ -11,7 +11,7 @@ class ledger.database.Database extends EventEmitter
     @_store.get @_name, (json) =>
       try
         @_migrateJsonToLoki125 json
-        @_db = new loki(@_name, ENV: 'BROWSER')
+        @_db = new loki(@_name, ENV: 'BROWSER', persistenceMethod: null)
         @_db.loadJSON JSON.stringify(json[@_name]) if json[@_name]?
         @_db.save = @scheduleFlush.bind(this)
       catch er
