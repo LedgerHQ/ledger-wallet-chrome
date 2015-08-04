@@ -51,11 +51,20 @@ class ledger.qr_codes.Scanner extends EventEmitter
 
   _decodeCallback: ->
     if @localStream?
+      process = window.process
+      require = window.require
       try
+        window.process = null
+        window.require = null
         context = @canvasTagEl.get(0).getContext('2d')
         context.drawImage(@videoTagEl.get(0), 0, 0, @canvasTagEl.width(), @canvasTagEl.height())
         result = zbarProcessImageData(context.getImageData(0, 0, @canvasTagEl.width(), @canvasTagEl.height()))
         if result?.length > 0
           qrcode = result[0][2]
           @emit 'qrcode', qrcode if qrcode?
+      catch ex
+        e ex
+      finally
+        window.process = process
+        window.require = require
       _.delay @_decodeCallback.bind(@), 250

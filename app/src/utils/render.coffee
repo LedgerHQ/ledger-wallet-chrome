@@ -8,7 +8,7 @@ helpers =
     context = _.extend(params, helpers)
     _.defer => callback?(JST[template](context))
   else
-    require('../views/' + template, =>
+    ledger.require('../views/' + template, =>
       context = _.extend(params, helpers)
       callback(JST[template](context))
     )

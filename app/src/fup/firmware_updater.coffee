@@ -55,7 +55,7 @@ class ledger.fup.FirmwareUpdater
     @_request = null if request is @_request
 
   load: (callback) ->
-    require ledger.fup.imports, (scripts) =>
+    ledger.require ledger.fup.imports, (scripts) =>
       @_scripts = scripts
       ledger.fup.setupUpdates()
       callback?()

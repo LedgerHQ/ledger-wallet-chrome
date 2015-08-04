@@ -1,4 +1,6 @@
-require @ledger.imports, ->
+ledger.require = ledger_require
+
+ledger.require ledger.imports, ->
 
   class Application extends ledger.common.application.BaseApplication
 
@@ -210,6 +212,6 @@ require @ledger.imports, ->
 
   ledger.database.Model.commitRelationship()
 
-  @ledger.application = new Application()
-  @ledger.app = @ledger.application
-  @ledger.application.start()
+  ledger.application = new Application()
+  ledger.app = ledger.application
+  ledger.application.start()

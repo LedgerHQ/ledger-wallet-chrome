@@ -13,7 +13,7 @@ require_script = (url, callback) ->
   document.getElementsByTagName('head')[0].appendChild(script)
   script
 
-@require = (urls, callback) ->
+@ledger_require = (urls, callback) ->
   self = this
   scripts = []
   if (urls instanceof Array)
@@ -22,7 +22,7 @@ require_script = (url, callback) ->
       if (index + 1 < urls.length)
         scripts.push require_script(urls[++index], require_array)
       else
-        callback.bind(self)(scripts)
+        callback?(scripts)
     do require_array
   else
     scripts.push require_script(urls, => callback?(scripts))

@@ -3,6 +3,8 @@ ledger.managers ?= {}
 class ledger.managers.Permissions extends EventEmitter
 
   request: (permissions, callback) ->
+    if ledger.nwjs?
+      return callback?(yes)
     if not permissions?
       callback?(no)
     if _.isString permissions
@@ -11,10 +13,14 @@ class ledger.managers.Permissions extends EventEmitter
       callback?(granted)
 
   getAll: (callback) ->
+    if ledger.nwjs?
+      return callback?([])
     chrome.permissions.getAll (permissions) =>
       callback?(permissions)
 
   has: (permissions, callback) ->
+    if ledger.nwjs?
+      return callback?(yes)
     if not permissions?
       callback?(no)
     if _.isString permissions
@@ -23,6 +29,8 @@ class ledger.managers.Permissions extends EventEmitter
       callback?(granted)
 
   remove: (permissions, callback) ->
+    if ledger.nwjs?
+      return callback?(yes)
     if not permissions?
       callback?(no)
     if _.isString permissions

@@ -53,7 +53,7 @@ ledger.specs.renderingNode = $('<div></div>')[0]
 
 @ledger.specs.init = (filters...) ->
   d = Q.defer()
-  require ledger.specs.jasmine, =>
+  ledger.require ledger.specs.jasmine, =>
     @env = jasmine.getEnv()
     if filters.length > 0
       filters = ((word.toLowerCase() for word in f.split(" ")) for f in _.flatten(filters))
@@ -69,7 +69,7 @@ ledger.specs.renderingNode = $('<div></div>')[0]
 
     @env.addReporter(@htmlReporter)
     @env.addReporter(ledger.specs.reporters.events)
-    require @files, =>
+    ledger.require @files, =>
       # Use mock local storage
       ledger.specs.storage.inject ->
         # Restore original storage implementation

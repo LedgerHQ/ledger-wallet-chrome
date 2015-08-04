@@ -31,8 +31,10 @@ unless chrome?.storage?.local?
       _.defer -> cb?(data)
 
     remove: (keys, cb) ->
-      localStorage.setItem(k) for k in keys
+      localStorage.removeItem(k) for k in keys
+      _.defer -> cb?(keys)
 
-    clear: ->
+    clear: (cb) ->
       localStorage.removeItem(k) for k in localStorage
+      _.defer -> cb?()
 
