@@ -1180,6 +1180,8 @@ var BTChip = Class.create({
     setCoin_async: function(version, p2sh) {
         var data = Convert.toHexByte(version);
         data += Convert.toHexByte(p2sh);
+
+        console.log("setCoin -- " + version + " -- " + p2sh);
         return this.card.sendApdu_async(0xe0, 0x14, 0x00, 0x00, new ByteString(data, HEX), [0x9000]);
     },
 
