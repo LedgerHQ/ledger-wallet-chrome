@@ -316,8 +316,8 @@ class @ledger.dongle.Dongle extends EventEmitter
       @_btchip.setupNew_async(
         BTChip.MODE_WALLET,
         BTChip.FEATURE_DETERMINISTIC_SIGNATURE | BTChip.FEATURE_NO_2FA_P2SH,
-        0,
-        5,
+        BTChip.VERSION_BITCOIN_MAINNET,
+        BTChip.VERSION_BITCOIN_P2SH_MAINNET,
         new ByteString(pin, ASCII),
         undefined,
         BTChip.QWERTY_KEYMAP_NEW,
@@ -600,9 +600,8 @@ class @ledger.dongle.Dongle extends EventEmitter
     Errors.throw(Errors.DongleLocked, 'Cannot switch coin/network while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
     _btchipQueue.enqueue "switchCoin", =>
       d = ledger.defer(callback)
-      @_btchip.getWalletPublicKey_async(path)
+      @_btchip.setCoin_async(version, p2sh)
       .then (result) =>
-        #ledger.wallet.Wallet.instance?.cache?.set [[path, result.bitcoinAddress.value]]
         _.defer -> d.resolve(result)
       .fail (err) =>
         error = @_handleErrorCode(err)
