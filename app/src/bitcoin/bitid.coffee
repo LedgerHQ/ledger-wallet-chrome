@@ -49,13 +49,17 @@ _.extend ledger.bitcoin.bitid,
     @return [Q.Promise]
   ###
   getAddress: (opts={}, callback=undefined) ->
-    [opts, callback] = [{}, opts] if ! callback && typeof opts == 'function'
-    path = @getPath(opts)
-    return ledger.defer(callback).resolve(@_cache[path]).promise if @_cache[path]?
-    ledger.app.dongle.getPublicAddress(path, callback)
-    .then (address) =>
-      @_cache[path] = address
-      address
+      [opts, callback] = [{}, opts] if ! callback && typeof opts == 'function'
+      path = @getPath(opts)
+      return ledger.defer(callback).resolve(@_cache[path]).promise if @_cache[path]?
+      ledger.app.dongle.switchCoin 0, 5, (result) =>
+        console.log(result)
+        ledger.app.dongle.getPublicAddress(path, callback)
+        .then (address) =>
+          console.log(address)
+          ledger.app.dongle.switchCoin(ledger.config.network.version.regular, ledger.config.network.version.P2SH)
+          @_cache[path] = address
+          address
 
   ###
   @overload signMessage(message, callback=undefined)

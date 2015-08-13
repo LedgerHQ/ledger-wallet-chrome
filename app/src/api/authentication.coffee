@@ -94,7 +94,6 @@ class AuthenticatedHttpClient extends @HttpClient
     .then (data) =>
       @_authToken = data['token']
       ledger.app.emit 'wallet:authenticated'
-      ledger.app.dongle.switchCoin(ledger.config.network.version.regular, ledger.config.network.version.P2SH)
       deferred.resolve()
     .fail (error) =>
       if deferred.retryNumber-- > 0 then @_performAuthenticate(deferred) else deferred.reject(error)
