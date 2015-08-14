@@ -16,16 +16,7 @@ ledger.preferences.defaults =
 
   # display preferences
   Display:
-    units:
-      bitcoin:
-        symbol: 'BTC'
-        unit: 8
-      milibitcoin:
-        symbol: 'mBTC'
-        unit: 5
-      microbitcoin:
-        symbol: 'bits'
-        unit: 2
+    units: ledger.config.network.units
     languages: null # lazy
     regions: null # lazy
 
@@ -48,19 +39,7 @@ ledger.preferences.defaults =
       fast:
         value: '20000'
         localization: 'common.fees.fast'
-    explorers:
-      blockchain:
-        name: 'Blockchain.info'
-        address: 'https://blockchain.info/tx/%s'
-      blockr:
-        name: 'Blockr.io'
-        address: 'https://btc.blockr.io/tx/info/%s'
-      biteasy:
-        name: 'Biteasy.com'
-        address: 'https://www.biteasy.com/blockchain/transactions/%s'
-      insight:
-        name: 'Insight.is'
-        address: 'https://insight.bitpay.com/tx/%s'
+    explorers: ledger.config.network.explorers
     discoveryGap: 20
 
   # support preferences

@@ -53,10 +53,8 @@ _.extend ledger.bitcoin.bitid,
       path = @getPath(opts)
       return ledger.defer(callback).resolve(@_cache[path]).promise if @_cache[path]?
       ledger.app.dongle.switchCoin 0, 5, (result) =>
-        console.log(result)
         ledger.app.dongle.getPublicAddress(path, callback)
         .then (address) =>
-          console.log(address)
           ledger.app.dongle.switchCoin(ledger.config.network.version.regular, ledger.config.network.version.P2SH)
           @_cache[path] = address
           address

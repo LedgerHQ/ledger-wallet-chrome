@@ -90,7 +90,9 @@ class ledger.formatters
     Symbol order
   ###
   @symbolIsFirst: ->
-    isNaN parseInt(ledger.i18n.formatAmount(0, ledger.preferences.defaults.Display.units.bitcoin.symbol).charAt(0))
+    # "BTC" was ledger.preferences.defaults.Display.units.bitcoin.symbol before but it doesn't doesn't work if it contains "DOGE".
+    # The currency variable is not really needed here to determine if the symbol comme first.
+    isNaN parseInt(ledger.i18n.formatAmount(0, "BTC").charAt(0))
 
 
   ###
@@ -205,4 +207,4 @@ class ledger.formatters
     if ledger.preferences.instance?
       ledger.preferences.instance.getBtcUnit()
     else
-      'BTC'
+      ledger.config.units.bitcoin
