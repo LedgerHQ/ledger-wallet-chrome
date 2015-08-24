@@ -23,12 +23,13 @@ _.extend ledger.nwjs.usb,
       for d in devices
         opened.push @openDevice(d)
       result = _(opened).map (d) ->
-        device: d.handle, productId: d.deviceDescriptor.idProduct, vendorId: d.deviceDescriptor.idVendor
+        handle: d.handle, productId: d.deviceDescriptor.idProduct, vendorId: d.deviceDescriptor.idVendor
       callback?(result)
 
-  getDevices: ({productId, deviceId}, callback) ->
+  getDevices: ({productId, vendorId}, callback) ->
+    _devices = []
     for d in USB.getDeviceList()
-      d.deviceId = +_.uniqueId()
+      d.deviceId = d.deviceAddress
       _devices[d.deviceId] = d
     result = _(_devices).chain().values().filter (d) ->
       d.deviceDescriptor.idProduct is productId and d.deviceDescriptor.idVendor is vendorId
@@ -47,17 +48,59 @@ _.extend ledger.nwjs.usb,
 
 
   closeDevice: (handle, callback) ->
-    _openedDevices[handle].close()
+    _openedDevices[handle.handle].close()
     _openedDevices = _(_openedDevices).omit(handle)
     callback?()
 
   listInterfaces: (handle, callback) ->
+    interfaces = _(_openedDevices[handle.handle].interfaces).map (i) ->
+      alternateSetting: i.descriptor.bAlternateSetting
+      endpoints: _(i.endpoints).map (e) ->
+        address: e.bEndpointAddress
+        direction: e.direction
+        extra_data: e.extra
+        maximumPacketSize: e.wMaxPacketSize
+        pollingInterval: e.bInterval
+        type: ['control', 'isochronous', 'bulk', 'interrupt'][e.transferType]
+        usage: 'data'
+      extra_data: i.descriptor.extra
+      interfaceClass: i.descriptor.bInterfaceClass
+      interfaceNumber: i.descriptor.bInterfaceNumber
+      interfaceProtocol: i.descriptor.bInterfaceProtocol
+      interfaceSubclass: i.descriptor.bInterfaceSubClass
+
+    callback?(interfaces)
+
 
   claimInterface: (handle, interfaceNumber, callback) ->
+    device = _openedDevices[handle.handle]
+    for i in _(device.interfaces).where(id: interfaceNumber)
+      i.claim()
+    callback?()
 
   releaseInterface: (handle, interfaceNumber, callback) ->
+    device = _openedDevices[handle.handle]
+    for i in _(device.interfaces).where(id: interfaceNumber)
+      i.release(yes)
+    callback?()
 
-  bulkTransfer: (handle, transferInfo, callback) ->
+
+  bulkTransfer: (handle, {direction, endpoint, length, data, timeout}, callback) ->
+    device = _openedDevices[handle.handle]
+    desiredInterface = _(device.interfaces).find (i) ->
+      _(i.endpoints).some (e) -> e.transferType is USB.LIBUSB_TRANSFER_TYPE_BULK and e.direction is direction
+    endpoint = _(desiredInterface.endpoints).find (e) -> e.direction is direction
+
+    if direction is 'in'
+      l "Read data"
+      endpoint.transfer length or endpoint.wMaxPacketSize, (error, data) ->
+        l "Data read :", data
+        callback?(resultCode: (if error? then 1 else 0), data: data)
+    else
+      l "Send data", new Uint8Array(data)
+      endpoint.transfer new Uint8Array(data), (error) ->
+        l "RESULT ", arguments
+        callback?(resultCode: (if error? then 1 else 0))
 
   getUserSelectedDevices: (options, callback) -> empty('getUserSelectedDevices')
 
@@ -78,7 +121,7 @@ _.extend ledger.nwjs.usb,
   resetDevice: (handle, callback) -> empty('resetDevice')
 
 ###
-  *getDevices − chrome.usb.getDevices(object options, function callback)
+  * getDevices − chrome.usb.getDevices(object options, function callback)
   getUserSelectedDevices − chrome.usb.getUserSelectedDevices(object options, function callback)
   requestAccess − chrome.usb.requestAccess( Device device, integer interfaceId, function callback)
   * openDevice − chrome.usb.openDevice( Device device, function callback)
