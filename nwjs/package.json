@@ -10,7 +10,7 @@
     "min_height": 640
   },
   "dependencies": {
-    "ledger-api": "git+https://github.com/LedgerHQ/ledger-node-js-api.git",
+    "node-hid": "latest",
     "usb": "latest"
   }
 }
