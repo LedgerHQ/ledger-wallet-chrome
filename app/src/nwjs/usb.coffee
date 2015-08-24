@@ -13,6 +13,11 @@ empty = (msg) ->
 _devices = {}
 _openedDevices = {}
 
+reloadUsb = ->
+  delete global.require.cache[global.require.resolve('usb')]
+  USB = global.require('usb')
+  ledger.nwjs.usb.USB = USB
+
 _.extend ledger.nwjs.usb,
 
   USB: USB
@@ -48,7 +53,7 @@ _.extend ledger.nwjs.usb,
 
 
   closeDevice: (handle, callback) ->
-    _openedDevices[handle.handle].close()
+    try _openedDevices[handle.handle].close()
     _openedDevices = _(_openedDevices).omit(handle)
     callback?()
 
@@ -99,7 +104,6 @@ _.extend ledger.nwjs.usb,
     else
       l "Send data", new Uint8Array(data)
       endpoint.transfer new Uint8Array(data), (error) ->
-        l "RESULT ", arguments
         callback?(resultCode: (if error? then 1 else 0))
 
   getUserSelectedDevices: (options, callback) -> empty('getUserSelectedDevices')
