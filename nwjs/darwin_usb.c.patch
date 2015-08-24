@@ -1,0 +1,11 @@
+--- darwin_usb.c	2015-02-27 00:57:03.000000000 +0100
++++ /Users/pollas_p/ledger-wallet-chrome/nwjs/node_modules/usb/libusb/libusb/os/darwin_usb.c	2015-08-07 12:15:31.000000000 +0200
+@@ -312,7 +312,7 @@
+ static void darwin_hotplug_poll (void)
+ {
+   /* not sure if 5 seconds will be too long/short but it should work ok */
+-  mach_timespec_t timeout = {.tv_sec = 5, .tv_nsec = 0};
++  mach_timespec_t timeout = {.tv_sec = 0, .tv_nsec = 5000};
+ 
+   /* since a kernel thread may nodify the IOInterators used for
+    * hotplug notidication we can't just clear the iterators.

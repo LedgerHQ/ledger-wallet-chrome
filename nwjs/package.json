@@ -9,8 +9,11 @@
     "min_width": 1000,
     "min_height": 640
   },
+  "scripts": {
+    "install": "node install.js"
+  },
   "dependencies": {
-    "node-hid": "latest",
-    "usb": "latest"
+    "tarball-extract": "latest",
+    "mv": "latest"
   }
 }
