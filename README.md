@@ -47,3 +47,4 @@ Once the application is packaged a directory is created in the 'dist' directory 
 
 Note: If you want the firmware update to work on windows, use [Zadig](http://sourceforge.net/projects/libwdi/files/zadig/) to install the WinUSB driver for your USB device.
 
+Note: There is no update mechanism. If you need to update the application version, you will have to build it again.
