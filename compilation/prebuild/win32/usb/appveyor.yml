@@ -1,0 +1,34 @@
+environment:
+  GYP_MSVS_VERSION: 2013
+
+  node_pre_gyp_accessKeyId:
+    secure: lYXAEyCIM03tC8M9oS4U1JXWbo+g9u+AnayYjekgqBQ=
+  node_pre_gyp_secretAccessKey:
+    secure: yRw0LuKh8Q/BORVLbBMaZXyGIvpIYuxYzGSherheoYTEMONUYfgj49x8b/FUm4s1
+
+  matrix:
+    - node_version: 0.10.38
+    - node_version: 0
+    - node_version: 1.0.4
+    - node_version: 1
+
+install:
+  - ps: Install-Product node $env:node_version $env:platform
+  - ps: npm install -g node-gyp
+  - ps: $publish_binary=0
+  - ps: if ($env:appveyor_repo_tag -match "true" -and $env:appveyor_repo_tag_name -match '^v[0-9]') { $publish_binary=1; }
+
+build_script:
+  - ps: echo $publish_binary
+  - ps: >
+      & {      
+        $ErrorActionPreference = 'SilentlyContinue'
+        git submodule update --init 2>&1 | write-host
+        npm install --build-from-source 2>&1 | write-host
+        ./node_modules/.bin/node-pre-gyp package 2>&1 | write-host
+        if ($publish_binary) { ./node_modules/.bin/node-pre-gyp publish 2>&1 | write-host; }
+      }
+
+platform:
+  - x86
+  - x64
