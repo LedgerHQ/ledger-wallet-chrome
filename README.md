@@ -38,3 +38,12 @@ You can build the chrome application for other coins. Run `gulp clean build pack
 
 Note: that the API is only available for bitcoin and testnet right now.
 
+Building a standalone app version
+---------------------------------
+
+You can build a version of the application that runs outside of chrome with [NW.js](http://nwjs.io/). The application is packaged with the following command:
+   `gulp clean build standalone --release`.
+Once the application is packaged a directory is created in the 'dist' directory with the packaged applications for linux (ledger-wallet), osx (ledger-wallet.app) and windows (ledger-wallet.exe).
+
+Note: If you want the firmware update to work on windows, use [Zadig](http://sourceforge.net/projects/libwdi/files/zadig/) to install the WinUSB driver for your USB device.
+
