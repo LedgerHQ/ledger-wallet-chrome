@@ -39,6 +39,9 @@
     "rimraf": "latest",
     "gulp-util": "latest",
     "gulp-cached": "latest",
-    "gulp-slash": "latest"
+    "gulp-slash": "latest",
+    "nw-builder": "latest",
+    "ncp": "latest",
+    "rimraf": "latest"
   }
 }

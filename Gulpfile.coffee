@@ -29,6 +29,7 @@ yargs = require 'yargs'
         .command 'configure', 'Configure default compilation flags'
         .command 'reset', 'Reset to the default compilation flags'
         .example '$0 configure --release --network testnet', 'set the default build mode to "release" with the "testnet" network'
+        .command 'standalone', 'Build a standalone version of the application that runs outside chrome.'
         .command 'release', 'Build, zip and package application'
         .help('help')
         .option 'b',
@@ -88,6 +89,8 @@ taskQueue = defer.promise
 gulp.task 'build', -> taskQueue = taskQueue.then -> checkoutAndRun('script-build')
 gulp.task 'zip', ->  taskQueue = taskQueue.then -> checkoutAndRun('script-zip')
 gulp.task 'package', -> taskQueue = taskQueue.then -> checkoutAndRun('script-package')
+
+gulp.task 'standalone', -> taskQueue = taskQueue.then -> checkoutAndRun('script-standalone')
 
 gulp.task 'doc', ->  taskQueue = taskQueue.then -> require('./compilation/script-doc')(configuration)
 gulp.task 'generate', ->  taskQueue = taskQueue.then -> require('./compilation/script-generate')(configuration)
