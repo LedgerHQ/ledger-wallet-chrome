@@ -7,6 +7,7 @@ Errors =
   NoRemoteData: 0
   NetworkError: 1
   NoChanges: 2
+  Closed: 3
 
 $logger = -> ledger.utils.Logger.getLoggerByTag('SyncedStore')
 $info = (args...) -> $logger().info(args...)
@@ -95,12 +96,15 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     @_clearChanges()
     @client.delete_settings()
 
+  close: ->
+
   # @return A promise
   _pull: ->
     # Get distant store md5
     # If local md5 and distant md5 are different
       # -> pull the data
       # -> merge data
+    return ledger.defer().reject(Errors.Closed).promise if @isClosed()
     @client.get_settings_md5().then (md5) =>
       $info 'Remote md5: ', md5, ', local md5', @_lastMd5
       return yes if @_lastMd5 is md5
@@ -162,6 +166,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     # Else
     # Update consistency chain
     # Push
+    return ledger.defer().reject(Errors.Closed).promise if @isClosed()
     return ledger.defer().reject(Errors.NoChanges).promise if @_changes.length is 0
 
     hasRemoteData = yes

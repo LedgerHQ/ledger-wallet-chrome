@@ -13,6 +13,7 @@ class @ledger.storage.Store extends EventEmitter
     regexSeparator = if keySeparator.match(/\./) then "\\" + keySeparator else keySeparator
     @_nameRegex = new RegExp("^#{@_name}#{regexSeparator}")
     @_substores = {}
+    @__isClosed = no
 
   # Gets one or more items from storage.
   # If keys is empty, retrieve all values in this namespace.
@@ -62,7 +63,11 @@ class @ledger.storage.Store extends EventEmitter
       @remove(keys, cb)
 
   # Close the store
-  close: -> @
+  close: ->
+    @__isClosed = yes
+    @
+
+  isClosed: -> @__isClosed
 
   # Raw get, without processing.
   # @see ledger.storage.Store#get
