@@ -19,7 +19,7 @@ Firmware =
   V1_4_13: 0x0001040d0146
   V_LW_1_0_0: 0x20010000010f
   V_LW_1_0_1: 0x200100010110
-
+  V_LW_1_1_0: 0x20010100011102
 
 # Ledger OS pubKey, used for pairing.
 Attestation =
@@ -76,13 +76,13 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @property [Integer]
   operationMode: undefined
 
-  # @property [BtChip]
+  # @private [BtChip]
   _btchip: undefined
-  # @property [Array<ledger.wallet.ExtendedPublicKey>]
+  # @private [Array<ledger.wallet.ExtendedPublicKey>]
   _xpubs: []
 
   # @private @property [String] pin used to unlock dongle.
-  _pin = undefined
+  _pin: undefined
 
   # @private @property [ledger.utils.PromiseQueue] Enqueue btchip calls to prevent multiple call to interfer
   _btchipQueue = undefined
@@ -254,8 +254,8 @@ class @ledger.dongle.Dongle extends EventEmitter
     Errors.throw(Errors.DongleAlreadyUnlock) if @state isnt States.LOCKED
     _btchipQueue.enqueue "unlockWithPinCode", =>
       d = ledger.defer(callback)
-      _pin = pin
-      @_btchip.verifyPin_async(new ByteString(_pin, ASCII))
+      @_pin = pin
+      @_btchip.verifyPin_async(new ByteString(@_pin, ASCII))
       .then =>
         # 19.7. SET OPERATION MODE
         @_sendApdu(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
@@ -372,7 +372,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         message = new ByteString(message, ASCII)
         @_btchip.signMessagePrepare_async(path, message)
         .then =>
-          return @_btchip.signMessageSign_async(new ByteString(_pin, ASCII))
+          return @_btchip.signMessageSign_async(new ByteString(@_pin, ASCII))
         .then (sig) =>
           signedMessage = @_convertMessageSignature(pubKey, message, sig.signature)
           d.resolve(signedMessage)
