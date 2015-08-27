@@ -103,7 +103,7 @@ class @ledger.dongle.Dongle extends EventEmitter
           # @todo Se connecter directement à la carte sans redemander le PIN
           console.warn("Dongle is already unlock ! Case not handle => Pin Code Required.")
           @_setState(States.LOCKED)
-        ).catch( (e) -> #console.error(e)
+        ).catch( (e) -> console.error(e)
         ).done()
       ).catch( (error) =>
         console.error("Fail to initialize Dongle :", error)
@@ -111,8 +111,17 @@ class @ledger.dongle.Dongle extends EventEmitter
     else
       _.defer => @_setState(States.BLANK)
 
+  # Recovers dongle firmware version and initialize current state
+  connect: (callback = undefined) ->
+    # Recover firmware version
+      # Create firmware info object
+      # Determine state (setup|locked|unlocked|blank)
+        # Resolve
+
+  getFirmwareInformation: -> @_firmwareInformation
+
   # Called when 
-  disconnect: () -> @_setState(States.DISCONNECTED)
+  disconnect: -> @_setState(States.DISCONNECTED)
 
   # @return [String] Firmware version, 1.0.0 for example.
   getStringFirmwareVersion: -> Try(=> @firmwareVersion.byteAt(1) + "." + @firmwareVersion.byteAt(2) + "." + @firmwareVersion.byteAt(3)).getOrElse('unknown')

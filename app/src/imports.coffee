@@ -208,6 +208,7 @@
         'dongle/dongle'
         'dongle/utils'
         'dongle/manager'
+        'dongle/firmware_information'
 
         ## Mobile 2FA
         'm2fa/m2fa'
