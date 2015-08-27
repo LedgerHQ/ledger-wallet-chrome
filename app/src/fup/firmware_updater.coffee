@@ -6,6 +6,9 @@ FirmwareAvailabilityResult =
   Update: 1
   Higher: 2
 
+FirmwareUpdateMode =
+  Setup: 0
+  Operation: 1
 
 ###
   FirmwareUpdater is a manager responsible of firmware update related features. It is able to check if firmware updates are
@@ -14,6 +17,7 @@ FirmwareAvailabilityResult =
 class ledger.fup.FirmwareUpdater
 
   @FirmwareAvailabilityResult: FirmwareAvailabilityResult
+  @FirmwareUpdateMode: FirmwareUpdateMode
 
   @instance: new @
 
@@ -46,10 +50,13 @@ class ledger.fup.FirmwareUpdater
     @see ledger.fup.FirmwareUpdateRequest
     @throw If a request is already running
   ###
-  requestFirmwareUpdate: ->
+  requestFirmwareUpdate: (firmwareUpdateMode = FirmwareUpdateMode.Setup) ->
     throw "An update request is already running" if @_request?
     @_request = new ledger.fup.FirmwareUpdateRequest(@)
     @_request
+
+  requestSetupFirmwareUpdate: -> @requestFirmwareUpdate(FirmwareUpdateMode.Setup)
+  requestOperationFirmwareUpdate: -> @requestFirmwareUpdate(FirmwareUpdateMode.Operation)
 
   _cancelRequest: (request) ->
     @_request = null if request is @_request

@@ -53,9 +53,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   @ExchangeTimeout: ExchangeTimeout
 
-  constructor: (firmwareUpdater) ->
+  constructor: (firmwareUpdater, osLoader) ->
     @_id = _.uniqueId("fup")
     @_fup = firmwareUpdater
+    @_osLoader = osLoader
     @_keyCardSeed = null
     @_currentState = States.Undefined
     @_isNeedingUserApproval = no
@@ -117,6 +118,12 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     throw new Error(Errors.InvalidSeedFormat) if seed.isFailure() or seed.getValue()?.length != 16
     @_keyCardSeed = seed.getValue()
     @emit "setKeyCardSeed"
+    @startUpdate()
+
+  ###
+
+  ###
+  startUpdate: ->
     @_handleCurrentState()
 
   ###
