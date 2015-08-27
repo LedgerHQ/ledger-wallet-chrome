@@ -96,8 +96,6 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     @_clearChanges()
     @client.delete_settings()
 
-  close: ->
-
   # @return A promise
   _pull: ->
     # Get distant store md5
