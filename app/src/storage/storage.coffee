@@ -10,7 +10,6 @@
   ledger.storage.logs.clear() # TODO: Remove this later (Crappy 'fix' for slow logger)
 
 @ledger.storage.closeStores = () ->
-  ledger.storage.sync = null
-  ledger.storage.wallet = null
-  ledger.storage.databases = null
-  ledger.storage.logs = null
+  for key, storage of ledger.storage when _(storage).isKindOf(ledger.storage.Store)
+    storage.close()
+    ledger.storage[key] = null

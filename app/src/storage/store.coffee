@@ -61,6 +61,9 @@ class @ledger.storage.Store extends EventEmitter
     @keys (keys) =>
       @remove(keys, cb)
 
+  # Close the store
+  close: -> @
+
   # Raw get, without processing.
   # @see ledger.storage.Store#get
   _raw_get: (raw_keys, cb) -> throw "Abstract method"
