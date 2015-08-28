@@ -35,9 +35,15 @@ ledger.fup.setupUpdates = ->
       <% end %>
     ]
 
-    OS_LOADER: [
+    SETUP_OS_LOADER: [
 
-      <% for e in @os_loader:%><%= e %>
+      <% for e in @setup_os_loader:%><%= e %>
+      <% end %>
+    ]
+
+    OPERATION_OS_LOADER: [
+
+      <% for e in @operation_os_loader:%><%= e %>
       <% end %>
     ]
 
@@ -59,7 +65,9 @@ ledger.fup.clearUpdates = ->
   <% end %>
   <% for e in @bl_loader: %>window.<%= e %> = undefined
   <% end %>
-  <% for e in @os_loader: %>window.<%= e %> = undefined
+  <% for e in @setup_os_loader: %>window.<%= e %> = undefined
+  <% end %>
+  <% for e in @operation_os_loader: %>window.<%= e %> = undefined
   <% end %>
   <% for e in @bl_reloader: %>window.<%= e[1] %> = undefined
   <% end %>

@@ -108,7 +108,7 @@ class @ledger.dongle.Dongle extends EventEmitter
             @_setState States.LOCKED
             States.LOCKED
           .catch (e) =>
-            if @state isnt States.LOCKED isnt @state is States.BLANK
+            if @state isnt States.LOCKED and @state isnt States.BLANK
               throw e
             @state
       .catch (error) =>

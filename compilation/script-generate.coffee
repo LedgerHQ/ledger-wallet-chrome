@@ -45,8 +45,11 @@ createFupManifest = () ->
     bl_loader = (varify('BL_LOADER', e) for e in names['loader-from-loader'])
     bl_loader = _.sortBy bl_loader, (varName) -> normalizeVersion(getVersionFromVarName(varName))
 
-    os_loader = (varify('LOADER', e) for e in names['loader'])
-    os_loader = _.sortBy os_loader, (varName) -> normalizeVersion(getVersionFromVarName(varName))
+    setup_os_loader = (varify('LOADER_SETUP', e) for e in names['loader-setup'])
+    setup_os_loader = _.sortBy setup_os_loader, (varName) -> normalizeVersion(getVersionFromVarName(varName))
+
+    operation_os_loader = (varify('LOADER_OPERATION', e) for e in names['loader-operation'])
+    operation_os_loader = _.sortBy operation_os_loader, (varName) -> normalizeVersion(getVersionFromVarName(varName))
 
     bl_reloader = []
     for e in names['reloader']
@@ -66,7 +69,15 @@ createFupManifest = () ->
     manifest['current_version']['os'] = expressionFromDotNotation(manifest['current_version']['os'])
     manifest['current_version']['reloader'] = expressionFromDotNotation(manifest['current_version']['reloader'])
 
-    file = Eco.render template, imports: imports, reloader_from_bl: reloader_from_bl, bl_loader: bl_loader, os_loader: os_loader, bl_reloader: bl_reloader, os_init: os_init, manifest: manifest
+    file = Eco.render template,
+      imports: imports
+      reloader_from_bl: reloader_from_bl
+      bl_loader: bl_loader
+      setup_os_loader: setup_os_loader
+      operation_os_loader: operation_os_loader
+      bl_reloader: bl_reloader
+      os_init: os_init
+      manifest: manifest
     fs.writeFile 'app/src/fup/firmwares_manifest.coffee', file, -> deferred.resolve()
     return
   deferred.promise

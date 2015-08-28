@@ -38,6 +38,7 @@ ledger.fup.setupUpdates = ->
       BL_RELOADER_01414
       BL_RELOADER_1100
       BL_RELOADER_1101
+      BL_RELOADER_1110
       
     ]
 
@@ -56,24 +57,45 @@ ledger.fup.setupUpdates = ->
       BL_LOADER_01414
       BL_LOADER_1100
       BL_LOADER_1101
+      BL_LOADER_1110
       
     ]
 
-    OS_LOADER: [
+    SETUP_OS_LOADER: [
 
-      LOADER_0143
-      LOADER_0144
-      LOADER_0146
-      LOADER_0147
-      LOADER_0148
-      LOADER_0149
-      LOADER_01410
-      LOADER_01411
-      LOADER_01412
-      LOADER_01413
-      LOADER_01414
-      LOADER_1100
-      LOADER_1101
+      LOADER_SETUP_0143
+      LOADER_SETUP_0144
+      LOADER_SETUP_0146
+      LOADER_SETUP_0147
+      LOADER_SETUP_0148
+      LOADER_SETUP_0149
+      LOADER_SETUP_01410
+      LOADER_SETUP_01411
+      LOADER_SETUP_01412
+      LOADER_SETUP_01413
+      LOADER_SETUP_01414
+      LOADER_SETUP_1100
+      LOADER_SETUP_1101
+      LOADER_SETUP_1110
+      
+    ]
+
+    OPERATION_OS_LOADER: [
+
+      LOADER_OPERATION_0143
+      LOADER_OPERATION_0144
+      LOADER_OPERATION_0146
+      LOADER_OPERATION_0147
+      LOADER_OPERATION_0148
+      LOADER_OPERATION_0149
+      LOADER_OPERATION_01410
+      LOADER_OPERATION_01411
+      LOADER_OPERATION_01412
+      LOADER_OPERATION_01413
+      LOADER_OPERATION_01414
+      LOADER_OPERATION_1100
+      LOADER_OPERATION_1101
+      LOADER_OPERATION_1110
       
     ]
 
@@ -93,6 +115,7 @@ ledger.fup.setupUpdates = ->
       [[0x00, (1 << 16) + (4 << 8) + (14)], RELOADER_01414]
       [[0x20, (1 << 16) + (0 << 8) + (0)], RELOADER_1100]
       [[0x20, (1 << 16) + (0 << 8) + (1)], RELOADER_1101]
+      [[0x20, (1 << 16) + (1 << 8) + (0)], RELOADER_1110]
       
     ]
 
@@ -105,6 +128,7 @@ ledger.fup.setupUpdates = ->
         [[0x00, (1 << 16) + (4 << 8) + (14)], INIT_01414]
         [[0x20, (1 << 16) + (0 << 8) + (0)], INIT_LW_1100]
         [[0x20, (1 << 16) + (0 << 8) + (1)], INIT_LW_1101]
+        [[0x20, (1 << 16) + (1 << 8) + (0)], INIT_LW_1110]
         
     ]
 
@@ -123,6 +147,7 @@ ledger.fup.clearUpdates = ->
   window.BL_RELOADER_01414 = undefined
   window.BL_RELOADER_1100 = undefined
   window.BL_RELOADER_1101 = undefined
+  window.BL_RELOADER_1110 = undefined
   
   window.BL_LOADER_0143 = undefined
   window.BL_LOADER_0144 = undefined
@@ -137,20 +162,37 @@ ledger.fup.clearUpdates = ->
   window.BL_LOADER_01414 = undefined
   window.BL_LOADER_1100 = undefined
   window.BL_LOADER_1101 = undefined
+  window.BL_LOADER_1110 = undefined
   
-  window.LOADER_0143 = undefined
-  window.LOADER_0144 = undefined
-  window.LOADER_0146 = undefined
-  window.LOADER_0147 = undefined
-  window.LOADER_0148 = undefined
-  window.LOADER_0149 = undefined
-  window.LOADER_01410 = undefined
-  window.LOADER_01411 = undefined
-  window.LOADER_01412 = undefined
-  window.LOADER_01413 = undefined
-  window.LOADER_01414 = undefined
-  window.LOADER_1100 = undefined
-  window.LOADER_1101 = undefined
+  window.LOADER_SETUP_0143 = undefined
+  window.LOADER_SETUP_0144 = undefined
+  window.LOADER_SETUP_0146 = undefined
+  window.LOADER_SETUP_0147 = undefined
+  window.LOADER_SETUP_0148 = undefined
+  window.LOADER_SETUP_0149 = undefined
+  window.LOADER_SETUP_01410 = undefined
+  window.LOADER_SETUP_01411 = undefined
+  window.LOADER_SETUP_01412 = undefined
+  window.LOADER_SETUP_01413 = undefined
+  window.LOADER_SETUP_01414 = undefined
+  window.LOADER_SETUP_1100 = undefined
+  window.LOADER_SETUP_1101 = undefined
+  window.LOADER_SETUP_1110 = undefined
+  
+  window.LOADER_OPERATION_0143 = undefined
+  window.LOADER_OPERATION_0144 = undefined
+  window.LOADER_OPERATION_0146 = undefined
+  window.LOADER_OPERATION_0147 = undefined
+  window.LOADER_OPERATION_0148 = undefined
+  window.LOADER_OPERATION_0149 = undefined
+  window.LOADER_OPERATION_01410 = undefined
+  window.LOADER_OPERATION_01411 = undefined
+  window.LOADER_OPERATION_01412 = undefined
+  window.LOADER_OPERATION_01413 = undefined
+  window.LOADER_OPERATION_01414 = undefined
+  window.LOADER_OPERATION_1100 = undefined
+  window.LOADER_OPERATION_1101 = undefined
+  window.LOADER_OPERATION_1110 = undefined
   
   window.RELOADER_0143 = undefined
   window.RELOADER_0144 = undefined
@@ -166,6 +208,7 @@ ledger.fup.clearUpdates = ->
   window.RELOADER_01414 = undefined
   window.RELOADER_1100 = undefined
   window.RELOADER_1101 = undefined
+  window.RELOADER_1110 = undefined
   
   window.INIT_01410 = undefined
   window.INIT_01411 = undefined
@@ -174,6 +217,7 @@ ledger.fup.clearUpdates = ->
   window.INIT_01414 = undefined
   window.INIT_LW_1100 = undefined
   window.INIT_LW_1101 = undefined
+  window.INIT_LW_1110 = undefined
   
 
 ledger.fup.imports = [
@@ -185,19 +229,7 @@ ledger.fup.imports = [
    '../firmwares/btchipfirmware-init-01414'
    '../firmwares/btchipfirmware-init-1100'
    '../firmwares/btchipfirmware-init-1101'
-   '../firmwares/btchipfirmware-loader-01410'
-   '../firmwares/btchipfirmware-loader-01411'
-   '../firmwares/btchipfirmware-loader-01412'
-   '../firmwares/btchipfirmware-loader-01413'
-   '../firmwares/btchipfirmware-loader-01414'
-   '../firmwares/btchipfirmware-loader-0143'
-   '../firmwares/btchipfirmware-loader-0144'
-   '../firmwares/btchipfirmware-loader-0146'
-   '../firmwares/btchipfirmware-loader-0147'
-   '../firmwares/btchipfirmware-loader-0148'
-   '../firmwares/btchipfirmware-loader-0149'
-   '../firmwares/btchipfirmware-loader-1100'
-   '../firmwares/btchipfirmware-loader-1101'
+   '../firmwares/btchipfirmware-init-1110'
    '../firmwares/btchipfirmware-loader-from-loader-01410'
    '../firmwares/btchipfirmware-loader-from-loader-01411'
    '../firmwares/btchipfirmware-loader-from-loader-01412'
@@ -211,6 +243,35 @@ ledger.fup.imports = [
    '../firmwares/btchipfirmware-loader-from-loader-0149'
    '../firmwares/btchipfirmware-loader-from-loader-1100'
    '../firmwares/btchipfirmware-loader-from-loader-1101'
+   '../firmwares/btchipfirmware-loader-from-loader-1110'
+   '../firmwares/btchipfirmware-loader-operation-01410'
+   '../firmwares/btchipfirmware-loader-operation-01411'
+   '../firmwares/btchipfirmware-loader-operation-01412'
+   '../firmwares/btchipfirmware-loader-operation-01413'
+   '../firmwares/btchipfirmware-loader-operation-01414'
+   '../firmwares/btchipfirmware-loader-operation-0143'
+   '../firmwares/btchipfirmware-loader-operation-0144'
+   '../firmwares/btchipfirmware-loader-operation-0146'
+   '../firmwares/btchipfirmware-loader-operation-0147'
+   '../firmwares/btchipfirmware-loader-operation-0148'
+   '../firmwares/btchipfirmware-loader-operation-0149'
+   '../firmwares/btchipfirmware-loader-operation-1100'
+   '../firmwares/btchipfirmware-loader-operation-1101'
+   '../firmwares/btchipfirmware-loader-operation-1110'
+   '../firmwares/btchipfirmware-loader-setup-01410'
+   '../firmwares/btchipfirmware-loader-setup-01411'
+   '../firmwares/btchipfirmware-loader-setup-01412'
+   '../firmwares/btchipfirmware-loader-setup-01413'
+   '../firmwares/btchipfirmware-loader-setup-01414'
+   '../firmwares/btchipfirmware-loader-setup-0143'
+   '../firmwares/btchipfirmware-loader-setup-0144'
+   '../firmwares/btchipfirmware-loader-setup-0146'
+   '../firmwares/btchipfirmware-loader-setup-0147'
+   '../firmwares/btchipfirmware-loader-setup-0148'
+   '../firmwares/btchipfirmware-loader-setup-0149'
+   '../firmwares/btchipfirmware-loader-setup-1100'
+   '../firmwares/btchipfirmware-loader-setup-1101'
+   '../firmwares/btchipfirmware-loader-setup-1110'
    '../firmwares/btchipfirmware-reloader-01410'
    '../firmwares/btchipfirmware-reloader-01411'
    '../firmwares/btchipfirmware-reloader-01412'
@@ -225,6 +286,7 @@ ledger.fup.imports = [
    '../firmwares/btchipfirmware-reloader-0149'
    '../firmwares/btchipfirmware-reloader-1100'
    '../firmwares/btchipfirmware-reloader-1101'
+   '../firmwares/btchipfirmware-reloader-1110'
    '../firmwares/btchipfirmware-reloader-from-loader-01410'
    '../firmwares/btchipfirmware-reloader-from-loader-01411'
    '../firmwares/btchipfirmware-reloader-from-loader-01412'
@@ -238,5 +300,6 @@ ledger.fup.imports = [
    '../firmwares/btchipfirmware-reloader-from-loader-0149'
    '../firmwares/btchipfirmware-reloader-from-loader-1100'
    '../firmwares/btchipfirmware-reloader-from-loader-1101'
+   '../firmwares/btchipfirmware-reloader-from-loader-1110'
    
 ]
