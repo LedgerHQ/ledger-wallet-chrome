@@ -115,7 +115,7 @@ class ledger.wallet.Transaction
     details.validationCharacters = (@recipientAddress[idx] for idx in details.recipientsAddress.indexes)
 
     # ~> 1.4.13 need validation on amount
-    if @dongle.getIntFirmwareVersion() < ledger.dongle.Firmware.V1_4_13
+    if @dongle.getIntFirmwareVersion() < ledger.dongle.Firmware.V_B_1_4_13
       stringifiedAmount = @amount.toString()
       stringifiedAmount = _.str.lpad(stringifiedAmount, 9, '0')
       # Split amount in integer and decimal parts

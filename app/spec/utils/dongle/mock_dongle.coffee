@@ -63,7 +63,7 @@ class ledger.dongle.MockDongle extends EventEmitter
 
   # @return [Integer] Firmware version, 0x20010000010f for example.
   getIntFirmwareVersion: ->
-    parseInt(0x0001040d0146.toString(HEX), 16)
+    parseInt(0x0001040d.toString(HEX), 16)
 
 
   ###

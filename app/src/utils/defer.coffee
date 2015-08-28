@@ -35,3 +35,8 @@
   defer.promise.onFulfilled callback if isCallback
 
   return defer
+
+@ledger.delay = (ms) ->
+  deferred = ledger.defer();
+  setTimeout(deferred.resolve, ms);
+  deferred.promise;

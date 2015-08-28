@@ -205,10 +205,10 @@
         'common/action_bar_navigation_controller'
 
         ## Dongle
+        'dongle/firmware_information'
         'dongle/dongle'
         'dongle/utils'
         'dongle/manager'
-        'dongle/firmware_information'
 
         ## Mobile 2FA
         'm2fa/m2fa'

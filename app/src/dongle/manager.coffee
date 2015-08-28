@@ -73,8 +73,17 @@ class @ledger.dongle.Manager extends EventEmitter
         _.extend card, deviceId: device.deviceId, productId: device.productId, vendorId: device.vendorId
         dongle = new ledger.dongle.Dongle(card)
         @_dongles[device.deviceId] = dongle
-        dongle.once 'state:locked', (event) => @emit 'connected', dongle
-        dongle.once 'state:blank', (event) => @emit 'connected', dongle
+        dongle.connect().then (state) =>
+          l "Connection done", state
+          States = ledger.dongle.States
+          switch state
+            when States.LOCKED then @emit 'connected', dongle
+            when States.BLANK then @emit 'connected', dongle
+          l "Connection done", state
+        .fail (error) =>
+          e "Connection failed", error
+          @emit 'connection:failure', error
+        .done()
         dongle.once 'forged', (event) => @emit 'forged', dongle
         dongle.once 'state:disconnected', (event) =>
           delete @_dongles[device.deviceId]

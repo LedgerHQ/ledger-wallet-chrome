@@ -13,13 +13,7 @@ States =
   # An error appended, user must unplug/replug dongle.
   ERROR: 'error'
 
-Firmware =
-  V1_4_11: 0x0001040b0146
-  V1_4_12: 0x0001040c0146
-  V1_4_13: 0x0001040d0146
-  V_LW_1_0_0: 0x20010000010f
-  V_LW_1_0_1: 0x200100010110
-  V_LW_1_1_0: 0x20010100011102
+Firmwares = ledger.dongle.FirmwareInformation.Firmwares
 
 # Ledger OS pubKey, used for pairing.
 Attestation =
@@ -46,7 +40,6 @@ $log = -> ledger.utils.Logger.getLoggerByTag("Dongle")
 @ledger.dongle ?= {}
 _.extend @ledger.dongle,
   States: States
-  Firmware: Firmware
   Attestation: Attestation
   BetaAttestation: BetaAttestation
   BitIdRootPath: BitIdRootPath
@@ -95,21 +88,6 @@ class @ledger.dongle.Dongle extends EventEmitter
     @productId = card.productId
     _btchipQueue = new ledger.utils.PromiseQueue("Dongle##{@id}")
     @_btchip = new BTChip(card)
-    unless @isInBootloaderMode()
-      @_recoverFirmwareVersion().then( =>
-        #@_recoverOperationMode() It seems useless by now
-        # Set dongle state on failure.
-        @getPublicAddress("0'/0/0").then( =>
-          # @todo Se connecter directement à la carte sans redemander le PIN
-          console.warn("Dongle is already unlock ! Case not handle => Pin Code Required.")
-          @_setState(States.LOCKED)
-        ).catch( (e) -> console.error(e)
-        ).done()
-      ).catch( (error) =>
-        console.error("Fail to initialize Dongle :", error)
-      ).done()
-    else
-      _.defer => @_setState(States.BLANK)
 
   # Recovers dongle firmware version and initialize current state
   connect: (callback = undefined) ->
@@ -117,6 +95,27 @@ class @ledger.dongle.Dongle extends EventEmitter
       # Create firmware info object
       # Determine state (setup|locked|unlocked|blank)
         # Resolve
+    @state = States.UNDEFINED
+    unless @isInBootloaderMode()
+      @_recoverFirmwareVersion().then =>
+        if @getFirmwareInformation().hasSetupFirmwareSupport()
+          @_setState States.BLANK
+          States.BLANK
+        else
+          @getPublicAddress("0").then =>
+            # @todo Se connecter directement à la carte sans redemander le PIN
+            console.warn("Dongle is already unlock ! Case not handle => Pin Code Required.")
+            @_setState States.LOCKED
+            States.LOCKED
+          .catch (e) =>
+            if @state isnt States.LOCKED isnt @state is States.BLANK
+              throw e
+            @state
+      .catch (error) =>
+        console.error("Fail to initialize Dongle :", error)
+        throw error
+    else
+      ledger.delay(0).then(=> @_setState States.BLANK).then(-> States.BLANK)
 
   getFirmwareInformation: -> @_firmwareInformation
 
@@ -124,11 +123,10 @@ class @ledger.dongle.Dongle extends EventEmitter
   disconnect: -> @_setState(States.DISCONNECTED)
 
   # @return [String] Firmware version, 1.0.0 for example.
-  getStringFirmwareVersion: -> Try(=> @firmwareVersion.byteAt(1) + "." + @firmwareVersion.byteAt(2) + "." + @firmwareVersion.byteAt(3)).getOrElse('unknown')
+  getStringFirmwareVersion: -> Try(=> @getFirmwareInformation().getStringFirmwareVersion()).getOrElse('unknown')
   
   # @return [Integer] Firmware version, 0x20010000010f for example.
-  getIntFirmwareVersion: ->
-    parseInt(@firmwareVersion.toString(HEX), 16)
+  getIntFirmwareVersion: -> @getFirmwareInformation().getIntFirmwareVersion()
 
   ###
     Gets the raw version {ByteString} of the dongle.
@@ -204,7 +202,7 @@ class @ledger.dongle.Dongle extends EventEmitter
   _checkCertification: (Attestation, callback) ->
     _btchipQueue.enqueue "checkCertification", =>
       d = ledger.defer(callback)
-      return d.resolve(true).promise if @getIntFirmwareVersion() < Firmware.V_LW_1_0_0
+      return d.resolve(true).promise if @getIntFirmwareVersion() < ledger.dongle.Firmwares.V_L_1_0_0
       randomValues = new Uint32Array(2)
       crypto.getRandomValues(randomValues)
       random = _.str.lpad(randomValues[0].toString(16), 8, '0') + _.str.lpad(randomValues[1].toString(16), 8, '0')
@@ -269,9 +267,9 @@ class @ledger.dongle.Dongle extends EventEmitter
         # 19.7. SET OPERATION MODE
         @_sendApdu(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
         .then =>
-          if @getIntFirmwareVersion() >= Firmware.V1_4_13
+          if @getIntFirmwareVersion() >= Firmwares.V_B_1_4_13
             # 19.7. SET OPERATION MODE
-            mode = if @getIntFirmwareVersion() >= Firmware.V_LW_1_0_0 then 0x02 else 0x01
+            mode = if @getIntFirmwareVersion() >= Firmwares.V_L_1_0_0 then 0x02 else 0x01
             @_sendApdu(0xE0, 0x26, mode, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).fail(=> e('Unlock FAIL', arguments)).done()
           @_setState(States.UNLOCKED)
           d.resolve()
@@ -512,24 +510,32 @@ class @ledger.dongle.Dongle extends EventEmitter
   splitTransaction: (input) ->
     @_btchip.splitTransaction(new ByteString(input.raw, HEX))
 
-  _sendApdu: (cla, ins, p1, p2, opt1, opt2, opt3, wrapScript) -> @_btchip.card.sendApdu_async(cla, ins, p1, p2, opt1, opt2, opt3, wrapScript)
+  _sendApdu: (args...) ->
+    apdu = new ByteString('', HEX)
+    swCheck = undefined
+    for arg, index in args
+      if arg instanceof ByteString
+        apdu = apdu.concat(arg)
+      else if index is args.length - 1 and _.isArray(arg)
+        swCheck = arg
+      else
+        apdu = apdu.concat(new ByteString((if _.isNumber(arg) then Convert.toHexByte(arg) else arg.replace(/\s/g, '')), HEX))
+    @_btchip.card.sendApdu_async(apdu, swCheck)
 
   # @return [Q.Promise] Must be done
   _recoverFirmwareVersion: ->
     _btchipQueue.enqueue "recoverFirmwareVersion", =>
-      @_btchip.getFirmwareVersion_async().then( (result) =>
-        firmwareVersion = result['firmwareVersion']
-        if (firmwareVersion.byteAt(1) == 0x01) && (firmwareVersion.byteAt(2) == 0x04) && (firmwareVersion.byteAt(3) < 7)
-          l "Using old BIP32 derivation"
+      @_sendApdu('E0 C4 00 00 00 08').then (version) =>
+        firmware = new ledger.dongle.FirmwareInformation(this, version)
+        if firmware.isUsingDeprecatedBip32Derivation()
           @_btchip.setDeprecatedBIP32Derivation()
-        if (firmwareVersion.byteAt(1) == 0x01) && (firmwareVersion.byteAt(2) == 0x04) && (firmwareVersion.byteAt(3) < 8)
-          l "Using old setup keymap encoding"
+        if firmware.isUsingDeprecatedSetupKeymap()
           @_btchip.setDeprecatedSetupKeymap()
-        @_btchip.setCompressedPublicKeys(result['compressedPublicKeys'])
-        @firmwareVersion = firmwareVersion
-      ).fail( (error) =>
+        @_btchip.setCompressedPublicKeys(firmware.hasCompressedPublicKeysSupport())
+        @_firmwareInformation = firmware
+      .fail (error) =>
         e("Firmware version not supported :", error)
-      )
+        throw error
 
   # @return [Q.Promise] Must be done
   _recoverOperationMode: ->
