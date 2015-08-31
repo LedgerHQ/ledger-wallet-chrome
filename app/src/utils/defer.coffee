@@ -38,5 +38,5 @@
 
 @ledger.delay = (ms) ->
   deferred = ledger.defer();
-  setTimeout(deferred.resolve, ms);
+  setTimeout(deferred.resolve.bind(deferred), ms);
   deferred.promise;

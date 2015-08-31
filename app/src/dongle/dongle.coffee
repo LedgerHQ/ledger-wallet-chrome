@@ -90,11 +90,12 @@ class @ledger.dongle.Dongle extends EventEmitter
     @_btchip = new BTChip(card)
 
   # Recovers dongle firmware version and initialize current state
-  connect: (callback = undefined) ->
+  connect: (forceBootloader = no, callback = undefined) ->
     # Recover firmware version
       # Create firmware info object
       # Determine state (setup|locked|unlocked|blank)
         # Resolve
+    @_forceBl = forceBootloader
     @state = States.UNDEFINED
     unless @isInBootloaderMode()
       @_recoverFirmwareVersion().then =>
@@ -164,7 +165,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       d.promise
 
   # @return [Boolean]
-  isInBootloaderMode: -> if @productId is 0x1808 or @productId is 0x1807 then yes else no
+  isInBootloaderMode: -> if @productId is 0x1808 or @productId is 0x1807 or @_forceBl then yes else no
 
   # @return [ledger.fup.FirmwareUpdater]
   getFirmwareUpdater: () -> ledger.fup.FirmwareUpdater.instance
