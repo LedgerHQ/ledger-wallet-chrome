@@ -18,25 +18,26 @@ limitations under the License.
 
 var ChromeapiPlugupCardTerminal = Class.extend(CardTerminal, {
 	/** @lends ChromeapiPlugupCardTerminal.prototype */
-	
+
 	/**
 	 *  @class In browser implementation of the {@link CardTerminal} interface using the Chrome API
 	 *  @param {String} terminalName Name of the terminal
 	 *  @constructs
 	 *  @augments CardTerminal
-	 */	
-	initialize: function(device, terminalName) {
+	 */
+	initialize: function(device, terminalName, ledgerTransport) {
 		this.device = device;
 		this.terminalName = terminalName;
+		this.ledgerTransport = ledgerTransport;
 	},
-	
+
 	isCardPresent:function() {
 		return true;
 	},
-	
+
 	getCard_async:function() {
 		if (typeof this.cardInstance == "undefined") {
-			this.cardInstance = new ChromeapiPlugupCard(this, this.device);
+			this.cardInstance = new ChromeapiPlugupCard(this, this.device, this.ledgerTransport);
 			return this.cardInstance.connect_async();
 		}
 		var currentObject = this;
@@ -44,12 +45,12 @@ var ChromeapiPlugupCardTerminal = Class.extend(CardTerminal, {
 			return currentObject.cardInstance;
 		});
 	},
-		
+
 	getTerminalName:function() {
 		return this.terminalName;
 	},
-	
-	getName:function() {		
+
+	getName:function() {
 		if ((typeof this.terminalName == "undefined") || (this.terminalName.length == 0)) {
 			return "Default";
 		}
@@ -57,5 +58,5 @@ var ChromeapiPlugupCardTerminal = Class.extend(CardTerminal, {
 			return this.terminalName;
 		}
 	}
-			
+
 });

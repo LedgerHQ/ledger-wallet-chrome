@@ -13,7 +13,7 @@ States =
   # An error appended, user must unplug/replug dongle.
   ERROR: 'error'
 
-Firmwares = ledger.dongle.FirmwareInformation.Firmwares
+Firmwares = ledger.dongle.Firmwares
 
 # Ledger OS pubKey, used for pairing.
 Attestation =
@@ -266,12 +266,12 @@ class @ledger.dongle.Dongle extends EventEmitter
       @_btchip.verifyPin_async(new ByteString(@_pin, ASCII))
       .then =>
         # 19.7. SET OPERATION MODE
-        @_sendApdu(0xE0, 0x26, 0x01, 0x01, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000])
+        @_sendApdu(0xE0, 0x26, 0x01, 0x01, 0x01, 0x01, [0x9000])
         .then =>
           if @getIntFirmwareVersion() >= Firmwares.V_B_1_4_13
             # 19.7. SET OPERATION MODE
             mode = if @getIntFirmwareVersion() >= Firmwares.V_L_1_0_0 then 0x02 else 0x01
-            @_sendApdu(0xE0, 0x26, mode, 0x00, new ByteString(Convert.toHexByte(0x01), HEX), [0x9000]).fail(=> e('Unlock FAIL', arguments)).done()
+            @_sendApdu(0xE0, 0x26, mode, 0x00, 0x01, 0x01, [0x9000]).fail(=> e('Unlock FAIL', arguments)).done()
           @_setState(States.UNLOCKED)
           d.resolve()
         .fail (err) =>

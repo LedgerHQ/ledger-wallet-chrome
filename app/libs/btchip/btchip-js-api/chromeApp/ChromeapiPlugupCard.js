@@ -27,18 +27,18 @@ var ChromeapiPlugupCard = Class.extend(Card, {
 	 *  @constructs
 	 *  @augments Card
 	 */
-	initialize:function(terminal, device, timeout) {		
+	initialize: function(terminal, device, ledgerTransport, timeout) {
 		if (typeof timeout == "undefined") {
 			timeout = 0;
 		}
 		this.winusb = (device['transport'] == 'winusb');
-		this.ledger = device['ledger'];
 		this.device = new chromeDevice(device);
 		this.terminal = terminal;
 		this.timeout = timeout;
+		this.ledger = ledgerTransport;
 		this.exchangeStack = [];
 	},
-	
+
 	connect_async:function() {
 		var currentObject = this;
 		return this.device.open_async().then(function(result) {

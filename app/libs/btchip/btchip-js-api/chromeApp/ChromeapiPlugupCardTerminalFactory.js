@@ -16,7 +16,6 @@ limitations under the License.
 *************************************************************************
 */
 
-
 var ChromeapiPlugupCardTerminalFactory = Class.extend(CardTerminalFactory, {
 	/** @lends ChromeapiPlugupCardTerminalFactory.prototype */
 
@@ -25,18 +24,20 @@ var ChromeapiPlugupCardTerminalFactory = Class.extend(CardTerminalFactory, {
 	 *  @constructs
 	 *  @augments CardTerminalFactory
 	 */
-	initialize: function(pid) {
+	initialize: function(pid, usagePage, ledgerTransport) {
 		this.pid = pid;
+		this.usagePage = usagePage;
+		this.ledgerTransport = ledgerTransport;
 	},
 
-	list_async: function() {
+	list_async: function(pid, usagePage) {
 		if (typeof chromeDevice == "undefined") {
 			throw "Content script is not available";
 		}
-		return chromeDevice.enumerateDongles_async(this.pid)
-		       .then(function(result) {
-		       		return result.deviceList;
-		       });
+		return chromeDevice.enumerateDongles_async(this.pid, this.usagePage)
+			.then(function(result) {
+				return result.deviceList;
+			});
 	},
 
 	waitInserted: function() {
@@ -44,6 +45,6 @@ var ChromeapiPlugupCardTerminalFactory = Class.extend(CardTerminalFactory, {
 	},
 
 	getCardTerminal: function(device) {
-		return new ChromeapiPlugupCardTerminal(device);
+		return new ChromeapiPlugupCardTerminal(device, undefined, this.ledgerTransport);
 	}
 });
