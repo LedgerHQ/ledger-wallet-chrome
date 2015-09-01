@@ -28,6 +28,7 @@ Errors =
   ErrorDongleMayHaveASeed: ledger.errors.ErrorDongleMayHaveASeed
   ErrorDueToCardPersonalization: ledger.errors.ErrorDueToCardPersonalization
   HigherVersion: ledger.errors.HigherVersion
+  WrongPinCode: ledger.errors.WrongPinCode
 
 ExchangeTimeout = 200
 
@@ -296,18 +297,25 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .done()
 
   _processUnlocking: ->
-    @_waitForUserApproval('unlock')
+    @_waitForUserApproval('pincode')
     .then =>
-      unless @_stateCache.pincode?
-        getRandomChar = -> "0123456789".charAt(_.random(10))
-        @_stateCache.pincode = getRandomChar() + getRandomChar()
-      pincode = @_stateCache.pincode
-      @_dongle.unlockWithPinCode pincode, (isUnlocked, error) =>
-        @emit "erasureStep", if error?.retryCount? then error.retryCount else 3
-        @_waitForPowerCycle()
-      return
+      if @_forceDongleErasure
+        @_setCurrentState(States.Erasing)
+      else
+        if @_pinCode.length is 0
+          @_setCurrentState(States.ReloadingBootloaderFromOs)
+          @_handleCurrentState()
+          return
+        pin = new ByteString(@_pinCode, ASCII)
+        @_getCard().exchange_async(new ByteString("E0220000" + Convert.toHexByte(pin.length), HEX).concat(pin)).then (result) =>
+          if @_getCard().SW os 0x900
+            @_setCurrentState(States.ReloadingBootloaderFromOs)
+            @_handleCurrentState()
+            return
+          else
+            throw Errors.WrongPinCode
     .fail =>
-      @_failure(Errors.CommunicationError)
+      @_failure(Errors.WrongPinCode)
     .done()
 
   _processInitOs: ->
