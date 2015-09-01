@@ -23,6 +23,20 @@ ledger.fup.setupUpdates = ->
 
   _.extend ledger.fup.updates,
 
+    BL_CUSTOMER_ID: [
+      new ByteString("0143", HEX)
+      new ByteString("0144", HEX)
+      new ByteString("0146", HEX)
+      new ByteString("0147", HEX)
+      new ByteString("0148", HEX)
+      new ByteString("0149", HEX)
+      new ByteString("014A", HEX)
+      new ByteString("014B", HEX)
+      new ByteString("014C", HEX)
+      new ByteString("014D", HEX)
+      new ByteString("014E", HEX)
+    ]
+
     RELOADER_FROM_BL: [
 
       <% for e in @reloader_from_bl:%><%= e %>

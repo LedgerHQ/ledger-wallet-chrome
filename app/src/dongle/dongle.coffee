@@ -137,7 +137,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     @param [Function] callback Called once the version is retrieved. The callback must be prototyped like size `(version, error) ->`
     @return [Q.Promise]
   ###
-  getRawFirmwareVersion: (isInBootLoaderMode, forceBl=no, callback=undefined) ->
+  getRawFirmwareVersion: (isInBootLoaderMode, forceBl=no, checkHiddenReloader = no, callback=undefined) ->
     _btchipQueue.enqueue "getRawFirmwareVersion", =>
       d = ledger.defer(callback)
       apdu = new ByteString((if !isInBootLoaderMode and !forceBl then "E0C4000000" else "F001000000"), HEX)
@@ -151,7 +151,20 @@ class @ledger.dongle.Dongle extends EventEmitter
             d.resolve @getRawFirmwareVersion(isInBootLoaderMode, yes)
         else
           if sw is 0x9000
-            d.resolve([0, (result.byteAt(5) << 16) + (result.byteAt(6) << 8) + result.byteAt(7)])
+            # Bootloader ok, let's see if hidden reloader
+            result2 = result
+            apdu = new ByteString("E001000000", HEX)
+            if checkHiddenReloader
+              @_sendApdu(apdu).then (result) =>
+                if @_btchip.card.SW isnt 0x9000
+                  result = result2
+                d.resolve([0, (result.byteAt(5) << 16) + (result.byteAt(6) << 8) + result.byteAt(7)])
+              .fail ->
+                result = result2
+                d.resolve([0, (result.byteAt(5) << 16) + (result.byteAt(6) << 8) + result.byteAt(7)])
+            else
+              result = result2
+              d.resolve([0, (result.byteAt(5) << 16) + (result.byteAt(6) << 8) + result.byteAt(7)])
           else if !isInBootLoaderMode and (sw is 0x6d00 or sw is 0x6e00)
             #  Unexpected - let's say it's 1.4.3
             d.resolve([0, (1 << 16) + (4 << 8) + (3)])

@@ -53,3 +53,5 @@ class ledger.dongle.FirmwareInformation
   hasCompressedPublicKeysSupport: -> @getFeaturesFlag() & 0x01
 
   hasSecureScreen2FASupport: -> @getIntFirmwareVersion() >= Firmwares.V_L_1_0_0
+
+  hasRecoveryFlashingSupport: -> @getIntFirmwareVersion() >= Firmwares.V_L_1_1_0

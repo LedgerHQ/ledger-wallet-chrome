@@ -3,14 +3,15 @@ ledger.fup ?= {}
 States =
   Undefined: 0
   Erasing: 1
-  LoadingOldApplication: 2
-  ReloadingBootloaderFromOs: 3
-  LoadingBootloader: 4
-  LoadingReloader: 5
-  LoadingBootloaderReloader: 6
-  LoadingOs: 7
-  InitializingOs: 8
-  Done: 9
+  Unlocking: 2
+  LoadingOldApplication: 3
+  ReloadingBootloaderFromOs: 4
+  LoadingBootloader: 5
+  LoadingReloader: 6
+  LoadingBootloaderReloader: 7
+  LoadingOs: 8
+  InitializingOs: 9
+  Done: 10
 
 Modes =
   Os: 0
@@ -56,7 +57,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   constructor: (firmwareUpdater, osLoader) ->
     @_id = _.uniqueId("fup")
     @_fup = firmwareUpdater
-    @_osLoader = osLoader
+    @_getOsLoader = -> ledger.fup.updates[osLoader]
     @_keyCardSeed = null
     @_currentState = States.Undefined
     @_isNeedingUserApproval = no
@@ -70,6 +71,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_isCancelled = no
     @_eventHandler = []
     @_logger = ledger.utils.Logger.getLoggerByTag('FirmwareUpdateRequest')
+    @_lastOriginalKey = undefined
+    @_pinCode = undefined
+    @_forceDongleErasure = no
 
   ###
     Stops all current tasks and listened events.
@@ -91,6 +95,17 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   approveCurrentState: -> @_setIsNeedingUserApproval no
 
   isNeedingUserApproval: -> @_isNeedingUserApproval
+
+  ###
+
+  ###
+  unlockWithPinCode: (pin) ->
+    @_pinCode = pin
+    @_approve 'pincode'
+
+  forceDongleErasure: ->
+    @_forceDongleErasure = yes
+    @_approve 'pincode'
 
   ###
     Gets the current dongle version
@@ -160,6 +175,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     return @_connectionCompletion if @_connectionCompletion?
     d = ledger.defer(callback)
     registerDongle = (dongle) =>
+      @_resetOriginalKey()
       @_lastMode = if dongle.isInBootloaderMode() then Modes.Bootloader else Modes.Os
       @_dongle = dongle
       handler =  =>
@@ -211,14 +227,15 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     # Otherwise handle the current by calling the right method depending on the last mode and the state
     if @_lastMode is Modes.Os
       switch @_currentState
-        when States.Undefined then do @_processInitStageOs
+        when States.Undefined then @_findOriginalKey().then(=> do @_processInitStageOs).fail(=> @_failure(Errors.CommunicationError)).done()
         when States.ReloadingBootloaderFromOs then do @_processReloadBootloaderFromOs
         when States.InitializingOs then do @_processInitOs
         when States.Erasing then do @_processErasing
+        when States.Unlocking then do @_processUnlocking
         else @_failure(Errors.InconsistentState)
     else
       switch @_currentState
-        when States.Undefined then do @_processInitStageBootloader
+        when States.Undefined then @_findOriginalKey().then(=> do @_processInitStageBootloader).fail(=> @_failure(Errors.CommunicationError)).done()
         when States.LoadingOs then do @_processLoadOs
         when States.LoadingBootloader then do @_processLoadBootloader
         when States.LoadingBootloaderReloader then do @_processLoadBootloaderReloader
@@ -228,7 +245,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_logger.info("Process init stage OS")
     @_dongle.getState (state) =>
       if state isnt ledger.dongle.States.BLANK and state isnt ledger.dongle.States.FROZEN
-        @_setCurrentState(States.Erasing)
+        if @_dongle.getFirmwareInformation().hasRecoveryFlashingSupport()
+          @_setCurrentState(States.Unlocking)
+        else
+          @_setCurrentState(States.Erasing)
         @_handleCurrentState()
       else
         @_fup.getFirmwareUpdateAvailability @_dongle, @_lastMode is Modes.Bootloader, no, (availability, error) =>
@@ -262,6 +282,21 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processErasing: ->
     @_waitForUserApproval('erasure')
+    .then =>
+      unless @_stateCache.pincode?
+        getRandomChar = -> "0123456789".charAt(_.random(10))
+        @_stateCache.pincode = getRandomChar() + getRandomChar()
+      pincode = @_stateCache.pincode
+      @_dongle.unlockWithPinCode pincode, (isUnlocked, error) =>
+        @emit "erasureStep", if error?.retryCount? then error.retryCount else 3
+        @_waitForPowerCycle()
+      return
+    .fail =>
+      @_failure(Errors.CommunicationError)
+    .done()
+
+  _processUnlocking: ->
+    @_waitForUserApproval('unlock')
     .then =>
       unless @_stateCache.pincode?
         getRandomChar = -> "0123456789".charAt(_.random(10))
@@ -320,7 +355,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processInitStageBootloader: ->
     @_lastVersion = null
-    @_dongle.getRawFirmwareVersion yes, yes, (version, error) =>
+    @_dongle.getRawFirmwareVersion yes, yes, yes, (version, error) =>
       return @_failure(Errors.UnableToRetrieveVersion) if error?
       @_lastVersion = version
       if ledger.fup.utils.compareVersions(version, ledger.fup.versions.Nano.CurrentVersion.Bootloader).eq()
@@ -337,9 +372,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processLoadOs: ->
     @_isOsLoaded = no
-    @_findOriginalKey(ledger.fup.updates.OS_LOADER).then (offset) =>
+    @_findOriginalKey().then (offset) =>
       @_isWaitForDongleSilent = yes
-      @_processLoadingScript(ledger.fup.updates.OS_LOADER[offset], States.LoadingOs).then (result) =>
+      @_processLoadingScript(@_getOsLoader()[offset], States.LoadingOs).then (result) =>
         @_isOsLoaded = yes
         _.delay (=> @_waitForPowerCycle(null, yes)), 200
       .fail (e) =>
@@ -351,20 +386,20 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_setCurrentState(States.Undefined)
 
   _processLoadBootloader: ->
-    @_findOriginalKey(ledger.fup.updates.BL_LOADER).then (offset) =>
+    @_findOriginalKey().then (offset) =>
       @_processLoadingScript(ledger.fup.updates.BL_LOADER[offset], States.LoadingBootloader)
     .then => @_waitForPowerCycle(null, yes)
     .fail (ex) =>
       @_failure(Errors.CommunicationError)
 
   _processLoadBootloaderReloader: ->
-    @_findOriginalKey(ledger.fup.updates.RELOADER_FROM_BL).then (offset) =>
+    @_findOriginalKey().then (offset) =>
       @_processLoadingScript(ledger.fup.updates.RELOADER_FROM_BL[offset], States.LoadingBootloaderReloader)
     .then => @_waitForPowerCycle(null, yes)
     .fail (ex) =>
       @_failure(ledger.errors.CommunicationError)
 
-  _getVersion: (forceBl, callback) -> @_dongle.getRawFirmwareVersion(@_lastMode is Modes.Bootloader, forceBl, callback)
+  _getVersion: (forceBl, checkHiddenReloader, callback) -> @_dongle.getRawFirmwareVersion(@_lastMode is Modes.Bootloader, forceBl, checkHiddenReloader, callback)
 
   _failure: (reason) ->
     @emit "error", cause: ledger.errors.new(reason)
@@ -406,6 +441,12 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         defferedApproval.resolve()
     return
 
+  _approve: (approvalName) ->
+    if @_deferredApproval?.approvalName is approvalName
+      @_setIsNeedingUserApproval yes
+    else
+      @_approvedStates.push approvalName
+
   _cancelApproval: ->
     if @_isNeedingUserApproval
       @_isNeedingUserApproval = no
@@ -418,6 +459,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       Q()
     else
       @_setIsNeedingUserApproval yes
+      @_deferredApproval.approvalName = approvalName
       @_deferredApproval.promise.then => @_approvedStates.push approvalName
 
   _removeUserApproval: (approvalName) ->
@@ -460,16 +502,42 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     catch ex
       e ex
 
-  _findOriginalKey: (loadingArray, offset = 0) ->
-    throw new Error("Key not found") if offset >= loadingArray.length
-    @_getCard().exchange_async(new ByteString(loadingArray[offset][0], HEX)).then (result) =>
-      if @_getCard().SW == 0x9000
-        offset
-      else
-        @_findOriginalKey(loadingArray, offset + 1)
-    .fail (er) =>
-      e er
-      throw new Error("Communication Error")
+  _findOriginalKey: ->
+    if @_lastOriginalKey?
+      l "Resolve with last key", @_lastOriginalKey
+      ledger.defer().resolve(@_lastOriginalKey).promise
+    else
+      @_getCard().exchange_async(new ByteString("F001010000", HEX), [0x9000]).then (result) =>
+        for blCustomerId, offset in ledger.fup.updates.BL_CUSTOMER_ID when result.equals(blCustomerId)
+          @_lastOriginalKey = offset
+          return offset
+        return
+
+  _resetOriginalKey: ->
+    @_lastOriginalKey = undefined
+
+  ###
+  function findOriginalKey_async() {
+    return lastCard.exchange_async(new ByteString("F001010000", HEX), [0x9000]).then(
+      function(result) {
+        console.log("Customer ID " + result.toString(HEX));
+        for (var i=0; i<BL_CUSTOMER_ID.length; i++) {
+          if (typeof BL_CUSTOMER_ID[i] != "undefined") {
+            if (result.equals(BL_CUSTOMER_ID[i])) {
+              originalKey = i;
+              return;
+            }
+          }
+        }
+        console.log("Failed to retrieve original key");
+        originalKey = undefined;
+      }
+    ).fail(function(e) {
+      console.log("Failed to retrieve original key");
+      originalKey = undefined;
+    });
+  }
+  ###
 
   _getCard: -> @_dongle?._btchip.card
 

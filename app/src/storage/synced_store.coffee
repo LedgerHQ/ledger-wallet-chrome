@@ -166,7 +166,6 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     # Push
     return ledger.defer().reject(Errors.Closed).promise if @isClosed()
     return ledger.defer().reject(Errors.NoChanges).promise if @_changes.length is 0
-
     hasRemoteData = yes
     unlockMutableOperations = _.noop
     pushedData = null

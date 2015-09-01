@@ -74,7 +74,7 @@ class ledger.dongle.MockDongle extends EventEmitter
     @param [Function] callback Called once the version is retrieved. The callback must be prototyped like size `(version, error) ->`
     @return [Q.Promise]
   ###
-  getRawFirmwareVersion: (isInBootLoaderMode, forceBl=no, callback=undefined) ->
+  getRawFirmwareVersion: (isInBootLoaderMode, forceBl=no, checkHiddenReloader = no, callback=undefined) ->
     d = ledger.defer(callback)
     try
       d.resolve ['00000020', '00010001']

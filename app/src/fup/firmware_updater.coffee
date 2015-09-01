@@ -31,7 +31,7 @@ class ledger.fup.FirmwareUpdater
   ###
   getFirmwareUpdateAvailability: (dongle, bootloaderMode = no, forceBl = no, callback = undefined) ->
     d = ledger.defer(callback)
-    dongle.getRawFirmwareVersion bootloaderMode, forceBl, (version, error) =>
+    dongle.getRawFirmwareVersion bootloaderMode, forceBl, no, (version, error) =>
       return d.reject(error) if error?
       @_lastVersion = version
       if ledger.fup.utils.compareVersions(@_lastVersion, ledger.fup.versions.Nano.CurrentVersion.Os).eq()
@@ -52,7 +52,11 @@ class ledger.fup.FirmwareUpdater
   ###
   requestFirmwareUpdate: (firmwareUpdateMode = FirmwareUpdateMode.Setup) ->
     throw "An update request is already running" if @_request?
-    @_request = new ledger.fup.FirmwareUpdateRequest(@)
+    @_request = do =>
+      switch firmwareUpdateMode
+        when FirmwareUpdateMode.Setup then new ledger.fup.SetupFirmwareUpdateRequest(@)
+        when FirmwareUpdateMode.Operation then new ledger.fup.OperationFirmwareUpdateRequest(@)
+        else throw new Error("Wrong firmrware update mode ${firmwareUpdateMode}")
     @_request
 
   requestSetupFirmwareUpdate: -> @requestFirmwareUpdate(FirmwareUpdateMode.Setup)

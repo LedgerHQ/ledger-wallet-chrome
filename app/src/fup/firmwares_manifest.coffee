@@ -9,10 +9,10 @@ _.extend ledger.fup.versions,
 
   Nano:
     CurrentVersion:
-      Bootloader: [0x00, (1 << 16) + (3 << 8) + (16)]
-      Os: [0x20, (1 << 16) + (0 << 8) + (1)]
+      Bootloader: [0x00, (1 << 16) + (3 << 8) + (129)]
+      Os: [0x20, (1 << 16) + (1 << 8) + (0)]
       Reloader: [0x00, (1 << 16) + (33 << 8) + (0)]
-      Beta: false
+      Beta: true
       Overwrite: true
       WhatsNew: 'onboarding.device.update.new_1_0_1'
 
@@ -22,6 +22,20 @@ ledger.fup.updates ?= {}
 ledger.fup.setupUpdates = ->
 
   _.extend ledger.fup.updates,
+
+    BL_CUSTOMER_ID: [
+      new ByteString("0143", HEX)
+      new ByteString("0144", HEX)
+      new ByteString("0146", HEX)
+      new ByteString("0147", HEX)
+      new ByteString("0148", HEX)
+      new ByteString("0149", HEX)
+      new ByteString("014A", HEX)
+      new ByteString("014B", HEX)
+      new ByteString("014C", HEX)
+      new ByteString("014D", HEX)
+      new ByteString("014E", HEX)
+    ]
 
     RELOADER_FROM_BL: [
 
