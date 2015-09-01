@@ -1,0 +1,6 @@
+<div id="view_controller_content">
+  UNLOCK
+  <span class="black-indication"><%= t 'onboarding.device.pin.enter_your_pin_code' %></span>
+  <div id="pin_container"></div>
+  <a href="#openSupport" class="medium-indication"><%= t 'onboarding.device.pin.i_lost_my_pin_code' %></a>
+</div>

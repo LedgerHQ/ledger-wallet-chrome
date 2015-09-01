@@ -371,6 +371,7 @@
         'controllers/update/update_plug_view_controller'
         'controllers/update/update_seed_view_controller'
         'controllers/update/update_erasing_view_controller'
+        'controllers/update/update_unlocking_view_controller'
         'controllers/update/update_unplug_view_controller'
         'controllers/update/update_updating_view_controller'
         'controllers/update/update_loading_view_controller'

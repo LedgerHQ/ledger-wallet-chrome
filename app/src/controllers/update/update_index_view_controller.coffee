@@ -1,7 +1,7 @@
 class @UpdateIndexViewController extends @UpdateViewController
 
   navigation:
-    nextRoute: "/update/seed"
+    nextRoute: ""
     previousRoute: "/onboarding/device/plug"
     previousParams: {animateIntro: no}
   localizablePageSubtitle: "update.index.important_notice"
@@ -9,3 +9,6 @@ class @UpdateIndexViewController extends @UpdateViewController
   navigatePrevious: ->
     ledger.app.setExecutionMode(ledger.app.Modes.Wallet)
     super
+
+  navigateNext: ->
+    @getRequest().startUpdate()

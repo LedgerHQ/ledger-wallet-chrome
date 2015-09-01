@@ -60,6 +60,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_fup = firmwareUpdater
     @_getOsLoader = -> ledger.fup.updates[osLoader]
     @_keyCardSeed = null
+    @_isRunning = no
     @_currentState = States.Undefined
     @_isNeedingUserApproval = no
     @_lastMode = Modes.Os
@@ -81,6 +82,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   ###
   cancel: () ->
     @off()
+    @_isRunning = no
     _(@_eventHandler).each ([object, event, handler]) -> object?.off?(event, handler)
     @_onProgress = null
     @_isCancelled = yes
@@ -102,6 +104,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   ###
   unlockWithPinCode: (pin) ->
     @_pinCode = pin
+    l "Unlocking with ", pin
     @_approve 'pincode'
 
   forceDongleErasure: ->
@@ -140,6 +143,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   ###
   startUpdate: ->
+    return if @_isRunning
+    @_isRunning = yes
     @_handleCurrentState()
 
   ###
@@ -247,7 +252,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_dongle.getState (state) =>
       if state isnt ledger.dongle.States.BLANK and state isnt ledger.dongle.States.FROZEN
         if @_dongle.getFirmwareInformation().hasRecoveryFlashingSupport()
-          @_setCurrentState(States.Unlocking)
+          @_fup.getFirmwareUpdateAvailability @_dongle, @_lastMode is Modes.Bootloader, no, (availability, error) =>
+            return if error?
+            @_dongleVersion = availability.dongleVersion
+            @_setCurrentState(States.Unlocking)
         else
           @_setCurrentState(States.Erasing)
         @_handleCurrentState()
@@ -297,8 +305,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .done()
 
   _processUnlocking: ->
+    l "waiting for approval"
     @_waitForUserApproval('pincode')
     .then =>
+      l "pincode approved"
       if @_forceDongleErasure
         @_setCurrentState(States.Erasing)
       else
@@ -308,13 +318,14 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           return
         pin = new ByteString(@_pinCode, ASCII)
         @_getCard().exchange_async(new ByteString("E0220000" + Convert.toHexByte(pin.length), HEX).concat(pin)).then (result) =>
-          if @_getCard().SW os 0x900
+          if @_getCard().SW is 0x9000
             @_setCurrentState(States.ReloadingBootloaderFromOs)
             @_handleCurrentState()
             return
           else
             throw Errors.WrongPinCode
     .fail =>
+      l "FAILURE ", arguments
       @_failure(Errors.WrongPinCode)
     .done()
 
@@ -326,7 +337,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     moddedInitScript = []
     for i in [0...currentInitScript.length]
       moddedInitScript.push currentInitScript[i]
-      if i is currentInitScript.length - 2
+      if i is currentInitScript.length - 2 and @_keyCardSeed?
         moddedInitScript.push "D026000011" + "04" + @_keyCardSeed.toString(HEX)
     @_processLoadingScript moddedInitScript, States.InitializingOs, yes
     .then =>
@@ -337,6 +348,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processReloadBootloaderFromOs: ->
     @_removeUserApproval('erasure')
+    @_removeUserApproval('pincode')
     @_waitForUserApproval('reloadbootloader')
     .then =>
       @_removeUserApproval('reloadbootloader')
@@ -450,8 +462,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     return
 
   _approve: (approvalName) ->
+    l "Approve ", approvalName, " waiting for ", @_deferredApproval?.approvalName
     if @_deferredApproval?.approvalName is approvalName
-      @_setIsNeedingUserApproval yes
+      @_setIsNeedingUserApproval no
     else
       @_approvedStates.push approvalName
 
