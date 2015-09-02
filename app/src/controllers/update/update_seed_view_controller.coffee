@@ -21,7 +21,10 @@ class @UpdateSeedViewController extends UpdateViewController
     super
 
   navigateNext: ->
-    @navigation.nextParams = {seed: @_seedInputvalue()}
+    l "My params ", @params
+    @navigation.nextParams =
+      seed: @_seedInputvalue()
+      redirect_to_updating: @params?.redirect_to_updating
     super
 
   shouldEnableNextButton: ->

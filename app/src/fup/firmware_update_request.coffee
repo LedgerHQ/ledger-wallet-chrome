@@ -146,6 +146,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_isRunning = yes
     @_handleCurrentState()
 
+  isRunning: -> @_isRunning
+
   ###
     Checks if a given keycard seed is valid or not. The seed must be a 32 characters string formatted as
     an hexadecimal value.
@@ -388,6 +390,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_dongle.getRawFirmwareVersion yes, yes, yes, (version, error) =>
       return @_failure(Errors.UnableToRetrieveVersion) if error?
       @_lastVersion = version
+      l "RELOADER VERSION IS", ledger.fup.versions.Nano.CurrentVersion.Reloader, "GOT", version
       if ledger.fup.utils.compareVersions(version, ledger.fup.versions.Nano.CurrentVersion.Bootloader).eq()
         @_setCurrentState(States.LoadingOs)
         @_handleCurrentState()
@@ -539,7 +542,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       ledger.defer().resolve(@_lastOriginalKey).promise
     else
       @_getCard().exchange_async(new ByteString("F001010000", HEX), [0x9000]).then (result) =>
+        l "CUST ID IS ", result.toString(HEX)
         for blCustomerId, offset in ledger.fup.updates.BL_CUSTOMER_ID when result.equals(blCustomerId)
+          l "OFFSET IS", offset
           @_lastOriginalKey = offset
           return offset
         return

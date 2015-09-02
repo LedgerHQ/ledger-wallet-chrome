@@ -2,6 +2,8 @@ class @UpdateUpdatingViewController extends UpdateViewController
 
   navigation:
     nextRoute: ""
+  view:
+    keycardErasureSection: '#keycard-erasure-section'
   localizablePageSubtitle: "update.updating.update_confirmation"
   localizableNextButton: "common.update"
 
@@ -17,3 +19,9 @@ class @UpdateUpdatingViewController extends UpdateViewController
     super
     @dongleVersion = @getRequest().getDongleVersion()
     @targetVersion = @getRequest().getTargetVersion()
+
+  onAfterRender: ->
+    super
+    if @params?.no_erase_keycard_seed is true
+      @view.keycardErasureSection.remove()
+

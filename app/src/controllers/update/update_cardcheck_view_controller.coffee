@@ -16,7 +16,10 @@ class @UpdateCardcheckViewController extends UpdateViewController
     @_generateCharacters()
 
   navigateNext: ->
+    l "My params ", @params
     @getRequest().setKeyCardSeed(@params.seed)
+    if @params?.redirect_to_updating is true
+      ledger.app.router.go '/update/updating?no_erase_keycard_seed=true'
 
   navigatePrevious: ->
     @navigation.previousParams = {seed: @params.seed}

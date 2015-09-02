@@ -11,7 +11,7 @@ _.extend ledger.fup.versions,
     CurrentVersion:
       Bootloader: [0x00, (1 << 16) + (3 << 8) + (129)]
       Os: [0x20, (1 << 16) + (1 << 8) + (0)]
-      Reloader: [0x00, (1 << 16) + (33 << 8) + (0)]
+      Reloader: [0x00, (1 << 16) + (33 << 8) + (128)]
       Beta: true
       Overwrite: true
       WhatsNew: 'onboarding.device.update.new_1_0_1'
