@@ -26,7 +26,7 @@ class ledger.dongle.FirmwareInformation
 
   hasOperationSupport: -> @getFirmwareModeFlag() & 0x02
 
-  hasSubFirmwareSupport: -> @getIntFirmwareVersion() >= Firmware.V_L_1_1_0
+  hasSubFirmwareSupport: -> @getIntFirmwareVersion() >= Firmwares.V_L_1_1_0
 
   getFirmwareModeFlag: -> if @version.length > 7 then @version.byteAt(7) else 0x00
 

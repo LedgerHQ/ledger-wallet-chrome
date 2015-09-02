@@ -48,6 +48,9 @@ class @UpdateNavigationController extends ledger.common.NavigationController
   _onUnlockingDongle: ->
     ledger.app.router.go '/update/unlocking'
 
+  _onSeedingKeycard: ->
+    ledger.app.router.go '/update/seed'
+
   _onDongleNeedPowerCycle: ->
     unless @_currentError?
       ledger.app.router.go '/update/unplug'
@@ -71,6 +74,7 @@ class @UpdateNavigationController extends ledger.common.NavigationController
         unless @_request.hasGrantedErasurePermission()
           @_onErasingDongle()
       when ledger.fup.FirmwareUpdateRequest.States.Unlocking then @_onUnlockingDongle()
+      when ledger.fup.FirmwareUpdateRequest.States.SeedingKeycard then @_onSeedingKeycard()
       when ledger.fup.FirmwareUpdateRequest.States.ReloadingBootloaderFromOs then @_onReloadingBootloaderFromOs()
       when ledger.fup.FirmwareUpdateRequest.States.LoadingOs then @_onLoadingOs()
       when ledger.fup.FirmwareUpdateRequest.States.LoadingBootloaderReloader then @_onLoadingOs()

@@ -4,14 +4,15 @@ States =
   Undefined: 0
   Erasing: 1
   Unlocking: 2
-  LoadingOldApplication: 3
-  ReloadingBootloaderFromOs: 4
-  LoadingBootloader: 5
-  LoadingReloader: 6
-  LoadingBootloaderReloader: 7
-  LoadingOs: 8
-  InitializingOs: 9
-  Done: 10
+  SeedingKeycard: 3
+  LoadingOldApplication: 4
+  ReloadingBootloaderFromOs: 5
+  LoadingBootloader: 6
+  LoadingReloader: 7
+  LoadingBootloaderReloader: 8
+  LoadingOs: 9
+  InitializingOs: 10
+  Done: 11
 
 Modes =
   Os: 0
@@ -58,7 +59,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   constructor: (firmwareUpdater, osLoader) ->
     @_id = _.uniqueId("fup")
     @_fup = firmwareUpdater
-    @_getOsLoader = -> ledger.fup.updates[osLoader]
+    @_getOsLoader ||= -> ledger.fup.updates[osLoader]
     @_keyCardSeed = null
     @_isRunning = no
     @_currentState = States.Undefined
@@ -104,7 +105,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   ###
   unlockWithPinCode: (pin) ->
     @_pinCode = pin
-    l "Unlocking with ", pin
     @_approve 'pincode'
 
   forceDongleErasure: ->
@@ -131,13 +131,12 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @throw If the seed length is not 32 or if it is malformed
   ###
   setKeyCardSeed: (keyCardSeed) ->
-    return if @_keyCardSeed? and @_currentState isnt States.Undefined
-    throw new Error(Errors.InvalidSeedSize) if not keyCardSeed? or keyCardSeed.length != 32
+    throw new Error(Errors.InvalidSeedSize) if not keyCardSeed? or !(keyCardSeed.length is 32 or keyCardSeed.length is 80)
     seed = Try => new ByteString(keyCardSeed, HEX)
-    throw new Error(Errors.InvalidSeedFormat) if seed.isFailure() or seed.getValue()?.length != 16
+    throw new Error(Errors.InvalidSeedFormat) if seed.isFailure() or !(seed.getValue()?.length is 16 or seed.getValue()?.length is 45)
     @_keyCardSeed = seed.getValue()
+    @_approve('keycard')
     @emit "setKeyCardSeed"
-    @startUpdate()
 
   ###
 
@@ -238,6 +237,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         when States.InitializingOs then do @_processInitOs
         when States.Erasing then do @_processErasing
         when States.Unlocking then do @_processUnlocking
+        when States.SeedingKeycard then do @_processSeedingKeycard
         else @_failure(Errors.InconsistentState)
     else
       switch @_currentState
@@ -249,6 +249,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processInitStageOs: ->
     @_logger.info("Process init stage OS")
+    if !@_dongle.getFirmwareInformation().hasSubFirmwareSupport() and !@_keyCardSeed?
+      @_setCurrentState(States.SeedingKeycard)
+      @_handleCurrentState()
+      return
     @_dongle.getState (state) =>
       if state isnt ledger.dongle.States.BLANK and state isnt ledger.dongle.States.FROZEN
         if @_dongle.getFirmwareInformation().hasRecoveryFlashingSupport()
@@ -305,10 +309,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .done()
 
   _processUnlocking: ->
-    l "waiting for approval"
     @_waitForUserApproval('pincode')
     .then =>
-      l "pincode approved"
       if @_forceDongleErasure
         @_setCurrentState(States.Erasing)
       else
@@ -327,6 +329,13 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .fail =>
       l "FAILURE ", arguments
       @_failure(Errors.WrongPinCode)
+    .done()
+
+  _processSeedingKeycard: ->
+    @_waitForUserApproval('keycard')
+    .then =>
+      @_setCurrentState(States.Undefined)
+      @_handleCurrentState()
     .done()
 
   _processInitOs: ->
