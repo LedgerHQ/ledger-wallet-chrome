@@ -3,4 +3,5 @@
   <span class="black-indication"><%= t 'onboarding.device.pin.enter_your_pin_code' %></span>
   <div id="pin_container"></div>
   <a href="#openSupport" class="medium-indication"><%= t 'onboarding.device.pin.i_lost_my_pin_code' %></a>
+  <a href="#resetWallet" class="medium-indication">RESET MY LEDGER WALLET</a>
 </div>

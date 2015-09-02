@@ -313,6 +313,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .then =>
       if @_forceDongleErasure
         @_setCurrentState(States.Erasing)
+        @_handleCurrentState()
       else
         if @_pinCode.length is 0
           @_setCurrentState(States.ReloadingBootloaderFromOs)
@@ -401,7 +402,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processLoadOs: ->
     @_isOsLoaded = no
+    l "Find KEY"
     @_findOriginalKey().then (offset) =>
+      l "Found KEY ", offset, @_getOsLoader()
       @_isWaitForDongleSilent = yes
       @_processLoadingScript(@_getOsLoader()[offset], States.LoadingOs).then (result) =>
         @_isOsLoaded = yes

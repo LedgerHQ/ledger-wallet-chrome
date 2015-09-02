@@ -18,8 +18,10 @@ class @UpdateUnlockingViewController extends UpdateViewController
     @view.pinCode.insertIn(@select('div#pin_container')[0])
     @view.pinCode.setStealsFocus(yes)
     @view.pinCode.once 'complete', (event, value) =>
-      l "Complete with ", value
       @getRequest().unlockWithPinCode(value)
 
   openSupport: ->
     window.open t 'application.support_url'
+
+  resetWallet: ->
+    @getRequest().forceDongleErasure()

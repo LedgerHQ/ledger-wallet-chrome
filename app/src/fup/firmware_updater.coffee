@@ -9,6 +9,7 @@ FirmwareAvailabilityResult =
 FirmwareUpdateMode =
   Setup: 0
   Operation: 1
+  Versatile: 2
 
 ###
   FirmwareUpdater is a manager responsible of firmware update related features. It is able to check if firmware updates are
@@ -56,11 +57,13 @@ class ledger.fup.FirmwareUpdater
       switch firmwareUpdateMode
         when FirmwareUpdateMode.Setup then new ledger.fup.SetupFirmwareUpdateRequest(@)
         when FirmwareUpdateMode.Operation then new ledger.fup.OperationFirmwareUpdateRequest(@)
+        when FirmwareUpdateMode.Versatile then new ledger.fup.VersatileFirmwareUpdateRequest(@)
         else throw new Error("Wrong firmrware update mode ${firmwareUpdateMode}")
     @_request
 
   requestSetupFirmwareUpdate: -> @requestFirmwareUpdate(FirmwareUpdateMode.Setup)
   requestOperationFirmwareUpdate: -> @requestFirmwareUpdate(FirmwareUpdateMode.Operation)
+  requestVersatileFirmwareUpdate: -> @requestFirmwareUpdate(FirmwareUpdateMode.Versatile)
 
   _cancelRequest: (request) ->
     @_request = null if request is @_request

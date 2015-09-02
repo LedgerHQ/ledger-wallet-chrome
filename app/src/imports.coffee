@@ -222,6 +222,7 @@
         'fup/firmware_update_request'
         'fup/setup_firmware_update_request'
         'fup/operation_firmware_update_request'
+        'fup/versatile_firmware_update_request'
         'fup/firmware_updater'
         'fup/firmwares_manifest'
         'fup/utils'

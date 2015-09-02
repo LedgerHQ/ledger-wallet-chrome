@@ -6,7 +6,7 @@ class @UpdateNavigationController extends ledger.common.NavigationController
     nextButton: "#next_button"
 
   onAttach: ->
-    @_request = ledger.fup.FirmwareUpdater.instance.requestSetupFirmwareUpdate()
+    @_request = ledger.fup.FirmwareUpdater.instance.requestVersatileFirmwareUpdate()
     @_request.on 'plug', => @_onPlugDongle()
     @_request.on 'unplug', =>  @_onDongleNeedPowerCycle()
     @_request.on 'stateChanged', (ev, data) => @_onStateChanged(data.newState, data.oldState)
