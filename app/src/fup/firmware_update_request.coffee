@@ -402,9 +402,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processLoadOs: ->
     @_isOsLoaded = no
-    l "Find KEY"
     @_findOriginalKey().then (offset) =>
-      l "Found KEY ", offset, @_getOsLoader()
       @_isWaitForDongleSilent = yes
       @_processLoadingScript(@_getOsLoader()[offset], States.LoadingOs).then (result) =>
         @_isOsLoaded = yes

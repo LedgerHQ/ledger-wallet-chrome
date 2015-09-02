@@ -103,22 +103,35 @@ class @ledger.dongle.Dongle extends EventEmitter
           @_setState States.BLANK
           States.BLANK
         else
-          @getPublicAddress("0").then =>
-            # @todo Se connecter directement à la carte sans redemander le PIN
-            console.warn("Dongle is already unlock ! Case not handle => Pin Code Required.")
-            @_setState States.LOCKED
-            States.LOCKED
-          .catch (e) =>
-            if @state isnt States.LOCKED and @state isnt States.BLANK
-              throw e
-            @state
+          @_sendApdu(0xE0, 0x40, 0x00, 0x00, 0x05, 0x01).then (result) =>
+            switch @getSw()
+              when 0x9000, 0x6982
+                @_setState States.LOCKED
+                States.LOCKED
+              when 0x6985
+                configureBlank = =>
+                  @_setState(States.BLANK)
+                  States.BLANK
+                # Check restore
+                if @getFirmwareInformation().hasSubFirmwareSupport()
+                  @restoreSetup().then ->
+                    @_setState States.LOCKED
+                    States.LOCKED
+                  .catch -> do configureBlank
+                else
+                  do configureBlank
+              when 0x6faa
+                throw "Invalid statue - 0x6faa"
       .catch (error) =>
         console.error("Fail to initialize Dongle :", error)
+        @_setState(States.ERROR)
         throw error
     else
       ledger.delay(0).then(=> @_setState States.BLANK).then(-> States.BLANK)
 
   getFirmwareInformation: -> @_firmwareInformation
+
+  getSw: -> @_btchip.card.SW
 
   # Called when 
   disconnect: -> @_setState(States.DISCONNECTED)
@@ -321,7 +334,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     @param [Function] callback
     @return [Q.Promise]
   ###
-  setup: (pin, restoreSeed, callback=undefined) ->
+  deprecatedSetup: (pin, restoreSeed, callback=undefined) ->
     Errors.throw(Errors.DongleNotBlank) if @state isnt States.BLANK
     [restoreSeed, callback] = [callback, restoreSeed] if ! callback && typeof restoreSeed == 'function'
     _btchipQueue.enqueue "setup", =>
@@ -360,6 +373,8 @@ class @ledger.dongle.Dongle extends EventEmitter
       ).done()
 
       d.promise
+
+  restoreSetup: (callback = undefined) -> @_sendApdu(0xE0, 0x20, 0xFF, 0x00, 0x01, 0x00, [0x9000]).then(callback or _.noop)
 
   # @param [String] path
   # @param [Function] callback Optional argument
@@ -538,6 +553,7 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   # @return [Q.Promise] Must be done
   _recoverFirmwareVersion: ->
+    l "RECOVER VERSION"
     _btchipQueue.enqueue "recoverFirmwareVersion", =>
       @_sendApdu('E0 C4 00 00 00 08').then (version) =>
         firmware = new ledger.dongle.FirmwareInformation(this, version)
