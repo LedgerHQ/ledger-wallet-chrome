@@ -114,10 +114,10 @@ class @ledger.dongle.Dongle extends EventEmitter
                   States.BLANK
                 # Check restore
                 if @getFirmwareInformation().hasSubFirmwareSupport()
-                  @restoreSetup().then ->
+                  @restoreSetup().then =>
                     @_setState States.LOCKED
                     States.LOCKED
-                  .catch -> do configureBlank
+                  .catch => do configureBlank
                 else
                   do configureBlank
               when 0x6faa
