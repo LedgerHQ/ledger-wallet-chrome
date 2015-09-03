@@ -131,9 +131,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @throw If the seed length is not 32 or if it is malformed
   ###
   setKeyCardSeed: (keyCardSeed) ->
-    throw new Error(Errors.InvalidSeedSize) if not keyCardSeed? or !(keyCardSeed.length is 32 or keyCardSeed.length is 80)
-    seed = Try => new ByteString(keyCardSeed, HEX)
-    throw new Error(Errors.InvalidSeedFormat) if seed.isFailure() or !(seed.getValue()?.length is 16 or seed.getValue()?.length is 45)
+    seed = @_keyCardSeedToByteString(keyCardSeed)
+    throw seed.getError() if seed.isFailure()
     @_keyCardSeed = seed.getValue()
     @_approve('keycard')
     @emit "setKeyCardSeed"
@@ -154,13 +153,14 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
     @param [String] keyCardSeed A 32 characters string formatted as an hexadecimal value (i.e. '01294b7431234b5323f5588ce7d02703'
   ###
-  checkIfKeyCardSeedIsValid: (keyCardSeed) -> (Try => @_keyCardSeedToByteString(keyCardSeed)).isSuccess()
+  checkIfKeyCardSeedIsValid: (keyCardSeed) -> @_keyCardSeedToByteString(keyCardSeed).isSuccess()
 
-  _keyCardSeedToByteString: (keyCardSeed, safe = no) ->
-    throw new Error(Errors.InvalidSeedSize) if not keyCardSeed? or keyCardSeed.length != 32
-    seed = Try => new ByteString(keyCardSeed, HEX)
-    throw new Error(Errors.InvalidSeedFormat) if seed.isFailure() or seed.getValue()?.length != 16
-    seed
+  _keyCardSeedToByteString: (keyCardSeed) ->
+    Try =>
+      throw new Error(Errors.InvalidSeedSize) if not keyCardSeed? or !(keyCardSeed.length is 32 or keyCardSeed.length is 80)
+      seed = new ByteString(keyCardSeed, HEX)
+      throw new Error(Errors.InvalidSeedFormat) if !seed? or !(seed.length is 16 or seed?.length is 40)
+      seed
 
 
   ###
@@ -345,7 +345,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_handleCurrentState()
     .done()
 
-  @_tryToInitializeOs: ->
+  _tryToInitializeOs: ->
     continueInitOs = =>
       @_setCurrentState(States.InitializingOs)
       @_handleCurrentState()
@@ -497,8 +497,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     if @_isNeedingUserApproval isnt value
       @_isNeedingUserApproval = value
       if @_isNeedingUserApproval is true
-        @emit 'needsUserApproval'
         @_deferredApproval = Q.defer()
+        _.defer => @emit 'needsUserApproval'
       else
         defferedApproval = @_deferredApproval
         @_deferredApproval = null
@@ -578,6 +578,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           l "OFFSET IS", offset
           @_lastOriginalKey = offset
           return offset
+        @_lastOriginalKey = undefined
+        return
+      .fail =>
+        @_lastOriginalKey = undefined
         return
 
   _resetOriginalKey: ->

@@ -6,7 +6,7 @@
       <a id="open_scanner_button" class="cancel-rounded-button"><i class="fa fa-camera"></i></a>
     </div>
     <div class="seed"></div>
-    <input id="seed_input" spellcheck="false" maxlength="32"></input>
+    <input id="seed_input" spellcheck="false" maxlength="80"></input>
     <div class="spacer right">
       <img id="valid_check" src="../assets/images/common/large_check.png" width="30" height="30" />
     </div>

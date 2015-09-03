@@ -20,7 +20,7 @@ class ledger.dongle.FirmwareInformation
   constructor: (dongle, @version) ->
     @_dongle = dongle
 
-  hasSwappedBip39SetupSupport: -> @getFirmwareModeFlag() & 0x04
+  hasSwappedBip39SetupSupport: -> @hasSubFirmwareSupport() # @getFirmwareModeFlag() & 0x04
 
   hasSetupFirmwareSupport: -> @getFirmwareModeFlag() & 0x01
 

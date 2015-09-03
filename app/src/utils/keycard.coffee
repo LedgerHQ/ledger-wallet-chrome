@@ -3,7 +3,8 @@ ledger.keycard ?= {}
 class @ledger.keycard
 
   @generateKeycardFromSeed: (seed) ->
-    throw "Invalid card seed" if seed.length != 32
+    throw "Invalid card seed" if seed.length != 32 and seed.length != 80
+    seed = seed.substr(0, 32)
     key = new JSUCrypt.key.DESKey(seed)
     cipher = new JSUCrypt.cipher.DES(JSUCrypt.padder.None, JSUCrypt.cipher.MODE_CBC)
     cipher.init(key, JSUCrypt.cipher.MODE_ENCRYPT)

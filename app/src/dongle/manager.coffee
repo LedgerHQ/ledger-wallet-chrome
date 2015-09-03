@@ -30,12 +30,26 @@ class @ledger.dongle.Manager extends EventEmitter
     @_factoryDongleOS = new ChromeapiPlugupCardTerminalFactory(0x1b7c);
     @_factoryDongleOSHID = new ChromeapiPlugupCardTerminalFactory(0x2b7c);
     @_factoryDongleOSHIDLedger = new ChromeapiPlugupCardTerminalFactory(0x3b7c, undefined, true);
+    @_isPaused = yes
 
   # Start observing if dongles are plugged in or unnplugged
   start: () ->
     return if @_running
     @_running = yes
+    @_isPaused = no
     @_interval = setInterval @_checkIfDongleIsPluggedIn.bind(@), 200
+
+  # Observe if dongles are plugged in or unplugged without emitting
+  pause: ->
+    unless @_isPaused
+      @_isPaused = yes
+      @_emit = @emit
+      @emit = _.noop
+
+  resume: ->
+    if @_isPaused
+      @_isPaused = no
+      @emit = @_emit
 
   # Stop observing dongles state
   stop: () ->
