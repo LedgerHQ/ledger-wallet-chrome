@@ -5,6 +5,7 @@ require @ledger.imports, ->
     Modes:
       Wallet: "Wallet"
       FirmwareUpdate: "FirmwareUpdate"
+      Setup: "Setup"
 
     onStart: ->
       Api.init()
