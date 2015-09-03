@@ -15,3 +15,8 @@ class ledger.fup.VersatileFirmwareUpdateRequest extends ledger.fup.FirmwareUpdat
     else
       @_osLoader = 'SETUP_OS_LOADER'
     super
+
+  _setCurrentState: (state) ->
+    if state is ledger.fup.FirmwareUpdateRequest.States.LoadingBootloader or ledger.fup.FirmwareUpdateRequest.States.LoadingBootloaderReloader
+      @_osLoader = 'SETUP_OS_LOADER'
+    super

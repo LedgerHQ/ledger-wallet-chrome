@@ -390,7 +390,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_dongle.getRawFirmwareVersion yes, yes, yes, (version, error) =>
       return @_failure(Errors.UnableToRetrieveVersion) if error?
       @_lastVersion = version
-      l "RELOADER VERSION IS", ledger.fup.versions.Nano.CurrentVersion.Reloader, "GOT", version
       if ledger.fup.utils.compareVersions(version, ledger.fup.versions.Nano.CurrentVersion.Bootloader).eq()
         @_setCurrentState(States.LoadingOs)
         @_handleCurrentState()
