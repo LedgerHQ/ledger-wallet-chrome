@@ -10,6 +10,9 @@ class @UpdateSeedViewController extends UpdateViewController
     validCheck: "#valid_check"
     openScannerButton: "#open_scanner_button"
 
+  render: ->
+    super
+
   onAfterRender: ->
     super
     @_listenEvents()
@@ -21,7 +24,6 @@ class @UpdateSeedViewController extends UpdateViewController
     super
 
   navigateNext: ->
-    l "My params ", @params
     @navigation.nextParams =
       seed: @_seedInputvalue()
       redirect_to_updating: @params?.redirect_to_updating

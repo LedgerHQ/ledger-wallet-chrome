@@ -394,14 +394,27 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       if ledger.fup.utils.compareVersions(version, ledger.fup.versions.Nano.CurrentVersion.Bootloader).eq()
         @_setCurrentState(States.LoadingOs)
         @_handleCurrentState()
-      else if ledger.fup.utils.compareVersions(version, ledger.fup.versions.Nano.CurrentVersion.Reloader).eq()
-        @_setCurrentState(States.LoadingBootloader)
-        @_handleCurrentState()
       else
-        SEND_RACE_BL = (1 << 16) + (3 << 8) + (11)
-        @_exchangeNeedsExtraTimeout = version[1] < SEND_RACE_BL
-        @_setCurrentState(States.LoadingBootloaderReloader)
-        @_handleCurrentState()
+        continueInitStageBootloader = =>
+          if ledger.fup.utils.compareVersions(version, ledger.fup.versions.Nano.CurrentVersion.Reloader).eq()
+            @_setCurrentState(States.LoadingBootloader)
+            @_handleCurrentState()
+          else
+            SEND_RACE_BL = (1 << 16) + (3 << 8) + (11)
+            @_exchangeNeedsExtraTimeout = version[1] < SEND_RACE_BL
+            @_setCurrentState(States.LoadingBootloaderReloader)
+            @_handleCurrentState()
+
+        if !@_keyCardSeed?
+          @_setCurrentState(States.SeedingKeycard)
+          @_waitForUserApproval('keycard')
+          .then =>
+            @_setCurrentState(States.Undefined)
+            do continueInitStageBootloader
+          .done()
+        else
+          do continueInitStageBootloader
+
 
   _processLoadOs: ->
     @_isOsLoaded = no
