@@ -234,7 +234,11 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     # Otherwise handle the current by calling the right method depending on the last mode and the state
     if @_lastMode is Modes.Os
       switch @_currentState
-        when States.Undefined then @_findOriginalKey().then(=> do @_processInitStageOs).fail(=> @_failure(Errors.CommunicationError)).done()
+        when States.Undefined
+          @_findOriginalKey()
+          .then => @_processInitStageOs()
+          .fail => @_tryToInitializeOs()
+          .done()
         when States.ReloadingBootloaderFromOs then do @_processReloadBootloaderFromOs
         when States.InitializingOs then do @_processInitOs
         when States.Erasing then do @_processErasing
@@ -340,6 +344,21 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_setCurrentState(States.Undefined)
       @_handleCurrentState()
     .done()
+
+  @_tryToInitializeOs: ->
+    continueInitOs = =>
+      @_setCurrentState(States.InitializingOs)
+      @_handleCurrentState()
+    if !@_keyCardSeed?
+      @_setCurrentState(States.SeedingKeycard)
+      @_waitForUserApproval('keycard')
+      .then =>
+        @_setCurrentState(States.Undefined)
+        do continueInitOs
+      .done()
+    else
+      do continueInitOs
+
 
   _processInitOs: ->
     index = 0

@@ -24,7 +24,7 @@ class ledger.dongle.FirmwareInformation
 
   hasSetupFirmwareSupport: -> @getFirmwareModeFlag() & 0x01
 
-  hasOperationSupport: -> @getFirmwareModeFlag() & 0x02
+  hasOperationFirmwareSupport: -> @getFirmwareModeFlag() & 0x02
 
   hasSubFirmwareSupport: -> @getIntFirmwareVersion() >= Firmwares.V_L_1_1_0
 
