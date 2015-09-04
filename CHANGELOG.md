@@ -1,4 +1,8 @@
 # Changelog
+1.4.1
+===
+- Silent API xpub exportation for path including 0xb11e magic number (Copay integration)
+
 1.4.0
 ===
 - New multi-accounts feature
