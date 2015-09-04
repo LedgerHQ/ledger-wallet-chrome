@@ -376,6 +376,8 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   restoreSetup: (callback = undefined) -> @_sendApdu(0xE0, 0x20, 0xFF, 0x00, 0x01, 0x00, [0x9000]).then(callback or _.noop)
 
+
+
   # @param [String] path
   # @param [Function] callback Optional argument
   # @return [Q.Promise]

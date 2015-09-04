@@ -35,9 +35,13 @@ class @OnboardingManagementSwitchfirmwareViewController extends @OnboardingViewC
   _onFirmwareSwitchDone: ->
     if @params.mode is 'setup'
       # Choose PIN...
-      ledger.app.router.go '/onboarding/management/security'
+      ledger.app.router.go '/onboarding/management/security', @params
     else
       # Congrats!
+
+  _onRequireUserPin: ->
+
+  _onError: ->
 
   _onProgress: (state, current, total) ->
     loadingBlProgress = if state is States.ReloadingBootloaderFromOs then current / total else 1

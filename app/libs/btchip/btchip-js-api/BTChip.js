@@ -256,6 +256,116 @@ var BTChip = Class.create({
     },
     /* FIN AJOUT NESS */
 
+    setupNew_async: function(modeMask, featuresMask, version, versionP2sh, pin, wipePin, keymapEncoding, restoreSeed, bip32SeedOrEntropy, wrappingKey, bip39Generate, bip39Restore) {
+        var deprecatedSetupKeymap = this.deprecatedSetupKeymap
+        var dongle = this;
+        if (typeof modeMask == "undefined") {
+            modeMask = BTChip.MODE_WALLET;
+        }
+        if (typeof featuresMask == "undefined") {
+            featuresMask = 0x00;
+        }
+        if (typeof pin == "undefined") {
+            pin = new ByteString("00000000", ASCII);
+        }
+        if (typeof keymapEncoding == "undefined") {
+            keymapEncoding = BTChip.QWERTY_KEYMAP_NEW;
+        }
+        var data = Convert.toHexByte(modeMask);
+        data += Convert.toHexByte(featuresMask);
+        data += Convert.toHexByte(version);
+        data += Convert.toHexByte(versionP2sh);
+        data += Convert.toHexByte(pin.length) + pin.toString(HEX);
+        if (typeof wipePin == "undefined") {
+            data += "00";
+        }
+        else {
+            data += Convert.toHexByte(wipePin.length) + wipePin.toString(HEX);
+        }
+        if (this.deprecatedSetupKeymap) {
+            data += keymapEncoding.toString(HEX);
+            data += Convert.toHexByte(restoreSeed ? 0x01 : 0x00);
+            if (typeof bip32SeedOrEntropy == "undefined") {
+                for (var i=0; i<32; i++) {
+                    data += "00";
+                }
+            }
+            else {
+                if (bip32SeedOrEntropy.length != 32) {
+                    throw "Invalid seed length";
+                }
+                data += bip32SeedOrEntropy.toString(HEX);
+            }
+        }
+        else {
+
+            if (restoreSeed || bip39Generate || bip39Restore) {
+                if (restoreSeed) {
+                    if ((bip32SeedOrEntropy.length < 32) || (bip32SeedOrEntropy.length > 64)) {
+                        throw "Invalid seed length";
+                    }
+                }
+                if (bip39Generate) {
+                    if (bip32SeedOrEntropy.length != 32) {
+                        throw "Invalid entropy length";
+                    }
+                }
+                if (bip39Restore) {
+                    if (bip32SeedOrEntropy.length != 48) {
+                        throw "Invalid encoded BIP 39 mnemonic length"
+                    }
+                }
+                data += Convert.toHexByte(bip32SeedOrEntropy.length);
+                data += bip32SeedOrEntropy.toString(HEX);
+            }
+            else {
+                data += "00"
+            }
+        }
+        if (typeof wrappingKey == "undefined") {
+            data += "00";
+        }
+        else {
+            data += Convert.toHexByte(wrappingKey.length) + wrappingKey.toString(HEX);
+        }
+
+        var p2 = 0x00;
+        if (bip39Generate) {
+            p2 = 0x02;
+        }
+        if (bip39Restore) {
+            p2 = 0x03;
+        }
+
+        return this.card.sendApdu_async(0xe0, 0x20, 0x00, p2, new ByteString(data, HEX), [0x9000]).then(function(result) {
+
+            var seedFlag = result.byteAt(0);
+            var offset = 1;
+            var resultList = {};
+            resultList['seedFlag'] = seedFlag;
+            if ((modeMask & BTChip.MODE_DEVELOPER) != 0) {
+                resultList['trustedInputKey'] = result.bytes(offset, 16);
+                offset += 16;
+                resultList['keyWrappingKey'] = result.bytes(offset, 16);
+                offset += 16;
+            }
+            if (seedFlag == 0x02) {
+                resultList['swappedMnemonic'] = result.bytes(offset, 48);
+                offset += 48;
+                resultList['encryptedDeviceEntropy'] = result.bytes(offset, 32);
+                offset += 32;
+            }
+            if (deprecatedSetupKeymap || bip39Generate) {
+                return resultList;
+            }
+            else {
+                return dongle.card.sendApdu_async(0xe0, 0x28, 0x00, 0x00, keymapEncoding, [0x9000]).then(function(result) {
+                    return resultList;
+                });
+            }
+        });
+    },
+
     verifyPin_async: function (pin) {
         return this.card.sendApdu_async(0xe0, 0x22, 0x00, 0x00, pin, [0x9000]);
     },
