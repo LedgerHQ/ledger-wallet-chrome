@@ -126,7 +126,7 @@ class @Account extends ledger.database.Model
   ###
   _createTransactionGetChangeAddressPath: (changeIndex, callback) ->
     changePath =  @getWalletAccount().getChangeAddressPath(changeIndex)
-    if ledger.app.dongle.getIntFirmwareVersion() isnt ledger.dongle.Firmware.V_L_1_0_0
+    if ledger.app.dongle.getIntFirmwareVersion() isnt ledger.dongle.Firmwares.V_L_1_0_0
       callback changePath
     else
       ledger.tasks.AddressDerivationTask.instance.getPublicAddress changePath, (xpubAddress) =>

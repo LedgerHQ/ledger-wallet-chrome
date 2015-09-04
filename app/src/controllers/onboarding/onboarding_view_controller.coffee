@@ -25,7 +25,7 @@ class @OnboardingViewController extends ledger.common.ViewController
     rootUrl: @params.rootUrl
     back: @representativeUrl()
     step: parseInt(@params.step) + 1
-    swapped_bip32: @params.swapped_bip32
+    swapped_bip39: @params.swapped_bip39
 
   _finalNavigationBackParams: ->
     _.extend(@_defaultNavigationBackParams(), @navigationBackParams())

@@ -257,7 +257,7 @@ var BTChip = Class.create({
     /* FIN AJOUT NESS */
 
     setupNew_async: function(modeMask, featuresMask, version, versionP2sh, pin, wipePin, keymapEncoding, restoreSeed, bip32SeedOrEntropy, wrappingKey, bip39Generate, bip39Restore) {
-        var deprecatedSetupKeymap = this.deprecatedSetupKeymap
+        var deprecatedSetupKeymap = this.deprecatedSetupKeymap;
         var dongle = this;
         if (typeof modeMask == "undefined") {
             modeMask = BTChip.MODE_WALLET;

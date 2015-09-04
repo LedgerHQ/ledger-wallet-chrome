@@ -34,9 +34,26 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
 
   onAfterRender: ->
     super
-    do @_generateInputs
-    do @_listenEvents
-    @_updateUI no
+    @view.indicationLabel.fadeOut(0)
+    @view.seedContainer.fadeOut(0)
+    initializeUi = (animate = no) =>
+      do @_generateInputs
+      do @_listenEvents
+      @_updateUI no
+      @view.seedContainer.fadeIn(if animate then 250 else 0)
+      @view.indicationLabel.fadeIn(if animate then 250 else 0)
+
+    if @params.swapped_bip39 and @params.wallet_mode == 'create'
+      @view.invalidLabel.fadeOut(0)
+      ledger.app.dongle.setupSwappedBip39(@params.pin).then (result) =>
+        @params.mnemonicPhrase = result.mnemonic.join(' ')
+        initializeUi(yes)
+      .fail (error) =>
+        # Display error
+    else if @params.swapped_bip39
+      # Handle restore swapped bip39
+    else
+      initializeUi()
 
   copy: ->
     text = @params.mnemonicPhrase
@@ -136,22 +153,23 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
         @_inputIsValid($(input))
 
     # validate mnemonic
-    if Bip39.isMnemonicPhraseValid(@params.mnemonicPhrase)
-      @view.invalidLabel.fadeOut(if animated then 250 else 0)
-      @view.continueButton.removeClass 'disabled'
-    else
-      if Bip39.utils.mnemonicPhraseWordsLength(@params.mnemonicPhrase) == Bip39.DEFAULT_PHRASE_LENGTH
-        @view.invalidLabel.fadeIn(if animated then 250 else 0)
-      else
+    unless @params.swapped_bip39
+      if Bip39.isMnemonicPhraseValid(@params.mnemonicPhrase)
         @view.invalidLabel.fadeOut(if animated then 250 else 0)
-      @view.continueButton.addClass 'disabled'
+        @view.continueButton.removeClass 'disabled'
+      else
+        if Bip39.utils.mnemonicPhraseWordsLength(@params.mnemonicPhrase) == Bip39.DEFAULT_PHRASE_LENGTH
+          @view.invalidLabel.fadeIn(if animated then 250 else 0)
+        else
+          @view.invalidLabel.fadeOut(if animated then 250 else 0)
+        @view.continueButton.addClass 'disabled'
 
   _writtenMnemonic: ->
     (_.string.trim(input.val()).toLowerCase() for input in @view.inputs).join(' ')
 
   _inputIsValid: (input) ->
     text = _.str.trim(input.val()).toLowerCase()
-    if Bip39.utils.isMnemonicWordValid(text)
+    if @params.wallet_mode is 'create' or Bip39.utils.isMnemonicWordValid(text)
       input.removeClass 'seed-invalid'
     else
       input.addClass 'seed-invalid'

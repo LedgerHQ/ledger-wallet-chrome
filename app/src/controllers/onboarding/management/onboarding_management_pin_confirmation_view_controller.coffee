@@ -6,6 +6,9 @@ class @OnboardingManagementPinconfirmationViewController extends @OnboardingView
     continueButton: '#continue_button'
     invalidLabel: '#invalid_pins'
 
+  initialize: ->
+    super
+
   onAfterRender: ->
     super
     do @_insertPinCode
