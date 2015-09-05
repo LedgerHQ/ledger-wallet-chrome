@@ -112,7 +112,14 @@ class @Api
     ledger.app.router.go '/wallet/p2sh/index', {inputs: JSON.stringify(data.inputs), scripts: JSON.stringify(data.scripts), outputs_number: data.outputs_number, outputs_script: data.outputs_script, paths: JSON.stringify(data.paths)}
 
   @getXPubKey: (data) ->
-    ledger.app.router.go '/wallet/xpubkey/index', {path: data.path}
+    if data.path && data.path.indexOf("0xb11e") > -1
+      ledger.app.dongle.getExtendedPublicKey data.path, (key, error) =>
+        if error?
+          @callback_cancel('get_xpubkey', t("wallet.xpubkey.errors.derivation_failed"))
+        else
+          @callback_success('get_xpubkey', {xpubkey: key._xpub58})
+    else
+      ledger.app.router.go '/wallet/xpubkey/index', {path: data.path}
 
   @bitid: (data) ->
     ledger.app.router.go '/wallet/bitid/index', {uri: data.uri, silent: data.silent}
