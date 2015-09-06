@@ -141,3 +141,6 @@ class @Api
         command: command,
         success: true 
       }, data
+
+  @cleanPath: (path) ->
+    path.replace "m/", ""
