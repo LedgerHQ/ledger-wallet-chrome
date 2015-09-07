@@ -3,6 +3,12 @@ class @OnboardingManagementSummaryViewController extends @OnboardingViewControll
   navigation:
     continueUrl: '/onboarding/management/provisioning'
 
+
+  initialize: ->
+    super
+    if @params.swapped_bip39
+      @navigation.continueUrl = '/onboarding/management/swapped_bip39_provisioning'
+
   navigationContinueParams: ->
     pin: @params.pin
-    seed: @params.seed
+    mnemonicPhrase: @params.mnemonicPhrase

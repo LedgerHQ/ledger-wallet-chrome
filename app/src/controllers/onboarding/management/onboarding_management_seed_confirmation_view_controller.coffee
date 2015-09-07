@@ -41,7 +41,7 @@ class @OnboardingManagementSeedconfirmationViewController extends @OnboardingVie
 
   navigationContinueParams: ->
     pin: @params.pin
-    seed: Bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
+    mnemonicPhrase: @params.mnemonicPhrase
 
   _generateInputs: ->
     # generate inputs

@@ -49,7 +49,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
         @params.mnemonicPhrase = result.mnemonic.join(' ')
         initializeUi(yes)
       .fail (error) =>
-        # Display error
+        ledger.app.router.go '/onboarding/management/switch_firmware', _.extend(_.clone(@params), mode: 'setup', on_done: '/onboarding/management/seed')
     else if @params.swapped_bip39
       # Handle restore swapped bip39
     else

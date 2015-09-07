@@ -117,6 +117,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   ###
   getDongleVersion: -> ledger.fup.utils.versionToString(@_dongleVersion)
 
+  getDongle: -> @_dongle
+
   ###
     Gets the version to update
     @return [String] The target version

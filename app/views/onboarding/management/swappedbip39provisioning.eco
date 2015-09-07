@@ -1,0 +1,35 @@
+<div class="nyan">
+  <div class="sparks-combo">
+    <div class="spark"></div>
+    <div class="spark"></div>
+    <div class="spark"></div>
+    <div class="spark"></div>
+  </div>
+
+  <div id="wave-a" class="hot rainbow"></div>
+  <div id="wave-a" class="cold rainbow"></div>
+
+  <div id="wave-b" class="hot rainbow"></div>
+  <div id="wave-b" class="cold rainbow"></div>
+
+  <div id="nyan-cat" class="frame1">
+  <div id="tail"></div>
+
+  <div id="paws"></div>
+
+  <div id="pop-tarts-body">
+    <div id="pop-tarts-body-cream"></div>
+  </div>
+
+  <div id="head">
+    <div id="face"></div>
+  </div>
+  </div>
+
+  <audio autoplay="true" loop="true">
+    <source src="../public/nyan/audio/nyan-cat.ogg" type="audio/ogg" />
+  </audio>
+  <div id="countdown" style="position:fixed;bottom:0px;width:100%;text-align:center;font-size: 75px;color: white">
+    3:30
+  </div>
+</div>
