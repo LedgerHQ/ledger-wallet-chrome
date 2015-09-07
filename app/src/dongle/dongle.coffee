@@ -285,7 +285,7 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
   unlockWithPinCode: (pin, callback=undefined) ->
-    Errors.throw(Errors.DongleAlreadyUnlock) if @state isnt States.LOCKED
+    Errors.throw(Errors.DongleAlreadyUnlock) if @state is States.UNLOCKED
     _btchipQueue.enqueue "unlockWithPinCode", =>
       d = ledger.defer(callback)
       @_pin = pin

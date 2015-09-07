@@ -281,10 +281,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
                 @_setCurrentState(States.InitializingOs)
                 @_handleCurrentState()
               else
-                @_dongle.isBetaCertified (__, error) =>
-                  @_setCurrentState(if error? and ledger.fup.versions.Nano.CurrentVersion.Overwrite is false then States.InitializingOs else States.ReloadingBootloaderFromOs)
-                  @_handleCurrentState()
-                return
+                @_checkReloadRecoveryAndHandleState()
             when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update, ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Higher
               index = 0
               while index < ledger.fup.updates.OS_INIT.length and !ledger.fup.utils.compareVersions(@_dongleVersion, ledger.fup.updates.OS_INIT[index][0]).eq()
@@ -292,14 +289,28 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
               if index isnt ledger.fup.updates.OS_INIT.length
                 @_processLoadingScript(ledger.fup.updates.OS_INIT[index][1], States.LoadingOldApplication, true)
                 .then =>
-                  @_setCurrentState(States.ReloadingBootloaderFromOs)
-                  @_handleCurrentState()
+                  @_checkReloadRecoveryAndHandleState()
                 .fail => @_failure(Errors.CommunicationError)
               else
-                @_setCurrentState(States.ReloadingBootloaderFromOs)
-                @_handleCurrentState()
+                @_checkReloadRecoveryAndHandleState()
             else return @_failure(Errors.HigherVersion)
           return
+
+  _checkReloadRecoveryAndHandleState: ->
+    handleState = (state) =>
+      @_setCurrentState(state)
+      @_handleCurrentState()
+      return
+
+    if @_dongle.getFirmwareInformation().hasRecoveryFlashingSupport()
+      @_getCard().exchange_async(new ByteString("E02280000100", HEX)).then =>
+        if ((@_getCard().SW & 0xFFF0) == 0x63C0) && (@_getCard().SW != 0x63C0)
+          handleState(States.Unlocking)
+        else
+          handleState(States.ReloadingBootloaderFromOs)
+    else
+      handleState(States.ReloadingBootloaderFromOs)
+    return
 
   _processErasing: ->
     @_waitForUserApproval('erasure')
@@ -371,7 +382,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     for i in [0...currentInitScript.length]
       moddedInitScript.push currentInitScript[i]
       if i is currentInitScript.length - 2 and @_keyCardSeed?
-        moddedInitScript.push "D026000011" + "04" + @_keyCardSeed.toString(HEX)
+        moddedInitScript.push "D026000011" + "04" + @_keyCardSeed.bytes(0, 16).toString(HEX)
+        moddedInitScript.push("D02A000018" + @_keyCardSeed.bytes(16).toString(HEX)) if @_keyCardSeed.length > 16
     @_processLoadingScript moddedInitScript, States.InitializingOs, yes
     .then =>
       @_success()
@@ -392,6 +404,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_failure(Errors.UnsupportedFirmware)
         return
       @_isWaitForDongleSilent = yes
+      l "Load RELOADER"
       @_processLoadingScript ledger.fup.updates.BL_RELOADER[index][1], States.ReloadingBootloaderFromOs
       .then =>
         @_waitForPowerCycle(null, yes)
