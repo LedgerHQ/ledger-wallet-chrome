@@ -92,8 +92,8 @@ class @OnboardingManagementSwappedbip39provisioningViewController extends @Onboa
       audio.pause()
 
   _countDown: ->
-    estimatedTime = (3 * 60 + 30) * 1000
+    estimatedTime = (4 * 60 + 30) * 1000
     diff = new Date().getTime() - @_startTime
-    minutes = Math.floor((diff) / (60 * 1000))
-    seconds = Math.floor((diff) % (60 * 1000) / 1000)
+    minutes = Math.floor((estimatedTime - diff) / (60 * 1000))
+    seconds = Math.floor((estimatedTime - diff) % (60 * 1000) / 1000)
     $('#countdown').text("#{Math.max(0, minutes)}:#{_.str.lpad(Math.max(0, seconds), 2, '0')}")

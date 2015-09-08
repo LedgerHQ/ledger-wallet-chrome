@@ -15,7 +15,7 @@ class @OnboardingManagementSwitchfirmwareViewController extends @OnboardingViewC
     @_request.onProgress @_onProgress.bind(@)
     @_request.on 'needsUserApproval', @_onUpdateNeedsUserApproval.bind(@)
     @_request.on 'stateChanged', (ev, data) => @_onStateChanged(data.newState, data.oldState)
-    @_request.setKeyCardSeed('02294b743102b45323f5588cf8d02703150009100407010c160506141711130a020e0b0312080d0f') # Todo: This is only for debug purpose due to a bug in setup firmware flash
+    @_request.setKeyCardSeed('02294b743102b45323f5588cf8d02703150009100407010c160506141711130a020e0b0312080d0f') if @params.mode is 'setup' # Todo: This is only for debug purpose due to a bug in setup firmware flash
     @_request.unlockWithPinCode(@params.pin) if @params.pin?
     @_fup = ledger.app.dongle.getFirmwareUpdater()
     ledger.app.setExecutionMode(ledger.app.Modes.FirmwareUpdate)
@@ -40,6 +40,7 @@ class @OnboardingManagementSwitchfirmwareViewController extends @OnboardingViewC
       ledger.app.router.go @params.on_done, @params
     else
       # Congrats!
+      ledger.app.router.go @params.on_done, @params
 
   _onRequireUserPin: ->
 

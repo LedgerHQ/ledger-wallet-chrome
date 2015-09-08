@@ -17,13 +17,8 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       @params.mnemonicPhrase = Bip39.generateMnemonicPhrase(Bip39.DEFAULT_PHRASE_LENGTH)
 
   navigationContinueParams: ->
-    hash =
-      pin: @params.pin
-    if @params.wallet_mode == 'create'
-      hash.mnemonicPhrase = @params.mnemonicPhrase
-    else
-      hash.seed = Bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
-    hash
+    pin: @params.pin
+    mnemonicPhrase: @params.mnemonicPhrase
 
   navigateContinue: ->
     if @params.wallet_mode == 'create'
@@ -52,6 +47,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
         ledger.app.router.go '/onboarding/management/switch_firmware', _.extend(_.clone(@params), mode: 'setup', on_done: '/onboarding/management/seed')
     else if @params.swapped_bip39
       # Handle restore swapped bip39
+      l "Handle swapped bip39", @params.swapped_bip39
     else
       initializeUi()
 

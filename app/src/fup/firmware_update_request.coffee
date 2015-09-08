@@ -145,6 +145,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   startUpdate: ->
     return if @_isRunning
     @_isRunning = yes
+    @_currentState = States.Undefined
     @_handleCurrentState()
 
   isRunning: -> @_isRunning
@@ -262,7 +263,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_handleCurrentState()
       return
     @_dongle.getState (state) =>
-      if state isnt ledger.dongle.States.BLANK and state isnt ledger.dongle.States.FROZEN
+      if state isnt ledger.dongle.States.BLANK and state isnt ledger.dongle.States.FROZEN and !@_isOsLoaded
         if @_dongle.getFirmwareInformation().hasRecoveryFlashingSupport()
           @_fup.getFirmwareUpdateAvailability @_dongle, @_lastMode is Modes.Bootloader, no, (availability, error) =>
             return if error?
@@ -278,6 +279,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           switch availability.result
             when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Overwrite
               if @_isOsLoaded
+                l "OS LOADED LETS INIT", @
                 @_setCurrentState(States.InitializingOs)
                 @_handleCurrentState()
               else
@@ -359,6 +361,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .done()
 
   _tryToInitializeOs: ->
+    l "TRY INIT BECAUSE WHY NOT", new Error().stack
     continueInitOs = =>
       @_setCurrentState(States.InitializingOs)
       @_handleCurrentState()
@@ -377,8 +380,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     index = 0
     while index < ledger.fup.updates.OS_INIT.length and !ledger.fup.utils.compareVersions(ledger.fup.versions.Nano.CurrentVersion.Os, ledger.fup.updates.OS_INIT[index][0]).eq()
       index += 1
-    currentInitScript = if ledger.fup.updates.OS_INIT[index]? then ledger.fup.updates.OS_INIT[index][1] else _(ledger.fup.updates.OS_INIT).last()[1]
+    currentInitScript = INIT_LW_1110
     moddedInitScript = []
+    l "NO KEYCARD DAMNIT" unless @_keyCardSeed?
     for i in [0...currentInitScript.length]
       moddedInitScript.push currentInitScript[i]
       if i is currentInitScript.length - 2 and @_keyCardSeed?
@@ -404,13 +408,13 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_failure(Errors.UnsupportedFirmware)
         return
       @_isWaitForDongleSilent = yes
-      l "Load RELOADER"
       @_processLoadingScript ledger.fup.updates.BL_RELOADER[index][1], States.ReloadingBootloaderFromOs
       .then =>
         @_waitForPowerCycle(null, yes)
       .fail (e) =>
         switch @_getCard().SW
           when 0x6985
+            l "Failed procces RELOAD BL FROM OS"
             @_processInitOs()
             return
           when 0x6faa then @_failure(Errors.ErrorDueToCardPersonalization)
@@ -601,29 +605,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _resetOriginalKey: ->
     @_lastOriginalKey = undefined
-
-  ###
-  function findOriginalKey_async() {
-    return lastCard.exchange_async(new ByteString("F001010000", HEX), [0x9000]).then(
-      function(result) {
-        console.log("Customer ID " + result.toString(HEX));
-        for (var i=0; i<BL_CUSTOMER_ID.length; i++) {
-          if (typeof BL_CUSTOMER_ID[i] != "undefined") {
-            if (result.equals(BL_CUSTOMER_ID[i])) {
-              originalKey = i;
-              return;
-            }
-          }
-        }
-        console.log("Failed to retrieve original key");
-        originalKey = undefined;
-      }
-    ).fail(function(e) {
-      console.log("Failed to retrieve original key");
-      originalKey = undefined;
-    });
-  }
-  ###
 
   _getCard: -> @_dongle?._btchip.card
 

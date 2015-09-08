@@ -34,7 +34,7 @@
       <img class="arrow" src="../assets/images/onboarding/large_right_arrow.png" width="16" height="30"/>
     </a>
   <% end %>
-  <a class="greyed-container detailed" href="<%= @url '/onboarding/management/security', wallet_mode: 'recover', swapped_bip39: true, back: @representativeUrl(), rootUrl: @representativeUrl(), step: 1 %>">
+  <a class="greyed-container detailed" href="<%= @url '/onboarding/management/security', wallet_mode: 'recover', swapped_bip39: false, back: @representativeUrl(), rootUrl: @representativeUrl(), step: 1 %>">
     <img class="index" src="../../assets/images/onboarding/management/restore_icon.png" width="46" height="46"/>
     <div class="texts">
       <div class="black-title"><%= t 'onboarding.management.welcome.recover_wallet' %></div>
