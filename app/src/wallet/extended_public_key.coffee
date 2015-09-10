@@ -28,8 +28,10 @@ class ledger.wallet.ExtendedPublicKey
         publicKey = bitcoin.compressPublicKey nodeData.publicKey
         depth = path.length
         lastChild = path[path.length - 1].split('\'')
-        childnum = parseInt(lastChild[0]) if lastChild.length is 1
-        childnum = (0x80000000 | parseInt(lastChild)) >>> 0
+        if lastChild.length is 1
+          childnum = parseInt(lastChild[0])
+        else
+          childnum = (0x80000000 | parseInt(lastChild[0])) >>> 0
         @_xpub = @_createXPUB depth, fingerprint, childnum, nodeData.chainCode, publicKey, ledger.config.network.name
         @_xpub58 = @_encodeBase58Check @_xpub
         @_hdnode = GlobalContext.bitcoin.HDNode.fromBase58 @_xpub58
