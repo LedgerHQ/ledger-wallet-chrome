@@ -5,7 +5,7 @@ _.extend ledger.bitcoin.bitid,
 
   # This path do not need a verified PIN to sign messages.
   ROOT_PATH: "0'/0xb11e'"
-  CALLBACK_PROXY_URL: "http://www.ledgerwallet.com/api/bitid"
+  CALLBACK_PROXY_URL: "https://www.ledgerwallet.com/api/bitid"
 
   isValidUri: (uri) ->
     uri.indexOf("bitid") == 0
@@ -102,11 +102,37 @@ _.extend ledger.bitcoin.bitid,
     if subpath?
       @ROOT_PATH + "/#{subpath}"
     else if uri?
-      @getPath(url: @uriToDerivationUrl(uri))
+      @getPathFromUri(uri)
     else if url?
       @getPath(subpath: "0x" + sha256_digest(url).substring(0,8) + "/0")
     else
       @ROOT_PATH
+
+  # Derive path from URI according to SLIP0013
+  getPathFromUri: (uri, index=0) ->
+    # remove params from URI
+    if uri.indexOf('?') > 0
+      uri = uri.substring(0, uri.indexOf('?'))
+    # compute the SHA256
+    bytes = [0, 0, 0, 0]
+    i = 0
+    while i < uri.length
+      bytes.push uri.charCodeAt(i++)
+    hb = sha256(bytes)
+    i = 0
+    hash = ""
+    while i < hb.length
+      hash += Convert.toHexByte(hb[i++])
+    # build the path
+    path = "13'/0x" + @reverseEndian(hash.substring(0, 8))
+    path += "'/0x" + @reverseEndian(hash.substring(8, 16))
+    path += "'/0x" + @reverseEndian(hash.substring(16, 24))
+    path += "'/0x" + @reverseEndian(hash.substring(24, 32)) + "'"
+    console.log path
+    path
+
+  reverseEndian: (str) ->
+    str.substring(6, 8) + str.substring(4, 6) + str.substring(2, 4) + str.substring(0, 2)
 
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
