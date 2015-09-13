@@ -128,7 +128,6 @@ _.extend ledger.bitcoin.bitid,
     path += "'/0x" + @reverseEndian(hash.substring(8, 16))
     path += "'/0x" + @reverseEndian(hash.substring(16, 24))
     path += "'/0x" + @reverseEndian(hash.substring(24, 32)) + "'"
-    console.log path
     path
 
   reverseEndian: (str) ->
