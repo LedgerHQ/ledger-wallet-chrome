@@ -2,6 +2,7 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
 
   view:
     amountInput: '#amount_input'
+    currencyContainer: '#currency_container'
     receiverAddress: "#receiver_address"
     accountsSelect: '#accounts_select'
     colorSquare: '#color_square'
@@ -40,7 +41,9 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
 
   _listenEvents: ->
     @view.amountInput.on 'keydown', (e) =>
-      _.defer => @_updateQrCode()
+      _.defer => 
+        @_updateQrCode()
+        @_updateExchangeValue()
     @view.accountsSelect.on 'change', =>
       @_updateColorSquare()
       @_updateQrCode()
@@ -48,6 +51,17 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
 
   _updateQrCode: () ->
     @view.qrcode.makeCode(@_bitcoinAddressUri());
+
+  _updateExchangeValue: ->
+    valueSatoshi = ledger.formatters.fromValueToSatoshi(_.str.trim(@view.amountInput.val() or "0"))
+    value = ledger.Amount.fromSatoshi(valueSatoshi)
+    if ledger.preferences.instance.isCurrencyActive()
+      if value.toString() != @view.currencyContainer.attr('data-countervalue')
+        @view.currencyContainer.removeAttr 'data-countervalue'
+        @view.currencyContainer.empty()
+        @view.currencyContainer.attr 'data-countervalue', value
+    else
+      @view.currencyContainer.hide()
 
   _updateReceiverAddress: ->
     @view.receiverAddress.text @_receivingAddress()

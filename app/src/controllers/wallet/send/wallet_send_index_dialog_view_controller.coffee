@@ -2,6 +2,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
 
   view:
     amountInput: '#amount_input'
+    currencyContainer: '#currency_container'
     sendButton: '#send_button'
     totalLabel: '#total_label'
     errorContainer: '#error_container'
@@ -121,6 +122,17 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     fees = @view.feesSelect.val()
     val = ledger.Amount.fromSatoshi(@_transactionAmount()).add(fees).toString()
     @view.totalLabel.text ledger.formatters.formatValue(val) + ' ' + _.str.sprintf(t('wallet.send.index.transaction_fees_text'), ledger.formatters.formatValue(fees))
+    @_updateExchangeValue()
+
+  _updateExchangeValue: ->
+    value = ledger.Amount.fromSatoshi(@_transactionAmount())
+    if ledger.preferences.instance.isCurrencyActive()
+      if value.toString() != @view.currencyContainer.attr('data-countervalue')
+        @view.currencyContainer.removeAttr 'data-countervalue'
+        @view.currencyContainer.empty()
+        @view.currencyContainer.attr 'data-countervalue', value
+    else
+      @view.currencyContainer.hide()
 
   _updateAccountsSelect: ->
     accounts = Account.displayableAccounts()
