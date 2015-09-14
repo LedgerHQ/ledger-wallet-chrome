@@ -66,6 +66,8 @@ _.extend ledger.bitcoin.bip39,
 
     checkMnemonicPhraseValid: (mnemonicPhrase) ->
       mnemonicWords = @mnemonicWordsFromPhrase(mnemonicPhrase)
+      if mnemonicWords.length != ledger.bitcoin.bip39.DEFAULT_PHRASE_LENGTH
+        throw "Invalid mnemonic length: #{mnemonicWords.length}"
       mnemonicIndexes = @mnemonicWordsToIndexes(mnemonicWords)
       if mnemonicIndexes.length % 3 != 0
         throw "Invalid mnemonic length : #{mnemonicIndexes.length}"
