@@ -7,15 +7,24 @@ _.extend ledger.bitcoin.bitid,
   ROOT_PATH: "0'/0xb11e'"
   CALLBACK_PROXY_URL: "https://www.ledgerwallet.com/api/bitid"
 
+  _cache: {}
+
   isValidUri: (uri) ->
     uri.indexOf("bitid") == 0
-
-  _cache: {}
 
   uriToDerivationUrl: (uri) ->
     url = uri.match(/^bitid:\/\/([^?]+)(?:\?.*)?$/)
     ledger.errors.throw("Invalid BitId URI") unless url?
     url[1]
+
+  uriToCallbackUrl: (uri) ->
+    m = uri.match(/^bitid\:([^?]+)/)
+    ledger.errors.throw("Invalid BitId URI") unless m?
+    if uri.indexOf("u=") > 0
+      url = "http://" + m[1]
+    else
+      url = "https://" + m[1]
+    url.replace "//", ""
 
   reset: -> @_cache = {}
 
@@ -110,27 +119,28 @@ _.extend ledger.bitcoin.bitid,
 
   # Derive path from URI according to SLIP0013
   getPathFromUri: (uri, index=0) ->
+    callback = @uriToCallbackUrl(uri)
     # remove params from URI
-    if uri.indexOf('?') > 0
-      uri = uri.substring(0, uri.indexOf('?'))
+    if callback.indexOf('?') > 0
+      callback = callback.substring(0, callback.indexOf('?'))
     # compute the SHA256
     bytes = [0, 0, 0, 0]
     i = 0
-    while i < uri.length
-      bytes.push uri.charCodeAt(i++)
+    while i < callback.length
+      bytes.push callback.charCodeAt(i++)
     hb = sha256(bytes)
     i = 0
     hash = ""
     while i < hb.length
       hash += Convert.toHexByte(hb[i++])
     # build the path
-    path = "13'/0x" + @reverseEndian(hash.substring(0, 8))
-    path += "'/0x" + @reverseEndian(hash.substring(8, 16))
-    path += "'/0x" + @reverseEndian(hash.substring(16, 24))
-    path += "'/0x" + @reverseEndian(hash.substring(24, 32)) + "'"
+    path = "13'/0x" + @littleEndian(hash.substring(0, 8))
+    path += "'/0x" + @littleEndian(hash.substring(8, 16))
+    path += "'/0x" + @littleEndian(hash.substring(16, 24))
+    path += "'/0x" + @littleEndian(hash.substring(24, 32)) + "'"
     path
 
-  reverseEndian: (str) ->
+  littleEndian: (str) ->
     str.substring(6, 8) + str.substring(4, 6) + str.substring(2, 4) + str.substring(0, 2)
 
   # @param [Function] callback Optional argument
