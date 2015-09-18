@@ -1,4 +1,9 @@
 # Changelog
+1.4.2
+===
+- Add 'bitcoin:' payment links registration
+- Show local currency counter value when sending or receiving a transaction
+
 1.4.1
 ===
 - Silent API xpub exportation for path including 0xb11e magic number (Copay integration)
