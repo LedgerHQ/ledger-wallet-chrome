@@ -85,7 +85,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     dialog.show()
 
   _listenEvents: ->
-    @view.amountInput.on 'keydown', =>
+    @view.amountInput.on 'keyup', =>
       _.defer => @_updateTotalLabel()
     @view.openScannerButton.on 'click', =>
       @openScanner()

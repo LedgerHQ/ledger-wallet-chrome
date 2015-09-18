@@ -40,7 +40,7 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
     window.print()
 
   _listenEvents: ->
-    @view.amountInput.on 'keydown', (e) =>
+    @view.amountInput.on 'keyup', (e) =>
       _.defer => 
         @_updateQrCode()
         @_updateExchangeValue()
