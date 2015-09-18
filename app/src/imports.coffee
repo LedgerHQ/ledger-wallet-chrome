@@ -311,6 +311,7 @@
 
         # - Tools
         'controllers/wallet/settings/tools/wallet_settings_tools_logs_setting_view_controller'
+        'controllers/wallet/settings/tools/wallet_settings_tools_protocols_setting_view_controller'
         'controllers/wallet/settings/wallet_settings_tools_section_dialog_view_controller'
 
         ## Onboarding controllers

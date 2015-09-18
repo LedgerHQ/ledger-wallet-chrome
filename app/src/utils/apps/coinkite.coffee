@@ -167,9 +167,15 @@ class @Coinkite
 
   verifyExtendedPublicKey: (request, callback) ->
     check = request.xpubkey_check
-    ledger.app.dongle.getExtendedPublicKey @_buildPath(request.ledger_key?.subkey_index), (key) =>
-      xpub = key._xpub58
-      callback?(xpub.indexOf(check, xpub.length - check.length) > 0)
+    path = @_buildPath(request.ledger_key?.subkey_index)
+    # check xpub against correct derivation and legacy derivation
+    ledger.app.dongle.getExtendedPublicKey path, (key) =>
+      if key._xpub58.indexOf(check, key._xpub58.length - check.length) > 0
+        callback?(true)
+      else
+        xpub = new ledger.wallet.ExtendedPublicKey(ledger.app.dongle, path)
+        xpub.initialize_legacy () =>
+          callback?(xpub._xpub58.indexOf(check, xpub._xpub58.length - check.length) > 0)
 
   testDongleCompatibility: (callback) ->
     transaction = Bitcoin.Transaction.deserialize("0100000001b4e84a9115e3633abaa1730689db782aa3bb54fa429a3c52a7fa55a788d611fd0100000000ffffffff02a0860100000000001976a914069b75ac23920928eda632a20525a027e67d040188ac50c300000000000017a914c70abc77a8bb21997a7a901b7e02d42c0c0bbf558700000000");

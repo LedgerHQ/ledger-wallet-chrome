@@ -7,8 +7,8 @@ class @WalletXpubkeyIndexDialogViewController extends ledger.common.DialogViewCo
   onAfterRender: ->
     super
     chrome.app.window.current().show()
-    @path = @params.path
-    @view.derivationPath.text(@path)
+    @path = Api.cleanPath(@params.path)
+    @view.derivationPath.text("m/" + @path)
 
   cancel: ->
     Api.callback_cancel 'get_xpubkey', t('wallet.xpubkey.errors.cancelled')

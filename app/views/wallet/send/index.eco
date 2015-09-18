@@ -9,6 +9,9 @@
         <td class="align-right">
           <input id="amount_input" class="large-text-input" placeholder="<%= t 'wallet.defaults.operations.amount' %>" value=""/>
           <label class="large-text-input"><%= ledger.formatters.getUnitSymbol() %></label>
+          <div class="align-right regular-grey-text-small">
+            <p class="balance-label" id="currency_container"></p>
+          </div>
         </td>
       </tr>
       <tr>
