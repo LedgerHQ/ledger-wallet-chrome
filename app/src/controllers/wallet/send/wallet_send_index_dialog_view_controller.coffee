@@ -86,7 +86,9 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
 
   _listenEvents: ->
     @view.amountInput.on 'keyup', =>
-      _.defer => @_updateTotalLabel()
+      _.defer => 
+        @_updateTotalLabel()
+        @_updateExchangeValue()
     @view.openScannerButton.on 'click', =>
       @openScanner()
     @view.feesSelect.on 'change', =>
@@ -122,7 +124,6 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     fees = @view.feesSelect.val()
     val = ledger.Amount.fromSatoshi(@_transactionAmount()).add(fees).toString()
     @view.totalLabel.text ledger.formatters.formatValue(val) + ' ' + _.str.sprintf(t('wallet.send.index.transaction_fees_text'), ledger.formatters.formatValue(fees))
-    @_updateExchangeValue()
 
   _updateExchangeValue: ->
     value = ledger.Amount.fromSatoshi(@_transactionAmount())
