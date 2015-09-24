@@ -15,6 +15,7 @@ _.extend ledger.errors,
   PermissionDenied: 107
   TimeoutError: 108
   InterruptedTask: 109
+  Cancelled: 110
 
   # Dongle errors
   NotSupportedDongle: 200

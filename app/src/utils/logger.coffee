@@ -256,7 +256,6 @@ class @ledger.utils.Logger
   # @param [String] msg Message to log.
   # @param [String] msgType Log level.
   _storeLog: (msg, msgType) ->
-    l 'NOT PERSISTENT' unless @_areLogsPersistents
     return unless @_areLogsPersistents
     now = new Date()
     log = {}

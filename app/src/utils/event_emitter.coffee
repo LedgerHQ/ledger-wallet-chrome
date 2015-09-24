@@ -35,6 +35,14 @@ class @EventEmitter
     @_eventEmitter = new _EventEmitter() unless @_eventEmitter?
     @_eventEmitter
 
+  emitAfter: (event, data, ms = null) ->
+    unless ms?
+      ms = data
+      data = undefined
+    setTimeout =>
+      @emit event, data
+    , ms
+
   emit: (event, data) ->
     @_getEventEmitter().emit event, data
 

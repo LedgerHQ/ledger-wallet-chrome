@@ -124,6 +124,7 @@
         'utils/promise/debounce'
         'utils/promise/throttle'
         'utils/math'
+        'utils/promise_map'
 
         ## Crypto
         'crypto/aes'
@@ -226,6 +227,7 @@
         'fup/firmware_updater'
         'fup/firmwares_manifest'
         'fup/utils'
+        'fup/card_manager'
 
         ## Models
         'models/wallet'

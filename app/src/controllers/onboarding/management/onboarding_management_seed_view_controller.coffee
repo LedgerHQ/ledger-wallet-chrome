@@ -30,7 +30,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
   onAfterRender: ->
     super
     @view.indicationLabel.fadeOut(0)
-    @view.seedContainer.fadeOut(0)
+    @view.seedContainer.fadeOut(1)
     initializeUi = (animate = no) =>
       do @_generateInputs
       do @_listenEvents

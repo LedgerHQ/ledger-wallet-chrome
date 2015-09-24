@@ -72,11 +72,11 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_exchangeNeedsExtraTimeout = no
     @_isWaitForDongleSilent = no
     @_isCancelled = no
-    @_eventHandler = []
     @_logger = ledger.utils.Logger.getLoggerByTag('FirmwareUpdateRequest')
     @_lastOriginalKey = undefined
     @_pinCode = undefined
     @_forceDongleErasure = no
+    @_cardManager = new ledger.fup.CardManager()
 
   ###
     Stops all current tasks and listened events.
@@ -84,10 +84,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   cancel: () ->
     @off()
     @_isRunning = no
-    _(@_eventHandler).each ([object, event, handler]) -> object?.off?(event, handler)
     @_onProgress = null
     @_isCancelled = yes
     @_fup._cancelRequest(this)
+    @_cardManager.stopWaiting()
 
   onProgress: (callback) -> @_onProgress = callback
 
@@ -116,8 +116,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @return [String] The current dongle version
   ###
   getDongleVersion: -> ledger.fup.utils.versionToString(@_dongleVersion)
-
-  getDongle: -> @_dongle
 
   ###
     Gets the version to update
@@ -180,58 +178,27 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   ###
   hasKeyCardSeed: () -> if @_keyCardSeed? then yes else no
 
-  _waitForConnectedDongle: (callback = undefined, silent = no) ->
-    @_isWaitForDongleSilent = silent
-    return @_connectionCompletion if @_connectionCompletion?
-    d = ledger.defer(callback)
-    registerDongle = (dongle) =>
+  _waitForConnectedDongle: (silent = no) ->
+    timeout = @emitAfter('plug',  if !silent then 0 else 200)
+    @_cardManager.waitForInsertion(silent).then ({card, mode}) =>
+      clearTimeout(timeout)
       @_resetOriginalKey()
-      @_lastMode = if dongle.isInBootloaderMode() then Modes.Bootloader else Modes.Os
-      @_dongle = dongle
-      handler =  =>
-        @_setCurrentState(States.Undefined)
-        @_dongle = null
-        @_waitForConnectedDongle(null, @_isWaitForDongleSilent)
-      dongle.once 'state:disconnected', handler
-      @_eventHandler.push [dongle, 'state:disconnected', handler]
+      @_lastMode = mode
+      @_setCurrentState(States.Undefined)
       @_handleCurrentState()
-      d.resolve(dongle)
-    [dongle] = ledger.app.donglesManager.getConnectedDongles()
-    try
-      unless dongle?
-        @_connectionCompletion = d.promise
-        delay = if !silent then 0 else 1000
-        setTimeout (=> @emit 'plug' unless @_dongle?), delay
-        handler = (e, dongle) =>
-          @_connectionCompletion = null
-          registerDongle(dongle)
-        ledger.app.donglesManager.once 'connected', handler
-        @_eventHandler.push [ledger.app.donglesManager, 'connected', handler]
-      else
-        registerDongle(dongle)
-    catch er
-      e er
-    d.promise
+      @_card = card
+      card
 
-  _waitForDisconnectDongle: (callback = undefined, silent = no) ->
-    return @_disconnectionCompletion if @_disconnectionCompletion?
-    d = ledger.defer(callback)
-    if @_dongle?
-      @emit 'unplug' unless silent
-      @_disconnectionCompletion = d.promise
-      @_dongle.once 'state:disconnected', =>
-        @_disconnectionCompletion = null
-        @_dongle = null
-        d.resolve()
-    else
-      d.resolve()
-    d.promise
+  _waitForDisconnectDongle: (silent = no) ->
+    timeout = @emitAfter('unplug', if !silent then 0  else 500)
+    @_cardManager.waitForDisconnection(silent).then =>
+      @_card = null
 
   _waitForPowerCycle: (callback = undefined, silent = no) -> @_waitForDisconnectDongle(null, silent).then(=> @_waitForConnectedDongle(callback, silent))
 
   _handleCurrentState: () ->
     # If there is no dongle wait for one
-    return @_waitForConnectedDongle() unless @_dongle?
+    return @_waitForConnectedDongle(yes) unless @_card?
     @_logger.info("Handle current state", lastMode: @_lastMode, currentState: @_currentState)
 
     # Otherwise handle the current by calling the right method depending on the last mode and the state
@@ -258,53 +225,37 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processInitStageOs: ->
     @_logger.info("Process init stage OS")
-    if !@_dongle.getFirmwareInformation().hasSubFirmwareSupport() and !@_keyCardSeed?
-      @_setCurrentState(States.SeedingKeycard)
-      @_handleCurrentState()
-      return
-    @_dongle.getState (state) =>
-      if state isnt ledger.dongle.States.BLANK and state isnt ledger.dongle.States.FROZEN and !@_isOsLoaded
-        if @_dongle.getFirmwareInformation().hasRecoveryFlashingSupport()
-          @_fup.getFirmwareUpdateAvailability @_dongle, @_lastMode is Modes.Bootloader, no, (availability, error) =>
-            return if error?
-            @_dongleVersion = availability.dongleVersion
-            @_setCurrentState(States.Unlocking)
-        else
-          @_setCurrentState(States.Erasing)
+    @_card.getVersion().then (version) ->
+      firmware = version.getFirmwareInformation()
+      if !firmware.hasSubFirmwareSupport() and !@_keyCardSeed?
+        @_setCurrentState(States.SeedingKeycard)
         @_handleCurrentState()
+      else if version.equals(ledger.fup.versions.Nano.CurrentVersion.Os)
+        if @_isOsLoaded
+          @_setCurrentState(States.LoadingOs)
+        else
+          @_checkReloadRecoveryAndHandleState(firmware)
+      else if version.gt(ledger.fup.versions.Nano.CurrentVersion.Os)
+        @_failure(Errors.HigherVersion)
       else
-        @_fup.getFirmwareUpdateAvailability @_dongle, @_lastMode is Modes.Bootloader, no, (availability, error) =>
-          return if error?
-          @_dongleVersion = availability.dongleVersion
-          switch availability.result
-            when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Overwrite
-              if @_isOsLoaded
-                l "OS LOADED LETS INIT", @
-                @_setCurrentState(States.InitializingOs)
-                @_handleCurrentState()
-              else
-                @_checkReloadRecoveryAndHandleState()
-            when ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Update, ledger.fup.FirmwareUpdater.FirmwareAvailabilityResult.Higher
-              index = 0
-              while index < ledger.fup.updates.OS_INIT.length and !ledger.fup.utils.compareVersions(@_dongleVersion, ledger.fup.updates.OS_INIT[index][0]).eq()
-                index += 1
-              if index isnt ledger.fup.updates.OS_INIT.length
-                @_processLoadingScript(ledger.fup.updates.OS_INIT[index][1], States.LoadingOldApplication, true)
-                .then =>
-                  @_checkReloadRecoveryAndHandleState()
-                .fail => @_failure(Errors.CommunicationError)
-              else
-                @_checkReloadRecoveryAndHandleState()
-            else return @_failure(Errors.HigherVersion)
-          return
+        index = 0
+        while index < ledger.fup.updates.OS_INIT.length and !version.equals(ledger.fup.updates.OS_INIT[index][0])
+          index += 1
+        if index isnt ledger.fup.updates.OS_INIT.length
+          @_processLoadingScript(ledger.fup.updates.OS_INIT[index][1], States.LoadingOldApplication, true)
+          .then =>
+            @_checkReloadRecoveryAndHandleState()
+          .fail => @_failure(Errors.CommunicationError)
+        else
+          @_checkReloadRecoveryAndHandleState(firmware)
 
-  _checkReloadRecoveryAndHandleState: ->
+  _checkReloadRecoveryAndHandleState: (firmware) ->
     handleState = (state) =>
       @_setCurrentState(state)
       @_handleCurrentState()
       return
 
-    if @_dongle.getFirmwareInformation().hasRecoveryFlashingSupport()
+    if firmware.hasRecoveryFlashingSupport()
       @_getCard().exchange_async(new ByteString("E02280000100", HEX)).then =>
         if ((@_getCard().SW & 0xFFF0) == 0x63C0) && (@_getCard().SW != 0x63C0)
           handleState(States.Unlocking)
@@ -321,7 +272,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         getRandomChar = -> "0123456789".charAt(_.random(10))
         @_stateCache.pincode = getRandomChar() + getRandomChar()
       pincode = @_stateCache.pincode
-      @_dongle.unlockWithPinCode pincode, (isUnlocked, error) =>
+      @_card.unlockWithPinCode(pincode).then (isUnlocked, error) =>
         @emit "erasureStep", if error?.retryCount? then error.retryCount else 3
         @_waitForPowerCycle()
       return
@@ -361,7 +312,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .done()
 
   _tryToInitializeOs: ->
-    l "TRY INIT BECAUSE WHY NOT", new Error().stack
     continueInitOs = =>
       @_setCurrentState(States.InitializingOs)
       @_handleCurrentState()
@@ -374,7 +324,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       .done()
     else
       do continueInitOs
-
 
   _processInitOs: ->
     index = 0
@@ -495,7 +444,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _attemptToFailDonglePinCode: (pincode) ->
     deferred = Q.defer()
-    @_dongle.unlockWithPinCode pincode, (isUnlocked, error) =>
+    @_card.unlockWithPinCode pincode, (isUnlocked, error) =>
       if isUnlocked or error.code isnt ledger.errors.WrongPinCode
         @emit "erasureStep", 3
         @_waitForPowerCycle().then -> deferred.reject()
@@ -606,6 +555,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _resetOriginalKey: ->
     @_lastOriginalKey = undefined
 
-  _getCard: -> @_dongle?._btchip.card
+  _getCard: -> @_card?.getCard()
 
   _notifyProgress: (state, offset, total) -> _.defer => @_onProgress?(state, offset, total)
