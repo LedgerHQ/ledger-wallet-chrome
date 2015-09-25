@@ -34,8 +34,8 @@ class @OnboardingManagementSwitchfirmwareViewController extends @OnboardingViewC
     ledger.app.setExecutionMode(ledger.app.Modes.Wallet)
 
   _onFirmwareSwitchDone: ->
-    @donglesManager.on 'connected', (event, dongle) =>
-      ledger.app.reconnectDongle(dongle)
+    @_request.cancel()
+    ledger.app.reconnectDongleAndEnterWalletMode().then =>
       if @params.mode is 'setup'
         # Choose PIN...
         ledger.app.router.go @params.on_done, @params
@@ -58,4 +58,4 @@ class @OnboardingManagementSwitchfirmwareViewController extends @OnboardingViewC
 
   _onStateChanged: (newState, oldState) ->
     switch newState
-      when ledger.fup.FirmwareUpdateRequest.States.Done then @_onFirmwareSwitchDone()
+      when States.Done then @_onFirmwareSwitchDone()

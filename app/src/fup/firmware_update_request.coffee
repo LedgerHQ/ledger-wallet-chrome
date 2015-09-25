@@ -82,13 +82,14 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     Stops all current tasks and listened events.
   ###
   cancel: () ->
-    @off()
-    @_isRunning = no
-    @_onProgress = null
-    @_isCancelled = yes
-    @_getCard()?.disconnect()
-    @_fup._cancelRequest(this)
-    @_cardManager.stopWaiting()
+    unless @_isCancelled
+      @off()
+      @_isRunning = no
+      @_onProgress = null
+      @_isCancelled = yes
+      @_getCard()?.disconnect()
+      @_fup._cancelRequest(this)
+      @_cardManager.stopWaiting()
 
 
   onProgress: (callback) -> @_onProgress = callback
@@ -322,7 +323,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_setCurrentState(States.InitializingOs)
       @_handleCurrentState()
     if !@_keyCardSeed?
-      debugger
       @_setCurrentState(States.SeedingKeycard)
       @_waitForUserApproval('keycard')
       .then =>

@@ -112,7 +112,6 @@ require @ledger.imports, ->
     _listenAppEvents: () ->
       @on 'wallet:operations:sync:failed', =>
 
-
       @on 'wallet:operations:sync:done', =>
 
       @on 'wallet:operations:update wallet:operations:new', =>
