@@ -445,7 +445,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     return
 
   _success: ->
-    debugger
     @_setCurrentState(States.Done)
     _.defer => @cancel()
 
