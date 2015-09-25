@@ -139,8 +139,8 @@ require @ledger.imports, ->
         ledger.utils.Logger._secureWriter = null
         ledger.utils.Logger._secureReader = null
         if removeDongle
-          @dongle = null
           @dongle.disconnect()
+          @dongle = null
         else
           @dongle?.lock()
       ledger.dialogs.manager.dismissAll(no)
