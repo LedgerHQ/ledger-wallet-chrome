@@ -86,8 +86,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_isRunning = no
     @_onProgress = null
     @_isCancelled = yes
+    @_getCard()?.disconnect()
     @_fup._cancelRequest(this)
     @_cardManager.stopWaiting()
+
 
   onProgress: (callback) -> @_onProgress = callback
 
@@ -443,6 +445,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     return
 
   _success: ->
+    debugger
     @_setCurrentState(States.Done)
     _.defer => @cancel()
 
