@@ -29,6 +29,10 @@ class ledger.fup.CardManager
     @_stopped = yes
     @_deferredWait?.reject(ledger.errors.new(ledger.errors.Cancelled))
 
+  checkIfCardIsStillConnected: (card) ->
+    @_scanDongles().then () =>
+      l arguments
+
   waitForInsertion: ->
     return if @_stopped
     @_deferredWait = ledger.defer()

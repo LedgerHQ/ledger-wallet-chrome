@@ -235,7 +235,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_handleCurrentState()
       else if version.equals(ledger.fup.versions.Nano.CurrentVersion.Os)
         if @_isOsLoaded
-          @_setCurrentState(States.LoadingOs)
+          @_setCurrentState(States.InitializingOs)
+          @_handleCurrentState()
         else
           @_checkReloadRecoveryAndHandleState(firmware)
       else if version.gt(ledger.fup.versions.Nano.CurrentVersion.Os)
@@ -251,6 +252,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           .fail => @_failure(Errors.CommunicationError)
         else
           @_checkReloadRecoveryAndHandleState(firmware)
+    .done()
 
   _checkReloadRecoveryAndHandleState: (firmware) ->
     handleState = (state) =>
@@ -354,7 +356,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .then =>
       @_removeUserApproval('reloadbootloader')
       index = 0
-      while index < ledger.fup.updates.BL_RELOADER.length and @_dongleVersion.equals(ledger.fup.updates.BL_RELOADER[index][0])
+      while index < ledger.fup.updates.BL_RELOADER.length and !@_dongleVersion.equals(ledger.fup.updates.BL_RELOADER[index][0])
         index += 1
       if index is ledger.fup.updates.BL_RELOADER.length
         @_failure(Errors.UnsupportedFirmware)
@@ -512,28 +514,33 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_exchangeNeedsExtraTimeout = no
       return
     try
-     @_getCard().exchange_async(new ByteString(adpus[offset], HEX))
-      .then =>
-        if ignoreSW or @_getCard().SW == 0x9000
-          if @_exchangeNeedsExtraTimeout or forceTimeout
-            deferred = Q.defer()
-            _.delay (=> deferred.resolve(@_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1))), ExchangeTimeout
-            deferred.promise
+      # BL not responding hack
+      if state is States.ReloadingBootloaderFromOs and offset is adpus.length - 1
+        @_getCard().exchange_async(new ByteString(adpus[offset], HEX))
+        ledger.delay(1000).then => @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
+      else
+        @_getCard().exchange_async(new ByteString(adpus[offset], HEX))
+        .then =>
+          if ignoreSW or @_getCard().SW == 0x9000
+            if @_exchangeNeedsExtraTimeout or forceTimeout
+              deferred = Q.defer()
+              _.delay (=> deferred.resolve(@_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1))), ExchangeTimeout
+              deferred.promise
+            else
+              @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
           else
-            @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
-        else
+            @_exchangeNeedsExtraTimeout = no
+            if forceTimeout is no
+              @_doProcessLoadingScript(adpus, state, ignoreSW, offset, yes)
+            else
+              throw new Error('Unexpected status ' + @_getCard().SW)
+        .fail (ex) =>
+          return @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1) if offset is adpus.length - 1
           @_exchangeNeedsExtraTimeout = no
           if forceTimeout is no
             @_doProcessLoadingScript(adpus, state, ignoreSW, offset, yes)
           else
-            throw new Error('Unexpected status ' + @_getCard().SW)
-      .fail (ex) =>
-        return @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1) if offset is adpus.length - 1
-        @_exchangeNeedsExtraTimeout = no
-        if forceTimeout is no
-          @_doProcessLoadingScript(adpus, state, ignoreSW, offset, yes)
-        else
-          throw new Error("ADPU sending failed " + ex)
+            throw new Error("ADPU sending failed " + ex)
     catch ex
       e ex
 
