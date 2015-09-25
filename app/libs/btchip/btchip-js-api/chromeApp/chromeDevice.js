@@ -84,10 +84,12 @@ function winUSBDevice(hardwareId) {
 }
 
 winUSBDevice.prototype.open = function(callback) {
+  var iId = this.interfaceId
     debug("Open winUSBDevice " + this.interfaceId);
     debug(this.device);
     var currentDevice = this;
     chrome.usb.claimInterface(this.device, this.interfaceId, function() {
+        debug("Claimed " + iId);
         currentDevice.claimed = true;
         chrome.runtime.sendMessage({usbClaimed: currentDevice});
         if (callback) callback(true);
@@ -102,7 +104,7 @@ winUSBDevice.prototype.send = function(data, callback) {
           endpoint: this.outEndpoint,
           data: hexToArrayBuffer(data)
         },        
-        function(result) {                  
+        function(result) {
           if (callback) {
             var exception = (result.resultCode != 0 ? "error " + result.resultCode : undefined);            
             callback({

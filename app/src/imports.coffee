@@ -228,6 +228,7 @@
         'fup/firmwares_manifest'
         'fup/utils'
         'fup/card_manager'
+        'fup/card'
 
         ## Models
         'models/wallet'

@@ -1,7 +1,7 @@
 ledger.fup ?= {}
 
 Modes = _.extend _.clone(ledger.fup.FirmwareUpdateRequest.Modes),
-  PreferBootloader: 3
+  PreferBootloader: 2
 
 class ledger.fup.CardManager
 
@@ -27,7 +27,7 @@ class ledger.fup.CardManager
 
   stopWaiting: ->
     @_stopped = yes
-    @_deferredWait.reject(ledger.errors.new(ledger.errors.Cancelled))
+    @_deferredWait?.reject(ledger.errors.new(ledger.errors.Cancelled))
 
   waitForInsertion: ->
     return if @_stopped

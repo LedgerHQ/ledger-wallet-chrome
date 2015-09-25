@@ -134,7 +134,9 @@ class @ledger.dongle.Dongle extends EventEmitter
   getSw: -> @_btchip.card.SW
 
   # Called when 
-  disconnect: -> @_setState(States.DISCONNECTED)
+  disconnect: ->
+    @_btchip.card.disconnect()
+    @_setState(States.DISCONNECTED)
 
   # @return [String] Firmware version, 1.0.0 for example.
   getStringFirmwareVersion: -> Try(=> @getFirmwareInformation().getStringFirmwareVersion()).getOrElse('unknown')

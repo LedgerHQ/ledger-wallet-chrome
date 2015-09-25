@@ -184,17 +184,19 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       clearTimeout(timeout)
       @_resetOriginalKey()
       @_lastMode = mode
+      @_card = new ledger.fup.Card(card)
       @_setCurrentState(States.Undefined)
       @_handleCurrentState()
-      @_card = card
       card
+    .done()
 
   _waitForDisconnectDongle: (silent = no) ->
     timeout = @emitAfter('unplug', if !silent then 0  else 500)
     @_cardManager.waitForDisconnection(silent).then =>
+      clearTimeout(timeout)
       @_card = null
 
-  _waitForPowerCycle: (callback = undefined, silent = no) -> @_waitForDisconnectDongle(null, silent).then(=> @_waitForConnectedDongle(callback, silent))
+  _waitForPowerCycle: (callback = undefined, silent = no) -> @_waitForDisconnectDongle(silent).then(=> @_waitForConnectedDongle(silent))
 
   _handleCurrentState: () ->
     # If there is no dongle wait for one
@@ -206,9 +208,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       switch @_currentState
         when States.Undefined
           @_findOriginalKey()
-          .then => @_processInitStageOs()
-          .fail => @_tryToInitializeOs()
-          .done()
+            .then => @_processInitStageOs()
+            .fail (error) => @_logger.error(error)
+            .done()
         when States.ReloadingBootloaderFromOs then do @_processReloadBootloaderFromOs
         when States.InitializingOs then do @_processInitOs
         when States.Erasing then do @_processErasing
@@ -225,7 +227,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processInitStageOs: ->
     @_logger.info("Process init stage OS")
-    @_card.getVersion().then (version) ->
+    @_card.getVersion(Modes.Os, no).then (version) =>
+      @_dongleVersion = version
       firmware = version.getFirmwareInformation()
       if !firmware.hasSubFirmwareSupport() and !@_keyCardSeed?
         @_setCurrentState(States.SeedingKeycard)
@@ -300,7 +303,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           else
             throw Errors.WrongPinCode
     .fail =>
-      l "FAILURE ", arguments
       @_failure(Errors.WrongPinCode)
     .done()
 
@@ -316,6 +318,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_setCurrentState(States.InitializingOs)
       @_handleCurrentState()
     if !@_keyCardSeed?
+      debugger
       @_setCurrentState(States.SeedingKeycard)
       @_waitForUserApproval('keycard')
       .then =>
@@ -351,7 +354,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .then =>
       @_removeUserApproval('reloadbootloader')
       index = 0
-      while index < ledger.fup.updates.BL_RELOADER.length and !ledger.fup.utils.compareVersions(@_dongleVersion, ledger.fup.updates.BL_RELOADER[index][0]).eq()
+      while index < ledger.fup.updates.BL_RELOADER.length and @_dongleVersion.equals(ledger.fup.updates.BL_RELOADER[index][0])
         index += 1
       if index is ledger.fup.updates.BL_RELOADER.length
         @_failure(Errors.UnsupportedFirmware)
@@ -373,16 +376,17 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       console.error(err)
 
   _processInitStageBootloader: ->
+    @_logger.info("Process init stage BL")
     @_lastVersion = null
-    @_dongle.getRawFirmwareVersion yes, yes, yes, (version, error) =>
+    @_card.getVersion(Modes.Bootloader, yes).then (version) =>
       return @_failure(Errors.UnableToRetrieveVersion) if error?
       @_lastVersion = version
-      if ledger.fup.utils.compareVersions(version, ledger.fup.versions.Nano.CurrentVersion.Bootloader).eq()
+      if version.equals(ledger.fup.versions.Nano.CurrentVersion.Bootloader)
         @_setCurrentState(States.LoadingOs)
         @_handleCurrentState()
       else
         continueInitStageBootloader = =>
-          if ledger.fup.utils.compareVersions(version, ledger.fup.versions.Nano.CurrentVersion.Reloader).eq()
+          if version.equals(ledger.fup.versions.Nano.CurrentVersion.Reloader)
             @_setCurrentState(States.LoadingBootloader)
             @_handleCurrentState()
           else
@@ -430,8 +434,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .then => @_waitForPowerCycle(null, yes)
     .fail (ex) =>
       @_failure(ledger.errors.CommunicationError)
-
-  _getVersion: (forceBl, checkHiddenReloader, callback) -> @_dongle.getRawFirmwareVersion(@_lastMode is Modes.Bootloader, forceBl, checkHiddenReloader, callback)
 
   _failure: (reason) ->
     @emit "error", cause: ledger.errors.new(reason)
@@ -542,6 +544,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     else
       @_getCard().exchange_async(new ByteString("F001010000", HEX), [0x9000]).then (result) =>
         l "CUST ID IS ", result.toString(HEX)
+        return if @_getCard().SW isnt 0x9000
         for blCustomerId, offset in ledger.fup.updates.BL_CUSTOMER_ID when result.equals(blCustomerId)
           l "OFFSET IS", offset
           @_lastOriginalKey = offset

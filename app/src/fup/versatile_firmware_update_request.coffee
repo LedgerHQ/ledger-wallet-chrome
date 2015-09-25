@@ -10,10 +10,10 @@ class ledger.fup.VersatileFirmwareUpdateRequest extends ledger.fup.FirmwareUpdat
   _getOsLoader: -> ledger.fup.updates[@_osLoader]
 
   _processInitStageOs: ->
-    if @_dongle.getFirmwareInformation().hasOperationFirmwareSupport() or yes
-      @_osLoader =  'OPERATION_OS_LOADER'
-    else
-      @_osLoader = 'OPERATION_OS_LOADER'#'SETUP_OS_LOADER'
+    #if @_dongle.getFirmwareInformation().hasOperationFirmwareSupport() or yes
+     # @_osLoader =  'OPERATION_OS_LOADER'
+    #else
+    @_osLoader = 'OPERATION_OS_LOADER'#'SETUP_OS_LOADER'
     super
 
   _setCurrentState: (state) ->

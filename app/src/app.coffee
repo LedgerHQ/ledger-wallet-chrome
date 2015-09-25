@@ -36,7 +36,7 @@ require @ledger.imports, ->
         ledger.utils.Logger.setGlobalLoggersPersistentLogsEnabled(off)
         ledger.utils.Logger.updateGlobalLoggersLevel()
       else
-        @donglesManager.pause()
+        @donglesManager.resume()
         ledger.utils.Logger.setGlobalLoggersPersistentLogsEnabled(on)
         ledger.utils.Logger.updateGlobalLoggersLevel()
         @connectDongle(ledger.app.dongle) if ledger.app.dongle?
@@ -141,6 +141,7 @@ require @ledger.imports, ->
         ledger.utils.Logger._secureReader = null
         if removeDongle
           @dongle = null
+          @dongle.disconnect()
         else
           @dongle?.lock()
       ledger.dialogs.manager.dismissAll(no)

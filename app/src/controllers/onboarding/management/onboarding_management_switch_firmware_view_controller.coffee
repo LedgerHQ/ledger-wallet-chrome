@@ -28,19 +28,20 @@ class @OnboardingManagementSwitchfirmwareViewController extends @OnboardingViewC
       @_request.startUpdate()
 
   onDetach: ->
+    super
     @_request.cancel()
     @_fup.unload()
     ledger.app.setExecutionMode(ledger.app.Modes.Wallet)
-    if @_request.getDongle()?
-      ledger.app.reconnectDongle(@_request.getDongle())
 
   _onFirmwareSwitchDone: ->
-    if @params.mode is 'setup'
-      # Choose PIN...
-      ledger.app.router.go @params.on_done, @params
-    else
-      # Congrats!
-      ledger.app.router.go @params.on_done, @params
+    @donglesManager.on 'connected', (event, dongle) =>
+      ledger.app.reconnectDongle(dongle)
+      if @params.mode is 'setup'
+        # Choose PIN...
+        ledger.app.router.go @params.on_done, @params
+      else
+        # Congrats!
+        ledger.app.router.go @params.on_done, @params
 
   _onRequireUserPin: ->
 
