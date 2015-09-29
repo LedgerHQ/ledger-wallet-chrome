@@ -255,7 +255,11 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           @_processLoadingScript(ledger.fup.updates.OS_INIT[index][1], States.LoadingOldApplication, true)
           .then =>
             @_checkReloadRecoveryAndHandleState()
-          .fail => @_failure(Errors.CommunicationError)
+          .fail (ex) =>
+            switch ex.message
+              when 'timeout'
+                @_waitForPowerCycle()
+              else @_failure(Errors.CommunicationError)
         else
           @_checkReloadRecoveryAndHandleState(firmware)
     .fail =>
@@ -313,6 +317,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           else
             throw Errors.WrongPinCode
     .fail =>
+      @_removeUserApproval('pincode')
       @_failure(Errors.WrongPinCode)
     .done()
 
@@ -352,8 +357,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .then =>
       @_success()
       @_isOsLoaded = no
-    .fail =>
-      @_failure(Errors.FailedToInitOs)
+    .fail (ex) =>
+      unless @_handleLoadingScriptError(ex)
+        @_failure(Errors.FailedToInitOs)
 
   _processReloadBootloaderFromOs: ->
     @_removeUserApproval('erasure')
@@ -372,14 +378,15 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       .then =>
         @_waitForPowerCycle(null, yes)
       .fail (e) =>
-        switch @_getCard().SW
-          when 0x6985
-            l "Failed procces RELOAD BL FROM OS"
-            @_processInitOs()
-            return
-          when 0x6faa then @_failure(Errors.ErrorDueToCardPersonalization)
-          else @_failure(Errors.CommunicationError)
-        @_waitForDisconnectDongle()
+        unless @_handleLoadingScriptError(e)
+          switch @_getCard().SW
+            when 0x6985
+              l "Failed procces RELOAD BL FROM OS"
+              @_processInitOs()
+              return
+            when 0x6faa then @_failure(Errors.ErrorDueToCardPersonalization)
+            else @_failure(Errors.CommunicationError)
+          @_waitForDisconnectDongle()
     .fail (err) ->
       console.error(err)
 
@@ -422,10 +429,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_processLoadingScript(@_getOsLoader()[offset], States.LoadingOs).then (result) =>
         @_isOsLoaded = yes
         _.delay (=> @_waitForPowerCycle(null, yes)), 200
-      .fail (e) =>
-        @_isWaitForDongleSilent = no
-        @_setCurrentState(States.Undefined)
-        @_failure(Errors.CommunicationError)
+      .fail (ex) => @_handleLoadingScriptError(ex)
     .fail (e) =>
       @_isWaitForDongleSilent = no
       @_setCurrentState(States.Undefined)
@@ -434,15 +438,13 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_findOriginalKey().then (offset) =>
       @_processLoadingScript(ledger.fup.updates.BL_LOADER[offset], States.LoadingBootloader)
     .then => @_waitForPowerCycle(null, yes)
-    .fail (ex) =>
-      @_failure(Errors.CommunicationError)
+    .fail (ex) => @_handleLoadingScriptError(ex)
 
   _processLoadBootloaderReloader: ->
     @_findOriginalKey().then (offset) =>
       @_processLoadingScript(ledger.fup.updates.RELOADER_FROM_BL[offset], States.LoadingBootloaderReloader)
     .then => @_waitForPowerCycle(null, yes)
-    .fail (ex) =>
-      @_failure(ledger.errors.CommunicationError)
+    .fail (ex) => @_handleLoadingScriptError(ex)
 
   _failure: (reason) ->
     @emit "error", cause: ledger.errors.new(reason)
@@ -527,6 +529,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         ledger.delay(1000).then => @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
       else
         @_getCard().exchange_async(new ByteString(adpus[offset], HEX))
+        .timeout(500, 'timeout')
         .then =>
           if ignoreSW or @_getCard().SW == 0x9000
             if @_exchangeNeedsExtraTimeout or forceTimeout
@@ -542,6 +545,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
             else
               throw new Error('Unexpected status ' + @_getCard().SW)
         .fail (ex) =>
+          throw ex if ex?.message is 'timeout'
           return @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1) if offset is adpus.length - 1
           @_exchangeNeedsExtraTimeout = no
           if forceTimeout is no
@@ -550,6 +554,13 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
             throw new Error("ADPU sending failed " + ex)
     catch ex
       e ex
+
+  _handleLoadingScriptError: (ex) ->
+    switch ex.message
+      when 'timeout'
+        @_waitForPowerCycle()
+      else @_failure(Errors.CommunicationError)
+    return
 
   _findOriginalKey: ->
     if @_lastOriginalKey?
