@@ -57,10 +57,11 @@
     &.detailed {
       display: flex;
       text-decoration: none;
-      color: @color-black;
+      color: @color-dark-grey;
       padding: 35px @metrics-ultra-large-padding;
       padding-bottom: 30px;
       margin-top: 20px;
+      align-items: center;
 
       .black-indication {
         margin-top: 10px;
@@ -68,19 +69,18 @@
       }
 
       > .index {
-        width: 46px;
+        width: 40px;
         font-size: 50px;
         font-weight: @font-weight-light;
         letter-spacing: -4px;
       }
 
       > .texts {
-        padding: 0 @metrics-medium-padding;
+        padding: 0 @metrics-medium-padding + 6px;
       }
 
       > .arrow {
         margin-left: auto;
-        align-self: center;
       }
     }
   }
