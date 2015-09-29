@@ -65,7 +65,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_currentState = States.Undefined
     @_isNeedingUserApproval = no
     @_lastMode = Modes.Os
-    @_lastVersion = undefined
+    @_dongleVersion = null
     @_isOsLoaded = no
     @_approvedStates = []
     @_stateCache = {} # This holds the state related data
@@ -206,6 +206,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     return @_waitForConnectedDongle(yes) unless @_card?
     @_logger.info("Handle current state", lastMode: @_lastMode, currentState: @_currentState)
 
+    if @_currentState is States.Undefined
+      @_dongleVersion = null
+
     # Otherwise handle the current by calling the right method depending on the last mode and the state
     if @_lastMode is Modes.Os
       switch @_currentState
@@ -230,7 +233,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processInitStageOs: ->
     @_logger.info("Process init stage OS")
-    @_card.getVersion(Modes.Os, no).then (version) =>
+    @_getVersion().then (version) =>
       @_dongleVersion = version
       firmware = version.getFirmwareInformation()
       if !firmware.hasSubFirmwareSupport() and !@_keyCardSeed?
@@ -255,6 +258,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           .fail => @_failure(Errors.CommunicationError)
         else
           @_checkReloadRecoveryAndHandleState(firmware)
+    .fail =>
+      @_failure(Errors.UnableToRetrieveVersion)
     .done()
 
   _checkReloadRecoveryAndHandleState: (firmware) ->
@@ -338,7 +343,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       index += 1
     currentInitScript = INIT_LW_1110
     moddedInitScript = []
-    l "NO KEYCARD DAMNIT" unless @_keyCardSeed?
     for i in [0...currentInitScript.length]
       moddedInitScript.push currentInitScript[i]
       if i is currentInitScript.length - 2 and @_keyCardSeed?
@@ -382,9 +386,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   _processInitStageBootloader: ->
     @_logger.info("Process init stage BL")
     @_lastVersion = null
-    @_card.getVersion(Modes.Bootloader, yes).then (version) =>
-      return @_failure(Errors.UnableToRetrieveVersion) if error?
-      @_lastVersion = version
+    @_getVersion().then (version) =>
       if version.equals(ledger.fup.versions.Nano.CurrentVersion.Bootloader)
         @_setCurrentState(States.LoadingOs)
         @_handleCurrentState()
@@ -408,6 +410,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
           .done()
         else
           do continueInitStageBootloader
+    .fail =>
+      return @_failure(Errors.UnableToRetrieveVersion)
+    .done()
 
 
   _processLoadOs: ->
@@ -568,5 +573,13 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_lastOriginalKey = undefined
 
   _getCard: -> @_card?.getCard()
+
+  _getVersion: ->
+    return ledger.defer().resolve(@_dongleVersion).promise if @_dongleVersion?
+    (if @_lastMode is Modes.Bootloader
+      @_card.getVersion(Modes.Bootloader, yes)
+    else
+      @_card.getVersion(Modes.Os, no)).then (version) =>
+        @_dongleVersion = version
 
   _notifyProgress: (state, offset, total) -> _.defer => @_onProgress?(state, offset, total)
