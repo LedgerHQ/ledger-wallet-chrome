@@ -61,6 +61,9 @@ _.extend ledger.bitcoin.bip39,
     hashHex = sjcl.codec.hex.fromBits(result)
     return hashHex
 
+  mnemonicPhraseToWordIndexes: (mnemonicPhrase) ->
+    (ledger.bitcoin.bip39.wordlist.indexOf(word) for word in mnemonicPhrase.split(' '))
+
   utils:
     BITS_IN_INTEGER: 8 * 4
 

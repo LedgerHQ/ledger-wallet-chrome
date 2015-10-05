@@ -15,16 +15,3 @@ class @OnboardingManagementProvisioningViewController extends @OnboardingViewCon
       ledger.app.router.go '/onboarding/management/done', {wallet_mode: @params.wallet_mode}
     .fail =>
       ledger.app.router.go '/onboarding/management/done', {wallet_mode: @params.wallet_mode, error: 1}
-
-  _performSetup: ->
-    ledger.app.dongle.deprecatedSetup @params.pin, ledger.bitcoin.bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
-    .then =>
-      ledger.app.router.go '/onboarding/management/switch_firmware', _.extend(_.clone(@params), mode: 'operation', pin: @params.pin, on_done: ledger.url.createUrlWithParams('/onboarding/management/done', wallet_mode: @params.wallet_mode))
-      return
-    .fail =>
-      if @params.retrying? is false
-        params = _.clone @params
-        _.extend params, retrying: yes
-        ledger.app.router.go '/onboarding/management/switch_firmware', _.extend(_.clone(@params), mode: 'setup', pin: @params.pin, on_done: ledger.url.createUrlWithParams('/onboarding/management/provisioning', params))
-      else
-        ledger.app.router.go '/onboarding/management/done', {wallet_mode: @params.wallet_mode, error: 1}

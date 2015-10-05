@@ -45,9 +45,6 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
         initializeUi(yes)
       .fail (error) =>
         ledger.app.router.go '/onboarding/management/switch_firmware', _.extend(_.clone(@params), mode: 'setup', on_done: '/onboarding/management/seed')
-    else if @params.swapped_bip39
-      # Handle restore swapped bip39
-      l "Handle swapped bip39", @params.swapped_bip39
     else
       initializeUi()
 

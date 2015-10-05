@@ -370,6 +370,10 @@ var BTChip = Class.create({
         return this.card.sendApdu_async(0xe0, 0x20, 0xfe, 0x00, new ByteString("00", HEX), [0x9000]);
     },
 
+    setupRecovery_async : function() {
+        return this.card.sendApdu_async(0xe0, 0x20, 0xff, 0x00, new ByteString("00", HEX), [0x9000]);
+    },
+
     verifyPin_async: function (pin) {
         return this.card.sendApdu_async(0xe0, 0x22, 0x00, 0x00, pin, [0x9000]);
     },

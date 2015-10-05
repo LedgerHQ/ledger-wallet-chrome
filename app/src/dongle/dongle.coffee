@@ -373,37 +373,48 @@ class @ledger.dongle.Dongle extends EventEmitter
       ).catch( (error) ->
         console.error("Fail to setup :", error)
       ).done()
-
       d.promise
 
-  setupSwappedBip39: (pin, userEntropy = undefined, callback = undefined) ->
+  setupSwappedBip39: (pin, userEntropy = undefined, callback = undefined) -> @_setupSwappedBip39({pin, userEntropy, callback})
+
+  restoreSwappedBip39: (pin, restoreSeed, callback = undefined) -> @_setupSwappedBip39({pin, restoreSeed, callback})
+
+  _setupSwappedBip39: ({pin, userEntropy, restoreSeed, callback}) ->
     Errors.throw(Errors.DongleNotBlank) if @state isnt States.BLANK
     userEntropy ||= ledger.bitcoin.bip39.generateEntropy()
+    if restoreSeed?
+      indexes = ledger.bitcoin.bip39.mnemonicPhraseToWordIndexes(restoreSeed)
+      restoreSeed = (Convert.toHexShort(index) for index in indexes).join('')
     d = ledger.defer(callback)
     @_btchip.setupNew_async(
       BTChip.MODE_WALLET,
       BTChip.FEATURE_DETERMINISTIC_SIGNATURE | BTChip.FEATURE_NO_2FA_P2SH,
-      BTChip.VERSION_BITCOIN_MAINNET,
-      BTChip.VERSION_BITCOIN_P2SH_MAINNET,
+      ledger.config.network.version.regular,
+      ledger.config.network.version.P2SH,
       new ByteString(pin, ASCII),
       undefined,
       undefined,
       false,
-      new ByteString(userEntropy, HEX),
-      undefined, true
+      new ByteString(restoreSeed or userEntropy, HEX),
+      undefined, !restoreSeed?, restoreSeed?
     ).then (result) =>
+      debugger
       mnemonic = []
       for i in [0...24]
         wordIndex = (result['swappedMnemonic'].byteAt(2 * i) << 8) + (result['swappedMnemonic'].byteAt(2 * i + 1))
         mnemonic.push ledger.bitcoin.bip39.wordlist[wordIndex]
       d.resolve(_.extend(result, mnemonic: mnemonic))
     .fail (error) =>
+      debugger
       d.reject(error)
     .done()
     d.promise
 
   setupFinalizeBip39: (callback = undefined) ->
     ledger.defer(callback).resolve(@_btchip.setupFinalizeBip39_async()).promise
+
+  restoreFinalizeBip29: (callback = undefined) ->
+    ledger.defer(callback).resolve(@_btchip.setupRecovery_async()).promise
 
   restoreSetup: (callback = undefined) -> @_sendApdu(0xE0, 0x20, 0xFF, 0x00, 0x01, 0x00, [0x9000]).then(callback or _.noop)
 

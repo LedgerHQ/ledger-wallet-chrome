@@ -4,13 +4,11 @@ class @OnboardingManagementSwappedbip39provisioningViewController extends @Onboa
     super
 
     # Important part
+    if @params.wallet_mode is 'create'
+      @_finalizeSetup()
+    else
+      @_performSetup()
 
-    ledger.app.dongle.setupFinalizeBip39().then =>
-      # Next step flash the dongle in operation firmware
-      ledger.app.router.go '/onboarding/management/switch_firmware', _.extend(_.clone(@params), mode: 'operation', pin: @params.pin, on_done: '/onboarding/management/done')
-    .fail =>
-      # Display Error (Need unplug)
-      e "FATAL ERROR SETUP", arguments
     # !Important part
 
 
@@ -97,3 +95,24 @@ class @OnboardingManagementSwappedbip39provisioningViewController extends @Onboa
     minutes = Math.floor((estimatedTime - diff) / (60 * 1000))
     seconds = Math.floor((estimatedTime - diff) % (60 * 1000) / 1000)
     $('#countdown').text("#{Math.max(0, minutes)}:#{_.str.lpad(Math.max(0, seconds), 2, '0')}")
+
+  _finalizeSetup: ->
+    ledger.app.dongle.setupFinalizeBip39().then =>
+      # Next step flash the dongle in operation firmware
+      ledger.app.router.go '/onboarding/management/switch_firmware', _.extend(_.clone(@params), mode: 'operation', pin: @params.pin, on_done: '/onboarding/management/done')
+    .fail =>
+      ledger.app.router.go '/onboarding/management/done', {wallet_mode: @params.wallet_mode, error: 1}
+
+  _performSetup: ->
+    ledger.app.dongle.restoreSwappedBip39 @params.pin, @params.mnemonicPhrase
+    .then => ledger.app.dongle.restoreFinalizeBip29()
+    .then =>
+      ledger.app.router.go '/onboarding/management/switch_firmware', _.extend(_.clone(@params), mode: 'operation', pin: @params.pin, on_done: ledger.url.createUrlWithParams('/onboarding/management/done', wallet_mode: @params.wallet_mode))
+      return
+    .fail =>
+      if @params.retrying? is false
+        params = _.clone @params
+        _.extend params, retrying: yes
+        ledger.app.router.go '/onboarding/management/switch_firmware', _.extend(_.clone(@params), mode: 'setup', pin: @params.pin, on_done: '/onboarding/management/done')
+      else
+        ledger.app.router.go '/onboarding/management/done', {wallet_mode: @params.wallet_mode, error: 1}
