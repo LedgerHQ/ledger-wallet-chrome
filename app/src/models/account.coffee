@@ -87,12 +87,14 @@ class @Account extends ledger.database.Model
   getBalanceFromOperations: ->
     total = ledger.Amount.fromSatoshi(0)
     for operation in @get('operations')
+      continue if operation.get('double_spent_priority')? and operation.get('double_spent_priority') > 0
       total = if operation.get('type') is 'reception' then total.add(operation.get('value')) else total.subtract(operation.get('value')).subtract(operation.get('fees'))
     total
 
   getUnconfirmedBalanceFromOperations: ->
     total = ledger.Amount.fromSatoshi(0)
     for operation in @get('operations') when operation.get('confirmations') > 0
+      continue if operation.get('double_spent_priority')? and operation.get('double_spent_priority') > 0
       total = if operation.get('type') is 'reception' then total.add(operation.get('value')) else total.subtract(operation.get('value')).subtract(operation.get('fees'))
     total
 
