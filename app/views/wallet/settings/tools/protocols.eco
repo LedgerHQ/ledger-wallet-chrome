@@ -1,9 +1,0 @@
-<div class="large-table">
-  <div class="header top">
-    <div class="uppercase-section-column"><%= t 'wallet.settings.tools.protocols' %></div>
-  </div>
-  <a class="row bottom" href="#openRegistration">
-    <div class="regular-text-small stretchable"><%= t 'wallet.settings.tools.register' %></div>
-    <div class="regular-grey-text"><i class="fa fa-angle-right"></i></div>
-  </a>
-</div>
