@@ -28,10 +28,11 @@ _.extend ledger.errors,
 
   # Wallet errors
   NotEnoughFunds: 300
-  SignatureError: 301
-  TransactionNotInitialized: 302
-  DustTransaction: 303
-  ChangeDerivationError: 304
+  NotEnoughFundsConfirmed: 301
+  SignatureError: 302
+  TransactionNotInitialized: 303
+  DustTransaction: 304
+  ChangeDerivationError: 305
 
   # Firmware update errors
   UnableToRetrieveVersion: 400

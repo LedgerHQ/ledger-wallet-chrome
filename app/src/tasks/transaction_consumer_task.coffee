@@ -211,13 +211,15 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
       tx.outputs = outputs
       if _(inputs).chain().some((i) -> _(i.accounts).some((a) -> a?.index is account.getId())).value()
         operation = Operation.fromSend(tx, account)
-        ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
+        checkForDoubleSpent(operation)
         operation.save()
+        ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
         (transaction.operations ||= []).push operation
       if _(outputs).chain().some((o) -> _(o.accounts).some((a) -> a?.index is account.getId()) and !_(o.nodes).chain().compact().every((n) -> n[1] is 1).value()).value()
         operation = Operation.fromReception(tx, account)
-        ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
+        checkForDoubleSpent(operation)
         operation.save()
+        ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
         (transaction.operations ||= []).push operation
       do next
     .done ->
@@ -227,3 +229,39 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
   @instance: new @
 
 {$info, $error, $warn} = ledger.utils.Logger.getLazyLoggerByTag("TransactionConsumerTask")
+
+checkForDoubleSpent = (operation) ->
+  for input_hash, index in operation.get('inputs_hash')
+    l "Check for double spent on #{input_hash}"
+    input_index = operation.get('inputs_index')[index]
+    query = {
+      $and: [
+        inputs_hash: $contain: input_hash
+        inputs_index: $contain: input_index
+        type: operation.get('type')
+        uuid: $neq: operation.get('uuid')
+      ]
+    }
+    suspiciousOperations = Operation.find(query).data()
+    suspiciousOperations.push operation
+    # If one of these is confirmed, invalidate the others
+    confirmedIndex =  _(suspiciousOperations).findIndex (i) -> i.get('confirmations') > 0
+    if confirmedIndex isnt -1
+      for op, index in suspiciousOperations
+        op.delete() unless index is confirmedIndex
+      return
+
+    suspiciousOperations.sort (a, b) ->
+      if a.get('fees') > b.get('fees')
+        return -1
+      else if a.get('fees') < b.get('fees')
+        return 1
+      else if a.get('time') < b.get('time')
+        return -1
+      else if a.get('time') < b.get('time')
+        return 1
+      else
+        return 0
+
+    for op, index in suspiciousOperations
+      op.set('double_spent_priority', index)
