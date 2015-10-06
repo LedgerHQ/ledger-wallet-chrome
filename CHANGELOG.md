@@ -1,4 +1,10 @@
 # Changelog
+1.4.3
+===
+- Handle bitcoin [malleability attack](http://blog.coinkite.com/post/130318407326/ongoing-bitcoin-malleability-attack-low-s-high)
+- Remove rejected transaction from the database
+- Add a feature to clear the application data from the tools dialog
+
 1.4.2
 ===
 - Add 'bitcoin:' payment links registration
