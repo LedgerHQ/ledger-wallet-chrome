@@ -261,6 +261,7 @@ class ledger.wallet.Transaction
           validOutputs = _(validOutputs).uniq no, (i) ->  i['output_index'] +  i['transaction_hash']
           finalOutputs = []
           collectedAmount = new Amount()
+          collectedAmountWithUnconfirmed = new Amount()
           hadNetworkFailure = no
           $info("Valid outputs: ", validOutputs)
 
@@ -269,10 +270,13 @@ class ledger.wallet.Transaction
             ledger.api.TransactionsRestClient.instance.getRawTransaction output.transaction_hash, (rawTransaction, error) ->
               if error?
                 hadNetworkFailure = yes
+              else if output.confirmations is 0 and !output.paths[0].match(/\d+'\/\d+'\/\d+'\/1\/\d+/)?
+                collectedAmountWithUnconfirmed = collectedAmountWithUnconfirmed.add(Amount.fromSatoshi(output.value))
               else
                 output.raw = rawTransaction
                 finalOutputs.push(output)
                 collectedAmount = collectedAmount.add(Amount.fromSatoshi(output.value))
+                collectedAmountWithUnconfirmed = collectedAmountWithUnconfirmed.add(Amount.fromSatoshi(output.value))
               if collectedAmount.gte(requiredAmount)
                 changeAmount = collectedAmount.subtract(requiredAmount)
                 fees = fees.add(changeAmount) if changeAmount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
@@ -285,6 +289,8 @@ class ledger.wallet.Transaction
               else if hasNext is true
                 # Continue to collect funds
                 done()
+              else if collectedAmountWithUnconfirmed.gte(requiredAmount)
+                d.rejectWithError(Errors.NotEnoughFundsConfirmed)
               else if hadNetworkFailure
                 d.rejectWithError(Errors.NetworkError)
               else

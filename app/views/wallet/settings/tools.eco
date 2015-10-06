@@ -2,8 +2,10 @@
   <header>
     <h1><%= t 'wallet.settings.common.tools' %></h1>
   </header>
+  <div id="protocols_table_container"></div>
   <div id="logs_table_container"></div>
 </section>
+
 <div class="dialog-actions-bar">
   <a class="uppercase-action" href="#openOtherSettings"><%= t 'wallet.settings.common.other_settings' %></a>
   <div class="left-spacer"></div>

@@ -213,11 +213,13 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
         operation = Operation.fromSend(tx, account)
         ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
         operation.save()
+        checkForDoubleSpent(operation)
         (transaction.operations ||= []).push operation
       if _(outputs).chain().some((o) -> _(o.accounts).some((a) -> a?.index is account.getId()) and !_(o.nodes).chain().compact().every((n) -> n[1] is 1).value()).value()
         operation = Operation.fromReception(tx, account)
         ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
         operation.save()
+        checkForDoubleSpent(operation)
         (transaction.operations ||= []).push operation
       do next
     .done ->
@@ -227,3 +229,6 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
   @instance: new @
 
 {$info, $error, $warn} = ledger.utils.Logger.getLazyLoggerByTag("TransactionConsumerTask")
+
+checkForDoubleSpent = (operation) ->
+  ledger.tasks.OperationsSynchronizationTask.prototype.checkForDoubleSpent(operation)

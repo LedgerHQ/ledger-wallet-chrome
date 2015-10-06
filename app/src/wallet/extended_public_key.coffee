@@ -18,7 +18,13 @@ class ledger.wallet.ExtendedPublicKey
     @_hdnode = GlobalContext.bitcoin.HDNode.fromBase58 @_xpub58
     return
 
+  initialize_legacy: (callback) ->
+    @_initialize callback, true
+
   initialize: (callback) ->
+    @_initialize callback, false
+
+  _initialize: (callback, legacyMode) ->
     derivationPath = @_derivationPath.substring(0, @_derivationPath.length - 1)
     path = derivationPath.split '/'
     bitcoin = new BitcoinExternal()
@@ -28,8 +34,12 @@ class ledger.wallet.ExtendedPublicKey
         publicKey = bitcoin.compressPublicKey nodeData.publicKey
         depth = path.length
         lastChild = path[path.length - 1].split('\'')
-        childnum = parseInt(lastChild[0]) if lastChild.length is 1
-        childnum = (0x80000000 | parseInt(lastChild)) >>> 0
+        if legacyMode
+          childnum = (0x80000000 | parseInt(lastChild)) >>> 0
+        else if lastChild.length is 1
+          childnum = parseInt(lastChild[0])
+        else
+          childnum = (0x80000000 | parseInt(lastChild[0])) >>> 0
         @_xpub = @_createXPUB depth, fingerprint, childnum, nodeData.chainCode, publicKey, ledger.config.network.name
         @_xpub58 = @_encodeBase58Check @_xpub
         @_hdnode = GlobalContext.bitcoin.HDNode.fromBase58 @_xpub58
@@ -49,6 +59,9 @@ class ledger.wallet.ExtendedPublicKey
         finalize fingerprint
     else
       finalize 0
+
+
+
 
   _createXPUB: (depth, fingerprint, childnum, chainCode, publicKey, network) ->
     magic = if ledger?.config?.network? then  Convert.toHexInt(ledger.config.network.bitcoinjs.bip32.public) else "0488B21E"

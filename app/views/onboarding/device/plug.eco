@@ -8,6 +8,7 @@
         <a href="#openSupport" class="medium-indication"><%= t 'onboarding.device.plug.is_not_recognized' %></a>
     </div>
     <div class="actions-container">
-      <span class="greyed-action"><%= ledger.managers.application.fullStringVersion() %></span>
+      <span class="greyed-action"><%= ledger.managers.application.fullStringVersion() %> - </span>
+      <a href="#openChangeLog" class="greyed-action medium-indication"><%= t 'onboarding.device.plug.whats_new' %></a>
     </div>
 </div>

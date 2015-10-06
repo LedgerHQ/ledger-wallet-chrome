@@ -2,4 +2,5 @@ class @WalletSettingsToolsSectionDialogViewController extends WalletSettingsSect
 
   settingViewControllersClasses: [
     WalletSettingsToolsLogsSettingViewController,
+    WalletSettingsToolsUtilitiesSettingViewController
   ]

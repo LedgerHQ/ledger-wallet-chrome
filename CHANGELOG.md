@@ -1,4 +1,19 @@
 # Changelog
+1.4.3
+===
+- Handle bitcoin [malleability attack](http://blog.coinkite.com/post/130318407326/ongoing-bitcoin-malleability-attack-low-s-high)
+- Remove rejected transaction from the database
+- Add a feature to clear the application data from the tools dialog
+
+1.4.2
+===
+- Add 'bitcoin:' payment links registration
+- Show local currency counter value when sending or receiving a transaction
+
+1.4.1
+===
+- Silent API xpub exportation for path including 0xb11e magic number (Copay integration)
+
 1.4.0
 ===
 - New multi-accounts feature

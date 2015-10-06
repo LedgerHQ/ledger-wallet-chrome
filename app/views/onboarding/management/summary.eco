@@ -17,8 +17,8 @@
   </div>
   <div class="page-content-container">
     <img src="../assets/images/onboarding/management/ledger_wallet.png" width="379" height="80" />
-    <div class="grey-indication-strong"><%= if @params.wallet_mode == 'create' then t 'onboarding.management.summary.by_clicking_finish_create' else t 'onboarding.management.summary.by_clicking_finish_other' %></div>
-    <div class="grey-indication"><%= t 'onboarding.management.summary.your_wallet_mode_' + @params.wallet_mode %> <%= t 'onboarding.management.summary.during_the_operation' %></div>
+    <div class="black-indication-strong"><%= if @params.wallet_mode == 'create' then t 'onboarding.management.summary.by_clicking_finish_create' else t 'onboarding.management.summary.by_clicking_finish_other' %></div>
+    <div class="black-indication"><%= t 'onboarding.management.summary.your_wallet_mode_' + @params.wallet_mode %> <%= t 'onboarding.management.summary.during_the_operation' %></div>
   </div>
   <div class="navigation-container">
     <a class="back" href="#navigateRoot" id="back_button"><i class="fa fa-angle-left"></i> <%= t 'onboarding.management.cancel' %></a>
