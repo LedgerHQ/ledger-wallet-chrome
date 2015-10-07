@@ -3,12 +3,9 @@ class @OnboardingManagementProvisioningViewController extends @OnboardingViewCon
   onAfterRender: ->
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@select('div.greyed-container')[0])
-    if ledger.app.dongle.getFirmwareInformation().hasSubFirmwareSupport()
-      @_performSetup()
-    else
-      @_performLegacySetup()
+    @_performSetup()
 
-  _performLegacySetup: ->
+  _performSetup: ->
     seed = ledger.bitcoin.bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
     ledger.app.dongle.setup @params.pin, seed
     .then =>

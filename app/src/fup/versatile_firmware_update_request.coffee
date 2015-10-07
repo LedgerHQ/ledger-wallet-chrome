@@ -12,7 +12,7 @@ class ledger.fup.VersatileFirmwareUpdateRequest extends ledger.fup.FirmwareUpdat
   _processInitStageOs: ->
     @_getVersion().then (version) =>
       firmware = version.getFirmwareInformation()
-      if firmware.hasOperationFirmwareSupport()
+      if firmware.hasSubFirmwareSupport() and firmware.hasOperationFirmwareSupport()
         @_osLoader =  'OPERATION_OS_LOADER'
       else
         @_osLoader = 'SETUP_OS_LOADER'

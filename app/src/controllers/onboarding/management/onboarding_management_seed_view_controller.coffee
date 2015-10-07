@@ -31,15 +31,15 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
     super
     @view.indicationLabel.fadeOut(0)
     @view.seedContainer.fadeOut(1)
+    @view.invalidLabel.fadeOut(0)
     initializeUi = (animate = no) =>
       do @_generateInputs
       do @_listenEvents
       @_updateUI no
       @view.seedContainer.fadeIn(if animate then 250 else 0)
       @view.indicationLabel.fadeIn(if animate then 250 else 0)
-
+    debugger
     if @params.swapped_bip39 and @params.wallet_mode == 'create'
-      @view.invalidLabel.fadeOut(0)
       ledger.app.dongle.setupSwappedBip39(@params.pin).then (result) =>
         @params.mnemonicPhrase = result.mnemonic.join(' ')
         initializeUi(yes)

@@ -2,6 +2,8 @@ class @OnboardingManagementWelcomeViewController extends @OnboardingViewControll
 
   onBeforeRender: ->
     super
+    if ledger.app.dongle.getFirmwareInformation().hasSetupFirmwareSupport()
+      @_isSwappedBip39FeatureEnabled = ledger.app.dongle.isSwappedBip39FeatureEnabled()
 
   createNewWallet: -> @navigateNextPage('create')
 
@@ -9,24 +11,42 @@ class @OnboardingManagementWelcomeViewController extends @OnboardingViewControll
     @navigateNextPage('restore')
 
   navigateNextPage: (mode) ->
-    navigateToSecurityPage = (swappedBip39) =>
+    navigateToSecurityPage = =>
       ledger.app.router.go '/onboarding/management/security',
           wallet_mode: mode
           back: @representativeUrl()
           rootUrl: @representativeUrl()
           step: 1
-          swapped_bip39: swappedBip39
+          swapped_bip39: no
+
+    navigateToFirstSwappedBip39Page = =>
+      ledger.app.router.go '/onboarding/management/pin',
+        wallet_mode: mode
+        back: @representativeUrl()
+        rootUrl: @representativeUrl()
+        step: 1
+        swapped_bip39: yes
+
+    navigateToSwitchFirmwarePage = =>
+      ledger.app.router.go '/onboarding/management/switch_firmware',
+        mode: 'setup'
+        wallet_mode: mode
+        back: @representativeUrl()
+        rootUrl: @representativeUrl()
+        step: 1
+        swapped_bip39: yes
 
     firmware = ledger.app.dongle.getFirmwareInformation()
 
     if !firmware.hasSubFirmwareSupport()
-      navigateToSecurityPage(no)
+      navigateToSecurityPage()
     else if firmware.hasSetupFirmwareSupport()
-      ledger.app.dongle.isSwappedBip39FeatureEnabled().then (enabled) =>
+      @_isSwappedBip39FeatureEnabled.then (enabled) =>
         if enabled
           # Do something
+          navigateToFirstSwappedBip39Page()
         else
-          navigateToSecurityPage(yes)
+          navigateToSecurityPage()
       .done()
     else
-      # Switch firmware
+      navigateToSwitchFirmwarePage()
