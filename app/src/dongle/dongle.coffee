@@ -398,14 +398,12 @@ class @ledger.dongle.Dongle extends EventEmitter
       new ByteString(restoreSeed or userEntropy, HEX),
       undefined, !restoreSeed?, restoreSeed?
     ).then (result) =>
-      debugger
       mnemonic = []
       for i in [0...24]
         wordIndex = (result['swappedMnemonic'].byteAt(2 * i) << 8) + (result['swappedMnemonic'].byteAt(2 * i + 1))
         mnemonic.push ledger.bitcoin.bip39.wordlist[wordIndex]
       d.resolve(_.extend(result, mnemonic: mnemonic))
     .fail (error) =>
-      debugger
       d.reject(error)
     .done()
     d.promise
@@ -417,6 +415,9 @@ class @ledger.dongle.Dongle extends EventEmitter
     ledger.defer(callback).resolve(@_btchip.setupRecovery_async()).promise
 
   restoreSetup: (callback = undefined) -> @_sendApdu(0xE0, 0x20, 0xFF, 0x00, 0x01, 0x00, [0x9000]).then(callback or _.noop)
+
+  isSwappedBip39FeatureEnabled: ->
+    @setupSwappedBip39("0000").then(->)
 
   # @param [String] path
   # @param [Function] callback Optional argument
