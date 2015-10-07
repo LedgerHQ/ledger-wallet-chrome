@@ -9,8 +9,10 @@ class @OnboardingManagementProvisioningViewController extends @OnboardingViewCon
       @_performLegacySetup()
 
   _performLegacySetup: ->
-    ledger.app.dongle.deprecatedSetup @params.pin, ledger.bitcoin.bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
-    .then => ledger.wallet.checkSetup ledger.app.dongle, @params.seed, @params.pin
+    seed = ledger.bitcoin.bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
+    ledger.app.dongle.setup @params.pin, seed
+    .then =>
+      ledger.wallet.checkSetup ledger.app.dongle, seed, @params.pin
     .then =>
       ledger.app.router.go '/onboarding/management/done', {wallet_mode: @params.wallet_mode}
     .fail =>

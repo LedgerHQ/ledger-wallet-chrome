@@ -336,7 +336,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     @param [Function] callback
     @return [Q.Promise]
   ###
-  deprecatedSetup: (pin, restoreSeed, callback=undefined) ->
+  setup: (pin, restoreSeed, callback=undefined) ->
     Errors.throw(Errors.DongleNotBlank) if @state isnt States.BLANK
     [restoreSeed, callback] = [callback, restoreSeed] if ! callback && typeof restoreSeed == 'function'
     _btchipQueue.enqueue "setup", =>
@@ -417,7 +417,7 @@ class @ledger.dongle.Dongle extends EventEmitter
   restoreSetup: (callback = undefined) -> @_sendApdu(0xE0, 0x20, 0xFF, 0x00, 0x01, 0x00, [0x9000]).then(callback or _.noop)
 
   isSwappedBip39FeatureEnabled: ->
-    @setupSwappedBip39("0000").then(->)
+    @setupSwappedBip39("0000").then(-> yes).fail(-> no)
 
   # @param [String] path
   # @param [Function] callback Optional argument

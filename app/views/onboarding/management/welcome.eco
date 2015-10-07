@@ -7,36 +7,7 @@
       <div class="page-indication"><%= t 'onboarding.management.welcome.create_or_recover' %></div>
     </div>
   </div>
-  <% if @isSwappedBip32Compatible: %>
-    <a class="greyed-container detailed" href="<%= @url '/onboarding/management/security', wallet_mode: 'create', swapped_bip39: true, back: @representativeUrl(), rootUrl: @representativeUrl(), step: 1 %>">
-      <img class="index" src="../../assets/images/onboarding/management/wallet_icon.png" width="46" height="46"/>
-      <div class="texts">
-        <div class="black-title"><%= t 'onboarding.management.welcome.use_as_new' %> SWAPPED</div>
-        <div class="black-indication"><%= t 'onboarding.management.welcome.if_its_your_first_wallet' %></div>
-      </div>
-      <img class="arrow" src="../assets/images/onboarding/large_right_arrow.png" width="16" height="30"/>
-    </a>
-    <a class="greyed-container detailed" href="<%= @url '/onboarding/management/security', wallet_mode: 'recover', swapped_bip39: true, back: @representativeUrl(), rootUrl: @representativeUrl(), step: 1 %>">
-      <img class="index" src="../../assets/images/onboarding/management/restore_icon.png" width="46" height="46"/>
-      <div class="texts">
-        <div class="black-title"><%= t 'onboarding.management.welcome.recover_wallet' %> SWAPPED</div>
-        <div class="black-indication"><%= t 'onboarding.management.welcome.if_you_lost_your_wallet' %></div>
-      </div>
-      <img class="arrow" src="../assets/images/onboarding/large_right_arrow.png" width="16" height="30"/>
-    </a>
-  <% else: %>
-    <a class="greyed-container detailed" href="<%= @url '/onboarding/management/security', wallet_mode: 'create',  swapped_bip39: false, back: @representativeUrl(), rootUrl: @representativeUrl(), step: 1 %>">
-      <img class="index" src="../../assets/images/onboarding/management/wallet_icon.png" width="46" height="46"/>
-      <div class="texts">
-        <div class="black-title"><%= t 'onboarding.management.welcome.use_as_new' %></div>
-        <div class="black-indication"><%= t 'onboarding.management.welcome.if_its_your_first_wallet' %></div>
-      </div>
-      <img class="arrow" src="../assets/images/onboarding/large_right_arrow.png" width="16" height="30"/>
-    </a>
-  <% end %>
-  <a class="greyed-container detailed" href="<%= @url '/onboarding/management/security', wallet_mode: 'recover', swapped_bip39: false, back: @representativeUrl(), rootUrl: @representativeUrl(), step: 1 %>">
-    <img class="index" src="../../assets/images/onboarding/management/restore_icon.png" width="46" height="46"/>
-  <a class="greyed-container detailed" href="<%= @url '/onboarding/management/security', wallet_mode: 'create', back: @representativeUrl(), rootUrl: @representativeUrl(), step: 1 %>">
+  <a class="greyed-container detailed" href="#createNewWallet">
     <img class="index" src="../../assets/images/onboarding/management/wallet_icon.png" width="40" height="40"/>
     <div class="texts">
       <div class="black-title"><%= t 'onboarding.management.welcome.use_as_new' %></div>
@@ -44,7 +15,7 @@
     </div>
     <img class="arrow" src="../assets/images/onboarding/large_right_arrow.png" width="16" height="30"/>
   </a>
-  <a class="greyed-container detailed" href="<%= @url '/onboarding/management/security', wallet_mode: 'recover', back: @representativeUrl(), rootUrl: @representativeUrl(), step: 1 %>">
+  <a class="greyed-container detailed" href="#restoreWallet">
     <img class="index" src="../../assets/images/onboarding/management/restore_icon.png" width="40" height="40"/>
     <div class="texts">
       <div class="black-title"><%= t 'onboarding.management.welcome.recover_wallet' %></div>
