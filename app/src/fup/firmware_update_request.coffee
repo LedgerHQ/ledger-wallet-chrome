@@ -166,7 +166,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       throw new Error(Errors.InvalidSeedFormat) if !seed? or !(seed.length is 16 or seed?.length is 40)
       seed
 
-
   ###
     Gets the current state.
 
@@ -254,7 +253,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         if index isnt ledger.fup.updates.OS_INIT.length
           @_processLoadingScript(ledger.fup.updates.OS_INIT[index][1], States.LoadingOldApplication, true)
           .then =>
-            @_checkReloadRecoveryAndHandleState()
+            @_checkReloadRecoveryAndHandleState(firmware)
           .fail (ex) =>
             switch ex.message
               when 'timeout'
