@@ -62,6 +62,9 @@
           <% for input in @operation.get('senders'): %>
           <%= input %><br />
           <% end %>
+          <% if @operation.get('senders').length: %>
+           coinbase
+          <% end %>
         </td>
       </tr>
       <tr>

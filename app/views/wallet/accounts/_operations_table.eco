@@ -27,7 +27,7 @@
     <% end %>
     <td class="fit-content align-right padding-right-very-small regular-grey-text-small"><%= if operation.get('type') == 'reception' then t 'wallet.defaults.operations.sender' else t 'wallet.defaults.operations.receiver' %></td>
     <td class="stretch-content regular-text-small selectable">
-        <%= if operation.get('type') == 'reception' then operation.get('senders')[0] else operation.get('recipients')[0] %>
+        <%= if operation.get('type') == 'reception' then operation.get('senders')[0] or 'coinbase' else operation.get('recipients')[0] or 'coinbase' %>
     </td>
     <td class="fit-content regular-grey-text-small"><%= if !ledger.preferences.instance.isConfirmationCountReached(operation.get('confirmations')) then t('wallet.defaults.operations.unconfirmed').toLowerCase() %></td>
     <% if ledger.preferences.instance.isCurrencyActive(): %>
