@@ -55,3 +55,5 @@ class ledger.dongle.FirmwareInformation
   hasSecureScreen2FASupport: -> @getIntFirmwareVersion() >= Firmwares.V_L_1_0_0
 
   hasRecoveryFlashingSupport: -> @getIntFirmwareVersion() >= Firmwares.V_L_1_1_0
+
+  isUsingInputFinalizeFull: -> @getIntFirmwareVersion() >= Firmwares.V_L_1_1_0

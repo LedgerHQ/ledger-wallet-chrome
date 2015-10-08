@@ -600,6 +600,8 @@ class @ledger.dongle.Dongle extends EventEmitter
     _btchipQueue.enqueue "recoverFirmwareVersion", =>
       @_sendApdu('E0 C4 00 00 00 08').then (version) =>
         firmware = new ledger.dongle.FirmwareInformation(this, version)
+        if firmware.isUsingInputFinalizeFull()
+          @_btchip.setUntrustedHashTransactionInputFinalizeFull()
         if firmware.isUsingDeprecatedBip32Derivation()
           @_btchip.setDeprecatedBIP32Derivation()
         if firmware.isUsingDeprecatedSetupKeymap()

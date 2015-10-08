@@ -29,10 +29,15 @@ var BTChip = Class.create({
         }
         this.card = card;
         this.deprecatedFirmwareVersion = false;
+        this.untrustedHashTransactionInputFinalizeFull = false;
     },
 
     setCompressedPublicKeys: function (compressedPublicKeys) {
         this.compressedPublicKeys = compressedPublicKeys;
+    },
+
+    setUntrustedHashTransactionInputFinalizeFull: function () {
+        this.untrustedHashTransactionInputFinalizeFull = true;
     },
 
     setDeprecatedFirmwareVersion: function () {
@@ -757,6 +762,9 @@ var BTChip = Class.create({
     },
 
     hashOutputInternal_async: function (outputType, path, outputAddress, amount, fees) {
+        if (this.untrustedHashTransactionInputFinalizeFull) {
+            return this.hashOutputInternalFull_async(outputType, path, outputAddress, amount, fees);
+        }
         if (typeof changeKey == "undefined") {
             changeKey = new ByteString("", HEX);
         }
@@ -1097,6 +1105,198 @@ var BTChip = Class.create({
             }
         );
         return deferred.promise;
+    },
+
+    provideOutputFullChangePath_async: function(path) {
+        var path = this.parseBIP32Path(path);
+        var data = new ByteString(Convert.toHexByte(path.length), HEX);
+        for (var i=0; i<path.length; i++) {
+            data = data.concat(path[i]);
+        }
+        this.card.sendApdu_async(0xe0, 0x4a, 0xff, 0x00, data, [0x9000]);
+    },
+
+    hashOutputFull_async: function(outputScript) {
+        var offset = 0;
+        var MAX_BLOCK_FULL = 216;
+        var encryptedOutputScript = new ByteString("", HEX);
+        var outData;
+        while (offset < outputScript.length) {
+            var blockSize = ((offset + MAX_BLOCK_FULL) >= outputScript.length ? outputScript.length - offset : MAX_BLOCK_FULL);
+            var p1 = ((offset + blockSize) == outputScript.length ? 0x80 : 0x00);
+            outData = this.card.sendApdu(0xe0, 0x4a, p1, 0x00, outputScript.bytes(offset, blockSize), [0x9000]);
+            if (outData.byteAt(0) != 0x00) {
+                encryptedOutputScript = encryptedOutputScript.concat(outData.bytes(1, outData.byteAt(0)));
+            }
+            offset += offset + blockSize;
+        }
+        var result = {};
+        var scriptDataLength = outData.byteAt(0);
+        result['encryptedOutputScript'] = encryptedOutputScript;
+        result['authorizationRequired'] = (outData.byteAt(1 + scriptDataLength) != 0x00);
+        var authorizationMode = outData.byteAt(1 + scriptDataLength);
+        var offset = 1 + scriptDataLength + 1;
+        if (authorizationMode == 0x02) {
+            var referenceLength = outData.byteAt(offset++);
+            result['authorizationReference'] = outData.bytes(offset, referenceLength);
+        }
+        if (authorizationMode == 0x03) {
+            var referenceLength = outData.byteAt(offset++);
+            result['authorizationReference'] = outData.bytes(offset, referenceLength);
+            offset += referenceLength;
+            result['authorizationPaired'] = outData.bytes(offset);
+        }
+        return result;
+    },
+
+    createPaymentTransactionNew_async: function(inputs, associatedKeysets, changePath, outputScript, lockTime, sighashType, authorization, resumeData) {
+
+        // Implementation starts here
+
+        // Inputs are provided as arrays of [transaction, output_index, optional redeem script]
+        // associatedKeysets are provided as arrays of [path]
+        var defaultVersion = new ByteString("01000000", HEX);
+        var defaultSequence = new ByteString("FFFFFFFF", HEX);
+        var trustedInputs = [];
+        var regularOutputs = [];
+        var signatures = [];
+        var publicKeys = [];
+        var firstRun = true;
+        var scriptData;
+        var resuming = (typeof authorization != "undefined");
+        var self = this;
+
+        if (typeof lockTime == "undefined") {
+            lockTime = BTChip.DEFAULT_LOCKTIME;
+        }
+        if (typeof sigHashType == "undefined") {
+            sigHashType = BTChip.SIGHASH_ALL;
+        }
+
+        for (var i = 0; i < inputs.length; i++) {
+            if (!resuming) {
+                trustedInputs.push(this.getTrustedInput(inputs[i][1], inputs[i][0]));
+            }
+            regularOutputs.push(inputs[i][0].outputs[inputs[i][1]]);
+        }
+
+        if (resuming) {
+            trustedInputs = resumeData['trustedInputs'];
+            publicKeys = resumeData['publicKeys'];
+            firstRun = false;
+        }
+
+        // Pre-build the target transaction
+        var targetTransaction = {};
+        targetTransaction['version'] = defaultVersion;
+        targetTransaction['inputs'] = [];
+
+        for (var i = 0; i < inputs.length; i++) {
+            var tmpInput = {};
+            tmpInput['script'] = new ByteString("", HEX);
+            tmpInput['sequence'] = defaultSequence;
+            targetTransaction['inputs'].push(tmpInput);
+        }
+
+        return doIf(!resuming, function () {
+            // Collect public keys
+            return foreach(inputs, function (input, i) {
+                return self.getWalletPublicKey_async(associatedKeysets[i])
+            }).then(function (result) {
+                for (var index = 0; index < result.length; index++) {
+                    publicKeys.push(result[i]['publicKey']);
+                }
+            });
+        }).then(function () {
+            return foreach(inputs, function (input, i) {
+                var usedScript;
+                if ((inputs[i].length == 3) && (typeof inputs[i][2] != "undefined")) {
+                    usedScript = inputs[i][2];
+                }
+                else {
+                    usedScript = regularOutputs[i]['script'];
+                }
+                targetTransaction['inputs'][i]['script'] = usedScript;
+                return self.startUntrustedHashTransactionInput_async(firstRun, targetTransaction, trustedInputs).then(function () {
+                    return doIf(!resuming && (typeof changePath != "undefined"), function () {
+                        return self.provideOutputFullChangePath_async(changePath);
+                    }).then (function () {
+                        return self.hashOutputFull_async(outputScript);
+                    }).then (function (resultHash) {
+                        scriptData = outputScript;
+                        if (resultHash['authorizationRequired']) {
+                            var tmpResult = {};
+                            tmpResult['authorizationRequired'] = resultHash['authorizationRequired'];
+                            tmpResult['authorizationReference'] = resultHash['authorizationReference'];
+                            tmpResult['authorizationPaired'] = resultHash['authorizationPaired'];
+                            tmpResult['encryptedOutputScript'] = resultHash['encryptedOutputScript'];
+                            tmpResult['scriptData'] = scriptData;
+                            tmpResult['trustedInputs'] = trustedInputs;
+                            tmpResult['publicKeys'] = publicKeys;
+                            // Interrupt the loop over inputs. We recover the failure at the end of the main function
+                            throw tmpResult;
+                        }
+                        return self.signTransaction_async(associatedKeysets[i], authorization).then(function (signature) {
+                            signatures.push(signature);
+                            targetTransaction['inputs'][i]['script'] = new ByteString("", HEX);
+                            if (firstRun) {
+                                firstRun = false;
+                            }
+                        });
+                    });
+                });
+            });
+        }).then(function () {
+            // Populate the final input scripts
+            for (var i=0; i < inputs.length; i++) {
+                var tmpScriptData = new ByteString(Convert.toHexByte(signatures[i].length), HEX);
+                tmpScriptData = tmpScriptData.concat(signatures[i]);
+                var publicKey = publicKeys[i];
+                tmpScriptData = tmpScriptData.concat(new ByteString(Convert.toHexByte(publicKey.length), HEX));
+                tmpScriptData = tmpScriptData.concat(publicKey);
+                targetTransaction['inputs'][i]['script'] = tmpScriptData;
+                targetTransaction['inputs'][i]['prevout'] = trustedInputs[i].bytes(4, 0x24);
+            }
+            var result = this.serializeTransaction(targetTransaction);
+            result = result.concat(scriptData);
+            result = result.concat(this.reverseBytestring(lockTime));
+            return result;
+        }).fail(function (failure) {
+            if ((typeof failure) != "undefined" && (typeof failure.authorizationRequired)) {
+                // Recover from failure
+                // This is just the signature interruption due to authorization requirement
+                return failure;
+            }
+        });
+
+        // Library
+        function foreach(arr, callback) {
+            var deferred = Q.defer();
+            var iterate = function (index, array, result) {
+                if (index >= array.length) {
+                    deferred.resolve(result);
+                    return ;
+                }
+                callback(array[index], index).then(function (res) {
+                    result.push(res);
+                    iterate(index + 1, array, result);
+                }).fail(function (ex) {
+                    deferred.reject(ex);
+                }).done();
+            };
+            iterate(0, arr, []);
+            return deferred.promise;
+        }
+
+        function doIf(condition, callback) {
+            var deferred = Q.defer();
+            if (condition) {
+                deferred.resolve(callback())
+            } else {
+                deferred.resolve();
+            }
+            return deferred.promise;
+        }
     },
 
     // Inputs : [ [ prevout tx hash, prevout index ] ]
