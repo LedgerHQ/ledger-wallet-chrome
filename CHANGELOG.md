@@ -1,4 +1,8 @@
 # Changelog
+1.4.4
+===
+- Bug fix
+
 1.4.3
 ===
 - Handle bitcoin [malleability attack](http://blog.coinkite.com/post/130318407326/ongoing-bitcoin-malleability-attack-low-s-high)
