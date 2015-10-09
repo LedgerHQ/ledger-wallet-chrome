@@ -533,6 +533,12 @@ class @ledger.dongle.Dongle extends EventEmitter
       resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)
       resumeData.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in resumeData.trustedInputs)
       resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
+    if @getFirmwareInformation().isUsingInputFinalizeFull()
+      @_createPaymentTransactionNew(inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData)
+    else
+      @_createPaymentTransaction(inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData)
+
+  _createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
     _btchipQueue.enqueue "createPaymentTransaction", =>
       @_btchip.createPaymentTransaction_async(
         inputs, associatedKeysets, changePath,
@@ -555,6 +561,72 @@ class @ledger.dongle.Dongle extends EventEmitter
           result.authorizationReference = result.authorizationReference.toString(HEX) if result.authorizationReference?
         return result
       )
+
+  _createPaymentTransactionNew: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
+    @getPublicAddress(changePath).then (result) =>
+      changeAddress = result.bitcoinAddress.toString(ASCII)
+      inputAmounts = do =>
+        for [prevTx, index], i in inputs
+          ledger.Amount.fromSatoshi(prevTx.outputs[index].amount)
+
+      totalInputAmount = ledger.Amount.fromSatoshi(0)
+      for inputAmount in inputAmounts
+        totalInputAmount = totalInputAmount.add(inputAmount)
+
+      changeAmount = totalInputAmount.subtract(amount).subtract(fees)
+      changePath = undefined if changeAmount.lte(0)
+
+      VI = @_btchip.createVarint.bind(@_btchip)
+      OP_DUP = new ByteString('76', HEX)
+      OP_HASH160 = new ByteString('A9', HEX)
+      OP_EQUALVERIFY = new ByteString('88', HEX)
+      OP_CHECKSIG = new ByteString('AC', HEX)
+
+      ###
+        Create the output script
+        Count (VI) | Value (8) | PkScript (var) | ....
+      ###
+
+      PkScript = (address) =>
+        script =
+          OP_DUP
+          .concat(OP_HASH160)
+          .concat(ledger.bitcoin.addressToHash160(address))
+          .concat(OP_EQUALVERIFY)
+          .concat(OP_CHECKSIG)
+        VI(script.length).concat(script)
+
+      outputScript =
+        VI(2)
+        .concat(amount.toScriptByteString())
+        .concat(PkScript(recipientAddress))
+        .concat(changeAmount.toScriptByteString())
+        .concat(PkScript(changeAddress))
+      debugger
+      _btchipQueue.enqueue "createPaymentTransaction", =>
+        @_btchip.createPaymentTransactionNew_async(
+          inputs, associatedKeysets, changePath,
+          outputScript,
+          lockTime && new ByteString(Convert.toHexInt(lockTime), HEX),
+          sighashType && new ByteString(Convert.toHexInt(sighashType), HEX),
+          authorization && new ByteString(authorization, HEX),
+          resumeData
+        )
+        .then( (result) ->
+          debugger
+          if result instanceof ByteString
+            result = result.toString(HEX)
+          else
+            result.scriptData = result.scriptData.toString(HEX)
+            result.trustedInputs = (trustedInput.toString(HEX) for trustedInput in result.trustedInputs)
+            result.publicKeys = (publicKey.toString(HEX) for publicKey in result.publicKeys)
+            result.authorizationPaired = result.authorizationPaired.toString(HEX) if result.authorizationPaired?
+            result.authorizationReference = result.authorizationReference.toString(HEX) if result.authorizationReference?
+          return result
+        )
+    .fail (er) ->
+      debugger
+      e er
 
   formatP2SHOutputScript: (transaction) ->
     @_btchip.formatP2SHOutputScript(transaction)

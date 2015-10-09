@@ -8,6 +8,7 @@ class @ledger.Amount
   @fromSatoshi: (value) ->
     return value if _.isKindOf(value, Amount)
     return new Amount(value) if _.isKindOf(value, Bitcoin.BigInteger)
+    return new Amount(new Bitcoin.BigInteger(value.toString(HEX).match(/../g).reverse().join(''), 16)) if _(value).isKindOf(ByteString)
     new Amount(new Bitcoin.BigInteger(value.toString()))
 
   # @param [Bitcoin.BigInteger] value The amount value in satoshi.
@@ -85,3 +86,8 @@ class @ledger.Amount
   toBigInteger: () -> @_value.clone()
   toNumber: -> @_value.intValue()
   toString: (base) -> @_value.toString(base)
+
+  toScriptByteString: () ->
+    hex = _.str.lpad(@toSatoshiString(16), 16, '0')
+    hex = hex.match(/../g).reverse().join('')
+    new ByteString(hex, HEX)
