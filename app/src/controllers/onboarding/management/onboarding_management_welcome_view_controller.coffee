@@ -8,7 +8,7 @@ class @OnboardingManagementWelcomeViewController extends @OnboardingViewControll
   createNewWallet: -> @navigateNextPage('create')
 
   restoreWallet: ->
-    @navigateNextPage('restore')
+    @navigateNextPage('recover')
 
   navigateNextPage: (mode) ->
     navigateToSecurityPage = =>

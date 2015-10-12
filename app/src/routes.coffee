@@ -48,19 +48,17 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   route '/onboarding/device/wrongpin', (params) ->
     app.router.go '/onboarding/device/error',
-      error: t 'onboarding.device.errors.wrongpin.wrong_pin'
       message: _.str.sprintf t('onboarding.device.errors.wrongpin.tries_left'), params['?params'].tries_left
       indication: t 'onboarding.device.errors.wrongpin.unplug_plug'
 
   route '/onboarding/device/frozen', (params) ->
     app.router.go '/onboarding/device/error',
-      error: t 'onboarding.device.errors.frozen.wallet_is_frozen'
+      serious: yes
       message: t 'onboarding.device.errors.frozen.blank_next_time'
       indication: t 'onboarding.device.errors.frozen.unplug_plug'
 
   route '/onboarding/device/forged', (params) ->
     app.router.go '/onboarding/device/error',
-      error: t 'onboarding.device.errors.forged.device_forged'
       message: t 'onboarding.device.errors.forged.forbidden_access'
       indication: t 'onboarding.device.errors.forged.get_help'
 

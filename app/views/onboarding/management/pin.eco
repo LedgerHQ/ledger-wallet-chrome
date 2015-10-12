@@ -21,7 +21,7 @@
         <input type="radio" name="pin_kind" value="auto" id="auto_radio">
         <span class="uppercase-title"><%= t 'onboarding.management.pin.auto' %></span>
       </label>
-      <a href="#randomizePinCode" class="uppercase-action" id="generate_link"><%= t 'onboarding.management.pin.new_pin_code' %>&nbsp;&nbsp;<i class="fa fa-refresh"></i></a>
+      <a href="#randomizePinCode" class="uppercase-action" id="generate_link"><i class="fa fa-refresh"></i><%= t 'onboarding.management.pin.new_pin_code' %></a>
     </div>
     <div class="separator">
       <div class="line"></div>
