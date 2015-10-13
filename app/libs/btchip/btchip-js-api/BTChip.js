@@ -1196,13 +1196,53 @@ var BTChip = Class.create({
             sighashType = BTChip.SIGHASH_ALL;
         }
 
-        return foreach(inputs, function (input, i) {
+        var deferred = Q.defer();
+
+        var progressObject = {
+            stage: "undefined",
+            currentPublicKey: 0,
+            publicKeyCount: inputs.length,
+            currentTrustedInput: 0,
+            trustedInputsCount: inputs.length,
+            currentSignTransaction: 0,
+            transactionSignCount: resuming ? inputs.length : 0,
+            currentHashOutputBase58: 0,
+            hashOutputBase58Count: resuming ? inputs.length : 1,
+            currentUntrustedHash: 0,
+            untrustedHashCount: resuming ? inputs.length : 1
+        };
+        for (var index in inputs) {
+            if (typeof inputs[index] === "function")
+                continue;
+            progressObject["currentTrustedInputProgress_" + index] = resuming ? inputs[index][0].inputs.length + inputs[index][0].outputs.length : 0;
+            progressObject["trustedInputsProgressTotal_" + index] = inputs[index][0].inputs.length + inputs[index][0].outputs.length;
+        }
+        var notify = function (notifyObject) {
+            var result = {};
+            for (var key in progressObject) {
+                result[key] = progressObject[key];
+                if (typeof notifyObject[key] !== "undefined") {
+                    result[key] = notifyObject[key];
+                    progressObject[key] = notifyObject[key];
+                }
+            }
+            deferred.notify(result);
+        };
+
+        foreach(inputs, function (input, i) {
             return doIf(!resuming, function () {
                 return self.getTrustedInput_async(input[1], input[0])
+                    .progress(function (p) {
+                        var inputProgress = {stage: "getTrustedInputsRaw"};
+                        inputProgress["currentTrustedInputProgress_" + (i)] = p.inputIndex + p.outputIndex;
+                        notify(inputProgress);
+                    })
                     .then(function (trustedInput) {
+                        notify({stage: "getTrustedInput", currentTrustedInput: i + 1});
                         trustedInputs.push(trustedInput);
                     });
             }).then(function () {
+                notify({stage: "getTrustedInput", currentTrustedInput: i + 1});
                 regularOutputs.push(input[0].outputs[input[1]]);
             });
         }).then(function () {
@@ -1226,8 +1266,12 @@ var BTChip = Class.create({
             return doIf(!resuming, function () {
                 // Collect public keys
                 return foreach(inputs, function (input, i) {
-                    return self.getWalletPublicKey_async(associatedKeysets[i])
+                    return self.getWalletPublicKey_async(associatedKeysets[i]).then(function (p) {
+                        notify({stage: "getWalletPublicKey", currentPublicKey: i + 1});
+                        return p;
+                    });
                 }).then(function (result) {
+                    notify({stage: "getWalletPublicKey", currentPublicKey: inputs.length});
                     for (var index = 0; index < result.length; index++) {
                         if (self.compressedPublicKeys) {
                             publicKeys.push(self.compressPublicKey(result[index]['publicKey']));
@@ -1247,12 +1291,16 @@ var BTChip = Class.create({
                     usedScript = regularOutputs[i]['script'];
                 }
                 targetTransaction['inputs'][i]['script'] = usedScript;
+                var notifyHashOutputBase58 = {stage: "hashTransaction", currentHashOutputBase58: i + 1};
+                var notifyStartUntrustedHash = {stage: "hashTransaction", currentUntrustedHash: i + 1};
                 return self.startUntrustedHashTransactionInput_async(firstRun, targetTransaction, trustedInputs).then(function () {
+                    notify(notifyHashOutputBase58);
                     return doIf(!resuming && (typeof changePath != "undefined"), function () {
                         return self.provideOutputFullChangePath_async(changePath);
                     }).then (function () {
                         return self.hashOutputFull_async(outputScript);
                     }).then (function (resultHash) {
+                        notify(notifyStartUntrustedHash);
                         scriptData = outputScript;
                         if (resultHash['authorizationRequired']) {
                             var tmpResult = {};
@@ -1268,6 +1316,7 @@ var BTChip = Class.create({
                             throw tmpResult;
                         }
                         return self.signTransaction_async(associatedKeysets[i], authorization).then(function (signature) {
+                            notify({stage: "getTrustedInput", currentSignTransaction: i + 1});
                             signatures.push(signature);
                             targetTransaction['inputs'][i]['script'] = new ByteString("", HEX);
                             if (firstRun) {
@@ -1299,7 +1348,13 @@ var BTChip = Class.create({
                 return failure;
             }
             throw failure;
+        }).then(function (result) {
+            deferred.resolve(result);
+        }).fail(function (error) {
+            deferred.reject(error);
         });
+
+        return deferred.promise;
 
         // Library
         function foreach(arr, callback) {
