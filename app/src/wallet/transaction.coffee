@@ -2,6 +2,7 @@ ValidationModes =
     PIN: 0x01
     KEYCARD: 0x02
     SECURE_SCREEN: 0x03
+    KEYCARD_NEW: 0x04
 
 Errors = @ledger.errors
 
@@ -115,7 +116,7 @@ class ledger.wallet.Transaction
     details.validationCharacters = (@recipientAddress[idx] for idx in details.recipientsAddress.indexes)
 
     # ~> 1.4.13 need validation on amount
-    if @dongle.getIntFirmwareVersion() < ledger.dongle.Firmware.V_B_1_4_13
+    if @dongle.getIntFirmwareVersion() < ledger.dongle.Firmwares.V_B_1_4_13
       stringifiedAmount = @amount.toString()
       stringifiedAmount = _.str.lpad(stringifiedAmount, 9, '0')
       # Split amount in integer and decimal parts
@@ -130,7 +131,7 @@ class ledger.wallet.Transaction
       # Compute amount indexes
       firstIdx = integerPart.length - 1
       lastIdx = if decimalPart is "00000000" then firstIdx else firstIdx+3
-      detail.amount =
+      details.amount =
         text: stringifiedAmount
         indexes: [firstIdx..lastIdx]
       details.needsAmountValidation = true

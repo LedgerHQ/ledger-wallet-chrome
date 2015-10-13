@@ -1118,12 +1118,14 @@ var BTChip = Class.create({
         var MAX_BLOCK_FULL = 216;
         var encryptedOutputScript = new ByteString("", HEX);
         var outData;
+        var self = this;
 
         return asyncWhile(function () {return offset < outputScript.length;}, function () {
             var blockSize = ((offset + MAX_BLOCK_FULL) >= outputScript.length ? outputScript.length - offset : MAX_BLOCK_FULL);
             var p1 = ((offset + blockSize) == outputScript.length ? 0x80 : 0x00);
-            return this.card.sendApdu_async(0xe0, 0x4a, p1, 0x00, outputScript.bytes(offset, blockSize), [0x9000])
-                .then(function (outData) {
+            return self.card.sendApdu_async(0xe0, 0x4a, p1, 0x00, outputScript.bytes(offset, blockSize), [0x9000])
+                .then(function (data) {
+                    outData = data;
                     if (outData.byteAt(0) != 0x00) {
                         encryptedOutputScript = encryptedOutputScript.concat(outData.bytes(1, outData.byteAt(0)));
                     }
@@ -1133,10 +1135,10 @@ var BTChip = Class.create({
             var result = {};
             var scriptDataLength = outData.byteAt(0);
             result['encryptedOutputScript'] = encryptedOutputScript;
-            result['authorizationRequired'] = (outData.byteAt(1 + scriptDataLength) != 0x00);
+            result['authorizationRequired'] = (outData.byteAt(1 + scriptDataLength));
             var authorizationMode = outData.byteAt(1 + scriptDataLength);
             var offset = 1 + scriptDataLength + 1;
-            if (authorizationMode == 0x02) {
+            if (authorizationMode == 0x02 || authorizationMode == 0x04) {
                 var referenceLength = outData.byteAt(offset++);
                 result['authorizationReference'] = outData.bytes(offset, referenceLength);
             }
@@ -1159,7 +1161,7 @@ var BTChip = Class.create({
                 }
                 callback().then(function (res) {
                     result.push(res);
-                    iterate(index + 1, array, result);
+                    iterate(result);
                 }).fail(function (ex) {
                     deferred.reject(ex);
                 }).done();
@@ -1185,19 +1187,24 @@ var BTChip = Class.create({
         var scriptData;
         var resuming = (typeof authorization != "undefined");
         var self = this;
+        var targetTransaction = {};
 
         if (typeof lockTime == "undefined") {
             lockTime = BTChip.DEFAULT_LOCKTIME;
         }
         if (typeof sigHashType == "undefined") {
-            sigHashType = BTChip.SIGHASH_ALL;
+            sighashType = BTChip.SIGHASH_ALL;
         }
 
-        return foreach(inputs, function () {
-            if (!resuming) {
-                trustedInputs.push(this.getTrustedInput(inputs[i][1], inputs[i][0]));
-            }
-            regularOutputs.push(inputs[i][0].outputs[inputs[i][1]]);
+        return foreach(inputs, function (input, i) {
+            return doIf(!resuming, function () {
+                return self.getTrustedInput_async(input[1], input[0])
+                    .then(function (trustedInput) {
+                        trustedInputs.push(trustedInput);
+                    });
+            }).then(function () {
+                regularOutputs.push(input[0].outputs[input[1]]);
+            });
         }).then(function () {
             if (resuming) {
                 trustedInputs = resumeData['trustedInputs'];
@@ -1206,7 +1213,6 @@ var BTChip = Class.create({
             }
 
             // Pre-build the target transaction
-            var targetTransaction = {};
             targetTransaction['version'] = defaultVersion;
             targetTransaction['inputs'] = [];
 
@@ -1223,7 +1229,11 @@ var BTChip = Class.create({
                     return self.getWalletPublicKey_async(associatedKeysets[i])
                 }).then(function (result) {
                     for (var index = 0; index < result.length; index++) {
-                        publicKeys.push(result[i]['publicKey']);
+                        if (self.compressedPublicKeys) {
+                            publicKeys.push(self.compressPublicKey(result[index]['publicKey']));
+                        } else {
+                            publicKeys.push(result[index]['publicKey']);
+                        }
                     }
                 });
             })
@@ -1250,6 +1260,7 @@ var BTChip = Class.create({
                             tmpResult['authorizationReference'] = resultHash['authorizationReference'];
                             tmpResult['authorizationPaired'] = resultHash['authorizationPaired'];
                             tmpResult['encryptedOutputScript'] = resultHash['encryptedOutputScript'];
+                            tmpResult['indexesKeyCard'] = resultHash['authorizationReference'].toString(HEX);
                             tmpResult['scriptData'] = scriptData;
                             tmpResult['trustedInputs'] = trustedInputs;
                             tmpResult['publicKeys'] = publicKeys;
@@ -1277,16 +1288,17 @@ var BTChip = Class.create({
                 targetTransaction['inputs'][i]['script'] = tmpScriptData;
                 targetTransaction['inputs'][i]['prevout'] = trustedInputs[i].bytes(4, 0x24);
             }
-            var result = this.serializeTransaction(targetTransaction);
+            var result = self.serializeTransaction(targetTransaction);
             result = result.concat(scriptData);
-            result = result.concat(this.reverseBytestring(lockTime));
+            result = result.concat(self.reverseBytestring(lockTime));
             return result;
         }).fail(function (failure) {
-            if ((typeof failure) != "undefined" && (typeof failure.authorizationRequired)) {
+            if ((typeof failure) != "undefined" && (typeof failure.authorizationRequired) != "undefined") {
                 // Recover from failure
                 // This is just the signature interruption due to authorization requirement
                 return failure;
             }
+            throw failure;
         });
 
         // Library

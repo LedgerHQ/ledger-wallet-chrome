@@ -588,10 +588,12 @@ class @ledger.dongle.Dongle extends EventEmitter
       ###
 
       PkScript = (address) =>
+        hash160 = ledger.bitcoin.addressToHash160(address)
         script =
           OP_DUP
           .concat(OP_HASH160)
-          .concat(ledger.bitcoin.addressToHash160(address))
+          .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
+          .concat(hash160)
           .concat(OP_EQUALVERIFY)
           .concat(OP_CHECKSIG)
         VI(script.length).concat(script)
@@ -602,7 +604,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         .concat(PkScript(recipientAddress))
         .concat(changeAmount.toScriptByteString())
         .concat(PkScript(changeAddress))
-      debugger
+
       _btchipQueue.enqueue "createPaymentTransaction", =>
         @_btchip.createPaymentTransactionNew_async(
           inputs, associatedKeysets, changePath,
@@ -613,7 +615,6 @@ class @ledger.dongle.Dongle extends EventEmitter
           resumeData
         )
         .then( (result) ->
-          debugger
           if result instanceof ByteString
             result = result.toString(HEX)
           else
@@ -625,7 +626,6 @@ class @ledger.dongle.Dongle extends EventEmitter
           return result
         )
     .fail (er) ->
-      debugger
       e er
 
   formatP2SHOutputScript: (transaction) ->
@@ -668,7 +668,6 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   # @return [Q.Promise] Must be done
   _recoverFirmwareVersion: ->
-    l "RECOVER VERSION"
     _btchipQueue.enqueue "recoverFirmwareVersion", =>
       @_sendApdu('E0 C4 00 00 00 08').then (version) =>
         firmware = new ledger.dongle.FirmwareInformation(this, version)
