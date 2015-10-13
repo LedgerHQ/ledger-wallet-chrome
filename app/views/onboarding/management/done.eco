@@ -4,8 +4,7 @@
   </div>
   <div class="greyed-container">
     <img src="../../assets/images/common/large_<%= if @params.error? then 'error' else 'check' %>.png" width="50" height="50" />
-    <div class="black-title"><%= if @params.error? then t 'onboarding.management.done.configuration_failed_' + @params.wallet_mode else t 'onboarding.management.done.configuration_is_complete_' + @params.wallet_mode %></div>
-    <div class="black-indication"><%= if @params.error? then t 'onboarding.management.done.error_occured' else t 'onboarding.management.done.you_can_access_your_wallet' %></div>
+    <div class="black-indication"><%= if @params.error? then t 'onboarding.management.done.configuration_failed_' + @params.wallet_mode else t 'onboarding.management.done.configuration_is_complete_' + @params.wallet_mode %></div>
     <% if not @params.error?: %>
     <div class="medium-indication"><%= t('onboarding.management.done.unplug_plug') %></div>
     <% else: %>

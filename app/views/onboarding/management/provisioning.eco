@@ -3,7 +3,7 @@
     <img src="../../assets/images/onboarding/large_logo.png" width="256" height="156">
   </div>
   <div class="greyed-container">
-    <div class="black-title"><%= t 'onboarding.management.provisioning.provisioning' %></div>
-    <div class="black-indication"><%= t 'onboarding.management.provisioning.dont_unplug' %></div>
+    <div class="black-indication"><%= t 'onboarding.management.provisioning.provisioning' %></div>
+    <div class="medium-indication"><%= t 'onboarding.management.provisioning.dont_unplug' %></div>
   </div>
 </div>
