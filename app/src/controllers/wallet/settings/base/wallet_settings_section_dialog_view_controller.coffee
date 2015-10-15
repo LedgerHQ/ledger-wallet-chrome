@@ -13,14 +13,12 @@ class @WalletSettingsSectionDialogViewController extends ledger.common.DialogVie
     # render self
     render @viewPath(), @, (html) =>
       mainNode = $(html)
-
       # render children
       @once 'children:rendered', =>
         # set css
         @setControllerStylesheet =>
           # insert in dom
           selector.empty().append mainNode
-
           # after render
           @_isRendered = yes
           do @onAfterRender
@@ -57,19 +55,15 @@ class @WalletSettingsSectionDialogViewController extends ledger.common.DialogVie
     # loop through classes
     for className in @settingViewControllersClasses
       continue if not className?
-
       # instantiate view controller
       instance = new className
-
       # get render node
       renderNode = mainNode.find instance.renderSelector
       continue if not renderNode?
-
       # retain instance
       @_settingViewControllersInstances[className] = instance
       instance.parentViewController = @
       instance.onAttach()
-
       # render view controller
       instance.render(renderNode)
       instance.once 'afterRender', @_childrenRenderCallback.bind(@)
