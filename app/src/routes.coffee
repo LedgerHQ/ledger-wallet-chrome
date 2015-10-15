@@ -96,6 +96,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/management/swapped_bip39_provisioning', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementSwappedbip39provisioningViewController
 
+  route '/onboarding/management/recovery_mode', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingManagementRecoverymodeViewController
+
   ## Wallet
   # Accounts
   route 'wallet/accounts/index', ->

@@ -1,10 +1,13 @@
 @import (reference) "../../constants";
 
-div.title-container {
-  div.page-indication {
-    margin-top: 15px;
-  }
-  div.page-strong-indication {
-    margin-top: @metrics-large-padding;
+#content-container {
+  > .title-container {
+    .page-indication {
+      margin-top: @metrics-almost-small-padding;
+    }
+
+    .page-strong-indication {
+      margin-top: @metrics-large-padding;
+    }
   }
 }

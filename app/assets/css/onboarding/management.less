@@ -30,7 +30,7 @@
     > .page-indication {
       font-size: @font-size-very-large;
       color: @color-black;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.4px;
     }
 
     > .page-strong-indication {
@@ -87,6 +87,10 @@
   padding: @metrics-large-padding @metrics-ultra-large-padding + 46px + @metrics-medium-padding;
   padding-bottom: 0;
   padding-right: @metrics-ultra-large-padding;
+
+  &.compact {
+    padding: 0 @metrics-ultra-large-padding;
+  }
 
   .indication(@color) {
     color: @color;
