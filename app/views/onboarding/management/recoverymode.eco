@@ -1,0 +1,26 @@
+<div id="content-container">
+  <div class="title-container">
+    <div class="titles">
+      <div class="page-title"><%= t 'onboarding.management.recover_my_wallet' %></div>
+      <div class="page-subtitle"><%= t 'application.name' %></div>
+      <div class="page-strong-indication"><%= t 'onboarding.management.recoverymode.select_the_type' %></div>
+      <div class="page-indication"><%= t 'onboarding.management.recoverymode.it_is_determined' %></div>
+    </div>
+  </div>
+  <div class="page-content-container compact">
+    <a class="panel" href="#">
+      <img src="../../assets/images/onboarding/management/scrambled_field.png" width="115" height="33"/>
+      <div class="title"><%= t 'onboarding.management.recoverymode.ordered_by_letters' %></div>
+      <div class="subtitle"><%= t 'onboarding.management.recoverymode.recover_scrambled' %></div>
+    </a>
+    <a class="panel" href="#">
+      <img src="../../assets/images/onboarding/management/numeric_field.png" width="115" height="33"/>
+      <div class="title"><%= t 'onboarding.management.recoverymode.ordered_by_numbers' %></div>
+      <div class="subtitle"><%= t 'onboarding.management.recoverymode.recover_bip39' %></div>
+    </a>
+  </div>
+  <div class="navigation-container">
+    <a class="back" href="#navigateRoot" id="back_button"><i class="fa fa-angle-left"></i> <%= t 'onboarding.management.cancel' %></a>
+    <a class="continue" href="#navigateContinue" id="continue_button"><%= t 'onboarding.management.continue' %> <i class="fa fa-angle-right"></i></a>
+  </div>
+</div>

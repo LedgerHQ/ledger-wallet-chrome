@@ -1,0 +1,46 @@
+@import (reference) "../../constants";
+
+#content-container {
+  > .title-container {
+    .page-indication {
+      margin-top: @metrics-almost-small-padding;
+    }
+
+    .page-strong-indication {
+      margin-top: @metrics-large-padding;
+    }
+  }
+
+  > .page-content-container.compact {
+    flex-direction: row;
+    justify-content: center;
+
+    > .panel {
+      display: flex;
+      flex-direction: column;
+      width: 46%;
+      border-radius: 10px;
+      align-items: center;
+      padding: @metrics-large-padding;
+
+      &:first-of-type {
+        margin-right: @metrics-small-padding;
+      }
+
+      > .title {
+        font-size: @font-size-very-large;
+        font-weight: @font-weight-light;
+        color: @color-dark-grey;
+        letter-spacing: -0.4px;
+        margin-top: @metrics-medium-padding;
+      }
+
+      > .subtitle {
+        font-size: @font-size-medium;
+        font-weight: @font-weight-light;
+        color: @color-dark-grey;
+        margin-top: @metrics-small-padding;
+      }
+    }
+  }
+}

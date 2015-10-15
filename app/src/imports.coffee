@@ -348,6 +348,7 @@
         'controllers/onboarding/management/onboarding_management_done_view_controller'
         'controllers/onboarding/management/onboarding_management_switch_firmware_view_controller'
         'controllers/onboarding/management/onboarding_management_swappedbip39provisioning_view_controller'
+        'controllers/onboarding/management/onboarding_management_recoverymode_view_controller'
 
         # Pairing
         'controllers/wallet/pairing/wallet_pairing_index_dialog_view_controller'
