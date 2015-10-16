@@ -39,8 +39,10 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
     @_send JSON.stringify(type: 'pairing', is_successful: false)
     @emit 'm2fa.pairing.rejected'
 
-  requestValidation: (data) ->
-    @_lastRequest = JSON.stringify(type: 'request', second_factor_data: data)
+  requestValidation: (data, output_data) ->
+    request = type: 'request', second_factor_data: data
+    request.output_data = output_data if output_data?
+    @_lastRequest = JSON.stringify(request)
     @_send @_lastRequest
     @emit 'm2fa.request.sended', data
 

@@ -162,6 +162,7 @@ class ledger.wallet.Transaction
     .then (@_resumeData) =>
       @_validationMode = @_resumeData.authorizationRequired
       @authorizationPaired = @_resumeData.authorizationPaired
+      @encryptedOutputScript = @_resumeData.encryptedOutputScript
       d.resolve(@)
     .fail (error) =>
       e "GOT ERROR", error

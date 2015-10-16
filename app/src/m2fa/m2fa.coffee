@@ -88,7 +88,7 @@ _.extend @ledger.m2fa,
     client.once 'm2fa.reject', ->
       client.stopIfNeccessary()
       d.reject('cancelled')
-    client.requestValidation(tx.authorizationPaired)
+    client.requestValidation(tx.authorizationPaired, tx.encryptedOutputScript)
     [client , d.promise]
 
   # Validate with M2FA that tx is correct on every paired mobile.

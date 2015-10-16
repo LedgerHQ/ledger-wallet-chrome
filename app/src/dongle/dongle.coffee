@@ -623,6 +623,7 @@ class @ledger.dongle.Dongle extends EventEmitter
             result.publicKeys = (publicKey.toString(HEX) for publicKey in result.publicKeys)
             result.authorizationPaired = result.authorizationPaired.toString(HEX) if result.authorizationPaired?
             result.authorizationReference = result.authorizationReference.toString(HEX) if result.authorizationReference?
+            result.encryptedOutputScript = result.encryptedOutputScript?.toString(HEX)
           return result
         )
     .fail (er) ->
