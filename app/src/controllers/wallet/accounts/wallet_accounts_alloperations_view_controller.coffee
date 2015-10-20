@@ -16,13 +16,14 @@ class @WalletAccountsAlloperationsViewController extends ledger.common.ActionBar
     super
     ledger.app.off 'wallet:transactions:new wallet:operations:sync:done', @_debouncedUpdateOperations
     ledger.preferences.instance?.off 'currencyActive:changed', @_debouncedUpdateOperations
+    ledger.database.contexts.main?.off 'delete:operation', @_debouncedUpdateOperations
 
   showOperation: (params) ->
     dialog = new WalletDialogsOperationdetailDialogViewController(params)
     dialog.show()
 
   _updateOperations: ->
-    operations = Operation.all()
+    operations = Operation.find().where((op) -> !op['double_spent_priority']? or op['double_spent_priority'] is 0).data()
     @view.emptyContainer.hide() if operations.length > 0
     render 'wallet/accounts/_operations_table', {operations: operations, showAccounts: true}, (html) =>
       @view.operationsList.html html
@@ -32,3 +33,4 @@ class @WalletAccountsAlloperationsViewController extends ledger.common.ActionBar
     @_updateOperations()
     ledger.app.on 'wallet:transactions:new wallet:operations:sync:done', @_debouncedUpdateOperations
     ledger.preferences.instance.on 'currencyActive:changed', @_debouncedUpdateOperations
+    ledger.database.contexts.main.on 'delete:operation', @_debouncedUpdateOperations
