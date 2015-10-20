@@ -6,7 +6,9 @@ class @Operation extends ledger.database.Model
 
   @displayableOperationsChain: (context = ledger.database.contexts.main) ->
     accountIds = _(Account.displayableAccounts(context)).map (a) -> a.index
-    Operation.find(account_id: {$in: accountIds}).sort(@defaultSort)
+    Operation.find(account_id: {$in: accountIds}).where(
+      (op) -> !op['double_spent_priority']? or op['double_spent_priority'] is 0
+    ).sort(@defaultSort)
 
   @fromSend: (tx, account) ->
     index = account.getId()

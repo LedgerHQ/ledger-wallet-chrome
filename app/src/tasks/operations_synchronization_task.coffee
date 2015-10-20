@@ -1,3 +1,5 @@
+{$info, $error, $warn} = ledger.utils.Logger.getLazyLoggerByTag("OperationsSynchronizationTask")
+
 class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
 
   constructor: () -> super 'global_operations_synchronizer'
@@ -12,18 +14,31 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
     operations = Operation.find(confirmations: $lt: 1).data() unless operations?
     return @stopIfNeccessary() if operations.length is 0
 
-    ledger.api.TransactionsRestClient.instance.refreshTransaction operations, (refreshedOperations, error) =>
-      return unless @isRunning()
-      unless error?
-        ledger.tasks.TransactionConsumerTask.instance.pushTransaction(refreshedOperations)
-        @_retryNumber = 0
-        @stopIfNeccessary()
-        do callback
-      else
-        ops = (op for op in (ops or operations) when @checkForDoubleSpent(op) is false)
-        @_retryNumber = Math.min(@_retryNumber + 1, 12)
-        _.delay (=> @synchronizeConfirmationNumbers ops.reverse(), callback), ledger.math.fibonacci(@_retryNumber) * 500
-      return
+    synchronize = (index, operations, updatedOperations, failedOperations) ->
+      return ledger.defer().resolve([updatedOperations, failedOperations]).promise if index >= operations.length
+      d = ledger.defer()
+      ledger.api.TransactionsRestClient.instance.refreshTransaction [operations[index]], (operation, error) =>
+        if error?
+          failedOperations = failedOperations.concat(operation[0])
+        else
+          updatedOperations = updatedOperations.concat(operation[0])
+          ledger.tasks.TransactionConsumerTask.instance.pushTransaction(operation[0])
+        d.resolve(synchronize(index + 1, operations, updatedOperations, failedOperations))
+      d.promise
+
+
+    synchronize(0, operations, [], []).then ([updatedOperations, failedOperations]) =>
+      if failedOperations.length > 0
+        throw failedOperations: failedOperations # Recover this later
+      @_retryNumber = 0
+      @stopIfNeccessary()
+      do callback
+    .fail (er) =>
+      return $error("An unexpected error occurred during operation synchronization ") unless er.failedOperations?
+      ops = (op for op in (ops or operations) when @checkForDoubleSpent(op) is false)
+      @_retryNumber = Math.min(@_retryNumber + 1, 12)
+      _.delay (=> @synchronizeConfirmationNumbers ops, callback), ledger.math.fibonacci(@_retryNumber) * 500
+    .done()
 
   @reset: () ->
     @instance = new @
