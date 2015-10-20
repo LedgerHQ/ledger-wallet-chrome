@@ -83,6 +83,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     Push a single json formatted transaction into the stream.
   ###
   pushTransaction: (transaction) ->
+    return @pushTransactions(transaction) if _.isArray(transaction)
     unless transaction?
       $warn "Transaction consumer received a null transaction.", new Error().stack
       return

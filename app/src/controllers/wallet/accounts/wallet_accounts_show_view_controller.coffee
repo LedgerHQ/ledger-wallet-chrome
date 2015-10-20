@@ -48,6 +48,7 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     # update operations
     ledger.app.off 'wallet:transactions:new wallet:operations:sync:done wallet:operations:new wallet:operations:update', @_debouncedUpdateOperations
     ledger.preferences.instance?.off 'currencyActive:changed', @_debouncedUpdateOperations
+    ledger.database.contexts.main.off 'delete:operation', @_debouncedUpdateOperations
 
     # settings
     ledger.preferences.instance?.off 'currencyActive:changed', @_debouncedUpdateCountervalueVisibility
@@ -79,6 +80,7 @@ class @WalletAccountsShowViewController extends ledger.common.ActionBarViewContr
     # update operations
     @_updateOperations()
     ledger.app.on 'wallet:transactions:new wallet:operations:sync:done wallet:operations:new wallet:operations:update', @_debouncedUpdateOperations
+    ledger.database.contexts.main.on 'delete:operation', @_debouncedUpdateOperations
     ledger.preferences.instance.on 'currencyActive:changed', @_debouncedUpdateOperations
 
     # settings

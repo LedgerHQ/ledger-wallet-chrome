@@ -19,6 +19,7 @@ class @WalletAccountsOperationsViewController extends ledger.common.ActionBarVie
     super
     ledger.app.off 'wallet:transactions:new wallet:operations:sync:done', @_debouncedUpdateOperations
     ledger.preferences.instance?.off 'currencyActive:changed', @_debouncedUpdateOperations
+    ledger.database.contexts.main.off 'delete:operation', @_debouncedUpdateOperations
 
   showOperation: (params) ->
     dialog = new WalletDialogsOperationdetailDialogViewController(params)
@@ -39,5 +40,6 @@ class @WalletAccountsOperationsViewController extends ledger.common.ActionBarVie
     @_updateOperations()
     ledger.app.on 'wallet:transactions:new wallet:operations:sync:done', @_debouncedUpdateOperations
     ledger.preferences.instance.on 'currencyActive:changed', @_debouncedUpdateOperations
+    ledger.database.contexts.main.on 'delete:operation', @_debouncedUpdateOperations
 
   _getAccount: () -> @_account ||= Account.findById(+@routedUrl.match(/wallet\/accounts\/(\d+)\/operations/)[1])

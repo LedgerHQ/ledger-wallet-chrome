@@ -22,7 +22,7 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
       else
         ops = (op for op in (ops or operations) when @checkForDoubleSpent(op) is false)
         @_retryNumber = Math.min(@_retryNumber + 1, 12)
-        _.delay (=> @synchronizeConfirmationNumbers ops, callback), ledger.math.fibonacci(@_retryNumber) * 500
+        _.delay (=> @synchronizeConfirmationNumbers ops.reverse(), callback), ledger.math.fibonacci(@_retryNumber) * 500
       return
 
   @reset: () ->
