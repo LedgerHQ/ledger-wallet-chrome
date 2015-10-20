@@ -19,7 +19,7 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
       d = ledger.defer()
       ledger.api.TransactionsRestClient.instance.refreshTransaction [operations[index]], (operation, error) =>
         if error?
-          failedOperations = failedOperations.concat(operation[0])
+          failedOperations = failedOperations.concat(operations[index])
         else
           updatedOperations = updatedOperations.concat(operation[0])
           ledger.tasks.TransactionConsumerTask.instance.pushTransaction(operation[0])
@@ -35,9 +35,10 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
       do callback
     .fail (er) =>
       return $error("An unexpected error occurred during operation synchronization ") unless er.failedOperations?
-      ops = (op for op in (ops or operations) when @checkForDoubleSpent(op) is false)
-      @_retryNumber = Math.min(@_retryNumber + 1, 12)
-      _.delay (=> @synchronizeConfirmationNumbers ops, callback), ledger.math.fibonacci(@_retryNumber) * 500
+      _.defer =>
+        ops = (op for op in (ops or operations) when @checkForDoubleSpent(op) is false)
+        @_retryNumber = Math.min(@_retryNumber + 1, 12)
+        _.delay (=> @synchronizeConfirmationNumbers ops, callback), ledger.math.fibonacci(@_retryNumber) * 500
     .done()
 
   @reset: () ->
