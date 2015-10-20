@@ -1,0 +1,1 @@
+class @OnboardingManagementRecoverydeviceViewController extends @OnboardingViewController

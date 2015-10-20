@@ -1,0 +1,25 @@
+<div id="content-container">
+  <div class="title-container">
+    <div class="titles">
+      <div class="page-title"><%= t 'onboarding.management.recover_my_wallet' %></div>
+      <div class="page-subtitle"><%= t 'application.name' %></div>
+      <div class="page-strong-indication"><%= t 'onboarding.management.recoverydevice.recovering_on_new_wallet' %></div>
+      <div class="page-indication"><%= t 'onboarding.management.recoverydevice.may_need_to_convert' %></div>
+    </div>
+  </div>
+  <div class="page-content-container compact">
+    <a class="panel" href="#">
+      <img src="../../assets/images/onboarding/management/existing_ledger_wallet.png" width="92" height="21"/>
+      <div class="title"><%= t 'onboarding.management.recoverydevice.no_its_the_same' %></div>
+      <div class="subtitle"><%= t 'onboarding.management.recoverydevice.i_froze_my_device' %></div>
+    </a>
+    <a class="panel" href="#">
+      <img src="../../assets/images/onboarding/management/new_ledger_wallet.png" width="112" height="32"/>
+      <div class="title"><%= t 'onboarding.management.recoverydevice.yes_its_a_new' %></div>
+      <div class="subtitle"><%= t 'onboarding.management.recoverydevice.i_have_another_empty_recovery_sheet' %></div>
+    </a>
+  </div>
+  <div class="navigation-container">
+    <a class="back" href="#navigateRoot" id="back_button"><i class="fa fa-angle-left"></i> <%= t 'onboarding.management.cancel' %></a>
+  </div>
+</div>
