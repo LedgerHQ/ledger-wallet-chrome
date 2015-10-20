@@ -19,7 +19,7 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
       d = ledger.defer()
       ledger.api.TransactionsRestClient.instance.refreshTransaction [operations[index]], (operation, error) =>
         if error?
-          failedOperations = failedOperations.concat(operation[0])
+          failedOperations = failedOperations.concat(operations[index])
         else
           updatedOperations = updatedOperations.concat(operation[0])
           ledger.tasks.TransactionConsumerTask.instance.pushTransaction(operation[0])
