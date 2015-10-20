@@ -20,8 +20,6 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
       switch data.payload.type
         when 'new-transaction'
           ledger.tasks.TransactionConsumerTask.instance.pushTransaction(data.payload.transaction)
-          data.payload.transaction.hash =  data.payload.transaction.hash.replace('a', 'b').replace('1', '2').replace('c', 'e')
-          ledger.tasks.TransactionConsumerTask.instance.pushTransaction(data.payload.transaction)
         when 'new-block'
           @_handleNewBlock data.payload.block
     @newTransactionStream.onclose = => @_listenNewTransactions() if @isRunning()
