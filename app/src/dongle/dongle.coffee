@@ -579,6 +579,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       VI = @_btchip.createVarint.bind(@_btchip)
       OP_DUP = new ByteString('76', HEX)
       OP_HASH160 = new ByteString('A9', HEX)
+      OP_EQUAL = new ByteString('87', HEX)
       OP_EQUALVERIFY = new ByteString('88', HEX)
       OP_CHECKSIG = new ByteString('AC', HEX)
 
@@ -588,7 +589,9 @@ class @ledger.dongle.Dongle extends EventEmitter
       ###
 
       PkScript = (address) =>
-        hash160 = ledger.bitcoin.addressToHash160(address)
+        hash160WithNetwork = ledger.bitcoin.addressToHash160WithNetwork(address)
+        hash160 = hash160.bytes(1, hash160.length - 1)
+        return P2shScript(hash160) if hash160WithNetwork.byte(0) is ledger.config.network.version.P2SH
         script =
           OP_DUP
           .concat(OP_HASH160)
@@ -597,6 +600,16 @@ class @ledger.dongle.Dongle extends EventEmitter
           .concat(OP_EQUALVERIFY)
           .concat(OP_CHECKSIG)
         VI(script.length).concat(script)
+
+      P2shScript = (hash160) =>
+        script =
+          OP_DUP
+          .concat(OP_HASH160)
+          .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
+          .concat(hash160)
+          .concat(OP_EQUAL)
+        VI(script.length).concat(script)
+
 
       outputScript =
         VI(2)

@@ -84,4 +84,10 @@ _.extend ledger.bitcoin,
     hash160String = (Convert.toHexByte(byte) for byte in bytes).join('')
     new ByteString(hash160String, HEX)
 
+  addressToHash160WithNetwork: (address) ->
+    bytes = ledger.crypto.Base58.decode(address)
+    bytes = bytes.slice(0, bytes.length - 4)
+    hash160String = (Convert.toHexByte(byte) for byte in bytes).join('')
+    new ByteString(hash160String, HEX)
+
 
