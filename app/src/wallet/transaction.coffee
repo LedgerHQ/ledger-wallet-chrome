@@ -208,7 +208,6 @@ class ledger.wallet.Transaction
       @_isValidated = yes
       tx = ledger.bitcoin.decodeTransaction(@getSignedTransaction())
       $info("Raw TX: ", @getSignedTransaction())
-      debugger
       ledger.wallet.pathsToAddresses [@changePath], (addresses) =>
         changeAddress = _(addresses).chain().values().first().value()
         result = ledger.bitcoin.verifyRawTx(@getSignedTransaction(), @inputs, @amount, @fees, @recipientAddress, changeAddress)
