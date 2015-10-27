@@ -589,9 +589,9 @@ class @ledger.dongle.Dongle extends EventEmitter
       ###
 
       PkScript = (address) =>
-        hash160WithNetwork = ledger.bitcoin.addressToHash160WithNetwork(address)
-        hash160 = hash160.bytes(1, hash160.length - 1)
-        return P2shScript(hash160) if hash160WithNetwork.byte(0) is ledger.config.network.version.P2SH
+        #hash160WithNetwork = ledger.bitcoin.addressToHash160WithNetwork(address)
+        hash160 = ledger.bitcoin.addressToHash160(address)
+        #return P2shScript(hash160) if hash160WithNetwork.byteAt(0) is ledger.config.network.version.P2SH
         script =
           OP_DUP
           .concat(OP_HASH160)
