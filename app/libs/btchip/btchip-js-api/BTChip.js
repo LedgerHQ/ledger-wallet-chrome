@@ -1144,7 +1144,7 @@ var BTChip = Class.create({
             }
             if (authorizationMode == 0x03) {
                 var referenceLength = outData.byteAt(offset++);
-                result['authorizationReference'] = outData.bytes(offset, referenceLength);
+                result['authorizationReference'] = outData.bytes(offset - 1, referenceLength + 1);
                 offset += referenceLength;
                 result['authorizationPaired'] = outData.bytes(offset);
             }
