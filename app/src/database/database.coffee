@@ -24,6 +24,7 @@ class ledger.database.Database extends EventEmitter
   addCollection: (collectionName) ->
     collection = @_db.addCollection(collectionName)
     collection.setChangesApi on
+    @_persistenceAdapter.declare(collection)
     collection
 
   listCollections: () -> @_db.listCollections()
