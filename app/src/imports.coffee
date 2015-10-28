@@ -195,6 +195,7 @@
         'wallet/sweep_private_key'
 
         'database/database'
+        'database/database_persistence_adapter'
         'common/base_application'
         'database/model_context'
         'database/model'
