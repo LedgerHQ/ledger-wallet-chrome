@@ -3,28 +3,39 @@ ledger.database ?= {}
 
 class ledger.database.Database extends EventEmitter
 
-  constructor: (name, store) ->
+  constructor: (name, persistenceAdapter) ->
     @_name = name
-    @_store = store
+    @_persistenceAdapter = persistenceAdapter
 
   load: (callback) ->
-    @_store.get @_name, (json) =>
+    @_persistenceAdapter.serialize().then (json) =>
       try
         @_migrateJsonToLoki125 json
         @_db = new loki(@_name, ENV: 'BROWSER')
         @_db.loadJSON JSON.stringify(json[@_name]) if json[@_name]?
         @_db.save = @scheduleFlush.bind(this)
+        for collection in @listCollections()
+          collection.setChangesApi on
       catch er
         e er
-      callback?()
-      @emit 'loaded'
+        callback?()
+        @emit 'loaded'
+
+  addCollection: (collectionName) ->
+    collection = @_db.addCollection(collectionName)
+    collection.setChangesApi on
+    collection
+
+  listCollections: () -> @_db.listCollections()
+
+  getCollection: (collectionName) -> @_db.getCollection(collectionName)
 
   _migrateJsonToLoki125: (json) ->
     if !json['__version']? or json['__version'] isnt '1.2.5'
       @_migrateDbJsonToLoki125(value) for key, value of json when !key.match(/^(__version)$/)
 
   _migrateDbJsonToLoki125: (dbJson) ->
-    return unless dbJson? and ['collections']?
+    return unless dbJson? and dbJson['collections']?
     for collection in dbJson['collections']
       for item in collection['data']
         item['$loki'] = item['id'] if item['id']
@@ -40,9 +51,9 @@ class ledger.database.Database extends EventEmitter
   flush: (callback) ->
     @perform =>
       clearTimeout @_scheduledFlush if @_scheduledFlush?
-      serializedData = {}
-      serializedData[@_name] = @_db
-      @_store.set serializedData, callback
+      changes = @_db.generateChangesNotification()
+      @_persistenceAdapter.saveChanges(changes).then -> callback?()
+      @_db.clearChanges()
 
   scheduleFlush: () ->
     clearTimeout @_scheduledFlush if @_scheduledFlush?
@@ -56,6 +67,9 @@ class ledger.database.Database extends EventEmitter
   getDb:() ->
     throw 'Unable to use database right now (not loaded)' unless @_db?
     @_db
+
+  delete: (callback) ->
+    @_persistenceAdapter.delete().then () -> callback?()
 
   close: () ->
     @flush()
