@@ -18,12 +18,21 @@ class @ledger.crypto.AES
   # Encrypts the given string using AES-256
   # @param [String] data Data to encrypt
   encrypt: (data) ->
-    encryption = sjcl.json._encrypt(@key, data, @_params)
-    sjcl.codec.base64.fromBits(encryption.ct,0)
+    sjcl.codec.base64.fromBits(@rawEncrypt(data), 0)
 
   # Decrypts the given encrypted data
   # @param [String] encryptedData An encrypted string
   decrypt: (encryptedData) ->
+    @rawDecrypt(sjcl.codec.base64.toBits(encryptedData))
+
+  rawEncrypt: (data) ->
+    crypted = sjcl.json._encrypt(@key, data, @_params).ct
+    for value, index in crypted
+      crypted[index] = value >>> 0
+    crypted
+
+
+  rawDecrypt: (data) ->
     params = _.clone(@_params)
-    params.ct = sjcl.codec.base64.toBits(encryptedData)
+    params.ct = data
     sjcl.json._decrypt(@key, params)

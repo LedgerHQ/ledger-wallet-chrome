@@ -12,14 +12,17 @@ class ledger.database.Database extends EventEmitter
       try
         @_migrateJsonToLoki125 json
         @_db = new loki(@_name, ENV: 'BROWSER')
-        @_db.loadJSON JSON.stringify(json[@_name]) if json[@_name]?
+        @_db.loadJSON JSON.stringify(json) if json?
         @_db.save = @scheduleFlush.bind(this)
         for collection in @listCollections()
           collection.setChangesApi on
       catch er
         e er
-        callback?()
-        @emit 'loaded'
+      callback?()
+      @emit 'loaded'
+    .fail (er) ->
+      e er
+    .done()
 
   addCollection: (collectionName) ->
     collection = @_db.addCollection(collectionName)
@@ -79,11 +82,12 @@ class ledger.database.Database extends EventEmitter
 _.extend ledger.database,
 
   init: (callback) ->
-    ledger.database.main = ledger.database.open 'main', ->
+    ledger.database.main = ledger.database.open 'main_' + ledger.storage.databases.name, ledger.storage.databases.getCipher?().key, ->
       callback?()
 
-  open: (databaseName, callback) ->
-    db = new ledger.database.Database(databaseName, ledger.storage.databases)
+  open: (databaseName, encryptionKey, callback) ->
+    persistenceAdapter = new ledger.database.DatabasePersistenceAdapter(databaseName, encryptionKey)
+    db = new ledger.database.Database(databaseName, persistenceAdapter)
     db.load callback
     db
 

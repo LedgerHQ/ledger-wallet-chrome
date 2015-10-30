@@ -8,6 +8,8 @@ class @ledger.storage.SecureStore extends ledger.storage.ChromeStore
     @_aes = new ledger.crypto.AES(key)
     @_hasCalledKeys = no
 
+  getCipher: -> @_aes
+
   # @see Store.keys
   keys: (cb) ->
     super (encrypted_keys) =>

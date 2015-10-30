@@ -3,8 +3,9 @@ ledger.database ||= {}
 
 class ledger.database.DatabasePersistenceAdapter
 
-  constructor: (dbName) ->
+  constructor: (dbName, password) ->
     @_dbName = dbName
+    @_password = password
     @_pendingCommands = {}
     @_worker = new Worker('../src/database/database_persistence_worker.js')
     @_worker.onmessage = (message) =>
@@ -32,17 +33,21 @@ class ledger.database.DatabasePersistenceAdapter
   serialize: () -> @_postCommand(command: 'serialize')
 
   _postCommand: (command) ->
-    @_prepare().then => @_postCommandToWorker(command)
+    @_prepare().then =>
+      @_postCommandToWorker(command)
+    .fail (er) =>
+      e er
 
   _postCommandToWorker: (command) ->
     queryId = _.uniqueId()
+    command['queryId'] = queryId
     defer = ledger.defer()
     @_pendingCommands[queryId] = defer
-    @_worker.postMessage {command: command, parameters: parameters, queryId: queryId}
+    @_worker.postMessage JSON.parse(JSON.stringify(command))
     defer.promise
 
   _prepare: () ->
     unless @_deferredPreparation?
       @_deferredPreparation = ledger.defer()
-      @_deferredPreparation.resolve(@_postCommandToWorker(command: 'prepare', dbName: @_dbName))
+      @_deferredPreparation.resolve(@_postCommandToWorker(command: 'prepare', dbName: @_dbName, password: @_password))
     @_deferredPreparation.promise
