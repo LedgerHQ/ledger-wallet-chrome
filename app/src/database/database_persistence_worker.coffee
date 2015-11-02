@@ -32,28 +32,30 @@ updateCounter = (data) ->
   encryptedDataBytesCounter += data.length * 8 # Each item represents 4 words of data
   data
 
-
-
 storify = (obj) ->
-  iterate = (obj, keys, index = 0) ->
+  storifyObject = (obj, keys, index = 0) ->
     return Q(obj) if index >= keys.length
     key = keys[index]
-    return iterate(obj, keys, index + 1) if key is '$loki'
+    return storifyObject(obj, keys, index + 1) if key is '$loki'
     value = obj[key]
-    if _.isArray(value)
-      # It
-    else if _.isObject(value)
-      # Recall
-      iterate(value, _.keys(value)).then (result) ->
-        obj[key] = result
-        iterate(obj, keys, index + 1)
-    else
-      cipher.encrypt(JSON.stringify(value)).then (data) ->
-        obj[key] = data
-      .then ->
-        iterate(obj, keys, index + 1)
-
-  iterate(obj, _(obj).keys())
+    storifyValue = (value) ->
+      if _.isArray(value)
+        storifyArray = (array, index = 0) ->
+          return Q(array) if index >= array.length
+          storifyValue(array[index]).then (data) ->
+            array[index] = data
+            storifyArray(array, index + 1)
+        storifyArray(value).then (array) ->
+          obj[key] = array
+      else if _.isObject(value)
+        storifyObject(value, _.keys(value)).then (result) ->
+          obj[key] = result
+      else
+        cipher.encrypt(JSON.stringify(value)).then (data) ->
+          obj[key] = data
+    storifyValue(value).then ->
+      storifyObject(obj, keys, index + 1)
+  storifyObject(obj, _(obj).keys())
 
 
 unstorify = (obj) ->
@@ -152,6 +154,7 @@ EventHandler =
 
   changes: ({changes}) ->
     do assertDbIsPrepared
+    do resetCounter
     storeChanges(changes)
 
   serialize: ({}) ->
@@ -229,26 +232,32 @@ queue = Q()
 
 class Cipher
 
-  constructor: (key) ->
+  constructor: (key, {algorithm, encoding} = {}) ->
     @_keyPromise = null
-    @_key = new ArrayBuffer(1)
+    @_encoding = encoding or 'utf-8'
+    @_algorithm = algorithm or 'AES-CBC'
+    @_key = key
+    @_encoder = new TextEncoder(@_encoding)
+    @_decoder = new TextDecoder(@_encoding)
 
   encrypt: (data) ->
     data = @_encode(data)
-    Q @_importKey().then (key) =>
-      crypto.subtle.encrypt(name: "AES-GCM", iv: @_iv(), key, data)
+    @_importKey().then (key) =>
+      crypto.subtle.encrypt(name: @_algorithm, iv: @_iv(), key, data)
 
   decrypt: (data) ->
-    Q @_importKey().then (key) =>
-      crypto.subtle.encrypt(name: "AES-GCM", iv: @_iv(), key, data).then (data) =>
-        @_decode(data)
+    @_importKey().then (key) =>
+      crypto.subtle.decrypt(name: @_algorithm, iv: @_iv(), key, data)
+    .then (data) =>
+      @_decode(data)
 
-  _encode: (data) -> data
+  _encode: (data) -> @_encoder.encode(data).buffer
 
-  _decode: (data) -> data
+  _decode: (data) -> @_decoder.decode(data)
 
   _importKey: ->
-    return @_keyPromise if @_keyPromise
-    Q(crypto.subtle.importKey("raw", @_key, name: "AES-GCM", false, ['encrypt', 'decrypt']))
+    @_keyPromise ||=
+      Q(crypto.subtle.digest(name: 'SHA-256', @_encode(@_key))).then (key) =>
+        crypto.subtle.importKey("raw", key, name: @_algorithm, true, ['encrypt', 'decrypt'])
 
-  _iv: -> new Uint8Array(16)
+  _iv: -> @__iv ||= new Uint8Array(16)
