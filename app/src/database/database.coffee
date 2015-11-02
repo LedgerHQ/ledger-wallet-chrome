@@ -6,13 +6,27 @@ class ledger.database.Database extends EventEmitter
   constructor: (name, persistenceAdapter) ->
     @_name = name
     @_persistenceAdapter = persistenceAdapter
+    @_store = ledger.storage.databases
 
   load: (callback) ->
-    @_persistenceAdapter.serialize().then (json) =>
+    @_store.get @_name, (json) =>
       try
         @_migrateJsonToLoki125 json
         @_db = new loki(@_name, ENV: 'BROWSER')
-        @_db.loadJSON JSON.stringify(json) if json?
+        @_db.loadJSON JSON.stringify(json[@_name]) if json[@_name]?
+        @_db.save = @scheduleFlush.bind(this)
+      catch er
+        e er
+      callback?()
+      @emit 'loaded'
+    return
+    @_persistenceAdapter.serialize().then (json) =>
+      try
+        l "Serialized ", json
+        #@_migrateJsonToLoki125 json
+        @_db = new loki(@_name, ENV: 'BROWSER')
+        if json?
+          @_db.loadJSON JSON.stringify(json)
         @_db.save = @scheduleFlush.bind(this)
         for collection in @listCollections()
           collection.setChangesApi on
@@ -30,7 +44,7 @@ class ledger.database.Database extends EventEmitter
     @_persistenceAdapter.declare(collection)
     collection
 
-  listCollections: () -> @_db.listCollections()
+  listCollections: () -> @_db.collections or []
 
   getCollection: (collectionName) -> @_db.getCollection(collectionName)
 
@@ -53,11 +67,18 @@ class ledger.database.Database extends EventEmitter
       @once 'loaded', callback
 
   flush: (callback) ->
+    ###
     @perform =>
       clearTimeout @_scheduledFlush if @_scheduledFlush?
       changes = @_db.generateChangesNotification()
       @_persistenceAdapter.saveChanges(changes).then -> callback?()
       @_db.clearChanges()
+    ###
+    @perform =>
+      clearTimeout @_scheduledFlush if @_scheduledFlush?
+      serializedData = {}
+      serializedData[@_name] = @_db
+      @_store.set serializedData, callback
 
   scheduleFlush: () ->
     clearTimeout @_scheduledFlush if @_scheduledFlush?

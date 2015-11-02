@@ -29,50 +29,15 @@ MEMORY_WARNING = 5 * 1024 * 1024 # 5 Mo
 resetCounter = () -> encryptedDataBytesCounter = 0
 
 updateCounter = (data) ->
-  encryptedDataBytesCounter += data.length * 8 # Each item represents 4 words of data
+  encryptedDataBytesCounter += data.byteLength
   data
 
 storify = (obj) ->
-  storifyObject = (obj, keys, index = 0) ->
-    return Q(obj) if index >= keys.length
-    key = keys[index]
-    return storifyObject(obj, keys, index + 1) if key is '$loki'
-    value = obj[key]
-    storifyValue = (value) ->
-      if _.isArray(value)
-        storifyArray = (array, index = 0) ->
-          return Q(array) if index >= array.length
-          storifyValue(array[index]).then (data) ->
-            array[index] = data
-            storifyArray(array, index + 1)
-        storifyArray(value).then (array) ->
-          obj[key] = array
-      else if _.isObject(value)
-        storifyObject(value, _.keys(value)).then (result) ->
-          obj[key] = result
-      else
-        cipher.encrypt(JSON.stringify(value)).then (data) ->
-          obj[key] = data
-    storifyValue(value).then ->
-      storifyObject(obj, keys, index + 1)
-  storifyObject(obj, _(obj).keys())
+  cipher.encrypt(JSON.stringify(obj)).then (data) ->
+    $loki: obj['$loki']
+    data: updateCounter(data)
 
-
-unstorify = (obj) ->
-  for key, value of obj
-    continue if key is '$loki' # Skip the index
-    storifyValue = (value) ->
-      _value = _(value)
-      if _value.isArray()
-        # Iterate
-        storifyValue(item) for item, index in value
-      else if _value.isObject()
-        storify(value)
-      else
-        JSON.parse(cipher.rawDecrypt(value))
-    obj[key] = storifyValue(value)
-  obj
-
+unstorify = (obj) -> cipher.decrypt(obj.data).then((json) -> JSON.parse(json))
 
 flushChanges = (changes) ->
   d = Q.defer()
@@ -85,18 +50,19 @@ flushChanges = (changes) ->
     else
       # Insert/Update
       store.put change.obj
-  transaction.oncomplete = -> d.resolve()
+  transaction.oncomplete = ->
+    d.resolve()
   transaction.onerror = (er) ->
     e er
     d.reject("Save error")
   d.promise
 
 storeChanges = (changes, index = 0, encryptedChanges = []) ->
-  return Q() if index >= changes.length
-  d = Q.defer()
   Q.fcall ->
     if encryptedDataBytesCounter > MEMORY_WARNING or index >= changes.length
-      flushChanges(encryptedChanges)
+      flushedChanges = encryptedChanges
+      encryptedChanges = []
+      flushChanges(flushedChanges)
   .then ->
     return if index >= changes.length
     change = changes[index]
@@ -110,25 +76,36 @@ storeChanges = (changes, index = 0, encryptedChanges = []) ->
           change.obj = cryptedObj
     .then ->
       storeChanges(changes, index + 1, encryptedChanges.concat(change))
+
+iterateThroughCollection = (collectionName, handler = (key, value) -> value) ->
+  store = db.transaction(collectionName).objectStore(collectionName)
+  d = Q.defer()
+  result = []
+  store.openCursor().onsuccess = (event) ->
+    cursor = event.target.result
+    if cursor?
+      try
+        result = result.concat(handler(cursor.key, cursor.value))
+        cursor.continue()
+      catch er
+        e er
+        d.reject(er)
+    else
+      d.resolve(result)
   d.promise
-
-
   ###
-   transaction = db.transaction(db.objectStoreNames, 'readwrite')
-    for change, index in changes
-      store = transaction.objectStore(change.name)
-      if change.operation is "D"
-        # Delete document
-        store.delete storify(change.obj['$loki'])
-      else
-        # Insert/Update
-        store.put storify(change.obj)
-      l "Warning too much data ", encryptedDataBytesCounter / (1024 * 1024), " #{index} / #{changes.length}" if encryptedDataBytesCounter >= MEMORY_WARNING
-    transaction.oncomplete = -> d.resolve()
-    transaction.onerror = (er) ->
-      e er
-      d.reject("Save error")
+    var objectStore = db.transaction("customers").objectStore("customers");
 
+    objectStore.openCursor().onsuccess = function(event) {
+      var cursor = event.target.result;
+      if (cursor) {
+        alert("Name for SSN " + cursor.key + " is " + cursor.value.name);
+        cursor.continue();
+      }
+      else {
+        alert("No more entries!");
+      }
+    };
   ###
 
 EventHandler =
@@ -159,32 +136,47 @@ EventHandler =
 
   serialize: ({}) ->
     do assertDbIsPrepared
-    d = Q.defer()
-    l "Serialize"
-    serialized = {
-      filename: databaseName,
-      collections:[],
-      databaseVersion: 1.1,
-      engineVersion: 1.1,
-      autosave: false,
-      autosaveInterval: 5000,
-      autosaveHandle: null,
-      options: {"ENV":"BROWSER"},
-      persistenceMethod: "localStorage",
-      persistenceAdapter:null,
-      events: {
-        init: [null],
-        "flushChanges":[],
-        "close":[],
-        "changes":[],
-        "warning":[]
-      },
-      ENV: "CORDOVA"
-    }
-    d.resolve(serialized)
-    l "RESULT ", serialized
-    d.promise
-
+    iterateThroughCollection('__collections').then (collections) ->
+      iterate = (index = 0) ->
+        return collections if index >= collections.length
+        collection = collections[index]
+        l "Iterate over collection", collection
+        inflateCollection = (id, object) ->
+          l "Inflating ", object
+          (collection.data ||= []).push object
+          l "Inflated"
+        iterateThroughCollection(collection.name, inflateCollection).then ->
+          unstorifyCollection = (index = 0) ->
+            l "Unstorify ", index, collection.data.length
+            return if index >= collection.data.length
+            l "Unstorify now", collection.data[index]
+            unstorify(collection.data[index]).then (obj) ->
+              l "Decrypted ", obj
+              collection.data[index] = obj
+              unstorifyCollection(index + 1)
+          unstorifyCollection().then ->
+            collection.maxId = collection.data.length
+            iterate(index + 1)
+      iterate()
+    .then (collections) ->
+        filename: databaseName,
+        collections: collections,
+        databaseVersion: 1.1,
+        engineVersion: 1.1,
+        autosave: false,
+        autosaveInterval: 5000,
+        autosaveHandle: null,
+        options: {"ENV":"BROWSER"},
+        persistenceMethod: "localStorage",
+        persistenceAdapter:null,
+        events: {
+          init: [null],
+          "flushChanges":[],
+          "close":[],
+          "changes":[],
+          "warning":[]
+        },
+        ENV: "CORDOVA"
 
   delete: () ->
     do assertDbIsPrepared
@@ -199,6 +191,7 @@ EventHandler =
     do assertDbIsPrepared
     d = Q.defer()
     # Put the collection into the collections store
+    collection.data = []
     transaction = db.transaction(['__collections'], 'readwrite')
     store = transaction.objectStore('__collections')
     request = store.put collection
@@ -225,10 +218,13 @@ queue = Q()
 
 @onmessage = (message) ->
   queue = queue.then =>
+    queryId =  message.data.queryId
     Q.fcall(EventHandler[message.data?.command], message.data).then (result) =>
-      @postMessage(queryId: message.data.queryId, result: result)
+      @postMessage(queryId: queryId, result: result)
     .fail (error) =>
-      @postMessage(queryId: message.data.queryId, error: error)
+      @postMessage(queryId: queryId, error: error)
+
+@onerror = (er) -> e er
 
 class Cipher
 

@@ -27,6 +27,7 @@ class Collection
     return unless model?._object
     id = model.getBestIdentifier()
     model.getBestIdentifier = -> id
+    l "REMOVE", model._object
     @_collection.remove(model._object['$loki'])
     @_removeSynchronizedProperties(model)
     @_context.emit "delete:" + _.str.underscored(model._object['objType']).toLowerCase(), model
@@ -193,6 +194,7 @@ class ledger.database.contexts.Context extends EventEmitter
         unless _(collectionData).isEmpty()
           collection.updateSynchronizedProperties(collectionData)
         else
+          debugger
           # delete all
           collection.getModelClass().chain(this).remove()
       @emit 'synchronized'
