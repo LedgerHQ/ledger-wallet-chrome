@@ -15,24 +15,15 @@ class @ledger.crypto.AES
       iv: sjcl.codec.base64.toBits(iv)
       salt: sjcl.codec.base64.toBits(salt)
 
-  # Encrypts the given string using AES-256
-  # @param [String] data Data to encrypt
+# Encrypts the given string using AES-256
+# @param [String] data Data to encrypt
   encrypt: (data) ->
-    sjcl.codec.base64.fromBits(@rawEncrypt(data), 0)
+    encryption = sjcl.json._encrypt(@key, data, @_params)
+    sjcl.codec.base64.fromBits(encryption.ct,0)
 
-  # Decrypts the given encrypted data
-  # @param [String] encryptedData An encrypted string
+# Decrypts the given encrypted data
+# @param [String] encryptedData An encrypted string
   decrypt: (encryptedData) ->
-    @rawDecrypt(sjcl.codec.base64.toBits(encryptedData))
-
-  rawEncrypt: (data) ->
-    crypted = sjcl.json._encrypt(@key, data, @_params).ct
-    for value, index in crypted
-      crypted[index] = value >>> 0
-    crypted
-
-
-  rawDecrypt: (data) ->
     params = _.clone(@_params)
-    params.ct = data
+    params.ct = sjcl.codec.base64.toBits(encryptedData)
     sjcl.json._decrypt(@key, params)

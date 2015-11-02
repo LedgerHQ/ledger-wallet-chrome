@@ -140,18 +140,12 @@ EventHandler =
       iterate = (index = 0) ->
         return collections if index >= collections.length
         collection = collections[index]
-        l "Iterate over collection", collection
         inflateCollection = (id, object) ->
-          l "Inflating ", object
           (collection.data ||= []).push object
-          l "Inflated"
         iterateThroughCollection(collection.name, inflateCollection).then ->
           unstorifyCollection = (index = 0) ->
-            l "Unstorify ", index, collection.data.length
-            return if index >= collection.data.length
-            l "Unstorify now", collection.data[index]
+            return Q() if index >= collection.data.length
             unstorify(collection.data[index]).then (obj) ->
-              l "Decrypted ", obj
               collection.data[index] = obj
               unstorifyCollection(index + 1)
           unstorifyCollection().then ->
