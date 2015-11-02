@@ -194,7 +194,6 @@ class ledger.database.contexts.Context extends EventEmitter
         unless _(collectionData).isEmpty()
           collection.updateSynchronizedProperties(collectionData)
         else
-          debugger
           # delete all
           collection.getModelClass().chain(this).remove()
       @emit 'synchronized'
