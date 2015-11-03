@@ -196,7 +196,7 @@ class ledger.wallet.Transaction
       stepsCount = progress.publicKeyCount + progress.transactionSignCount + progress.trustedInputsCount + progress.hashOutputBase58Count + progress.untrustedHashCount
       for key, value of progress
         [__, index] = key.match(/currentTrustedInputProgress_(\d)/) or [null, null]
-        continue unless indexz
+        continue unless index
         currentStep += progress["currentTrustedInputProgress_#{index}"]
         stepsCount += progress["trustedInputsProgressTotal_#{index}"]
       percent = Math.ceil(currentStep / stepsCount * 100)
