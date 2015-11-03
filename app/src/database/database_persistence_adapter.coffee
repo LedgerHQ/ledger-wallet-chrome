@@ -57,7 +57,6 @@ class ledger.database.DatabasePersistenceAdapter
     queryId = _.uniqueId()
     command['queryId'] = queryId
     defer = ledger.defer()
-    l "POST ", command
     @_pendingCommands[queryId] = defer
     @_worker.postMessage command
     defer.promise
