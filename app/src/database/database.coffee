@@ -6,6 +6,7 @@ class ledger.database.Database extends EventEmitter
   constructor: (name, persistenceAdapter) ->
     @_name = name
     @_persistenceAdapter = persistenceAdapter
+    @_changes = []
 
   load: (callback) ->
     @_persistenceAdapter.serialize().then (json) =>
@@ -55,18 +56,25 @@ class ledger.database.Database extends EventEmitter
       @once 'loaded', callback
 
   flush: (callback) ->
+    changes = @_changes
+    @_changes = []
     @perform =>
       clearTimeout @_scheduledFlush if @_scheduledFlush?
-      changes = @_db.generateChangesNotification()
       @_persistenceAdapter.saveChanges(changes).then -> callback?()
-      @_db.clearChanges()
 
   scheduleFlush: () ->
+    return unless @_db?
+    @_changes = @_changes.concat(@_db.generateChangesNotification())
+    @_db.clearChanges()
     clearTimeout @_scheduledFlush if @_scheduledFlush?
-    @_scheduledFlush = setTimeout =>
+    if @_changes.length > 50
       @_scheduledFlush = null
       @flush()
-    , 1000
+    else
+      @_scheduledFlush = setTimeout =>
+        @_scheduledFlush = null
+        @flush()
+      , 1000
 
   isLoaded: () -> if @_db? then yes else no
 
@@ -78,7 +86,7 @@ class ledger.database.Database extends EventEmitter
     @_persistenceAdapter.delete().then () -> callback?()
 
   close: () ->
-    @flush()
+    @flush => @_persistenceAdapter.stop()
     @_db = null
 
 _.extend ledger.database,

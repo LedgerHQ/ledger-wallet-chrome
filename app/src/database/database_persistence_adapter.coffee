@@ -32,6 +32,8 @@ class ledger.database.DatabasePersistenceAdapter
 
   serialize: () -> @_postCommand(command: 'serialize')
 
+  stop: -> @_worker.terminate()
+
   _postCommand: (command) ->
     @_prepare().then =>
       @_postCommandToWorker(command)

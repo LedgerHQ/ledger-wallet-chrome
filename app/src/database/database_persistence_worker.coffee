@@ -174,11 +174,9 @@ EventHandler =
 
   delete: () ->
     do assertDbIsPrepared
-    d = Q.defer()
-    request = IndexedDb.deleteDatabase(databaseName)
-    request.onsuccess = -> d.resolve()
-    request.onerror = -> d.reject(new Error("Failed to delete database"))
-    d.promise
+    db.close()
+    IndexedDb.deleteDatabase(databaseName)
+    Q()
 
 
   declare: ({collection}) ->
