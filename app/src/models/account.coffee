@@ -127,7 +127,6 @@ class @Account extends ledger.database.Model
       inputHashes = op.get 'inputs_hash'
       for __, index in inputIndexes
         excludedInputs.push([inputIndexes[index], inputHashes[index]])
-    debugger
     @_createTransactionGetChangeAddressPath @getWalletAccount().getCurrentChangeAddressIndex(), (changePath) =>
       ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, excludedInputs: excludedInputs, callback)
 
