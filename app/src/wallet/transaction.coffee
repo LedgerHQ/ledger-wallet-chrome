@@ -196,7 +196,7 @@ class ledger.wallet.Transaction
       stepsCount = progress.publicKeyCount + progress.transactionSignCount + progress.trustedInputsCount + progress.hashOutputBase58Count + progress.untrustedHashCount
       for key, value of progress
         [__, index] = key.match(/currentTrustedInputProgress_(\d)/) or [null, null]
-        continue unless index?
+        continue unless indexz
         currentStep += progress["currentTrustedInputProgress_#{index}"]
         stepsCount += progress["trustedInputsProgressTotal_#{index}"]
       percent = Math.ceil(currentStep / stepsCount * 100)
@@ -231,11 +231,13 @@ class ledger.wallet.Transaction
   @option [Function] callback The callback called once the transaction is created
   @return [Q.Promise] A closure
   ###
-  @create: ({amount, fees, address, inputsPath, changePath}, callback = null) ->
+  @create: ({amount, fees, address, inputsPath, changePath, excludedInputs}, callback = null) ->
     d = ledger.defer(callback)
     return d.rejectWithError(Errors.DustTransaction) && d.promise if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
     return d.rejectWithError(Errors.NotEnoughFunds) && d.promise unless inputsPath?.length
     requiredAmount = amount.add(fees)
+
+    excludedInputs = excludedInputs or []
 
     $info("--- CREATE TRANSACTION ---")
     $info("Amount: ", amount.toString())
@@ -243,7 +245,19 @@ class ledger.wallet.Transaction
     $info("Address: ", address)
     $info("Inputs paths: ", inputsPath)
     $info("Change path: ", changePath)
+    $info("Excluded inputs", excludedInputs)
 
+    ###
+      Utils
+    ###
+
+    isOutputExcluded = (output) ->
+      return for [index, hash] in excludedInputs when output['transaction_hash'] is hash and output['output_index'] is index
+      no
+
+    ###
+      End of Uitls
+    ###
     ledger.app.dongle.getPublicAddress changePath, (dongleChangeAddress) ->
       ledger.tasks.AddressDerivationTask.instance.getPublicAddress changePath, (workerChangeaddress, error) ->
         if dongleChangeAddress.bitcoinAddress.toString(ASCII) isnt workerChangeaddress
@@ -254,7 +268,12 @@ class ledger.wallet.Transaction
             $error("Error during unspents outputs gathering", error)
             return d.rejectWithError(Errors.NetworkError, error)
           # Collect each valid outputs and sort them by desired priority
-          validOutputs = _(output for output in outputs when output.paths.length > 0).sortBy (output) ->  -output['confirmatons']
+
+          validOutputs =
+            _(output for output in outputs when output.paths.length > 0 and !isOutputExcluded(output))
+              .chain()
+              .sortBy (output) ->  -output['confirmatons']
+              .value()
           if validOutputs.length == 0
             $error("Error not enough funds")
             return d.rejectWithError(Errors.NotEnoughFunds)
