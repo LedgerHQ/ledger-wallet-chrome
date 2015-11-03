@@ -1,6 +1,19 @@
 
 ledger.database ||= {}
 
+clone = (obj) ->
+  if _.isFunction(obj)
+    {}
+  else if _.isArray(obj)
+    (clone(item) for item in obj)
+  else if _.isObject(obj)
+    out = {}
+    for key, value of obj
+      out[key] = clone(value)
+    out
+  else
+    obj
+
 class ledger.database.DatabasePersistenceAdapter
 
   constructor: (dbName, password) ->
@@ -24,7 +37,7 @@ class ledger.database.DatabasePersistenceAdapter
     @_ready = no
     @_prepare()
 
-  declare: (collection) -> @_postCommand(command: 'declare', collection: collection)
+  declare: (collection) -> @_postCommand(command: 'declare', collection: clone(collection))
 
   delete: () -> @_postCommand(command: 'delete')
 
@@ -44,8 +57,9 @@ class ledger.database.DatabasePersistenceAdapter
     queryId = _.uniqueId()
     command['queryId'] = queryId
     defer = ledger.defer()
+    l "POST ", command
     @_pendingCommands[queryId] = defer
-    @_worker.postMessage JSON.parse(JSON.stringify(command))
+    @_worker.postMessage command
     defer.promise
 
   _prepare: () ->
