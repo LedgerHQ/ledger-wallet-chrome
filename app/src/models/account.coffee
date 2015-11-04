@@ -120,8 +120,15 @@ class @Account extends ledger.database.Model
     amount = ledger.Amount.fromSatoshi(amount)
     fees = ledger.Amount.fromSatoshi(fees)
     inputsPath = @getWalletAccount().getAllAddressesPaths()
+    unconfirmedOperations = Operation.find($and: [{confirmations: 0}, {type: 'sending'}]).data()
+    excludedInputs = []
+    for op in unconfirmedOperations
+      inputIndexes = op.get 'inputs_index'
+      inputHashes = op.get 'inputs_hash'
+      for __, index in inputIndexes
+        excludedInputs.push([inputIndexes[index], inputHashes[index]])
     @_createTransactionGetChangeAddressPath @getWalletAccount().getCurrentChangeAddressIndex(), (changePath) =>
-      ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, callback)
+      ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, excludedInputs: excludedInputs, callback)
 
   ###
     Special get change address path to 'avoid' LW 1.0.0 derivation failure.

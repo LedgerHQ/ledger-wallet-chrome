@@ -27,6 +27,7 @@ class Collection
     return unless model?._object
     id = model.getBestIdentifier()
     model.getBestIdentifier = -> id
+    l "REMOVE", model._object
     @_collection.remove(model._object['$loki'])
     @_removeSynchronizedProperties(model)
     @_context.emit "delete:" + _.str.underscored(model._object['objType']).toLowerCase(), model
@@ -147,8 +148,8 @@ class ledger.database.contexts.Context extends EventEmitter
     @_collections = {}
     @_synchronizedCollections = {}
     @_syncStore = syncStore
-    for collection in @_db.getDb().listCollections()
-      @_collections[collection.name] = new Collection(@_db.getDb().getCollection(collection.name), @)
+    for collection in @_db.listCollections()
+      @_collections[collection.name] = new Collection(@_db.getCollection(collection.name), @)
       @_listenCollectionEvent(@_collections[collection.name])
     @_syncStore.on 'pulled', (@onSyncStorePulled = @onSyncStorePulled.bind(this))
     @initialize()
@@ -168,7 +169,7 @@ class ledger.database.contexts.Context extends EventEmitter
   getCollection: (name) ->
     collection = @_collections[name]
     unless collection?
-      collection = new Collection(@_db.getDb().addCollection(name), @)
+      collection = new Collection(@_db.addCollection(name), @)
       @_collections[name] = collection
       @_listenCollectionEvent(collection)
     collection

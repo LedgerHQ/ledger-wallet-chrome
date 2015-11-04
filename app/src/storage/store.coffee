@@ -8,6 +8,7 @@ class @ledger.storage.Store extends EventEmitter
 
   # @param [String] name The store name (for key mangling)
   constructor: (name, keySeparator = '.') ->
+    @name = name
     @_name = name
     @_keySeparator = keySeparator
     regexSeparator = if keySeparator.match(/\./) then "\\" + keySeparator else keySeparator

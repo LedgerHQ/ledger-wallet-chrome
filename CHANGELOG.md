@@ -1,4 +1,11 @@
 # Changelog
+1.4.5
+===
+- Fix a sorting issue in operations list
+- Fix a occasional transaction creation failure
+- Improved performances for big transactions
+- Minor bug fixes
+
 1.4.4
 ===
 - Bug fix

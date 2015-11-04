@@ -12,6 +12,7 @@ class @WalletSettingsToolsUtilitiesSettingViewController extends WalletSettingsS
     dialog.positiveLocalizableKey = 'common.no'
     dialog.negativeLocalizableKey = 'common.yes'
     dialog.once 'click:negative', =>
-      chrome.storage.local.clear()
-      chrome.runtime.reload()
+      ledger.database.main.delete ->
+        chrome.storage.local.clear()
+        chrome.runtime.reload()
     dialog.show()
