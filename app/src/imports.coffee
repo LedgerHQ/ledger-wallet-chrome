@@ -60,11 +60,15 @@
         '../libs/zbarqrcode'
         '../libs/mutation-summary'
         '../libs/jsencrypt'
+        '../libs/progressbar.min'
         '../libs/ua-parser-0.7.7.min'
         '../libs/zip/zip'
         '../libs/zip/z-worker'
         '../libs/zip/inflate'
         '../libs/zip/deflate'
+
+        # Slick
+        '../public/slick/slick.min'
 
         # Used be m2fa.DebugClient
         '../libs/btchip/ucrypt/ka'
@@ -359,6 +363,7 @@
 
         ## Widgets
         'widgets/switch'
+        'widgets/circle_progress_bar'
         'widgets/segmented_control'
 
         ## i18n

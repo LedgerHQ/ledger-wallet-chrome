@@ -1,100 +1,60 @@
+
+EstimatedTime = (4 * 60 + 30) * 1000
+
 class @OnboardingManagementSwappedbip39provisioningViewController extends @OnboardingViewController
+
+  view:
+    progressBar: '#circle_progress_bar'
+    carousel: '.carousel'
+
+  carouselTexts: [
+    "Ledger Nano is a Bitcoin wallet on a smartcard device, small format and low weight. Comfortable and simple to use, you connect it directly to a USB port to manage your account.",
+    "Ledger Nano is a Bitcoin wallet on a smartcard device, small format and low weight. Comfortable and simple to use, you connect it directly to a USB port to manage your account.",
+    "Ledger Nano is a Bitcoin wallet on a smartcard device, small format and low weight. Comfortable and simple to use, you connect it directly to a USB port to manage your account.",
+    "Ledger Nano is a Bitcoin wallet on a smartcard device, small format and low weight. Comfortable and simple to use, you connect it directly to a USB port to manage your account."
+  ]
 
   onAfterRender: ->
     super
+    @_progressBar = new ledger.widgets.CircleProgressBar(@view.progressBar, width: 70, height: 70)
+    window.pr = @_progressBar
 
+    @_startTime = new Date().getTime()
+    @_interval = setInterval(@_refreshProgression.bind(this), 1000)
+
+    @_initializeCarousel()
+
+    return
     # Important part
     if @params.wallet_mode is 'create'
       @_finalizeSetup()
     else
       @_performSetup()
-
     # !Important part
-
-
-    $('.nyan').click @togglePlay
-    deferredTimer = ledger.defer()
-    @_countDownInterval = setInterval @_countDown.bind(this), 1000
-    @_startTime = new Date().getTime()
-    @_timer = deferredTimer.promise
-    `
-        console.log('Nyan!');
-
-        var NyanCat = function () {
-            return {
-                init: function () {
-                    this.cat = $('#nyan-cat');
-                    this.framesAmount = 6;
-                    this.currentFrame = 1;
-                },
-
-                cycleFrames: function () {
-                    var myself = this;
-                    this.cat.removeClass('frame' + myself.currentFrame).addClass('frame' + myself.cycleIds(myself.currentFrame));
-                    this.currentFrame = this.cycleIds(this.currentFrame);
-                },
-
-                cycleIds: function (_currId) {
-                    if (_currId >= this.framesAmount) {
-                        _currId = 1;
-                    } else {
-                        _currId += 1;
-                    }
-
-                    return _currId;
-                }
-            }
-        }
-
-        var Sparks = function () {
-            return {
-                init: function (_combo) {
-                    var yCombosAmount = Math.ceil($(document).height() / _combo.height()),
-                        comboTags = $(document.createElement('div')),
-                        newCombo = null;
-
-                    for (var a = 0; a < yCombosAmount-1; a += 1) {
-                        newCombo = _combo.clone();
-                        comboTags.append(newCombo); // <- still have to improve this crap
-                    }
-
-                    $('.nyan').prepend(comboTags.html());
-                }
-            }
-        };
-
-        $(function() {
-            var nyancat = new NyanCat(),
-                sparks = new Sparks();
-
-            nyancat.init();
-            sparks.init($('.sparks-combo'));
-
-            var timer = setInterval(function () {
-                nyancat.cycleFrames();
-            }, 70);
-            deferredTimer.resolve(timer);
-        });
-    `
 
   onDetach: ->
     super
-    @_timer.then (t) -> clearInterval(t)
-    clearInterval(@_countDownInterval)
+    cleanInterval(@_interval)
 
-  togglePlay: ->
-    audio = $("audio")[0]
-    if audio.paused
-      audio.play()
-    else
-      audio.pause()
+  _initializeCarousel: ->
+    @view.carousel.empty()
 
-  _countDown: ->
-    estimatedTime = (4 * 60 + 30) * 1000
+    for text in @carouselTexts
+      child =
+        $("<div>#{text}</div>")
+      @view.carousel.append(child)
+
+    @view.carousel.slick
+      dots: on
+      infinite: on
+      autoplay: on
+      arrows: off
+      accessibility: off
+      draggable: off
+
+  _refreshProgression: ->
     diff = new Date().getTime() - @_startTime
-    minutes = Math.floor((estimatedTime - diff) / (60 * 1000))
-    seconds = Math.floor((estimatedTime - diff) % (60 * 1000) / 1000)
-    $('#countdown').text("#{Math.max(0, minutes)}:#{_.str.lpad(Math.max(0, seconds), 2, '0')}")
+    @_progressBar.setProgress(Math.min(diff / EstimatedTime, 1))
 
   _finalizeSetup: ->
     ledger.app.dongle.setupFinalizeBip39().then =>

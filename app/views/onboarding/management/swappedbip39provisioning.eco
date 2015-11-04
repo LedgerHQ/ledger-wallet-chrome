@@ -1,35 +1,12 @@
-<div class="nyan">
-  <div class="sparks-combo">
-    <div class="spark"></div>
-    <div class="spark"></div>
-    <div class="spark"></div>
-    <div class="spark"></div>
+<div id="content-container">
+<div class="logo-container">
+  <img src="../../assets/images/onboarding/large_logo.png" width="256" height="156">
+</div>
+<div class="greyed-container">
+  <div id="circle_progress_bar"></div>
+</div>
+<div class="actions-container">
+  <div class="carousel">
   </div>
-
-  <div id="wave-a" class="hot rainbow"></div>
-  <div id="wave-a" class="cold rainbow"></div>
-
-  <div id="wave-b" class="hot rainbow"></div>
-  <div id="wave-b" class="cold rainbow"></div>
-
-  <div id="nyan-cat" class="frame1">
-  <div id="tail"></div>
-
-  <div id="paws"></div>
-
-  <div id="pop-tarts-body">
-    <div id="pop-tarts-body-cream"></div>
-  </div>
-
-  <div id="head">
-    <div id="face"></div>
-  </div>
-  </div>
-
-  <audio autoplay="true" loop="true">
-    <source src="../public/nyan/audio/nyan-cat.ogg" type="audio/ogg" />
-  </audio>
-  <div id="countdown" style="position:fixed;bottom:0px;width:100%;text-align:center;font-size: 75px;color: white">
-    3:30
-  </div>
+</div>
 </div>
