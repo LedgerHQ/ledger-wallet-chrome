@@ -118,7 +118,7 @@
 .slick-dots
 {
     position: absolute;
-    bottom: -45px;
+    bottom: -25px;
 
     display: block;
 
@@ -171,9 +171,8 @@
     opacity: 1;
 }
 
+.slick-dots li:hover,
 .slick-dots li.slick-active
 {
-    opacity: .75;
-    color: black;
     background-color: #999999;
 }

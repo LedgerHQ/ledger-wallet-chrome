@@ -8,10 +8,10 @@ class @OnboardingManagementSwappedbip39provisioningViewController extends @Onboa
     carousel: '.carousel'
 
   carouselTexts: [
-    "Ledger Nano is a Bitcoin wallet on a smartcard device, small format and low weight. Comfortable and simple to use, you connect it directly to a USB port to manage your account.",
-    "Ledger Nano is a Bitcoin wallet on a smartcard device, small format and low weight. Comfortable and simple to use, you connect it directly to a USB port to manage your account.",
-    "Ledger Nano is a Bitcoin wallet on a smartcard device, small format and low weight. Comfortable and simple to use, you connect it directly to a USB port to manage your account.",
-    "Ledger Nano is a Bitcoin wallet on a smartcard device, small format and low weight. Comfortable and simple to use, you connect it directly to a USB port to manage your account."
+    "Ledger Nano is a Bitcoin wallet on a smartcard device, small format and low weight.<br /> Comfortable and simple to use, you connect it directly to a USB port to manage your account.",
+    "Extensible Duo from de Super market on a Random device, power format efficient low format.<br /> Comfortable to applaude to car, you unchained it card to a money transport strong management.",
+    "Ledger Nano is a Bitcoin wallet on a smartcard device, small format and low weight.<br /> Comfortable and simple to use, you connect it directly to a USB port to manage your account.",
+    "Ledger Nano is a Bitcoin wallet on a smartcard device, small format and low weight.<br /> Comfortable and simple to use, you connect it directly to a USB port to manage your account."
   ]
 
   onAfterRender: ->
@@ -41,7 +41,7 @@ class @OnboardingManagementSwappedbip39provisioningViewController extends @Onboa
 
     for text in @carouselTexts
       child =
-        $("<div>#{text}</div>")
+        $("<div class=\"carousel-item \">#{text}</div>")
       @view.carousel.append(child)
 
     @view.carousel.slick
@@ -51,6 +51,8 @@ class @OnboardingManagementSwappedbip39provisioningViewController extends @Onboa
       arrows: off
       accessibility: off
       draggable: off
+      fade: on
+      speed: 500
 
   _refreshProgression: ->
     diff = new Date().getTime() - @_startTime
