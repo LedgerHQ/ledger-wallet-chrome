@@ -41,7 +41,7 @@ class @OnboardingManagementSwappedbip39provisioningViewController extends @Onboa
 
     for text in @carouselTexts
       child =
-        $("<div class=\"carousel-item \">#{text}</div>")
+        $("<div class=\"carousel-item \">#{t(text)}</div>")
       @view.carousel.append(child)
 
     @view.carousel.slick
