@@ -12,7 +12,6 @@ ledger.router.pluggedWalletRoutesExceptions = [
 @declareRoutes = (route, app) ->
   ## Default
   route '/', ->
-    return app.router.go '/onboarding/management/swapped_bip39_provisioning'
     if app.isInWalletMode()
       app.router.go '/onboarding/device/plug', {animateIntro: yes}
     else
@@ -63,6 +62,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
       message: t 'onboarding.device.errors.forged.forbidden_access'
       indication: t 'onboarding.device.errors.forged.get_help'
 
+  route '/onboarding/device/swapped_bip39_provisioning', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingManagementSwappedbip39provisioningViewController
+
   # Management
   route '/onboarding/management/security', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementSecurityViewController
@@ -93,9 +95,6 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   route '/onboarding/management/switch_firmware', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementSwitchfirmwareViewController
-
-  route '/onboarding/management/swapped_bip39_provisioning', (params) ->
-    app.navigate ONBOARDING_LAYOUT, OnboardingManagementSwappedbip39provisioningViewController
 
   route '/onboarding/management/recovery_mode', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementRecoverymodeViewController

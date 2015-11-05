@@ -24,7 +24,6 @@ class @OnboardingManagementSwappedbip39provisioningViewController extends @Onboa
 
     @_initializeCarousel()
 
-    return
     # Important part
     if @params.wallet_mode is 'create'
       @_finalizeSetup()
