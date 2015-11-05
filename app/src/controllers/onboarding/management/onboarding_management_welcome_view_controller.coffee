@@ -28,7 +28,7 @@ class @OnboardingManagementWelcomeViewController extends @OnboardingViewControll
         swapped_bip39: yes
 
     navigateToSwitchFirmwarePage = =>
-      ledger.app.router.go '/onboarding/management/switch_firmware',
+      ledger.app.router.go '/onboarding/device/switch_firmware',
         mode: 'setup'
         wallet_mode: mode
         back: @representativeUrl()

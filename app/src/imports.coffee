@@ -340,6 +340,8 @@
         'controllers/onboarding/device/onboarding_device_update_view_controller'
         'controllers/onboarding/device/onboarding_device_unsupported_view_controller'
         'controllers/onboarding/device/onboarding_device_failed_view_controller'
+        'controllers/onboarding/device/onboarding_device_switch_firmware_view_controller'
+        'controllers/onboarding/device/onboarding_device_swappedbip39provisioning_view_controller'
 
         # Management
         'controllers/onboarding/management/onboarding_management_security_view_controller'
@@ -351,8 +353,6 @@
         'controllers/onboarding/management/onboarding_management_summary_view_controller'
         'controllers/onboarding/management/onboarding_management_provisioning_view_controller'
         'controllers/onboarding/management/onboarding_management_done_view_controller'
-        'controllers/onboarding/management/onboarding_management_switch_firmware_view_controller'
-        'controllers/onboarding/management/onboarding_management_swappedbip39provisioning_view_controller'
         'controllers/onboarding/management/onboarding_management_recoverymode_view_controller'
         'controllers/onboarding/management/onboarding_management_recoverydevice_view_controller'
 

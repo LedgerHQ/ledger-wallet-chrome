@@ -1,8 +1,0 @@
-<div id="view_controller_content">
-  <div class="page-large-indication">LOADING TO <%= @params.mode %></div>
-  <div class="progress-container">
-    <div id="bar_container"></div>
-    <div id="progress" class="percent page-indication">0%</div>
-  </div>
-  <div class="page-indication"><%- t 'update.loading.do_not_unplug' %></div>
-</div>

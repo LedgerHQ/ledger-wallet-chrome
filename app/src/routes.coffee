@@ -63,7 +63,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
       indication: t 'onboarding.device.errors.forged.get_help'
 
   route '/onboarding/device/swapped_bip39_provisioning', (params) ->
-    app.navigate ONBOARDING_LAYOUT, OnboardingManagementSwappedbip39provisioningViewController
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceSwappedbip39provisioningViewController
+
+  route '/onboarding/device/switch_firmware', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceSwitchfirmwareViewController
 
   # Management
   route '/onboarding/management/security', (params) ->
@@ -92,9 +95,6 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   route '/onboarding/management/provisioning', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementProvisioningViewController
-
-  route '/onboarding/management/switch_firmware', (params) ->
-    app.navigate ONBOARDING_LAYOUT, OnboardingManagementSwitchfirmwareViewController
 
   route '/onboarding/management/recovery_mode', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementRecoverymodeViewController
