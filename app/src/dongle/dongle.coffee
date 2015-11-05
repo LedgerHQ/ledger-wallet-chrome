@@ -100,8 +100,12 @@ class @ledger.dongle.Dongle extends EventEmitter
     unless @isInBootloaderMode()
       @_recoverFirmwareVersion().then =>
         if @getFirmwareInformation().hasSetupFirmwareSupport()
-          @_setState States.BLANK
-          States.BLANK
+          @getRemainingPinAttempt().then =>
+            @_setState(States.LOCKED)
+            States.LOCKED
+          .fail (error) =>
+            @_setState(States.BLANK)
+            States.BLANK
         else
           @_sendApdu(0xE0, 0x40, 0x00, 0x00, 0x05, 0x01).then (result) =>
             switch @getSw()
@@ -113,7 +117,7 @@ class @ledger.dongle.Dongle extends EventEmitter
                   @_setState(States.BLANK)
                   States.BLANK
                 # Check restore
-                if @getFirmwareInformation().hasSubFirmwareSupport()
+                if @getFirmwareInformation().hasSubFirmwareSupport() and @getFirmwareInformation().hasOperationFirmwareSupport()
                   @restoreSetup().then =>
                     @_setState States.LOCKED
                     States.LOCKED
