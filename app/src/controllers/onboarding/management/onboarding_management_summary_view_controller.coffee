@@ -9,7 +9,7 @@ class @OnboardingManagementSummaryViewController extends @OnboardingViewControll
     if @params.swapped_bip39
       @navigation.continueUrl = '/onboarding/management/swapped_bip39_provisioning'
     else if ledger.app.dongle.getFirmwareInformation().hasSubFirmwareSupport()
-      @navigation.continueUrl = '/onboarding/management/switch_firmware'
+      @navigation.continueUrl = '/onboarding/device/switch_firmware'
 
   navigationContinueParams: ->
     pin: @params.pin

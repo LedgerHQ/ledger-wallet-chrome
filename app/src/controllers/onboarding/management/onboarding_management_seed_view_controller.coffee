@@ -45,7 +45,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
         @params.mnemonicPhrase = result.mnemonic.join(' ')
         initializeUi(yes)
       .fail (error) =>
-        ledger.app.router.go '/onboarding/management/switch_firmware', _.extend(_.clone(@params), mode: 'setup', on_done: '/onboarding/management/seed')
+        ledger.app.router.go '/onboarding/device/switch_firmware', _.extend(_.clone(@params), mode: 'setup', on_done: '/onboarding/management/seed')
     else
       initializeUi()
 
