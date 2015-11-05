@@ -5,8 +5,8 @@
 <div class="greyed-container">
   <div id="circle_progress_bar"></div>
   <div class="text-container">
-    <p class="regular-soft-grey-text-very-large">Configuration in progress...</p>
-    <p class="regular-soft-grey-text">Please wait, this operation may take a while.</p>
+    <p class="light-soft-grey-text-very-large">Configuration in progress...</p>
+    <p class="light-soft-grey-text almost-small-top-margin">Please wait, this operation may take a while.</p>
   </div>
 </div>
 <div class="actions-container">
