@@ -3,8 +3,11 @@
     <img src="../../assets/images/onboarding/large_logo.png" width="256" height="156">
   </div>
   <div class="greyed-container">
-    <img src="../assets/images/common/plug_wallet.png" height="44" width="187"/>
-    <div class="black-indication"><%= t 'onboarding.device.plug.to_start' %></div>
-    <a href="#openSupport" class="medium-indication"><%= t 'onboarding.device.plug.is_not_recognized' %></a>
+    <div class="black-indication"><%= t 'onboarding.device.switchfirmware.preparing' %></div>
+    <div class="progress-container">
+      <div id="bar_container"></div>
+      <div id="progress" class="percent page-indication">0%</div>
+    </div>
+    <p class="medium-indication"><%= t 'onboarding.device.switchfirmware.do_not_unplug' %></p>
   </div>
 </div>

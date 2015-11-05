@@ -1,14 +1,31 @@
 @import (reference) "../../constants";
 
 div.greyed-container {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
-  > img {
-    margin-bottom: @metrics-small-padding;
+  .progress-container {
+    display: flex;
+    align-items: center;
+    margin: @metrics-almost-small-padding 0;
+
+    #bar_container {
+      margin: 0 0;
+
+      > .progressbar {
+        width: 400px;
+      }
+    }
+
+    #progress {
+      margin-left: @metrics-small-padding;
+    }
+
   }
 
   > .medium-indication {
-    margin-top: @metrics-small-padding;
     display: block;
   }
 }

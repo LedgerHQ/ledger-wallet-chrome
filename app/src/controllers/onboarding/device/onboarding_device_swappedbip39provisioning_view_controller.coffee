@@ -33,7 +33,7 @@ class @OnboardingDeviceSwappedbip39provisioningViewController extends @Onboardin
 
   onDetach: ->
     super
-    cleanInterval(@_interval)
+    clearInterval(@_interval)
 
   _initializeCarousel: ->
     @view.carousel.empty()

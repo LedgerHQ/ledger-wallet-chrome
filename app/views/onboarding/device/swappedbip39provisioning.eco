@@ -5,8 +5,8 @@
 <div class="greyed-container">
   <div id="circle_progress_bar"></div>
   <div class="text-container">
-    <p class="black-indication">Configuration in progress...</p>
-    <p class="medium-indication almost-small-top-margin">Please wait, this operation may take a while.</p>
+    <p class="black-indication"><%= t 'onboarding.device.swappedbip39provisioning.in_progress' %></p>
+    <p class="medium-indication almost-small-top-margin"><%= t 'common.may_take_a_while' %></p>
   </div>
 </div>
 <div class="actions-container">
