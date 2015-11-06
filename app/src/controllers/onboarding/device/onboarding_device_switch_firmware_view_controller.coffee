@@ -22,12 +22,11 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
   onAfterRender: ->
     super
     @view.progressBar = new ledger.progressbars.ProgressBar(@view.progressBarContainer)
-
     start = =>
       ledger.app.setExecutionMode(ledger.app.Modes.FirmwareUpdate)
       @_fup.load =>
         @_request.startUpdate()
-    if @params.mode is 'operation' and @params.mnemonicPhrase?
+    if @params.mode is 'operation' and @params.mnemonicPhrase? and @params.swapped_bip39 isnt true
       seed = ledger.bitcoin.bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
       ledger.app.dongle.setup @params.pin, seed
       .then => start()
@@ -85,6 +84,7 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
       ledger.app.router.go '/onboarding/management/done', {wallet_mode: @params.wallet_mode, error: 1}
 
   _navigateOpen: ->
-    ledger.app.notifyDongleIsUnlocked()
-    ledger.utils.Logger.setPrivateModeEnabled on
-    ledger.app.router.go '/onboarding/device/opening'
+    ledger.app.dongle.unlockWithPinCode @params.pin, =>
+      ledger.app.notifyDongleIsUnlocked()
+      ledger.utils.Logger.setPrivateModeEnabled on
+      ledger.app.router.go '/onboarding/device/opening'

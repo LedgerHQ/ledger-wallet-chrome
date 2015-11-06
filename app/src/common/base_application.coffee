@@ -213,6 +213,7 @@ class ledger.common.application.BaseApplication extends @EventEmitter
         _.defer => (Try => @onDongleIsDisconnected(dongle)).printError()
       dongle.once 'state:error', =>
         (Try => @onDongleNeedsUnplug(dongle)).printError()
+      @onReconnectingDongle()
       d.resolve(dongle)
     d.promise
 
@@ -220,7 +221,7 @@ class ledger.common.application.BaseApplication extends @EventEmitter
     DongleLogger().info('Dongle unlocked', @dongle.id)
     (Try => @onDongleIsUnlocked(@dongle)).printError()
 
-  onConnectingDongle: (device) ->
+  onConnectingDongle: (dongle) ->
       @dongle = dongle
       dongle.once 'disconnected', =>
         _.defer => (Try => @onDongleIsDisconnected(dongle)).printError()
@@ -257,3 +258,5 @@ class ledger.common.application.BaseApplication extends @EventEmitter
   onCommandExportLogs: ->
 
   onCommandRunSpecs: ->
+
+  onReconnectingDongle: ->

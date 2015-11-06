@@ -78,7 +78,11 @@ require @ledger.imports, ->
     onDongleNeedsUnplug: (dongle) ->
       @emit 'dongle:unplugged', @dongle if @isInWalletMode()
 
+    onReconnectingDongle: () ->
+      @_currentMode = ledger.app.Modes.Wallet
+
     onDongleIsUnlocked: (dongle) ->
+      debugger
       return unless @isInWalletMode()
       @emit 'dongle:unlocked', @dongle
       @emit 'wallet:initializing'
