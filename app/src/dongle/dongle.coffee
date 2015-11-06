@@ -297,6 +297,9 @@ class @ledger.dongle.Dongle extends EventEmitter
       @_pin = pin
       @_btchip.verifyPin_async(new ByteString(@_pin, ASCII))
       .then =>
+        if @getFirmwareInformation().hasSubFirmwareSupport() and @getFirmwareInformation().hasSetupFirmwareSupport()
+          d.resolve()
+          return
         # 19.7. SET OPERATION MODE
         @_sendApdu(0xE0, 0x26, 0x01, 0x01, 0x01, 0x01, [0x9000])
         .then =>

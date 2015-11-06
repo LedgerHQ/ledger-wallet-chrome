@@ -39,7 +39,6 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       @view.seedContainer.fadeIn(if animate then 250 else 0)
       if @params.wallet_mode == 'create'
         @view.indicationLabel.fadeIn(if animate then 250 else 0)
-    debugger
     if @params.swapped_bip39 and @params.wallet_mode == 'create'
       ledger.app.dongle.setupSwappedBip39(@params.pin).then (result) =>
         @params.mnemonicPhrase = result.mnemonic.join(' ')

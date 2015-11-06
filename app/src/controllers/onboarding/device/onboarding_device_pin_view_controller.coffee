@@ -11,10 +11,14 @@ class @OnboardingDevicePinViewController extends @OnboardingViewController
     @view.pinCode.once 'complete', (event, value) =>
       ledger.app.dongle.unlockWithPinCode value, (success, error) =>
         l error if error?
-        if success == yes
-          ledger.app.notifyDongleIsUnlocked()
-          ledger.utils.Logger.setPrivateModeEnabled on
-          ledger.app.router.go '/onboarding/device/opening'
+        if success
+          firmware = ledger.app.dongle.getFirmwareInformation()
+          if firmware.hasSubFirmwareSupport() and firmware.hasSetupFirmwareSupport()
+            ledger.app.router.go '/onboarding/device/switch_firmware', pin: value, mode:'operation_and_open'
+          else
+            ledger.app.notifyDongleIsUnlocked()
+            ledger.utils.Logger.setPrivateModeEnabled on
+            ledger.app.router.go '/onboarding/device/opening'
         else if error.code == ledger.errors.WrongPinCode and error['retryCount'] > 0
           ledger.app.router.go '/onboarding/device/wrongpin', {tries_left: error['retryCount']}
         else if error.code == ledger.errors.NotSupportedDongle

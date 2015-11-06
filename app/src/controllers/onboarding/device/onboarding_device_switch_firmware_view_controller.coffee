@@ -27,7 +27,7 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
       ledger.app.setExecutionMode(ledger.app.Modes.FirmwareUpdate)
       @_fup.load =>
         @_request.startUpdate()
-    if @params.mode is 'operation'
+    if @params.mode is 'operation' and @params.mnemonicPhrase?
       seed = ledger.bitcoin.bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
       ledger.app.dongle.setup @params.pin, seed
       .then => start()
@@ -47,6 +47,8 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
     ledger.app.reconnectDongleAndEnterWalletMode().then =>
         if @params.mode is 'setup'
           @_navigateNextSetup()
+        else if @params.mode is 'operation_and_open'
+          @_navigateOpen()
         else
           @_navigateNextOperation()
 
@@ -81,3 +83,8 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
       ledger.app.router.go '/onboarding/management/done', {wallet_mode: @params.wallet_mode}
     .fail =>
       ledger.app.router.go '/onboarding/management/done', {wallet_mode: @params.wallet_mode, error: 1}
+
+  _navigateOpen: ->
+    ledger.app.notifyDongleIsUnlocked()
+    ledger.utils.Logger.setPrivateModeEnabled on
+    ledger.app.router.go '/onboarding/device/opening'
