@@ -82,7 +82,6 @@ require @ledger.imports, ->
       @_currentMode = ledger.app.Modes.Wallet
 
     onDongleIsUnlocked: (dongle) ->
-      debugger
       return unless @isInWalletMode()
       @emit 'dongle:unlocked', @dongle
       @emit 'wallet:initializing'
