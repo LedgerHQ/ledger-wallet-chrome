@@ -355,6 +355,7 @@
         'controllers/onboarding/management/onboarding_management_done_view_controller'
         'controllers/onboarding/management/onboarding_management_recoverymode_view_controller'
         'controllers/onboarding/management/onboarding_management_recoverydevice_view_controller'
+        'controllers/onboarding/management/onboarding_management_convert_view_controller'
 
         # Pairing
         'controllers/wallet/pairing/wallet_pairing_index_dialog_view_controller'
