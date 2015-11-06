@@ -11,6 +11,10 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
         callback?(response.hex)
       onError: @networkErrorCallback(callback)
 
+  getTransactionsFromPaths: (paths, batchsize, callback) ->
+    ledger.wallet.pathsToAddresses paths, (addresses) =>
+      @getTransactions(_(addresses).values(), batchsize, callback)
+
   getTransactions: (addresses, batchSize, callback) ->
     if _.isFunction(batchSize)
       callback = batchSize
