@@ -1,7 +1,7 @@
 <div id="content-container">
   <div class="title-container">
     <div class="titles">
-      <div class="page-title"><%= t 'onboarding.management.' + @params.wallet_mode + '_my_wallet' %></div>
+      <div class="page-title"><%= t 'onboarding.management.recover_my_wallet' %></div>
       <div class="page-subtitle"><%= t 'application.name' %></div>
     </div>
   </div>
