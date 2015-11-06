@@ -120,15 +120,21 @@ class @Account extends ledger.database.Model
     amount = ledger.Amount.fromSatoshi(amount)
     fees = ledger.Amount.fromSatoshi(fees)
     inputsPath = @getWalletAccount().getAllAddressesPaths()
-    unconfirmedOperations = Operation.find($and: [{confirmations: 0}, {type: 'sending'}]).data()
-    excludedInputs = []
-    for op in unconfirmedOperations
-      inputIndexes = op.get 'inputs_index'
-      inputHashes = op.get 'inputs_hash'
-      for __, index in inputIndexes
-        excludedInputs.push([inputIndexes[index], inputHashes[index]])
-    @_createTransactionGetChangeAddressPath @getWalletAccount().getCurrentChangeAddressIndex(), (changePath) =>
-      ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, excludedInputs: excludedInputs, callback)
+    ledger.api.TransactionsRestClient.instance.getTransactionsFromPaths inputsPath, (transactions) =>
+      Q.fcall ->
+        if transactions.length > 0
+          ledger.tasks.TransactionConsumerTask.instance.waitForTransactionToBeInserted(_.last(transactions).hash)
+      .then =>
+        unconfirmedOperations = Operation.find($and: [{confirmations: 0}, {type: 'sending'}]).data()
+        excludedInputs = []
+        for op in unconfirmedOperations
+          inputIndexes = op.get 'inputs_index'
+          inputHashes = op.get 'inputs_hash'
+          for __, index in inputIndexes
+            excludedInputs.push([inputIndexes[index], inputHashes[index]])
+        @_createTransactionGetChangeAddressPath @getWalletAccount().getCurrentChangeAddressIndex(), (changePath) =>
+          ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, excludedInputs: excludedInputs, callback)
+      ledger.tasks.TransactionConsumerTask.instance.pushTransactions(transactions)
 
   ###
     Special get change address path to 'avoid' LW 1.0.0 derivation failure.
@@ -145,8 +151,6 @@ class @Account extends ledger.database.Model
             callback?(changePath)
           else
             @_createTransactionGetChangeAddressPath(changeIndex + 1, callback)
-
-
 
   addRawTransactionAndSave: (rawTransaction, callback = _.noop) ->
     hdAccount = ledger.wallet.Wallet.instance?.getAccount(@get('index'))
@@ -212,7 +216,6 @@ class @Account extends ledger.database.Model
       [operation, null]
     else
       [null, operation]
-
 
   _addRawSendTransaction: (rawTransaction, changeAddresses) ->
     value = 0

@@ -58,6 +58,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
 
   constructor: ->
     super 'global_transaction_consumer'
+    @_deferredWait = {}
 
     safe = (f) ->
       (err, i, push, next) ->
@@ -105,6 +106,11 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     Get an observable version of the transaction stream
   ###
   observe: -> @_stream.fork()
+
+  ###
+    Return a promise completed once a transaction is inserted/updated in the database
+  ###
+  waitForTransactionToBeInserted: (txHash) -> (@_deferredWait[txHash] ||= ledger.defer()).promise
 
   ###
     Get an observable version of the error stream
@@ -183,7 +189,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
       .uniq((a) -> a.index)
     .value()
     pulled = no
-    ledger.stream(accounts).consume (err, account, push, next) ->
+    ledger.stream(accounts).consume (err, account, push, next) =>
       return push(null, ledger.stream.nil) if account is ledger.stream.nil
       createAccount = =>
         databaseAccount = Account.findById(account.index)
@@ -203,7 +209,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
           do next
       createAccount()
       return
-    .consume (err, account, push, next) ->
+    .consume (err, account, push, next) =>
       return push(null, ledger.stream.nil) if account is ledger.stream.nil
       inputs = transaction.inputs
       outputs = transaction.outputs
@@ -223,7 +229,9 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
         checkForDoubleSpent(operation)
         (transaction.operations ||= []).push operation
       do next
-    .done ->
+    .done =>
+      @_deferredWait[transaction.hash]?.resolve(transaction)
+      @_deferredWait = _(@_deferredWait).omit(transaction.hash)
       push null, transaction
       do next
 
