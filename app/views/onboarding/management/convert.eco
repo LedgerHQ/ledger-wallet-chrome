@@ -1,0 +1,27 @@
+<div id="content-container">
+  <div class="title-container">
+    <div class="titles">
+      <div class="page-title"><%= t 'onboarding.management.' + @params.wallet_mode + '_my_wallet' %></div>
+      <div class="page-subtitle"><%= t 'application.name' %></div>
+    </div>
+  </div>
+  <div class="page-content-container compact">
+    <div class="text-container">
+      <div class="page-large-indication"><%= t 'onboarding.management.convert.need_to_convert' %></div>
+      <div class="regular-text"><%= t 'onboarding.management.convert.before_starting' %></div>
+      <div class="regular-grey-text-small"><%= t 'onboarding.management.convert.example_from_' + @params.message_mode %></div>
+      <div class="grey-indication-strong"><%= t 'onboarding.management.convert.please_take_time' %></div>
+    </div>
+    <div class="image-container">
+      <div class="container <%= @params.message_mode %>">
+        <div class="sheet-title current"><%= t 'onboarding.management.convert.current_24_words' %></div>
+        <div class="sheet-title new"><%= t 'onboarding.management.convert.new_recovery_sheet' %></div>
+        <img src="../assets/images/onboarding/management/convert_from_<%= @params.message_mode %>.png" height="100%" />
+      </div>
+    </div>
+  </div>
+  <div class="navigation-container">
+    <a class="back" href="#navigateRoot" id="back_button"><i class="fa fa-angle-left"></i> <%= t 'onboarding.management.cancel' %></a>
+    <a class="continue" href="#navigateContinue" id="continue_button"><%= t 'onboarding.management.continue' %> <i class="fa fa-angle-right"></i></a>
+  </div>
+</div>
