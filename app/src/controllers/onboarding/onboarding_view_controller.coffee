@@ -2,14 +2,13 @@ class @OnboardingViewController extends ledger.common.ViewController
 
   view:
     continueButton: '#continue_button'
+  navigation:
+    continueUrl: undefined
 
   onAfterRender: ->
     super
     do @unbindWindow
     do @bindWindow
-
-  navigation:
-    continueUrl: undefined
 
   navigationBackParams: ->
     undefined
@@ -45,8 +44,9 @@ class @OnboardingViewController extends ledger.common.ViewController
   navigateBack: ->
     ledger.app.router.go @params.back, @_finalNavigationBackParams()
 
-  navigateContinue: ->
-    ledger.app.router.go @navigation.continueUrl, @_finalNavigationContinueParams()
+  navigateContinue: (url, params) ->
+    params = _.extend(@_defaultNavigationContinueParams(), params) if params?
+    ledger.app.router.go (url || @navigation.continueUrl), (params || @_finalNavigationContinueParams())
 
   unbindWindow: ->
     $(window).unbind 'keyup', null
