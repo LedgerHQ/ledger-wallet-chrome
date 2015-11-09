@@ -12,6 +12,7 @@
 .dialog_container {
   display: flex;
   align-items: center;
+  justify-items: center;
   position: absolute;
   top: 0px;
   left: 0px;
@@ -20,6 +21,7 @@
   transition: background-color @animation-normal-duration @animation-default-timing-function;
   background-color: rgba(0, 0, 0, 0);
   z-index: 9999;
+  padding: @metrics-large-padding @metrics-large-padding;
 
   &.display {
     background-color: rgba(0, 0, 0, 0.3);
@@ -33,7 +35,13 @@
     margin: auto;
     position: relative;
     background-color: @color-background-color;
+<<<<<<< Updated upstream
     border-radius: 5px;
+=======
+    max-height: 100%;
+    overflow: scroll;
+    border-radius: 10px;
+>>>>>>> Stashed changes
     padding: @metrics-medium-padding;
     box-shadow: 0px 0px 50px rgba(0, 0, 0, 0.1);
     &:hover {
