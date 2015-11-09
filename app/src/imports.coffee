@@ -66,6 +66,7 @@
         '../libs/zip/z-worker'
         '../libs/zip/inflate'
         '../libs/zip/deflate'
+        '../libs/socket.io'
 
         # Slick
         '../public/slick/slick.min'
