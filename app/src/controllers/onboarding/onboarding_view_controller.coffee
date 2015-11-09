@@ -45,6 +45,7 @@ class @OnboardingViewController extends ledger.common.ViewController
     ledger.app.router.go @params.back, @_finalNavigationBackParams()
 
   navigateContinue: (url, params) ->
+    url = undefined unless _.isFunction(url?.parseAsUrl)
     params = _.extend(@_defaultNavigationContinueParams(), params) if params?
     ledger.app.router.go (url || @navigation.continueUrl), (params || @_finalNavigationContinueParams())
 

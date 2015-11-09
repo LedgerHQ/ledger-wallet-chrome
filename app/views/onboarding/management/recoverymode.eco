@@ -8,12 +8,12 @@
     </div>
   </div>
   <div class="page-content-container compact">
-    <a class="panel" href="#">
+    <a class="panel" href="#navigateRecoveryDevice">
       <img src="../../assets/images/onboarding/management/scrambled_field.png" width="115" height="33"/>
       <div class="title"><%= t 'onboarding.management.recoverymode.ordered_by_letters' %></div>
       <div class="subtitle"><%= t 'onboarding.management.recoverymode.recover_scrambled' %></div>
     </a>
-    <a class="panel" href="#">
+    <a class="panel" href="#navigateConvert">
       <img src="../../assets/images/onboarding/management/numeric_field.png" width="115" height="33"/>
       <div class="title"><%= t 'onboarding.management.recoverymode.ordered_by_numbers' %></div>
       <div class="subtitle"><%= t 'onboarding.management.recoverymode.recover_bip39' %></div>

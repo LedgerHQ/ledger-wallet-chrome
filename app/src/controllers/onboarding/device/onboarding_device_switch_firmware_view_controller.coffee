@@ -70,7 +70,10 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
 
   _navigateNextSetup: ->
     ledger.app.dongle.isSwappedBip39FeatureEnabled().then (enabled) =>
-      url = if enabled then '/onboarding/management/pin' else '/onboarding/management/security'
+      if @params.mode is 'create'
+        url = if enabled then '/onboarding/management/pin' else '/onboarding/management/security'
+      else
+        url = if enabled then '/onboarding/management/recovery_mode' else '/onboarding/management/security'
       params = _.clone(@params)
       ledger.app.router.go url, _.extend(params, swapped_bip39: enabled)
     .done()

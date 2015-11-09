@@ -12,7 +12,7 @@ class @OnboardingManagementWelcomeViewController extends @OnboardingViewControll
 
   navigateNextPage: (mode) ->
     navigateToSecurityPage = =>
-      ledger.app.router.go '/onboarding/management/security',
+      @navigateContinue '/onboarding/management/security',
           wallet_mode: mode
           back: @representativeUrl()
           rootUrl: @representativeUrl()
@@ -20,7 +20,7 @@ class @OnboardingManagementWelcomeViewController extends @OnboardingViewControll
           swapped_bip39: no
 
     navigateToFirstSwappedBip39Page = =>
-      ledger.app.router.go '/onboarding/management/pin',
+      @navigateContinue (if mode is 'create' then '/onboarding/management/pin' else '/onboarding/management/recovery_mode'),
         wallet_mode: mode
         back: @representativeUrl()
         rootUrl: @representativeUrl()
@@ -28,7 +28,7 @@ class @OnboardingManagementWelcomeViewController extends @OnboardingViewControll
         swapped_bip39: yes
 
     navigateToSwitchFirmwarePage = =>
-      ledger.app.router.go '/onboarding/device/switch_firmware',
+      @navigateContinue '/onboarding/device/switch_firmware',
         mode: 'setup'
         wallet_mode: mode
         back: @representativeUrl()
