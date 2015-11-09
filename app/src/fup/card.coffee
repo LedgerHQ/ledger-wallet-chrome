@@ -31,12 +31,21 @@ class ledger.fup.Card
     .then (version) =>
       new ledger.fup.Card.Version(version)
 
-  unlockWithPinCode: (pinCode) ->
-    @_card.exchange_async(new ByteString("E0220000" + Convert.toHexByte(pin.length), HEX).concat(pin)).then (result) =>
+  unlockWithPinCode: (pin) ->
+    @_card.exchange_async(new ByteString("E0220000" + Convert.toHexByte(pin.length), HEX).concat(new ByteString(pin, ASCII))).then (result) =>
       unless @_card.SW is 0x9000
         error = ledger.errors.new(Errors.WrongPinCode)
         error.remaining = +(@_card.SW.toString(16).match(/63c(.)/i) or [])[1] or 0
         throw error
+
+  getRemainingPinAttempt: ->
+    @_card.exchange_async(new ByteString("E02280000100", HEX)).then (result) =>
+      statusWord = @_card.SW?.toString(16) or '6985'
+      remainingPinAttempt = statusWord.match /63c(\d)/
+      if remainingPinAttempt?.length is 2
+        +remainingPinAttempt[1]
+      else
+        throw new Error("Invalid status - #{statusWord}")
 
   getCard: -> @_card
 

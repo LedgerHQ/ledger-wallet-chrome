@@ -235,32 +235,43 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_getVersion().then (version) =>
       @_dongleVersion = version
       firmware = version.getFirmwareInformation()
+
+      checkVersion = =>
+        if version.equals(ledger.fup.versions.Nano.CurrentVersion.Os)
+          if @_isOsLoaded
+            @_setCurrentState(States.InitializingOs)
+            @_handleCurrentState()
+          else
+            @_checkReloadRecoveryAndHandleState(firmware)
+        else if version.gt(ledger.fup.versions.Nano.CurrentVersion.Os)
+          @_failure(Errors.HigherVersion)
+        else
+          index = 0
+          while index < ledger.fup.updates.OS_INIT.length and !version.equals(ledger.fup.updates.OS_INIT[index][0])
+            index += 1
+          if index isnt ledger.fup.updates.OS_INIT.length
+            @_processLoadingScript(ledger.fup.updates.OS_INIT[index][1], States.LoadingOldApplication, true)
+            .then =>
+              @_checkReloadRecoveryAndHandleState(firmware)
+            .fail (ex) =>
+              switch ex.message
+                when 'timeout'
+                  @_waitForPowerCycle()
+                else @_failure(Errors.CommunicationError)
+          else
+            @_checkReloadRecoveryAndHandleState(firmware)
+
       if !firmware.hasSubFirmwareSupport() and !@_keyCardSeed?
         @_setCurrentState(States.SeedingKeycard)
         @_handleCurrentState()
-      else if version.equals(ledger.fup.versions.Nano.CurrentVersion.Os)
-        if @_isOsLoaded
-          @_setCurrentState(States.InitializingOs)
+      else if !firmware.hasSubFirmwareSupport()
+        @_card.getRemainingPinAttempt().then =>
+          @_setCurrentState(States.Erasing)
           @_handleCurrentState()
-        else
-          @_checkReloadRecoveryAndHandleState(firmware)
-      else if version.gt(ledger.fup.versions.Nano.CurrentVersion.Os)
-        @_failure(Errors.HigherVersion)
+        .fail =>
+          checkVersion()
       else
-        index = 0
-        while index < ledger.fup.updates.OS_INIT.length and !version.equals(ledger.fup.updates.OS_INIT[index][0])
-          index += 1
-        if index isnt ledger.fup.updates.OS_INIT.length
-          @_processLoadingScript(ledger.fup.updates.OS_INIT[index][1], States.LoadingOldApplication, true)
-          .then =>
-            @_checkReloadRecoveryAndHandleState(firmware)
-          .fail (ex) =>
-            switch ex.message
-              when 'timeout'
-                @_waitForPowerCycle()
-              else @_failure(Errors.CommunicationError)
-        else
-          @_checkReloadRecoveryAndHandleState(firmware)
+        checkVersion()
     .fail =>
       @_failure(Errors.UnableToRetrieveVersion)
     .done()
@@ -288,11 +299,15 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         getRandomChar = -> "0123456789".charAt(_.random(10))
         @_stateCache.pincode = getRandomChar() + getRandomChar()
       pincode = @_stateCache.pincode
-      @_card.unlockWithPinCode(pincode).then (isUnlocked, error) =>
-        @emit "erasureStep", if error?.retryCount? then error.retryCount else 3
+      @_card.unlockWithPinCode(pincode).then =>
+        @emit "erasureStep", 3
         @_waitForPowerCycle()
-      return
-    .fail =>
+      .fail (error) =>
+        @emit "erasureStep", if error?.remaining? then error.remaining else 3
+        @_waitForPowerCycle()
+      .done()
+    .fail (err) =>
+      debugger
       @_failure(Errors.CommunicationError)
     .done()
 
