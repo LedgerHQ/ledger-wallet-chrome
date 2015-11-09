@@ -60,20 +60,21 @@ class @OnboardingDeviceSwappedbip39provisioningViewController extends @Onboardin
   _finalizeSetup: ->
     ledger.app.dongle.setupFinalizeBip39().then =>
       # Next step flash the dongle in operation firmware
-      ledger.app.router.go '/onboarding/device/switch_firmware', _.extend(_.clone(@params), mode: 'operation', pin: @params.pin, on_done: '/onboarding/management/done')
+      @navigateContinue '/onboarding/device/switch_firmware', _.extend(_.clone(@params), mode: 'operation')
     .fail =>
-      ledger.app.router.go '/onboarding/management/done', {wallet_mode: @params.wallet_mode, error: 1}
+      @navigateContinue '/onboarding/management/done', {wallet_mode: @params.wallet_mode, error: 1}
 
   _performSetup: ->
     ledger.app.dongle.restoreSwappedBip39 @params.pin, @params.mnemonicPhrase
     .then => ledger.app.dongle.restoreFinalizeBip29()
     .then =>
-      ledger.app.router.go '/onboarding/device/switch_firmware', _.extend(_.clone(@params), mode: 'operation', pin: @params.pin, on_done: ledger.url.createUrlWithParams('/onboarding/management/done', wallet_mode: @params.wallet_mode))
+      @navigateContinue '/onboarding/device/switch_firmware', _.extend(_.clone(@params), mode: 'operation')
       return
-    .fail =>
-      if @params.retrying? is false
+    .fail (err) =>
+      debugger
+      if @params.retrying? is false and off
         params = _.clone @params
         _.extend params, retrying: yes
-        ledger.app.router.go '/onboarding/device/switch_firmware', _.extend(_.clone(@params), mode: 'setup', pin: @params.pin, on_done: '/onboarding/management/done')
+        @navigateContinue '/onboarding/device/switch_firmware', _.extend(_.clone(@params), mode: 'setup')
       else
         ledger.app.router.go '/onboarding/management/done', {wallet_mode: @params.wallet_mode, error: 1}

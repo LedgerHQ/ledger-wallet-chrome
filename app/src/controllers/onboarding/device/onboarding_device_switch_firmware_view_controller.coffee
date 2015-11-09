@@ -44,12 +44,16 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
   _onFirmwareSwitchDone: ->
     @_request.cancel()
     ledger.app.reconnectDongleAndEnterWalletMode().then =>
+      debugger
+      try
         if @params.mode is 'setup'
           @_navigateNextSetup()
         else if @params.mode is 'operation_and_open'
           @_navigateOpen()
         else
           @_navigateNextOperation()
+      catch er
+        debugger
 
   _onRequireUserPin: ->
 
@@ -70,21 +74,25 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
 
   _navigateNextSetup: ->
     ledger.app.dongle.isSwappedBip39FeatureEnabled().then (enabled) =>
-      if @params.mode is 'create'
+      debugger
+      if @params.wallet_mode is 'create'
         url = if enabled then '/onboarding/management/pin' else '/onboarding/management/security'
       else
         url = if enabled then '/onboarding/management/recovery_mode' else '/onboarding/management/security'
       params = _.clone(@params)
-      ledger.app.router.go url, _.extend(params, swapped_bip39: enabled)
+      @navigateContinue url, _.extend(params, swapped_bip39: enabled)
     .done()
 
   _navigateNextOperation: ->
-    seed = ledger.bitcoin.bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
-    ledger.wallet.checkSetup ledger.app.dongle, seed, @params.pin
+    Q =>
+      debugger
+      unless @params.swapped_bip39 is true
+        seed = ledger.bitcoin.bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
+        ledger.wallet.checkSetup ledger.app.dongle, seed, @params.pin
     .then =>
-      ledger.app.router.go '/onboarding/management/done', {wallet_mode: @params.wallet_mode}
-    .fail =>
-      ledger.app.router.go '/onboarding/management/done', {wallet_mode: @params.wallet_mode, error: 1}
+      @navigateContinue '/onboarding/management/done', {wallet_mode: @params.wallet_mode}
+    .fail (err) =>
+      @navigateContinue '/onboarding/management/done', {wallet_mode: @params.wallet_mode, error: 1}
 
   _navigateOpen: ->
     ledger.app.dongle.unlockWithPinCode @params.pin, =>
