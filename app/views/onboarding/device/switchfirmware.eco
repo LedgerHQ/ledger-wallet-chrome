@@ -3,7 +3,7 @@
     <img src="../../assets/images/onboarding/large_logo.png" width="256" height="156">
   </div>
   <div class="greyed-container">
-    <div class="black-indication"><%= t 'onboarding.device.switchfirmware.preparing' %></div>
+    <div class="black-indication"><%= if @params.mode is 'setup' then t 'onboarding.device.switchfirmware.preparing' else  t 'onboarding.device.switchfirmware.finalizing' %></div>
     <div class="progress-container">
       <div id="bar_container"></div>
       <div id="progress" class="percent page-indication">0%</div>
