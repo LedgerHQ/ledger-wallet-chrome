@@ -13,11 +13,18 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
     else
       @_request = ledger.app.dongle.getFirmwareUpdater().requestOperationFirmwareUpdate()
     @_request.onProgress @_onProgress.bind(@)
+    @_request.on 'plug', =>
+      @_currentError = null
+      @_setUserInterface('plug')
+    @_request.on 'unplug', =>
+      @_setUserInterface('unplug') unless @_currentError?
+    @_request.on 'error', (event, error) => @_onError(error.cause)
     @_request.on 'needsUserApproval', @_onUpdateNeedsUserApproval.bind(@)
     @_request.on 'stateChanged', (ev, data) => @_onStateChanged(data.newState, data.oldState)
     @_request.setKeyCardSeed('02294b743102b45323f5588cf8d02703150009100407010c160506141711130a020e0b0312080d0f') if @params.mode is 'setup' # Todo: This is only for debug purpose due to a bug in setup firmware flash
     @_request.unlockWithPinCode(@params.pin) if @params.pin?
     @_fup = ledger.app.dongle.getFirmwareUpdater()
+    @_currentError = null
 
   onAfterRender: ->
     super
@@ -41,6 +48,17 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
     @_fup.unload()
     ledger.app.setExecutionMode(ledger.app.Modes.Wallet)
 
+  openSupport: ->
+    window.open t 'application.support_key_not_recognized_url'
+
+  # @param interfaceName (String) 'progress'|'plug'|'unplug'
+  _setUserInterface: (interfaceName) ->
+    for node in @select(".greyed-container")
+      if node.id is "#{interfaceName}_container"
+        $(node).show()
+      else
+        $(node).hide()
+
   _onFirmwareSwitchDone: ->
     @_request.cancel()
     ledger.app.reconnectDongleAndEnterWalletMode().then =>
@@ -56,9 +74,11 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
 
   _onRequireUserPin: ->
 
-  _onError: ->
+  _onError: (error) ->
+    @_currentError = error
 
   _onProgress: (state, current, total) ->
+    @_setUserInterface('progress')
     loadingBlProgress = if state is States.ReloadingBootloaderFromOs then current / total else 1
     loadingOsProgress = if state is States.LoadingOs then  current / total else (if state is States.InitializingOs then 1 else 0)
     progress = (loadingBlProgress + loadingOsProgress) / 2

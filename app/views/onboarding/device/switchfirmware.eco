@@ -2,12 +2,22 @@
   <div class="logo-container">
     <img src="../../assets/images/onboarding/large_logo.png" width="256" height="156">
   </div>
-  <div class="greyed-container">
+  <div id="progress_container" class="greyed-container">
     <div class="black-indication"><%= if @params.mode is 'setup' then t 'onboarding.device.switchfirmware.preparing' else  t 'onboarding.device.switchfirmware.finalizing' %></div>
     <div class="progress-container">
       <div id="bar_container"></div>
       <div id="progress" class="percent page-indication">0%</div>
     </div>
     <p class="medium-indication"><%= t 'onboarding.device.switchfirmware.do_not_unplug' %></p>
+  </div>
+  <div id="plug_container" class="greyed-container" style="display: none;">
+    <img src="../assets/images/common/plug_wallet.png" height="44" width="187"/>
+    <div class="black-indication"><%= t 'onboarding.device.switchfirmware.plug' %></div>
+    <a href="#openSupport" class="medium-indication"><%= t 'onboarding.device.plug.is_not_recognized' %></a>
+  </div>
+  <div id="unplug_container" class="greyed-container" style="display: none;">
+    <img src="../assets/images/common/unplug_wallet.png" height="44" width="187"/>
+    <div class="black-indication"><%= t 'onboarding.device.switchfirmware.unplug' %></div>
+    <p class="medium-indication"><%= t 'onboarding.device.switchfirmware.unplug_information' %></p>
   </div>
 </div>

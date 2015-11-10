@@ -57,6 +57,7 @@ _.mixin
       scheduled = setTimeout(onTimeout, timeout)
     onWindowResize = -> scheduleTimeout()
 
+    scheduleTimeout()
     window.addEventListener('resize', onWindowResize)
     object.then (results...) ->
       d.resolve.apply(d, results...)
