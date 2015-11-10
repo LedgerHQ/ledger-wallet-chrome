@@ -22,19 +22,17 @@
           display: block;
           text-align: left;
           width: @metrics-small-padding + 2;
-          letter-spacing: -0.5px;
+          letter-spacing: 0px;
           font-size: @font-size-small;
           color: @color-dark-grey;
           font-weight: @font-weight-semibold;
         }
 
         > div {
-
           width: 82px;
           height: 20px;
           font-size: @font-size-medium;
           font-family: @font-family-name;
-          letter-spacing: -0.3px;
 
           > input {
             background: transparent;
@@ -48,6 +46,7 @@
             color: @color-black;
             position: relative;
             z-index: 10;
+            margin-top: 1px;
 
             &[readonly] {
               -webkit-user-select: none;

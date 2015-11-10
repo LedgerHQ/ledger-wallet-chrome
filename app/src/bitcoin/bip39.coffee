@@ -87,6 +87,7 @@ _.extend ledger.bitcoin.bip39,
     # @param [String] mnemonicPhrase A mnemonic phrase.
     # @return [Array] Mnemonic words in the phrase.
     mnemonicWordsFromPhrase: (mnemonicPhrase="") ->
+      mnemonicPhrase = _.str.clean(mnemonicPhrase)
       mnemonicPhrase.trim().split(/\ /)
 
     # @param [String] mnemonicWord
