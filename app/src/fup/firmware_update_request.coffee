@@ -307,7 +307,6 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_waitForPowerCycle()
       .done()
     .fail (err) =>
-      debugger
       @_failure(Errors.CommunicationError)
     .done()
 

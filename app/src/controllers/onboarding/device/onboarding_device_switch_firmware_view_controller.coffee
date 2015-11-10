@@ -44,7 +44,6 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
   _onFirmwareSwitchDone: ->
     @_request.cancel()
     ledger.app.reconnectDongleAndEnterWalletMode().then =>
-      debugger
       try
         if @params.mode is 'setup'
           @_navigateNextSetup()
@@ -53,7 +52,7 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
         else
           @_navigateNextOperation()
       catch er
-        debugger
+        e er
 
   _onRequireUserPin: ->
 
@@ -74,7 +73,6 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
 
   _navigateNextSetup: ->
     ledger.app.dongle.isSwappedBip39FeatureEnabled().then (enabled) =>
-      debugger
       if @params.wallet_mode is 'create'
         url = if enabled then '/onboarding/management/pin' else '/onboarding/management/security'
       else
@@ -85,7 +83,6 @@ class @OnboardingDeviceSwitchfirmwareViewController extends @OnboardingViewContr
 
   _navigateNextOperation: ->
     Q =>
-      debugger
       unless @params.swapped_bip39 is true
         seed = ledger.bitcoin.bip39.mnemonicPhraseToSeed(@params.mnemonicPhrase)
         ledger.wallet.checkSetup ledger.app.dongle, seed, @params.pin

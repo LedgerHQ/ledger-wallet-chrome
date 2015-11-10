@@ -49,7 +49,7 @@ class @Operation extends ledger.database.Model
         .set 'outputs_address', (output.addresses[0] for output in tx.outputs)
         .set 'account', account
     catch er
-      debugger
+      e er
 
 
   serialize: () ->

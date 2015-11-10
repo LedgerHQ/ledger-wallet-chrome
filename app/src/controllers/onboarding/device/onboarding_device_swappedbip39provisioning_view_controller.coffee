@@ -71,7 +71,6 @@ class @OnboardingDeviceSwappedbip39provisioningViewController extends @Onboardin
       @navigateContinue '/onboarding/device/switch_firmware', _.extend(_.clone(@params), mode: 'operation')
       return
     .fail (err) =>
-      debugger
       if @params.retrying? is false and off
         params = _.clone @params
         _.extend params, retrying: yes
