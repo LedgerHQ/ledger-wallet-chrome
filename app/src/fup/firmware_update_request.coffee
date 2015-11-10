@@ -541,8 +541,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         @_getCard().exchange_async(new ByteString(adpus[offset], HEX))
         ledger.delay(1000).then => @_doProcessLoadingScript(adpus, state, ignoreSW, offset + 1)
       else
-        @_getCard().exchange_async(new ByteString(adpus[offset], HEX))
-        .timeout(500, 'timeout')
+        _(@_getCard().exchange_async(new ByteString(adpus[offset], HEX)))
+        .smartTimeout(500, 'timeout')
         .then =>
           if ignoreSW or @_getCard().SW == 0x9000
             if @_exchangeNeedsExtraTimeout or forceTimeout

@@ -40,3 +40,29 @@
   deferred = ledger.defer();
   setTimeout(deferred.resolve.bind(deferred), ms);
   deferred.promise;
+
+
+_.mixin
+
+  smartTimeout: (object, timeout, message = 'Timeout operation') ->
+    if !_.isFunction(object?.then) and !_.isFunction(object?.fail)
+      throw new Error("Smart timeout needs a promise")
+
+    scheduled = null
+    d = ledger.defer()
+
+    onTimeout = -> d.reject(new Error(message))
+    scheduleTimeout = ->
+      clearTimeout(scheduled) if scheduled?
+      scheduled = setTimeout(onTimeout, timeout)
+    onWindowResize = -> scheduleTimeout()
+
+    window.addEventListener('resize', onWindowResize)
+    object.then (results...) ->
+      d.resolve.apply(d, results...)
+    .fail (errors...) ->
+      d.reject.apply(d, errors...)
+    d.promise.fin ->
+      window.removeEventListener('resize', onWindowResize)
+      clearTimeout(scheduled) if scheduled?
+    d.promise
