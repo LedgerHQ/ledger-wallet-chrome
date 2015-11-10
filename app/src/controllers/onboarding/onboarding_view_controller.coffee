@@ -4,6 +4,7 @@ class @OnboardingViewController extends ledger.common.ViewController
     continueButton: '#continue_button'
   navigation:
     continueUrl: undefined
+  bumpsStepCount: true
 
   onAfterRender: ->
     super
@@ -23,7 +24,7 @@ class @OnboardingViewController extends ledger.common.ViewController
     wallet_mode: @params.wallet_mode
     rootUrl: @params.rootUrl
     back: @representativeUrl()
-    step: parseInt(@params.step) + 1
+    step: parseInt(@params.step) + if @_canBumpNextViewControllerStepCount() then 1 else 0
     swapped_bip39: @params.swapped_bip39
 
   _finalNavigationBackParams: ->
@@ -31,6 +32,10 @@ class @OnboardingViewController extends ledger.common.ViewController
 
   _finalNavigationContinueParams: ->
     _.extend(@_defaultNavigationContinueParams(), @navigationContinueParams())
+
+  _canBumpNextViewControllerStepCount: ->
+    words = _.str.words(_.str.underscored(@identifier()), "_")
+    return words.length >= 2 && words[1] == "management" && @bumpsStepCount
 
   navigateRoot: ->
     dialog = new CommonDialogsConfirmationDialogViewController()

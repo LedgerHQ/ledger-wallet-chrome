@@ -1,5 +1,7 @@
 class @OnboardingManagementWelcomeViewController extends @OnboardingViewController
 
+  bumpsStepCount: false
+
   onBeforeRender: ->
     super
     if ledger.app.dongle.getFirmwareInformation().hasSetupFirmwareSupport()

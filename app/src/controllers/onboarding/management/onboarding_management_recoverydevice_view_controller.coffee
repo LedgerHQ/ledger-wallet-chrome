@@ -1,5 +1,7 @@
 class @OnboardingManagementRecoverydeviceViewController extends @OnboardingViewController
 
+  bumpsStepCount: false
+
   navigateConvert: ->
     @navigateContinue('/onboarding/management/convert', message_mode: 'new')
 

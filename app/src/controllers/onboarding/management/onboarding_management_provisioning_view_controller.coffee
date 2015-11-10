@@ -1,5 +1,7 @@
 class @OnboardingManagementProvisioningViewController extends @OnboardingViewController
 
+  bumpsStepCount: false
+
   onAfterRender: ->
     super
     @view.spinner = ledger.spinners.createLargeSpinner(@select('div.greyed-container')[0])

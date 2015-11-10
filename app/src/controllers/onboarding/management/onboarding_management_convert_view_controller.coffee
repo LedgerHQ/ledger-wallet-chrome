@@ -4,3 +4,4 @@ class @OnboardingManagementConvertViewController extends @OnboardingViewControll
 
   navigation:
     continueUrl: '/onboarding/management/pin'
+  bumpsStepCount: false
