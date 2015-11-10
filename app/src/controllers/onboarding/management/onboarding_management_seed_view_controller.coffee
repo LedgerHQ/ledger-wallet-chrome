@@ -11,11 +11,6 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
   navigation:
     continueUrl: null
 
-  initialize: ->
-    super
-    if @params.wallet_mode == 'create'
-      @params.mnemonicPhrase = Bip39.generateMnemonicPhrase(Bip39.DEFAULT_PHRASE_LENGTH)
-
   navigationContinueParams: ->
     pin: @params.pin
     mnemonicPhrase: @params.mnemonicPhrase
@@ -29,24 +24,22 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
 
   onAfterRender: ->
     super
-    @view.indicationLabel.fadeOut(0)
-    @view.seedContainer.fadeOut(1)
-    @view.invalidLabel.fadeOut(0)
-    initializeUi = (animate = no) =>
-      do @_generateInputs
-      do @_listenEvents
-      @_updateUI no
-      @view.seedContainer.fadeIn(if animate then 250 else 0)
-      if @params.wallet_mode == 'create'
-        @view.indicationLabel.fadeIn(if animate then 250 else 0)
-    if @params.swapped_bip39 and @params.wallet_mode == 'create'
-      ledger.app.dongle.setupSwappedBip39(@params.pin).then (result) =>
-        @params.mnemonicPhrase = result.mnemonic.join(' ')
-        initializeUi(yes)
-      .fail (error) =>
-        ledger.app.router.go '/onboarding/device/switch_firmware', _.extend(_.clone(@params), mode: 'setup', on_done: '/onboarding/management/seed')
-    else
-      initializeUi()
+    # setup ui
+    @_generateInputs()
+    @_listenEvents()
+    @_updateUI(no)
+
+    # generate seed
+    if @params.wallet_mode == 'create' and not @params.mnemonicPhrase?
+      if @params.swapped_bip39
+        ledger.app.dongle.setupSwappedBip39(@params.pin).then (result) =>
+          @params.mnemonicPhrase = result.mnemonic.join(' ')
+          @_updateUI(no)
+        .fail (error) =>
+          @navigateContinue '/onboarding/device/switch_firmware', _.extend(_.clone(@params), mode: 'setup')
+      else
+        @params.mnemonicPhrase = Bip39.generateMnemonicPhrase(Bip39.DEFAULT_PHRASE_LENGTH)
+        @_updateUI(no)
 
   copy: ->
     text = @params.mnemonicPhrase
@@ -72,7 +65,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
       div = document.createElement("div")
       div.className = 'seed-word'
       span = document.createElement("span")
-      span.innerHTML = (i + 1) + '.'
+      span.innerHTML = if @params.swapped_bip39 then String.fromCharCode(0x41 + i) + '.' else (i + 1) + '.'
       div.appendChild(span)
       input = document.createElement("input")
       input.type = 'text'
@@ -84,10 +77,10 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
         input.focus()
 
   _listenEvents: ->
+    return if @params.wallet_mode == 'create'
     self = @
     for input in @view.inputs
       input.on 'keydown', ->
-        return if self.params.wallet_mode == 'create'
         $(this).removeClass 'seed-invalid'
         setTimeout ->
           self.params.mnemonicPhrase = self._writtenMnemonic()
@@ -95,7 +88,7 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
         , 0
       input.on 'blur', ->
         return if self.params.wallet_mode == 'create'
-        self._inputIsValid $(this)
+        self._validateInput $(this)
       input.on 'paste', ->
         setTimeout =>
           words = $(this).val().split(/[^A-Za-z]/)
@@ -107,17 +100,19 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
           for i in [0..words.length - 1]
             if self.view.inputs[i + beginInput]
               self.view.inputs[i + beginInput].val(words[i])
-              self._inputIsValid self.view.inputs[i + beginInput]
+              self._validateInput self.view.inputs[i + beginInput]
           self.params.mnemonicPhrase = self._writtenMnemonic()
           do self._updateUI
         , 0
 
-  _updateUI: (animated = yes) ->
-    if animated == no
+  _updateUI: (limited = yes) ->
+    if limited == no
       # hide indication label
       if @params.wallet_mode == 'create'
+        @view.invalidLabel.hide()
         @view.indicationLabel.show()
       else
+        @view.invalidLabel.fadeOut(0)
         @view.indicationLabel.hide()
 
       # switch of readonly
@@ -129,40 +124,54 @@ class @OnboardingManagementSeedViewController extends @OnboardingViewController
           input.prop 'readonly', no
           input.prop 'disabled', no
 
-      # write words
-      if @params.mnemonicPhrase?
-        words = @params.mnemonicPhrase.split(' ')
-        for i in [0 .. words.length - 1]
-          @view.inputs[i].val(words[i])
-
       # hide copy button
       if @params.wallet_mode == 'create'
         @view.actionsContainer.show()
       else
         @view.actionsContainer.hide()
 
+      # write words
+      if @params.mnemonicPhrase?
+        words = @params.mnemonicPhrase.split(' ')
+        for i in [0 .. words.length - 1]
+          @view.inputs[i].val(words[i])
+
       # validate words
       for input in @view.inputs
-        @_inputIsValid($(input))
+        @_validateInput(input)
 
     # validate mnemonic
-    unless @params.swapped_bip39
-      if Bip39.isMnemonicPhraseValid(@params.mnemonicPhrase)
-        @view.invalidLabel.fadeOut(if animated then 250 else 0)
-        @view.continueButton.removeClass 'disabled'
+    if @params.wallet_mode == 'create'
+      if not @params.mnemonicPhrase?
+          @view.continueButton.addClass 'disabled'
       else
-        if Bip39.utils.mnemonicPhraseWordsLength(@params.mnemonicPhrase) == Bip39.DEFAULT_PHRASE_LENGTH
-          @view.invalidLabel.fadeIn(if animated then 250 else 0)
+          @view.continueButton.removeClass 'disabled'
+    else
+      if Bip39.utils.mnemonicPhraseWordsLength(@params.mnemonicPhrase) == Bip39.DEFAULT_PHRASE_LENGTH
+        if @params.swapped_bip39
+          valid = Bip39.utils.isMnemonicWordsValid(Bip39.utils.mnemonicWordsFromPhrase(@params.mnemonicPhrase))
         else
-          @view.invalidLabel.fadeOut(if animated then 250 else 0)
+          valid = Bip39.isMnemonicPhraseValid(@params.mnemonicPhrase)
+        if valid
+          @view.continueButton.removeClass 'disabled'
+          @view.invalidLabel.fadeOut(250)
+        else
+          @view.continueButton.addClass 'disabled'
+          @view.invalidLabel.fadeIn(250)
+      else
+        @view.invalidLabel.fadeOut(250)
         @view.continueButton.addClass 'disabled'
 
   _writtenMnemonic: ->
     (_.string.trim(input.val()).toLowerCase() for input in @view.inputs).join(' ')
 
-  _inputIsValid: (input) ->
-    text = _.str.trim(input.val()).toLowerCase()
-    if @params.wallet_mode is 'create' or Bip39.utils.isMnemonicWordValid(text)
+  _writtenWord: (input) ->
+    return _.str.trim(input.val()).toLowerCase()
+
+  _validateInput: (input) ->
+    return if @params.wallet_mode is 'create'
+    text = @_writtenWord(input)
+    if Bip39.utils.isMnemonicWordValid(text)
       input.removeClass 'seed-invalid'
     else
       input.addClass 'seed-invalid'
