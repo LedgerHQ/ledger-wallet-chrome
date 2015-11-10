@@ -50,7 +50,7 @@ class @OnboardingManagementSeedconfirmationViewController extends @OnboardingVie
       word = document.createElement("div")
       word.className = 'seed-word'
       span = document.createElement("span")
-      span.innerHTML = (i + 1) + '.'
+      span.innerHTML = if @params.swapped_bip39 then String.fromCharCode(0x41 + i) + '.' else (i + 1) + '.'
       word.appendChild(span)
       div = document.createElement("div")
       word.appendChild(div)
