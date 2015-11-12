@@ -1,0 +1,5 @@
+<div id="view_controller_content">
+  <img src="../assets/images/update/gears.png" width="50" height="50" />
+  <div class="page-large-indication"><%- t 'update.welcome.you_are_about' %></div>
+  <div class="page-indication"><%= t 'update.welcome.assistant' %></div>
+</div>

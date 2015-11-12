@@ -396,6 +396,7 @@
         'controllers/update/update_linux_view_controller'
         'controllers/update/update_cardcheck_view_controller'
         'controllers/update/update_error_view_controller'
+        'controllers/update/update_welcome_view_controller'
 
         ## API
         'api'

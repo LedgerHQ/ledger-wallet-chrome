@@ -1,6 +1,6 @@
 <div id="view_controller_content">
-  <img src="../assets/images/update/skyrocket.png" width="46" height="46" />
+  <img src="../assets/images/update/skyrocket.png" width="50" height="50" />
   <div class="page-large-indication"><%- t 'update.updating.wallet_is_ready' %></div>
   <div class="page-indication"><%= _.str.sprintf(t('update.updating.clicking_continue'), @dongleVersion, @targetVersion) %></div>
-  <div id="keycard-erasure-section"><a href="/update/seed?redirect_to_updating=true">CHANGE MY KEYCARD SEED</a></div>
+  <div id="keycard-erasure-section" class="regular-grey-text-small"><a href="/update/seed?redirect_to_updating=true"><%= t 'update.updating.change_security_card' %></a></div>
 </div>
