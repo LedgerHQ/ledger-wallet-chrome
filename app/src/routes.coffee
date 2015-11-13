@@ -15,7 +15,7 @@ ledger.router.pluggedWalletRoutesExceptions = [
     if app.isInWalletMode()
       app.router.go '/onboarding/device/plug', {animateIntro: yes}
     else
-      app.router.go '/update/index'
+      app.router.go '/update/welcome'
 
   ## Onboarding
   # Device
@@ -181,6 +181,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   route '/update/error', (param) ->
     app.navigate UPDATE_LAYOUT, UpdateErrorViewController
+
+  route '/update/welcome', (param) ->
+    app.navigate UPDATE_LAYOUT, UpdateWelcomeViewController
 
   # BitID
   route '/wallet/bitid/index', (params = {}) ->

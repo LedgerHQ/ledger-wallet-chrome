@@ -40,9 +40,10 @@ class @UpdateSeedViewController extends UpdateViewController
     @view.seedInput.on 'blur', => @view.seedInput.focus()
     _.defer => @view.seedInput.focus()
     # listen input
-    @view.seedInput.on 'input', =>
+    @view.seedInput.on 'input propertychange', =>
       @parentViewController.updateNavigationItems()
       @_updateValidCheck()
+      @_updateInputSize()
     @view.openScannerButton.on 'click', =>
       dialog = new CommonDialogsQrcodeDialogViewController
       dialog.qrcodeCheckBlock = (data) =>
@@ -51,10 +52,17 @@ class @UpdateSeedViewController extends UpdateViewController
         @view.seedInput.val data
         @parentViewController.updateNavigationItems()
         @_updateValidCheck()
+        @_updateInputSize()
       dialog.show()
 
   _updateValidCheck: ->
     if @_keychardValueIsValid @_seedInputvalue() then @view.validCheck.show() else @view.validCheck.hide()
+
+  _updateInputSize: ->
+    if @_seedInputvalue().length > 32
+      @view.seedInput.addClass 'large'
+    else
+      @view.seedInput.removeClass 'large'
 
   _seedInputvalue: ->
     _.str.trim @view.seedInput.val()

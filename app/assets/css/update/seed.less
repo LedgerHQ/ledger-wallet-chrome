@@ -26,9 +26,10 @@
       }
     }
 
-    > input {
-      height: 36px;
-      width: 340px;
+    > textarea {
+      height: 43px;
+      width: 350px;
+      resize: none;
       font-size: @font-size-very-very-large;
       font-family: @font-family-name;
       font-weight: @font-weight-light;
@@ -37,6 +38,13 @@
       text-align: center;
       border: 1px solid @color-light-grey;
       border-radius: @border-radius-very-large-value;
+      padding-top: 8px;
+
+      &.large {
+        height: 71px;
+        width: 425px;
+        padding: @metrics-very-small-padding @metrics-almost-small-padding @metrics-extra-small-padding;
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 class @UpdateUnlockingViewController extends UpdateViewController
 
-  localizablePageSubtitle: ""
+  localizablePageSubtitle: "update.unlocking.pin_code"
   navigation:
     previousRoute: "/onboarding/device/plug"
     previousParams: {animateIntro: no}
@@ -19,9 +19,6 @@ class @UpdateUnlockingViewController extends UpdateViewController
     @view.pinCode.setStealsFocus(yes)
     @view.pinCode.once 'complete', (event, value) =>
       @getRequest().unlockWithPinCode(value)
-
-  openSupport: ->
-    window.open t 'application.support_url'
 
   resetWallet: ->
     @getRequest().forceDongleErasure()
