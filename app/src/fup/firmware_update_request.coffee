@@ -99,6 +99,9 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   ###
     Approves the current request state and continue its execution.
   ###
+
+  approveDongleErasure: -> @_approve 'erasure'
+
   approveCurrentState: -> @_setIsNeedingUserApproval no
 
   isNeedingUserApproval: -> @_isNeedingUserApproval
@@ -111,8 +114,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     @_approve 'pincode'
 
   forceDongleErasure: ->
-    @_forceDongleErasure = yes
-    @_approve 'pincode'
+    if @_currentState is States.Unlocking
+      @_forceDongleErasure = yes
+      @_approve 'pincode'
+
 
   ###
     Gets the current dongle version

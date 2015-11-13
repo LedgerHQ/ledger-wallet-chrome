@@ -16,5 +16,4 @@ class @UpdateErasingViewController extends UpdateViewController
 
   navigateNext: ->
     @getRequest().forceDongleErasure()
-    _.defer =>
-      @getRequest().approveCurrentState()
+    @getRequest().approveDongleErasure()
