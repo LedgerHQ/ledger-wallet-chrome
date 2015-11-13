@@ -30,6 +30,9 @@ class @Operation extends ledger.database.Model
 
   @_createOperationFromTransaction: (uid, type, tx, value, account) ->
     try
+      recipients = _(tx.outputs).chain().filter((o) -> !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
+      if recipients?.length is 0
+        recipients = _(tx.outputs).chain().map((o) -> o.addresses).flatten().value()
       @findOrCreate(uid: uid)
         .set 'hash', tx['hash']
         .set 'fees', tx['fees']
@@ -38,7 +41,7 @@ class @Operation extends ledger.database.Model
         .set 'value', value.toString()
         .set 'confirmations', tx['confirmations']
         .set 'senders', _(tx.inputs).chain().map((i) -> i.addresses).flatten().value()
-        .set 'recipients', _(tx.outputs).chain().filter((o) -> !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
+        .set 'recipients', recipients
         .set 'inputs_hash', (input.output_hash for input in tx.inputs)
         .set 'inputs_index', (input.output_index for input in tx.inputs)
         .set 'inputs_value', (input.value for input in tx.inputs)
