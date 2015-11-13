@@ -9,7 +9,7 @@ class @UpdateNavigationController extends ledger.common.NavigationController
     @_request = ledger.fup.FirmwareUpdater.instance.requestVersatileFirmwareUpdate()
     @_request.on 'plug', => @_onPlugDongle()
     @_request.on 'unplug', =>  @_onDongleNeedPowerCycle()
-    @_request.on 'stateChanged', (ev, data) => @_onStateChanged(data.newState, data.oldState)
+    @_request.on 'stateChanged', (ev, data) => @_onStateChanged(data.newState, data.oldState, data)
     @_request.on 'needsUserApproval', => @_onNeedsUserApproval()
     ledger.app.on 'dongle:disconnected', =>
       if _(@topViewController()).isKindOf(UpdateIndexViewController) or _(@topViewController()).isKindOf(UpdateSeedViewController) or _(@topViewController()).isKindOf(UpdateDoneViewController) or _(@topViewController()).isKindOf(UpdateErrorViewController)
@@ -61,14 +61,15 @@ class @UpdateNavigationController extends ledger.common.NavigationController
   _onLoadingOs: ->
     ledger.app.router.go '/update/loading'
 
-  _onDone: ->
-    ledger.app.router.go '/update/done'
+  _onDone: ({provisioned}) ->
+    debugger
+    ledger.app.router.go '/update/done', provisioned: provisioned
 
   _onError: (error) ->
     @_currentError = error
     ledger.app.router.go '/update/error', {errorCode: error.code.intValue()}
 
-  _onStateChanged: (newState, oldState) ->
+  _onStateChanged: (newState, oldState, data) ->
     switch newState
       when ledger.fup.FirmwareUpdateRequest.States.Erasing
         unless @_request.hasGrantedErasurePermission()
@@ -79,7 +80,7 @@ class @UpdateNavigationController extends ledger.common.NavigationController
       when ledger.fup.FirmwareUpdateRequest.States.LoadingOs then @_onLoadingOs()
       when ledger.fup.FirmwareUpdateRequest.States.LoadingBootloaderReloader then @_onLoadingOs()
       when ledger.fup.FirmwareUpdateRequest.States.LoadingBootloader then @_onLoadingOs()
-      when ledger.fup.FirmwareUpdateRequest.States.Done then @_onDone()
+      when ledger.fup.FirmwareUpdateRequest.States.Done then @_onDone(data)
 
   _onNeedsUserApproval: ->
     if @topViewController()?.isRendered()

@@ -60,7 +60,6 @@ _.mixin
     scheduleTimeout()
     window.addEventListener('resize', onWindowResize)
     object.then (results...) ->
-      l "Smart results ", results
       d.resolve(results...)
     .fail (errors...) ->
       d.reject(errors...)

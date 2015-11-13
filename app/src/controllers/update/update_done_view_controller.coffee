@@ -5,6 +5,11 @@ class @UpdateDoneViewController extends @UpdateViewController
   navigation:
     nextRoute: "/onboarding/device/connecting"
 
+  initialize: ->
+    super
+    if @params.provisioned
+      @localizableNextButton = "common.continue"
+
   navigateNext: ->
     @getRequest().cancel()
     ledger.app.reconnectDongleAndEnterWalletMode().then =>

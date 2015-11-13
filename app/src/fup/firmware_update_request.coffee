@@ -315,6 +315,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     .done()
 
   _processUnlocking: ->
+    @_provisioned = no
     @_waitForUserApproval('pincode')
     .then =>
       if @_forceDongleErasure
@@ -328,6 +329,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
         pin = new ByteString(@_pinCode, ASCII)
         @_getCard().exchange_async(new ByteString("E0220000" + Convert.toHexByte(pin.length), HEX).concat(pin)).then (result) =>
           if @_getCard().SW is 0x9000
+            @_provisioned = yes
             @_setCurrentState(States.ReloadingBootloaderFromOs)
             @_handleCurrentState()
             return
@@ -469,11 +471,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     return
 
   _success: ->
-    @_card.getRemainingPinAttempt().fail ->
-      0
-    .then (remainingAttempts) =>
-      @_setCurrentState(States.Done, {provisioned: remainingAttempts > 0})
-      _.defer => @cancel()
+    @_setCurrentState(States.Done, {provisioned: @_provisioned})
+    _.defer => @cancel()
 
   _attemptToFailDonglePinCode: (pincode) ->
     deferred = Q.defer()
