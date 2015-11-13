@@ -72,3 +72,5 @@ class ledger.fup.Card.Version
   gte: (version) -> @equals(version) or @gt(version)
 
   getFirmwareInformation: -> @_firmware
+
+  toString: -> ledger.fup.utils.versionToString(@_version)
