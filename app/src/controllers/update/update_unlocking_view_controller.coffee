@@ -21,4 +21,4 @@ class @UpdateUnlockingViewController extends UpdateViewController
       @getRequest().unlockWithPinCode(value)
 
   resetWallet: ->
-    @getRequest().forceDongleErasure()
+    ledger.app.router.go '/update/erasing'

@@ -126,6 +126,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
   ###
   getTargetVersion: -> ledger.fup.utils.versionToString(ledger.fup.versions.Nano.CurrentVersion.Os)
 
+  getDongleFirmware: -> @_dongleVersion.getFirmwareInformation()
+
   ###
     Sets the key card seed used during the firmware update process. The seed must be a 32 characters string formatted as
     an hexadecimal value.

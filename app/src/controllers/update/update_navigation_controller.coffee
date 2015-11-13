@@ -62,7 +62,6 @@ class @UpdateNavigationController extends ledger.common.NavigationController
     ledger.app.router.go '/update/loading'
 
   _onDone: ({provisioned}) ->
-    debugger
     ledger.app.router.go '/update/done', provisioned: provisioned
 
   _onError: (error) ->
