@@ -99,7 +99,7 @@ var ChromeapiPlugupCard = Class.extend(Card, {
 				padding += "00";
 			}
 			return result.concat(new ByteString(padding, HEX));
-		}		
+		}
 
 		var currentObject = this;
 		if (!(apdu instanceof ByteString)) {
@@ -121,25 +121,25 @@ var ChromeapiPlugupCard = Class.extend(Card, {
 				deferred.reject("timeout");
 			}, this.timeout);
 		}
-                
+
 		// enter the exchange wait list
 		currentObject.exchangeStack.push(deferred);
-                
+
 		if (currentObject.exchangeStack.length == 1) {
 			var processNextExchange = function() {
-                    
+
 				// don't pop it now, to avoid multiple at once
 				var deferred = currentObject.exchangeStack[0];
-                    
+
 				// notify graphical listener
 				if (typeof currentObject.listener != "undefined") {
 					currentObject.listener.begin();
 				}
-                
+
 				var performExchange = function() {
 					if (currentObject.winusb) {
 						return currentObject.device.send_async(deferred.promise.apdu.toString(HEX)).then(
-							function(result) {                      
+							function(result) {
 								return currentObject.device.recv_async(512);
 							});
 					}
@@ -149,7 +149,7 @@ var ChromeapiPlugupCard = Class.extend(Card, {
 						var firstReceived = true;
 						var toReceive = 0;
 
-						var unwrapResponseAPDU = function(channel, data, packetSize) {							
+						var unwrapResponseAPDU = function(channel, data, packetSize) {
 							var offset = 0;
 							var sequenceIdx = 0;
 							if ((typeof data == "undefined") || (data.length < 7 + 5)) {
@@ -160,7 +160,7 @@ var ChromeapiPlugupCard = Class.extend(Card, {
 							}
 							if (data.byteAt(offset++) != (channel & 0xff)) {
 								throw "Invalid channel";
-							}							
+							}
 							if (data.byteAt(offset++) != 0x05) {
 								throw "Invalid tag";
 							}
@@ -169,13 +169,13 @@ var ChromeapiPlugupCard = Class.extend(Card, {
 							}
 							if (data.byteAt(offset++) != (sequenceIdx & 0xff)) {
 								throw "Invalid sequence";
-							}				
+							}
 							var responseLength = (data.byteAt(offset) << 8)	+ data.byteAt(offset + 1);
 							offset += 2;
 							if (data.length < 7 + responseLength) {
 								return;
 							}
-							var blockSize = (responseLength > packetSize - 7 ? packetSize - 7 : responseLength);							
+							var blockSize = (responseLength > packetSize - 7 ? packetSize - 7 : responseLength);
 							var result = data.bytes(offset, blockSize);
 							offset += blockSize;
 							while (result.length != responseLength) {
@@ -188,16 +188,16 @@ var ChromeapiPlugupCard = Class.extend(Card, {
 								}
 								if (data.byteAt(offset++) != (channel & 0xff)) {
 									throw "Invalid channel";
-								}							
+								}
 								if (data.byteAt(offset++) != 0x05) {
 									throw "Invalid tag";
-								}	
+								}
 								if (data.byteAt(offset++) != ((sequenceIdx >> 8) & 0xff)) {
 									throw "Invalid sequence";
 								}
 								if (data.byteAt(offset++) != (sequenceIdx & 0xff)) {
 									throw "Invalid sequence";
-								}				
+								}
 								blockSize = ((responseLength - result.length) > packetSize - 5 ? packetSize - 5 : responseLength - result.length);
 								result = result.concat(data.bytes(offset, blockSize));
 								offset += blockSize;
@@ -236,18 +236,18 @@ var ChromeapiPlugupCard = Class.extend(Card, {
 									if (firstReceived) {
 										firstReceived = false;
 										if ((received.length == 2) || (received.byteAt(0) != 0x61)) {
-											deferredHidSend.resolve({resultCode:0, data:received.toString(HEX)});									
+											deferredHidSend.resolve({resultCode:0, data:received.toString(HEX)});
 										}
-										else {									
+										else {
 											toReceive = received.byteAt(1);
 											if (toReceive == 0) {
 												toReceive == 256;
 											}
 											toReceive += 2;
-										}								
+										}
 									}
 									if (toReceive < 64) {
-										deferredHidSend.resolve({resultCode:0, data:received.toString(HEX)});									
+										deferredHidSend.resolve({resultCode:0, data:received.toString(HEX)});
 									}
 									else {
 										toReceive -= 64;
@@ -269,7 +269,7 @@ var ChromeapiPlugupCard = Class.extend(Card, {
 									}
 								}).fail(function(error) {
 									deferredHidSend.reject(error);
-								});								
+								});
 							}
 						}
 						sendPart();
@@ -286,7 +286,7 @@ var ChromeapiPlugupCard = Class.extend(Card, {
 						}
 						else {
 							var size = resultBin.byteAt(1);
-							// fake T0 
+							// fake T0
 							if (size == 0) { size = 256; }
 							deferred.promise.response = resultBin.bytes(2, size);
 							deferred.promise.SW1 = resultBin.byteAt(2 + size);
@@ -311,13 +311,13 @@ var ChromeapiPlugupCard = Class.extend(Card, {
 					}
 					deferred.resolve(deferred.promise.response);
 				})
-				.fail(function(err) { 
+				.fail(function(err) {
 					if (this.timeout != 0) {
 						clearTimeout(exchangeTimeout);
-					}					
+					}
 					deferred.reject(err);
 				})
-				.finally(function () { 
+				.finally(function () {
 					// notify graphical listener
 					if (typeof currentObject.listener != "undefined") {
 						currentObject.listener.end();
@@ -325,18 +325,18 @@ var ChromeapiPlugupCard = Class.extend(Card, {
 
 					// consume current promise
 					currentObject.exchangeStack.shift();
-                      
+
 					// schedule next exchange
 					if (currentObject.exchangeStack.length > 0) {
 						processNextExchange();
 					}
-				});                    
+				});
             }; //processNextExchange
-                  
+
 			// schedule next exchange
 			processNextExchange();
 		}
-                
+
 		// the exchangeStack will process the promise when possible
 		return deferred.promise;
 	},

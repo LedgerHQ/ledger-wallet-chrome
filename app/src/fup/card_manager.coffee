@@ -115,7 +115,7 @@ class ledger.fup.CardManager
   _checkForBootloader: ({terminal}) ->
     terminal.getCard_async().then (card) ->
       apdu = new ByteString("F001000000", HEX)
-      card.exchange_async(apdu).then (result) ->
+      _(card.exchange_async(apdu)).smartTimeout(500).then (result) ->
         if result.byteAt(0) is 0xF0
           throw new Error()
         else

@@ -60,9 +60,10 @@ _.mixin
     scheduleTimeout()
     window.addEventListener('resize', onWindowResize)
     object.then (results...) ->
-      d.resolve.apply(d, results...)
+      l "Smart results ", results
+      d.resolve(results...)
     .fail (errors...) ->
-      d.reject.apply(d, errors...)
+      d.reject(errors...)
     d.promise.fin ->
       window.removeEventListener('resize', onWindowResize)
       clearTimeout(scheduled) if scheduled?

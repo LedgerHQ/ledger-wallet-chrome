@@ -232,6 +232,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _processInitStageOs: ->
     @_logger.info("Process init stage OS")
+    if @_isApproved('erase')
+      @_setCurrentState(States.Erasing)
+      @_handleCurrentState()
+      return
     @_getVersion().then (version) =>
       @_dongleVersion = version
       firmware = version.getFirmwareInformation()
@@ -465,8 +469,11 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     return
 
   _success: ->
-    @_setCurrentState(States.Done)
-    _.defer => @cancel()
+    @_card.getRemainingPinAttempt().fail ->
+      0
+    .then (remainingAttempts) =>
+      @_setCurrentState(States.Done, {provisioned: remainingAttempts > 0})
+      _.defer => @cancel()
 
   _attemptToFailDonglePinCode: (pincode) ->
     deferred = Q.defer()
@@ -482,10 +489,10 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
             deferred.resolve(state is ledger.dongle.States.BLANK or state is ledger.dongle.States.FROZEN)
     deferred.promise
 
-  _setCurrentState: (newState) ->
+  _setCurrentState: (newState, data = {}) ->
     oldState = @_currentState
     @_currentState = newState
-    @emit 'stateChanged', {oldState, newState}
+    @emit 'stateChanged', _({oldState, newState}).extend(data)
 
   _setIsNeedingUserApproval: (value) ->
     if @_isNeedingUserApproval isnt value
@@ -520,6 +527,8 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
       @_setIsNeedingUserApproval yes
       @_deferredApproval.approvalName = approvalName
       @_deferredApproval.promise.then => @_approvedStates.push approvalName
+
+  _isApproved: (approvalName) -> _.contains(@_approvedStates, approvalName)
 
   _removeUserApproval: (approvalName) ->
     @_approvedStates = _(@_approvedStates).without(approvalName)
@@ -577,19 +586,21 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
 
   _findOriginalKey: ->
     if @_lastOriginalKey?
-      l "Resolve with last key", @_lastOriginalKey
       ledger.defer().resolve(@_lastOriginalKey).promise
     else
-      @_getCard().exchange_async(new ByteString("F001010000", HEX), [0x9000]).then (result) =>
-        l "CUST ID IS ", result.toString(HEX)
-        return if @_getCard().SW isnt 0x9000
+      _(@_getCard().exchange_async(new ByteString("F001010000", HEX), [0x9000]))
+      .smartTimeout(500)
+      .then (result) =>
+        l "CUST ID IS ", result.toString(HEX) if result?.toString?
+        return if @_getCard().SW isnt 0x9000 or !result?
         for blCustomerId, offset in ledger.fup.updates.BL_CUSTOMER_ID when result.equals(blCustomerId)
           l "OFFSET IS", offset
           @_lastOriginalKey = offset
           return offset
         @_lastOriginalKey = undefined
         return
-      .fail =>
+      .fail (er) =>
+        e "Failed findOriginalKey", er
         @_lastOriginalKey = undefined
         return
 
