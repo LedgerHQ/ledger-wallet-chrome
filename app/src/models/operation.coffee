@@ -24,8 +24,16 @@ class @Operation extends ledger.database.Model
   @fromReception: (tx, account) ->
     index = account.getId()
     uid = "reception_#{tx.hash}_#{index}"
-    outputs = _(tx.outputs).filter((o) -> _(o.nodes).some((n) -> n?[1] isnt 1 and n?[0] is index))
-    value = _(outputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
+    accountInputs = _(tx.inputs).filter((i) -> _(i.accounts).some((a) -> a? and a.index is index))
+    accountOutputs = _(tx.outputs).filter((o) -> _(o.accounts).some((a) -> a? and a.index is index))
+    accountChangeOutputs = _(accountOutputs).filter((o) -> _(o.nodes).some((n) -> n?[1] is 1))
+    if accountOutputs.length is accountChangeOutputs.length
+      inputValue = _(accountInputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
+      outputValue = _(accountOutputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
+      value = outputValue.subtract(inputValue)
+    else
+      outputs = _(tx.outputs).filter((o) -> _(o.nodes).some((n) -> n?[1] isnt 1 and n?[0] is index))
+      value = _(outputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
     @_createOperationFromTransaction(uid, "reception", tx, value, account)
 
   @_createOperationFromTransaction: (uid, type, tx, value, account) ->
@@ -53,7 +61,6 @@ class @Operation extends ledger.database.Model
         .set 'account', account
     catch er
       e er
-
 
   serialize: () ->
     json = super
