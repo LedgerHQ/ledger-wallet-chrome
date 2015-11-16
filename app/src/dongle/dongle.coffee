@@ -43,7 +43,7 @@ class Attestation
 
   getAttestationId: -> new ByteString(@Id, HEX)
 
-Attestation(0, 0, "04e69fd3c044865200e66f124b5ea237c918503931bee070edfcab79a00a25d6b5a09afbee902b4b763ecf1f9c25f82d6b0cf72bce3faf98523a1066948f1a395f")
+Attestation(0, 1, "04e69fd3c044865200e66f124b5ea237c918503931bee070edfcab79a00a25d6b5a09afbee902b4b763ecf1f9c25f82d6b0cf72bce3faf98523a1066948f1a395f")
 Attestation(1, 1, "04223314cdffec8740150afe46db3575fae840362b137316c0d222a071607d61b2fd40abb2652a7fea20e3bb3e64dc6d495d59823d143c53c4fe4059c5ff16e406")
 Attestation(2, 1, "04c370d4013107a98dfef01d6db5bb3419deb9299535f0be47f05939a78b314a3c29b51fcaa9b3d46fa382c995456af50cd57fb017c0ce05e4a31864a79b8fbfd6")
 
@@ -267,7 +267,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         sha = new JSUCrypt.hash.SHA256()
         domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1")
         if isBeta
-          Attestation = Attestations["0000000000000000"]
+          Attestation = Attestations["0000000000000001"]
         else
           Attestation = Attestations[result.bytes(0, 8).toString()]
         affinePoint = new JSUCrypt.ECFp.AffinePoint(Attestation.xPoint, Attestation.yPoint)

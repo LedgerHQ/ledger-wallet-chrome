@@ -28,21 +28,21 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
   # Transmit 4 bytes challenge. 
   # @params [String] challenge is encoded in hex "8 nonce bytes"+"4 challenge bytes"
   sendChallenge: (challenge) ->
-    @_send JSON.stringify(type: 'challenge', data: challenge)
+    @_send type: 'challenge', data: challenge
     @emit 'm2fa.challenge.sended', challenge
 
   # End a pairing process whether its successful or not.
   confirmPairing: (success=true) ->
-    @_send JSON.stringify(type: 'pairing', is_successful: success)
+    @_send type: 'pairing', is_successful: success
     @emit 'm2fa.pairing.confirmed', success
   rejectPairing: () ->
-    @_send JSON.stringify(type: 'pairing', is_successful: false)
+    @_send type: 'pairing', is_successful: false
     @emit 'm2fa.pairing.rejected'
 
   requestValidation: (data, output_data) ->
     request = type: 'request', second_factor_data: data
     request.output_data = output_data if output_data?
-    @_lastRequest = JSON.stringify(request)
+    @_lastRequest = request
     @_send @_lastRequest
     @emit 'm2fa.request.sended', data
 
@@ -105,7 +105,8 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
   _send: (data) ->
     @_joinRoom().then(=> @_send(data)) if ! @_connectionPromise?
     @_connectionPromise.then =>
-      @ws.send(data)
+      data['attestation'] = ledger.app.dongle.getAttestation().getAttestationId().toString()
+      @ws.send(JSON.stringify(data))
 
   _onConnect: (data) ->
     @emit 'm2fa.connect'
