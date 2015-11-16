@@ -217,9 +217,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
       tx.inputs = inputs
       tx.outputs = outputs
       isSending = no
-      l transaction
       if _(inputs).chain().some((i) -> _(i.accounts).some((a) -> a?.index is account.getId())).value()
-        l "IS SENDING"
         isSending = yes
         operation = Operation.fromSend(tx, account)
         ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
@@ -229,14 +227,11 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
       isReception =
         _(outputs).chain().some(
           (o) ->
-            l "ITERATING ", o
             a = _(o.accounts).some((a) -> a?.index is account.getId()) and !_(o.nodes).chain().compact().every((n) -> n[1] is 1).value()
             b = !isSending and _(o.accounts).some((a) -> a?.index is account.getId())
-            l "RESULT FOR ", o, (a or b), a, b
             a or b
         ).value()
       if isReception
-        l "IS RECEPTION"
         operation = Operation.fromReception(tx, account)
         ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
         operation.save()
