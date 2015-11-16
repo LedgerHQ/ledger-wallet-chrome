@@ -1,4 +1,9 @@
 # Changelog
+1.4.6
+===
+- Fix a display bug on some transaction containing only change addresses
+- Better transaction parsing
+
 1.4.5
 ===
 - Fix a sorting issue in operations list
