@@ -89,6 +89,29 @@ initializeWalletModel = (dongle, raise, done) -> Wallet.initializeWallet done
 
 initializePreferences = (dongle, raise, done) -> ledger.preferences.init done
 
+ensureDataConsistency = (dongle, raise, done) ->
+  # First ensure the wallet class exists
+
+  checkWallet = =>
+    if Wallet.findById(1)?
+      Wallet.initializeWallet(checkAccounts)
+    else
+      checkAccounts()
+
+  checkAccounts = =>
+    accounts = Account.all() or []
+    if accounts.length is 0
+      Account.recoverAccount(0).save()
+    else
+      for account in accounts
+        account.set('wallet', Wallet.instance).save()
+        unless account.get('color')?
+          account.set('color', ledger.preferences.defaults.Accounts.firstAccountColor).save()
+    done()
+
+  checkWallet()
+
+
 ProceduresOrder = [
   openStores
   openHdWallet
@@ -103,6 +126,7 @@ ProceduresOrder = [
   restoreStructure
   completeLayoutInitialization
   initializePreferences
+  ensureDataConsistency
 ]
 
 ###
