@@ -38,6 +38,8 @@ class @Operation extends ledger.database.Model
 
   @_createOperationFromTransaction: (uid, type, tx, value, account) ->
     try
+      tx.inputs = _(tx.inputs).filter((i) -> i.addresses?)
+      tx.outputs = _(tx.outputs).filter((o) -> o.addresses?)
       recipients = _(tx.outputs).chain().filter((o) -> !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
       if recipients?.length is 0
         recipients = _(tx.outputs).chain().map((o) -> o.addresses).flatten().value()

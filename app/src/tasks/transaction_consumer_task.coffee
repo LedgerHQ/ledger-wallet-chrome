@@ -156,6 +156,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
             io.nodes.push [+accountIndex, +node, +index]
           else
             io.nodes.push undefined
+
       push null, transaction
       do next
     .fail (error) ->
