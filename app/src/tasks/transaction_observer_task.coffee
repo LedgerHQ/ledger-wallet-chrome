@@ -4,11 +4,9 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
 
   onStart: () ->
     @_listenNewTransactions()
-    @_listenNewTransactionWithVierzonNode()
 
   onStop: () ->
     @newTransactionStream?.close()
-    @newTransactionStreamVierzon?.close()
 
   _listenNewTransactions: () ->
     @newTransactionStream = new WebSocket "wss://ws.ledgerwallet.com/blockchain/btc/ws"
