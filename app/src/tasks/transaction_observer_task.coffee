@@ -21,7 +21,6 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
           @_handleNewBlock data.payload.block
     @newTransactionStream.onclose = => @_listenNewTransactions() if @isRunning()
 
-
   _handleNewBlock: (block) ->
     @logger().trace 'Receive new block'
     for transactionHash in block['transaction_hashes']
