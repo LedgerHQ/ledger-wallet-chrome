@@ -1,4 +1,13 @@
 # Changelog
+1.4.8
+===
+- Small bug fixes
+- Use new notification websocket server
+
+1.4.7
+===
+- Fix a bug due to OP_RETURN outputs
+
 1.4.6
 ===
 - Fix a display bug on some transaction containing only change addresses
