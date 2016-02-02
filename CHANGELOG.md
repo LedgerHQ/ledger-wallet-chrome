@@ -1,4 +1,9 @@
 # Changelog
+1.4.9
+===
+- Fix a timeout error during P2SH signature
+- Fix wallet balance computation
+
 1.4.8
 ===
 - Small bug fixes
