@@ -999,9 +999,13 @@ var BTChip = Class.create({
         async.eachSeries(
             inputs,
             function (input, finishedCallback) {
+                deferred.notify("Progress")
                 currentObject.startP2SHUntrustedHashTransactionInput_async(firstRun, defaultVersion, inputs, scripts[currentIndex], currentIndex).then(function (result) {
+                    deferred.notify("Progress")
                     currentObject.untrustedHashTransactionInputFinalizeFull_async(numOutputs, output).then(function (result) {
+                        deferred.notify("Progress")
                         currentObject.signTransaction_async(paths[currentIndex], authorization, lockTime, sigHashType).then(function (result) {
+                            deferred.notify("Progress")
                             signatures.push(result.toString(HEX));
                             firstRun = false;
                             currentIndex++;
