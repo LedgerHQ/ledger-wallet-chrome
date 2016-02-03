@@ -32,7 +32,8 @@ class @Operation extends ledger.database.Model
       outputValue = _(accountOutputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
       value = outputValue.subtract(inputValue)
     else
-      outputs = _(tx.outputs).filter((o) -> _(o.nodes).some((n) -> n?[1] isnt 1 and n?[0] is index))
+      hasOwnInputs = _(tx.inputs).filter((i) -> _(i.nodes).some((n) -> n?[0] is index)).length > 0
+      outputs = _(tx.outputs).filter((o) -> _(o.nodes).some((n) -> (!hasOwnInputs or n?[1] isnt 1) and n?[0] is index))
       value = _(outputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
     @_createOperationFromTransaction(uid, "reception", tx, value, account)
 
