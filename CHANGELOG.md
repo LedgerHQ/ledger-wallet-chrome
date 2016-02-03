@@ -1,4 +1,9 @@
 # Changelog
+1.4.9
+===
+- Fix a bug in transaction interpretation
+- Fix a timeout bug in P2SH signatures
+
 1.4.8
 ===
 - Small bug fixes
