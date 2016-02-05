@@ -160,9 +160,16 @@ class ledger.wallet.Transaction
       d.notify({currentStep, stepsCount, percent})
       progressCallback?({currentStep, stepsCount, percent})
     .then (@_resumeData) =>
-      @_validationMode = @_resumeData.authorizationRequired
-      @authorizationPaired = @_resumeData.authorizationPaired
-      @encryptedOutputScript = @_resumeData.encryptedOutputScript
+      l "Just signed this ", @_resumeData
+      @_signedRawTransaction = @_resumeData
+      d.resolve(@)
+      return
+      if (@_resumeData instanceof String)
+        @_signedRawTransaction = @_resumeData
+      else
+        @_validationMode = @_resumeData.authorizationRequired
+        @authorizationPaired = @_resumeData.authorizationPaired
+        @encryptedOutputScript = @_resumeData.encryptedOutputScript
       d.resolve(@)
     .fail (error) =>
       e "GOT ERROR", error

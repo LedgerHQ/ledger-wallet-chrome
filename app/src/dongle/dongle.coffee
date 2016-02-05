@@ -322,6 +322,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       @_btchip.verifyPin_async(new ByteString(@_pin, ASCII))
       .then =>
         if @getFirmwareInformation().hasSubFirmwareSupport() and @getFirmwareInformation().hasSetupFirmwareSupport()
+          @_setState(States.UNLOCKED)
           d.resolve()
           return
         # 19.7. SET OPERATION MODE

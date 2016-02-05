@@ -54,10 +54,14 @@ class @Operation extends ledger.database.Model
         .set 'inputs_index', (input.output_index for input in tx.inputs)
         .set 'inputs_value', (input.value for input in tx.inputs)
         .set 'inputs_address', (input.addresses?[0] for input in tx.inputs)
+        .set 'inputs_path', (input.paths?[0] for input in tx.inputs)
+        .set 'inputs_account', (input.accounts?[0]?.index for input in tx.inputs)
         .set 'outputs_hash', (output.output_hash for output in tx.outputs)
         .set 'outputs_index', (output.output_index for output in tx.outputs)
         .set 'outputs_value', (output.value for output in tx.outputs)
         .set 'outputs_address', (output.addresses[0] for output in tx.outputs)
+        .set 'outputs_path', (output.paths?[0] for output in tx.outputs)
+        .set 'outputs_account', (output.accounts?[0]?.index for output in tx.outputs)
         .set 'account', account
     catch er
       e er
