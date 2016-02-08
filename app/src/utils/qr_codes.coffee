@@ -40,7 +40,7 @@ class ledger.qr_codes.Scanner extends EventEmitter
 
   stop: ->
     return if not @mainEl?
-    @localStream?.stop()
+    @localStream?.getTracks?()?[0]?.stop?()
     @videoTagEl?.get(0).pause()
     @videoEl = undefined
     @canvasTagEl = undefined
