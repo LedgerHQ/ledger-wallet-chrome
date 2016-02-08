@@ -2,6 +2,8 @@
 ledger.database = {} unless ledger.database?
 ledger.database.contexts = {} unless ledger.database.contexts?
 
+{$info} = ledger.utils.Logger.getLazyLoggerByTag("ModelContext")
+
 collectionNameForRelationship = (object, relationship) ->
   switch relationship.type
     when 'many_one' then relationship.Class
@@ -83,6 +85,8 @@ class Collection
         object.set k, v for k, v of synchronizedObject
       object.save()
     # Remove objects not present in sync store
+    $info "Remove item", @getModelClass().where(((i) => !_.contains(existingsIds, i[@getModelClass().getBestIdentifierName()])), @_context).data()
+    $info "Received data", data
     @getModelClass().where(((i) => !_.contains(existingsIds, i[@getModelClass().getBestIdentifierName()])), @_context).remove()
     return
 
@@ -195,6 +199,8 @@ class ledger.database.contexts.Context extends EventEmitter
           collection.updateSynchronizedProperties(collectionData)
         else
           # delete all
+          $info 'Delete all', collectionData
+          $info 'Received data', data
           collection.getModelClass().chain(this).remove()
       @emit 'synchronized'
 

@@ -65,7 +65,6 @@
         '../libs/zip/z-worker'
         '../libs/zip/inflate'
         '../libs/zip/deflate'
-        '../libs/socket.io'
 
         # Used be m2fa.DebugClient
         '../libs/btchip/ucrypt/ka'

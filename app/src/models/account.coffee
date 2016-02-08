@@ -86,17 +86,27 @@ class @Account extends ledger.database.Model
 
   getBalanceFromOperations: ->
     total = ledger.Amount.fromSatoshi(0)
-    for operation in @get('operations')
-      continue if operation.get('double_spent_priority')? and operation.get('double_spent_priority') > 0
-      total = if operation.get('type') is 'reception' then total.add(operation.get('value')) else total.subtract(operation.get('value')).subtract(operation.get('fees'))
+    for {type, value} in @extractInputsOutputs(@get('operations'), 1)
+      total = (if type is "input" then total.subtract(value) else total.add(value))
     total
 
   getUnconfirmedBalanceFromOperations: ->
     total = ledger.Amount.fromSatoshi(0)
-    for operation in @get('operations') when operation.get('confirmations') > 0
-      continue if operation.get('double_spent_priority')? and operation.get('double_spent_priority') > 0
-      total = if operation.get('type') is 'reception' then total.add(operation.get('value')) else total.subtract(operation.get('value')).subtract(operation.get('fees'))
+    for {type, value} in @extractInputsOutputs(@get('operations'), 0)
+      total = (if type is "input" then total.subtract(value) else total.add(value))
     total
+
+  extractInputsOutputs: (ops, minConfirmations) ->
+    result = []
+    for op in ops when op.get('confirmations') >= minConfirmations
+      continue if op.get('double_spent_priority')? and op.get('double_spent_priority') > 0
+      for address, index in op.get("inputs_address")
+        if ledger.wallet.Wallet.instance.cache.getDerivationPath(address)?
+          result.push {type: 'input', value: op.get("inputs_value")[index]}
+      for address, index in op.get("outputs_address")
+        if ledger.wallet.Wallet.instance.cache.getDerivationPath(address)?
+          result.push {type: 'output', value: op.get("outputs_value")[index]}
+    result
 
   ## Add/Remove/Hidden
 

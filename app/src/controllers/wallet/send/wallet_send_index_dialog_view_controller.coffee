@@ -79,7 +79,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       else
         params = ledger.managers.schemes.bitcoin.parseURI data
       if params?.amount?
-        @view.amountInput.val(ledger.formatters.formatUnit(ledger.formatters.fromBtcToSatoshi(params.amount), ledger.preferences.instance.getBtcUnit()))
+        separator = ledger.number.getLocaleDecimalSeparator(ledger.preferences.instance.getLocale().replace('_', '-'))
+        @view.amountInput.val(ledger.formatters.formatUnit(ledger.formatters.fromBtcToSatoshi(params.amount), ledger.preferences.instance.getBtcUnit()).replace(separator, '.'))
       @view.receiverInput.val params.address if params?.address?
       @_updateTotalLabel()
     dialog.show()

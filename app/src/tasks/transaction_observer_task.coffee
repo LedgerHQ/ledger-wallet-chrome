@@ -4,17 +4,12 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
 
   onStart: () ->
     @_listenNewTransactions()
-    @_listenNewTransactionWithVierzonNode()
 
   onStop: () ->
     @newTransactionStream?.close()
-    @newTransactionStreamVierzon?.close()
 
   _listenNewTransactions: () ->
-    @newTransactionStream = new WebSocket "wss://ws.chain.com/v2/notifications"
-    @newTransactionStream.onopen = () =>
-      @newTransactionStream.send JSON.stringify type: "new-transaction", block_chain: ledger.config.network.ws_chain
-      @newTransactionStream.send JSON.stringify type: "new-block", block_chain: ledger.config.network.ws_chain
+    @newTransactionStream = new WebSocket "wss://ws.ledgerwallet.com/blockchain/btc/ws"
 
     @newTransactionStream.onmessage = (event) =>
       data = JSON.parse(event.data)
@@ -25,15 +20,6 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
         when 'new-block'
           @_handleNewBlock data.payload.block
     @newTransactionStream.onclose = => @_listenNewTransactions() if @isRunning()
-
-  _listenNewTransactionWithVierzonNode: () ->
-    return
-    return unless ledger.config.network is ledger.bitcoin.Networks.bitcoin
-    @newTransactionStreamVierzon = io("http://91.121.210.159:3001/")
-    @newTransactionStreamVierzon.on 'connect', =>
-      @newTransactionStreamVierzon.emit 'subscribe', 'inv'
-    @newTransactionStreamVierzon.on 'tx', (data) =>
-      l "Received ", data
 
   _handleNewBlock: (block) ->
     @logger().trace 'Receive new block'

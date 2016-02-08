@@ -24,12 +24,26 @@ class @Operation extends ledger.database.Model
   @fromReception: (tx, account) ->
     index = account.getId()
     uid = "reception_#{tx.hash}_#{index}"
-    outputs = _(tx.outputs).filter((o) -> _(o.nodes).some((n) -> n?[1] isnt 1 and n?[0] is index))
-    value = _(outputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
+    accountInputs = _(tx.inputs).filter((i) -> _(i.accounts).some((a) -> a? and a.index is index))
+    accountOutputs = _(tx.outputs).filter((o) -> _(o.accounts).some((a) -> a? and a.index is index))
+    accountChangeOutputs = _(accountOutputs).filter((o) -> _(o.nodes).some((n) -> n?[1] is 1))
+    if accountOutputs.length is accountChangeOutputs.length
+      inputValue = _(accountInputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
+      outputValue = _(accountOutputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
+      value = outputValue.subtract(inputValue)
+    else
+      hasOwnInputs = _(tx.inputs).filter((i) -> _(i.nodes).some((n) -> n?[0] is index)).length > 0
+      outputs = _(tx.outputs).filter((o) -> _(o.nodes).some((n) -> (!hasOwnInputs or n?[1] isnt 1) and n?[0] is index))
+      value = _(outputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
     @_createOperationFromTransaction(uid, "reception", tx, value, account)
 
   @_createOperationFromTransaction: (uid, type, tx, value, account) ->
     try
+      tx.inputs = _(tx.inputs).filter((i) -> i.addresses?)
+      tx.outputs = _(tx.outputs).filter((o) -> o.addresses?)
+      recipients = _(tx.outputs).chain().filter((o) -> !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
+      if recipients?.length is 0
+        recipients = _(tx.outputs).chain().map((o) -> o.addresses).flatten().value()
       @findOrCreate(uid: uid)
         .set 'hash', tx['hash']
         .set 'fees', tx['fees']
@@ -38,7 +52,7 @@ class @Operation extends ledger.database.Model
         .set 'value', value.toString()
         .set 'confirmations', tx['confirmations']
         .set 'senders', _(tx.inputs).chain().map((i) -> i.addresses).flatten().value()
-        .set 'recipients', _(tx.outputs).chain().filter((o) -> !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
+        .set 'recipients', recipients
         .set 'inputs_hash', (input.output_hash for input in tx.inputs)
         .set 'inputs_index', (input.output_index for input in tx.inputs)
         .set 'inputs_value', (input.value for input in tx.inputs)
@@ -50,7 +64,6 @@ class @Operation extends ledger.database.Model
         .set 'account', account
     catch er
       debugger
-
 
   serialize: () ->
     json = super

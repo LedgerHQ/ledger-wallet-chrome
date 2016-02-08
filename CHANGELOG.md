@@ -1,4 +1,23 @@
 # Changelog
+1.4.9
+===
+- Fix a bug in transaction interpretation
+- Fix a timeout bug in P2SH signatures
+
+1.4.8
+===
+- Small bug fixes
+- Use new notification websocket server
+
+1.4.7
+===
+- Fix a bug due to OP_RETURN outputs
+
+1.4.6
+===
+- Fix a display bug on some transaction containing only change addresses
+- Better transaction parsing
+
 1.4.5
 ===
 - Fix a sorting issue in operations list

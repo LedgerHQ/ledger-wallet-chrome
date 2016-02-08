@@ -156,6 +156,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
             io.nodes.push [+accountIndex, +node, +index]
           else
             io.nodes.push undefined
+
       push null, transaction
       do next
     .fail (error) ->
@@ -216,13 +217,22 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
       tx = _.clone(transaction)
       tx.inputs = inputs
       tx.outputs = outputs
+      isSending = no
       if _(inputs).chain().some((i) -> _(i.accounts).some((a) -> a?.index is account.getId())).value()
+        isSending = yes
         operation = Operation.fromSend(tx, account)
         ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
         operation.save()
         checkForDoubleSpent(operation)
         (transaction.operations ||= []).push operation
-      if _(outputs).chain().some((o) -> _(o.accounts).some((a) -> a?.index is account.getId()) and !_(o.nodes).chain().compact().every((n) -> n[1] is 1).value()).value()
+      isReception =
+        _(outputs).chain().some(
+          (o) ->
+            a = _(o.accounts).some((a) -> a?.index is account.getId()) and !_(o.nodes).chain().compact().every((n) -> n[1] is 1).value()
+            b = !isSending and _(o.accounts).some((a) -> a?.index is account.getId())
+            a or b
+        ).value()
+      if isReception
         operation = Operation.fromReception(tx, account)
         ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
         operation.save()

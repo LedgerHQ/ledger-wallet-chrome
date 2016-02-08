@@ -92,7 +92,7 @@ module.exports = (configuration) ->
       .pipe gulp.dest "#{configuration.buildDir}/"
 
     translate: () ->
-      gulp.src 'app/locales/**/!(es)/*.properties'
+      gulp.src 'app/locales/**/!(es|ru|de|it)/*.properties'
       .pipe slash()
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
@@ -102,7 +102,7 @@ module.exports = (configuration) ->
       .pipe gulp.dest "#{configuration.buildDir}/_locales"
 
     buildLangFile: () ->
-      gulp.src 'app/locales/**/!(es)/*.properties'
+      gulp.src 'app/locales/**/!(es|ru|de|it)/*.properties'
       .pipe slash()
       .pipe plumber()
       .pipe flavors(flavors: configuration.flavors, merge: yes)
