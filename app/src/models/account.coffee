@@ -98,13 +98,14 @@ class @Account extends ledger.database.Model
 
   extractInputsOutputs: (ops, minConfirmations) ->
     result = []
+    ops = _.uniq(ops, (op) -> op.get('hash'))
     for op in ops when op.get('confirmations') >= minConfirmations
       continue if op.get('double_spent_priority')? and op.get('double_spent_priority') > 0
       for address, index in op.get("inputs_address")
-        if ledger.wallet.Wallet.instance.cache.getDerivationPath(address)?
+        if ledger.wallet.Wallet.instance.cache.getDerivationPath(address)?.match("44'/\\d+'/#{@getId()}'")?
           result.push {type: 'input', value: op.get("inputs_value")[index]}
       for address, index in op.get("outputs_address")
-        if ledger.wallet.Wallet.instance.cache.getDerivationPath(address)?
+        if ledger.wallet.Wallet.instance.cache.getDerivationPath(address)?.match("44'/\\d+'/#{@getId()}'")?
           result.push {type: 'output', value: op.get("outputs_value")[index]}
     result
 
