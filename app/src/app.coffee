@@ -113,9 +113,10 @@ require @ledger.imports, ->
 
       @on 'wallet:operations:update wallet:operations:new', =>
         return unless @isInWalletMode()
-        retrieveBalance = => Wallet.instance.retrieveAccountsBalances()
-        _.debounce(retrieveBalance, 500)
+        @_refreshBalance()
 
+
+    _refreshBalance: _.debounce((=> Wallet.instance.retrieveAccountsBalances()), 500)
 
     _listenPreferencesEvents: ->
       ledger.preferences.instance.on 'btcUnit:changed language:changed locale:changed confirmationsCount:changed', => @scheduleReloadUi()

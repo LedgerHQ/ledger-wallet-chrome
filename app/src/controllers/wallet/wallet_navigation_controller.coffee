@@ -69,7 +69,6 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
 
   _listenSynchronizationEvents: ->
     @view.reloadIcon.on 'click', =>
-      Wallet.instance.retrieveAccountsBalances()
       ledger.tasks.TickerTask.instance.updateTicker()
       ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary()
       ledger.storage.sync.pull()

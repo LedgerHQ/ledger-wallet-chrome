@@ -78,7 +78,7 @@ class @Account extends ledger.database.Model
     unconfirmedBalance = @get 'unconfirmed_balance'
     @set 'total_balance', @getBalanceFromOperations().toString()
     @set 'unconfirmed_balance', @getUnconfirmedBalanceFromOperations().toString()
-
+    @save()
     if ledger.Amount.fromSatoshi(totalBalance or 0).neq(@get('total_balance') or 0) or ledger.Amount.fromSatoshi(unconfirmedBalance or 0).neq(@get('unconfirmed_balance') or 0)
       ledger.app.emit "wallet:balance:changed", @get('wallet').getBalance()
     else

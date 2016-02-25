@@ -1,4 +1,18 @@
 # Changelog
+1.4.10
+===
+- Add italian translation
+- Add portuguese translation
+- Add russian translation
+- Add bengali translation
+- Add hindi translation
+- Add arabic translation
+- Add spanish translation
+- Add chinese translation
+- Add greek translation
+- Fix a non-stopping camera
+- Fix a bug in balance computation
+
 1.4.9
 ===
 - Fix a bug in transaction interpretation
