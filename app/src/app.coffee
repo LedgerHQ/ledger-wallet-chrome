@@ -92,7 +92,6 @@ require @ledger.imports, ->
           _.defer =>
             ledger.tasks.TransactionObserverTask.instance.startIfNeccessary()
             ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() unless result.operation_consumption
-            ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary() unless result.operation_consumption
 
     onDongleIsDisconnected: (dongle) ->
       @emit 'dongle:disconnected'

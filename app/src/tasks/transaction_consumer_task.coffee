@@ -80,6 +80,14 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     @_errorInput = ledger.stream()
     @_errorStream = ledger.stream(@_errorInput)
 
+
+  ###
+
+  ###
+  pushCallback: (callback) ->
+    @_input.write(callback)
+    @
+
   ###
     Push a single json formatted transaction into the stream.
   ###
@@ -141,6 +149,10 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     @private
   ###
   _extendTransaction: (err, transaction, push, next) ->
+    if _.isFunction(transaction)
+      Try -> transaction()
+      push null, transaction
+      return next()
     wallet = ledger.wallet.Wallet.instance
     @_getAddressCache().then (cache) =>
       for io in transaction.inputs.concat(transaction.outputs)
@@ -169,6 +181,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     @private
   ###
   _filterTransaction: (transaction) ->
+    return no if _.isFunction(transaction)
     !_(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().compact().isEmpty().value()
 
   _updateLayout: (err, transaction, push, next) ->

@@ -54,7 +54,7 @@ refreshHdWallet = (dongle, raise, done) ->
   ledger.wallet.Wallet.instance.initialize ledger.storage.sync.wallet, done
 
 restoreStructure = (dongle, raise, done) ->
-  if ledger.wallet.Wallet.instance.isEmpty()
+  if ledger.wallet.Wallet.instance.isEmpty() or true
     ledger.app.emit 'wallet:initialization:creation'
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'done', () =>
       Account.recoverAccount(0, Wallet.instance) if Account.chain().count() is 0
@@ -64,14 +64,6 @@ restoreStructure = (dongle, raise, done) ->
       ledger.app.emit 'wallet:initialization:failed'
       raise ledger.errors.new(ledger.errors.FatalErrorDuringLayoutWalletRecovery)
     ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
-  else if Operation.all().length is 0 and !ledger.wallet.Wallet.instance.getAccount(0).isEmpty()
-    for accountIndex in [0...ledger.wallet.Wallet.instance.getAccountsCount()]
-      ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{ledger.wallet.Wallet.instance.getRootDerivationPath()}/#{accountIndex}'", _.noop
-    ledger.app.emit 'wallet:initialization:creation'
-    ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary()
-    ledger.tasks.OperationsConsumptionTask.instance.on 'stop', ->
-      ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
-      done?(operation_consumption: yes)
   else
     ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
     done?()

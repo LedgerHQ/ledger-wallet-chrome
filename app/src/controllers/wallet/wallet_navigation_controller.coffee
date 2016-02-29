@@ -70,7 +70,7 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
   _listenSynchronizationEvents: ->
     @view.reloadIcon.on 'click', =>
       ledger.tasks.TickerTask.instance.updateTicker()
-      ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary()
+      ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
       ledger.storage.sync.pull()
       _.defer @_updateReloadIconState
     ledger.app.on 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done', @_onSynchronizationStateChanged
@@ -87,7 +87,7 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
       @view.reloadIcon.removeClass 'spinning'
 
   _isSynchronizationRunning: ->
-    return ledger.tasks.OperationsConsumptionTask.instance.isRunning()
+    return ledger.tasks.WalletLayoutRecoveryTask.instance.isRunning()
 
   _listenCountervalueEvents: ->
     # update counter value

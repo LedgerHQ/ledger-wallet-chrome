@@ -4,6 +4,22 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
 
   DefaultBatchSize: 20
 
+  getSyncToken: (callback) ->
+    @http().get
+      url: "blockchain/v2/#{ledger.config.network.ticker}/syncToken"
+      onSuccess: (response) ->
+        callback?(response['token'])
+      onError: @networkErrorCallback(callback)
+
+  deleteSyncToken: (token, callback) ->
+    @http().setHttpHeader("X-LedgerWallet-SyncToken", token)
+    @http().delete
+      url: "blokchain/v2/#{ledger.config.network.ticker}/syncToken"
+      onSuccess: (response) ->
+        callback?()
+      onError: @networkErrorCallback(callback)
+
+
   getRawTransaction: (transactionHash, callback) ->
     @http().get
       url: "blockchain/#{ledger.config.network.ticker}/transactions/#{transactionHash}/hex"
@@ -29,6 +45,16 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
           callback(transactions) unless hasNext
           do done
         onError: @networkErrorCallback(callback)
+
+  getPaginatedTransactions: (addresses, blockHash, syncToken, callback) ->
+    data = _.pick({blockHash: blockHash}, _.identity)
+    @http().setHttpHeader("X-LedgerWallet-SyncToken", syncToken)
+    @http().get
+      url: "blockchain/v2/#{ledger.config.network.ticker}/addresses/#{addresses.join(',')}/transactions"
+      data: data
+      onSuccess: (response) ->
+        callback?(response)
+      onError: @networkErrorCallback(callback)
 
   createTransactionStreamForAllObservedPaths: ->
     addresses = ledger.wallet.pathsToAddressesStream(ledger.wallet.Wallet.instance.getAllObservedAddressesPaths()).map (e) -> e[1]
