@@ -7,9 +7,18 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   @instance: new @()
 
   onStart: () ->
-    @_performRecovery()
+    @_performRecovery().then () =>
+      l "Recovery completed"
+      @emit 'done'
+    .fail (er) =>
+      e "Serious error during synchro", er
+      @emit 'fatal_error'
+    .fin =>
+      # Delete sync token and stop
+      @_deleteSynchronizationToken(syncToken) if syncToken?
+      @stopIfNeccessary()
 
-  _performRecovery: ->
+  _performRecovery: () ->
     syncToken = null
     savedState = {}
     @_loadSynchronizationData().then (data) =>
@@ -24,15 +33,12 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       iterate(0)
     .fail (er) ->
       # Handle reorgs
-      @emit 'fatal_error'
-      e er
-    .then () =>
-      l "Recovery completed"
-      @emit 'done'
-    .fin =>
-      # Delete sync token and stop
-      @_deleteSynchronizationToken(syncToken) if syncToken?
-      @stopIfNeccessary()
+      e "Failure during synchro", er
+      if er?.getStatusCode?() is 404
+        @_handlerReorgs(savedState, er.block).then () =>
+          @_performRecovery()
+      else
+        throw er
 
   _recoverAccount: (accountIndex, savedState, syncToken) ->
     savedAccountState = savedState["account_#{accountIndex}"] or {}
@@ -84,6 +90,9 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       ledger.tasks.TransactionConsumerTask.instance.pushTransactions(result['txs'])
       ledger.tasks.TransactionConsumerTask.instance.pushCallback =>
         d.resolve({hasNext, block})
+    .fail (er) ->
+      er.block = block
+      throw er
     d.promise
 
   _recoverAddresses: (root, from, to, blockHash, syncToken) ->
@@ -140,7 +149,10 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       d.resolve()
     d.promise
 
-  _handlerReorgs: ->
+  _handlerReorgs: (state, failedBlock) ->
+    # Iterate through the state and delete any block heigher or equal to block.height
+    # Remove from the database all orphan transaction and blocks
+    # Save the new state
 
   ###
   onStart: () ->
