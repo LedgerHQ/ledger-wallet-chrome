@@ -9,7 +9,7 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
     @newTransactionStream?.close()
 
   _listenNewTransactions: () ->
-    @newTransactionStream = new WebSocket "wss://ws.ledgerwallet.com/blockchain/btc/ws"
+    @newTransactionStream = new WebSocket "wss://ws.ledgerwallet.com/blockchain/v2/btc/ws"
 
     @newTransactionStream.onmessage = (event) =>
       data = JSON.parse(event.data)
@@ -23,6 +23,12 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
 
   _handleNewBlock: (block) ->
     @logger().trace 'Receive new block'
+    json =
+      hash: block['hash']
+      height: block['height']
+      time: new Date(block['time'])
+    Block.fromJson(json).save()
+    ledger.app.emit 'wallet:transaction:update'
     for transactionHash in block['transaction_hashes']
       if Operation.find(hash: transactionHash).count() > 0
         @logger().trace 'Found transaction in block'
