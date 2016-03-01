@@ -229,6 +229,10 @@
         'models/operation'
         'models/account'
         'models/configuration'
+        'models/transaction'
+        'models/output'
+        'models/block'
+        'models/input'
 
         ## Dialog Management
         'utils/dialogs'

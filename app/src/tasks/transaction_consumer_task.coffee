@@ -51,6 +51,9 @@
       "amount":142175914
    }
 
+  @example Transaction format v2
+  
+
 ###
 class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
 
@@ -59,7 +62,6 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
   constructor: ->
     super 'global_transaction_consumer'
     @_deferredWait = {}
-
     safe = (f) ->
       (err, i, push, next) ->
         if err?
@@ -68,8 +70,6 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
           return do next
         return push(null, ledger.stream.nil) if i is ledger.stream.nil
         f(err, i, push, next)
-
-
     @_input = ledger.stream()
     @_stream = ledger.stream(@_input)
       .consume(safe(@_extendTransaction.bind(@)))

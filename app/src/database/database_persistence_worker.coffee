@@ -44,7 +44,7 @@ flushChanges = (changes) ->
   transaction = db.transaction(db.objectStoreNames, 'readwrite')
   for change, index in changes
     store = transaction.objectStore(change.name)
-    if change.operation is "D"
+    if change.operation is "R"
       # Delete document
       store.delete(change.id)
     else
@@ -68,7 +68,7 @@ storeChanges = (changes, index = 0, encryptedChanges = []) ->
     change = changes[index]
     changes[index] = null
     Q.fcall ->
-      if change.operation is 'D'
+      if change.operation is 'R'
         change.id = change.obj['$loki']
         change.obj = null
       else

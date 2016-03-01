@@ -30,7 +30,10 @@ class Collection
     id = model.getBestIdentifier()
     model.getBestIdentifier = -> id
     l "REMOVE", model._object
-    @_collection.remove(model._object['$loki'])
+    try
+      @_collection.remove(model._object)
+    catch er
+      e er
     @_removeSynchronizedProperties(model)
     @_context.emit "delete:" + _.str.underscored(model._object['objType']).toLowerCase(), model
     @_context.notifyDatabaseChange()

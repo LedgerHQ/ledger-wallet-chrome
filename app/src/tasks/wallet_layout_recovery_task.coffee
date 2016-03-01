@@ -26,8 +26,14 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       @_requestSynchronizationToken()
     .then (token) =>
       syncToken = token
+      hdWallet = ledger.wallet.Wallet.instance
       iterate = (index) =>
-        @_recoverAccount(index, savedState, syncToken).then (isEmpty) =>
+        d = ledger.defer()
+        ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{hdWallet.getRootDerivationPath()}/#{index}'", ->
+          d.resolve()
+        d.promise.then =>
+          @_recoverAccount(index, savedState, syncToken)
+        .then (isEmpty) =>
           unless isEmpty
             iterate(index + 1)
       iterate(0)
@@ -129,7 +135,6 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       d.resolve()
     d.promise
 
-
   _loadSynchronizationData: ->
     d = ledger.defer()
     ledger.storage.local.get 'ledger.tasks.WalletLayoutRecoveryTask', (data) =>
@@ -138,7 +143,12 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
         d.resolve({})
       else
         d.resolve(data['ledger.tasks.WalletLayoutRecoveryTask'])
-    d.promise
+    d.promise.then (data) =>
+      if _.isEmpty(data)
+        @_removeOldTransactions().then ->
+          data
+      else
+        data
 
   _saveSynchronizationData: (data) ->
     d = ledger.defer()
@@ -149,8 +159,14 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       d.resolve()
     d.promise
 
+  _removeOldTransactions: ->
+    d = ledger.defer()
+    op.delete() for op in Operation.all()
+    d.resolve()
+    d.promise
+
   _handlerReorgs: (state, failedBlock) ->
-    # Iterate through the state and delete any block heigher or equal to block.height
+    # Iterate through the state and delete any block higher or equal to block.height
     # Remove from the database all orphan transaction and blocks
     # Save the new state
 
