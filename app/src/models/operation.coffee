@@ -38,32 +38,33 @@ class @Operation extends ledger.database.Model
     @_createOperationFromTransaction(uid, "reception", tx, value, account)
 
   @_createOperationFromTransaction: (uid, type, tx, value, account) ->
-    try
-      tx.inputs = _(tx.inputs).filter((i) -> i.addresses?)
-      tx.outputs = _(tx.outputs).filter((o) -> o.addresses?)
-      recipients = _(tx.outputs).chain().filter((o) -> !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
-      if recipients?.length is 0
-        recipients = _(tx.outputs).chain().map((o) -> o.addresses).flatten().value()
-      @findOrCreate(uid: uid)
-        .set 'hash', tx['hash']
-        .set 'fees', tx['fees']
-        .set 'time', (new Date(tx['chain_received_at'] or new Date().getTime())).getTime()
-        .set 'type', type
-        .set 'value', value.toString()
-        .set 'confirmations', tx['confirmations']
-        .set 'senders', _(tx.inputs).chain().map((i) -> i.addresses).flatten().value()
-        .set 'recipients', recipients
-        .set 'inputs_hash', (input.output_hash for input in tx.inputs)
-        .set 'inputs_index', (input.output_index for input in tx.inputs)
-        .set 'inputs_value', (input.value for input in tx.inputs)
-        .set 'inputs_address', (input.addresses?[0] for input in tx.inputs)
-        .set 'outputs_hash', (output.output_hash for output in tx.outputs)
-        .set 'outputs_index', (output.output_index for output in tx.outputs)
-        .set 'outputs_value', (output.value for output in tx.outputs)
-        .set 'outputs_address', (output.addresses[0] for output in tx.outputs)
-        .set 'account', account
-    catch er
-      debugger
+    # Inflate block if possible
+    block = Block.fromJson(tx['block'])?.save()
+    # Inflate transaction
+    transaction = Transaction.fromJson(tx)
+    for i in tx['inputs']
+      # Inflate inputs
+      input = Input.fromJson(i).save()
+      transaction.add('input')
+    for o in tx['outputs']
+      # Inflate outputs
+      output = Output.fromJson(o).save()
+      transaction.add('output', output)
+    block?.add('transactions', transaction)
+
+    # Inflate operation
+    tx.inputs = _(tx.inputs).filter((i) -> i.addresses?)
+    tx.outputs = _(tx.outputs).filter((o) -> o.addresses?)
+    recipients = _(tx.outputs).chain().filter((o) -> !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
+    if recipients?.length is 0
+      recipients = _(tx.outputs).chain().map((o) -> o.addresses).flatten().value()
+    @findOrCreate(uid: uid)
+      .set 'type', type
+      .set 'value', value.toString()
+      .set 'senders', _(tx.inputs).chain().map((i) -> i.addresses).flatten().value()
+      .set 'recipients', recipients
+      .set 'account', account
+      .set 'transaction', transaction
 
   serialize: () ->
     json = super
