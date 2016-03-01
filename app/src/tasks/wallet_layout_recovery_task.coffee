@@ -15,6 +15,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       @emit 'fatal_error'
     .fin =>
       # Delete sync token and stop
+      ledger.api.BlockRestClient.instance.refreshLastBlock()
       @_deleteSynchronizationToken(syncToken) if syncToken?
       @stopIfNeccessary()
 

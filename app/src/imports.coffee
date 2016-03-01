@@ -173,6 +173,7 @@
         'api/currencies_restclient'
         'api/groove_restclient'
         'api/fees_restclient'
+        'api/block_restclient'
 
         ## Tasks
         'tasks/task'
