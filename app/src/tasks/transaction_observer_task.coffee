@@ -28,7 +28,7 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
       height: block['height']
       time: new Date(block['time'])
     Block.fromJson(json).save()
-    ledger.app.emit 'wallet:transaction:update'
+    ledger.app.emit 'wallet:operations:update'
     for transactionHash in block['transaction_hashes']
       if Operation.find(hash: transactionHash).count() > 0
         @logger().trace 'Found transaction in block'

@@ -9,6 +9,6 @@ class ledger.api.BlockRestClient extends ledger.api.RestClient
       onSuccess: (response) ->
         response['time'] = new Date(response['time'] * 1000)
         block = Block.fromJson(response).save()
-        ledger.app.emit 'wallet:transaction:update'
+        ledger.app.emit 'wallet:operations:update'
         callback?(block)
       onError: @networkErrorCallback(callback)
