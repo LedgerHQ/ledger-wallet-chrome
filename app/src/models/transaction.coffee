@@ -3,6 +3,7 @@ class @Transaction extends ledger.database.Model
 
   @index 'hash'
   @has many: 'operations', onDelete: 'destroy'
+  @has many: 'outputs', onDelete: 'destroy'
 
   ###
   {

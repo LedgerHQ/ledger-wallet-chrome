@@ -14,11 +14,11 @@ class @Output extends ledger.database.Model
     }
   ###
   @fromJson: (transactionHash, output, context = ledger.database.contexts.main) ->
-    uid = "#{transactionHash}_#{input['output_index']}"
+    uid = "#{transactionHash}_#{output['output_index']}"
     base =
       uid: uid
       transaction_hash: transactionHash
-      value: input['value']
-      address: input['addresses'][0]
-      script_hex: input['script_hex']
+      value: output['value']
+      address: output['addresses'][0]
+      script_hex: output['script_hex']
     @findOrCreate(uid: uid, base, context)

@@ -7,7 +7,7 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
 
   onStart: () ->
     @_retryNumber = 0
-    @synchronizeConfirmationNumbers()
+    #@synchronizeConfirmationNumbers()
 
   synchronizeConfirmationNumbers: (operations = null, callback = _.noop) ->
     ops = operations
@@ -44,7 +44,7 @@ class ledger.tasks.OperationsSynchronizationTask extends ledger.tasks.Task
     @instance = new @
 
   checkForDoubleSpent: (operation) ->
-    return false if operation.get('confirmations') > 0
+    return false if operation.get('confirmations') > 0 or yes
     try
       for input_hash, index in operation.get('inputs_hash')
         l "Check for double spent on #{input_hash}"

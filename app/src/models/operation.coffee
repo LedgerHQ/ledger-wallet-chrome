@@ -38,33 +38,43 @@ class @Operation extends ledger.database.Model
     @_createOperationFromTransaction(uid, "reception", tx, value, account)
 
   @_createOperationFromTransaction: (uid, type, tx, value, account) ->
-    # Inflate block if possible
-    block = Block.fromJson(tx['block'])?.save()
-    # Inflate transaction
-    transaction = Transaction.fromJson(tx)
-    for i in tx['inputs']
-      # Inflate inputs
-      input = Input.fromJson(i).save()
-      transaction.add('input')
-    for o in tx['outputs']
-      # Inflate outputs
-      output = Output.fromJson(o).save()
-      transaction.add('output', output)
-    block?.add('transactions', transaction)
+    try
+      # Inflate block if possible
+      block = Block.fromJson(tx['block'])?.save()
+      # Inflate transaction
+      transaction = Transaction.fromJson(tx)
+      inputs = []
+      for i in tx['inputs']
+        # Inflate inputs
+        input = Input.fromJson(i).save()
+        inputs.push input.get('uid')
+      transaction.set('inputs_uids', inputs)
+      for o in tx['outputs']
+        # Inflate outputs
+        output = Output.fromJson(tx['hash'], o).save()
+        transaction.add('outputs', output)
+      transaction.save()
+      block?.add('transactions', transaction).save()
 
-    # Inflate operation
-    tx.inputs = _(tx.inputs).filter((i) -> i.addresses?)
-    tx.outputs = _(tx.outputs).filter((o) -> o.addresses?)
-    recipients = _(tx.outputs).chain().filter((o) -> !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
-    if recipients?.length is 0
-      recipients = _(tx.outputs).chain().map((o) -> o.addresses).flatten().value()
-    @findOrCreate(uid: uid)
-      .set 'type', type
-      .set 'value', value.toString()
-      .set 'senders', _(tx.inputs).chain().map((i) -> i.addresses).flatten().value()
-      .set 'recipients', recipients
-      .set 'account', account
-      .set 'transaction', transaction
+      # Inflate operation
+      tx.inputs = _(tx.inputs).filter((i) -> i.addresses?)
+      tx.outputs = _(tx.outputs).filter((o) -> o.addresses?)
+      recipients = _(tx.outputs).chain().filter((o) -> !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
+      if recipients?.length is 0
+        recipients = _(tx.outputs).chain().map((o) -> o.addresses).flatten().value()
+      operation = @findOrCreate(uid: uid)
+        .set 'type', type
+        .set 'value', value.toString()
+        .set 'senders', _(tx.inputs).chain().map((i) -> i.addresses).flatten().value()
+        .set 'time', (new Date(tx['received_at'] or new Date().getTime())).getTime()
+        .set 'recipients', recipients
+        .save()
+      operation
+        .set 'account', account
+        .set 'transaction', transaction
+        .save()
+    catch er
+      debugger
 
   serialize: () ->
     json = super
@@ -72,10 +82,20 @@ class @Operation extends ledger.database.Model
     return json
 
   get: (key) ->
+    transaction = =>
+      transaction._tx if transaction._tx?
+      transaction._tx = @get('transaction')
+    block = =>
+      block._block if block._block?
+      block._block = transaction().get('block')
     switch key
+      when 'hash' then transaction().get 'hash'
+      when 'time' then transaction().get 'received_at'
+      when 'confirmations' then (if block()? then Block.lastBlock()?.get('height') - block().get('height') else 0)
+      when 'fees' then transaction().get 'fees'
       when 'total_value'
         if super('type') == 'sending'
-          ledger.Amount.fromSatoshi(super 'value').add(super 'fees')
+          ledger.Amount.fromSatoshi(super 'value').add(transaction().get('fees'))
         else
           super 'value'
       else super key
