@@ -96,7 +96,9 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @_updateTotalLabel()
     @view.accountsSelect.on 'change', =>
       @_updateCurrentAccount()
-      @_updateColorSquare()
+      @_updateTotalLabel()
+    ledger.app.on 'wallet:operations:changed', =>
+      @_updateTotalLabel()
 
   _receiverBitcoinAddress: ->
     _.str.trim(@view.receiverInput.val())
@@ -172,5 +174,5 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       else if desiredAmount.gt(0) and total.lt(desiredAmount.add(fees))
         compute(desiredAmount.add(fees))
       else
-        total: total, amount: desiredAmount.add(fees), fees: fees, utxo: selectedUtxo. size: estimatedSize
+        total: total, amount: desiredAmount.add(fees), fees: fees, utxo: selectedUtxo, size: estimatedSize
     compute(desiredAmount)
