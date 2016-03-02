@@ -71,6 +71,12 @@ class @Account extends ledger.database.Model
 
   isDeletable: -> @get('operations').length is 0
 
+  ## Utxo
+
+  getUtxo: ->
+    hdaccount = @getWalletAccount()
+    _(Output.utxo()).filter (utxo) -> utxo.get('path').match(hdaccount.getRootDerivationPath())
+
   ## Balance management
 
   retrieveBalance: () ->

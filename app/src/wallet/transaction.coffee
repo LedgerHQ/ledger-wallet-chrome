@@ -231,6 +231,7 @@ class ledger.wallet.Transaction
   @option [Function] callback The callback called once the transaction is created
   @return [Q.Promise] A closure
   ###
+  ###
   @create: ({amount, fees, address, inputsPath, changePath, excludedInputs}, callback = null) ->
     d = ledger.defer(callback)
     return d.rejectWithError(Errors.DustTransaction) && d.promise if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
@@ -248,7 +249,7 @@ class ledger.wallet.Transaction
     $info("Excluded inputs", excludedInputs)
 
     ###
-      Utils
+      #Utils
     ###
 
     isOutputExcluded = (output) ->
@@ -256,7 +257,7 @@ class ledger.wallet.Transaction
       no
 
     ###
-      End of Uitls
+      #End of Uitls
     ###
     ledger.app.dongle.getPublicAddress changePath, (dongleChangeAddress) ->
       ledger.tasks.AddressDerivationTask.instance.getPublicAddress changePath, (workerChangeaddress, error) ->
@@ -315,3 +316,20 @@ class ledger.wallet.Transaction
               else
                 d.rejectWithError(Errors.NotEnoughFunds)
     d.promise
+    ###
+    ###
+      Creates a new transaction asynchronously. The created transaction will only be initialized (i.e. it will only retrieve
+      a sufficient number of input to perform the transaction)
+
+      @param {ledger.Amount} amount The amount to send (expressed in satoshi)
+      @param {ledger.Amount} fees The miner fees (expressed in satoshi)
+      @param {String} address The recipient address
+      @param {Array<Output>} utxo The list of utxo to sign in order to perform the transaction
+      @param {String} changePath The path to use for the change
+      @option [Function] callback The callback called once the transaction is created
+      @return [Q.Promise] A closure
+    ###
+    @create: ({amount, fees, address, utxo, changePath, excludedInputs}, callback = null) ->
+      d = ledger.defer(callback)
+
+      d.promise

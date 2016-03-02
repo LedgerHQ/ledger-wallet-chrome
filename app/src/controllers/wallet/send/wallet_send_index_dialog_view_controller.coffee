@@ -25,9 +25,9 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     @view.amountInput.amountInput(ledger.preferences.instance.getBitcoinUnitMaximumDecimalDigitsCount())
     @view.errorContainer.hide()
     @_updateFeesSelect()
-    @_updateTotalLabel()
     @_updateAccountsSelect()
-    @_updateColorSquare()
+    @_updateCurrentAccount()
+    @_updateTotalLabel()
     @_listenEvents()
 
   onShow: ->
@@ -95,6 +95,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     @view.feesSelect.on 'change', =>
       @_updateTotalLabel()
     @view.accountsSelect.on 'change', =>
+      @_updateCurrentAccount()
       @_updateColorSquare()
 
   _receiverBitcoinAddress: ->
@@ -122,9 +123,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @view.feesSelect.append node
 
   _updateTotalLabel: ->
-    fees = @view.feesSelect.val()
-    val = ledger.Amount.fromSatoshi(@_transactionAmount()).add(fees).toString()
-    @view.totalLabel.text ledger.formatters.formatValue(val) + ' ' + _.str.sprintf(t('wallet.send.index.transaction_fees_text'), ledger.formatters.formatValue(fees))
+    {amount, fees} = @_computeAmount()
+    @view.totalLabel.text ledger.formatters.formatValue(amount) + ' ' + _.str.sprintf(t('wallet.send.index.transaction_fees_text'), ledger.formatters.formatValue(fees))
 
   _updateExchangeValue: ->
     value = ledger.Amount.fromSatoshi(@_transactionAmount())
@@ -143,8 +143,34 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       option.attr('selected', true) if @params.account_id? and account.index is +@params.account_id
       @view.accountsSelect.append option
 
+  _updateCurrentAccount: ->
+    @_updateColorSquare()
+    l "Time to utxo"
+
   _updateColorSquare: ->
     @view.colorSquare.css('color', @_selectedAccount().get('color'))
 
   _selectedAccount: ->
     Account.find(index: parseInt(@view.accountsSelect.val())).first()
+
+  _computeAmount: ->
+    account = @_selectedAccount()
+    desiredAmount = ledger.Amount.fromSatoshi(@_transactionAmount())
+    feePerByte = ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000)
+    compute = (target) =>
+      utxo = account.getUtxo()
+      selectedUtxo = []
+      total = ledger.Amount.fromSatoshi(0)
+      for output in utxo when total.lt(target)
+        selectedUtxo.push output
+        total = total.add(output.get('value'))
+      estimatedSize = ledger.bitcoin.estimateTransactionSize(selectedUtxo.length, 2).max # For now always consider we need a change output
+      fees = feePerByte.multiply(estimatedSize)
+      if desiredAmount.gt(0) and total.lt(desiredAmount.add(fees)) and selectedUtxo.length is utxo.length
+        # Not enough funds
+        total: total, amount: desiredAmount.add(fees), fees: fees, utxo: selectedUtxo, size: estimatedSize
+      else if desiredAmount.gt(0) and total.lt(desiredAmount.add(fees))
+        compute(desiredAmount.add(fees))
+      else
+        total: total, amount: desiredAmount.add(fees), fees: fees, utxo: selectedUtxo. size: estimatedSize
+    compute(desiredAmount)

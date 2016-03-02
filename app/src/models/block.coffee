@@ -5,6 +5,7 @@ class @Block extends ledger.database.Model
   @has many: 'transactions', onDelete: 'destroy'
 
   @fromJson: (json, context = ledger.database.contexts.main) ->
+    return null if !json?
     @findOrCreate(hash: json['hash'], json, context)
 
   @lastBlock: (context = ledger.database.contexts.main) ->

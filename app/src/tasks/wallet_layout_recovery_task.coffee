@@ -12,6 +12,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       @emit 'done'
     .fail (er) =>
       e "Serious error during synchro", er
+      ledger.app.emit "wallet:operations:sync:failed"
       @emit 'fatal_error'
     .fin =>
       # Delete sync token and stop
@@ -84,7 +85,6 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       d.promise
 
   _recoverBatch: (batch, accountIndex, syncToken) ->
-    d = ledger.defer()
     wallet = ledger.wallet.Wallet.instance
     account = wallet.getOrCreateAccount(accountIndex)
     blockHash = batch['blockHash']
@@ -92,15 +92,16 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     to = from + @BatchSize
     hasNext = no
     @_recoverAddresses(account.getRootDerivationPath(), from, to, blockHash, syncToken).then (result) =>
+      d = ledger.defer()
       hasNext = result["truncated"]
       block = @_findHighestBlock(result.txs)
       ledger.tasks.TransactionConsumerTask.instance.pushTransactions(result['txs'])
       ledger.tasks.TransactionConsumerTask.instance.pushCallback =>
         d.resolve({hasNext, block})
+      d.promise
     .fail (er) ->
-      er.block = block
+      er.block = batch
       throw er
-    d.promise
 
   _recoverAddresses: (root, from, to, blockHash, syncToken) ->
     paths = _.map [from...to], (i) -> "#{root}/#{0}/#{i}"
