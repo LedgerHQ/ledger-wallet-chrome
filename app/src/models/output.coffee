@@ -23,3 +23,6 @@ class @Output extends ledger.database.Model
       path: ledger.wallet.Wallet.instance.cache.getDerivationPath(output['addresses'][0])
       script_hex: output['script_hex']
     @findOrCreate(uid: uid, base, context)
+
+  @utxo: (context = ledger.database.contexts.main) ->
+    output for output in @find(path: {$ne: undefined}, context).data() when _.isEmpty(Input.find(uid: output.get('uid'), context).data())

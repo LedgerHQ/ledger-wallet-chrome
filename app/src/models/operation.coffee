@@ -85,13 +85,10 @@ class @Operation extends ledger.database.Model
     transaction = =>
       transaction._tx if transaction._tx?
       transaction._tx = @get('transaction')
-    block = =>
-      block._block if block._block?
-      block._block = transaction().get('block')
     switch key
       when 'hash' then transaction().get 'hash'
       when 'time' then transaction().get 'received_at'
-      when 'confirmations' then (if block()? then Block.lastBlock()?.get('height') - block().get('height') else 0)
+      when 'confirmations' then transaction().get 'confirmations'
       when 'fees' then transaction().get 'fees'
       when 'total_value'
         if super('type') == 'sending'

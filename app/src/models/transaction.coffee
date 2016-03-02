@@ -20,3 +20,11 @@ class @Transaction extends ledger.database.Model
       lock_time: tx['lock_time']
       fees: tx['fees']
     @findOrCreate({hash: base['hash']}, base, context)
+
+  get: (key) ->
+    block = =>
+      block._block if block._block?
+      block._block = @get('block')
+    switch key
+      when 'confirmations' then (if block()? then Block.lastBlock()?.get('height') - block().get('height') + 1 else 0)
+      else super key

@@ -76,38 +76,21 @@ class @Account extends ledger.database.Model
   retrieveBalance: () ->
     totalBalance = @get 'total_balance'
     unconfirmedBalance = @get 'unconfirmed_balance'
-    @set 'total_balance', @getBalanceFromOperations().toString()
-    @set 'unconfirmed_balance', @getUnconfirmedBalanceFromOperations().toString()
+    @set 'total_balance', @getBalanceFromUtxo(1).toString()
+    @set 'unconfirmed_balance', @getBalanceFromUtxo(0).toString()
     @save()
     if ledger.Amount.fromSatoshi(totalBalance or 0).neq(@get('total_balance') or 0) or ledger.Amount.fromSatoshi(unconfirmedBalance or 0).neq(@get('unconfirmed_balance') or 0)
       ledger.app.emit "wallet:balance:changed", @get('wallet').getBalance()
     else
       ledger.app.emit "wallet:balance:unchanged", @get('wallet').getBalance()
 
-  getBalanceFromOperations: ->
+  getBalanceFromUtxo: (minConfirmation) ->
+    utxo = Output.utxo()
     total = ledger.Amount.fromSatoshi(0)
-    for {type, value} in @extractInputsOutputs(@get('operations'), 1)
-      total = (if type is "input" then total.subtract(value) else total.add(value))
+    for output in utxo
+      if (output.get('path').match(@getWalletAccount().getRootDerivationPath()) and output.get('transaction').get('confirmations')) >= minConfirmation
+        total = total.add(output.get('value'))
     total
-
-  getUnconfirmedBalanceFromOperations: ->
-    total = ledger.Amount.fromSatoshi(0)
-    for {type, value} in @extractInputsOutputs(@get('operations'), 0)
-      total = (if type is "input" then total.subtract(value) else total.add(value))
-    total
-
-  extractInputsOutputs: (ops, minConfirmations) ->
-    result = []
-    ops = _.uniq(ops, (op) -> op.get('hash'))
-    for op in ops when op.get('confirmations') >= minConfirmations
-      continue if op.get('double_spent_priority')? and op.get('double_spent_priority') > 0
-      for address, index in op.get("inputs_address")
-        if ledger.wallet.Wallet.instance.cache.getDerivationPath(address)?.match("44'/\\d+'/#{@getId()}'")?
-          result.push {type: 'input', value: op.get("inputs_value")[index]}
-      for address, index in op.get("outputs_address")
-        if ledger.wallet.Wallet.instance.cache.getDerivationPath(address)?.match("44'/\\d+'/#{@getId()}'")?
-          result.push {type: 'output', value: op.get("outputs_value")[index]}
-    result
 
   ## Add/Remove/Hidden
 
