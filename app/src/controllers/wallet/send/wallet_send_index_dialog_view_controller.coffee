@@ -159,8 +159,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     account = @_selectedAccount()
     desiredAmount = ledger.Amount.fromSatoshi(@_transactionAmount())
     feePerByte = ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000)
+    utxo = _(account.getUtxo()).sortBy (o) -> o.get('transaction').get('confirmations')
     compute = (target) =>
-      utxo = account.getUtxo()
       selectedUtxo = []
       total = ledger.Amount.fromSatoshi(0)
       for output in utxo when total.lt(target)

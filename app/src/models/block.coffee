@@ -10,3 +10,8 @@ class @Block extends ledger.database.Model
 
   @lastBlock: (context = ledger.database.contexts.main) ->
     @find({}, context).simpleSort('height', yes).data()[0]
+
+  get: (key) ->
+    switch key
+      when 'time' then new Date(super key)
+      else super key

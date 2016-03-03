@@ -54,7 +54,8 @@ refreshHdWallet = (dongle, raise, done) ->
   ledger.wallet.Wallet.instance.initialize ledger.storage.sync.wallet, done
 
 restoreStructure = (dongle, raise, done) ->
-  if ledger.wallet.Wallet.instance.isEmpty() or true
+  block = Block.lastBlock()
+  if _.isEmpty(block) or (new Date().getTime() - block.get('time').getTime() >= 7 * 24 * 60 * 60 * 1000)
     ledger.app.emit 'wallet:initialization:creation'
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'done', () =>
       Account.recoverAccount(0, Wallet.instance) if Account.chain().count() is 0
