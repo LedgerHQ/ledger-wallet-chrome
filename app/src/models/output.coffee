@@ -18,6 +18,7 @@ class @Output extends ledger.database.Model
     base =
       uid: uid
       transaction_hash: transactionHash
+      index: output['output_index']
       value: output['value']
       address: output['addresses'][0]
       path: ledger.wallet.Wallet.instance.cache.getDerivationPath(output['addresses'][0])

@@ -47,7 +47,9 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @view.errorContainer.hide()
 
       pushDialogBlock = (fees) =>
-        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount()
+        {utxo, fees} = @_computeAmount(ledger.Amount.fromSatoshi(fees).divide(1000))
+        # TODO check UTXO confirmations here
+        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount(), utxo: utxo
         @getDialog().push dialog
 
       # check transactions fees
@@ -147,7 +149,6 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
 
   _updateCurrentAccount: ->
     @_updateColorSquare()
-    l "Time to utxo"
 
   _updateColorSquare: ->
     @view.colorSquare.css('color', @_selectedAccount().get('color'))
@@ -155,10 +156,9 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
   _selectedAccount: ->
     Account.find(index: parseInt(@view.accountsSelect.val())).first()
 
-  _computeAmount: ->
+  _computeAmount: (feePerByte = ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000)) ->
     account = @_selectedAccount()
     desiredAmount = ledger.Amount.fromSatoshi(@_transactionAmount())
-    feePerByte = ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000)
     utxo = _(account.getUtxo()).sortBy (o) -> o.get('transaction').get('confirmations')
     compute = (target) =>
       selectedUtxo = []

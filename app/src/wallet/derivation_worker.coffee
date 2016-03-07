@@ -43,8 +43,6 @@ ledger.wallet.Wallet.instance ?= {}
 enqueue = (command, parameters, queryId) ->
   Queue.push command: command, parameters: parameters, queryId: queryId
 
-dequeue = () ->
-
 postResult = (result) ->
   postMessage command: CurrentCommand.command, result: result, queryId: CurrentCommand.queryId
   CurrentCommand = null
@@ -113,6 +111,7 @@ getPublicAddress = (path) ->
 
   # No result from cache perform the derivation on the chip
   unless address?
+    console.warn "Trying to derive with dongle ", path
     ledger.app.dongle.getPublicAddress path, (publicKey) ->
       @_derivationPath
       if publicKey?

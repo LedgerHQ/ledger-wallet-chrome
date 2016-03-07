@@ -33,7 +33,9 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       hdWallet = ledger.wallet.Wallet.instance
       iterate = (index) =>
         d = ledger.defer()
-        ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{hdWallet.getRootDerivationPath()}/#{index}'", ->
+        l "Register xpub ", "#{hdWallet.getRootDerivationPath()}/#{index}'"
+        account = hdWallet.getOrCreateAccount(index)
+        ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath account.getRootDerivationPath(), ->
           d.resolve()
         d.promise.then =>
           @_recoverAccount(index, savedState, syncToken)
@@ -76,7 +78,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
           batches.splice(-1, 1)
         if hasNext
           iterate(index)
-        else if !hasNext and block?
+        else if !hasNext and batch['blockHash']?
           iterate(index + 1)
 
     iterate(0).then () =>

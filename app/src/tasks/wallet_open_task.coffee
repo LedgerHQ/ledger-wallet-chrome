@@ -115,7 +115,6 @@ ProceduresOrder = [
   initializeWalletModel
   startTransactionConsumerTask
   pullStore
-  refreshHdWallet
   restoreStructure
   completeLayoutInitialization
   initializePreferences

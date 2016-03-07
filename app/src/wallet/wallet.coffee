@@ -27,9 +27,9 @@ class ledger.wallet.Wallet
 
   createAccount: (id = undefined) ->
     account = new ledger.wallet.Wallet.Account(@, id or @getNextAccountIndex(), @_store)
+    ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath(account.getRootDerivationPath(), _.noop)
     @_accounts.push account
     do @save
-    ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath(account.getRootDerivationPath(), _.noop)
     account
 
   getOrCreateAccount: (id) ->
@@ -47,6 +47,7 @@ class ledger.wallet.Wallet
     paths
 
   initialize: (store, callback) ->
+    l "INIT WALLET ", store, new Error().stack
     @_store = store
     @_store.get ['accounts'], (result) =>
       @_accounts = []
@@ -291,19 +292,8 @@ class ledger.wallet.Wallet.Account
 _.extend ledger.wallet,
 
   initialize: (dongle, callback=undefined) ->
-    previousLayout = new ledger.wallet.Wallet()
     hdWallet = new ledger.wallet.Wallet()
-    previousLayout.initialize ledger.storage.wallet, =>
-      unless previousLayout.isEmpty()
-        ledger.storage.sync.wallet.set previousLayout.serialize(), =>
-          previousLayout.release()
-          ledger.storage.wallet.remove ["accounts", "account_0"], =>
-            @_endInitialize(hdWallet, callback)
-      else
-        @_endInitialize(hdWallet, callback)
-
-  _endInitialize: (hdWallet, callback) ->
-    hdWallet.initialize ledger.storage.sync.wallet, () =>
+    hdWallet.initialize ledger.storage.wallet, () =>
       ledger.wallet.Wallet.instance = hdWallet
       callback?()
 

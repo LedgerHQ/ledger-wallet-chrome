@@ -49,23 +49,25 @@ class @Operation extends ledger.database.Model
         input = Input.fromJson(i).save()
         inputs.push input.get('uid')
       transaction.set('inputs_uids', inputs)
-      for o in tx['outputs']
+      for o in (tx['ownOutputs'] or [])
         # Inflate outputs
-        output = Output.fromJson(tx['hash'], o).save()
+        output = Output.fromJson(tx['hash'], o).save() unless _.isEmpty(o.paths)
         transaction.add('outputs', output)
       transaction.save()
       block?.add('transactions', transaction).save()
 
       # Inflate operation
       tx.inputs = _(tx.inputs).filter((i) -> i.addresses?)
-      tx.outputs = _(tx.outputs).filter((o) -> o.addresses?)
-      recipients = _(tx.outputs).chain().filter((o) -> !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
+      # tx.outputs = _(tx.outputs).filter((o) -> o.addresses?)
+      outputs = if tx.outputs.length > 100 then tx.ownOutputs else tx.outputs # Special for mining wallet
+      recipients = _(tx.outputs).chain().filter((o) -> o.addresses? and !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
+      senders = _(tx.inputs).chain().map((i) -> i.addresses).flatten().value()
       if recipients?.length is 0
         recipients = _(tx.outputs).chain().map((o) -> o.addresses).flatten().value()
       operation = @findOrCreate(uid: uid)
         .set 'type', type
         .set 'value', value.toString()
-        .set 'senders', _(tx.inputs).chain().map((i) -> i.addresses).flatten().value()
+        .set 'senders', senders
         .set 'time', (new Date(tx['received_at'] or new Date().getTime())).getTime()
         .set 'recipients', recipients
         .save()
@@ -73,6 +75,7 @@ class @Operation extends ledger.database.Model
         .set 'account', account
         .set 'transaction', transaction
         .save()
+      operation
     catch er
       debugger
 

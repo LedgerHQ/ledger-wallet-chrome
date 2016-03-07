@@ -93,6 +93,7 @@ class @Account extends ledger.database.Model
   getBalanceFromUtxo: (minConfirmation) ->
     utxo = Output.utxo()
     total = ledger.Amount.fromSatoshi(0)
+    return total unless @getWalletAccount()? or yes
     for output in utxo
       if (output.get('path').match(@getWalletAccount().getRootDerivationPath()) and output.get('transaction').get('confirmations')) >= minConfirmation
         total = total.add(output.get('value'))
@@ -135,6 +136,14 @@ class @Account extends ledger.database.Model
         @_createTransactionGetChangeAddressPath @getWalletAccount().getCurrentChangeAddressIndex(), (changePath) =>
           ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, excludedInputs: excludedInputs, callback)
       ledger.tasks.TransactionConsumerTask.instance.pushTransactions(transactions)
+
+  createTransaction: ({amount, fees, address, utxo}, callback) ->
+    amount = ledger.Amount.fromSatoshi(amount)
+    fees = ledger.Amount.fromSatoshi(fees)
+    changeIndex = @getWalletAccount().getCurrentChangeAddressIndex()
+    changePath =  @getWalletAccount().getChangeAddressPath(changeIndex)
+    ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, utxo: utxo, changePath: changePath, callback)
+
 
   ###
     Special get change address path to 'avoid' LW 1.0.0 derivation failure.

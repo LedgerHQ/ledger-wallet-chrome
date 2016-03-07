@@ -231,9 +231,37 @@ class ledger.wallet.Transaction
     @option [Function] callback The callback called once the transaction is created
     @return [Q.Promise] A closure
   ###
-  @create: ({amount, fees, address, utxo, changePath, excludedInputs}, callback = null) ->
+  @create: ({amount, fees, address, utxo, changePath}, callback = null) ->
     d = ledger.defer(callback)
+    return d.rejectWithError(Errors.DustTransaction) && d.promise if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+    totalUtxoAmount = _(utxo).chain().map((u) -> ledger.Amount.fromSatoshi(u.get('value'))).reduce(((a, b) -> a.add(b)), ledger.Amount.fromSatoshi(0)).value()
+    return d.rejectWithError(Errors.NotEnoughFunds) && d.promise if totalUtxoAmount.lt(amount.add(fees))
+    $info("--- CREATE TRANSACTION ---")
+    $info("Amount: ", amount.toString())
+    $info("Fees: ", fees.toString())
+    $info("Total send: ", totalUtxoAmount.toString())
+    $info("Address: ", address)
+    $info("UTXO: ", utxo)
+    $info("Change path: ", changePath)
 
+    changeAmount = totalUtxoAmount.subtract(amount.add(fees))
+    if changeAmount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+      fees  = totalUtxoAmount.subtract(amount)
+      changeAmount = ledger.Amount.fromSatoshi(0)
+      $info("Applied fees: ", fees)
+
+    # Get each raw tx
+    iterate = (index, inputs) ->
+      output = utxo[index]
+      return d.resolve(inputs) unless output?
+      d = ledger.defer()
+      ledger.api.TransactionsRestClient.instance.getRawTransaction output.get('transaction_hash'), (rawTransaction, error) ->
+        if error?
+         return d.rejectWithError(Errors.NetworkError)
+        result = raw: rawTransaction, paths: [output.get('path')], output_index: output.get('index'), value: output.get('value')
+        d.resolve(iterate(index + 1, inputs.concat([result])))
+      d.promise
+    d.resolve(iterate(0, []).then (inputs) => new Transaction(ledger.app.dongle, amount, fees, address, inputs, changePath))
     d.promise
 
   ###

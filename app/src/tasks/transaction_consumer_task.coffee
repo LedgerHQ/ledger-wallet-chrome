@@ -125,7 +125,6 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     @_stream = ledger.stream(@_input)
       .consume(safe(@_extendTransaction.bind(@)))
       .filter(@_filterTransaction.bind(@))
-      .consume(safe(@_updateLayout.bind(@)))
       .consume(safe(@_updateDatabase.bind(@)))
 
     @_errorInput = ledger.stream()
@@ -206,22 +205,35 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
       return next()
     wallet = ledger.wallet.Wallet.instance
     @_getAddressCache().then (cache) =>
-      for io in transaction.inputs.concat(transaction.outputs)
-        io.paths = []
-        io.accounts = []
-        io.nodes = []
-        for address in (io.addresses or [])
-          path = cache[address]
-          io.paths.push path
-          io.accounts.push (if path? then wallet.getOrCreateAccountFromDerivationPath(path) else undefined)
-          if path?
-            [__, accountIndex, node, index] = path.match("#{wallet.getRootDerivationPath()}/(\\d+)'/(0|1)/(\\d+)")
-            io.nodes.push [+accountIndex, +node, +index]
-          else
-            io.nodes.push undefined
-
-      push null, transaction
-      do next
+      transaction.accounts = []
+      extendIos = (ios) ->
+        hasOwn = no
+        for io in ios
+          io.paths = []
+          io.accounts = []
+          io.nodes = []
+          io.addresses ||= _.compact([io.address])
+          for address in (io.addresses or [])
+            path = cache[address]
+            io.paths.push path
+            if path?
+              ledger.wallet.Wallet.instance.getAccountFromDerivationPath(path).notifyPathsAsUsed([path])
+              hasOwn = yes
+            io.accounts.push (if path? then wallet.getOrCreateAccountFromDerivationPath(path) else undefined)
+            if path?
+              if ios is transaction.outputs
+                (transaction.ownOutputs ||= []).push io
+              [__, accountIndex, node, index] = path.match("#{wallet.getRootDerivationPath()}/(\\d+)'/(0|1)/(\\d+)")
+              transaction.accounts.push wallet.getOrCreateAccount(accountIndex)
+              io.nodes.push [+accountIndex, +node, +index]
+            else
+              io.nodes.push undefined
+        hasOwn
+      transaction.hasOwn = extendIos(transaction.inputs)
+      transaction.hasOwn = extendIos(transaction.outputs) or transaction.hasOwn
+      _.defer =>
+        push null, transaction
+        do next
     .fail (error) ->
       push {error, transaction}
       do next
@@ -233,24 +245,12 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
   ###
   _filterTransaction: (transaction) ->
     return no if _.isFunction(transaction)
-    !_(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().compact().isEmpty().value()
-
-  _updateLayout: (err, transaction, push, next) ->
-    # Notify to the layout that the path is used
-
-    for path in _(transaction.inputs.concat(transaction.outputs)).chain().map((i) -> i.paths).flatten().compact().value()
-      ledger.wallet.Wallet.instance.getAccountFromDerivationPath(path).notifyPathsAsUsed([path])
-
-    push null, transaction
-    do next
+    transaction.hasOwn
 
   _updateDatabase: (err, transaction, push, next) ->
     # Parse and create operations depending of the transaction. Also create missing accounts
-    accounts = _(transaction.inputs.concat(transaction.outputs))
+    accounts = _(transaction.accounts)
       .chain()
-      .map((io) -> io.accounts)
-      .flatten()
-      .compact()
       .uniq((a) -> a.index)
     .value()
     pulled = no
@@ -278,7 +278,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
       return push(null, ledger.stream.nil) if account is ledger.stream.nil
       inputs = transaction.inputs
       outputs = transaction.outputs
-      tx = _.clone(transaction)
+      tx = transaction
       tx.inputs = inputs
       tx.outputs = outputs
       isSending = no
@@ -290,7 +290,7 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
         checkForDoubleSpent(operation)
         (transaction.operations ||= []).push operation
       isReception =
-        _(outputs).chain().some(
+        _(transaction.ownOutputs or []).chain().some(
           (o) ->
             a = _(o.accounts).some((a) -> a?.index is account.getId()) and !_(o.nodes).chain().compact().every((n) -> n[1] is 1).value()
             b = !isSending and _(o.accounts).some((a) -> a?.index is account.getId())
@@ -304,10 +304,11 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
         (transaction.operations ||= []).push operation
       do next
     .done =>
-      @_deferredWait[transaction.hash]?.resolve(transaction)
-      @_deferredWait = _(@_deferredWait).omit(transaction.hash)
-      push null, transaction
-      do next
+      _.defer =>
+        @_deferredWait[transaction.hash]?.resolve(transaction)
+        @_deferredWait = _(@_deferredWait).omit(transaction.hash)
+        #push null, transaction
+        do next
 
   @instance: new @
 
