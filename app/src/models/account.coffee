@@ -93,7 +93,7 @@ class @Account extends ledger.database.Model
   getBalanceFromUtxo: (minConfirmation) ->
     utxo = Output.utxo()
     total = ledger.Amount.fromSatoshi(0)
-    return total unless @getWalletAccount()? or yes
+    return total unless @getWalletAccount()?
     for output in utxo
       if (output.get('path').match(@getWalletAccount().getRootDerivationPath()) and output.get('transaction').get('confirmations')) >= minConfirmation
         total = total.add(output.get('value'))

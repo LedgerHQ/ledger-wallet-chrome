@@ -16,6 +16,7 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
       return unless data?.payload?.type?
       switch data.payload.type
         when 'new-transaction'
+          #l "Received transaction ", data.payload.transaction?.hash
           ledger.tasks.TransactionConsumerTask.instance.pushTransaction(data.payload.transaction)
         when 'new-block'
           @_handleNewBlock data.payload.block

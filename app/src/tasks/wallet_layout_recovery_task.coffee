@@ -7,6 +7,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   @instance: new @()
 
   getLastSynchronizationStatus: () -> @_loadSynchronizationData().then (state) -> state['lastSyncStatus']
+  getLastSynchronizationDate: () -> @_loadSynchronizationData().then (state) -> new Date(state['lastSyncTime'])
 
   onStart: () ->
     @_performRecovery().then () =>
@@ -56,6 +57,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
         throw er
     .then =>
       savedState['lastSyncStatus'] = 'success'
+      savedState['lastSyncTime'] = new Date().getTime()
       @_saveSynchronizationData(savedState)
 
   _recoverAccount: (accountIndex, savedState, syncToken) ->
@@ -178,7 +180,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     d.promise
 
   _handlerReorgs: (state, failedBlock) ->
-    # Iterate through the state and delete any block higher or equal to block.height
+    # Iterate through the state and delete any block higher or equal to failedBlock.height
     # Remove from the database all orphan transaction and blocks
     # Save the new state
 

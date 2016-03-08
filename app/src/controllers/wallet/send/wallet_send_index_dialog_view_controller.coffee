@@ -12,6 +12,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     accountsSelect: '#accounts_select'
     colorSquare: '#color_square'
 
+  RefreshWalletInterval: 2 * 60 * 1000 # 2 Minutes
+
   onAfterRender: () ->
     super
 
@@ -29,6 +31,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     @_updateCurrentAccount()
     @_updateTotalLabel()
     @_listenEvents()
+    @_ensureDatabaseUpToDate()
+    @_updateSendButton()
 
   onShow: ->
     super
@@ -176,3 +180,34 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       else
         total: total, amount: desiredAmount.add(fees), fees: fees, utxo: selectedUtxo, size: estimatedSize
     compute(desiredAmount)
+
+  _ensureDatabaseUpToDate: ->
+    task = ledger.tasks.WalletLayoutRecoveryTask.instance
+    task.getLastSynchronizationDate().then (lastSynchronization) =>
+      d = ledger.defer()
+      if task.isRunning() or !lastSynchronization? or new Date().getTime() - lastSynchronization.getTime() > @RefreshWalletInterval
+        @_updateSendButton(yes)
+        task.startIfNeccessary()
+        task.once 'done', =>
+          d.resolve()
+        task.once 'fatal_error', =>
+          d.reject(new Error("Fatal error during sync"))
+      else
+        d.resolve()
+      d.promise
+    .fail (er) =>
+      e er
+      _.delay(@_ensureDatabaseUpToDate.bind(this), 30 * 1000)
+      throw er
+    .then () =>
+      @_updateSendButton(no)
+      _.delay(@_ensureDatabaseUpToDate.bind(this), @RefreshWalletInterval)
+    return
+
+  _updateSendButton: (syncing = ledger.tasks.WalletLayoutRecoveryTask.instance.isRunning()) ->
+    if syncing
+      @view.sendButton.addClass('disabled')
+      @view.sendButton.text(t('wallet.send.index.syncing'))
+    else
+      @view.sendButton.removeClass('disabled')
+      @view.sendButton.text(t('common.send'))
