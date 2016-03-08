@@ -47,7 +47,6 @@ class ledger.wallet.Wallet
     paths
 
   initialize: (store, callback) ->
-    l "INIT WALLET ", store, new Error().stack
     @_store = store
     @_store.get ['accounts'], (result) =>
       @_accounts = []

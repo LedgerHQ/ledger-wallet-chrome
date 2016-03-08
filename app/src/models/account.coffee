@@ -82,7 +82,7 @@ class @Account extends ledger.database.Model
   retrieveBalance: () ->
     totalBalance = @get 'total_balance'
     unconfirmedBalance = @get 'unconfirmed_balance'
-    @set 'total_balance', @getBalanceFromUtxo(1).toString()
+    @set 'total_balance', @getBalanceFromUtxo(0).toString()
     @set 'unconfirmed_balance', @getBalanceFromUtxo(0).toString()
     @save()
     if ledger.Amount.fromSatoshi(totalBalance or 0).neq(@get('total_balance') or 0) or ledger.Amount.fromSatoshi(unconfirmedBalance or 0).neq(@get('unconfirmed_balance') or 0)
@@ -91,7 +91,7 @@ class @Account extends ledger.database.Model
       ledger.app.emit "wallet:balance:unchanged", @get('wallet').getBalance()
 
   getBalanceFromUtxo: (minConfirmation) ->
-    utxo = Output.utxo()
+    utxo = @getUtxo()
     total = ledger.Amount.fromSatoshi(0)
     return total unless @getWalletAccount()?
     for output in utxo

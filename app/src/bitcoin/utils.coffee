@@ -62,7 +62,6 @@ _.extend ledger.bitcoin,
   verifyRawTx: (tx, inputs, amount, fees, recipientAddress, changeAddress) ->
     Try =>
       try
-        debugger
         transaction = ledger.bitcoin.decodeTransaction(tx)
         inputAmount = ledger.Amount.fromSatoshi(0)
         inputAmount = inputAmount.add input.value for input in inputs

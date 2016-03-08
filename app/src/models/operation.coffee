@@ -40,7 +40,7 @@ class @Operation extends ledger.database.Model
   @_createOperationFromTransaction: (uid, type, tx, value, account) ->
     try
       # Inflate block if possible
-      block = Block.fromJson(tx['block'])?.save()
+      block = Block.fromJson(tx['block'])?.save() if tx['block']?['hash']?
       # Inflate transaction
       transaction = Transaction.fromJson(tx)
       inputs = []
