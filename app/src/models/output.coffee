@@ -27,3 +27,12 @@ class @Output extends ledger.database.Model
 
   @utxo: (context = ledger.database.contexts.main) ->
     output for output in @find(path: {$ne: undefined}, context).data() when _.isEmpty(Input.find(uid: output.get('uid'), context).data())
+
+  get: (key) ->
+    transaction = =>
+      transaction._tx if transaction._tx?
+      transaction._tx = @get('transaction')
+    switch key
+      when 'confirmations' then transaction().get 'confirmations'
+      when 'double_spent_priority' then transaction().get 'double_spent_priority'
+      else super key

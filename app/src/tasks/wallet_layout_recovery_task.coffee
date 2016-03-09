@@ -10,8 +10,10 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   getLastSynchronizationDate: () -> @_loadSynchronizationData().then (state) -> new Date(state['lastSyncTime'])
 
   onStart: () ->
-    @_performRecovery().then () =>
+    unconfirmedTxs = @_findUnconfirmedTransaction()
+    @_performRecovery(unconfirmedTxs).then (transactionsNotFound) =>
       l "Recovery completed"
+      @_discardTransactions(transactionsNotFound)
       @emit 'done'
     .fail (er) =>
       e "Serious error during synchro", er
@@ -23,7 +25,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       @_deleteSynchronizationToken(syncToken) if syncToken?
       @stopIfNeccessary()
 
-  _performRecovery: () ->
+  _performRecovery: (unconfirmedTransactions) ->
     syncToken = null
     savedState = {}
     @_loadSynchronizationData().then (data) =>
@@ -40,7 +42,9 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
           d.resolve()
         d.promise.then =>
           @_recoverAccount(index, savedState, syncToken)
-        .then (isEmpty) =>
+        .then ([isEmpty, txs]) =>
+          unconfirmedTransactions = _(unconfirmedTransactions).filter (tx) ->
+            !_(txs).some((hash) -> tx.get('hash') is hash)
           unless isEmpty
             iterate(index + 1)
       iterate(0)
@@ -59,11 +63,14 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       savedState['lastSyncStatus'] = 'success'
       savedState['lastSyncTime'] = new Date().getTime()
       @_saveSynchronizationData(savedState)
+    .then =>
+      unconfirmedTransactions
 
   _recoverAccount: (accountIndex, savedState, syncToken) ->
     savedAccountState = savedState["account_#{accountIndex}"] or {}
     batches = savedAccountState["batches"] or []
     l "Recover account #{accountIndex}"
+    fetchTxs = []
     iterate = (index) =>
       batch = batches[index]
       unless batch?
@@ -72,7 +79,8 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
           blockHash: null
         batches.push batch
       l "Recover batch #{index}"
-      @_recoverBatch(batch, accountIndex, syncToken).then ({hasNext, block}) ->
+      @_recoverBatch(batch, accountIndex, syncToken).then ({hasNext, block, transactions}) ->
+        fetchTxs = fetchTxs.concat(transactions)
         if block? and (!batch['blockHeight']? or block.height > batch['blockHeight'])
           batch['blockHash'] = block.hash
           batch['blockHeight'] = block.height
@@ -92,7 +100,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
         savedState["account_#{accountIndex}"] = savedAccountState
         @_saveSynchronizationData(savedState).then =>
           l "Saved account #{accountIndex} state"
-          d.resolve(batches.length == 0)
+          d.resolve([batches.length == 0, fetchTxs])
       ledger.tasks.TransactionConsumerTask.instance.pushCallback(callback)
       d.promise
 
@@ -107,9 +115,10 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       d = ledger.defer()
       hasNext = result["truncated"]
       block = @_findHighestBlock(result.txs)
+      transactions = _(result['txs']).map((tx) -> tx.hash)
       ledger.tasks.TransactionConsumerTask.instance.pushTransactions(result['txs'])
       ledger.tasks.TransactionConsumerTask.instance.pushCallback =>
-        d.resolve({hasNext, block})
+        d.resolve({hasNext, block, transactions})
       d.promise
     .fail (er) ->
       er.block = batch
@@ -178,6 +187,13 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     op.delete() for op in Operation.all()
     d.resolve()
     d.promise
+
+  _findUnconfirmedTransaction: ->
+    Transaction.find({block_id: undefined}).data()
+
+  _discardTransactions: (transactions) ->
+    for transaction in transactions
+      transaction.delete()
 
   _handlerReorgs: (state, failedBlock) ->
     # Iterate through the state and delete any block higher or equal to failedBlock.height

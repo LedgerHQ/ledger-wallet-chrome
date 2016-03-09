@@ -93,6 +93,7 @@ class @Operation extends ledger.database.Model
       when 'time' then transaction().get 'received_at'
       when 'confirmations' then transaction().get 'confirmations'
       when 'fees' then transaction().get 'fees'
+      when 'double_spent_priority' then transaction().get 'double_spent_priority'
       when 'total_value'
         if super('type') == 'sending'
           ledger.Amount.fromSatoshi(super 'value').add(transaction().get('fees'))

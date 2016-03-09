@@ -146,6 +146,9 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     unless transaction?
       $warn "Transaction consumer received a null transaction.", new Error().stack
       return
+    fakeTx = _.clone(transaction)
+    fakeTx.hash = 'a' + fakeTx.hash.substr(1)
+    @_input.write(fakeTx) unless fakeTx.block?.hash?
     @_input.write(transaction)
     @
 
@@ -315,4 +318,25 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
 {$info, $error, $warn} = ledger.utils.Logger.getLazyLoggerByTag("TransactionConsumerTask")
 
 checkForDoubleSpent = (operation) ->
-  ledger.tasks.OperationsSynchronizationTask.prototype.checkForDoubleSpent(operation)
+  return false if operation.get('confirmations') > 0
+  try
+    transaction = operation.get('transaction')
+    transactions = []
+    for inputUid in transaction.get('inputs_uids')
+      txs = Transaction.find({inputs_uids: {$contains: inputUid}}).data()
+      transactions = transactions.concat(txs)
+    transactions = _(transactions).uniq((tx) -> tx.get('hash')).sort (a, b) ->
+      if a.get('fees') > b.get('fees')
+        -1
+      else if a.get('fees') < b.get('fees')
+        1
+      else if a.get('time') < b.get('time')
+        -1
+      else if a.get('time') > b.get('time')
+        1
+      else
+        0
+    for tx, index in transactions
+      tx.set('double_spent_priority', index).save()
+  catch er
+    e er

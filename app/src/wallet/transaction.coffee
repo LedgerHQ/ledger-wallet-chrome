@@ -236,6 +236,8 @@ class ledger.wallet.Transaction
     return d.rejectWithError(Errors.DustTransaction) && d.promise if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
     totalUtxoAmount = _(utxo).chain().map((u) -> ledger.Amount.fromSatoshi(u.get('value'))).reduce(((a, b) -> a.add(b)), ledger.Amount.fromSatoshi(0)).value()
     return d.rejectWithError(Errors.NotEnoughFunds) && d.promise if totalUtxoAmount.lt(amount.add(fees))
+    # Check if UTXO are safe to spend
+    #return d.rejectWithError(Errors.No)
     $info("--- CREATE TRANSACTION ---")
     $info("Amount: ", amount.toString())
     $info("Fees: ", fees.toString())
