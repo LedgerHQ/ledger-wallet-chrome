@@ -42,7 +42,7 @@ class @Operation extends ledger.database.Model
       # Inflate block if possible
       block = Block.fromJson(tx['block'])?.save() if tx['block']?['hash']?
       # Inflate transaction
-      transaction = Transaction.fromJson(tx)
+      transaction = Transaction.fromJson(tx).save()
       inputs = []
       for i in tx['inputs']
         # Inflate inputs
@@ -68,7 +68,7 @@ class @Operation extends ledger.database.Model
         .set 'type', type
         .set 'value', value.toString()
         .set 'senders', senders
-        .set 'time', (new Date(tx['received_at'] or new Date().getTime())).getTime()
+        .set 'time', new Date(transaction.get('received_at')).getTime()
         .set 'recipients', recipients
         .save()
       operation

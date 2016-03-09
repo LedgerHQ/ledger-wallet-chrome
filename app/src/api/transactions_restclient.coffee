@@ -24,7 +24,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     @http().get
       url: "blockchain/v2/#{ledger.config.network.ticker}/transactions/#{transactionHash}/hex"
       onSuccess: (response) ->
-        callback?(response.hex)
+        callback?(response[0].hex)
       onError: @networkErrorCallback(callback)
 
   getTransactionsFromPaths: (paths, batchsize, callback) ->
@@ -78,7 +78,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
 
   postTransaction: (transaction, callback) ->
     @http().post
-      url: "blockchain/v2/#{ledger.config.network.ticker}/pushtx",
+      url: "blockchain/#{ledger.config.network.ticker}/pushtx",
       data: {tx: transaction.getSignedTransaction()}
       onSuccess: (response) ->
         transaction.setHash(response.transaction_hash)
@@ -87,7 +87,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
 
   postTransactionHex: (txHex, callback) ->
     @http().post
-      url: "blockchain/v2/#{ledger.config.network.ticker}/pushtx",
+      url: "blockchain/#{ledger.config.network.ticker}/pushtx",
       data: {tx: txHex}
       onSuccess: (response) ->
         callback?(response.transaction_hash)

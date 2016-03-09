@@ -38,6 +38,11 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     super
     @view.amountInput.focus()
 
+  onDismiss: ->
+    super
+    clearTimeout(@_scheduledRefresh) if @_scheduledRefresh?
+
+
   cancel: ->
     Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
     @dismiss()
@@ -52,7 +57,6 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
 
       pushDialogBlock = (fees) =>
         {utxo, fees} = @_computeAmount(ledger.Amount.fromSatoshi(fees).divide(1000))
-        # TODO check UTXO confirmations here
         dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount(), utxo: utxo
         @getDialog().push dialog
 
@@ -196,12 +200,14 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
         d.resolve()
       d.promise
     .fail (er) =>
+      return unless @isShown()
       e er
-      _.delay(@_ensureDatabaseUpToDate.bind(this), 30 * 1000)
+      @_scheduledRefresh = _.delay(@_ensureDatabaseUpToDate.bind(this), 30 * 1000)
       throw er
     .then () =>
+      return unless @isShown()
       @_updateSendButton(no)
-      _.delay(@_ensureDatabaseUpToDate.bind(this), @RefreshWalletInterval)
+      @_scheduledRefresh = _.delay(@_ensureDatabaseUpToDate.bind(this), @RefreshWalletInterval)
     return
 
   _updateSendButton: (syncing = ledger.tasks.WalletLayoutRecoveryTask.instance.isRunning()) ->

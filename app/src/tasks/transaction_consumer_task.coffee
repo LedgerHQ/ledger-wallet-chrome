@@ -146,9 +146,6 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
     unless transaction?
       $warn "Transaction consumer received a null transaction.", new Error().stack
       return
-    fakeTx = _.clone(transaction)
-    fakeTx.hash = 'a' + fakeTx.hash.substr(1)
-    @_input.write(fakeTx) unless fakeTx.block?.hash?
     @_input.write(transaction)
     @
 
@@ -290,7 +287,6 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
         operation = Operation.fromSend(tx, account)
         ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
         operation.save()
-        checkForDoubleSpent(operation)
         (transaction.operations ||= []).push operation
       isReception =
         _(transaction.ownOutputs or []).chain().some(
@@ -303,8 +299,8 @@ class ledger.tasks.TransactionConsumerTask extends ledger.tasks.Task
         operation = Operation.fromReception(tx, account)
         ledger.app.emit (if operation.isInserted() then 'wallet:operations:update' else 'wallet:operations:new'), [operation]
         operation.save()
-        checkForDoubleSpent(operation)
         (transaction.operations ||= []).push operation
+      checkForDoubleSpent(operation)
       do next
     .done =>
       _.defer =>
