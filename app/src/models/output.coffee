@@ -26,7 +26,9 @@ class @Output extends ledger.database.Model
     @findOrCreate(uid: uid, base, context)
 
   @utxo: (context = ledger.database.contexts.main) ->
-    output for output in @find(path: {$ne: undefined}, context).data() when _.isEmpty(Input.find(uid: output.get('uid'), context).data())
+    result = (output for output in @find(path: {$ne: undefined}, context).data() when _.isEmpty(Input.find(uid: output.get('uid'), context).data()))
+    result.sort (a, b) ->
+      b.get('confirmations') - a.get('confirmations')
 
   get: (key) ->
     transaction = =>
