@@ -78,6 +78,12 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
     @_updateReloadIconState()
 
   _onSynchronizationStateChanged: ->
+    ledger.tasks.WalletLayoutRecoveryTask.instance.getLastSynchronizationStatus().then (state) =>
+      if state is 'failure'and !@_syncFailureDialog?
+        @_syncFailureDialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("common.errors.synchronization_error"), subtitle: t('common.errors.error_during_synchronization'))
+        @_syncFailureDialog.show()
+        @_syncFailureDialog.on 'dismiss', =>
+          @_syncFailureDialog = undefined
     _.defer @_updateReloadIconState
 
   _updateReloadIconState: =>

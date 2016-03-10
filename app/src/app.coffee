@@ -91,8 +91,6 @@ require @ledger.imports, ->
         _.defer =>
           ledger.tasks.TransactionObserverTask.instance.startIfNeccessary()
           ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() unless result.operation_consumption
-        dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t('common.errors.error_during_synchronization'))
-        dialog.show()
 
     onDongleIsDisconnected: (dongle) ->
       @emit 'dongle:disconnected'

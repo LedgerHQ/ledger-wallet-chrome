@@ -191,7 +191,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     task = ledger.tasks.WalletLayoutRecoveryTask.instance
     task.getLastSynchronizationDate().then (lastSynchronization) =>
       d = ledger.defer()
-      if task.isRunning() or !lastSynchronization? or new Date().getTime() - lastSynchronization.getTime() > @RefreshWalletInterval
+      if task.isRunning() or !lastSynchronization? or new Date().getTime() - lastSynchronization.getTime() > @RefreshWalletInterval or _.isNaN(lastSynchronization.getTime())
         @_updateSendButton(yes)
         task.startIfNeccessary()
         task.once 'done', =>
