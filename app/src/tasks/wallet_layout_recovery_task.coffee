@@ -26,7 +26,8 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     .fin =>
       # Delete sync token and stop
       ledger.api.BlockRestClient.instance.refreshLastBlock()
-      @_deleteSynchronizationToken(syncToken) if syncToken?
+      @_deleteSynchronizationToken(@_syncToken) if @_syncToken?
+      @_syncToken = null
       @stopIfNeccessary()
 
   _performRecovery: (unconfirmedTransactions) ->
@@ -36,6 +37,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       savedState = data
       @_requestSynchronizationToken()
     .then (token) =>
+      @_syncToken = token
       syncToken = token
       hdWallet = ledger.wallet.Wallet.instance
       iterate = (index) =>

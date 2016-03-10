@@ -14,7 +14,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
   deleteSyncToken: (token, callback) ->
     @http().setHttpHeader("X-LedgerWallet-SyncToken", token)
     @http().delete
-      url: "blokchain/v2/#{ledger.config.network.ticker}/syncToken"
+      url: "blockchain/v2/#{ledger.config.network.ticker}/syncToken"
       onSuccess: (response) ->
         callback?()
       onError: @networkErrorCallback(callback)
