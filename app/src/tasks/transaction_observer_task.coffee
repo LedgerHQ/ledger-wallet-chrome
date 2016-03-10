@@ -31,13 +31,9 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
     Block.fromJson(json).save()
     ledger.app.emit 'wallet:operations:update'
     for transactionHash in block['transaction_hashes']
-      if Operation.find(hash: transactionHash).count() > 0
+      if Transaction.find(hash: transactionHash).count() > 0
         @logger().trace 'Found transaction in block'
-        if ledger.tasks.OperationsSynchronizationTask.instance.isRunning()
-          ledger.tasks.OperationsSynchronizationTask.instance.synchronizeConfirmationNumbers()
-        else
-          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary()
-        Wallet.instance?.retrieveAccountsBalances()
+        ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
         return
 
   @instance: new @()
