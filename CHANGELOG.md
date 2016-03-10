@@ -4,6 +4,9 @@
 - Incremental wallet synchronization
 - Better fee computation (use fee per byte instead of fee per kb)
 - Improved performances
+- Add korean translation
+- Add indonesian translation
+- Add malay translation
 
 1.4.10
 ===
