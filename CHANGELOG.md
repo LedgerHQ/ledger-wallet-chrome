@@ -1,4 +1,10 @@
 # Changelog
+1.5.0
+===
+- Incremental wallet synchronization
+- Better fee computation (use fee per byte instead of fee per kb)
+- Improved performances
+
 1.4.10
 ===
 - Add italian translation
