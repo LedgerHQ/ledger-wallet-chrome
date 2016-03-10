@@ -1,3 +1,7 @@
+$log = -> ledger.utils.Logger.getLoggerByTag("WalletLayoutRecoveryTask")
+$info = (args...) -> $log().info args...
+$error = (args...) -> $log().error args...
+
 class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
 
   BatchSize: 20
@@ -52,7 +56,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       # Handle reorgs
       e "Failure during synchro", er
       if er?.getStatusCode?() is 404
-        @_handlerReorgs(savedState, er.block).then () =>
+        @_handleReorgs(savedState, er.block).then () =>
           @_performRecovery()
       else
         # Mark failure and save
@@ -195,10 +199,23 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     for transaction in transactions
       transaction.delete()
 
-  _handlerReorgs: (state, failedBlock) ->
+  _handleReorgs: (savedState, failedBlock) ->
     # Iterate through the state and delete any block higher or equal to failedBlock.height
     # Remove from the database all orphan transaction and blocks
     # Save the new state
+    $info("Handle reorg for block #{failedBlock.blockHash} at #{failedBlock.blockHeight}")
+    previousBlock = Block.find({height: {$lt: failedBlock.blockHeight}}).simpleSort("height", true).limit(1).data()[0]
+    $info("Revert to block #{previousBlock.get('hash')} at #{previousBlock.get('height')}")
+    idx = 0
+    while savedState["account_#{idx}"]?
+      for batch in savedState["account_#{idx}"]["batches"]
+        if batch.blockHeight > previousBlock.get('height')
+          batch.blockHeight = previousBlock.get('height')
+          batch.blockHash = previousBlock.get('hash')
+      idx += 1
+    for block in Block.find({height: {$gte: failedBlock.blockHeight}}).data()
+      block.delete()
+    @_saveSynchronizationData(savedState)
 
   @reset: () ->
     @instance = new @
