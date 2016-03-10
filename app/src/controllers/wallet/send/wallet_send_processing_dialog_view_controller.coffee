@@ -44,7 +44,7 @@ class @WalletSendProcessingDialogViewController extends ledger.common.DialogView
           new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.network_no_response"))
         else if error?
           Api.callback_cancel 'send_payment', t("common.errors.push_transaction_failed")
-          new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.push_transaction_failed"))
+          new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.sending_failed"), subtitle: t("common.errors.error_occurred"))
         else
           Api.callback_success 'send_payment', transaction: transaction.serialize()
           new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.send.errors.sending_succeeded"), subtitle: t("wallet.send.errors.transaction_completed"))

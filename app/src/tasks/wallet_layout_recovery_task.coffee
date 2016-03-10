@@ -64,6 +64,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
         @_saveSynchronizationData(savedState)
         throw er
     .then =>
+      throw "Toto is here"
       savedState['lastSyncStatus'] = 'success'
       savedState['lastSyncTime'] = new Date().getTime()
       @_saveSynchronizationData(savedState)
