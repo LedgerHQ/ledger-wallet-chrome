@@ -51,8 +51,9 @@ class @Operation extends ledger.database.Model
       transaction.set('inputs_uids', inputs)
       for o in (tx['ownOutputs'] or [])
         # Inflate outputs
-        output = Output.fromJson(tx['hash'], o).save() unless _.isEmpty(o.paths)
-        transaction.add('outputs', output)
+        unless _.isEmpty(o.paths)
+          output = Output.fromJson(tx['hash'], o).save()
+          transaction.add('outputs', output)
       transaction.save()
       block?.add('transactions', transaction).save()
 
