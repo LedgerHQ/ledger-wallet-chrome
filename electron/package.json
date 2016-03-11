@@ -1,7 +1,16 @@
 {
   "name": "ledger-wallet",
   "version": "0.0.1",
-  "private": true,
+  "main"    : "main.js",
+  "scripts": {
+    "start": "./node_modules/.bin/electron main.js",
+    "postinstall": "./node_modules/.bin/electron-rebuild --pre-gyp-fix --force"
+  },
   "dependencies": {
+    "node-hid": "0.5.1"
+  },
+  "devDependencies": {
+    "electron-prebuilt": "0.36.10",
+    "electron-rebuild": "1.1.3"
   }
 }

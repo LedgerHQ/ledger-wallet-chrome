@@ -1,4 +1,5 @@
 require_script = (url, callback) ->
+  console.log("Require script ", url)
   script = document.createElement('script')
   script.type = 'text/javascript'
   script.src = '../src/' + url + '.js' + '?' + (new Date().getTime())
@@ -7,6 +8,12 @@ require_script = (url, callback) ->
       script.onload = script.onreadystatechange;
   document.getElementsByTagName('head')[0].appendChild(script)
   script
+
+@electron = @module
+if @electron?
+  electron_require = require
+@exports = undefined
+delete @module
 
 @require = (urls, callback) ->
   self = this

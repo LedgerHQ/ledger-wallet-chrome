@@ -87,6 +87,8 @@ class ledger.i18n
   @_loadTranslationFile: (tag) ->
     d = ledger.defer()
     url = '/_locales/' + tag + '/messages.json'
+    if window.electron?
+      url = __dirname + "/../" + url
     $.ajax
       dataType: "json",
       url: url,

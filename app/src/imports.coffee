@@ -66,6 +66,11 @@
         '../libs/zip/inflate'
         '../libs/zip/deflate'
 
+        # Electron
+        'electron/runtime'
+        'electron/usb'
+        'electron/hid'
+
         # Used be m2fa.DebugClient
         '../libs/btchip/ucrypt/ka'
         '../libs/btchip/ucrypt/pad'
