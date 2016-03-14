@@ -1,6 +1,8 @@
 return unless @electron?
 
-HID = electron.require("node-hid")
+HID = electron.require("transport-api")
+
+console.log("TRANSPORT ", HID.aString())
 
 empty = (msg) ->
   e "#{msg}: Not implemented"

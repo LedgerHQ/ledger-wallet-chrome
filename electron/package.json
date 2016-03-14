@@ -4,10 +4,11 @@
   "main"    : "main.js",
   "scripts": {
     "start": "./node_modules/.bin/electron main.js",
-    "postinstall": "./node_modules/.bin/electron-rebuild --pre-gyp-fix --force"
+    "postinstall": "./node_modules/.bin/electron-rebuild"
   },
   "dependencies": {
-    "node-hid": "0.5.1"
+    "transport-api": "file:./transport_api",
+    "nan": "^2.0.5"
   },
   "devDependencies": {
     "electron-prebuilt": "0.36.10",
