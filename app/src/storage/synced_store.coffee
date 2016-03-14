@@ -220,8 +220,9 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
 
   _computeCommit: (data, changes) ->
     data = @_applyChanges(data, changes)
+    data.__hashes = (data.__hashes or []).slice(0, @HASHES_CHAIN_MAX_SIZE - 1)
     commitHash = ledger.crypto.SHA256.hashString _(data).toJson()
-    data.__hashes = [commitHash].concat(data.__hashes or []).slice(0, @HASHES_CHAIN_MAX_SIZE)
+    data.__hashes = [commitHash].concat(data.__hashes)
     [commitHash, data]
 
   _areChangesMeaningful: (data, changes) ->

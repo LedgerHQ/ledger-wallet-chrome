@@ -20,7 +20,7 @@ class @Output extends ledger.database.Model
       transaction_hash: transactionHash
       index: output['output_index']
       value: output['value']
-      address: output['addresses'][0]
+      address: output['addresses']?[0]
       path: ledger.wallet.Wallet.instance.cache.getDerivationPath(output['addresses'][0])
       script_hex: output['script_hex']
     @findOrCreate(uid: uid, base, context)
