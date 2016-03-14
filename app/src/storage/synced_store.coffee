@@ -101,7 +101,12 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     # If local md5 and distant md5 are different
       # -> pull the data
       # -> merge data
-    @client.get_settings_md5().then (md5) =>
+    @_getAllData()
+    .then (data) =>
+      unless @_areChangesMeaningful(data, @_changes)
+        @_changes = []
+    .then () => @client.get_settings_md5()
+    .then (md5) =>
       $info 'Remote md5: ', md5, ', local md5', @_lastMd5
       return yes if @_lastMd5 is md5
       @client.get_settings().then (data) =>
