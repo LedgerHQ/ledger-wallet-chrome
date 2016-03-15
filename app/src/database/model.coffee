@@ -21,6 +21,7 @@ class @ledger.database.Model extends @EventEmitter
     @_object = base
     @_needsUpdate = if @isInserted() then no else yes
     @_deleted = no
+    @_changes = []
 
   get: (key) ->
     if @getRelationships()?[key]?
@@ -50,6 +51,7 @@ class @ledger.database.Model extends @EventEmitter
     else
       @_object[key] = value
     @_needsUpdate = yes
+    @_changes.push {type: 'set', key: key, value: value}
     @
 
   remove: (key, value) ->
@@ -65,6 +67,7 @@ class @ledger.database.Model extends @EventEmitter
       if _.contains(@_object[key], value)
         @_object[key] = _.without(@_object[key], value)
     @_needsUpdate = yes
+    @_changes.push {type: 'remove', key: key, value: value}
     @
 
   add: (key, value) ->
@@ -79,6 +82,7 @@ class @ledger.database.Model extends @EventEmitter
       unless _.contains(@_object[key], value)
         @_object[key].push value
     @_needsUpdate = yes
+    @_changes.push {type: 'add', key: key, value: value}
     @
 
   save: () ->
@@ -89,7 +93,8 @@ class @ledger.database.Model extends @EventEmitter
     else if @onInsert() isnt false
       @_collection.insert this
       @_commitPendingRelationships()
-      @_needsUpdate = no
+    @_needsUpdate = no
+    @_changes = []
     @
 
   delete: () ->
@@ -116,6 +121,10 @@ class @ledger.database.Model extends @EventEmitter
       @_deleted = true
       @_collection.remove this
       return
+
+  getChanges: -> @_changes
+
+  hasKeyChanged: (key) -> _(@_changes).some (change) -> change.key is key
 
   refresh: () ->
     @_collection.refresh this

@@ -45,7 +45,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
         @getAll (data) =>
           @_data = data
           @_changes = @_cleanChanges(data, item['__sync_changes'].concat(@_changes)) if item['__sync_changes']?
-          $info 'Initialize store: ', md5: @_lastMd5, changes: @_changes, init: item, data: data
+          $info 'Initialize store: ', md5: @_lastMd5, changes: _.clone(@_changes), init: item, data: data
           @pull()
           @push() if @_changes.length > 0
 
@@ -117,9 +117,11 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
         $info 'Changes before merge', @_changes
         @_merge(data).then =>
           @_setLastMd5(md5)
+          $info "Storage pulled"
           @emit 'pulled'
           yes
     .fail (e) =>
+      $error "Pull error", e
       if e.status is 404
         throw Errors.NoRemoteData
       throw Errors.NetworkError

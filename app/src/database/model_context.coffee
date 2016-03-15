@@ -101,10 +101,11 @@ class Collection
     return unless model.hasSynchronizedProperties()
     dataToSet = {}
     dataToRemove = {}
-    for key, value of model.getSynchronizedProperties()
+    for key, value of model.getSynchronizedProperties() when model.hasKeyChanged(key)
       (if value? then dataToSet else dataToRemove)[key] = value
-    @_getModelSyncSubstore(model).set(dataToSet)
-    @_getModelSyncSubstore(model).remove(_(dataToRemove).keys())
+    l "Update sync model with", dataToSet, dataToRemove
+    @_getModelSyncSubstore(model).set(dataToSet) unless _.isEmpty(dataToSet)
+    @_getModelSyncSubstore(model).remove(_(dataToRemove).keys()) unless _.isEmpty(dataToRemove)
 
   _removeSynchronizedProperties: (model) ->
     return unless model.hasSynchronizedProperties()
@@ -170,6 +171,7 @@ class ledger.database.contexts.Context extends EventEmitter
       collection.getCollection().ensureIndex(index.field) for index in modelClass._indexes if modelClass.__indexes?
     try
       new ledger.database.MigrationHandler(@).applyMigrations()
+      @onSyncStorePulled()
     catch er
       e er
 
@@ -194,18 +196,19 @@ class ledger.database.contexts.Context extends EventEmitter
       @emit "update:" + _.str.underscored(data['objType']).toLowerCase(), @_modelize(data)
 
   onSyncStorePulled: ->
-    @_syncStore.getAll (data) =>
-      for name, collection of @_collections
-        continue unless collection.getModelClass().hasSynchronizedProperties()
-        collectionData = _(data).pick (v, k) -> k.match("__sync_#{_.str.underscored(name).toLowerCase()}")?
-        unless _(collectionData).isEmpty()
-          collection.updateSynchronizedProperties(collectionData)
-        else
-          # delete all
-          $info 'Delete all', collectionData
-          $info 'Received data', data
-          collection.getModelClass().chain(this).remove()
-      @emit 'synchronized'
+    _.defer =>
+      @_syncStore.getAll (data) =>
+        for name, collection of @_collections
+          continue unless collection.getModelClass().hasSynchronizedProperties()
+          collectionData = _(data).pick (v, k) -> k.match("__sync_#{_.str.underscored(name).toLowerCase()}")?
+          unless _(collectionData).isEmpty()
+            collection.updateSynchronizedProperties(collectionData)
+          else
+            # delete all
+            $info 'Delete all', collectionData
+            $info 'Received data', data
+            collection.getModelClass().chain(this).remove()
+        @emit 'synchronized'
 
   refresh: ->
     d = ledger.defer()
