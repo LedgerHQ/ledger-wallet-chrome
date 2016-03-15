@@ -103,7 +103,6 @@ class Collection
     dataToRemove = {}
     for key, value of model.getSynchronizedProperties() when model.hasKeyChanged(key)
       (if value? then dataToSet else dataToRemove)[key] = value
-    l "Update sync model with", dataToSet, dataToRemove
     @_getModelSyncSubstore(model).set(dataToSet) unless _.isEmpty(dataToSet)
     @_getModelSyncSubstore(model).remove(_(dataToRemove).keys()) unless _.isEmpty(dataToRemove)
 
