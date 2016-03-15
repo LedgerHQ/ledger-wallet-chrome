@@ -4,7 +4,7 @@ $error = (args...) -> $log().error args...
 
 class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
 
-  BatchSize: 20
+  BatchSize: 100
 
   constructor: -> super 'recovery-global-instance'
 
@@ -15,6 +15,8 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
 
   onStart: () ->
     unconfirmedTxs = @_findUnconfirmedTransaction()
+    startDate = new Date()
+    $info "Start synchronization", startDate.toString()
     @_performRecovery(unconfirmedTxs).then (transactionsNotFound) =>
       l "Recovery completed"
       @_discardTransactions(transactionsNotFound)
@@ -28,13 +30,17 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       ledger.api.BlockRestClient.instance.refreshLastBlock()
       @_deleteSynchronizationToken(@_syncToken) if @_syncToken?
       @_syncToken = null
+      duration = moment.duration(new Date().getTime() - startDate.getTime())
+      $info "Stop synchronization. Synchronization took #{duration.get("minutes")}:#{duration.get("seconds")}:#{duration.get("milliseconds")}"
       @stopIfNeccessary()
 
   _performRecovery: (unconfirmedTransactions) ->
     syncToken = null
     savedState = {}
+    persistState = no
     @_loadSynchronizationData().then (data) =>
-      savedState = data
+      savedState = @_migrateSavedState(data)
+      persistState = yes
       @_requestSynchronizationToken()
     .then (token) =>
       @_syncToken = token
@@ -63,12 +69,12 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       else
         # Mark failure and save
         savedState['lastSyncStatus'] = 'failure'
-        @_saveSynchronizationData(savedState)
+        @_saveSynchronizationData(savedState) if persistState
         throw er
     .then =>
       savedState['lastSyncStatus'] = 'success'
       savedState['lastSyncTime'] = new Date().getTime()
-      @_saveSynchronizationData(savedState)
+      @_saveSynchronizationData(savedState) if persistState
     .then =>
       unconfirmedTransactions
 
@@ -218,6 +224,19 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     for block in Block.find({height: {$gte: failedBlock.blockHeight}}).data()
       block.delete()
     @_saveSynchronizationData(savedState)
+
+  _migrateSavedState: (state = {}) ->
+    oldBatchSize = state["batch_size"] or 20
+    if (oldBatchSize != @BatchSize)
+      idx = 0
+      while state["account_#{idx}"]?
+        oldBatches = state["account_#{idx}"]["batches"]
+        batches = []
+        total  = oldBatches.length * oldBatchSize
+        state["account_#{idx}"] = batches: batches
+        idx += 1
+    state["batch_size"] = @BatchSize
+    state
 
   @reset: () ->
     @instance = new @
