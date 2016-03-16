@@ -4,7 +4,7 @@ $error = (args...) -> $log().error args...
 
 class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
 
-  BatchSize: 20
+  BatchSize: 50
 
   constructor: -> super 'recovery-global-instance'
 
@@ -16,8 +16,12 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   onStart: () ->
     unconfirmedTxs = @_findUnconfirmedTransaction()
     startDate = new Date()
+    lastBlock = null
     $info "Start synchronization", startDate.toString()
-    @_performRecovery(unconfirmedTxs).then (transactionsNotFound) =>
+    ledger.api.BlockRestClient.instance.refreshLastBlock().then (block) =>
+      lastBlock = block
+      @_performRecovery(lastBlock, unconfirmedTxs)
+    .then (transactionsNotFound) =>
       l "Recovery completed"
       @_discardTransactions(transactionsNotFound)
       @emit 'done'
@@ -27,14 +31,13 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       @emit 'fatal_error'
     .fin =>
       # Delete sync token and stop
-      ledger.api.BlockRestClient.instance.refreshLastBlock()
       @_deleteSynchronizationToken(@_syncToken) if @_syncToken?
       @_syncToken = null
       duration = moment.duration(new Date().getTime() - startDate.getTime())
       $info "Stop synchronization. Synchronization took #{duration.get("minutes")}:#{duration.get("seconds")}:#{duration.get("milliseconds")}"
       @stopIfNeccessary()
 
-  _performRecovery: (unconfirmedTransactions) ->
+  _performRecovery: (lastBlock, unconfirmedTransactions) ->
     savedState = {}
     persistState = no
     @_loadSynchronizationData().then (data) =>
@@ -59,9 +62,20 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       unconfirmedTransactions = unconfirmed
       savedState['lastSyncStatus'] = 'success'
       savedState['lastSyncTime'] = new Date().getTime()
+      savedState = @_normalizeCurrentBlock(lastBlock, savedState)
       @_saveSynchronizationData(savedState) if persistState
     .then =>
       unconfirmedTransactions
+
+  _normalizeCurrentBlock: (block, state) ->
+    accountIndex = 0
+    while state["account_#{accountIndex}"]?
+      for batch in (state["account_#{accountIndex}"]["batches"] or [])
+        if batch.blockHeight < block.height
+          batch.blockHeight = block.height
+          batch.blockHash = block.hash
+      accountIndex += 1
+    state
 
   _numberOfAccountInState: (savedState) ->
     accountIndex = 0
