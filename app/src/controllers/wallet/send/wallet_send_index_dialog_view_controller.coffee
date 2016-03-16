@@ -12,7 +12,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     accountsSelect: '#accounts_select'
     colorSquare: '#color_square'
 
-  RefreshWalletInterval: 2 * 60 * 1000 # 2 Minutes
+  RefreshWalletInterval: 15 * 60 * 1000 # 15 Minutes
 
   onAfterRender: () ->
     super

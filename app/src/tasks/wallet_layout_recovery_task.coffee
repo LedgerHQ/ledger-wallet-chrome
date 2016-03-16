@@ -4,7 +4,7 @@ $error = (args...) -> $log().error args...
 
 class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
 
-  BatchSize: 100
+  BatchSize: 20
 
   constructor: -> super 'recovery-global-instance'
 
@@ -35,7 +35,6 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       @stopIfNeccessary()
 
   _performRecovery: (unconfirmedTransactions) ->
-    syncToken = null
     savedState = {}
     persistState = no
     @_loadSynchronizationData().then (data) =>
@@ -44,22 +43,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       @_requestSynchronizationToken()
     .then (token) =>
       @_syncToken = token
-      syncToken = token
-      hdWallet = ledger.wallet.Wallet.instance
-      iterate = (index) =>
-        d = ledger.defer()
-        l "Register xpub ", "#{hdWallet.getRootDerivationPath()}/#{index}'"
-        account = hdWallet.getOrCreateAccount(index)
-        ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath account.getRootDerivationPath(), ->
-          d.resolve()
-        d.promise.then =>
-          @_recoverAccount(index, savedState, syncToken)
-        .then ([isEmpty, txs]) =>
-          unconfirmedTransactions = _(unconfirmedTransactions).filter (tx) ->
-            !_(txs).some((hash) -> tx.get('hash') is hash)
-          unless isEmpty
-            iterate(index + 1)
-      iterate(0)
+      @_recoverAccounts(unconfirmedTransactions, savedState, token)
     .fail (er) =>
       # Handle reorgs
       e "Failure during synchro", er
@@ -71,50 +55,99 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
         savedState['lastSyncStatus'] = 'failure'
         @_saveSynchronizationData(savedState) if persistState
         throw er
-    .then =>
+    .then (unconfirmed) =>
+      unconfirmedTransactions = unconfirmed
       savedState['lastSyncStatus'] = 'success'
       savedState['lastSyncTime'] = new Date().getTime()
       @_saveSynchronizationData(savedState) if persistState
     .then =>
       unconfirmedTransactions
 
-  _recoverAccount: (accountIndex, savedState, syncToken) ->
-    savedAccountState = savedState["account_#{accountIndex}"] or {}
-    batches = savedAccountState["batches"] or []
-    l "Recover account #{accountIndex}"
-    fetchTxs = []
-    iterate = (index) =>
-      batch = batches[index]
-      unless batch?
-        batch =
-          index: index
-          blockHash: null
-        batches.push batch
-      l "Recover batch #{index}"
-      @_recoverBatch(batch, accountIndex, syncToken).then ({hasNext, block, transactions}) ->
-        fetchTxs = fetchTxs.concat(transactions)
-        if block? and (!batch['blockHeight']? or block.height > batch['blockHeight'])
-          batch['blockHash'] = block.hash
-          batch['blockHeight'] = block.height
-        if !block? and !batch['blockHash']?
-          batches.splice(-1, 1)
-        if hasNext
-          iterate(index)
-        else if !hasNext and batch['blockHash']?
-          iterate(index + 1)
+  _numberOfAccountInState: (savedState) ->
+    accountIndex = 0
+    while savedState["account_#{accountIndex}"]?
+      accountIndex += 1
+    accountIndex
 
-    iterate(0).then () =>
-      d = ledger.defer()
-      l "Account #{accountIndex} restored!"
-      callback = =>
-        l "Saving account #{accountIndex} state"
-        savedAccountState["batches"] = batches
-        savedState["account_#{accountIndex}"] = savedAccountState
-        @_saveSynchronizationData(savedState).then =>
-          l "Saved account #{accountIndex} state"
-          d.resolve([batches.length == 0, fetchTxs])
-      ledger.tasks.TransactionConsumerTask.instance.pushCallback(callback)
-      d.promise
+  _recoverAccounts: (unconfirmedTransactions, savedState, syncToken) ->
+    hdWallet = ledger.wallet.Wallet.instance
+    accountsCount = @_numberOfAccountInState(savedState)
+    recover = (fromIndex, toIndex = 0) =>
+      promises = []
+      accountIndex = fromIndex
+      while savedState["account_#{accountIndex}"]? or accountIndex <= toIndex
+        account = hdWallet.getOrCreateAccount(accountIndex)
+        do (account) =>
+          d = ledger.defer()
+          ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath account.getRootDerivationPath(), =>
+            d.resolve(@_recoverAccount(account, savedState, syncToken))
+          promises.push d.promise
+        accountIndex += 1
+      Q.all(promises)
+
+    recoverUntilEmpty = (fromIndex = 0, toIndex = 0) =>
+      recover(fromIndex, toIndex).then (results) =>
+        containsEmpty = no
+        for [isEmpty, txs] in results
+          containsEmpty ||= isEmpty
+          unconfirmedTransactions = _(unconfirmedTransactions).filter (tx) ->
+            !_(txs).some((hash) -> tx.get('hash') is hash)
+        unless containsEmpty
+          accountsCount += 1
+          recoverUntilEmpty(accountsCount, accountsCount)
+        else
+          unconfirmedTransactions
+      .fail (er) =>
+        throw er
+
+    recoverUntilEmpty()
+
+  _recoverAccount: (account, savedState, syncToken) ->
+    $info "Recover account #{account.index}"
+    savedAccountState = savedState["account_#{account.index}"] or {}
+    savedState["account_#{account.index}"] = savedAccountState
+    batches = savedAccountState["batches"] or []
+    savedAccountState["batches"] = batches
+    fetchTxs = []
+
+    recover = (fromIndex, toIndex) =>
+      promises = []
+      for index in [fromIndex..toIndex]
+        do (index) =>
+          batch = batches[index]
+          unless batch?
+            batch =
+              index: index
+              blockHash: null
+            batches.push batch
+          $info "Recover batch #{batch.index} for account #{account.index}"
+          recoverUntilEnd = () =>
+            @_recoverBatch(batch, account.index, syncToken).then ({hasNext, block, transactions}) =>
+              fetchTxs = fetchTxs.concat(transactions)
+              if block? and (!batch['blockHeight']? or block.height > batch['blockHeight'])
+                batch['blockHash'] = block.hash
+                batch['blockHeight'] = block.height
+              d = ledger.defer()
+              l "Batch #{batch.index} for account #{account.index} has next", hasNext
+              if hasNext
+                ledger.tasks.TransactionConsumerTask.instance.pushCallback =>
+                  d.resolve(recoverUntilEnd())
+              else
+                d.resolve()
+              d.promise
+          promises.push recoverUntilEnd()
+      Q.all(promises)
+
+
+    recoverUntilEmpty = (fromIndex = 0, toIndex = Math.max(batches.length - 1, 0)) =>
+      recover(fromIndex, toIndex).then () =>
+        if _(batches).last().blockHash?
+          recoverUntilEmpty(batches.length, batches.length)
+        else
+          [batches.length <= 1, fetchTxs]
+      .fail (er) =>
+        throw er
+    recoverUntilEmpty()
 
   _recoverBatch: (batch, accountIndex, syncToken) ->
     wallet = ledger.wallet.Wallet.instance
