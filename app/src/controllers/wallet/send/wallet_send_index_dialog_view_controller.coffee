@@ -26,6 +26,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     # configure view
     @view.amountInput.amountInput(ledger.preferences.instance.getBitcoinUnitMaximumDecimalDigitsCount())
     @view.errorContainer.hide()
+    @_utxo = []
     @_updateFeesSelect()
     @_updateAccountsSelect()
     @_updateCurrentAccount()
@@ -33,6 +34,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     @_listenEvents()
     @_ensureDatabaseUpToDate()
     @_updateSendButton()
+    @_updateTotalLabel = _.debounce(@_updateTotalLabel.bind(this), 500)
 
   onShow: ->
     super
@@ -108,6 +110,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @_updateCurrentAccount()
       @_updateTotalLabel()
     ledger.app.on 'wallet:operations:changed', =>
+      @_updateUtxo()
       @_updateTotalLabel()
 
   _receiverBitcoinAddress: ->
@@ -154,9 +157,14 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       option = $('<option></option>').text(account.name + ' (' + ledger.formatters.formatValue(account.balance) + ')').val(account.index)
       option.attr('selected', true) if @params.account_id? and account.index is +@params.account_id
       @view.accountsSelect.append option
+    @_updateUtxo()
 
   _updateCurrentAccount: ->
+    @_updateUtxo()
     @_updateColorSquare()
+
+  _updateUtxo: ->
+    @_utxo = _(@_selectedAccount().getUtxo()).sortBy (o) -> o.get('transaction').get('confirmations')
 
   _updateColorSquare: ->
     @view.colorSquare.css('color', @_selectedAccount().get('color'))
@@ -169,7 +177,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     desiredAmount = ledger.Amount.fromSatoshi(@_transactionAmount())
     if desiredAmount.lte(0)
       return total: ledger.Amount.fromSatoshi(0), amount: ledger.Amount.fromSatoshi(0), fees: ledger.Amount.fromSatoshi(0), utxo: [], size: 0
-    utxo = _(account.getUtxo()).sortBy (o) -> o.get('transaction').get('confirmations')
+    utxo = @_utxo
     compute = (target) =>
       selectedUtxo = []
       total = ledger.Amount.fromSatoshi(0)
@@ -206,6 +214,9 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       e er
       @_scheduledRefresh = _.delay(@_ensureDatabaseUpToDate.bind(this), 30 * 1000)
       throw er
+    .then () =>
+      return unless @isShown()
+      @_updateSendButton(no)
     return
 
   _updateSendButton: (syncing = ledger.tasks.WalletLayoutRecoveryTask.instance.isRunning()) ->

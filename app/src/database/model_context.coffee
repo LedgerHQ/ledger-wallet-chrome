@@ -39,9 +39,26 @@ class Collection
     @_context.notifyDatabaseChange()
 
   update: (model) ->
-    @_collection.update(model._object)
+    try
+      @_collection.update(model._object)
+    catch er
+      @_updateHackOfTheCentury(model)
     @_updateSynchronizedProperties(model)
     @_context.notifyDatabaseChange()
+
+  _updateHackOfTheCentury: (model) ->
+    # !Big hack! lockijs probably assigned multiple objects to the same id. We need to fetch every objects with the same
+    # id and destroy them manually (from data and idIndex). Then we will create them again in the database. The tricky
+    # part is to update the relationships with our new ids.
+    $loki = model._object.$loki
+    impostors = @_modelize(@_collection.find($loki: $loki))
+    debugger
+    return if impostors.length is 0
+    @_collection.idIndex = _(@_collection.idIndex).reject (v) -> v is $loki
+    @_collection.data = _(@_collection.data).reject (v) -> v.$loki is $loki
+    for impostor in impostors
+      model._object = _(model._object).omit("$loki", "meta")
+      model._object = @_collection.insert(model._object)
 
   get: (id) -> @_modelize(@_collection.get(id))
 

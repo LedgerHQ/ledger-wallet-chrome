@@ -16,7 +16,7 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
       return unless data?.payload?.type?
       switch data.payload.type
         when 'new-transaction'
-          #l "Received transaction ", data.payload.transaction?.hash
+          # l "Received transaction ", data.payload.transaction?.hash, data.payload
           ledger.tasks.TransactionConsumerTask.instance.pushTransaction(data.payload.transaction)
         when 'new-block'
           @_handleNewBlock data.payload.block
@@ -29,7 +29,7 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
       height: block['height']
       time: new Date(block['time'])
     block = Block.fromJson(json).save()
-    for transactionHash in block['transaction_hashes']
+    for transactionHash in (block['transaction_hashes'] or [])
       txs = Transaction.find(hash: transactionHash).data()
       if txs.length > 0
         @logger().trace 'Found transaction in block'
