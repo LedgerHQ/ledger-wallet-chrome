@@ -143,13 +143,16 @@ EventHandler =
         inflateCollection = (id, object) ->
           (collection.data ||= []).push object
         iterateThroughCollection(collection.name, inflateCollection).then ->
+          maxId = 0
           unstorifyCollection = (index = 0) ->
             return Q() if index >= collection.data.length
             unstorify(collection.data[index]).then (obj) ->
+              if (maxId <= obj.$loki)
+                maxId = obj.$loki + 1
               collection.data[index] = obj
               unstorifyCollection(index + 1)
           unstorifyCollection().then ->
-            collection.maxId = collection.data.length
+            collection.maxId = maxId
             iterate(index + 1)
       iterate()
     .then (collections) ->
