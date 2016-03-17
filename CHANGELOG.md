@@ -1,4 +1,11 @@
 # Changelog
+1.5.1
+===
+- Parallelized wallet synchronization
+- Fix UI issues on "Send" dialog
+- Fix database corruption bug
+- Fix synchronized storage bugs
+
 1.5.0
 ===
 - Incremental wallet synchronization
