@@ -29,15 +29,18 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
       height: block['height']
       time: new Date(block['time'])
     block = Block.fromJson(json).save()
+    found = no
     for transactionHash in (block['transaction_hashes'] or [])
       txs = Transaction.find(hash: transactionHash).data()
       if txs.length > 0
+        found = yes
         @logger().trace 'Found transaction in block'
         for tx in txs
           block.add('transactions', tx)
     block.save()
-    ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
-    ledger.app.emit 'wallet:operations:update'
+    if found
+      ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
+      ledger.app.emit 'wallet:operations:update'
 
   @instance: new @()
 

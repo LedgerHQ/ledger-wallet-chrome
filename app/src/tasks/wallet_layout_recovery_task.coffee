@@ -5,6 +5,7 @@ $error = (args...) -> $log().error args...
 class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
 
   BatchSize: 50
+  NumberOfRetry: 1
 
   constructor: -> super 'recovery-global-instance'
 
@@ -16,17 +17,16 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   onStart: () ->
     unconfirmedTxs = @_findUnconfirmedTransaction()
     startDate = new Date()
-    lastBlock = null
     $info "Start synchronization", startDate.toString()
-    ledger.api.BlockRestClient.instance.refreshLastBlock().then (block) =>
-      lastBlock = block
-      @_performRecovery(lastBlock, unconfirmedTxs)
+    @_performRecovery(unconfirmedTxs)
     .then (transactionsNotFound) =>
-      l "Recovery completed"
+      $info "Recovery completed"
+      $info "Unable to find these transactions", transactionsNotFound
       @_discardTransactions(transactionsNotFound)
+      ledger.app.emit 'wallet:operations:sync:done'
       @emit 'done'
     .fail (er) =>
-      e "Serious error during synchro", er
+      $error "Synchronization failed", er
       ledger.app.emit "wallet:operations:sync:failed"
       @emit 'fatal_error'
     .fin =>
@@ -37,12 +37,16 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       $info "Stop synchronization. Synchronization took #{duration.get("minutes")}:#{duration.get("seconds")}:#{duration.get("milliseconds")}"
       @stopIfNeccessary()
 
-  _performRecovery: (lastBlock, unconfirmedTransactions) ->
+  _performRecovery: (unconfirmedTransactions, retryCount = 0) ->
     savedState = {}
     persistState = no
+    lastBlock = undefined
     @_loadSynchronizationData().then (data) =>
       savedState = @_migrateSavedState(data)
       persistState = yes
+      ledger.api.BlockRestClient.instance.refreshLastBlock()
+    .then (block) =>
+      lastBlock = block
       @_requestSynchronizationToken()
     .then (token) =>
       @_syncToken = token
@@ -52,12 +56,20 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       e "Failure during synchro", er
       if er?.getStatusCode?() is 404
         @_handleReorgs(savedState, er.block).then () =>
-          @_performRecovery()
+          @_performRecovery(unconfirmedTransactions)
+      else if retryCount < @NumberOfRetry
+        d = ledger.defer()
+        _.delay((=> d.resolve(@_performRecovery(unconfirmedTransactions, retryCount + 1))), 1000)
+        d.promise
       else
         # Mark failure and save
         savedState['lastSyncStatus'] = 'failure'
-        @_saveSynchronizationData(savedState) if persistState
-        throw er
+        d = ledger.defer()
+        if persistState
+          @_saveSynchronizationData(savedState).then -> d.reject(er)
+        else
+          d.reject(er)
+        d.promise
     .then (unconfirmed) =>
       unconfirmedTransactions = unconfirmed
       savedState['lastSyncStatus'] = 'success'
@@ -243,7 +255,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
 
   _removeOldTransactions: ->
     d = ledger.defer()
-    op.delete() for op in Operation.all()
+    op.delete() for op in Operation.all() when !op.get('block')?
     d.resolve()
     d.promise
 
@@ -251,7 +263,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     Transaction.find({block_id: undefined}).data()
 
   _discardTransactions: (transactions) ->
-    for transaction in transactions
+    for transaction in transactions when !transaction.get('block')?
       transaction.delete()
 
   _handleReorgs: (savedState, failedBlock) ->

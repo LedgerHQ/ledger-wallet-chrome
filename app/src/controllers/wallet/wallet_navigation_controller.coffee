@@ -11,6 +11,7 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
     balanceValue: '#balance_value'
     reloadIcon: '#reload_icon'
     currencyContainer: '#currency_container'
+    flashContainer: '.flash-container'
 
   constructor: () ->
     super
@@ -22,6 +23,7 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
 
   onAfterRender: () ->
     super
+    @view.flashContainer.hide()
     url = ledger.application.router.currentUrl
     @updateMenu url
     @_listenBalanceEvents()
@@ -73,17 +75,19 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
       ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
       ledger.storage.sync.pull()
       _.defer @_updateReloadIconState
-    ledger.app.on 'wallet:balance:changed wallet:balance:unchanged wallet:balance:failed wallet:operations:sync:failed wallet:operations:sync:done', @_onSynchronizationStateChanged
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'start stop', @_onSynchronizationStateChanged
     @_updateReloadIconState()
 
   _onSynchronizationStateChanged: ->
     ledger.tasks.WalletLayoutRecoveryTask.instance.getLastSynchronizationStatus().then (state) =>
-      if state is 'failure'and !@_syncFailureDialog?
-        @_syncFailureDialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("common.errors.synchronization_error"), subtitle: t('common.errors.error_during_synchronization'))
-        @_syncFailureDialog.show()
-        @_syncFailureDialog.on 'dismiss', =>
-          @_syncFailureDialog = undefined
+      l "State is", state
+      if state is 'failure'and !@_syncFailureFlash?
+        @_syncFailureFlash = @flash("wallet.flash.api_failure")
+        @_syncFailureFlash.onClick =>
+          l "Display dialog now"
+      else if state isnt 'failure'
+        @_syncFailureFlash?.hide()
+        @_syncFailureFlash = undefined
     _.defer @_updateReloadIconState
 
   _updateReloadIconState: =>
@@ -133,3 +137,41 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
       getBreadCrumbHolderView: => @select('.breadcrumb-holder')
 
       getActionsHolderView: => @select('.actions-holder')
+
+  flash: (infoText, linkText = undefined, priority = 0) ->
+    flash = new WalletNavigationController.Flash(infoText, linkText, priority)
+    if !@_currentFlash? or @_currentFlash.getPriority() < priority or @_currentFlash.isHidden()
+      @_currentFlash = flash
+      flash.show(@view.flashContainer)
+    flash
+
+  getCurrentFlash: -> @_currentFlash
+
+class @WalletNavigationController.Flash
+
+  constructor: (infoText, linkText, priority) ->
+    @_infoText = t(infoText)
+    @_linkText = if linkText? then t(linkText) else t('common.flash.link')
+    @_priority = priority
+    @_container = undefined
+
+  onClick: (callback) ->
+    @_onClick = callback
+    @_container?.find('.flash-link').click(@_onClick)
+
+  show: (container) ->
+    @_container = container
+    container.find('.flash-text').text(@_infoText)
+    container.find('.flash-link').text(@_linkText)
+    container.slideDown(250)
+    @onClick(@_onClick)
+
+  hide: ->
+    @_container?.slideUp(250)
+    @_container = undefined
+
+  isHidden: -> !@_container?
+
+  isShown: -> !@isHidden()
+
+  getPriority: -> @_priority
