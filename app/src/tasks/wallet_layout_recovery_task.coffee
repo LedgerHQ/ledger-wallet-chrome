@@ -18,6 +18,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     unconfirmedTxs = @_findUnconfirmedTransaction()
     startDate = new Date()
     $info "Start synchronization", startDate.toString()
+    $info "Looking for mempool tx", unconfirmedTxs
     @_performRecovery(unconfirmedTxs)
     .then (transactionsNotFound) =>
       $info "Recovery completed"
