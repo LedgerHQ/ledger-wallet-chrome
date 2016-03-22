@@ -1,4 +1,9 @@
 # Changelog
+1.5.2
+===
+- Better synchronization error management
+- Small bug fixes
+
 1.5.1
 ===
 - Parallelized wallet synchronization
