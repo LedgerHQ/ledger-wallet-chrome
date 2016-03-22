@@ -256,6 +256,7 @@
         '/controllers/wallet/dialogs/wallet_dialogs_accountsettings_dialog_view_controller'
         '/controllers/wallet/dialogs/wallet_dialogs_operationdetail_dialog_view_controller'
         '/controllers/wallet/dialogs/wallet_dialogs_xpub_dialog_view_controller'
+        '/controllers/wallet/dialogs/wallet_dialogs_apifailures_dialog_view_controller'
 
         # Accounts
         'controllers/wallet/accounts/wallet_accounts_index_view_controller'

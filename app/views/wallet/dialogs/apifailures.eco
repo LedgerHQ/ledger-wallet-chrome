@@ -1,0 +1,12 @@
+<section id="dialogs_apifaulures_dialog">
+  <div class="content-container">
+    <div class="uppercase-section-title"><%- t('common.errors.synchronization_error') %></div>
+    <div class="regular-text-small"><%- t('common.errors.error_during_synchronization_1') %></div>
+    <div class="regular-text-small"><%- t('common.errors.error_during_synchronization_2') %></div>
+  </div>
+  <div class="dialog-actions-bar">
+    <a href="#openHelpCenter" class="uppercase-action"><%= t 'common.visit_help_center' %></a>
+    <div class="left-spacer"></div>
+    <a href="#dismiss" class="cancel-rounded-button"><%= t 'common.close' %></a>
+  </div>
+</section>

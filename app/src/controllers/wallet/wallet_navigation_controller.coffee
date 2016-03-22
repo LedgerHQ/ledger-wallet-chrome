@@ -84,7 +84,7 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
       if state is 'failure'and !@_syncFailureFlash?
         @_syncFailureFlash = @flash("wallet.flash.api_failure")
         @_syncFailureFlash.onClick =>
-          l "Display dialog now"
+          new WalletDialogsApifailuresDialogViewController().show()
       else if state isnt 'failure'
         @_syncFailureFlash?.hide()
         @_syncFailureFlash = undefined
