@@ -188,18 +188,20 @@ class ledger.i18n
   @initMemoryValueFromBrowser: (i18nValueName) =>
     d = ledger.defer()
     done = false
+
     # Load user language of his Chrome browser UI version into browserUiLang
     browserUiLang = chrome.i18n.getUILanguage()
     for tag in @browserAcceptLanguages
       # Take the first tag that is part of our supported languages (@Languages)
-      if tag.substr(0, 2) in Object.keys(@Languages) and not done
+      lng = tag.substr(0, 2)
+      if not done and _.chain().keys(@Languages).some((l) -> l.startsWith(lng)).value()
         @[i18nValueName].memoryValue = if i18nValueName is 'favLang' and (tag.length > 2) then tag.substr(0, 2) else tag
         done = true
       # Fallback to browser UI language if vars are still not set
       @favLang.memoryValue = browserUiLang if not @favLang.memoryValue?
       @favLocale.memoryValue = browserUiLang if not @favLocale.memoryValue?
       # Fallback to English if the favorite language is not supported
-      @favLang.memoryValue = 'en' if @favLang.memoryValue not in Object.keys(@Languages)
+      @favLang.memoryValue = 'en' if !@favLang.memoryValue?
       d.resolve()
     d.promise
 
