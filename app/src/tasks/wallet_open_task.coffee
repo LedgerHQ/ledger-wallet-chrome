@@ -20,9 +20,8 @@ openStores = (dongle, raise, done) ->
     return
 
 pullStore = (dongle, raise, done) ->
-  ledger.storage.sync.pull().then done
-  .fail done
-  .done()
+  ledger.storage.sync.pull()
+  done()
 
 openHdWallet = (dongle, raise, done) -> ledger.wallet.initialize(dongle, done)
 

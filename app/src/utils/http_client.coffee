@@ -19,7 +19,7 @@ class @HttpClient
     r.data = JSON.stringify(r.data) if r.contentType == 'application/json'
     r.url = @baseUrl + r.url unless r.url.match(/^[a-z0-9A-Z]+:\//)?
     r.crossDomain = true
-    r.timeout = 30 * 1000
+    r.timeout ?= 30 * 1000
     $.ajax(r)
 
   ###

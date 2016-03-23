@@ -22,6 +22,9 @@ class @ledger.database.Model extends @EventEmitter
     @_needsUpdate = if @isInserted() then no else yes
     @_deleted = no
     @_changes = []
+    unless @isInserted()
+      for key, value of (base or {})
+        @_changes.push {type: 'set', key: key, value: value}
 
   get: (key) ->
     if @getRelationships()?[key]?
@@ -217,7 +220,6 @@ class @ledger.database.Model extends @EventEmitter
     new @ context, base
 
   @uniqueId: (prefix = "") -> ledger.crypto.SHA256.hashString(prefix + (byte.toString(16) for byte in crypto.getRandomValues(new Uint8Array(32))).join(''))
-
 
   @findById: (id, context = ledger.database.contexts.main) ->
     if @getBestIdentifierName() is '$loki'
