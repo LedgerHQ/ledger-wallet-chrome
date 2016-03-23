@@ -1,4 +1,10 @@
 # Changelog
+1.5.3
+===
+- Fix disappearing transaction for new wallet
+- Add traditional chinese
+- Small bug fixes
+
 1.5.2
 ===
 - Better synchronization error management
