@@ -225,6 +225,8 @@ class ledger.i18n
     d.promise
 
 
+
+
   ###
     Set user locale (region) into memory and both stores by UI
     @example Set a locale
@@ -255,7 +257,6 @@ class ledger.i18n
   ###
   @setFavLangByUI: (tag) =>
     d = ledger.defer()
-    throw new Error 'Tag language must be two characters. Use ledger.i18n.setLocaleByUI() if you want to set the region' if tag.length > 2
     # Check if it is a supported language
     if tag not in Object.keys(@Languages)
       tag = 'en'
@@ -272,3 +273,21 @@ class ledger.i18n
             storesAreSync: true
         d.resolve()
     d.promise
+
+
+  @getRegionsByLanguage: (language) =>
+    language = if language.indexOf("-") != -1 then language.split("-")[0] else language
+    regions = {}
+    for lng, name of ledger.preferences.defaults.Display.regions
+      continue if not _.str.startsWith(lng, language)
+      regions[lng] = name
+    regions
+
+  @findBestLanguage: () ->
+    language = @favLang.memoryValue
+    if language?.length is 2 and _(_.keys(@Languages)).find((l) -> l.startsWith(language))?
+      @favLang.memoryValue = _(_.keys(@Languages)).find((l) -> l.startsWith(language))
+      Try => @setFavLangByUI(_(_.keys(@Languages)).find (l) -> l.startsWith(language))
+    else
+      @favLang.memoryValue = "en"
+      Try => @setFavLangByUI("en")
