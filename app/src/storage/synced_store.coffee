@@ -238,7 +238,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
 
   _areChangesMeaningful: (data, changes) ->
     if data['__hashes']?.length > 0
-      return no unless _(changes).some (change) -> !(change.type is OperationTypes.REMOVE or (data[change.key] is change.value))
+      return no if _(changes).every (change) -> (change.type is OperationTypes.REMOVE and (data[change.key] is change.value))
       checkData = _.clone(data)
       checkData['__hashes'] = _(checkData['__hashes']).without(checkData['__hashes'][0])
       checkData = _(checkData).omit('__hashes') if checkData['__hashes'].length is 0
