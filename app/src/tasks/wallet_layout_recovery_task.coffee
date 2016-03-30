@@ -18,11 +18,11 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     unconfirmedTxs = @_findUnconfirmedTransaction()
     startDate = new Date()
     $info "Start synchronization", startDate.toString()
-    $info "Looking for mempool tx", unconfirmedTxs
+    $info "Looking for mempool tx", _(unconfirmedTxs).map((tx) -> tx.get('hash'))
     @_performRecovery(unconfirmedTxs)
     .then (transactionsNotFound) =>
       $info "Recovery completed"
-      $info "Unable to find these transactions", transactionsNotFound
+      $info "Unable to find these transactions", _(transactionsNotFound).map((tx) -> tx.get('hash'))
       @_discardTransactions(transactionsNotFound)
       ledger.app.emit 'wallet:operations:sync:done'
       @emit 'done'
@@ -244,6 +244,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
     d.promise
 
   _removeOldTransactions: ->
+    $info "Removing old transactions"
     d = ledger.defer()
     op.delete() for op in Operation.all() when !op.get('block')?
     d.resolve()
