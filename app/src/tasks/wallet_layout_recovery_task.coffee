@@ -75,20 +75,9 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       unconfirmedTransactions = unconfirmed
       savedState['lastSyncStatus'] = 'success'
       savedState['lastSyncTime'] = new Date().getTime()
-      savedState = @_normalizeCurrentBlock(lastBlock, savedState)
       @_saveSynchronizationData(savedState) if persistState
     .then =>
       unconfirmedTransactions
-
-  _normalizeCurrentBlock: (block, state) ->
-    accountIndex = 0
-    while state["account_#{accountIndex}"]?
-      for batch in (state["account_#{accountIndex}"]["batches"] or [])
-        if batch.blockHeight < block.height
-          batch.blockHeight = block.height
-          batch.blockHash = block.hash
-      accountIndex += 1
-    state
 
   _numberOfAccountInState: (savedState) ->
     accountIndex = 0
