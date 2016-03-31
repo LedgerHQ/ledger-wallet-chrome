@@ -29,7 +29,7 @@ class Collection
     return unless model?._object
     id = model.getBestIdentifier()
     model.getBestIdentifier = -> id
-    $info "Remove from database", model._object
+    $info "Remove from database", model._object,  new Error().stack
     try
       @_collection.remove(model._object)
     catch er
@@ -105,7 +105,7 @@ class Collection
         object.set k, v for k, v of synchronizedObject
       object.save()
     # Remove objects not present in sync store
-    $info "Remove item", _(@getModelClass().where(((i) => !_.contains(existingsIds, i[@getModelClass().getBestIdentifierName()])), @_context).data() or []).map((i) -> i._object), new Error().stack
+    $info "Remove item", _(@getModelClass().where(((i) => !_.contains(existingsIds, i[@getModelClass().getBestIdentifierName()])), @_context).data() or []).map((i) -> i._object)
     $info "Received data", data
     @getModelClass().where(((i) => !_.contains(existingsIds, i[@getModelClass().getBestIdentifierName()])), @_context).remove()
     return

@@ -1,4 +1,8 @@
 # Changelog
+1.5.5
+===
+- Minor synchronization bug fixes
+
 1.5.4
 ===
 - Fix a bug preventing to delete the pairing

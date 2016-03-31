@@ -1,4 +1,6 @@
 
+{$info} = ledger.utils.Logger.getLazyLoggerByTag("Model")
+
 resolveRelationship = (object, relationship) ->
   Class = window[relationship.Class]
   switch relationship.type
@@ -101,6 +103,7 @@ class @ledger.database.Model extends @EventEmitter
     @
 
   delete: () ->
+    $info "Delete model from database", @_object,  new Error().stack
     if not @_deleted and @onDelete() isnt false
       if @getRelationships()?
         for relationshipName, relationship of @getRelationships()
@@ -113,14 +116,14 @@ class @ledger.database.Model extends @EventEmitter
                   @get(relationshipName).delete()
                 when 'one_many'
                   @get(relationshipName).delete()
-                when 'many_many' then throw 'many:many relastionships are not implemented yet'
+                when 'many_many' then throw 'many:many relationships are not implemented yet'
             when 'nullify'
               switch relationship.type
                 when 'many_one'
                   item.set(relationship.inverse, null).save() for item in @get(relationshipName)
                 when 'one_one'
                   @get(relationshipName).set(relationship.inverse, null)
-                when 'many_many' then throw 'many:many relastionships are not implemented yet'
+                when 'many_many' then throw 'many:many relationships are not implemented yet'
       @_deleted = true
       @_collection.remove this
       return
