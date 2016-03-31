@@ -1,4 +1,8 @@
 # Changelog
+1.5.4
+===
+- Fix a bug preventing to delete the pairing
+
 1.5.3
 ===
 - Fix disappearing transaction for new wallet
