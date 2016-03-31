@@ -109,7 +109,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
           unconfirmedTransactions = _(unconfirmedTransactions).filter (tx) ->
             !_(txs).some((hash) -> tx.get('hash') is hash)
         unless containsEmpty
-          accountsCount += 1
+          accountsCount = @_numberOfAccountInState(savedState)
           recoverUntilEmpty(accountsCount, accountsCount)
         else
           unconfirmedTransactions
@@ -160,6 +160,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
         if _(batches).last().blockHash?
           recoverUntilEmpty(batches.length, batches.length)
         else
+          $info "Download txs ", fetchTxs
           [batches.length <= 1, fetchTxs]
       .fail (er) =>
         throw er
