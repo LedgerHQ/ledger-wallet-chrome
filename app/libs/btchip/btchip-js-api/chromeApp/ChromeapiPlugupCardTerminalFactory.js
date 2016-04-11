@@ -24,17 +24,18 @@ var ChromeapiPlugupCardTerminalFactory = Class.extend(CardTerminalFactory, {
 	 *  @constructs
 	 *  @augments CardTerminalFactory
 	 */
-	initialize: function(pid, usagePage, ledgerTransport) {
+	initialize: function(pid, usagePage, ledgerTransport, vid) {
 		this.pid = pid;
+	  	this.vid = vid;
 		this.usagePage = usagePage;
 		this.ledgerTransport = ledgerTransport;
 	},
 
 	list_async: function(pid, usagePage) {
 		if (typeof chromeDevice == "undefined") {
-			throw "Content script is not available";
+		  throw "Content script is not available";
 		}
-		return chromeDevice.enumerateDongles_async(this.pid, this.usagePage)
+		return chromeDevice.enumerateDongles_async(this.pid, this.usagePage, this.vid)
 			.then(function(result) {
 				return result.deviceList;
 			});

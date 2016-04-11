@@ -443,11 +443,11 @@ chromeDevice.prototype.close_async = function() {
 }
 
 
-chromeDevice.enumerateDongles_async = function(pid) {
+chromeDevice.enumerateDongles_async = function(pid, up, vid) {
   var msg = {
     parameters: {
-      vid: 0x2581,
-      pid: pid || 0x1b7c
+      vid: vid || 0x2581,
+      pid: (typeof pid != "undefined") ? pid : 0x1b7c
     }
   };
 
@@ -476,6 +476,10 @@ chromeDevice.enumerateDongles_async = function(pid) {
     pidHid = 0x2b7c; // LW Legacy - old
     pidHid2 = 0x3b7c; // LW Legacy - Ledger Protocol
     pidHid3 = 0x4b7c; // LW Proton
+  } else
+  if (vid == 0x2c97) {
+    vidHid = vid
+    pidHid = pid
   }
   debug("Looking up " + vid +  " " + pid);
 

@@ -28,6 +28,7 @@ class @DevicesManager extends EventEmitter
 
     checkIfWalletIsPluggedIn = () ->
       devicesInfo = [
+        {productId: 0x0000, vendorId: 0x2c97, type: 'hid'}
         {productId: 0x1b7c, vendorId: 0x2581, type: 'usb'}
         {productId: 0x2b7c, vendorId: 0x2581, type: 'hid'}
         {productId: 0x3b7c, vendorId: 0x2581, type: 'hid'}
@@ -35,6 +36,7 @@ class @DevicesManager extends EventEmitter
         {productId: 0x1807, vendorId: 0x2581, type: 'hid'}
       ]
       getDevices devicesInfo, (devices) =>
+        l "Devices", devices
         oldDevices = @_devices
         @_devices = {}
         for device in devices
