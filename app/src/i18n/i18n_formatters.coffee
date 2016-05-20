@@ -12,6 +12,8 @@ _.extend ledger.i18n,
     @return [String] localized message
   ###
   t: (messageId) ->
+    if (!@translations[@favLang.memoryValue]?)
+      ledger.i18n.findBestLanguage()
     messageId = _.string.replace(messageId, '.', '_')
     key = @translations[@favLang.memoryValue][messageId] or @translations['en'][messageId]
     if not key? or not key['message']?

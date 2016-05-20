@@ -90,16 +90,13 @@ require @ledger.imports, ->
         if error?
           # TODO: Handle wallet opening fatal error
           e "Raise", error
-        else
-          @_listenPreferencesEvents()
-          @_listenCountervalueEvents(true)
-          ledger.utils.Logger.updateGlobalLoggersLevel()
-          @emit 'wallet:initialized'
-          _.defer =>
-            Wallet.instance.retrieveAccountsBalances()
-            ledger.tasks.TransactionObserverTask.instance.startIfNeccessary()
-            ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() unless result.operation_consumption
-            ledger.tasks.OperationsConsumptionTask.instance.startIfNeccessary() unless result.operation_consumption
+        @_listenPreferencesEvents()
+        @_listenCountervalueEvents(true)
+        ledger.utils.Logger.updateGlobalLoggersLevel()
+        @emit 'wallet:initialized'
+        _.defer =>
+          ledger.tasks.TransactionObserverTask.instance.startIfNeccessary()
+          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() unless result.operation_consumption
 
     onDongleIsDisconnected: (dongle) ->
       @emit 'dongle:disconnected'
@@ -119,7 +116,10 @@ require @ledger.imports, ->
 
       @on 'wallet:operations:update wallet:operations:new', =>
         return unless @isInWalletMode()
-        Wallet.instance.retrieveAccountsBalances()
+        @_refreshBalance()
+
+
+    _refreshBalance: _.debounce((=> Wallet.instance.retrieveAccountsBalances()), 500)
 
     _listenPreferencesEvents: ->
       ledger.preferences.instance.on 'btcUnit:changed language:changed locale:changed confirmationsCount:changed', => @scheduleReloadUi()

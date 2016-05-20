@@ -6,7 +6,7 @@ class ledger.api.UnspentOutputsRestClient extends ledger.api.RestClient
     result = []
     _.async.eachBatch addresses, 20, (batch, done, hasNext, batchIndex, batchCount) =>
       @http().get
-        url: "blockchain/#{ledger.config.network.ticker}/addresses/#{batch.join(',')}/unspents"
+        url: "blockchain/v2/#{ledger.config.network.ticker}/addresses/#{batch.join(',')}/unspents"
         onSuccess: (response) ->
           result = result.concat(response)
           callback(result) unless hasNext

@@ -12,6 +12,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     accountsSelect: '#accounts_select'
     colorSquare: '#color_square'
 
+  RefreshWalletInterval: 15 * 60 * 1000 # 15 Minutes
+
   onAfterRender: () ->
     super
 
@@ -24,15 +26,24 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     # configure view
     @view.amountInput.amountInput(ledger.preferences.instance.getBitcoinUnitMaximumDecimalDigitsCount())
     @view.errorContainer.hide()
+    @_utxo = []
     @_updateFeesSelect()
-    @_updateTotalLabel()
     @_updateAccountsSelect()
-    @_updateColorSquare()
+    @_updateCurrentAccount()
+    @_updateTotalLabel()
     @_listenEvents()
+    @_ensureDatabaseUpToDate()
+    @_updateSendButton()
+    @_updateTotalLabel = _.debounce(@_updateTotalLabel.bind(this), 500)
 
   onShow: ->
     super
     @view.amountInput.focus()
+
+  onDismiss: ->
+    super
+    clearTimeout(@_scheduledRefresh) if @_scheduledRefresh?
+
 
   cancel: ->
     Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
@@ -47,7 +58,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @view.errorContainer.hide()
 
       pushDialogBlock = (fees) =>
-        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount()
+        {utxo, fees} = @_computeAmount(ledger.Amount.fromSatoshi(fees).divide(1000))
+        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount(), utxo: utxo
         @getDialog().push dialog
 
       # check transactions fees
@@ -79,7 +91,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       else
         params = ledger.managers.schemes.bitcoin.parseURI data
       if params?.amount?
-        @view.amountInput.val(ledger.formatters.formatUnit(ledger.formatters.fromBtcToSatoshi(params.amount), ledger.preferences.instance.getBtcUnit()))
+        separator = ledger.number.getLocaleDecimalSeparator(ledger.preferences.instance.getLocale().replace('_', '-'))
+        @view.amountInput.val(ledger.formatters.formatUnit(ledger.formatters.fromBtcToSatoshi(params.amount), ledger.preferences.instance.getBtcUnit()).replace(separator, '.'))
       @view.receiverInput.val params.address if params?.address?
       @_updateTotalLabel()
     dialog.show()
@@ -94,7 +107,11 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     @view.feesSelect.on 'change', =>
       @_updateTotalLabel()
     @view.accountsSelect.on 'change', =>
-      @_updateColorSquare()
+      @_updateCurrentAccount()
+      @_updateTotalLabel()
+    ledger.app.on 'wallet:operations:changed', =>
+      @_updateUtxo()
+      @_updateTotalLabel()
 
   _receiverBitcoinAddress: ->
     _.str.trim(@view.receiverInput.val())
@@ -121,9 +138,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @view.feesSelect.append node
 
   _updateTotalLabel: ->
-    fees = @view.feesSelect.val()
-    val = ledger.Amount.fromSatoshi(@_transactionAmount()).add(fees).toString()
-    @view.totalLabel.text ledger.formatters.formatValue(val) + ' ' + _.str.sprintf(t('wallet.send.index.transaction_fees_text'), ledger.formatters.formatValue(fees))
+    {amount, fees} = @_computeAmount()
+    @view.totalLabel.text ledger.formatters.formatValue(amount) + ' ' + _.str.sprintf(t('wallet.send.index.transaction_fees_text'), ledger.formatters.formatValue(fees))
 
   _updateExchangeValue: ->
     value = ledger.Amount.fromSatoshi(@_transactionAmount())
@@ -141,9 +157,72 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       option = $('<option></option>').text(account.name + ' (' + ledger.formatters.formatValue(account.balance) + ')').val(account.index)
       option.attr('selected', true) if @params.account_id? and account.index is +@params.account_id
       @view.accountsSelect.append option
+    @_updateUtxo()
+
+  _updateCurrentAccount: ->
+    @_updateUtxo()
+    @_updateColorSquare()
+
+  _updateUtxo: ->
+    @_utxo = _(@_selectedAccount().getUtxo()).sortBy (o) -> o.get('transaction').get('confirmations')
 
   _updateColorSquare: ->
     @view.colorSquare.css('color', @_selectedAccount().get('color'))
 
   _selectedAccount: ->
     Account.find(index: parseInt(@view.accountsSelect.val())).first()
+
+  _computeAmount: (feePerByte = ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000)) ->
+    account = @_selectedAccount()
+    desiredAmount = ledger.Amount.fromSatoshi(@_transactionAmount())
+    if desiredAmount.lte(0)
+      return total: ledger.Amount.fromSatoshi(0), amount: ledger.Amount.fromSatoshi(0), fees: ledger.Amount.fromSatoshi(0), utxo: [], size: 0
+    utxo = @_utxo
+    compute = (target) =>
+      selectedUtxo = []
+      total = ledger.Amount.fromSatoshi(0)
+      for output in utxo when total.lt(target)
+        selectedUtxo.push output
+        total = total.add(output.get('value'))
+      estimatedSize = ledger.bitcoin.estimateTransactionSize(selectedUtxo.length, 2).max # For now always consider we need a change output
+      fees = feePerByte.multiply(estimatedSize)
+      if desiredAmount.gt(0) and total.lt(desiredAmount.add(fees)) and selectedUtxo.length is utxo.length
+        # Not enough funds
+        total: total, amount: desiredAmount.add(fees), fees: fees, utxo: selectedUtxo, size: estimatedSize
+      else if desiredAmount.gt(0) and total.lt(desiredAmount.add(fees))
+        compute(desiredAmount.add(fees))
+      else
+        total: total, amount: desiredAmount.add(fees), fees: fees, utxo: selectedUtxo, size: estimatedSize
+    compute(desiredAmount)
+
+  _ensureDatabaseUpToDate: ->
+    task = ledger.tasks.WalletLayoutRecoveryTask.instance
+    task.getLastSynchronizationStatus().then (status) =>
+      d = ledger.defer()
+      if task.isRunning() or _.isEmpty(status) or status is 'failure'
+        @_updateSendButton(yes)
+        task.startIfNeccessary()
+        task.once 'done', =>
+          d.resolve()
+        task.once 'fatal_error', =>
+          d.reject(new Error("Fatal error during sync"))
+      else
+        d.resolve()
+      d.promise
+    .fail (er) =>
+      return unless @isShown()
+      e er
+      @_scheduledRefresh = _.delay(@_ensureDatabaseUpToDate.bind(this), 30 * 1000)
+      throw er
+    .then () =>
+      return unless @isShown()
+      @_updateSendButton(no)
+    return
+
+  _updateSendButton: (syncing = ledger.tasks.WalletLayoutRecoveryTask.instance.isRunning()) ->
+    if syncing
+      @view.sendButton.addClass('disabled')
+      @view.sendButton.text(t('wallet.send.index.syncing'))
+    else
+      @view.sendButton.removeClass('disabled')
+      @view.sendButton.text(t('common.send'))

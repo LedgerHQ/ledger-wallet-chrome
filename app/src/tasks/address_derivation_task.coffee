@@ -1,6 +1,8 @@
 class ledger.tasks.AddressDerivationTask extends ledger.tasks.Task
 
-  constructor: () -> super 'global_address_derivation'
+  constructor: () ->
+    super 'global_address_derivation'
+    @_readyPromise = ledger.defer()
 
   @instance: new @()
 
@@ -42,6 +44,8 @@ class ledger.tasks.AddressDerivationTask extends ledger.tasks.Task
       ledger.wallet.Wallet.instance?.xpubCache.set parameters[0]
       @_worker.postMessage command: command, queryId: queryId, result: 'success', error: undefined
 
+    @_readyPromise.resolve()
+
   onStop: () ->
     @_worker.terminate()
 
@@ -55,9 +59,12 @@ class ledger.tasks.AddressDerivationTask extends ledger.tasks.Task
 
   _postCommand: (command, parameters, callback) ->
     queryId = _.uniqueId()
-    @_vents.once "#{command}::#{queryId}", (ev, data) =>
-      callback? data
-    @_worker.postMessage {command: command, parameters: parameters, queryId: queryId}
+    @_ready().then =>
+      @_vents.once "#{command}::#{queryId}", (ev, data) =>
+        callback? data
+      @_worker.postMessage {command: command, parameters: parameters, queryId: queryId}
     queryId
+
+  _ready: () -> @_readyPromise.promise
 
   @reset: () -> @instance = new @()

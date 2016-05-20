@@ -43,8 +43,6 @@ ledger.wallet.Wallet.instance ?= {}
 enqueue = (command, parameters, queryId) ->
   Queue.push command: command, parameters: parameters, queryId: queryId
 
-dequeue = () ->
-
 postResult = (result) ->
   postMessage command: CurrentCommand.command, result: result, queryId: CurrentCommand.queryId
   CurrentCommand = null
@@ -91,6 +89,9 @@ registerExtendedPublicKeyForPath = (path) ->
     return
   sendCommand 'private:getXpubFromCache', [path], (xpu58, error) =>
     ExtendedPublicKeys[path] = new ledger.wallet.ExtendedPublicKey(ledger.app.dongle, path)
+    #xpu58 = {
+    #  "44'/0'/0'": "xpub6CdVafwY3FGLCrTz3zh5WkvzK8gt1YZsdbahUp6WwJz21xt6Bj2ZBnFZJNgcArt9zExcnjW3zVBA1EykmWGWw2ToECyvtsCqMWYJvb61GwP"
+    #}[path]
     if xpu58?
       ExtendedPublicKeys[path].initializeWithBase58(xpu58)
       postResult 'registered'
@@ -113,6 +114,7 @@ getPublicAddress = (path) ->
 
   # No result from cache perform the derivation on the chip
   unless address?
+    console.warn "Trying to derive with dongle ", path
     ledger.app.dongle.getPublicAddress path, (publicKey) ->
       @_derivationPath
       if publicKey?

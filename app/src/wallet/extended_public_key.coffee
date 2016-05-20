@@ -60,9 +60,6 @@ class ledger.wallet.ExtendedPublicKey
     else
       finalize 0
 
-
-
-
   _createXPUB: (depth, fingerprint, childnum, chainCode, publicKey, network) ->
     magic = if ledger?.config?.network? then  Convert.toHexInt(ledger.config.network.bitcoinjs.bip32.public) else "0488B21E"
     xpub = new ByteString magic, HEX

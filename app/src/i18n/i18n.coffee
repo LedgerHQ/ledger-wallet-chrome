@@ -188,18 +188,20 @@ class ledger.i18n
   @initMemoryValueFromBrowser: (i18nValueName) =>
     d = ledger.defer()
     done = false
+
     # Load user language of his Chrome browser UI version into browserUiLang
     browserUiLang = chrome.i18n.getUILanguage()
     for tag in @browserAcceptLanguages
       # Take the first tag that is part of our supported languages (@Languages)
-      if tag.substr(0, 2) in Object.keys(@Languages) and not done
+      lng = tag.substr(0, 2)
+      if not done and _.chain().keys(@Languages).some((l) -> l.startsWith(lng)).value()
         @[i18nValueName].memoryValue = if i18nValueName is 'favLang' and (tag.length > 2) then tag.substr(0, 2) else tag
         done = true
       # Fallback to browser UI language if vars are still not set
       @favLang.memoryValue = browserUiLang if not @favLang.memoryValue?
       @favLocale.memoryValue = browserUiLang if not @favLocale.memoryValue?
       # Fallback to English if the favorite language is not supported
-      @favLang.memoryValue = 'en' if @favLang.memoryValue not in Object.keys(@Languages)
+      @favLang.memoryValue = 'en' if !@favLang.memoryValue?
       d.resolve()
     d.promise
 
@@ -223,6 +225,8 @@ class ledger.i18n
     else
       d.resolve()
     d.promise
+
+
 
 
   ###
@@ -255,7 +259,6 @@ class ledger.i18n
   ###
   @setFavLangByUI: (tag) =>
     d = ledger.defer()
-    throw new Error 'Tag language must be two characters. Use ledger.i18n.setLocaleByUI() if you want to set the region' if tag.length > 2
     # Check if it is a supported language
     if tag not in Object.keys(@Languages)
       tag = 'en'
@@ -272,3 +275,21 @@ class ledger.i18n
             storesAreSync: true
         d.resolve()
     d.promise
+
+
+  @getRegionsByLanguage: (language) =>
+    language = if language.indexOf("-") != -1 then language.split("-")[0] else language
+    regions = {}
+    for lng, name of ledger.preferences.defaults.Display.regions
+      continue if not _.str.startsWith(lng, language)
+      regions[lng] = name
+    regions
+
+  @findBestLanguage: () ->
+    language = @favLang.memoryValue
+    if language?.length is 2 and _(_.keys(@Languages)).find((l) -> l.startsWith(language))?
+      @favLang.memoryValue = _(_.keys(@Languages)).find((l) -> l.startsWith(language))
+      Try => @setFavLangByUI(_(_.keys(@Languages)).find (l) -> l.startsWith(language))
+    else
+      @favLang.memoryValue = "en"
+      Try => @setFavLangByUI("en")

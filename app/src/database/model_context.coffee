@@ -2,6 +2,8 @@
 ledger.database = {} unless ledger.database?
 ledger.database.contexts = {} unless ledger.database.contexts?
 
+{$info} = ledger.utils.Logger.getLazyLoggerByTag("ModelContext")
+
 collectionNameForRelationship = (object, relationship) ->
   switch relationship.type
     when 'many_one' then relationship.Class
@@ -27,16 +29,36 @@ class Collection
     return unless model?._object
     id = model.getBestIdentifier()
     model.getBestIdentifier = -> id
-    l "REMOVE", model._object
-    @_collection.remove(model._object['$loki'])
+    $info "Remove from database", model._object,  new Error().stack
+    try
+      @_collection.remove(model._object)
+    catch er
+      e er
     @_removeSynchronizedProperties(model)
     @_context.emit "delete:" + _.str.underscored(model._object['objType']).toLowerCase(), model
     @_context.notifyDatabaseChange()
 
   update: (model) ->
-    @_collection.update(model._object)
+    try
+      @_collection.update(model._object)
+    catch er
+      @_updateHackOfTheCentury(model)
     @_updateSynchronizedProperties(model)
     @_context.notifyDatabaseChange()
+
+  _updateHackOfTheCentury: (model) ->
+    # !Big hack! lockijs probably assigned multiple objects to the same id. We need to fetch every objects with the same
+    # id and destroy them manually (from data and idIndex). Then we will create them again in the database. The tricky
+    # part is to update the relationships with our new ids.
+    $loki = model._object.$loki
+    impostors = @_modelize(@_collection.find($loki: $loki))
+    debugger
+    return if impostors.length is 0
+    @_collection.idIndex = _(@_collection.idIndex).reject (v) -> v is $loki
+    @_collection.data = _(@_collection.data).reject (v) -> v.$loki is $loki
+    for impostor in impostors
+      model._object = _(model._object).omit("$loki", "meta")
+      model._object = @_collection.insert(model._object)
 
   get: (id) -> @_modelize(@_collection.get(id))
 
@@ -83,6 +105,8 @@ class Collection
         object.set k, v for k, v of synchronizedObject
       object.save()
     # Remove objects not present in sync store
+    $info "Remove item", _(@getModelClass().where(((i) => !_.contains(existingsIds, i[@getModelClass().getBestIdentifierName()])), @_context).data() or []).map((i) -> i._object)
+    $info "Received data", data
     @getModelClass().where(((i) => !_.contains(existingsIds, i[@getModelClass().getBestIdentifierName()])), @_context).remove()
     return
 
@@ -94,10 +118,10 @@ class Collection
     return unless model.hasSynchronizedProperties()
     dataToSet = {}
     dataToRemove = {}
-    for key, value of model.getSynchronizedProperties()
+    for key, value of model.getSynchronizedProperties() when model.hasKeyChanged(key)
       (if value? then dataToSet else dataToRemove)[key] = value
-    @_getModelSyncSubstore(model).set(dataToSet)
-    @_getModelSyncSubstore(model).remove(_(dataToRemove).keys())
+    @_getModelSyncSubstore(model).set(dataToSet) unless _.isEmpty(dataToSet)
+    @_getModelSyncSubstore(model).remove(_(dataToRemove).keys()) unless _.isEmpty(dataToRemove)
 
   _removeSynchronizedProperties: (model) ->
     return unless model.hasSynchronizedProperties()
@@ -163,6 +187,7 @@ class ledger.database.contexts.Context extends EventEmitter
       collection.getCollection().ensureIndex(index.field) for index in modelClass._indexes if modelClass.__indexes?
     try
       new ledger.database.MigrationHandler(@).applyMigrations()
+      @onSyncStorePulled()
     catch er
       e er
 
@@ -187,16 +212,19 @@ class ledger.database.contexts.Context extends EventEmitter
       @emit "update:" + _.str.underscored(data['objType']).toLowerCase(), @_modelize(data)
 
   onSyncStorePulled: ->
-    @_syncStore.getAll (data) =>
-      for name, collection of @_collections
-        continue unless collection.getModelClass().hasSynchronizedProperties()
-        collectionData = _(data).pick (v, k) -> k.match("__sync_#{_.str.underscored(name).toLowerCase()}")?
-        unless _(collectionData).isEmpty()
-          collection.updateSynchronizedProperties(collectionData)
-        else
-          # delete all
-          collection.getModelClass().chain(this).remove()
-      @emit 'synchronized'
+    _.defer =>
+      @_syncStore.getAll (data) =>
+        for name, collection of @_collections
+          continue unless collection.getModelClass().hasSynchronizedProperties()
+          collectionData = _(data).pick (v, k) -> k.match("__sync_#{_.str.underscored(name).toLowerCase()}")?
+          unless _(collectionData).isEmpty()
+            collection.updateSynchronizedProperties(collectionData)
+          else
+            # delete all
+            $info 'Delete all', collectionData
+            $info 'Received data', data
+            collection.getModelClass().chain(this).remove()
+        @emit 'synchronized'
 
   refresh: ->
     d = ledger.defer()

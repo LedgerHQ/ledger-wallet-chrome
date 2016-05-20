@@ -1,6 +1,6 @@
 name: "__MSG_application_name__"
 description: "__MSG_application_small_description__"
-version: "1.4.6"
+version: "1.5.5"
 manifest_version: 2
 minimum_chrome_version: "38"
 default_locale: "en"
@@ -17,6 +17,7 @@ permissions:
   - "*://*.chain.com/v2/notifications/*"
   - "*://api.coinkite.com/*"
   - "*://coinkite.com/*"
+  - "*://node.ledger.fr/*"
   - "storage"
   - "unlimitedStorage"
   - "usb"

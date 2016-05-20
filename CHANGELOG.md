@@ -1,4 +1,67 @@
 # Changelog
+1.5.5
+===
+- Minor synchronization bug fixes
+
+1.5.4
+===
+- Fix a bug preventing to delete the pairing
+
+1.5.3
+===
+- Fix disappearing transaction for new wallet
+- Add traditional chinese
+- Small bug fixes
+
+1.5.2
+===
+- Better synchronization error management
+- Small bug fixes
+
+1.5.1
+===
+- Parallelized wallet synchronization
+- Fix UI issues on "Send" dialog
+- Fix database corruption bug
+- Fix synchronized storage bugs
+
+1.5.0
+===
+- Incremental wallet synchronization
+- Better fee computation (use fee per byte instead of fee per kb)
+- Improved performances
+- Add korean translation
+- Add indonesian translation
+- Add malay translation
+
+1.4.10
+===
+- Add italian translation
+- Add portuguese translation
+- Add russian translation
+- Add bengali translation
+- Add hindi translation
+- Add arabic translation
+- Add spanish translation
+- Add chinese translation
+- Add greek translation
+- Fix a non-stopping camera
+- Fix a bug in balance computation
+
+1.4.9
+===
+- Fix a bug in transaction interpretation
+- Fix a timeout bug in P2SH signatures
+
+1.4.8
+===
+- Small bug fixes
+- Use new notification websocket server
+
+1.4.7
+===
+- Fix a bug due to OP_RETURN outputs
+
 1.4.6
 ===
 - Fix a display bug on some transaction containing only change addresses

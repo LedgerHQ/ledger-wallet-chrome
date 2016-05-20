@@ -178,6 +178,7 @@
         'api/currencies_restclient'
         'api/groove_restclient'
         'api/fees_restclient'
+        'api/block_restclient'
 
         ## Tasks
         'tasks/task'
@@ -240,6 +241,10 @@
         'models/operation'
         'models/account'
         'models/configuration'
+        'models/transaction'
+        'models/output'
+        'models/block'
+        'models/input'
 
         ## Dialog Management
         'utils/dialogs'
@@ -262,6 +267,7 @@
         '/controllers/wallet/dialogs/wallet_dialogs_accountsettings_dialog_view_controller'
         '/controllers/wallet/dialogs/wallet_dialogs_operationdetail_dialog_view_controller'
         '/controllers/wallet/dialogs/wallet_dialogs_xpub_dialog_view_controller'
+        '/controllers/wallet/dialogs/wallet_dialogs_apifailures_dialog_view_controller'
 
         # Accounts
         'controllers/wallet/accounts/wallet_accounts_index_view_controller'

@@ -24,9 +24,9 @@ class @WalletSettingsDisplayLanguageSettingViewController extends WalletSettings
     # add corresponding regions
     languageCode = @view.languageSelect.val()
     @view.regionSelect.empty()
-    for id in _.sortBy(_.keys(ledger.preferences.defaults.Display.regions), (id) -> ledger.preferences.defaults.Display.regions[id])
-      continue if not _.str.startsWith(id, languageCode)
-      node = $("<option></option>").text(ledger.preferences.defaults.Display.regions[id]).attr('value', id)
+    regions = ledger.i18n.getRegionsByLanguage(languageCode)
+    for id in _.sortBy(_.keys(regions), (id) -> regions[id])
+      node = $("<option></option>").text(regions[id]).attr('value', id)
       if (fromPreferences == true and id == ledger.preferences.instance.getLocale()) or (fromPreferences == false and id == ledger.i18n.mostAcceptedLanguage())
         node.attr 'selected', true
       @view.regionSelect.append node

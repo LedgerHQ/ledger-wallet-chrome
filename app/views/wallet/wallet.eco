@@ -65,6 +65,10 @@
       </a>
     </div>
   </div>
+  <div class="flash-container">
+    <p class="flash-text"></p>
+    <a class="flash-link" href="#openFlashUrl"></a>
+  </div>
   <div class="action-bar-holder">
     <div class="breadcrumb-holder"></div>
     <div class="actions-holder"></div>
