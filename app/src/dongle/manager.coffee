@@ -118,7 +118,7 @@ class @ledger.dongle.Manager extends EventEmitter
       else
         throw new Error("Factory dongle Legacy (HID) failed")
 
-  _scanDongleBootloaderHid: ->
+  _scanDongleHidBootloader: ->
     @_factoryDongleBootloaderHID.list_async().then (result) =>
       if result.length > 0
         [@_factoryDongleBootloaderHID.getCardTerminal(result[0]), yes]

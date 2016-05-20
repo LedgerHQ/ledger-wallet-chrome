@@ -8,6 +8,7 @@ Firmwares =
   V_B_1_4_13: 0x0001040d
   V_L_1_0_0: 0x20010000
   V_L_1_0_1: 0x20010001
+  V_L_1_0_2: 0x20010002
   V_L_1_1_0: 0x20010100
 
 @ledger.dongle.Firmwares = Firmwares
