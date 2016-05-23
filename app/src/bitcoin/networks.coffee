@@ -18,6 +18,13 @@ ledger.bitcoin.Networks =
       P2SH: 196
     bitcoinjs: bitcoin.networks.testnet
     ws_chain: 'testnet3'
+  segnet:
+    name: 'segnet'
+    ticker: 'segtest'
+    bip44_coin_type: '1'
+    version:
+      regular: 30
+      P2SH: 50
   litecoin:
     ticker: 'ltc'
     bip44_coin_type: '2'
