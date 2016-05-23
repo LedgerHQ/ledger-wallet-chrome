@@ -124,7 +124,6 @@ getPublicAddress = (path) ->
       else
         postError "Unable to derive path '#{path}'"
 
-
 @onmessage = (event) =>
   {command, parameters, queryId} = event.data
   if queryId?

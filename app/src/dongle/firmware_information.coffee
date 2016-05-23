@@ -57,4 +57,4 @@ class ledger.dongle.FirmwareInformation
 
   hasRecoveryFlashingSupport: -> @getIntFirmwareVersion() >= Firmwares.V_L_1_1_0
 
-  isUsingInputFinalizeFull: -> @getIntFirmwareVersion() >= Firmwares.V_L_1_1_0
+  isUsingInputFinalizeFull: -> @getIntFirmwareVersion() >= Firmwares.V_L_1_0_2
