@@ -151,6 +151,14 @@ class @ledger.dongle.Dongle extends EventEmitter
     else
       ledger.delay(0).then(=> @_setState States.BLANK).then(-> States.BLANK)
 
+  setCoinVersion: (p2pkhVersion, p2shVersion, callback = undefined) ->
+    d = ledger.defer(callback)
+    @_sendApdu(new ByteString("E014000002#{("0" + p2pkhVersion.toString(16)).substr(-2)}#{("0" + p2shVersion.toString(16)).substr(-2)}", HEX)).then ->
+      d.resolve()
+    .fail (e) ->
+      d.reject(e)
+    d.promise
+
   getFirmwareInformation: -> @_firmwareInformation
 
   getSw: -> @_btchip.card.SW

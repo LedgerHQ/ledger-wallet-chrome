@@ -172,7 +172,6 @@
         'api/restclient'
         'api/unspent_outputs_restclient'
         'api/transactions_restclient'
-        'api/balance_restclient'
         'api/sync_rest_client'
         'api/m2fa_restclient'
         'api/currencies_restclient'

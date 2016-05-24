@@ -85,18 +85,19 @@ require @ledger.imports, ->
       return unless @isInWalletMode()
       @emit 'dongle:unlocked', @dongle
       @emit 'wallet:initializing'
-      ledger.tasks.WalletOpenTask.instance.startIfNeccessary()
-      ledger.tasks.WalletOpenTask.instance.onComplete (result, error) =>
-        if error?
-          # TODO: Handle wallet opening fatal error
-          e "Raise", error
-        @_listenPreferencesEvents()
-        @_listenCountervalueEvents(true)
-        ledger.utils.Logger.updateGlobalLoggersLevel()
-        @emit 'wallet:initialized'
-        _.defer =>
-          ledger.tasks.TransactionObserverTask.instance.startIfNeccessary()
-          ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() unless result.operation_consumption
+      ledger.app.dongle.setCoinVersion(ledger.config.network.version.regular, ledger.config.network.version.P2SH).then =>
+        ledger.tasks.WalletOpenTask.instance.startIfNeccessary()
+        ledger.tasks.WalletOpenTask.instance.onComplete (result, error) =>
+          if error?
+            # TODO: Handle wallet opening fatal error
+            e "Raise", error
+          @_listenPreferencesEvents()
+          @_listenCountervalueEvents(true)
+          ledger.utils.Logger.updateGlobalLoggersLevel()
+          @emit 'wallet:initialized'
+          _.defer =>
+            ledger.tasks.TransactionObserverTask.instance.startIfNeccessary()
+            ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() unless result.operation_consumption
 
     onDongleIsDisconnected: (dongle) ->
       @emit 'dongle:disconnected'
