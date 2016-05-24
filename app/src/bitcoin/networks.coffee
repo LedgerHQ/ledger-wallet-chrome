@@ -7,6 +7,7 @@ ledger.bitcoin.Networks =
     version:
       regular: 0
       P2SH: 5
+      XPUB: 0x0488B21E
     bitcoinjs: bitcoin.networks.bitcoin
     ws_chain: 'bitcoin'
   testnet:
@@ -25,6 +26,7 @@ ledger.bitcoin.Networks =
     version:
       regular: 30
       P2SH: 50
+      XPUB: 0x053587CF
   litecoin:
     ticker: 'ltc'
     bip44_coin_type: '2'
