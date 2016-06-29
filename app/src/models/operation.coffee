@@ -32,23 +32,44 @@ class @Operation extends ledger.database.Model
       outputValue = _(accountOutputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
       value = outputValue.subtract(inputValue)
     else
-      outputs = _(tx.outputs).filter((o) -> _(o.nodes).some((n) -> n?[1] isnt 1 and n?[0] is index))
+      hasOwnInputs = _(tx.inputs).filter((i) -> _(i.nodes).some((n) -> n?[0] is index)).length > 0
+      outputs = _(tx.outputs).filter((o) -> _(o.nodes).some((n) -> (!hasOwnInputs or n?[1] isnt 1) and n?[0] is index))
       value = _(outputs).reduce(((m, o) -> m.add(o.value)), ledger.Amount.fromSatoshi(0))
     @_createOperationFromTransaction(uid, "reception", tx, value, account)
 
   @_createOperationFromTransaction: (uid, type, tx, value, account) ->
     try
-      recipients = _(tx.outputs).chain().filter((o) -> !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
+      # Inflate block if possible
+      block = Block.fromJson(tx['block'])?.save() if tx['block']?['hash']?
+      # Inflate transaction
+      transaction = Transaction.fromJson(tx).save()
+      inputs = []
+      for i in tx['inputs']
+        # Inflate inputs
+        input = Input.fromJson(i).save()
+        inputs.push input.get('uid')
+      transaction.set('inputs_uids', inputs)
+      for o in (tx['ownOutputs'] or [])
+        # Inflate outputs
+        unless _.isEmpty(o.paths)
+          output = Output.fromJson(tx['hash'], o).save()
+          transaction.add('outputs', output)
+      transaction.save()
+      block?.add('transactions', transaction).save()
+
+      # Inflate operation
+      tx.inputs = _(tx.inputs).filter((i) -> i.addresses?)
+      # tx.outputs = _(tx.outputs).filter((o) -> o.addresses?)
+      outputs = if tx.outputs.length > 100 then tx.ownOutputs else tx.outputs # Special for mining wallet
+      recipients = _(tx.outputs).chain().filter((o) -> o.addresses? and !_(o.nodes).some((n) -> n?[1] is 1)).map((o) -> o.addresses).flatten().value()
+      senders = _(tx.inputs).chain().map((i) -> i.addresses).flatten().value()
       if recipients?.length is 0
         recipients = _(tx.outputs).chain().map((o) -> o.addresses).flatten().value()
-      @findOrCreate(uid: uid)
-        .set 'hash', tx['hash']
-        .set 'fees', tx['fees']
-        .set 'time', (new Date(tx['chain_received_at'] or new Date().getTime())).getTime()
+      operation = @findOrCreate(uid: uid)
         .set 'type', type
         .set 'value', value.toString()
-        .set 'confirmations', tx['confirmations']
-        .set 'senders', _(tx.inputs).chain().map((i) -> i.addresses).flatten().value()
+        .set 'senders', senders
+        .set 'time', new Date(transaction.get('received_at')).getTime()
         .set 'recipients', recipients
         .set 'inputs_hash', (input.output_hash for input in tx.inputs)
         .set 'inputs_index', (input.output_index for input in tx.inputs)
@@ -63,6 +84,9 @@ class @Operation extends ledger.database.Model
         .set 'outputs_path', (output.paths?[0] for output in tx.outputs)
         .set 'outputs_account', (output.accounts?[0]?.index for output in tx.outputs)
         .set 'account', account
+        .set 'transaction', transaction
+        .save()
+      operation
     catch er
       e er
 
@@ -72,10 +96,18 @@ class @Operation extends ledger.database.Model
     return json
 
   get: (key) ->
+    transaction = =>
+      transaction._tx if transaction._tx?
+      transaction._tx = @get('transaction')
     switch key
+      when 'hash' then transaction().get 'hash'
+      when 'time' then transaction().get 'received_at'
+      when 'confirmations' then transaction().get 'confirmations'
+      when 'fees' then transaction().get 'fees'
+      when 'double_spent_priority' then transaction().get 'double_spent_priority'
       when 'total_value'
         if super('type') == 'sending'
-          ledger.Amount.fromSatoshi(super 'value').add(super 'fees')
+          ledger.Amount.fromSatoshi(super 'value').add(transaction().get('fees'))
         else
           super 'value'
       else super key

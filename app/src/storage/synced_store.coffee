@@ -35,17 +35,20 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     @_debounced_push = ledger.utils.promise.debounce _.bind((-> @._push()),@), @PUSH_DEBOUNCE_DELAY
     @_auxiliaryStore = auxiliaryStore
     @_changes = []
-    @_unlockMethods = _.lock(this, ['set', 'get', 'remove', 'clear', 'pull', 'push'])
+    @_unlockMethods = _.lock(this, ['set', 'get', 'remove', 'clear', 'pull', 'push', 'keys'])
     @_deferredPull = null
     @_deferredPush = null
+    @_data = {}
     _.defer =>
       @_auxiliaryStore.get ['__last_sync_md5', '__sync_changes'], (item) =>
         @_lastMd5 = item.__last_sync_md5
-        @_changes = item['__sync_changes'].concat(@_changes) if item['__sync_changes']?
-        $info 'Initialize store: ', md5: @_lastMd5, changes: @_changes, init: item
         @_unlockMethods()
-        @pull()
-        @push() if @_changes.length > 0
+        @getAll (data) =>
+          @_data = data
+          @_changes = @_cleanChanges(data, item['__sync_changes'].concat(@_changes)) if item['__sync_changes']?
+          $info 'Initialize store: ', md5: @_lastMd5, changes: _.clone(@_changes), init: item, data: data
+          @pull()
+          @push() if @_changes.length > 0
 
   pull: -> @_throttled_pull()
 
@@ -57,7 +60,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
   # @param [Function] cb A callback invoked once the insertion is done
   set: (items, cb) ->
     return cb?() unless items?
-    @_changes.push {type: OperationTypes.SET, key: key, value: value} for key, value of items
+    @_changes.push {type: OperationTypes.SET, key: key, value: value} for key, value of items when @_areChangesMeaningful(@_data, [{type: OperationTypes.SET, key: key, value: value}])
     @_debounced_push()
     @_saveChanges -> cb?()
 
@@ -87,7 +90,7 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
   # @param [Function] cb A callback invoked once the removal is done.
   remove: (keys, cb) ->
     return cb?() unless keys?
-    @_changes.push {type: OperationTypes.REMOVE, key: key} for key in keys
+    @_changes.push {type: OperationTypes.REMOVE, key: key} for key in keys when @_areChangesMeaningful(@_data, [{type: OperationTypes.REMOVE, key: key}])
     @_debounced_push()
     _.defer => cb?()
 
@@ -115,9 +118,11 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
         $info 'Changes before merge', @_changes
         @_merge(data).then =>
           @_setLastMd5(md5)
+          $info "Storage pulled"
           @emit 'pulled'
           yes
     .fail (e) =>
+      $error "Pull error", e
       if e.status is 404
         throw Errors.NoRemoteData
       throw Errors.NetworkError
@@ -169,9 +174,11 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     hasRemoteData = yes
     unlockMutableOperations = _.noop
     pushedData = null
+    changes = _.clone(@_changes)
     @_getAllData()
     .then (data) =>
-      throw Errors.NoChanges unless @_areChangesMeaningful(data, @_changes)
+      changes = @_cleanChanges(data, changes)
+      throw Errors.NoChanges unless @_areChangesMeaningful(data, changes)
     .then () =>
       @pull()
     .fail (e) =>
@@ -179,18 +186,18 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
       throw Errors.NetworkError if e is Errors.NetworkError
       hasRemoteData = no
     .then =>
-      throw Errors.NoChanges if @_changes.length is 0
+      throw Errors.NoChanges if changes.length is 0
       # Lock mutable operations during the push
       unlockMutableOperations = _.lock(this, ['set', 'remove', 'clear', 'pull', 'push'])
       # Create the data to send
       @_getAllData()
     .then (data) =>
       # Check if the changes are useful or not by hashing the changes without the last commit
-      $info 'Changes to apply', @_changes
-      throw Errors.NoChanges unless @_areChangesMeaningful(data, @_changes)
+      $info 'Changes to apply', changes
+      throw Errors.NoChanges unless @_areChangesMeaningful(data, changes)
       # Create commit hash
-      [commitHash, pushedData] = @_computeCommit(data, @_changes)
-      $info 'Push ', commitHash, ' -> ', pushedData, ' Local data ', data, ' Changes ', @_changes
+      [commitHash, pushedData] = @_computeCommit(data, changes)
+      $info 'Push ', commitHash, ' -> ', pushedData, ' Local data ', data, ' Changes ', changes
       # Jsonify data
       @_encryptToJson(pushedData)
     .then (data) => if hasRemoteData then @client.put_settings(data) else @client.post_settings(data)
@@ -212,6 +219,9 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
       @push() # Retry later
       throw e
 
+  _cleanChanges: (data, changes) ->
+    (change for change in changes when @_areChangesMeaningful(data, [change]))
+
   _applyChanges: (data, changes) ->
     for change in changes
       if change.type is OperationTypes.SET
@@ -222,12 +232,14 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
 
   _computeCommit: (data, changes) ->
     data = @_applyChanges(data, changes)
+    data.__hashes = (data.__hashes or []).slice(0, @HASHES_CHAIN_MAX_SIZE - 1)
     commitHash = ledger.crypto.SHA256.hashString _(data).toJson()
-    data.__hashes = [commitHash].concat(data.__hashes or []).slice(0, @HASHES_CHAIN_MAX_SIZE)
+    data.__hashes = [commitHash].concat(data.__hashes)
     [commitHash, data]
 
   _areChangesMeaningful: (data, changes) ->
     if data['__hashes']?.length > 0
+      return no if _(changes).every (change) -> (change.type is OperationTypes.REMOVE and (data[change.key] is change.value))
       checkData = _.clone(data)
       checkData['__hashes'] = _(checkData['__hashes']).without(checkData['__hashes'][0])
       checkData = _(checkData).omit('__hashes') if checkData['__hashes'].length is 0
@@ -248,9 +260,12 @@ class ledger.storage.SyncedStore extends ledger.storage.Store
     d.promise
 
   _setAllData: (data) ->
+    @_data = data
     d = ledger.defer()
+    unlock = _.lock(this, ["set", "get", "pull", "push", "keys", "remove"])
     @_secureStore.clear =>
       @_secureStore.set data, =>
+        unlock()
         d.resolve()
     d.promise
 

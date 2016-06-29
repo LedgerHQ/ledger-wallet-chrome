@@ -172,6 +172,7 @@ class @ledger.dongle.Manager extends EventEmitter
       States = ledger.dongle.States
       switch state
         when States.LOCKED then @emit 'connected', dongle
+        when States.UNLOCKED then @emit 'connected', dongle
         when States.BLANK then @emit 'connected', dongle
       l "Connection done", state
     .fail (error) =>

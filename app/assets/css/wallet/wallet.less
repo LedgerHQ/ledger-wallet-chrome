@@ -56,3 +56,37 @@ section {
   }
 
 }
+
+.flash-container {
+  background-color: @color-blue-dark-grey;
+  height: 30px;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  .flash-text {
+    display: block;
+    color: @color-white;
+    font-size: @font-size-very-small;
+    font-weight: @font-weight-regular;
+    margin-top: -2px;
+  }
+
+  .flash-link {
+    margin-left: 3px;
+    margin-top: -2px;
+    display: block;
+    color: @color-white;
+    font-size: @font-size-very-small;
+    font-weight: @font-weight-semibold;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+}

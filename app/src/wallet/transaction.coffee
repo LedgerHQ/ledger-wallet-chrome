@@ -229,6 +229,54 @@ class ledger.wallet.Transaction
     d.promise
 
   ###
+    Creates a new transaction asynchronously. The created transaction will only be initialized (i.e. it will only retrieve
+    a sufficient number of input to perform the transaction)
+
+    @param {ledger.Amount} amount The amount to send (expressed in satoshi)
+    @param {ledger.Amount} fees The miner fees (expressed in satoshi)
+    @param {String} address The recipient address
+    @param {Array<Output>} utxo The list of utxo to sign in order to perform the transaction
+    @param {String} changePath The path to use for the change
+    @option [Function] callback The callback called once the transaction is created
+    @return [Q.Promise] A closure
+  ###
+  @create: ({amount, fees, address, utxo, changePath}, callback = null) ->
+    d = ledger.defer(callback)
+    return d.rejectWithError(Errors.DustTransaction) && d.promise if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+    totalUtxoAmount = _(utxo).chain().map((u) -> ledger.Amount.fromSatoshi(u.get('value'))).reduce(((a, b) -> a.add(b)), ledger.Amount.fromSatoshi(0)).value()
+    return d.rejectWithError(Errors.NotEnoughFunds) && d.promise if totalUtxoAmount.lt(amount.add(fees))
+    # Check if UTXO are safe to spend
+    
+    #return d.rejectWithError(Errors.No)
+    $info("--- CREATE TRANSACTION ---")
+    $info("Amount: ", amount.toString())
+    $info("Fees: ", fees.toString())
+    $info("Total send: ", totalUtxoAmount.toString())
+    $info("Address: ", address)
+    $info("UTXO: ", utxo)
+    $info("Change path: ", changePath)
+
+    changeAmount = totalUtxoAmount.subtract(amount.add(fees))
+    if changeAmount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+      fees  = totalUtxoAmount.subtract(amount)
+      changeAmount = ledger.Amount.fromSatoshi(0)
+      $info("Applied fees: ", fees)
+
+    # Get each raw tx
+    iterate = (index, inputs) ->
+      output = utxo[index]
+      return d.resolve(inputs) unless output?
+      d = ledger.defer()
+      ledger.api.TransactionsRestClient.instance.getRawTransaction output.get('transaction_hash'), (rawTransaction, error) ->
+        if error?
+         return d.rejectWithError(Errors.NetworkError)
+        result = raw: rawTransaction, paths: [output.get('path')], output_index: output.get('index'), value: output.get('value')
+        d.resolve(iterate(index + 1, inputs.concat([result])))
+      d.promise
+    d.resolve(iterate(0, []).then (inputs) => new Transaction(ledger.app.dongle, amount, fees, address, inputs, changePath))
+    d.promise
+
+  ###
   Creates a new transaction asynchronously. The created transaction will only be initialized (i.e. it will only retrieve
   a sufficient number of input to perform the transaction)
 
@@ -239,6 +287,7 @@ class ledger.wallet.Transaction
   @param {String} changePath The path to use for the change
   @option [Function] callback The callback called once the transaction is created
   @return [Q.Promise] A closure
+  ###
   ###
   @create: ({amount, fees, address, inputsPath, changePath, excludedInputs}, callback = null) ->
     d = ledger.defer(callback)
@@ -256,17 +305,11 @@ class ledger.wallet.Transaction
     $info("Change path: ", changePath)
     $info("Excluded inputs", excludedInputs)
 
-    ###
-      Utils
-    ###
 
     isOutputExcluded = (output) ->
       return for [index, hash] in excludedInputs when output['transaction_hash'] is hash and output['output_index'] is index
       no
 
-    ###
-      End of Uitls
-    ###
     ledger.app.dongle.getPublicAddress changePath, (dongleChangeAddress) ->
       ledger.tasks.AddressDerivationTask.instance.getPublicAddress changePath, (workerChangeaddress, error) ->
         if dongleChangeAddress.bitcoinAddress.toString(ASCII) isnt workerChangeaddress
@@ -324,3 +367,4 @@ class ledger.wallet.Transaction
               else
                 d.rejectWithError(Errors.NotEnoughFunds)
     d.promise
+  ###

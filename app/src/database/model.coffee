@@ -1,4 +1,6 @@
 
+{$info} = ledger.utils.Logger.getLazyLoggerByTag("Model")
+
 resolveRelationship = (object, relationship) ->
   Class = window[relationship.Class]
   switch relationship.type
@@ -21,6 +23,10 @@ class @ledger.database.Model extends @EventEmitter
     @_object = base
     @_needsUpdate = if @isInserted() then no else yes
     @_deleted = no
+    @_changes = []
+    unless @isInserted()
+      for key, value of (base or {})
+        @_changes.push {type: 'set', key: key, value: value}
 
   get: (key) ->
     if @getRelationships()?[key]?
@@ -50,6 +56,7 @@ class @ledger.database.Model extends @EventEmitter
     else
       @_object[key] = value
     @_needsUpdate = yes
+    @_changes.push {type: 'set', key: key, value: value}
     @
 
   remove: (key, value) ->
@@ -65,6 +72,7 @@ class @ledger.database.Model extends @EventEmitter
       if _.contains(@_object[key], value)
         @_object[key] = _.without(@_object[key], value)
     @_needsUpdate = yes
+    @_changes.push {type: 'remove', key: key, value: value}
     @
 
   add: (key, value) ->
@@ -79,6 +87,7 @@ class @ledger.database.Model extends @EventEmitter
       unless _.contains(@_object[key], value)
         @_object[key].push value
     @_needsUpdate = yes
+    @_changes.push {type: 'add', key: key, value: value}
     @
 
   save: () ->
@@ -89,10 +98,12 @@ class @ledger.database.Model extends @EventEmitter
     else if @onInsert() isnt false
       @_collection.insert this
       @_commitPendingRelationships()
-      @_needsUpdate = no
+    @_needsUpdate = no
+    @_changes = []
     @
 
   delete: () ->
+    $info "Delete model from database", @_object,  new Error().stack
     if not @_deleted and @onDelete() isnt false
       if @getRelationships()?
         for relationshipName, relationship of @getRelationships()
@@ -105,17 +116,21 @@ class @ledger.database.Model extends @EventEmitter
                   @get(relationshipName).delete()
                 when 'one_many'
                   @get(relationshipName).delete()
-                when 'many_many' then throw 'many:many relastionships are not implemented yet'
+                when 'many_many' then throw 'many:many relationships are not implemented yet'
             when 'nullify'
               switch relationship.type
                 when 'many_one'
                   item.set(relationship.inverse, null).save() for item in @get(relationshipName)
                 when 'one_one'
                   @get(relationshipName).set(relationship.inverse, null)
-                when 'many_many' then throw 'many:many relastionships are not implemented yet'
+                when 'many_many' then throw 'many:many relationships are not implemented yet'
       @_deleted = true
       @_collection.remove this
       return
+
+  getChanges: -> @_changes
+
+  hasKeyChanged: (key) -> _(@_changes).some (change) -> change.key is key
 
   refresh: () ->
     @_collection.refresh this
@@ -208,7 +223,6 @@ class @ledger.database.Model extends @EventEmitter
     new @ context, base
 
   @uniqueId: (prefix = "") -> ledger.crypto.SHA256.hashString(prefix + (byte.toString(16) for byte in crypto.getRandomValues(new Uint8Array(32))).join(''))
-
 
   @findById: (id, context = ledger.database.contexts.main) ->
     if @getBestIdentifierName() is '$loki'

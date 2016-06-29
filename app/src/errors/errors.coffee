@@ -63,6 +63,7 @@ _.extend ledger.errors,
   InvalidChangeAmount: 702
   RecipientAddressNotFound: 703
   InvalidRecipientAmount: 704
+  UnsafeUnspentOutputs: 705
 
   DefaultMessages:
     0: "StandardError"

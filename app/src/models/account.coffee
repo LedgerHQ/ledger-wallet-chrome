@@ -71,31 +71,32 @@ class @Account extends ledger.database.Model
 
   isDeletable: -> @get('operations').length is 0
 
+  ## Utxo
+
+  getUtxo: ->
+    hdaccount = @getWalletAccount()
+    _(Output.utxo()).filter (utxo) -> utxo.get('path').match(hdaccount.getRootDerivationPath())
+
   ## Balance management
 
   retrieveBalance: () ->
     totalBalance = @get 'total_balance'
     unconfirmedBalance = @get 'unconfirmed_balance'
-    @set 'total_balance', @getBalanceFromOperations().toString()
-    @set 'unconfirmed_balance', @getUnconfirmedBalanceFromOperations().toString()
-
+    @set 'total_balance', @getBalanceFromUtxo(0).toString()
+    @set 'unconfirmed_balance', @getBalanceFromUtxo(0).toString()
+    @save()
     if ledger.Amount.fromSatoshi(totalBalance or 0).neq(@get('total_balance') or 0) or ledger.Amount.fromSatoshi(unconfirmedBalance or 0).neq(@get('unconfirmed_balance') or 0)
-      ledger.app.emit "wallet:balance:changed", @get('wallet').getBalance()
+      ledger.app.emit "wallet:balance:changed", Wallet.instance.getBalance()
     else
-      ledger.app.emit "wallet:balance:unchanged", @get('wallet').getBalance()
+      ledger.app.emit "wallet:balance:unchanged", Wallet.instance.getBalance()
 
-  getBalanceFromOperations: ->
+  getBalanceFromUtxo: (minConfirmation) ->
     total = ledger.Amount.fromSatoshi(0)
-    for operation in @get('operations')
-      continue if operation.get('double_spent_priority')? and operation.get('double_spent_priority') > 0
-      total = if operation.get('type') is 'reception' then total.add(operation.get('value')) else total.subtract(operation.get('value')).subtract(operation.get('fees'))
-    total
-
-  getUnconfirmedBalanceFromOperations: ->
-    total = ledger.Amount.fromSatoshi(0)
-    for operation in @get('operations') when operation.get('confirmations') > 0
-      continue if operation.get('double_spent_priority')? and operation.get('double_spent_priority') > 0
-      total = if operation.get('type') is 'reception' then total.add(operation.get('value')) else total.subtract(operation.get('value')).subtract(operation.get('fees'))
+    return total unless @getWalletAccount()?
+    utxo = @getUtxo()
+    for output in utxo when !output.get('double_spent_priority')? or output.get('double_spent_priority') == 0
+      if (output.get('path').match(@getWalletAccount().getRootDerivationPath()) and output.get('transaction').get('confirmations')) >= minConfirmation
+        total = total.add(output.get('value'))
     total
 
   ## Add/Remove/Hidden
@@ -135,6 +136,14 @@ class @Account extends ledger.database.Model
         @_createTransactionGetChangeAddressPath @getWalletAccount().getCurrentChangeAddressIndex(), (changePath) =>
           ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, excludedInputs: excludedInputs, callback)
       ledger.tasks.TransactionConsumerTask.instance.pushTransactions(transactions)
+
+  createTransaction: ({amount, fees, address, utxo}, callback) ->
+    amount = ledger.Amount.fromSatoshi(amount)
+    fees = ledger.Amount.fromSatoshi(fees)
+    changeIndex = @getWalletAccount().getCurrentChangeAddressIndex()
+    changePath =  @getWalletAccount().getChangeAddressPath(changeIndex)
+    ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, utxo: utxo, changePath: changePath, callback)
+
 
   ###
     Special get change address path to 'avoid' LW 1.0.0 derivation failure.

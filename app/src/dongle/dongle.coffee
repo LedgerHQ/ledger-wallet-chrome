@@ -115,6 +115,13 @@ class @ledger.dongle.Dongle extends EventEmitter
         # Resolve
     @_forceBl = forceBootloader
     @state = States.UNDEFINED
+    if @_btchip.card.vendorId is 11415
+      d = ledger.defer(callback)
+      @_recoverFirmwareVersion().then =>
+        @_setState(States.UNLOCKED)
+        d.resolve(States.UNLOCKED)
+      return d.promise
+
     unless @isInBootloaderMode()
       @_recoverFirmwareVersion().then =>
         if @getFirmwareInformation().hasSetupFirmwareSupport()
@@ -252,7 +259,7 @@ class @ledger.dongle.Dongle extends EventEmitter
   _checkCertification: (isBeta, callback = undefined) ->
     _btchipQueue.enqueue "checkCertification", =>
       d = ledger.defer(callback)
-      return d.resolve(true).promise if @getIntFirmwareVersion() < ledger.dongle.Firmwares.V_L_1_0_0 or yes
+      return d.resolve(true).promise if @_btchip.card.vendorId is 11415 or @getIntFirmwareVersion() < ledger.dongle.Firmwares.V_L_1_0_0
       randomValues = new Uint32Array(2)
       crypto.getRandomValues(randomValues)
       random = _.str.lpad(randomValues[0].toString(16), 8, '0') + _.str.lpad(randomValues[1].toString(16), 8, '0')
