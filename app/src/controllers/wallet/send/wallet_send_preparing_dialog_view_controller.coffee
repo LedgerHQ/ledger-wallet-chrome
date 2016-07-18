@@ -41,10 +41,10 @@ class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewC
     mobileBlock = (transaction, secureScreens) =>
       @getDialog().push new WalletSendValidatingDialogViewController(transaction: transaction, secureScreens: secureScreens, validationMode: 'mobile')
     methodBlock = (transaction) =>
-      @getDialog().push new WalletSendMethodDialogViewController(transaction: transaction)
+      @getDialog().push new WalletSendValidatingDialogViewController(transaction: transaction)
 
     if ledger.app.dongle.getFirmwareInformation().hasScreenAndButton()
-      @getDialog().push new WalletSendProcessingDialogViewController transaction: @params.transaction
+      @getDialog().push new WalletSendSignDialogViewController(transaction: transaction)
     # if mobile validation is supported
     else if ledger.app.dongle.getFirmwareInformation().hasSecureScreen2FASupport()
       # fetch grouped paired screens

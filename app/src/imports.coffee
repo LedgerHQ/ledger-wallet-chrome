@@ -282,6 +282,7 @@
         'controllers/wallet/send/wallet_send_preparing_dialog_view_controller'
         'controllers/wallet/send/wallet_send_validating_dialog_view_controller'
         'controllers/wallet/send/wallet_send_method_dialog_view_controller'
+        'controllers/wallet/send/wallet_send_sign_dialog_view_controller'
 
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'

@@ -170,6 +170,31 @@ class ledger.wallet.Transaction
     .done()
     d.promise
 
+  sign: (callback = undefined, progressCallback = undefined) ->
+    d = ledger.defer(callback)
+    l "Prepare", @_btInputs, @_btcAssociatedKeyPath
+    @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees)
+    .progress (progress) =>
+      d.notify(progress)
+    .then (@_signedRawTransaction) =>
+      @_isValidated = yes
+      tx = ledger.bitcoin.decodeTransaction(@getSignedTransaction())
+      $info("Raw TX: ", @getSignedTransaction())
+      ledger.wallet.pathsToAddresses [@changePath], (addresses) =>
+        changeAddress = _(addresses).chain().values().first().value()
+        result = ledger.bitcoin.verifyRawTx(@getSignedTransaction(), @inputs, @amount, @fees, @recipientAddress, changeAddress)
+        if result.isSuccess()
+          _.defer => d.resolve(@)
+        else
+          $error("Invalid signed tx ", result.getError().message)
+          return d.rejectWithError(Errors.ChangeDerivationError)
+    .fail (error) =>
+      e "GOT ERROR", error
+      d.rejectWithError(Errors.SignatureError)
+    .done()
+    d.promise
+
+
   # @param [String] validationKey 4 chars ASCII encoded
   # @param [Function] callback
   # @return [Q.Promise]
