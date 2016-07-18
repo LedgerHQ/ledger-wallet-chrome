@@ -32,14 +32,14 @@ class @WalletSendSignDialogViewController extends ledger.common.DialogViewContro
   _onSignatureProgress: (progress) ->
     l progress
     if progress.currentHashOutputBase58 is 1 and progress.currentUntrustedHash is 0
-      @_invalidate('confirm')
+      setTimeout((=> @_invalidate('confirm')), 1000)
     else if progress.currentHashOutputBase58 is 0
       # Validating
       currentStep = progress.currentTrustedInput + progress.currentPublicKey
       stepsCount = 2 * progress.publicKeyCount
       percent = Math.ceil(currentStep / stepsCount * 100)
       @_invalidateProgressBar(percent)
-    else if progress.currentHashOutputBase58 is 1 and progress.currentUntrustedHash is 1
+    else if progress.currentHashOutputBase58 is 1 and progress.currentUntrustedHash is 1 and progress.publicKeyCount >= 4
       # Enter processing
       @_invalidate('processing')
     else
@@ -51,8 +51,9 @@ class @WalletSendSignDialogViewController extends ledger.common.DialogViewContro
 
 
   _invalidateProgressBar: (percent) ->
-    @view["#{@_currentMode}ProgressBar"].setProgress(percent / 100)
-    @view["#{@_currentMode}ProgressLabel"].text percent + '%'
+    if @_currentMode is 'validating' or @_currentMode is 'processing'
+      @view["#{@_currentMode}ProgressBar"].setProgress(percent / 100)
+      @view["#{@_currentMode}ProgressLabel"].text percent + '%'
 
   _currentMode: 'validating'
   _invalidate: (mode = undefined) ->
