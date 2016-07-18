@@ -42,6 +42,9 @@ permissions:
       -
         vendorId: 9601
         productId: 6152
+      -
+        vendorId: 11415
+        productId: 0
 
 optional_permissions:
   - "videoCapture"

@@ -117,7 +117,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     @state = States.UNDEFINED
     unless @isInBootloaderMode()
       @_recoverFirmwareVersion().then =>
-        if @getFirmwareInformation().hasSetupFirmwareSupport()
+        if @getFirmwareInformation().hasSetupFirmwareSupport() && !@getFirmwareInformation().hasScreenAndButton()
           @getRemainingPinAttempt().then =>
             @_setState(States.LOCKED)
             States.LOCKED
@@ -125,25 +125,30 @@ class @ledger.dongle.Dongle extends EventEmitter
             @_setState(States.BLANK)
             States.BLANK
         else
-          @_sendApdu(0xE0, 0x40, 0x00, 0x00, 0x05, 0x01).then (result) =>
-            switch @getSw()
-              when 0x9000, 0x6982
-                @_setState States.LOCKED
-                States.LOCKED
-              when 0x6985
-                configureBlank = =>
-                  @_setState(States.BLANK)
-                  States.BLANK
-                # Check restore
-                if @getFirmwareInformation().hasSubFirmwareSupport() and @getFirmwareInformation().hasOperationFirmwareSupport()
-                  @restoreSetup().then =>
-                    @_setState States.LOCKED
-                    States.LOCKED
-                  .catch => do configureBlank
-                else
-                  do configureBlank
-              when 0x6faa
-                throw "Invalid statue - 0x6faa"
+          # Nano S, Blue
+          if @getFirmwareInformation().hasScreenAndButton()
+            @_setState States.UNLOCKED
+            States.UNLOCKED
+          else
+            @_sendApdu(0xE0, 0x40, 0x00, 0x00, 0x05, 0x01).then (result) =>
+              switch @getSw()
+                when 0x9000, 0x6982
+                  @_setState States.LOCKED
+                  States.LOCKED
+                when 0x6985
+                  configureBlank = =>
+                    @_setState(States.BLANK)
+                    States.BLANK
+                  # Check restore
+                  if @getFirmwareInformation().hasSubFirmwareSupport() and @getFirmwareInformation().hasOperationFirmwareSupport()
+                    @restoreSetup().then =>
+                      @_setState States.LOCKED
+                      States.LOCKED
+                    .catch => do configureBlank
+                  else
+                    do configureBlank
+                when 0x6faa
+                  throw "Invalid statue - 0x6faa"
       .catch (error) =>
         console.error("Fail to initialize Dongle :", error)
         @_setState(States.ERROR)
@@ -490,7 +495,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         message = new ByteString(message, ASCII)
         @_btchip.signMessagePrepare_async(path, message)
         .then =>
-          return @_btchip.signMessageSign_async(new ByteString(@_pin, ASCII))
+          return @_btchip.signMessageSign_async(if (@_pin?) then new ByteString(@_pin, ASCII) else undefined)
         .then (sig) =>
           signedMessage = @_convertMessageSignature(pubKey, message, sig.signature)
           d.resolve(signedMessage)

@@ -116,11 +116,14 @@ class ledger.common.application.BaseApplication extends @EventEmitter
     Requests the application to perform or perform again a dongle certification process
   ###
   performDongleAttestation: ->
-    return if @_dongleAttestationLock is on
-    @_dongleAttestationLock = on
-    @dongle?.isCertified (dongle, error) =>
-      @_dongleAttestationLock = off
-      (Try => @onDongleCertificationDone(dongle, error)).printError()
+    if @dongle.getFirmwareInformation().hasScreenAndButton()
+      (Try => @onDongleCertificationDone(@dongle, null)).printError()
+    else
+      return if @_dongleAttestationLock is on
+      @_dongleAttestationLock = on
+      @dongle?.isCertified (dongle, error) =>
+        @_dongleAttestationLock = off
+        (Try => @onDongleCertificationDone(dongle, error)).printError()
     return
 
   isConnectingDongle: -> @_isConnectingDongle

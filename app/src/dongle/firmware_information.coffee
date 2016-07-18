@@ -58,3 +58,10 @@ class ledger.dongle.FirmwareInformation
   hasRecoveryFlashingSupport: -> @getIntFirmwareVersion() >= Firmwares.V_L_1_1_0
 
   isUsingInputFinalizeFull: -> @getIntFirmwareVersion() >= Firmwares.V_L_1_0_2
+
+  hasFeature: (featureFlag) -> (@getFirmwareModeFlag() & featureFlag) == featureFlag
+
+  hasBleSupport: -> @hasFeature(0x10)
+  hasSecureScreenAndButton: -> @hasFeature(0x02)
+  hasUnsafeScreenAndButton: -> @hasFeature(0x04)
+  hasScreenAndButton: -> @hasSecureScreenAndButton() || @hasUnsafeScreenAndButton()
