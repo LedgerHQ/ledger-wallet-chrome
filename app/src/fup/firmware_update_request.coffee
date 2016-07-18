@@ -372,7 +372,7 @@ class ledger.fup.FirmwareUpdateRequest extends @EventEmitter
     index = 0
     while index < ledger.fup.updates.OS_INIT.length and !ledger.fup.utils.compareVersions(ledger.fup.versions.Nano.CurrentVersion.Os, ledger.fup.updates.OS_INIT[index][0]).eq()
       index += 1
-    currentInitScript = INIT_LW_1102
+    currentInitScript = INIT_LW_1101
     moddedInitScript = []
     for i in [0...currentInitScript.length]
       moddedInitScript.push currentInitScript[i]
