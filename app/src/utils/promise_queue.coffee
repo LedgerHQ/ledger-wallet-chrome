@@ -57,14 +57,14 @@ class @ledger.utils.PromiseQueue extends @EventEmitter
     @param [Function] task
     @return [Q.Promise]
   ###
-  enqueue: (taskId, task) ->
+  enqueue: (taskId, task, delay = PromiseQueue.TIMOUT_DELAY) ->
     [taskId, task] = [Math.round(Math.random() * 1000), taskId] if ! task && typeof taskId == 'function'
     defer = ledger.defer()
     taskWrapper = =>
       @emit 'task:starting', taskId
       try
         # TODO: use defer.promise.isFilfilled instead of done, but fail randomly sometimes.
-        timer = @_setTimeout(taskId, defer)
+        timer = @_setTimeout(taskId, defer, delay)
         task().finally( =>
           clearTimeout(timer)
           @emit 'task:done', taskId
@@ -72,7 +72,7 @@ class @ledger.utils.PromiseQueue extends @EventEmitter
         ).then( (args...) -> defer.resolve(args...); return
         ).progress( (args...) =>
           clearTimeout(timer)
-          timer = @_setTimeout(taskId, defer)
+          timer = @_setTimeout(taskId, defer, delay)
           defer.notify(args...); return
         ).catch( (args...) -> defer.reject(args...); return
         ).done()
@@ -96,14 +96,14 @@ class @ledger.utils.PromiseQueue extends @EventEmitter
       @_taskRunning = false
       @emit 'queue:empty'
 
-  _setTimeout: (taskId, defer) ->
-    setTimeout (=> @_timeout(taskId, defer)), PromiseQueue.TIMOUT_DELAY
+  _setTimeout: (taskId, defer, delay) ->
+    setTimeout (=> @_timeout(taskId, defer, delay)), delay
 
-  _timeout: (taskId, defer) ->
+  _timeout: (taskId, defer, delay) ->
     return if defer.promise.isFulfilled()
     if @_queue.length > 0
       console.warn("PromiseQueue#{@brakName} Timeout for task #{taskId}. Call next task.")
-      setTimeout (=> @_timeout(taskId, defer)), PromiseQueue.TIMOUT_DELAY
+      setTimeout (=> @_timeout(taskId, defer, delay)), delay
       @_taskDone()
     else
       msg = "PromiseQueue#{@brakName} Timeout for task #{taskId}. No task to call."

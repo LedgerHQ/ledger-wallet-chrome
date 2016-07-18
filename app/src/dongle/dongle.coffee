@@ -661,7 +661,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         .concat(changeAmount.toScriptByteString())
         .concat(PkScript(changeAddress))
 
-      _btchipQueue.enqueue "createPaymentTransaction", =>
+      task = =>
         @_btchip.createPaymentTransactionNew_async(
           inputs, associatedKeysets, changePath,
           outputScript,
@@ -682,6 +682,7 @@ class @ledger.dongle.Dongle extends EventEmitter
             result.encryptedOutputScript = result.encryptedOutputScript?.toString(HEX)
           return result
         )
+      _btchipQueue.enqueue("createPaymentTransaction", task, (if (@getFirmwareInformation().hasScreenAndButton()) then 72000000 else undefined))
     .fail (er) ->
       e er
 
