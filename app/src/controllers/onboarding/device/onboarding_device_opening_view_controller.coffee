@@ -9,7 +9,7 @@ class @OnboardingDeviceOpeningViewController extends @OnboardingViewController
     if Wallet.instance?.isInitialized
       ledger.app.router.go '/wallet/accounts/index'
     else
-      @view.currentAction.text t 'onboarding.device.opening.is_opening'
+      @view.currentAction.text t 'onboarding.device.opening.opening'
       ledger.app.on 'wallet:initialized', @onWalletInitialized
       ledger.app.on 'wallet:initialization:creation', @onWalletIsSynchronizing
 
