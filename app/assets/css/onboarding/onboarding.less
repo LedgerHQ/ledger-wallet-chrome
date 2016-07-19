@@ -13,8 +13,6 @@
   > .greyed-container {
     background-color: @color-extra-light-grey;
     padding: @metrics-large-padding 0;
-    border-top: 1px solid @color-very-light-grey;
-    border-bottom: 1px solid @color-very-light-grey;
 
     .black-indication {
       font-size: @font-size-very-large;
@@ -84,6 +82,12 @@
       }
     }
   }
+
+  a.greyed-container {
+    border-top: 1px solid @color-very-light-grey;
+    border-bottom: 1px solid @color-very-light-grey;
+  }
+
   a.greyed-container.detailed:hover {
     background-color: darken(@color-extra-light-grey, 1%);
   }

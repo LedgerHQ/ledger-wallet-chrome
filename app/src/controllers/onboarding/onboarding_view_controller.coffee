@@ -57,6 +57,9 @@ class @OnboardingViewController extends ledger.common.ViewController
   unbindWindow: ->
     $(window).unbind 'keyup', null
 
+  openHelpCenter: ->
+    window.open t 'application.support_url'
+
   bindWindow: ->
     if @view.continueButton? and @view.continueButton.length == 1
       $(window).on 'keyup', (e) =>
