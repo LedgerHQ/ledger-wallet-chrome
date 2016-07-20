@@ -6,6 +6,7 @@ DevicesInfo = [
   {productId: 0x2b7c, vendorId: 0x2581, type: 'hid', scanner: 'LegacyHid'}
   {productId: 0x3b7c, vendorId: 0x2581, type: 'hid', scanner: 'Hid'}
   {productId: 0x0000, vendorId: 0x2c97, type: 'hid', scanner: 'HidBlue'}
+  {productId: 0x0001, vendorId: 0x2c97, type: 'hid', scanner: 'HidBlue'}
   {productId: 0x1808, vendorId: 0x2581, type: 'usb', scanner: 'WinUsbBootloader'}
   {productId: 0x1807, vendorId: 0x2581, type: 'hid', scanner: 'HidBootloader'}
 ]
@@ -32,6 +33,7 @@ class @ledger.dongle.Manager extends EventEmitter
     @_factoryDongleOSHID = new ChromeapiPlugupCardTerminalFactory(0x2b7c);
     @_factoryDongleOSHIDLedger = new ChromeapiPlugupCardTerminalFactory(0x3b7c, undefined, true);
     @_factoryDongleOSHIDLedgerBlue = new ChromeapiPlugupCardTerminalFactory(0x0000, undefined, true, 0x2c97);
+    @_factoryDongleOSHIDLedgerNanoS = new ChromeapiPlugupCardTerminalFactory(0x0001, undefined, true, 0x2c97);
     @_isPaused = yes
 
   # Start observing if dongles are plugged in or unnplugged
@@ -162,6 +164,14 @@ class @ledger.dongle.Manager extends EventEmitter
   _scanDongleHidBlue: ->
     l "Connect Hid blue"
     @_factoryDongleOSHIDLedgerBlue.list_async().then (result) =>
+      if result.length > 0
+        [@_factoryDongleOSHIDLedgerBlue.getCardTerminal(result[0]), no]
+      else
+        throw new Error("Factory dongle HID blue new failed")
+
+  _scanDongleHidBlue: ->
+    l "Connect Hid Nano S"
+    @_factoryDongleOSHIDLedgerNanoS.list_async().then (result) =>
       if result.length > 0
         [@_factoryDongleOSHIDLedgerBlue.getCardTerminal(result[0]), no]
       else

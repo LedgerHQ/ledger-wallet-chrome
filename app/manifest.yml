@@ -20,6 +20,7 @@ permissions:
   - "*://node.ledger.fr/*"
   - "storage"
   - "unlimitedStorage"
+  - "notifications"
   - "usb"
   - "hid"
   -
@@ -45,6 +46,9 @@ permissions:
       -
         vendorId: 11415
         productId: 0
+      -
+        vendorId: 11415
+        productId: 1
 
 optional_permissions:
   - "videoCapture"

@@ -78,7 +78,6 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
 
   postTransaction: (transaction, callback) ->
     @http().post
-
       url: "blockchain/v2/#{ledger.config.network.ticker}/transactions/send",
       data: {tx: transaction.getSignedTransaction()}
       onSuccess: (response) ->
