@@ -62,21 +62,22 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
         dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount(), utxo: utxo
         @getDialog().push dialog
 
+      {amount, fees} = @_computeAmount()
       # check transactions fees
-      if +@view.feesSelect.val() > ledger.preferences.fees.MaxValue
-        # warn if wrong
-        dialog = new CommonDialogsConfirmationDialogViewController()
-        dialog.showsCancelButton = yes
-        dialog.restrainsDialogWidth = no
-        dialog.negativeText = _.str.sprintf(t('wallet.send.index.no_use'), ledger.formatters.formatValue(ledger.preferences.fees.MaxValue))
-        dialog.positiveLocalizableKey = 'common.yes'
-        dialog.message = _.str.sprintf(t('common.errors.fees_too_high'), ledger.formatters.formatValue(@view.feesSelect.val()))
-        dialog.once 'click:positive', => pushDialogBlock(@view.feesSelect.val())
-        dialog.once 'click:negative', => pushDialogBlock(ledger.preferences.fees.MaxValue)
-        dialog.show()
-      else
-        # push next dialog
-        pushDialogBlock(@view.feesSelect.val())
+#      if +fees > ledger.preferences.fees.MaxValue
+#        # warn if wrong
+#        dialog = new CommonDialogsConfirmationDialogViewController()
+#        dialog.showsCancelButton = yes
+#        dialog.restrainsDialogWidth = no
+#        dialog.negativeText = _.str.sprintf(t('wallet.send.index.no_use'), ledger.formatters.formatValue(ledger.preferences.fees.MaxValue))
+#        dialog.positiveLocalizableKey = 'common.yes'
+#        dialog.message = _.str.sprintf(t('common.errors.fees_too_high'), ledger.formatters.formatValue(fees))
+#        dialog.once 'click:positive', => pushDialogBlock(@view.feesSelect.val())
+#        dialog.once 'click:negative', => pushDialogBlock(ledger.preferences.fees.MaxValue)
+#        dialog.show()
+#      else
+#        # push next dialog
+      pushDialogBlock(@view.feesSelect.val())
 
   openScanner: ->
     dialog = new CommonDialogsQrcodeDialogViewController

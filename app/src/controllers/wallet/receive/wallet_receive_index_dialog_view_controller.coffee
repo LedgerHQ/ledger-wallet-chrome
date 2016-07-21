@@ -68,7 +68,7 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
 
   _bitcoinAddressUri: ->
     uri = "bitcoin:" + @_receivingAddress()
-    uri += "?amount=#{ledger.formatters.fromSatoshiToBTC(@_selectedAmount())}" if @_selectedAmount() isnt "0" and @_selectedAmount() isnt 0
+    uri += "?amount=#{ledger.formatters.fromSatoshiToBTC(@_selectedAmount()).replace(',', '.').replace(" ", "")}" if @_selectedAmount() isnt "0" and @_selectedAmount() isnt 0
     uri
 
   _updateAccountsSelect: ->
