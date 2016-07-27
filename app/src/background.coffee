@@ -4,7 +4,7 @@ updateAvailable = no
   var apps = [
     {
       name: "Ledger Wallet Ethereum",
-      id: "bnnlcfinjccfjckfgnknjdmjamgnlgcj"
+      id: "hmlhkialjkaldndjnlcdfdphcgeadkkm"
     }
   ];
 
@@ -83,6 +83,7 @@ chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse) =>
     req = request.request.command
     data = request.request
   payload = {}
+  console.log(request);
   switch req
     when 'ping' 
       window.externalSendResponse { command: "ping", result: true }

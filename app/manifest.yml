@@ -2,7 +2,7 @@ name: "__MSG_application_name__"
 description: "__MSG_application_small_description__"
 version: "1.6.0"
 manifest_version: 2
-minimum_chrome_version: "38"
+minimum_chrome_version: "50"
 default_locale: "en"
 key: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk2jSUQ+PRQdNdw9T6XLr7TLwQpOry4TwwtACJUuK2HasLurg5/2ebzezBeU49ptRLUV5uSq9Pp2bhN+97Vyi2ryrIGemiNdeFWzG1MK8fNDDdaFYXUEC3oRWnzyGNbYHz7lwV4lc65del8tQDiUpjw5bsd+tUrRuasNINeLmQaV0yGQrPVMFjO9n3SpGtom1urLKOPEzNa9mLNsCV4hqz2AI4KMa6sA4hVAEMUDXBRD7ezRv3qX0EeyVel8n2lZTCyxoHZScMxgUlFPXBYVx2U8IBYQU+uCOdxPbe4ON16egzZHPsULmoZnBry0v1cJpMX5BTYlEjkHRRwnTCWJ/AwIDAQAB"
 

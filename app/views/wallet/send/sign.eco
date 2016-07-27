@@ -11,7 +11,7 @@
     <div class="regular-grey-text-small"><%= t 'common.may_take_a_while' %></div>
   </div>
   <div id="confirm" class="content-container">
-    <img src="../assets/images/wallet/send/confirm_on_nanos.png" width="50" height="50" />
+    <img src="../assets/images/wallet/send/ic_exchange.png" width="50" height="50" />
     <div class="regular-text"><%- t 'wallet.send.sign.confirm' %></div>
     <div class="regular-grey-text-small"><%- t 'wallet.send.sign.confirm_check_1' %></div>
     <div class="regular-grey-text-small second-line"><%- t 'wallet.send.sign.confirm_check_2' %></div>

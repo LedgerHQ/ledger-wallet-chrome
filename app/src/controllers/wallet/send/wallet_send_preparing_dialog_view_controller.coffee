@@ -36,18 +36,20 @@ class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewC
     @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
 
   _routeToNextDialog: (transaction) ->
+    if ledger.app.dongle.getFirmwareInformation().hasScreenAndButton()
+      @getDialog().push new WalletSendSignDialogViewController(transaction: transaction)
+      return
+
     cardBlock = (transaction) =>
       @getDialog().push new WalletSendValidatingDialogViewController(transaction: transaction, options: {hideOtherValidationMethods: true}, validationMode: 'card')
     mobileBlock = (transaction, secureScreens) =>
       @getDialog().push new WalletSendValidatingDialogViewController(transaction: transaction, secureScreens: secureScreens, validationMode: 'mobile')
     methodBlock = (transaction) =>
-      @getDialog().push new WalletSendValidatingDialogViewController(transaction: transaction)
+      @getDialog().push new WalletSendMethodDialogViewController(transaction: transaction)
 
-    if ledger.app.dongle.getFirmwareInformation().hasScreenAndButton()
-      @getDialog().push new WalletSendSignDialogViewController(transaction: transaction)
     # if mobile validation is supported
-    else if ledger.app.dongle.getFirmwareInformation().hasSecureScreen2FASupport()
-      # fetch grouped paired screens
+    if ledger.app.dongle.getIntFirmwareVersion() >= ledger.dongle.Firmwares.V_LW_1_0_0
+  # fetch grouped paired screens
       ledger.m2fa.PairedSecureScreen.getAllGroupedByUuidFromSyncedStore (groups, error) =>
         groups = _.values(_.omit(groups, undefined)) if groups?
         ## if paired and only one pairing id exists
