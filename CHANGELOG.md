@@ -1,4 +1,8 @@
 # Changelog
+1.6.0
+===
+- Add Nano S support
+
 1.5.5
 ===
 - Minor synchronization bug fixes
