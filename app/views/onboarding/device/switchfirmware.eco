@@ -1,6 +1,6 @@
 <div id="content-container">
   <div class="logo-container">
-    <img src="../../assets/images/onboarding/large_logo.png" width="280" height="125">
+    <img src="../../assets/images/onboarding/large_logo.png" width="191" height="96">
   </div>
   <div id="progress_container" class="greyed-container">
     <div class="black-indication"><%= if @params.mode is 'setup' then t 'onboarding.device.switchfirmware.preparing' else  t 'onboarding.device.switchfirmware.finalizing' %></div>
