@@ -1,4 +1,8 @@
 # Changelog
+1.6.1
+===
+- Fix mobile 2FA
+
 1.6.0
 ===
 - Add Nano S support
