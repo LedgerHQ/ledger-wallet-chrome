@@ -86,8 +86,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     total = ledger.Amount.fromSatoshi(0)
     for output in utxo
       total = total.add(output.get('value'))
-    estimatedSize = ledger.bitcoin.estimateTransactionSize(utxo.length, 2).max
-    fees = feePerByte.multiply(estimatedSize)
+    {fees} = @_computeAmount(feePerByte, total)
     amount = total.subtract(fees)
     if amount.lte(0)
       amount = ledger.Amount.fromSatoshi(0)
@@ -191,9 +190,9 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
   _selectedAccount: ->
     Account.find(index: parseInt(@view.accountsSelect.val())).first()
 
-  _computeAmount: (feePerByte = ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000)) ->
+  _computeAmount: (feePerByte = ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000), desiredAmount = undefined) ->
     account = @_selectedAccount()
-    desiredAmount = ledger.Amount.fromSatoshi(@_transactionAmount())
+    desiredAmount ?= ledger.Amount.fromSatoshi(@_transactionAmount())
     if desiredAmount.lte(0)
       return total: ledger.Amount.fromSatoshi(0), amount: ledger.Amount.fromSatoshi(0), fees: ledger.Amount.fromSatoshi(0), utxo: [], size: 0
     utxo = @_utxo
