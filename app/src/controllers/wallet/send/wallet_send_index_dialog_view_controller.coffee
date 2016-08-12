@@ -88,7 +88,6 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       total = total.add(output.get('value'))
     estimatedSize = ledger.bitcoin.estimateTransactionSize(utxo.length, 2).max
     fees = feePerByte.multiply(estimatedSize)
-    l total.toBtcString(), fees.toBtcString()
     amount = total.subtract(fees)
     if amount.lte(0)
       amount = ledger.Amount.fromSatoshi(0)
