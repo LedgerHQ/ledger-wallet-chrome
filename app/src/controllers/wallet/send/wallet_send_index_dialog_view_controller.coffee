@@ -11,6 +11,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     feesSelect: '#fees_select'
     accountsSelect: '#accounts_select'
     colorSquare: '#color_square'
+    maxButton: '#max_button'
 
   RefreshWalletInterval: 15 * 60 * 1000 # 15 Minutes
 
@@ -78,6 +79,24 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
 #      else
 #        # push next dialog
       pushDialogBlock(@view.feesSelect.val())
+
+  max: ->
+    feePerByte = ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000)
+    utxo = @_utxo
+    total = ledger.Amount.fromSatoshi(0)
+    for output in utxo
+      total = total.add(output.get('value'))
+    estimatedSize = ledger.bitcoin.estimateTransactionSize(utxo.length, 2).max
+    fees = feePerByte.multiply(estimatedSize)
+    l total.toBtcString(), fees.toBtcString()
+    amount = total.subtract(fees)
+    if amount.lte(0)
+      amount = ledger.Amount.fromSatoshi(0)
+    @view.amountInput.val ledger.formatters.fromValue(amount, -1, off)
+    _.defer =>
+      @_updateTotalLabel()
+      @_updateExchangeValue()
+
 
   openScanner: ->
     dialog = new CommonDialogsQrcodeDialogViewController

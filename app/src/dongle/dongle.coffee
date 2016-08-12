@@ -655,11 +655,14 @@ class @ledger.dongle.Dongle extends EventEmitter
 
 
       outputScript =
-        VI(2)
+        VI(if (changeAmount.lte(0)) then 1 else 2)
         .concat(amount.toScriptByteString())
         .concat(PkScript(recipientAddress))
-        .concat(changeAmount.toScriptByteString())
-        .concat(PkScript(changeAddress))
+
+      if changeAmount.gt(0)
+        outputScript
+          .concat(changeAmount.toScriptByteString())
+          .concat(PkScript(changeAddress))
 
       task = =>
         @_btchip.createPaymentTransactionNew_async(

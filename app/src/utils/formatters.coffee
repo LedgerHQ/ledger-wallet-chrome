@@ -21,7 +21,7 @@ class ledger.formatters
     @param [Integer] precision Fixed number of decimal places (the number of digits following the decimal point)
     @return [String] The formatted value
   ###
-  @formatUnit: (value, unit, precision = -1) ->
+  @formatUnit: (value, unit, precision = -1, localized = true) ->
     return if not value? or not unit?
     found = no
     for k, v of ledger.preferences.defaults.Display.units
@@ -31,8 +31,12 @@ class ledger.formatters
         break
     throw new Error("unit must be in " + _.reduce(ledger.preferences.instance.getAllBitcoinUnits(), (cumul, unit) -> return cumul + ', ' + unit), '') if found == no
 
-    decimalSeparator = ledger.number.getLocaleDecimalSeparator(ledger.preferences.instance.getLocale().replace('_', '-'))
-    thousandSeparator = ledger.number.getLocaleThousandSeparator(ledger.preferences.instance.getLocale().replace('_', '-'))
+    if localized
+      decimalSeparator = ledger.number.getLocaleDecimalSeparator(ledger.preferences.instance.getLocale().replace('_', '-'))
+      thousandSeparator = ledger.number.getLocaleThousandSeparator(ledger.preferences.instance.getLocale().replace('_', '-'))
+    else
+      decimalSeparator = '.'
+      thousandSeparator = ''
 
     integerPart = new Bitcoin.BigInteger(value.toString())
     .divide Bitcoin.BigInteger.valueOf(10).pow(unit)
@@ -70,8 +74,8 @@ class ledger.formatters
     @param [Integer] precision Fixed number of decimal places (the number of digits following the decimal point)
     @return [String] The formatted value
   ###
-  @fromValue: (value, precision) ->
-    @formatUnit(value, @_getBtcUnit(), precision)
+  @fromValue: (value, precision, localized) ->
+    @formatUnit(value, @_getBtcUnit(), precision, localized)
 
 
   ###
