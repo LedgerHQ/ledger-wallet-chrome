@@ -1,4 +1,9 @@
 # Changelog
+1.6.2
+===
+- Add max button when creating a transaction
+- Fix a bug when creating transaction with no change
+
 1.6.1
 ===
 - Fix mobile 2FA
