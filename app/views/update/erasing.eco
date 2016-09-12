@@ -1,6 +1,6 @@
 <div id="view_controller_content">
   <img src="../assets/images/update/flash.png" width="50" height="50" />
   <div class="page-large-indication"><%- t 'update.erasing.ready_to_start_process' %></div>
-  <div class="page-indication"><%- t 'update.erasing.clicking_continue' %></div>
+  <div class="page-indication"><%- _.str.sprintf(t('update.erasing.clicking_continue'), ledger.config.network.plural) %></div>
   <div class="regular-grey-text-small"><%= t 'update.erasing.please_note' %></div>
 </div>

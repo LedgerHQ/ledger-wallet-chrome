@@ -6,7 +6,7 @@
     <img src="../../assets/images/common/large_<%= if @params.error? then 'error' else 'check' %>.png" width="50" height="50" />
     <div class="black-indication"><%= if @params.error? then t 'onboarding.management.done.configuration_failed_' + @params.wallet_mode else t 'onboarding.management.done.configuration_is_complete_' + @params.wallet_mode %></div>
     <% if not @params.error?: %>
-    <div class="medium-indication"><%= t('onboarding.management.done.unplug_plug') %></div>
+    <div class="medium-indication"><%= _.str.sprintf(t('onboarding.management.done.unplug_plug'), ledger.config.network.plural) %></div>
     <% else: %>
     <a href="#openSupport" class="action-rounded-button"><%= t 'onboarding.management.done.contact_support' %></a>
     <% end %>

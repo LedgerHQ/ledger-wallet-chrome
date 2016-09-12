@@ -22,7 +22,7 @@
   <div class="page-content-container">
     <div id="seed_container"></div>
     <div id="invalid_label"><span class="invalid-indication"><%= t 'onboarding.management.seed.invalid_recovery_phrase' %></span></div>
-    <div id="indication_label"><span class="black-indication-strong"><%= t 'onboarding.management.seed.it_wont_be_displayed_again' %></span> <span class="black-indication"><%= t 'onboarding.management.seed.without_it' %></span></div>
+    <div id="indication_label"><span class="black-indication-strong"><%= t 'onboarding.management.seed.it_wont_be_displayed_again' %></span> <span class="black-indication"><%= _.str.sprintf(t('onboarding.management.seed.without_it'), ledger.config.network.plural) %></span></div>
   </div>
   <div class="navigation-container">
     <a class="back" href="#navigateRoot" id="back_button"><i class="fa fa-angle-left"></i> <%= t 'onboarding.management.cancel' %></a>

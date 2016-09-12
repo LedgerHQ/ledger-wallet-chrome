@@ -6,7 +6,7 @@
       <td class="fit-content"><%= t 'wallet.defaults.operations.account' %></td>
     <% end %>
     <td class="fit-content align-right padding-right-very-small"></td>
-    <td class="stretch-content"><%= t 'wallet.defaults.operations.bitcoin_address' %></td>
+    <td class="stretch-content"><%= _.str.sprintf(t('wallet.defaults.operations.bitcoin_address'), _.str.capitalize(ledger.config.network.name)) %></td>
     <td></td>
   <% if ledger.preferences.instance.isCurrencyActive(): %>
       <td class="fit-content align-right padding-right-medium"><%= t 'wallet.defaults.operations.countervalue' %></td>

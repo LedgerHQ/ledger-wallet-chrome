@@ -1,6 +1,6 @@
 <section id="receive_index_dialog">
   <header>
-    <h1><%= t 'wallet.receive.index.title' %></h1>
+    <h1><%= _.str.sprintf(t('wallet.receive.index.title'), ledger.config.network.plural) %></h1>
   </header>
   <table class="no-table-head">
     <tbody>
@@ -24,7 +24,7 @@
         </td>
       </tr>
       <tr class="no-border">
-        <td class="row-title"><%= t 'wallet.receive.index.receiver_address' %></td>
+        <td class="row-title"><%= _.str.sprintf(t('wallet.receive.index.receiver_address'), _.str.capitalize(ledger.config.network.name)) %></td>
         <td class="align-right" id="receiver_address"></td>
       </tr>
     </tbody>
@@ -33,7 +33,7 @@
     <div>
       <div id="qrcode_frame"></div>
     </div>
-    <p class="regular-grey-text-small"><%- t 'wallet.receive.index.qr_code_explanation' %></p>
+    <p class="regular-grey-text-small"><%- _.str.sprintf(t('wallet.receive.index.qr_code_explanation'), ledger.config.network.plural) %></p>
   </div>
 </section>
 <div class="dialog-actions-bar">

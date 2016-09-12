@@ -3,7 +3,7 @@
     <div class="titles">
       <div class="page-title"><%= t 'onboarding.management.recover_my_wallet' %></div>
       <div class="page-subtitle"><%= t 'application.name' %></div>
-      <div class="page-strong-indication"><%= t 'onboarding.management.recoverydevice.recovering_on_new_wallet' %></div>
+      <div class="page-strong-indication"><%= _.str.sprintf(t('onboarding.management.recoverydevice.recovering_on_new_wallet'), ledger.config.network.plural) %></div>
       <div class="page-indication"><%= t 'onboarding.management.recoverydevice.may_need_to_convert' %></div>
     </div>
   </div>
@@ -11,7 +11,7 @@
     <a class="panel" href="#navigatePin">
       <img src="../../assets/images/onboarding/management/existing_ledger_wallet.png" width="92" height="21"/>
       <div class="title"><%= t 'onboarding.management.recoverydevice.no_its_the_same' %></div>
-      <div class="subtitle"><%= t 'onboarding.management.recoverydevice.i_froze_my_device' %></div>
+      <div class="subtitle"><%= _.str.sprintf(t('onboarding.management.recoverydevice.i_froze_my_device'), ledger.config.network.plural) %></div>
     </a>
     <a class="panel" href="#navigateConvert">
       <img src="../../assets/images/onboarding/management/new_ledger_wallet.png" width="112" height="32"/>

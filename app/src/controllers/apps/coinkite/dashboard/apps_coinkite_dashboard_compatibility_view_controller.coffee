@@ -14,5 +14,5 @@ class @AppsCoinkiteDashboardCompatibilityDialogViewController extends ledger.com
           dialog.show()
       else
         @dismiss =>
-          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("apps.coinkite.dashboard.compatibility.fail"), subtitle: t("apps.coinkite.dashboard.compatibility.fail_text"))
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("apps.coinkite.dashboard.compatibility.fail"), subtitle: _.str.sprintf(t("apps.coinkite.dashboard.compatibility.fail_text"), ledger.config.network.plural))
           dialog.show()

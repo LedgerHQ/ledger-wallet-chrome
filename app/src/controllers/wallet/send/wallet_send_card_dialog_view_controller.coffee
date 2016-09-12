@@ -51,9 +51,9 @@ class @WalletSendCardDialogViewController extends ledger.common.DialogViewContro
     @view.keycard.setValidableValues @_validationDetails.validationCharacters
     @view.tinyPincode.setInputsCount @_validationDetails.validationCharacters.length
     if @_validationDetails.needsAmountValidation
-      @view.validationSubtitle.text t 'wallet.send.card.amount_and_address_to_validate'
+      @view.validationSubtitle.text _.str.sprintf(t('wallet.send.card.amount_and_address_to_validate'), _.str.capitalize(ledger.config.network.name))
     else
-      @view.validationSubtitle.text t 'wallet.send.card.address_to_validate'
+      @view.validationSubtitle.text _.str.sprintf(t('wallet.send.card.address_to_validate'), _.str.capitalize(ledger.config.network.name))
 
   _updateValidableIndication: ->
     return if @_validationDetails.localizedIndexes.length == 0

@@ -1,5 +1,5 @@
 <div id="view_controller_content">
   <img src="../assets/images/common/large_check.png" width="50" height="50" />
   <div class="page-large-indication"><%- t 'update.done.successfully_updated' %></div>
-  <div class="page-indication"><%- t(if @params.provisioned then 'update.done.enjoy' else 'update.done.use_24_words')%></div>
+  <div class="page-indication"><%- _.str.sprintf(t(if @params.provisioned then 'update.done.enjoy' else 'update.done.use_24_words'), ledger.config.network.plural)%></div>
 </div>

@@ -1,6 +1,6 @@
 <section id="send_method_dialog">
   <header>
-    <h1><%= t 'wallet.send.common.send_bitcoins' %></h1>
+    <h1><%= _.str.sprintf(t('wallet.send.common.send_bitcoins'), ledger.config.network.plural) %></h1>
   </header>
   <div class="regular-text"><%- t 'wallet.send.method.select_method' %></div>
   <div id="mobile_table_container"></div>

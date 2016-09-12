@@ -2,6 +2,8 @@ ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
   bitcoin:
     name: 'bitcoin'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
     ticker: 'btc'
     tickerKey:
       from: 'fromBTC'
@@ -17,6 +19,7 @@ ledger.bitcoin.Networks =
     handleFeePerByte: yes
   testnet:
     name: 'testnet'
+    plural: 'bitcoins'
     ticker: 'btctest'
     bip44_coin_type: '1'
     version:
@@ -28,6 +31,7 @@ ledger.bitcoin.Networks =
     handleFeePerByte: yes
   segnet:
     name: 'segnet'
+    plural: 'bitcoins'
     ticker: 'segtest'
     bip44_coin_type: '1'
     version:
@@ -48,6 +52,8 @@ ledger.bitcoin.Networks =
     handleFeePerByte: yes
   litecoin:
     name: 'litecoin'
+    plural: 'litecoins'
+    bolosAppName: 'Litecoin'
     ticker: 'ltc'
     tickerKey:
       from: 'fromLTC'

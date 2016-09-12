@@ -12,7 +12,7 @@
     <div class="texts">
       <span class="black-title"><%= t 'onboarding.management.summary.your_wallet_is' %></span>
       <span class="black-strong-title"><%= t 'onboarding.management.summary.almost_ready' %></span>
-      <div class="black-indication"><%= if @params.wallet_mode == 'create' then t 'onboarding.management.summary.use_your_bitcoins_create' else t 'onboarding.management.summary.use_your_bitcoins_other' %></div>
+      <div class="black-indication"><%= _.str.sprintf((if @params.wallet_mode == 'create' then t 'onboarding.management.summary.use_your_bitcoins_create' else t 'onboarding.management.summary.use_your_bitcoins_other'), ledger.config.network.plural)%></div>
     </div>
   </div>
   <div class="page-content-container">

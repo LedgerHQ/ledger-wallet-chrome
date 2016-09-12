@@ -19,7 +19,7 @@
     <img class="index" src="../../assets/images/onboarding/management/restore_icon.png" width="40" height="40"/>
     <div class="texts">
       <div class="black-title"><%= t 'onboarding.management.welcome.recover_wallet' %></div>
-      <div class="black-indication"><%= t 'onboarding.management.welcome.if_you_lost_your_wallet' %></div>
+      <div class="black-indication"><%= _.str.sprintf(t('onboarding.management.welcome.if_you_lost_your_wallet'), ledger.config.network.plural) %></div>
     </div>
     <img class="arrow" src="../assets/images/onboarding/large_right_arrow.png" width="16" height="30"/>
   </a>

@@ -1,6 +1,6 @@
 <section id="send_validating_dialog">
   <header>
-    <h1><%= t 'wallet.send.common.send_bitcoins' %></h1>
+    <h1><%= _.str.sprintf(t('wallet.send.common.send_bitcoins'), ledger.config.network.plural) %></h1>
   </header>
   <div id="validating" class="content-container">
     <div class="regular-text"><%= t 'wallet.send.validating.validating_transaction' %></div>

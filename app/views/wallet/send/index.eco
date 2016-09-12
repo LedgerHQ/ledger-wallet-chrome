@@ -1,6 +1,6 @@
 <section id="send_index_dialog">
   <header>
-    <h1><%= t 'wallet.send.common.send_bitcoins' %></h1>
+    <h1><%= _.str.sprintf(t('wallet.send.common.send_bitcoins'), ledger.config.network.plural) %></h1>
   </header>
   <table class="no-table-head">
     <tbody>
@@ -16,9 +16,9 @@
         </td>
       </tr>
       <tr>
-        <td class="row-title"><%= t 'wallet.send.index.receiver_address' %></td>
+        <td class="row-title"><%= _.str.sprintf(t('wallet.send.index.receiver_address'), _.str.capitalize(ledger.config.network.name)) %></td>
         <td class="align-right">
-          <input class="text-input" placeholder="<%= t 'wallet.defaults.operations.bitcoin_address' %>" id="receiver_input" value=""/>
+          <input class="text-input" placeholder="<%= _.str.sprintf(t('wallet.defaults.operations.bitcoin_address'), _.str.capitalize(ledger.config.network.name)) %>" id="receiver_input" value=""/>
         </td>
       </tr>
       <tr>

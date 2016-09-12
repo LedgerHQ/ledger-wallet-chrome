@@ -1,7 +1,7 @@
 <section id="dialogs_apifaulures_dialog">
   <div class="content-container">
     <div class="uppercase-section-title"><%- t('common.errors.synchronization_error') %></div>
-    <div class="regular-text-small"><%- t('common.errors.error_during_synchronization_1') %></div>
+    <div class="regular-text-small"><%- _.str.sprintf(t('common.errors.error_during_synchronization_1'), ledger.config.network.name) %></div>
     <div class="regular-text-small"><%- t('common.errors.error_during_synchronization_2') %></div>
   </div>
   <div class="dialog-actions-bar">
