@@ -261,6 +261,8 @@ class ledger.wallet.Transaction
   @create: ({amount, fees, address, utxo, changePath}, callback = null) ->
     d = ledger.defer(callback)
     dust = Amount.fromSatoshi(ledger.config.network.dust)
+    l "CREATE TRANSACTION", arguments
+    l "DUST", dust
     return d.rejectWithError(Errors.DustTransaction) && d.promise if amount.lte(dust)
     totalUtxoAmount = _(utxo).chain().map((u) -> ledger.Amount.fromSatoshi(u.get('value'))).reduce(((a, b) -> a.add(b)), ledger.Amount.fromSatoshi(0)).value()
     return d.rejectWithError(Errors.NotEnoughFunds) && d.promise if totalUtxoAmount.lt(amount.add(fees))
