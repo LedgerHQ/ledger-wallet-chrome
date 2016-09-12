@@ -8,8 +8,8 @@
       <div class="uppercase-action"><%= t 'wallet.settings.common.display' %></div>
     </a>
     <a class="panel" href="#openBitcoin">
-      <i class="fa fa-bitcoin"></i>
-      <div class="uppercase-action"><%= t 'wallet.settings.common.bitcoin' %></div>
+      <i class="fa fa-globe"></i>
+      <div class="uppercase-action"><%= t 'wallet.settings.common.coin' %></div>
     </a>
     <a class="panel" href="#openHardware">
       <i class="fa fa-rocket"></i>

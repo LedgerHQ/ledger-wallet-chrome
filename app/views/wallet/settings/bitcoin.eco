@@ -1,6 +1,6 @@
 <section id="settings_bitcoin_dialog">
   <header>
-    <h1><%= t 'wallet.settings.common.bitcoin' %></h1>
+    <h1><%= t 'wallet.settings.common.coin' %></h1>
   </header>
   <div id="confirmations_table_container"></div>
   <div id="fees_table_container"></div>

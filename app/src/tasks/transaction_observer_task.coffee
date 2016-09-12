@@ -9,7 +9,7 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
     @newTransactionStream?.close()
 
   _listenNewTransactions: () ->
-    @newTransactionStream = new WebSocket "wss://ws.ledgerwallet.com/blockchain/v2/btc/ws"
+    @newTransactionStream = new WebSocket "wss://ws.ledgerwallet.com/blockchain/v2/#{ledger.config.network.ticker}/ws"
 
     @newTransactionStream.onmessage = (event) =>
       data = JSON.parse(event.data)

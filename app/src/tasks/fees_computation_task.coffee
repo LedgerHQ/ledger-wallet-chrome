@@ -27,7 +27,7 @@ class ledger.tasks.FeesComputationTask extends ledger.tasks.Task
   constructor: ->
     super('FeesComputationTask')
     @_client = new ledger.api.FeesRestClient()
-    @_store = new ledger.storage.ChromeStore("fees_cache")
+    @_store = new ledger.storage.ChromeStore("fees_#{ledger.config.network.ticker}_cache")
     @_fees = {}
     @_store.get ['fees'], (result) =>
       @_fees = _(result['fees'] or {}).extend(@_fees)

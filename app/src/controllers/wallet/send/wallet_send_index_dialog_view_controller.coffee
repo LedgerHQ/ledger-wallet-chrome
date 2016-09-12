@@ -142,7 +142,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     if @_transactionAmount().length == 0 or not ledger.Amount.fromSatoshi(@_transactionAmount()).gt(0)
       return t 'common.errors.invalid_amount'
     else if not Bitcoin.Address.validate @_receiverBitcoinAddress()
-      return t 'common.errors.invalid_receiver_address'
+      return _.str.sprintf(t('common.errors.invalid_receiver_address'), ledger.config.network.name)
     undefined
 
   _updateFeesSelect: ->
@@ -203,6 +203,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
         selectedUtxo.push output
         total = total.add(output.get('value'))
       estimatedSize = ledger.bitcoin.estimateTransactionSize(selectedUtxo.length, 2).max # For now always consider we need a change output
+      unless ledger.config.network.handleFeePerByte
+        estimatedSize = (estimatedSize + 1000) - ((estimatedSize + 1000) % 1000)
       fees = feePerByte.multiply(estimatedSize)
       if desiredAmount.gt(0) and total.lt(desiredAmount.add(fees)) and selectedUtxo.length is utxo.length
         # Not enough funds
