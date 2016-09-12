@@ -57,6 +57,10 @@ class ledger.tasks.AddressDerivationTask extends ledger.tasks.Task
     @_postCommand 'public:getPublicAddress', [path], (data) =>
       callback?(data.result, data.error)
 
+  setNetwork: (networkName) ->
+    @_postCommand 'public:setNetwork', [networkName], (data) =>
+      callback?(data.result, data.error)
+
   _postCommand: (command, parameters, callback) ->
     queryId = _.uniqueId()
     @_ready().then =>

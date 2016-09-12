@@ -11,8 +11,8 @@ class @WalletSettingsBitcoinBlockchainSettingViewController extends WalletSettin
 
   _updateExplorer: ->
     @view.blockchainSelect.empty()
-    for id in _.keys(ledger.preferences.defaults.Bitcoin.explorers)
-      node = $("<option></option>").text(ledger.preferences.defaults.Bitcoin.explorers[id].name).attr('value', id)
+    for id in _.keys(ledger.preferences.defaults.Coin.explorers)
+      node = $("<option></option>").text(ledger.preferences.defaults.Coin.explorers[id].name).attr('value', id)
       if id == ledger.preferences.instance.getBlockchainExplorer()
         node.attr 'selected', true
       @view.blockchainSelect.append node

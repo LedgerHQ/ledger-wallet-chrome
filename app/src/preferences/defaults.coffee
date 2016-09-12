@@ -2,35 +2,15 @@ ledger.preferences ?= {}
 
 # Declares all usable preferences
 # All prefrences below are hardened in this file, but some nodes are loaded lazily at app startup
-ledger.preferences.defaults =
-  # Call at app startup to load lazy preferences defaults nodes
-  init: (callback) ->
-    # languages
-    ledger.preferences.defaults.Display.languages = ledger.i18n.Languages
 
-    # regions
-    regions = []
-    ledger.i18n.getAllLocales (locales) =>
-      ledger.preferences.defaults.Display.regions = locales
-      callback?()
-
+ledger.preferences.common =
   # display preferences
   Display:
-    units:
-      bitcoin:
-        symbol: 'BTC'
-        unit: 8
-      milibitcoin:
-        symbol: 'mBTC'
-        unit: 5
-      microbitcoin:
-        symbol: 'bits'
-        unit: 2
     languages: null # lazy
     regions: null # lazy
 
-  # bitcoin preferences
-  Bitcoin:
+  # coin preferences
+  Coin:
     confirmations:
       one: 1
       two: 2
@@ -48,19 +28,6 @@ ledger.preferences.defaults =
       fast:
         value: '20000'
         localization: 'common.fees.fast'
-    explorers:
-      blockchain:
-        name: 'Blockchain.info'
-        address: 'https://blockchain.info/tx/%s'
-      blockr:
-        name: 'Blockr.io'
-        address: 'https://btc.blockr.io/tx/info/%s'
-      biteasy:
-        name: 'Biteasy.com'
-        address: 'https://www.biteasy.com/blockchain/transactions/%s'
-      insight:
-        name: 'Insight.is'
-        address: 'https://insight.bitpay.com/tx/%s'
     discoveryGap: 20
 
   # support preferences
@@ -106,3 +73,87 @@ ledger.preferences.defaults =
         option = $("<option></option>").text(t(color.localization)).attr('value', color.hex)
         optionCallback?(option)
         select.append(option)
+
+  # Call at app startup to load lazy preferences defaults nodes
+  init: (callback) ->
+    # languages
+    ledger.preferences.common.Display.languages = ledger.i18n.Languages
+
+    # regions
+    regions = []
+    ledger.i18n.getAllLocales (locales) =>
+      ledger.preferences.common.Display.regions = locales
+      callback?()
+
+  setCoin: (coinName) ->
+    merge = (dest, src) ->
+      for key, value of src
+        if _.isObject(value)
+          dest[key] ?= {}
+          merge(dest[key], value)
+        else
+          dest[key] = value
+      dest
+    clean = merge({}, ledger.preferences.common)
+    ledger.preferences.defaults  = merge(clean, ledger.preferences[coinName])
+
+ledger.preferences.defaults = {}
+
+ledger.preferences.bitcoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'BTC'
+        unit: 8
+      milibitcoin:
+        symbol: 'mBTC'
+        unit: 5
+      microbitcoin:
+        symbol: 'bits'
+        unit: 2
+
+  # Coin preferences
+  Coin:
+    explorers:
+      blockchain:
+        name: 'Blockchain.info'
+        address: 'https://blockchain.info/tx/%s'
+      blockr:
+        name: 'Blockr.io'
+        address: 'https://btc.blockr.io/tx/info/%s'
+      biteasy:
+        name: 'Biteasy.com'
+        address: 'https://www.biteasy.com/blockchain/transactions/%s'
+      insight:
+        name: 'Insight.is'
+        address: 'https://insight.bitpay.com/tx/%s'
+    discoveryGap: 20
+
+ledger.preferences.litecoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'LTC'
+        unit: 8
+      milibitcoin:
+        symbol: 'mLTC'
+        unit: 5
+      microbitcoin:
+        symbol: 'μLTC'
+        unit: 2
+
+  # Coin preferences
+  Coin:
+    explorers:
+      blockr:
+        name: 'Blockr.io'
+        address: 'https://ltc.blockr.io/tx/info/%s'
+      sochain:
+        name: 'SoChain'
+        address: 'https://chain.so/tx/LTC/%s'
+      bchain:
+        name: 'Bchain.info'
+        address: 'https://bchain.info/LTC/tx/%s'
+    discoveryGap: 20
+
+ledger.preferences.common.setCoin("bitcoin")

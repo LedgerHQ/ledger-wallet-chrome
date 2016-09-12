@@ -1,5 +1,13 @@
 ledger.converters ?= {}
 
+findRate = (rateName, currency) ->
+  currency ?= ledger.preferences.instance.getCurrency()
+  currencies = ledger.tasks.TickerTask.instance.getCache()
+  rates = currencies?[currency]?.values or []
+  for rate in rates
+    return rate[rateName].value if rate[rateName]?
+  0.0
+
 ###
   This class is a namespace and cannot be instantiated
 ###
@@ -30,7 +38,7 @@ class ledger.converters
     currency ?= ledger.preferences.instance.getCurrency()
     currencies = ledger.tasks.TickerTask.instance.getCache()
     # satoshiValueCurrency is the amount in Satoshi for 1 in the given currency
-    satoshiValueCurrency = currencies[currency].values[2]['toSatoshis'].value || 0
+    satoshiValueCurrency = findRate(ledger.config.network.tickerKey.to, currency) * Math.pow(10, 8)
     satoshiValue = satoshiValueCurrency * currencyValue
     Math.round(satoshiValue)
 
@@ -47,7 +55,7 @@ class ledger.converters
     currencies = ledger.tasks.TickerTask.instance.getCache()
 
     # currencyValueBTC is the amount in the given currency for 1 BTC
-    currencyValueBTC = currencies[currency]?.values[0]['fromBTC'].value || 0
+    currencyValueBTC = findRate(ledger.config.network.tickerKey.from, currency)
     val = currencyValueBTC * Math.pow(10, -8)
     currencyValueSatoshi = val * satoshiValue
     ledger.i18n.formatNumber(parseFloat(currencyValueSatoshi.toFixed(2)))
@@ -62,10 +70,10 @@ class ledger.converters
   @satoshiToCurrencyFormatted: (satoshiValue, currency) =>
     currency ?= ledger.preferences.instance.getCurrency()
     currencies = ledger.tasks.TickerTask.instance.getCache()
-    
-    if currencies?[currency]?.values?[0]?['fromBTC']?.value?
+    rate = findRate(ledger.config.network.tickerKey.from, currency)
+    if rate > 0
       # currencyValueBTC is the amount in the given currency for 1 BTC
-      currencyValueBTC = currencies[currency].values[0]['fromBTC'].value || 0
+      currencyValueBTC = rate
       val = currencyValueBTC * Math.pow(10, -8)
       currencyValueSatoshi = val * satoshiValue
       res = parseFloat(currencyValueSatoshi.toFixed(2))

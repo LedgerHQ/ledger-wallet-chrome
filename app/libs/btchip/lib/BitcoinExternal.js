@@ -123,7 +123,7 @@ var BitcoinExternal = Class.create({
 		return data;
 	},
 
-	getSignedMessageHash: function(message) {
+	getSignedMessageHash: function(message, prefix) {
 		var messageLength;
 	    if (message.length < 0xfd) {
       		messageLength = new ByteString(Convert.toHexByte(message.length), HEX);
@@ -137,7 +137,7 @@ var BitcoinExternal = Class.create({
 
 		var sha = new JSUCrypt.hash.SHA256();		
 
-		var messageToSign = new ByteString("18", HEX).concat(new ByteString("Bitcoin Signed Message:", ASCII)).concat(new ByteString("0A", HEX));
+		var messageToSign = new ByteString(prefix, ASCII);
 		messageToSign = messageToSign.concat(messageLength).concat(message);
 		var result = sha.finalize(messageToSign.toString(HEX));
 		result = new ByteString(JSUCrypt.utils.byteArrayToHexStr(result), HEX);

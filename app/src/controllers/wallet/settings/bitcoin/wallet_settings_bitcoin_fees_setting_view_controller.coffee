@@ -12,8 +12,8 @@ class @WalletSettingsBitcoinFeesSettingViewController extends WalletSettingsSett
   _updateFees: ->
     # add fees
     @view.feesSelect.empty()
-    for id in _.sortBy(_.keys(ledger.preferences.defaults.Bitcoin.fees), (id) -> ledger.preferences.defaults.Bitcoin.fees[id].value).reverse()
-      fee = ledger.preferences.defaults.Bitcoin.fees[id]
+    for id in _.sortBy(_.keys(ledger.preferences.defaults.Coin.fees), (id) -> ledger.preferences.defaults.Coin.fees[id].value).reverse()
+      fee = ledger.preferences.defaults.Coin.fees[id]
       text = t(fee.localization)
       node = $("<option></option>").text(text).attr('value', fee.value)
       if fee.value == ledger.preferences.instance.getMiningFee()

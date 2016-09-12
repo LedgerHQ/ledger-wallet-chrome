@@ -260,7 +260,8 @@ class ledger.wallet.Transaction
   ###
   @create: ({amount, fees, address, utxo, changePath}, callback = null) ->
     d = ledger.defer(callback)
-    return d.rejectWithError(Errors.DustTransaction) && d.promise if amount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+    dust = Amount.fromSatoshi(ledger.config.network.dust)
+    return d.rejectWithError(Errors.DustTransaction) && d.promise if amount.lte(dust)
     totalUtxoAmount = _(utxo).chain().map((u) -> ledger.Amount.fromSatoshi(u.get('value'))).reduce(((a, b) -> a.add(b)), ledger.Amount.fromSatoshi(0)).value()
     return d.rejectWithError(Errors.NotEnoughFunds) && d.promise if totalUtxoAmount.lt(amount.add(fees))
     # Check if UTXO are safe to spend
@@ -275,7 +276,7 @@ class ledger.wallet.Transaction
     $info("Change path: ", changePath)
 
     changeAmount = totalUtxoAmount.subtract(amount.add(fees))
-    if changeAmount.lte(Transaction.MINIMUM_OUTPUT_VALUE)
+    if changeAmount.lte(dust)
       fees  = totalUtxoAmount.subtract(amount)
       changeAmount = ledger.Amount.fromSatoshi(0)
       $info("Applied fees: ", fees)

@@ -6,6 +6,9 @@
         <img src="../assets/images/common/plug_wallet.png" height="50" width="50"/>
         <div class="black-indication"><%= t 'onboarding.device.plug.welcome_instruction' %></div>
         <span class="medium-indication"><%= t 'onboarding.device.plug.welcome_bolos_instruction' %></span>
+        <select id="networks">
+
+        </select>
     </div>
     <div class="actions-container">
       <a href="#openHelpCenter" class="greyed-action medium-indication"><%= t 'onboading.common.help' %></a>

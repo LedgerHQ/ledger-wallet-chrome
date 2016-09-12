@@ -14,7 +14,7 @@ require @ledger.imports, ->
       @_listenAppEvents()
       addEventListener "message", Api.listener.bind(Api), false
       ledger.i18n.init =>
-        ledger.preferences.defaults.init =>
+        ledger.preferences.common.init =>
           @router.go('/') if @setExecutionMode(@Modes.Wallet)
           ledger.tasks.FeesComputationTask.instance.startIfNeccessary()
 

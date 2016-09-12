@@ -4,20 +4,22 @@
 ###
 
 openStores = (dongle, raise, done) ->
-  ledger.bitcoin.bitid.getAddress (address) =>
-    bitIdAddress = address.bitcoinAddress.toString(ASCII)
-    dongle.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>
-      if not (pubKey?.bitcoinAddress?) or not (bitIdAddress?)
-        logger().error("Fatal error during openStores, missing bitIdAddress and/or pubKey.bitcoinAddress")
-        raise(ledger.errors.new(ledger.errors.UnableToRetrieveBitidAddress))
-        ledger.app.emit 'wallet:initialization:fatal_error'
+  ledger.app.dongle.setCoinVersion ledger.config.network.version.regular, ledger.config.network.version.P2SH, () =>
+    ledger.preferences.common.setCoin(ledger.config.network.name)
+    ledger.bitcoin.bitid.getAddress (address) =>
+      bitIdAddress = address.bitcoinAddress.toString(ASCII)
+      dongle.getPublicAddress "0x50DA'/0xBED'/0xC0FFEE'", (pubKey) =>
+        if not (pubKey?.bitcoinAddress?) or not (bitIdAddress?)
+          logger().error("Fatal error during openStores, missing bitIdAddress and/or pubKey.bitcoinAddress")
+          raise(ledger.errors.new(ledger.errors.UnableToRetrieveBitidAddress))
+          ledger.app.emit 'wallet:initialization:fatal_error'
+          return
+        ledger.storage.openStores bitIdAddress, pubKey.bitcoinAddress.value
+        ledger.utils.Logger._secureWriter = new ledger.utils.SecureLogWriter(pubKey.bitcoinAddress.toString(ASCII), bitIdAddress, ledger.config.defaultLoggerDaysMax)
+        ledger.utils.Logger._secureReader = new ledger.utils.SecureLogReader(pubKey.bitcoinAddress.toString(ASCII), bitIdAddress, ledger.config.defaultLoggerDaysMax)
+        done?()
         return
-      ledger.storage.openStores bitIdAddress, pubKey.bitcoinAddress.value
-      ledger.utils.Logger._secureWriter = new ledger.utils.SecureLogWriter(pubKey.bitcoinAddress.toString(ASCII), bitIdAddress, ledger.config.defaultLoggerDaysMax)
-      ledger.utils.Logger._secureReader = new ledger.utils.SecureLogReader(pubKey.bitcoinAddress.toString(ASCII), bitIdAddress, ledger.config.defaultLoggerDaysMax)
-      done?()
       return
-    return
 
 pullStore = (dongle, raise, done) ->
   ledger.storage.sync.pull()
@@ -29,6 +31,7 @@ startDerivationTask = (dongle, raise, done) ->
   hdWallet = ledger.wallet.Wallet.instance
   ledger.tasks.AddressDerivationTask.instance.start()
   _.defer =>
+    ledger.tasks.AddressDerivationTask.instance.setNetwork(ledger.config.network.name)
     for accountIndex in [0...hdWallet.getAccountsCount()]
       ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath "#{hdWallet.getRootDerivationPath()}/#{accountIndex}'", _.noop
     done?()

@@ -7,6 +7,7 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
     logoContainer: '.logo-container'
     greyedContainer: '.greyed-container'
     actionsContainer: '.actions-container'
+    networkSelect: '#networks'
 
   onAfterRender: ->
     super
@@ -14,6 +15,7 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
       do @_animateIntro
     else
       do @_listenEvents
+    @_updateNetworkList()
 
   openSupport: ->
     window.open t 'application.support_key_not_recognized_url'
@@ -43,7 +45,13 @@ class @OnboardingDevicePlugViewController extends @OnboardingViewController
     , 1500
 
   navigateContinue: ->
+    ledger.config.network = _(ledger.bitcoin.Networks).find((item) => item.name is @view.networkSelect.val())
     ledger.app.router.go '/onboarding/device/connecting'
+
+  _updateNetworkList: ->
+    $.each ledger.bitcoin.Networks,  (i, item) =>
+      @view.networkSelect.append($('<option>', {value: item.name, text : item.name}))
+
 
   _listenEvents: ->
     if ledger.app.dongle? and !ledger.app.dongle.isInBootloaderMode() or ledger.app.isConnectingDongle()

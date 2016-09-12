@@ -486,7 +486,8 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @param [String] path Optional argument
   # @param [Function] callback Optional argument
   # @return [Q.Promise]
-  signMessage: (message, {path, pubKey}, callback=undefined) ->
+  signMessage: (message, {prefix, path, pubKey}, callback=undefined) ->
+    prefix ?= '\x18Bitcoin Signed Message:\n'
     if ! pubKey?
       @getPublicAddress(path).then((address) => console.log("address=", address); @signMessage(message, path: path, pubKey: address.publicKey, callback))
     else
@@ -497,7 +498,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         .then =>
           return @_btchip.signMessageSign_async(if (@_pin?) then new ByteString(@_pin, ASCII) else new ByteString("0000", ASCII))
         .then (sig) =>
-          signedMessage = @_convertMessageSignature(pubKey, message, sig.signature)
+          signedMessage = @_convertMessageSignature(pubKey, message, prefix, sig.signature)
           d.resolve(signedMessage)
         .catch (error) ->
           console.error("Fail to signMessage :", error)
@@ -781,9 +782,9 @@ class @ledger.dongle.Dongle extends EventEmitter
       error = Errors.new(Errors.UnknowError, errorCode)
     return error
 
-  _convertMessageSignature: (pubKey, message, signature) ->
+  _convertMessageSignature: (pubKey, message, prefix, signature) ->
     bitcoin = new BitcoinExternal()
-    hash = bitcoin.getSignedMessageHash(message)
+    hash = bitcoin.getSignedMessageHash(message, prefix)
     pubKey = bitcoin.compressPublicKey(pubKey)
     for i in [0...4]
       recoveredKey = bitcoin.recoverPublicKey(signature, hash, i)

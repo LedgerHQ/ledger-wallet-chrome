@@ -11,7 +11,7 @@ ledger.preferences.close = ->
   ledger.preferences.instance?.close()
   ledger.preferences.instance = undefined
 
-PreferencesStructure =
+PreferencesStructure = ->
   btcUnit:
     default: ledger.preferences.defaults.Display.units.bitcoin.symbol
     synchronized: yes
@@ -20,10 +20,10 @@ PreferencesStructure =
     default: 'USD'
 
   miningFee:
-    default: ledger.preferences.defaults.Bitcoin.fees.fast.value
+    default: ledger.preferences.defaults.Coin.fees.fast.value
 
   blockchainExplorer:
-    default: _.keys(ledger.preferences.defaults.Bitcoin.explorers)[0]
+    default: _.keys(ledger.preferences.defaults.Coin.explorers)[0]
 
   currencyActive:
     default: true
@@ -38,7 +38,7 @@ PreferencesStructure =
     default: 1
 
   confirmationsCount:
-    default: ledger.preferences.defaults.Bitcoin.confirmations.one
+    default: ledger.preferences.defaults.Coin.confirmations.one
 
   language:
     getter: -> ledger.i18n.favLang.memoryValue
@@ -54,7 +54,7 @@ PreferencesStructure =
 class ledger.preferences.Preferences extends EventEmitter
 
   constructor: ->
-    @_preferences = _.clone PreferencesStructure
+    @_preferences = PreferencesStructure()
     defaultGetter = -> @_value
     defaultSetter = (value) ->
       @_value = value
@@ -114,7 +114,7 @@ class ledger.preferences.Preferences extends EventEmitter
 
   getAllBitcoinUnits: -> _.map(_.values(ledger.preferences.defaults.Display.units), (unit) -> unit.symbol)
   getBitcoinUnitMaximumDecimalDigitsCount: () -> _.object.apply(_, _.unzip(_.map(ledger.preferences.defaults.Display.units, (u) -> [u.symbol, u.unit])))[@getBtcUnit()]
-  getBlockchainExplorerAddress: -> ledger.preferences.defaults.Bitcoin.explorers[@getBlockchainExplorer()].address
+  getBlockchainExplorerAddress: -> ledger.preferences.defaults.Coin.explorers[@getBlockchainExplorer()].address
 
   isConfirmationCountReached: (count) -> count >= @getConfirmationsCount()
 

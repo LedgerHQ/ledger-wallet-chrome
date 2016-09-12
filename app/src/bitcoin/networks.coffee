@@ -3,6 +3,9 @@ ledger.bitcoin.Networks =
   bitcoin:
     name: 'bitcoin'
     ticker: 'btc'
+    tickerKey:
+      from: 'fromBTC'
+      to: 'toBTC'
     bip44_coin_type: '0'
     version:
       regular: 0
@@ -10,6 +13,8 @@ ledger.bitcoin.Networks =
       XPUB: 0x0488B21E
     bitcoinjs: bitcoin.networks.bitcoin
     ws_chain: 'bitcoin'
+    dust: 5430
+    handleFeePerByte: yes
   testnet:
     name: 'testnet'
     ticker: 'btctest'
@@ -19,6 +24,8 @@ ledger.bitcoin.Networks =
       P2SH: 196
     bitcoinjs: bitcoin.networks.testnet
     ws_chain: 'testnet3'
+    dust: 5430
+    handleFeePerByte: yes
   segnet:
     name: 'segnet'
     ticker: 'segtest'
@@ -37,20 +44,31 @@ ledger.bitcoin.Networks =
       scriptHash: 50,
       wif: 158,
       dustThreshold: 546
+    dust: 5430
+    handleFeePerByte: yes
   litecoin:
+    name: 'litecoin'
     ticker: 'ltc'
+    tickerKey:
+      from: 'fromLTC'
+      to: 'toLTC'
     bip44_coin_type: '2'
     version:
       regular: 48
       P2SH: 5
+      XPUB: 0x19DA462
     bitcoinjs: bitcoin.networks.litecoin
+    dust: 10000
+    handleFeePerByte: no
   litecoin_test:
+    name: 'litecoin test'
     ticker: 'ltctest'
     bip44_coin_type: '1'
     version:
       regular: 111
       P2SH: 196
   dogecoin:
+    name: 'dogecoin'
     ticker: 'doge'
     bip44_coin_type: '3'
     version:
@@ -58,6 +76,7 @@ ledger.bitcoin.Networks =
       P2SH: 22
     bitcoinjs: bitcoin.networks.dogecoin
   dogecoin_test:
+    name: 'dogecoin test'
     ticker: 'dogetest'
     bip44_coin_type: '1'
     version:

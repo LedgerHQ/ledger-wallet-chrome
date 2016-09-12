@@ -83,6 +83,10 @@ class WorkerCache
     sendCommand 'private:setCacheEntries', [entries], (result, error) =>
       callback?(result, error)
 
+setNetwork = (networkName) ->
+  ledger.config.network = _(ledger.bitcoin.Networks).find((item) => item.name is networkName)
+  postResult yes
+
 registerExtendedPublicKeyForPath = (path) ->
   if ExtendedPublicKeys[path]?
     postResult 'Already registered'
@@ -149,5 +153,6 @@ dequeue = () ->
   {command, parameters} = CurrentCommand
   switch command
     when 'public:registerExtendedPublicKeyForPath' then registerExtendedPublicKeyForPath.apply(command, parameters)
+    when 'public:setNetwork' then setNetwork.apply(command, parameters)
     when 'public:getPublicAddress' then getPublicAddress.apply(command, parameters)
     else LockQueue = no
