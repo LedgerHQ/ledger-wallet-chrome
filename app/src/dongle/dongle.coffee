@@ -661,7 +661,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         .concat(PkScript(recipientAddress))
 
       if changeAmount.gt(0)
-        outputScript
+        outputScript = outputScript
           .concat(changeAmount.toScriptByteString())
           .concat(PkScript(changeAddress))
 
