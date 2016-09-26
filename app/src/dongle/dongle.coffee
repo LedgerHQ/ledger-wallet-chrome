@@ -164,6 +164,16 @@ class @ledger.dongle.Dongle extends EventEmitter
       d.reject(e)
     d.promise
 
+  getCoinVersion: (callback = undefined) ->
+    d = ledger.defer(callback)
+    d.resolve(
+      @_sendApdu(new ByteString("E016000000", HEX)).then (result) =>
+        {P2PKH: result.byteAt(0), P2SH: result.byteAt(1), message: "#{result.bytes(2).toString()} signed message:\n"}
+      .fail =>
+        {P2PKH: ledger.Networks.bitcoin.version.regular, P2SH: ledger.Networks.bitcoin.version.P2SH, message: "Bitcoin signed message:\n"}
+    )
+    d.promise
+
   getFirmwareInformation: -> @_firmwareInformation
 
   getSw: -> @_btchip.card.SW

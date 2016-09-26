@@ -88,7 +88,7 @@ ledger.preferences.common =
   setCoin: (coinName) ->
     merge = (dest, src) ->
       for key, value of src
-        if _.isObject(value)
+        if _.isObject(value) and !_.isFunction(value)
           dest[key] ?= {}
           merge(dest[key], value)
         else
