@@ -116,7 +116,7 @@ class @ledger.m2fa.Client extends ledger.tasks.Task
 
   # Sent by mobile clients to request chrome application to repeat their 'request' message.
   _onRepeat: (data) ->
-    @ws.send(@_lastRequest) if @_lastRequest?
+    @ws.send(JSON.stringify(@_lastRequest)) if @_lastRequest?
 
   # Sent by mobile clients to indicate the chrome application that one client is able to handle the 'request' message.
   _onAccept: (data) ->

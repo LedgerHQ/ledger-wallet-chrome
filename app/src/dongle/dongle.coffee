@@ -168,9 +168,12 @@ class @ledger.dongle.Dongle extends EventEmitter
     d = ledger.defer(callback)
     d.resolve(
       @_sendApdu(new ByteString("E016000000", HEX)).then (result) =>
-        {P2PKH: result.byteAt(0), P2SH: result.byteAt(1), message: "#{result.bytes(2).toString()} signed message:\n"}
+        message = result.bytes(3, result.byteAt(2))
+        short = result.bytes(3 + message.length + 1, result.byteAt(3 + message.length))
+        {P2PKH: result.byteAt(0), P2SH: result.byteAt(1), message: "#{message} signed message:\n", short: short}
       .fail =>
-        {P2PKH: ledger.Networks.bitcoin.version.regular, P2SH: ledger.Networks.bitcoin.version.P2SH, message: "Bitcoin signed message:\n"}
+        l "FAILED"
+        {P2PKH: ledger.bitcoin.Networks.bitcoin.version.regular, P2SH: ledger.bitcoin.Networks.bitcoin.version.P2SH, message: "Bitcoin signed message:\n", short: 'BTC'}
     )
     d.promise
 

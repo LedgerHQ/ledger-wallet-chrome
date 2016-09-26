@@ -229,11 +229,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
       else
         d.resolve(data['ledger.tasks.WalletLayoutRecoveryTask'])
     d.promise.then (data) =>
-      if _.isEmpty(data)
-        @_removeOldTransactions().then ->
-          data
-      else
-        data
+      data
 
   _saveSynchronizationData: (data) ->
     d = ledger.defer()
