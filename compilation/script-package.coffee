@@ -8,7 +8,7 @@ rsa             = require 'node-rsa'
 path            = require 'path'
 join            = path.join
 resolve         = path.resolve
-Q = require 'Q'
+Q = require 'q'
 
 keygen = (dir) ->
   dir = resolve dir
