@@ -37,6 +37,7 @@
     "rimraf": "latest",
     "gulp-util": "latest",
     "gulp-cached": "latest",
-    "gulp-slash": "latest"
+    "gulp-slash": "latest",
+    "js-yaml": "3.6.1"
   }
 }
