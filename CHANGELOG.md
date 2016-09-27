@@ -1,4 +1,10 @@
 # Changelog
+1.6.4
+===
+- Add Litecoin support for Nano S
+- Fix a bug during mobile second factor
+- Small bug fixes
+
 1.6.2
 ===
 - Add max button when creating a transaction
