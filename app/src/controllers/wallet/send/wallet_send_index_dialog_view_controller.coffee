@@ -7,6 +7,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     totalLabel: '#total_label'
     errorContainer: '#error_container'
     receiverInput: '#receiver_input'
+    dataInput: '#data_input'
+    dataRow: '#data_row'
     openScannerButton: '#open_scanner_button'
     feesSelect: '#fees_select'
     accountsSelect: '#accounts_select'
@@ -18,11 +20,16 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
   onAfterRender: () ->
     super
 
+    @view.dataRow.hide()
+
     # apply params
     if @params.amount?
       @view.amountInput.val @params.amount
     if @params.address?
       @view.receiverInput.val @params.address
+    if @params.extra?
+      @view.dataInput.val @params.extra
+      @view.dataRow.show()
 
     # configure view
     @view.amountInput.amountInput(ledger.preferences.instance.getBitcoinUnitMaximumDecimalDigitsCount())
@@ -60,7 +67,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
 
       pushDialogBlock = (fees) =>
         {utxo, fees} = @_computeAmount(ledger.Amount.fromSatoshi(fees).divide(1000))
-        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount(), utxo: utxo
+        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount(), utxo: utxo, extra: @_dataValue()
         @getDialog().push dialog
 
       {amount, fees} = @_computeAmount()
@@ -136,6 +143,9 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
 
   _transactionAmount: ->
     ledger.formatters.fromValueToSatoshi(_.str.trim(@view.amountInput.val()))
+
+  _dataValue: ->
+    @view.dataInput.val()
 
   _nextFormError: ->
     # check amount
