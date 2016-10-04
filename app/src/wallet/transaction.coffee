@@ -258,7 +258,7 @@ class ledger.wallet.Transaction
     @option [Function] callback The callback called once the transaction is created
     @return [Q.Promise] A closure
   ###
-  @create: ({amount, fees, address, utxo, changePath}, callback = null) ->
+  @create: ({amount, fees, address, utxo, changePath, data}, callback = null) ->
     d = ledger.defer(callback)
     dust = Amount.fromSatoshi(ledger.config.network.dust)
     l "CREATE TRANSACTION", arguments
@@ -276,6 +276,7 @@ class ledger.wallet.Transaction
     $info("Address: ", address)
     $info("UTXO: ", utxo)
     $info("Change path: ", changePath)
+    $info("Data: ", data)
 
     changeAmount = totalUtxoAmount.subtract(amount.add(fees))
     if changeAmount.lte(dust)
@@ -290,7 +291,8 @@ class ledger.wallet.Transaction
       d = ledger.defer()
       ledger.api.TransactionsRestClient.instance.getRawTransaction output.get('transaction_hash'), (rawTransaction, error) ->
         if error?
-         return d.rejectWithError(Errors.NetworkError)
+          console.log error
+          return d.rejectWithError(Errors.NetworkError)
         result = raw: rawTransaction, paths: [output.get('path')], output_index: output.get('index'), value: output.get('value')
         d.resolve(iterate(index + 1, inputs.concat([result])))
       d.promise
@@ -325,7 +327,6 @@ class ledger.wallet.Transaction
     $info("Inputs paths: ", inputsPath)
     $info("Change path: ", changePath)
     $info("Excluded inputs", excludedInputs)
-
 
     isOutputExcluded = (output) ->
       return for [index, hash] in excludedInputs when output['transaction_hash'] is hash and output['output_index'] is index

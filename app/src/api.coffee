@@ -42,7 +42,7 @@ class @Api
     }    
 
   @sendPayment: (data) ->
-    ledger.app.router.go '/wallet/send/index', {address: data.address, amount: data.amount}
+    ledger.app.router.go '/wallet/send/index', {address: data.address, amount: data.amount, data: data.data}
 
   @getAccounts: (data) ->
     ledger.app.router.go '/wallet/api/accounts'
