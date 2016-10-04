@@ -27,7 +27,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @view.amountInput.val @params.amount
     if @params.address?
       @view.receiverInput.val @params.address
-    if @params.data?
+    if @params.data? && @params.data.length > 0
       @view.dataInput.val @params.data
       @view.dataRow.show()
 
