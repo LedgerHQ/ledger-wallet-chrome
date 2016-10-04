@@ -67,7 +67,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
 
       pushDialogBlock = (fees) =>
         {utxo, fees} = @_computeAmount(ledger.Amount.fromSatoshi(fees).divide(1000))
-        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount(), utxo: utxo, data: @_dataValue()
+        data = if (@_dataValue().length > 0) then @_dataValue() else undefined
+        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount(), utxo: utxo, data: data
         @getDialog().push dialog
 
       {amount, fees} = @_computeAmount()
@@ -213,6 +214,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
         selectedUtxo.push output
         total = total.add(output.get('value'))
       estimatedSize = ledger.bitcoin.estimateTransactionSize(selectedUtxo.length, 2).max # For now always consider we need a change output
+      if (@_dataValue().length > 0)
+        estimatedSize += @_dataValue().length / 2 + 4 + 1
       unless ledger.config.network.handleFeePerByte
         estimatedSize = (estimatedSize + 1000) - ((estimatedSize + 1000) % 1000)
       fees = feePerByte.multiply(estimatedSize)

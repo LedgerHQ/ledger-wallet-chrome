@@ -585,14 +585,14 @@ class @ledger.dongle.Dongle extends EventEmitter
   @param [Object] resumeData
   @return [Q.Promise] Resolve with resumeData
   ###
-  createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
+  createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, data, lockTime, sighashType, authorization, resumeData) ->
     if resumeData?
       resumeData = _.clone(resumeData)
       resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)
       resumeData.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in resumeData.trustedInputs)
       resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
     if @getFirmwareInformation().isUsingInputFinalizeFull()
-      @_createPaymentTransactionNew(inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData)
+      @_createPaymentTransactionNew(inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, data, resumeData)
     else
       @_createPaymentTransaction(inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData)
 
@@ -620,7 +620,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         return result
       )
 
-  _createPaymentTransactionNew: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
+  _createPaymentTransactionNew: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, data, resumeData) ->
     @getPublicAddress(changePath).then (result) =>
       changeAddress = result.bitcoinAddress.toString(ASCII)
       inputAmounts = do =>
@@ -640,6 +640,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       OP_EQUAL = new ByteString('87', HEX)
       OP_EQUALVERIFY = new ByteString('88', HEX)
       OP_CHECKSIG = new ByteString('AC', HEX)
+      OP_RETURN = new ByteString('6A', HEX)
 
       ###
         Create the output script
@@ -667,9 +668,17 @@ class @ledger.dongle.Dongle extends EventEmitter
           .concat(OP_EQUAL)
         VI(script.length).concat(script)
 
+      OpReturnScript = (data) =>
+        script =
+          OP_RETURN
+          .concat(new ByteString(Convert.toHexByte(data.length / 2), HEX))
+          .concat(new ByteString(data, HEX))
+        VI(script.length).concat(script)
 
+
+      numberOfOutputs = 1 + (if (changeAmount.lte(0)) then 0 else 1) + (if (data?) then 1 else 0)
       outputScript =
-        VI(if (changeAmount.lte(0)) then 1 else 2)
+        VI(numberOfOutputs)
         .concat(amount.toScriptByteString())
         .concat(PkScript(recipientAddress))
 
@@ -677,6 +686,10 @@ class @ledger.dongle.Dongle extends EventEmitter
         outputScript = outputScript
           .concat(changeAmount.toScriptByteString())
           .concat(PkScript(changeAddress))
+      if data?
+        outputScript = outputScript
+          .concat(ledger.Amount.fromSatoshi(0).toScriptByteString())
+          .concat(OpReturnScript(data))
 
       task = =>
         @_btchip.createPaymentTransactionNew_async(

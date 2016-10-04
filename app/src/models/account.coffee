@@ -117,25 +117,25 @@ class @Account extends ledger.database.Model
     @option [Function] callback The callback called once the transaction is created
     @return [Q.Promise] A closure
   ###
-  createTransaction: ({amount, fees, address}, callback) ->
-    amount = ledger.Amount.fromSatoshi(amount)
-    fees = ledger.Amount.fromSatoshi(fees)
-    inputsPath = @getWalletAccount().getAllAddressesPaths()
-    ledger.api.TransactionsRestClient.instance.getTransactionsFromPaths inputsPath, (transactions) =>
-      Q.fcall ->
-        if transactions.length > 0
-          ledger.tasks.TransactionConsumerTask.instance.waitForTransactionToBeInserted(_.last(transactions).hash)
-      .then =>
-        unconfirmedOperations = Operation.find($and: [{confirmations: 0}, {type: 'sending'}]).data()
-        excludedInputs = []
-        for op in unconfirmedOperations
-          inputIndexes = op.get 'inputs_index'
-          inputHashes = op.get 'inputs_hash'
-          for __, index in inputIndexes
-            excludedInputs.push([inputIndexes[index], inputHashes[index]])
-        @_createTransactionGetChangeAddressPath @getWalletAccount().getCurrentChangeAddressIndex(), (changePath) =>
-          ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, excludedInputs: excludedInputs, callback)
-      ledger.tasks.TransactionConsumerTask.instance.pushTransactions(transactions)
+#  createTransaction: ({amount, fees, address}, callback) ->
+#    amount = ledger.Amount.fromSatoshi(amount)
+#    fees = ledger.Amount.fromSatoshi(fees)
+#    inputsPath = @getWalletAccount().getAllAddressesPaths()
+#    ledger.api.TransactionsRestClient.instance.getTransactionsFromPaths inputsPath, (transactions) =>
+#      Q.fcall ->
+#        if transactions.length > 0
+#          ledger.tasks.TransactionConsumerTask.instance.waitForTransactionToBeInserted(_.last(transactions).hash)
+#      .then =>
+#        unconfirmedOperations = Operation.find($and: [{confirmations: 0}, {type: 'sending'}]).data()
+#        excludedInputs = []
+#        for op in unconfirmedOperations
+#          inputIndexes = op.get 'inputs_index'
+#          inputHashes = op.get 'inputs_hash'
+#          for __, index in inputIndexes
+#            excludedInputs.push([inputIndexes[index], inputHashes[index]])
+#        @_createTransactionGetChangeAddressPath @getWalletAccount().getCurrentChangeAddressIndex(), (changePath) =>
+#          ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, excludedInputs: excludedInputs, callback)
+#      ledger.tasks.TransactionConsumerTask.instance.pushTransactions(transactions)
 
   createTransaction: ({amount, fees, address, utxo, data}, callback) ->
     amount = ledger.Amount.fromSatoshi(amount)
