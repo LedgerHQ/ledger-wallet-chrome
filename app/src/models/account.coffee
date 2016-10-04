@@ -137,12 +137,12 @@ class @Account extends ledger.database.Model
           ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, inputsPath: inputsPath, changePath: changePath, excludedInputs: excludedInputs, callback)
       ledger.tasks.TransactionConsumerTask.instance.pushTransactions(transactions)
 
-  createTransaction: ({amount, fees, address, utxo}, callback) ->
+  createTransaction: ({amount, fees, address, utxo, data}, callback) ->
     amount = ledger.Amount.fromSatoshi(amount)
     fees = ledger.Amount.fromSatoshi(fees)
     changeIndex = @getWalletAccount().getCurrentChangeAddressIndex()
     changePath =  @getWalletAccount().getChangeAddressPath(changeIndex)
-    ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, utxo: utxo, changePath: changePath, callback)
+    ledger.wallet.Transaction.create(amount: amount, fees: fees, address: address, utxo: utxo, changePath: changePath, data:data, callback)
 
 
   ###

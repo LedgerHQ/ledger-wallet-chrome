@@ -83,7 +83,6 @@ chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse) =>
     req = request.request.command
     data = request.request
   payload = {}
-  console.log(request);
   switch req
     when 'ping' 
       window.externalSendResponse { command: "ping", result: true }
@@ -121,7 +120,8 @@ chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse) =>
       payload = {
         command: 'send_payment',
         address: data.address,
-        amount: data.amount
+        amount: data.amount,
+        data: data.data
       }
     when 'get_xpubkey'
       payload = {

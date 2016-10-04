@@ -27,8 +27,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @view.amountInput.val @params.amount
     if @params.address?
       @view.receiverInput.val @params.address
-    if @params.extra?
-      @view.dataInput.val @params.extra
+    if @params.data?
+      @view.dataInput.val @params.data
       @view.dataRow.show()
 
     # configure view
@@ -67,7 +67,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
 
       pushDialogBlock = (fees) =>
         {utxo, fees} = @_computeAmount(ledger.Amount.fromSatoshi(fees).divide(1000))
-        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount(), utxo: utxo, extra: @_dataValue()
+        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount(), utxo: utxo, data: @_dataValue()
         @getDialog().push dialog
 
       {amount, fees} = @_computeAmount()
