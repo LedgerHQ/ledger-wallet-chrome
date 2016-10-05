@@ -1,4 +1,9 @@
 # Changelog
+1.6.5
+===
+- Add support for OP_RETURN output with the js API
+- Bug fixes
+
 1.6.4
 ===
 - Add Litecoin support for Nano S

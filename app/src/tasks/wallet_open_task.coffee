@@ -65,7 +65,7 @@ restoreStructure = (dongle, raise, done) ->
       done?(operation_consumption: yes)
     ledger.tasks.WalletLayoutRecoveryTask.instance.on 'fatal_error', () =>
       ledger.app.emit 'wallet:initialization:failed'
-      raise ledger.errors.new(ledger.errors.FatalErrorDuringLayoutWalletRecovery)
+      done?()
     ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
   else
     ledger.tasks.WalletLayoutRecoveryTask.instance.startIfNeccessary()
