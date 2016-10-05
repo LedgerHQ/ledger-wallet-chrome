@@ -98,7 +98,6 @@ require @ledger.imports, ->
           if error?
             # TODO: Handle wallet opening fatal error
             e "Raise", error
-          debugger
           @_listenPreferencesEvents()
           @_listenCountervalueEvents(true)
           ledger.utils.Logger.updateGlobalLoggersLevel()
