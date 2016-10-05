@@ -22,7 +22,7 @@
         </td>
       </tr>
       <tr id="data_row">
-        <td class="row-title">DATA (OP_RETURN)</td>
+        <td class="row-title"><%= t 'wallet.defaults.operations.data' %></td>
         <td class="align-right">
           <input class="text-input" id="data_input" value=""/>
         </td>
