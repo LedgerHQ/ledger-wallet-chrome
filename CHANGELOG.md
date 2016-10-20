@@ -1,4 +1,10 @@
 # Changelog
+1.6.6
+===
+- Add Litecoin mention to application description on Chrome Webstore
+- Fix a synchronization bug during synchronization after switching between different currencies
+- Prevent the application to open if the Ledger manager is already running
+
 1.6.5
 ===
 - Add support for OP_RETURN output with the js API
