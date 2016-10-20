@@ -5,6 +5,10 @@ updateAvailable = no
     {
       name: "Ledger Wallet Ethereum",
       id: "hmlhkialjkaldndjnlcdfdphcgeadkkm"
+    },
+    {
+      name: "Ledger Manager",
+      id: "beimhnaefocolcplfimocfiaiefpkgbf"
     }
   ];
 

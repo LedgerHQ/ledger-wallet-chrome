@@ -14,6 +14,8 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
   getLastSynchronizationStatus: () -> @_loadSynchronizationData().then (state) -> state['lastSyncStatus']
   getLastSynchronizationDate: () -> @_loadSynchronizationData().then (state) -> new Date(state['lastSyncTime'])
 
+  getConsumer: -> @_consumer ||= ledger.tasks.AddressDerivationTask.instance
+  
   onStart: () ->
     unconfirmedTxs = @_findUnconfirmedTransaction()
     startDate = new Date()
@@ -95,7 +97,7 @@ class ledger.tasks.WalletLayoutRecoveryTask extends ledger.tasks.Task
         account = hdWallet.getOrCreateAccount(accountIndex)
         do (account) =>
           d = ledger.defer()
-          ledger.tasks.AddressDerivationTask.instance.registerExtendedPublicKeyForPath account.getRootDerivationPath(), =>
+          @getConsumer().registerExtendedPublicKeyForPath account.getRootDerivationPath(), =>
             d.resolve(@_recoverAccount(account, savedState, syncToken))
           promises.push d.promise
         accountIndex += 1
