@@ -11,7 +11,7 @@ class ledger.managers.schemes.Bitcoin extends ledger.managers.schemes.Base
   parseURI: (uri) ->
     return undefined unless uri?
     uri = ledger.url.parseAsUrl uri
-    return undefined unless (uri? and uri.protocol == 'bitcoin:' and uri.pathname? and uri.pathname.length > 0)
+    return undefined unless (uri? and uri.protocol == ledger.config.network.scheme and uri.pathname? and uri.pathname.length > 0)
     hash = {}
     params = uri.params()
     hash.address = uri.pathname

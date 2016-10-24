@@ -1,4 +1,9 @@
 # Changelog
+1.6.7
+===
+
+- Fix Litecoin scheme in QR codes
+
 1.6.6
 ===
 - Add Litecoin mention to application description on Chrome Webstore

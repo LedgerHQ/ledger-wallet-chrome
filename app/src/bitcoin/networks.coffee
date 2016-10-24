@@ -5,6 +5,7 @@ ledger.bitcoin.Networks =
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
     ticker: 'btc'
+    scheme: 'bitcoin:'
     tickerKey:
       from: 'fromBTC'
       to: 'toBTC'
@@ -21,6 +22,7 @@ ledger.bitcoin.Networks =
     name: 'testnet'
     plural: 'bitcoins'
     ticker: 'btctest'
+    scheme: 'bitcoin:'
     bip44_coin_type: '1'
     version:
       regular: 111
@@ -33,6 +35,7 @@ ledger.bitcoin.Networks =
     name: 'segnet'
     plural: 'bitcoins'
     ticker: 'segtest'
+    scheme: 'bitcoin:'
     bip44_coin_type: '1'
     version:
       regular: 30
@@ -53,6 +56,7 @@ ledger.bitcoin.Networks =
   litecoin:
     name: 'litecoin'
     plural: 'litecoins'
+    scheme: 'litecoin:'
     bolosAppName: 'Litecoin'
     ticker: 'ltc'
     tickerKey:
@@ -69,6 +73,7 @@ ledger.bitcoin.Networks =
   litecoin_test:
     name: 'litecoin test'
     ticker: 'ltctest'
+    scheme: 'litecoin:'
     bip44_coin_type: '1'
     version:
       regular: 111
@@ -76,6 +81,7 @@ ledger.bitcoin.Networks =
   dogecoin:
     name: 'dogecoin'
     ticker: 'doge'
+    scheme: 'dogecoin:'
     bip44_coin_type: '3'
     version:
       regular: 30
