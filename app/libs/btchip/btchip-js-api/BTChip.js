@@ -875,11 +875,11 @@ var BTChip = Class.create({
         return new ByteString(Convert.toHexByte(prefix), HEX).concat(publicKey.bytes(1, 32));
     },
 
-    createPaymentTransaction_async: function (inputs, associatedKeysets, changePath, outputAddress, amount, fees, lockTime, sighashType, authorization, resumeData) {
+    createPaymentTransaction_async: function (inputs, associatedKeysets, changePath, outputAddress, amount, fees, lockTime, sighashType, authorization, resumeData, disableRbf) {
         // Inputs are provided as arrays of [transaction, output_index]
         // associatedKeysets are provided as arrays of [path]
         var defaultVersion = new ByteString("01000000", HEX);
-        var defaultSequence = new ByteString("FFFFFFFF", HEX);
+        var defaultSequence = (disableRbf ? new ByteString("FFFFFFFF", HEX) : new ByteString("FDFFFFFF", HEX));
         var trustedInputs = [];
         var regularOutputs = [];
         var signatures = [];
@@ -1171,14 +1171,14 @@ var BTChip = Class.create({
         }
     },
 
-    createPaymentTransactionNew_async: function(inputs, associatedKeysets, changePath, outputScript, lockTime, sighashType, authorization, resumeData) {
+    createPaymentTransactionNew_async: function(inputs, associatedKeysets, changePath, outputScript, lockTime, sighashType, authorization, resumeData, disableRbf) {
 
         // Implementation starts here
 
         // Inputs are provided as arrays of [transaction, output_index, optional redeem script]
         // associatedKeysets are provided as arrays of [path]
         var defaultVersion = new ByteString("01000000", HEX);
-        var defaultSequence = new ByteString("FFFFFFFF", HEX);
+        var defaultSequence = (disableRbf ? new ByteString("FFFFFFFF", HEX) : new ByteString("FDFFFFFF", HEX));
         var trustedInputs = [];
         var regularOutputs = [];
         var signatures = [];
