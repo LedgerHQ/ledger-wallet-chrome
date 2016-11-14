@@ -206,11 +206,11 @@ ledger.preferences.dash =
   Coin:
     explorers:
       cryptoID:
-        name: 'cryptoID'
+        name: 'CryptoID'
         address: 'https://chainz.cryptoid.info/dash/tx.dws?%s.htm'
-      bitinfocharts:
-        name: 'BitInfoCharts'
-        address: 'https://bitinfocharts.com/darkcoin/tx/%s'
+      dash_explorer:
+        name: 'Dash Block Explorer'
+        address: 'https://explorer.dash.org/tx/%s'
     discoveryGap: 20
 
 ledger.preferences.common.setCoin("bitcoin")

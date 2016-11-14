@@ -1,6 +1,6 @@
 
 bitcoin.networks.dash =
-  magicPrefix: '\x18DarkCoin Signed Message:\n',
+  magicPrefix: '\x19DarkCoin Signed Message:\n',
   bip32:
     public: 0x02FE52F8,
     private: 0x05358394
@@ -135,7 +135,7 @@ ledger.bitcoin.Networks =
       P2SH: 0x1CBD
       XPUB: 0x0488B21E
     bitcoinjs:
-      messagePrefix: '\x18Zcash Signed Message:\n',
+      messagePrefix: '\x16Zcash Signed Message:\n',
       bip32: {
         public: 0x0488B21E,
         private: 0x05358394

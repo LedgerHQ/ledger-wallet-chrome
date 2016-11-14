@@ -73,6 +73,7 @@ _.extend ledger.bitcoin.bitid,
     [opts, callback] = [{}, opts] if ! callback && typeof opts == 'function'
     path = @getPath(opts)
     pubKey = @_cache[path]?.publicKey
+    l "SIGH PREFIX", ledger.config.network.bitcoinjs.magicPrefix
     ledger.app.dongle.signMessage(message, path: path, pubKey: pubKey, prefix: ledger.config.network.bitcoinjs.magicPrefix, callback)
 
   ###

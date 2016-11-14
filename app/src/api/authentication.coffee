@@ -113,7 +113,9 @@ class AuthenticatedHttpClient extends @HttpClient
 
 
   @instance: (baseUrl = ledger.config.restClient.baseUrl) -> @_instance ?= new @(baseUrl)
+  @reset: () -> @_instance = null
 
 _.extend ledger.api,
 
   authenticated: (baseUrl = ledger.config.restClient.baseUrl) -> AuthenticatedHttpClient.instance(baseUrl)
+  resetAuthentication: -> AuthenticatedHttpClient.reset()
