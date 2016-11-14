@@ -4,7 +4,7 @@ class ledger.api.HttpClient extends @HttpClient
   constructor: () -> super
 
   authenticated: ->
-    authenticatedHttpClient = ledger.api.authenticated(@_baseUrl)
+    authenticatedHttpClient = ledger.api.authenticated(@baseUrl)
     for key, value of @headers
       authenticatedHttpClient.setHttpHeader key, value
     authenticatedHttpClient

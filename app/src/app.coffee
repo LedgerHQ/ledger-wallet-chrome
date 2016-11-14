@@ -85,6 +85,7 @@ require @ledger.imports, ->
       @emit 'dongle:unlocked', @dongle
       @emit 'wallet:initializing'
       ledger.app.dongle.getCoinVersion().then ({P2PKH, P2SH, message}) =>
+        l "Looking for #{P2PKH} #{P2SH}"
         network = ledger.bitcoin.Networks.bitcoin
         for k, v of ledger.bitcoin.Networks
           if v.version.regular is P2PKH and v.version.P2SH is P2SH

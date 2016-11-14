@@ -15,7 +15,7 @@ class ledger.wallet.ExtendedPublicKey
 
   initializeWithBase58: (xpub58) ->
     @_xpub58 = xpub58
-    @_hdnode = GlobalContext.bitcoin.HDNode.fromBase58 @_xpub58
+    @_hdnode = GlobalContext.bitcoin.HDNode.fromBase58 @_xpub58, ledger.config.network.bitcoinjs
     return
 
   initialize_legacy: (callback) ->

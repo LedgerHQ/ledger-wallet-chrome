@@ -61,6 +61,7 @@ _.extend @ledger.dongle,
   States: States
   BitIdRootPath: BitIdRootPath
 
+
 ###
 Signals :
   @emit state:changed(States)

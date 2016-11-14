@@ -1,3 +1,13 @@
+
+bitcoin.networks.dash =
+  magicPrefix: '\x18DarkCoin Signed Message:\n',
+  bip32:
+    public: 0x02FE52F8,
+    private: 0x05358394
+  pubKeyHash: 76
+  scriptHash: 16
+
+
 ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
   bitcoin:
@@ -18,6 +28,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
+
   testnet:
     name: 'testnet'
     plural: 'bitcoins'
@@ -31,6 +42,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'testnet3'
     dust: 5430
     handleFeePerByte: yes
+
   segnet:
     name: 'segnet'
     plural: 'bitcoins'
@@ -53,6 +65,7 @@ ledger.bitcoin.Networks =
       dustThreshold: 546
     dust: 5430
     handleFeePerByte: yes
+
   litecoin:
     name: 'litecoin'
     plural: 'litecoins'
@@ -70,27 +83,62 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.litecoin
     dust: 10000
     handleFeePerByte: no
-  litecoin_test:
-    name: 'litecoin test'
-    ticker: 'ltctest'
-    scheme: 'litecoin:'
-    bip44_coin_type: '1'
-    version:
-      regular: 111
-      P2SH: 196
+
   dogecoin:
     name: 'dogecoin'
-    ticker: 'doge'
+    plural: 'dogecoins'
     scheme: 'dogecoin:'
+    bolosAppName: 'Dogecoin'
+    ticker: 'doge'
+    tickerKey:
+      from: 'fromDOGE'
+      to: 'toDOGE'
     bip44_coin_type: '3'
     version:
       regular: 30
       P2SH: 22
+      XPUB: 0x02facafd
     bitcoinjs: bitcoin.networks.dogecoin
-  dogecoin_test:
-    name: 'dogecoin test'
-    ticker: 'dogetest'
-    bip44_coin_type: '1'
+    dust: 10000
+    handleFeePerByte: no
+
+  dash:
+    name: 'dash'
+    plural: 'dash'
+    scheme: 'dash:'
+    bolosAppName: 'Dash'
+    ticker: 'dash'
+    tickerKey:
+      from: 'fromDASH'
+      to: 'toDASH'
+    bip44_coin_type: '5'
     version:
-      regular: 113
-      P2SH: 196
+      regular: 76
+      P2SH: 16
+      XPUB: 0x02FE52F8
+    bitcoinjs: bitcoin.networks.dash
+    dust: 10000
+    handleFeePerByte: no
+
+  zcash:
+    name: 'zcash'
+    plural: 'zcash'
+    scheme: 'zcash:'
+    bolosAppName: 'Zcash'
+    ticker: 'zec'
+    tickerKey:
+      from: 'fromZEC'
+      to: 'toZEC'
+    bip44_coin_type: '133'
+    version:
+      regular: 0x1CB8
+      P2SH: 0x1CBD
+      XPUB: 0x0488B21E
+    bitcoinjs:
+      messagePrefix: '\x18Zcash Signed Message:\n',
+      bip32: {
+        public: 0x0488B21E,
+        private: 0x05358394
+      }
+    dust: 10000
+    handleFeePerByte: no

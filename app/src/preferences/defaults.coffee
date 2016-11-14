@@ -156,4 +156,61 @@ ledger.preferences.litecoin =
         address: 'https://bchain.info/LTC/tx/%s'
     discoveryGap: 20
 
+ledger.preferences.dogecoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'DOGE'
+        unit: 8
+      milibitcoin:
+        symbol: 'mDOGE'
+        unit: 5
+
+  # Coin preferences
+  Coin:
+    explorers:
+      blockcypher:
+        name: 'Blockcypher'
+        address: 'https://live.blockcypher.com/doge/tx/%s'
+      dogechain:
+        name: 'Dogechain.info'
+        address: 'https://dogechain.info/tx/%s'
+      sochain:
+        name: 'SoChain'
+        address: 'https://chain.so/tx/DOGE/%s'
+    discoveryGap: 20
+
+ledger.preferences.zcash =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'ZEC'
+        unit: 8
+
+  # Coin preferences
+  Coin:
+    explorers:
+      zchain:
+        name: 'ZChain'
+        address: 'https://explorer.zcha.in/transactions/%s'
+    discoveryGap: 20
+
+ledger.preferences.dash =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'DASH'
+        unit: 8
+
+  # Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'cryptoID'
+        address: 'https://chainz.cryptoid.info/dash/tx.dws?%s.htm'
+      bitinfocharts:
+        name: 'BitInfoCharts'
+        address: 'https://bitinfocharts.com/darkcoin/tx/%s'
+    discoveryGap: 20
+
 ledger.preferences.common.setCoin("bitcoin")

@@ -96,6 +96,7 @@ class AuthenticatedHttpClient extends @HttpClient
       ledger.app.emit 'wallet:authenticated'
       deferred.resolve()
     .fail (error) =>
+      e "AUTH FAIL", error
       if deferred.retryNumber-- > 0 then @_performAuthenticate(deferred) else deferred.reject(error)
     .done()
 
