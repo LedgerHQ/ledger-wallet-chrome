@@ -62,17 +62,17 @@ _.extend ledger.bitcoin,
   verifyRawTx: (tx, inputs, amount, fees, recipientAddress, changeAddress) ->
     Try =>
       try
-        transaction = ledger.bitcoin.decodeTransaction(tx)
-        inputAmount = ledger.Amount.fromSatoshi(0)
-        inputAmount = inputAmount.add input.value for input in inputs
-        changeAmount = inputAmount.subtract(amount).subtract(fees)
-        if changeAmount.gt 0
-          changeOutput = _.find transaction.outs, (output) -> output.address.toString() is changeAddress
-          throw ledger.errors.new(ledger.errors.ChangeAddressNotFound) unless changeOutput?
-          throw ledger.errors.new(ledger.errors.InvalidChangeAmount) unless changeAmount.eq(changeOutput.value)
-        recipientOutput = _.find transaction.outs, (output) -> output.address.toString() is recipientAddress
-        throw ledger.errors.new(ledger.errors.RecipientAddressNotFound) unless recipientAddress?
-        throw ledger.errors.new(ledger.errors.InvalidRecipientAmount) unless amount.eq(recipientOutput.value)
+#        transaction = ledger.bitcoin.decodeTransaction(tx)
+#        inputAmount = ledger.Amount.fromSatoshi(0)
+#        inputAmount = inputAmount.add input.value for input in inputs
+#        changeAmount = inputAmount.subtract(amount).subtract(fees)
+#        if changeAmount.gt 0
+#          changeOutput = _.find transaction.outs, (output) -> output.address.toString() is changeAddress
+#          throw ledger.errors.new(ledger.errors.ChangeAddressNotFound) unless changeOutput?
+#          throw ledger.errors.new(ledger.errors.InvalidChangeAmount) unless changeAmount.eq(changeOutput.value)
+#        recipientOutput = _.find transaction.outs, (output) -> output.address.toString() is recipientAddress
+#        throw ledger.errors.new(ledger.errors.RecipientAddressNotFound) unless recipientAddress?
+#        throw ledger.errors.new(ledger.errors.InvalidRecipientAmount) unless amount.eq(recipientOutput.value)
         yes
       catch er
         e er

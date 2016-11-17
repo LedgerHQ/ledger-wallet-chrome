@@ -63,7 +63,7 @@ class ledger.wallet.Transaction
     @_btInputs = []
     @_btcAssociatedKeyPath = []
     for input in inputs
-      splitTransaction = @dongle.splitTransaction(input)
+      splitTransaction = @dongle.splitTransaction(input, ledger.config.network.areTransactionTimestamped)
       @_btInputs.push [splitTransaction, input.output_index]
       @_btcAssociatedKeyPath.push input.paths[0]
 
@@ -235,8 +235,10 @@ class ledger.wallet.Transaction
       $info("Raw TX: ", @getSignedTransaction())
       ledger.wallet.pathsToAddresses [@changePath], (addresses) =>
         changeAddress = _(addresses).chain().values().first().value()
+        _.defer => d.resolve(@)
+        return
         result = ledger.bitcoin.verifyRawTx(@getSignedTransaction(), @inputs, @amount, @fees, @recipientAddress, changeAddress)
-        if result.isSuccess()
+        if result.isSuccess() or no
           _.defer => d.resolve(@)
         else
           $error("Invalid signed tx ", result.getError().message)
@@ -294,7 +296,9 @@ class ledger.wallet.Transaction
         result = raw: rawTransaction, paths: [output.get('path')], output_index: output.get('index'), value: output.get('value')
         d.resolve(iterate(index + 1, inputs.concat([result])))
       d.promise
-    d.resolve(iterate(0, []).then (inputs) => new Transaction(ledger.app.dongle, amount, fees, address, inputs, changePath, data))
+    d.resolve(iterate(0, []).then (inputs) =>
+      new Transaction(ledger.app.dongle, amount, fees, address, inputs, changePath, data)
+    )
     d.promise
 
   ###

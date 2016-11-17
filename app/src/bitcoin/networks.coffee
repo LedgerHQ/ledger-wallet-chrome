@@ -16,7 +16,7 @@ bitcoin.networks.zcash =
   scriptHash: 0x1CBD
 
 bitcoin.networks.clubcoin =
-  magicPrefix: '\x16ClubCoin Signed Message:\n'
+  magicPrefix: '\x19ClubCoin Signed Message:\n'
   bip32:
     public: 0x0488B21E,
     private: 0x05358394
@@ -170,3 +170,4 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.clubcoin
     dust: 10000
     handleFeePerByte: no
+    areTransactionTimestamped: yes

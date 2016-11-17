@@ -171,7 +171,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       @_sendApdu(new ByteString("E016000000", HEX)).then (result) =>
         message = result.bytes(3, result.byteAt(2))
         short = result.bytes(3 + message.length + 1, result.byteAt(3 + message.length))
-        {P2PKH: (0x1C << 8) + result.byteAt(0), P2SH: (0x1C << 8) + result.byteAt(1), message: "#{message} signed message:\n", short: short}
+        {P2PKH: result.byteAt(0), P2SH: result.byteAt(1), message: "#{message} signed message:\n", short: short}
       .fail =>
         l "FAILED"
         {P2PKH: ledger.bitcoin.Networks.bitcoin.version.regular, P2SH: ledger.bitcoin.Networks.bitcoin.version.P2SH, message: "Bitcoin signed message:\n", short: 'BTC'}
@@ -744,8 +744,8 @@ class @ledger.dongle.Dongle extends EventEmitter
       [Array<Byte>] script var length
     [Array<Byte>] locktime length is 4
   ###
-  splitTransaction: (input) ->
-    @_btchip.splitTransaction(new ByteString(input.raw, HEX))
+  splitTransaction: (input, areTransactionTimestamped) ->
+    @_btchip.splitTransaction(new ByteString(input.raw, HEX), areTransactionTimestamped)
 
   _sendApdu: (args...) ->
     apdu = new ByteString('', HEX)
