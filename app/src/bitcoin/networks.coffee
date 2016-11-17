@@ -7,6 +7,21 @@ bitcoin.networks.dash =
   pubKeyHash: 76
   scriptHash: 16
 
+bitcoin.networks.zcash =
+  magicPrefix: '\x16Zcash Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x05358394
+  pubKeyHash: 0x1CB8
+  scriptHash: 0x1CBD
+
+bitcoin.networks.clubcoin =
+  magicPrefix: '\x16ClubCoin Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x05358394
+  pubKeyHash: 28
+  scriptHash: 85
 
 ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
@@ -134,11 +149,24 @@ ledger.bitcoin.Networks =
       regular: 0x1CB8
       P2SH: 0x1CBD
       XPUB: 0x0488B21E
-    bitcoinjs:
-      messagePrefix: '\x16Zcash Signed Message:\n',
-      bip32: {
-        public: 0x0488B21E,
-        private: 0x05358394
-      }
+    bitcoinjs: bitcoin.networks.zcash
+    dust: 10000
+    handleFeePerByte: no
+
+  clubcoin:
+    name: 'clubcoin'
+    plural: 'clubcoins'
+    scheme: 'clubcoin:'
+    bolosAppName: 'ClubCoin'
+    ticker: 'club'
+    tickerKey:
+      from: 'fromCLUB'
+      to: 'toCLUB'
+    bip44_coin_type: '79'
+    version:
+      regular: 28
+      P2SH: 85
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.clubcoin
     dust: 10000
     handleFeePerByte: no

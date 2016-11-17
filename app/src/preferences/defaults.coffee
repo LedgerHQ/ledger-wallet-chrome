@@ -213,4 +213,22 @@ ledger.preferences.dash =
         address: 'https://explorer.dash.org/tx/%s'
     discoveryGap: 20
 
+ledger.preferences.clubcoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'CLUB'
+        unit: 8
+
+  # Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/club/tx.dws?%s.htm'
+      dash_explorer:
+        name: 'ClubCoin Block Explorer'
+        address: 'http://www.clubcha.in/tx/%s'
+    discoveryGap: 20
+
 ledger.preferences.common.setCoin("bitcoin")

@@ -13728,8 +13728,15 @@
         };
         Address.prototype.toBase58Check = function() {
           var payload = new Buffer(21);
-          payload.writeUInt8(this.version, 0);
-          this.hash.copy(payload, 1);
+          if (this.version > 0xFF) {
+            payload = new Buffer(22);
+            payload.writeUInt16BE(this.version, 0);
+            this.hash.copy(payload, 2);
+          } else {
+            payload.writeUInt8(this.version, 0);
+            this.hash.copy(payload, 1);
+          }
+
           return base58check.encode(payload)
         };
         Address.prototype.toOutputScript = function() {

@@ -171,7 +171,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       @_sendApdu(new ByteString("E016000000", HEX)).then (result) =>
         message = result.bytes(3, result.byteAt(2))
         short = result.bytes(3 + message.length + 1, result.byteAt(3 + message.length))
-        {P2PKH: result.byteAt(0), P2SH: result.byteAt(1), message: "#{message} signed message:\n", short: short}
+        {P2PKH: (0x1C << 8) + result.byteAt(0), P2SH: (0x1C << 8) + result.byteAt(1), message: "#{message} signed message:\n", short: short}
       .fail =>
         l "FAILED"
         {P2PKH: ledger.bitcoin.Networks.bitcoin.version.regular, P2SH: ledger.bitcoin.Networks.bitcoin.version.P2SH, message: "Bitcoin signed message:\n", short: 'BTC'}
@@ -650,8 +650,12 @@ class @ledger.dongle.Dongle extends EventEmitter
 
       PkScript = (address) =>
         hash160WithNetwork = ledger.bitcoin.addressToHash160WithNetwork(address)
-        hash160 = hash160WithNetwork.bytes(1, hash160WithNetwork.length - 1) #ledger.bitcoin.addressToHash160(address)
-        return P2shScript(hash160) if hash160WithNetwork.byteAt(0) is ledger.config.network.version.P2SH
+        p2pkhNetworkVersionSize = hash160WithNetwork.length - 20
+        hash160 = hash160WithNetwork.bytes(p2pkhNetworkVersionSize, hash160WithNetwork.length - p2pkhNetworkVersionSize) #ledger.bitcoin.addressToHash160(address)
+        if p2pkhNetworkVersionSize is 1
+          return P2shScript(hash160) if hash160WithNetwork.byteAt(0) is ledger.config.network.version.P2SH
+        else
+          return P2shScript(hash160) if (hash160WithNetwork.byteAt(0) << 8 + hash160WithNetwork.byteAt(1)) is ledger.config.network.version.P2SH
         script =
           OP_DUP
           .concat(OP_HASH160)
