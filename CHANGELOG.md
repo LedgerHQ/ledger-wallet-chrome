@@ -1,7 +1,13 @@
 # Changelog
+1.6.8
+===
+- Add Dash support
+- Add Dogecoin support
+- Add Zcash support
+- Restore translations
+
 1.6.7
 ===
-
 - Fix Litecoin scheme in QR codes
 
 1.6.6

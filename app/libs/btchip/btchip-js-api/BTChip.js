@@ -1581,7 +1581,6 @@ var BTChip = Class.create({
         result['inputs'] = inputs;
         result['outputs'] = outputs;
         result['locktime'] = locktime;
-        console.log("END");
         return result;
     },
 
