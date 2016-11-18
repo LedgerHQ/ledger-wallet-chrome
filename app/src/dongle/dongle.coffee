@@ -159,19 +159,33 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   setCoinVersion: (p2pkhVersion, p2shVersion, callback = undefined) ->
     d = ledger.defer(callback)
-    @_sendApdu(new ByteString("E014000002#{("0" + p2pkhVersion.toString(16)).substr(-2)}#{("0" + p2shVersion.toString(16)).substr(-2)}", HEX)).then ->
-      d.resolve()
-    .fail (e) ->
-      d.reject(e)
+    if (@getFirmwareInformation().hasUInt16CoinVersion())
+      @_sendApdu(new ByteString("E014000002#{Convert.toHexShort(p2pkhVersion)}#{Convert.toHexShort(p2shVersion)}", HEX)).then ->
+        d.resolve()
+      .fail (e) ->
+        d.reject(e)
+    else
+      @_sendApdu(new ByteString("E014000002#{("0" + p2pkhVersion.toString(16)).substr(-2)}#{("0" + p2shVersion.toString(16)).substr(-2)}", HEX)).then ->
+        d.resolve()
+      .fail (e) ->
+        d.reject(e)
     d.promise
 
   getCoinVersion: (callback = undefined) ->
     d = ledger.defer(callback)
     d.resolve(
       @_sendApdu(new ByteString("E016000000", HEX)).then (result) =>
-        message = result.bytes(3, result.byteAt(2))
-        short = result.bytes(3 + message.length + 1, result.byteAt(3 + message.length))
-        {P2PKH: result.byteAt(0), P2SH: result.byteAt(1), message: "#{message} signed message:\n", short: short}
+        if (@getFirmwareInformation().hasUInt16CoinVersion())
+          P2PKH = (result.byteAt(0) << 8) + result.byteAt(1)
+          P2SH = (result.byteAt(2) << 8) + result.byteAt(3)
+          message = result.bytes(5, result.byteAt(4))
+          short = result.bytes(5 + message.length + 1, result.byteAt(5 + message.length))
+        else
+          P2PKH = result.byteAt(0)
+          P2SH = result.byteAt(1)
+          message = result.bytes(3, result.byteAt(2))
+          short = result.bytes(3 + message.length + 1, result.byteAt(3 + message.length))
+        {P2PKH: P2PKH, P2SH: P2SH, message: "#{message} signed message:\n", short: short}
       .fail =>
         l "FAILED"
         {P2PKH: ledger.bitcoin.Networks.bitcoin.version.regular, P2SH: ledger.bitcoin.Networks.bitcoin.version.P2SH, message: "Bitcoin signed message:\n", short: 'BTC'}

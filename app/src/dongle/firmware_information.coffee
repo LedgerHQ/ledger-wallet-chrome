@@ -10,6 +10,7 @@ Firmwares =
   V_L_1_0_1: 0x20010001
   V_L_1_0_2: 0x20010002
   V_L_1_1_0: 0x20010100
+  V_B_L_1_1_1: 0x30010101
 
 @ledger.dongle.Firmwares = Firmwares
 
@@ -60,6 +61,8 @@ class ledger.dongle.FirmwareInformation
   isUsingInputFinalizeFull: -> @getIntFirmwareVersion() >= Firmwares.V_L_1_0_2
 
   hasFeature: (featureFlag) -> (@getFirmwareModeFlag() & featureFlag) == featureFlag
+
+  hasUInt16CoinVersion: () ->  @getIntFirmwareVersion() >= Firmwares.V_B_L_1_1_1
 
   hasBleSupport: -> @hasFeature(0x10)
   hasSecureScreenAndButton: -> @hasFeature(0x02)

@@ -612,7 +612,7 @@ var BTChip = Class.create({
                 }
             );
         }
-        var data = transaction['version'].concat(currentObject.createVarint(transaction['inputs'].length));
+        var data = transaction['version'].concat(transaction['timestamp']).concat(currentObject.createVarint(transaction['inputs'].length));
         currentObject.getTrustedInputRaw_async(true, indexLookup, data).then(function (result) {
             processInputs();
         }).fail(function (err) {
@@ -628,7 +628,7 @@ var BTChip = Class.create({
 
     startUntrustedHashTransactionInput_async: function (newTransaction, transaction, trustedInputs) {
         var currentObject = this;
-        var data = transaction['version'].concat(currentObject.createVarint(transaction['inputs'].length));
+        var data = transaction['version'].concat(transaction['timestamp']).concat(currentObject.createVarint(transaction['inputs'].length));
         var deferred = Q.defer();
         currentObject.startUntrustedHashTransactionInputRaw_async(newTransaction, true, data).then(function (result) {
             var i = 0;
@@ -1185,6 +1185,10 @@ var BTChip = Class.create({
         var publicKeys = [];
         var firstRun = true;
         var scriptData;
+        var timestamp = new ByteString(Convert.toHexInt(new Date().getTime() / 1000).match(/([0-9a-f]{2})/g).reverse().join(''), HEX);
+        if (ledger.config.network.areTransactionTimestamped !== true) {
+            timestamp = new ByteString("", HEX);
+        }
         var resuming = (typeof authorization != "undefined");
         var self = this;
         var targetTransaction = {};
@@ -1254,6 +1258,7 @@ var BTChip = Class.create({
 
             // Pre-build the target transaction
             targetTransaction['version'] = defaultVersion;
+            targetTransaction['timestamp'] = timestamp;
             targetTransaction['inputs'] = [];
 
             for (var i = 0; i < inputs.length; i++) {
@@ -1337,7 +1342,7 @@ var BTChip = Class.create({
                 targetTransaction['inputs'][i]['script'] = tmpScriptData;
                 targetTransaction['inputs'][i]['prevout'] = trustedInputs[i].bytes(4, 0x24);
             }
-            var result = self.serializeTransaction(targetTransaction);
+            var result = self.serializeTransaction(targetTransaction, timestamp);
             result = result.concat(scriptData);
             result = result.concat(self.reverseBytestring(lockTime));
             return result;
@@ -1476,10 +1481,10 @@ var BTChip = Class.create({
         return data.toString();
     },
 
-    serializeTransaction: function (transaction) {
+    serializeTransaction: function (transaction, timestamp) {
         var data = transaction['version'];
         if (ledger.config.network.areTransactionTimestamped === true) {
-            data = data.concat(new ByteString(Convert.toHexInt(new Date().getTime() / 1000).match(/([0-9a-f]{2})/g).reverse().join(''), HEX));
+            data = data.concat(timestamp);
         }
         data = data.concat(this.createVarint(transaction['inputs'].length));
         for (var i = 0; i < transaction['inputs'].length; i++) {
@@ -1531,7 +1536,6 @@ var BTChip = Class.create({
     },
 
     splitTransaction: function (transaction, hasTimestamp) {
-        console.log("BEGIN");
         var result = {};
         var inputs = [];
         var outputs = [];
@@ -1539,12 +1543,14 @@ var BTChip = Class.create({
         var version = transaction.bytes(offset, 4);
         offset += 4;
         if (hasTimestamp === true) {
+            result['timestamp'] = transaction.bytes(offset, 4);
             offset += 4;
+        } else {
+            result['timestamp'] = new ByteString("", HEX);
         }
         var varint = this.getVarint(transaction, offset);
         var numberInputs = varint[0];
         offset += varint[1];
-        console.log("BEGIN PARSE INPUTS " + varint[0]);
         for (var i = 0; i < numberInputs; i++) {
             var input = {};
             input['prevout'] = transaction.bytes(offset, 36);
@@ -1557,11 +1563,9 @@ var BTChip = Class.create({
             offset += 4;
             inputs.push(input);
         }
-        console.log("END PARSE INPUTS");
         varint = this.getVarint(transaction, offset);
         var numberOutputs = varint[0];
         offset += varint[1];
-        console.log("BEGIN PARSE OUTPUTS");
         for (var i = 0; i < numberOutputs; i++) {
             var output = {};
             output['amount'] = transaction.bytes(offset, 8);
@@ -1572,7 +1576,6 @@ var BTChip = Class.create({
             offset += varint[0];
             outputs.push(output);
         }
-        console.log("END PARSE OUTPUTS");
         var locktime = transaction.bytes(offset, 4);
         result['version'] = version;
         result['inputs'] = inputs;
