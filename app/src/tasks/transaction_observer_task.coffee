@@ -30,7 +30,7 @@ class ledger.tasks.TransactionObserverTask extends ledger.tasks.Task
       time: new Date(block['time'])
     block = Block.fromJson(json).save()
     found = no
-    for transactionHash in (block['transaction_hashes'] or [])
+    for transactionHash in (block['txs'] or [])
       txs = Transaction.find(hash: transactionHash).data()
       if txs.length > 0
         found = yes

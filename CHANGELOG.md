@@ -1,4 +1,12 @@
 # Changelog
+1.6.10
+===
+- Fix transaction issue for the Ledger Nano
+
+1.6.9
+===
+- Revert to 1.6.7
+
 1.6.8
 ===
 - Add Dash support
