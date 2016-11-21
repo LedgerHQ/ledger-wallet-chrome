@@ -1298,7 +1298,6 @@ var BTChip = Class.create({
                 targetTransaction['inputs'][i]['script'] = usedScript;
                 var notifyHashOutputBase58 = {stage: "hashTransaction", currentHashOutputBase58: i + 1};
                 var notifyStartUntrustedHash = {stage: "hashTransaction", currentUntrustedHash: i + 1};
-                debugger;
                 return self.startUntrustedHashTransactionInput_async(firstRun, targetTransaction, trustedInputs).then(function () {
                     notify(notifyHashOutputBase58);
                     return doIf(!resuming && (typeof changePath != "undefined"), function () {
@@ -1308,7 +1307,6 @@ var BTChip = Class.create({
                     }).then (function (resultHash) {
                         notify(notifyStartUntrustedHash);
                         scriptData = outputScript;
-                        debugger;
                         if (resultHash['authorizationRequired']) {
                             var tmpResult = {};
                             tmpResult['authorizationRequired'] = resultHash['authorizationRequired'];
