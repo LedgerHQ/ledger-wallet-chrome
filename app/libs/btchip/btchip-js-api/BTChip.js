@@ -963,6 +963,7 @@ var BTChip = Class.create({
                 // Pre-build the target transaction
                 var targetTransaction = {};
                 targetTransaction['version'] = defaultVersion;
+                targetTransaction['timestamp'] = new ByteString("", HEX);
                 targetTransaction['inputs'] = [];
                 for (var i = 0; i < inputs.length; i++) {
                     var tmpInput = {};
@@ -1232,7 +1233,6 @@ var BTChip = Class.create({
             }
             deferred.notify(result);
         };
-
         foreach(inputs, function (input, i) {
             return doIf(!resuming, function () {
                 return self.getTrustedInput_async(input[1], input[0])
@@ -1298,6 +1298,7 @@ var BTChip = Class.create({
                 targetTransaction['inputs'][i]['script'] = usedScript;
                 var notifyHashOutputBase58 = {stage: "hashTransaction", currentHashOutputBase58: i + 1};
                 var notifyStartUntrustedHash = {stage: "hashTransaction", currentUntrustedHash: i + 1};
+                debugger;
                 return self.startUntrustedHashTransactionInput_async(firstRun, targetTransaction, trustedInputs).then(function () {
                     notify(notifyHashOutputBase58);
                     return doIf(!resuming && (typeof changePath != "undefined"), function () {
@@ -1307,6 +1308,7 @@ var BTChip = Class.create({
                     }).then (function (resultHash) {
                         notify(notifyStartUntrustedHash);
                         scriptData = outputScript;
+                        debugger;
                         if (resultHash['authorizationRequired']) {
                             var tmpResult = {};
                             tmpResult['authorizationRequired'] = resultHash['authorizationRequired'];
