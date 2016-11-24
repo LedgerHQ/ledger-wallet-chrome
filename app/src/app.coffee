@@ -93,12 +93,12 @@ require @ledger.imports, ->
         ledger.config.network = network
         ledger.app.dongle.setCoinVersion(ledger.config.network.version.regular, ledger.config.network.version.P2SH)
       .then =>
-        ledger.tasks.FeesComputationTask.instance.startIfNeccessary()
         ledger.tasks.WalletOpenTask.instance.startIfNeccessary()
         ledger.tasks.WalletOpenTask.instance.onComplete (result, error) =>
           if error?
             # TODO: Handle wallet opening fatal error
             e "Raise", error
+          ledger.tasks.FeesComputationTask.instance.startIfNeccessary()
           @_listenPreferencesEvents()
           @_listenCountervalueEvents(true)
           ledger.utils.Logger.updateGlobalLoggersLevel()

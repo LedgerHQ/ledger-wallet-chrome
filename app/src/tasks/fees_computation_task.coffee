@@ -35,7 +35,9 @@ class ledger.tasks.FeesComputationTask extends ledger.tasks.Task
   # Create a single instance of TickerTask
   @instance: new @()
 
-  @reset: -> @instance
+  @reset: ->
+    @instance.stopIfNeccessary()
+    @instance = new @()
 
   onStart: ->
     super
@@ -43,7 +45,6 @@ class ledger.tasks.FeesComputationTask extends ledger.tasks.Task
 
   onStop: ->
     super
-    setTimeout (=> @startIfNeccessary()), 200
 
   update: -> @_update(no)
 
