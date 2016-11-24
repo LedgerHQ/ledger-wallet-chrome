@@ -1,4 +1,8 @@
 # Changelog
+1.6.11
+===
+- Fix wrong fees when using the application with multiple cryptocurrencies.
+
 1.6.10
 ===
 - Fix transaction issue for the Ledger Nano
