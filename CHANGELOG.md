@@ -1,6 +1,7 @@
 # Changelog
 1.6.11
 ===
+- Add spanish translation
 - Fix wrong fees when using the application with multiple cryptocurrencies.
 
 1.6.10
