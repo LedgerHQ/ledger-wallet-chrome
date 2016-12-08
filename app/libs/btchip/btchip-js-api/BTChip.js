@@ -532,9 +532,10 @@ var BTChip = Class.create({
             var internalPromise = Q.defer();
             var scriptBlocks = [];
             var offset = 0;
+            var scriptResult;
             while (offset != script.length) {
                 var blockSize = (script.length - offset > 251 ? 251 : script.length - offset);
-                if ((offset + blockSize) != script.length) {
+                if (((offset + blockSize) != script.length) || (typeof sequence == 'undefined')) {
                     scriptBlocks.push(script.bytes(offset, blockSize));
                 }
                 else {
@@ -546,13 +547,14 @@ var BTChip = Class.create({
                 scriptBlocks,
                 function (scriptBlock, finishedCallback) {
                     currentObject.getTrustedInputRaw_async(false, undefined, scriptBlock).then(function (result) {
+                        scriptResult = result;
                         finishedCallback();
                     }).fail(function (err) {
                         internalPromise.reject(err);
                     });
                 },
                 function (finished) {
-                    internalPromise.resolve();
+                    internalPromise.resolve(scriptResult);
                 }
             );
             return internalPromise.promise;
@@ -604,13 +606,28 @@ var BTChip = Class.create({
                 },
                 function (finished) {
                     data = transaction['locktime'];
+                    if (typeof transaction['extraData'] != 'undefined') {
+                        data = data.concat(currentObject.createVarint(transaction['extraData'].length));
+                    }
                     currentObject.getTrustedInputRaw_async(false, undefined, data).then(function (result) {
-                        deferred.resolve(result);
+                        if (transaction['extraData'] != 'undefined') {
+                            processExtraData();
+                        }
+                        else {
+                            deferred.resolve(result);
+                        }
                     }).fail(function (err) {
                         deferred.reject(err);
                     });
                 }
             );
+        }
+        var processExtraData = function() {
+            processScriptBlocks(transaction['extraData']).then(function (result) {
+                deferred.resolve(result);
+            }).fail(function (err) {
+                deferred.reject(err);
+            });
         }
         var data = transaction['version'].concat(transaction['timestamp']).concat(currentObject.createVarint(transaction['inputs'].length));
         currentObject.getTrustedInputRaw_async(true, indexLookup, data).then(function (result) {
@@ -1581,6 +1598,10 @@ var BTChip = Class.create({
         result['inputs'] = inputs;
         result['outputs'] = outputs;
         result['locktime'] = locktime;
+	offset += 4;
+	if (offset != transaction.length) {
+		result['extraData'] = transaction.bytes(offset);
+	}
         return result;
     },
 
