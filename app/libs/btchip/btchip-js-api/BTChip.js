@@ -610,7 +610,7 @@ var BTChip = Class.create({
                         data = data.concat(currentObject.createVarint(transaction['extraData'].length));
                     }
                     currentObject.getTrustedInputRaw_async(false, undefined, data).then(function (result) {
-                        if (transaction['extraData'] != 'undefined') {
+                        if (typeof transaction['extraData'] != 'undefined') {
                             processExtraData();
                         }
                         else {
@@ -1598,10 +1598,10 @@ var BTChip = Class.create({
         result['inputs'] = inputs;
         result['outputs'] = outputs;
         result['locktime'] = locktime;
-	offset += 4;
-	if (offset != transaction.length) {
-		result['extraData'] = transaction.bytes(offset);
-	}
+        offset += 4;
+        if (offset != transaction.length) {
+            result['extraData'] = transaction.bytes(offset);
+        }
         return result;
     },
 
