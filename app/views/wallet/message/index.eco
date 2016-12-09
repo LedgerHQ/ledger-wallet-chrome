@@ -1,20 +1,28 @@
-<section id="wallet_xpubkey_index_dialog">
+<section id="wallet_message_index_dialog">
   <header>
-    <h1><%= t 'wallet.xpubkey.index.title' %></h1>
+    <h1><%= t 'wallet.message.index.title' %></h1>
   </header>
   <table class="no-table-head">
     <tbody>
       <tr>
         <td class="no-border">
-          <%= t 'wallet.xpubkey.index.info' %>
+          <%= t 'wallet.message.index.info' %>
         </td>
       </tr>
       <tr>
-        <td class="row-title"><%= t 'wallet.xpubkey.index.path' %></td>
+        <td class="row-title"><%= t 'wallet.message.index.path' %></td>
       </tr>
       <tr>
         <td>
           <span id="derivation_path"></span>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title"><%= t 'wallet.message.index.message' %></td>
+      </tr>
+      <tr>
+        <td>
+          <span id="message"></span>
         </td>
       </tr>
     </tbody>
@@ -26,3 +34,4 @@
   <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
   <a class="action-rounded-button" href="#confirm"><%= t 'common.confirm' %></a>
 </div>
+
