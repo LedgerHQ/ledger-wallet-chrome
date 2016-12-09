@@ -8,7 +8,7 @@
         <td class="no-border">
           <%= t 'wallet.xpubkey.index.info' %>
         </td>
-      </tr>
+      </tr>    
       <tr>
         <td class="row-title"><%= t 'wallet.xpubkey.index.path' %></td>
       </tr>
