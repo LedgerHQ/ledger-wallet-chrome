@@ -53,6 +53,7 @@ ledger.bitcoin.Networks =
     version:
       regular: 111
       P2SH: 196
+      XPUB: 0x043587CF
     bitcoinjs: bitcoin.networks.testnet
     ws_chain: 'testnet3'
     dust: 5430

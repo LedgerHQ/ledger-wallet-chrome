@@ -129,6 +129,36 @@ ledger.preferences.bitcoin =
         address: 'https://insight.bitpay.com/tx/%s'
     discoveryGap: 20
 
+ledger.preferences.testnet =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'BTC'
+        unit: 8
+      milibitcoin:
+        symbol: 'mBTC'
+        unit: 5
+      microbitcoin:
+        symbol: 'bits'
+        unit: 2
+
+  # Coin preferences
+  Coin:
+    explorers:
+      blocktrail:
+        name: 'Blocktrail.com'
+        address: 'https://www.blocktrail.com/tBTC/tx/%s'
+      blockr:
+        name: 'Blockr.io'
+        address: 'https://tbtc.blockr.io/tx/info/%s'
+      biteasy:
+        name: 'Biteasy.com'
+        address: 'https://www.biteasy.com/testnet/transactions/%s'
+      insight:
+        name: 'Insight.is'
+        address: 'https://test-insight.bitpay.com/tx/%s'
+    discoveryGap: 20
+
 ledger.preferences.litecoin =
   Display:
     units:
