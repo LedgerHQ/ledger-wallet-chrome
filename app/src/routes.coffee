@@ -49,17 +49,17 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/device/wrongpin', (params) ->
     app.router.go '/onboarding/device/error',
       message: _.str.sprintf t('onboarding.device.errors.wrongpin.tries_left'), params['?params'].tries_left
-      indication: _.str.sprintf(t('onboarding.device.errors.wrongpin.unplug_plug'), ledger.config.network.plural)
+      indication: _.str.sprintf(t('onboarding.device.errors.wrongpin.unplug_plug'), ledger.config.network.plural())
 
   route '/onboarding/device/frozen', (params) ->
     app.router.go '/onboarding/device/error',
       serious: yes
-      message: _.str.sprintf(t('onboarding.device.errors.frozen.blank_next_time'), ledger.config.network.plural)
-      indication: _.str.sprintf(t('onboarding.device.errors.frozen.unplug_plug'), ledger.config.network.plural)
+      message: _.str.sprintf(t('onboarding.device.errors.frozen.blank_next_time'), ledger.config.network.plural())
+      indication: _.str.sprintf(t('onboarding.device.errors.frozen.unplug_plug'), ledger.config.network.plural())
 
   route '/onboarding/device/forged', (params) ->
     app.router.go '/onboarding/device/error',
-      message: _.str.sprintf(t('onboarding.device.errors.forged.forbidden_access'), ledger.config.network.plural)
+      message: _.str.sprintf(t('onboarding.device.errors.forged.forbidden_access'), ledger.config.network.plural())
       indication: t 'onboarding.device.errors.forged.get_help'
 
   route '/onboarding/device/swapped_bip39_provisioning', (params) ->
