@@ -1,4 +1,8 @@
 # Changelog
+1.6.12
+===
+- Fix Zcash transactions (from coinbase input and z addresses)
+
 1.6.11
 ===
 - Add spanish translation
