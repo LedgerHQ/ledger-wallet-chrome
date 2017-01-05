@@ -10,12 +10,11 @@ class @WalletMessageIndexDialogViewController extends ledger.common.DialogViewCo
     super
     @_isEditable = @params.editable || no
     chrome.app.window.current().show()
-    @view.derivationPath.val("m/" + @params.path)
-    @view.message.val(@message)
-
+    @view.derivationPath.val("m/" + Api.cleanPath(@params.path))
+    @view.message.val(@params.message)
     unless @_isEditable
-      @view.message.attr("read-only", on)
-      @view.derivationPath.attr("read-only", on)
+      @view.message.attr("readonly", on)
+      @view.derivationPath.attr("readonly", on)
 
   cancel: ->
     unless @_isEditable
