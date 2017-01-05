@@ -23,6 +23,14 @@ bitcoin.networks.clubcoin =
   pubKeyHash: 28
   scriptHash: 85
 
+bitcoin.networks.stratis =
+  magicPrefix: '\x18Stratis Signed Message:\n'
+  bip32:
+    public: 0x0488c21e,
+    private: 0x05358394
+  pubKeyHash: 63
+  scriptHash: 125
+
 ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
   bitcoin:
@@ -168,6 +176,25 @@ ledger.bitcoin.Networks =
       P2SH: 85
       XPUB: 0x0488B21E
     bitcoinjs: bitcoin.networks.clubcoin
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: yes
+
+  stratis:
+    name: 'stratis'
+    plural: 'statis'
+    scheme: 'stratis:'
+    bolosAppName: 'Stratis'
+    ticker: 'strat'
+    tickerKey:
+      from: 'fromSTRAT'
+      to: 'toSTRAT'
+    bip44_coin_type: '105'
+    version:
+      regular: 63
+      P2SH: 125
+      XPUB: 0x0488c21e
+    bitcoinjs: bitcoin.networks.stratis
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: yes
