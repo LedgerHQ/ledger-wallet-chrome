@@ -78,22 +78,7 @@ class @Api
       return
 
   @signMessage: (data) ->
-    try
-      ledger.bitcoin.bitid.getAddress path: data.path
-      .then (result) =>
-        @address = result.bitcoinAddress.value
-        ledger.bitcoin.bitid.signMessage(data.message, path: data.path)
-        .then (result) =>
-          @callback_success('sign_message', signature: result, address: @address)
-          return
-        .fail (error) =>
-          @callback_cancel('sign_message', JSON.stringify(error))
-          return
-      .fail (error) =>
-        @callback_cancel('sign_message', JSON.stringify(error))
-        return
-    catch error
-      callback_cancel('sign_message', JSON.stringify(error))
+    ledger.app.router.go '/wallet/message/index', {path: data.path, message: data.message}
 
   @cosignTransaction: (data) ->
     try

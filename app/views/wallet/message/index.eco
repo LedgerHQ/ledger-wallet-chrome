@@ -1,0 +1,23 @@
+<section id="wallet_message_index_dialog">
+  <header>
+    <h1><%= t 'wallet.message.index.title' %></h1>
+  </header>
+  <table class="no-table-head">
+    <tbody>
+      <tr class="no-border">
+        <td class="row-title"><%= t 'wallet.message.index.path' %></td>
+        <td>
+          <input class="text-input" placeholder="<%= t 'wallet.message.index.path' %>" id="derivation_path" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <textarea class="rounded-text-area" id="message" placeholder="<%= t 'common.message' %>"></textarea>
+</section>
+<div id="error_container"></div>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
+  <a class="action-rounded-button" href="#confirm"><%= t 'wallet.message.index.sign' %></a>
+</div>
+

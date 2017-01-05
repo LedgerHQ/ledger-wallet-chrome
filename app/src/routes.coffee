@@ -199,6 +199,11 @@ ledger.router.pluggedWalletRoutesExceptions = [
     dialog = new WalletXpubkeyIndexDialogViewController({ path: params["?params"]?.path })
     dialog.show()
 
+  # Message
+  route '/wallet/message/index', (params = {}) ->
+    dialog = new WalletMessageIndexDialogViewController({ path: params["?params"]?.path, message: params["?params"]?.message })
+    dialog.show()
+
   # P2SH
   route '/wallet/p2sh/index', (params = {}) ->
     dialog = new WalletP2shIndexDialogViewController({ inputs: params["?params"]?.inputs, scripts: params["?params"]?.scripts, outputs_number: params["?params"]?.outputs_number, outputs_script: params["?params"]?.outputs_script, paths: params["?params"]?.paths })

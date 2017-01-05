@@ -10,4 +10,8 @@
     <div class="regular-text-small stretchable"><%= t 'wallet.settings.tools.register' %></div>
     <div class="regular-grey-text"><i class="fa fa-angle-right"></i></div>
   </a>
+  <a class="row bottom" href="#signMessage">
+    <div class="regular-text-small stretchable"><%= t 'wallet.settings.tools.sign_message' %></div>
+    <div class="regular-grey-text"><i class="fa fa-angle-right"></i></div>
+  </a>
 </div>

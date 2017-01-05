@@ -1,0 +1,17 @@
+<section id="wallet_message_processing_dialog">
+  <header>
+    <h1><%= t 'wallet.message.index.title' %></h1>
+  </header>
+  <div id="content_container">
+    <img src="../assets/images/wallet/send/ic_exchange.png" width="50" height="50" />
+    <div class="regular-text"><%= t 'wallet.message.processing.info' %></div>
+    <div class="regular-grey-text-small"><%- t 'wallet.message.processing.confirm_check_1' %></div>
+    <div class="regular-grey-text-small second-line"><%- t 'wallet.message.processing.confirm_check_2' %></div>
+  </div>
+</section>
+<div class="dialog-actions-bar">
+  <div id="message_hash_label"><%= t 'wallet.message.processing.hash' %>: </div>
+  <div id="message_hash"></div>
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.cancel' %></a>
+</div>

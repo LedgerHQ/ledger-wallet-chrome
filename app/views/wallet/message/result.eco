@@ -1,0 +1,17 @@
+<section id="wallet_message_index_dialog">
+  <header>
+    <h1><%= t 'wallet.message.result.title' %></h1>
+  </header>
+  <table class="no-table-head">
+    <tbody>
+
+    </tbody>
+  </table>
+  <textarea class="rounded-text-area" id="result" placeholder="<%= t 'common.message' %>" readonly></textarea>
+</section>
+<div id="error_container"></div>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.close' %></a>
+</div>
+
