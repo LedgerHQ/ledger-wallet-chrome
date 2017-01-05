@@ -2,10 +2,12 @@ class @WalletMessageProcessingDialogViewController extends ledger.common.DialogV
 
   view:
     contentContainer: '#content_container'
-    
+    hash: "#message_hash"
+
   onAfterRender: ->
     super
-    @view.spinner = ledger.spinners.createLargeSpinner(@view.contentContainer[0])
+    hash = ledger.crypto.SHA256.hashString(@params.message).toUpperCase()
+    @view.hash.text(hash.substr(0, 4) + "..." + hash.substr(-4))
     try
       ledger.bitcoin.bitid.getAddress path: @params.path
       .then (result) =>
@@ -14,7 +16,10 @@ class @WalletMessageProcessingDialogViewController extends ledger.common.DialogV
         .then (result) =>
           Api.callback_success('sign_message', signature: result, address: address)
           @dismiss =>
-            dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.message.errors.sign_message_successfull"))
+            if @params.editable
+              dialog = new WalletMessageResultDialogViewController(signature: result, address: address, message: @params.message)
+            else
+              dialog = new CommonDialogsMessageDialogViewController(kind: "success", title: t("wallet.message.errors.sign_message_successfull"))
             dialog.show()
           return
         .fail (error) =>

@@ -4,34 +4,20 @@
   </header>
   <table class="no-table-head">
     <tbody>
-      <tr>
-        <td class="no-border">
-          <%= t 'wallet.message.index.info' %>
-        </td>
-      </tr>
-      <tr>
+      <tr class="no-border">
         <td class="row-title"><%= t 'wallet.message.index.path' %></td>
-      </tr>
-      <tr>
         <td>
-          <span id="derivation_path"></span>
-        </td>
-      </tr>
-      <tr>
-        <td class="row-title"><%= t 'wallet.message.index.message' %></td>
-      </tr>
-      <tr>
-        <td>
-          <span id="message"></span>
+          <input class="text-input" placeholder="<%= t 'wallet.message.index.path' %>" id="derivation_path" />
         </td>
       </tr>
     </tbody>
   </table>
+  <textarea class="rounded-text-area" id="message" placeholder="<%= t 'common.message' %>"></textarea>
 </section>
 <div id="error_container"></div>
 <div class="dialog-actions-bar">
   <div class="left-spacer"></div>
   <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
-  <a class="action-rounded-button" href="#confirm"><%= t 'common.confirm' %></a>
+  <a class="action-rounded-button" href="#confirm"><%= t 'wallet.message.index.sign' %></a>
 </div>
 

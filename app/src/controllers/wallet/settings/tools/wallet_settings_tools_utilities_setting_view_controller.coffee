@@ -16,3 +16,12 @@ class @WalletSettingsToolsUtilitiesSettingViewController extends WalletSettingsS
         chrome.storage.local.clear()
         chrome.runtime.reload()
     dialog.show()
+
+  signMessage: ->
+    dialog = new WalletMessageIndexDialogViewController({
+      path: "44'/#{ledger.config.network.bip44_coin_type}'/0/0"
+      message: ""
+      editable: yes
+    })
+    dialog.show()
+    @parentViewController.dismiss()
