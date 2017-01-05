@@ -127,6 +127,9 @@ ledger.preferences.bitcoin =
       insight:
         name: 'Insight.is'
         address: 'https://insight.bitpay.com/tx/%s'
+      blockonomics:
+        name: 'Blockonomics.co'
+        address: 'https://www.blockonomics.co/api/tx?txid=%s'  
     discoveryGap: 20
 
 ledger.preferences.litecoin =
