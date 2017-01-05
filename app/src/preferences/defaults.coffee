@@ -231,4 +231,19 @@ ledger.preferences.clubcoin =
         address: 'http://www.clubcha.in/tx/%s'
     discoveryGap: 20
 
+ledger.preferences.stratis =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'CLUB'
+        unit: 8
+
+# Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/strat/tx.dws?%s.htm'
+    discoveryGap: 20
+
 ledger.preferences.common.setCoin("bitcoin")
