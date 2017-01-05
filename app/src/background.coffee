@@ -132,6 +132,12 @@ chrome.runtime.onMessageExternal.addListener (request, sender, sendResponse) =>
         command: 'get_xpubkey',
         path: data.path
       }
+    when 'sign_message'
+      payload = {
+        command: 'sign_message',
+        path: data.path,
+        message: data.message
+      }
     when 'sign_p2sh'
       payload = {
         command: 'sign_p2sh',
