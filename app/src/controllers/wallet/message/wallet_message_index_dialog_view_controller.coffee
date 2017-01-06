@@ -24,7 +24,10 @@ class @WalletMessageIndexDialogViewController extends ledger.common.DialogViewCo
   confirm: ->
     path = Api.cleanPath(@view.derivationPath.val())
     message = @view.message.val()
-    if _.isEmpty(path) || path.match(/[^0-9\/']/ig)?
+    if !ledger.app.dongle.getFirmwareInformation().hasScreenAndButton() and !path.startsWith(ledger.bitcoin.bitid.ROOT_PATH)
+      @view.error.text(t("wallet.message.index.unsupported_path"))
+      return
+    if _.isEmpty(path) || path.match(/[^0-9\/'xa-f]/ig)?
       @view.error.text(t("wallet.message.index.invalid_path"))
       return
     if _.isEmpty(message)
