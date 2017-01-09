@@ -238,7 +238,7 @@ ledger.preferences.stratis =
   Display:
     units:
       bitcoin:
-        symbol: 'CLUB'
+        symbol: 'STRAT'
         unit: 8
 
 # Coin preferences

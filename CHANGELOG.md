@@ -1,7 +1,7 @@
 # Changelog
 1.6.13
 ===
-- Sign arbitraty messages with Ledger Nano S
+- Sign arbitrary messages with Ledger Nano S
 
 1.6.12
 ===
