@@ -1,4 +1,8 @@
 # Changelog
+1.6.13
+===
+- Sign arbitraty messages with Ledger Nano S
+
 1.6.12
 ===
 - Fix Zcash transactions (from coinbase input and z addresses)
