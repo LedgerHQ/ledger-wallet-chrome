@@ -1,4 +1,8 @@
 # Changelog
+1.6.14
+===
+- Bug fixes
+
 1.6.13
 ===
 - Sign arbitrary messages with Ledger Nano S
