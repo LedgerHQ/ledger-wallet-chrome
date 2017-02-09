@@ -1,4 +1,10 @@
 # Changelog
+1.6.15
+===
+- Lock application when the device is locked
+- Add support for Peercoin and Komodo (the service is not available yet)
+- Bug fixes
+
 1.6.14
 ===
 - Bug fixes
