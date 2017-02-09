@@ -128,6 +128,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         else
           # Nano S, Blue
           if @getFirmwareInformation().hasScreenAndButton()
+            @ensureDeviceIsUnlocked(on)
             @_setState States.UNLOCKED
             States.UNLOCKED
           else
@@ -156,6 +157,21 @@ class @ledger.dongle.Dongle extends EventEmitter
         throw error
     else
       ledger.delay(0).then(=> @_setState States.BLANK).then(-> States.BLANK)
+
+  ensureDeviceIsUnlocked: (runForever = no) ->
+    return if @_ensureDeviceIsUnlockedTimeout?
+    @_ensureDeviceIsUnlockedTimeout = _.delay(() =>
+      @getPublicAddress("0'/0").then =>
+        yes
+      .fail (err) =>
+        if @state is States.LOCKED
+          @disconnect()
+        yes
+      .then =>
+        @_ensureDeviceIsUnlockedTimeout = undefined
+        @ensureDeviceIsUnlocked(runForever) if runForever
+      .done()
+    , 30000)
 
   setCoinVersion: (p2pkhVersion, p2shVersion, callback = undefined) ->
     d = ledger.defer(callback)
@@ -198,6 +214,8 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   # Called when 
   disconnect: ->
+    clearTimeout(@_ensureDeviceIsUnlockedTimeout) if @_ensureDeviceIsUnlockedTimeout?
+    @_ensureDeviceIsUnlockedTimeout = undefined
     @_btchip.card.disconnect()
     @_setState(States.DISCONNECTED)
 
