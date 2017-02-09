@@ -2,6 +2,7 @@
 1.6.15
 ===
 - Lock application when the device is locked
+- Display transaction total spent with its counter value currency
 - Add support for Peercoin and Komodo (the service is not available yet)
 - Bug fixes
 
