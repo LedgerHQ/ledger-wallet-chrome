@@ -5,6 +5,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     currencyContainer: '#currency_container'
     sendButton: '#send_button'
     totalLabel: '#total_label'
+    counterValueTotalLabel: '#countervalue_total_label'
     errorContainer: '#error_container'
     receiverInput: '#receiver_input'
     dataInput: '#data_input'
@@ -156,7 +157,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     # check amount
     if @_transactionAmount().length == 0 or not ledger.Amount.fromSatoshi(@_transactionAmount()).gt(0)
       return t 'common.errors.invalid_amount'
-    else if not Bitcoin.Address.validate @_receiverBitcoinAddress() || @_receiverBitcoinAddress().startsWith("z")
+    else if not ledger.bitcoin.checkAddress @_receiverBitcoinAddress() || @_receiverBitcoinAddress().startsWith("z")
       return _.str.sprintf(t('common.errors.invalid_receiver_address'), ledger.config.network.name)
     else if @_dataValue().length > 0 && not @_isDataValid()
       return t 'common.errors.invalid_op_return_data'
@@ -175,6 +176,10 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
   _updateTotalLabel: ->
     {amount, fees} = @_computeAmount()
     @view.totalLabel.text ledger.formatters.formatValue(amount) + ' ' + _.str.sprintf(t('wallet.send.index.transaction_fees_text'), ledger.formatters.formatValue(fees))
+    counterValueFee = ledger.converters.satoshiToCurrencyFormatted(fees)
+    if parseInt(ledger.converters.satoshiToCurrency(fees, "USD")) >= 1
+      counterValueFee = '<span class="bold-invalid-text">' + counterValueFee + '</span>'
+    @view.counterValueTotalLabel.html ledger.converters.satoshiToCurrencyFormatted(amount) + ' ' + _.str.sprintf(t('wallet.send.index.transaction_fees_text'), counterValueFee)
 
   _updateExchangeValue: ->
     value = ledger.Amount.fromSatoshi(@_transactionAmount())

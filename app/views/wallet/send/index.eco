@@ -47,7 +47,10 @@
       </tr>
       <tr class="no-border">
         <td class="row-title optional"><%= t 'wallet.send.index.total_spent' %></td>
-        <td class="align-right regular-grey-text-small" id="total_label"></td>
+        <td class="align-right regular-grey-text-small">
+          <p id="total_label"></p>
+          <p id="countervalue_total_label" style="margin-top: 10px;"></p>
+        </td>
       </tr>
     </tbody>
   </table>
