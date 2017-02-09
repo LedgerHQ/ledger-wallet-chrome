@@ -84,7 +84,8 @@
         var rest = decoded.substr(0, decoded.length - 4);
         var good_cksum = hex2a(sha256_digest(hex2a(sha256_digest(rest)))).substr(0, 4);
 
-        if (cksum != good_cksum) return false;
+        var version = parseInt(new ByteString(rest.substr(-20), ASCII).toString(HEX), 16);
+        if (cksum != good_cksum || (version !== ledger.config.network.version.P2SH && version !== ledger.config.network.version.regular)) return false;
         return true;
     }
 
