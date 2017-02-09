@@ -31,6 +31,22 @@ bitcoin.networks.stratis =
   pubKeyHash: 63
   scriptHash: 125
 
+bitcoin.networks.peercoin =
+  magicPrefix: '\x17PPCoin Signed Message:\n'
+  bip32:
+    public: 0xe6e8e9e5,
+    private: 0x05358394
+  pubKeyHash: 55
+  scriptHash: 117
+
+bitcoin.networks.komodo =
+  magicPrefix: '\x17Komodo Signed Message:\n'
+  bip32:
+    public: 0xf9eee48d,
+    private: 0x05358394
+  pubKeyHash: 60
+  scriptHash: 85
+
 ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
   bitcoin:
@@ -198,3 +214,40 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: yes
+
+  peercoin:
+    name: 'peercoin'
+    plural: 'peercoins'
+    scheme: 'peercoin:'
+    bolosAppName: 'Peercoin'
+    ticker: 'ppc'
+    tickerKey:
+      from: 'fromPPC'
+      to: 'toPPC'
+    bip44_coin_type: '6'
+    version:
+      regular: 55
+      P2SH: 117
+      XPUB: 0xe6e8e9e5
+    bitcoinjs: bitcoin.networks.peercoin
+    dust: 10000
+    handleFeePerByte: yes
+    areTransactionTimestamped: yes
+
+  komodo:
+    name: 'komodo'
+    plural: 'komodos'
+    scheme: 'komodo:'
+    bolosAppName: 'Komodo'
+    ticker: 'kmd'
+    tickerKey:
+      from: 'fromKMD'
+      to: 'toKMD'
+    bip44_coin_type: '141'
+    version:
+      regular: 60
+      P2SH: 85
+      XPUB: 0xf9eee48d
+    bitcoinjs: bitcoin.networks.komodo
+    dust: 10000
+    handleFeePerByte: no

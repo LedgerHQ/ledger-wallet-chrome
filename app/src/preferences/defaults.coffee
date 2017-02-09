@@ -249,4 +249,37 @@ ledger.preferences.stratis =
         address: 'https://chainz.cryptoid.info/strat/tx.dws?%s.htm'
     discoveryGap: 20
 
+ledger.preferences.komodo =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'KMD'
+        unit: 8
+
+# Coin preferences
+  Coin:
+    explorers:
+      kpx:
+        name: 'KPX'
+        address: 'https://kpx.io/transactions/%s'
+    discoveryGap: 20
+
+ledger.preferences.peercoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'PPC'
+        unit: 8
+
+# Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/ppc/tx.dws?%s.htm'
+      peercoin_explorer:
+        name: 'Peercoin Blockchain Explorer'
+        address: 'https://peercoin.mintr.org/tx/%s'
+    discoveryGap: 20
+
 ledger.preferences.common.setCoin("bitcoin")
