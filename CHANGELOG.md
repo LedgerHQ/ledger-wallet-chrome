@@ -1,5 +1,5 @@
 # Changelog
-1.6.15
+1.6.15 / 1.6.16
 ===
 - Lock application when the device is locked
 - Display transaction total spent with its counter value currency

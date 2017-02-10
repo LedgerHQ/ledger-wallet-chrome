@@ -74,13 +74,27 @@
         return a.join('');
     }
 
+    function ia2hex(ia) {
+        var aHex = "0123456789abcdef";
+        var l = ia.length;
+        var nBuf;
+        var strBuf;
+        var strOut = "";
+        for (var i = 0; i < l; i++) {
+            nBuf = ia[i];
+            strBuf = aHex[Math.floor(nBuf/16)];
+            strBuf += aHex[nBuf % 16];
+            strOut += strBuf;
+        }
+        return strOut;
+    }
+
     ledger.bitcoin = {};
 
     ledger.bitcoin.checkAddress = function (address) {
-        var decoded = base58_decode(address);
-        if (decoded.length != 25) return false;
+        var decoded = hex2a(ia2hex(bs58.decode(address)));
 
-        var cksum = decoded.substr(decoded.length - 4);
+        var cksum = decoded.substr(-4);
         var rest = decoded.substr(0, decoded.length - 4);
         var good_cksum = hex2a(sha256_digest(hex2a(sha256_digest(rest)))).substr(0, 4);
 
