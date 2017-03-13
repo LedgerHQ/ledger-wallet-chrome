@@ -70,6 +70,9 @@
         # Slick
         '../public/slick/slick.min'
 
+        # Chosen
+        '../libs/chosen.jquery.min'
+
         # Used be m2fa.DebugClient
         '../libs/btchip/ucrypt/ka'
         '../libs/btchip/ucrypt/pad'

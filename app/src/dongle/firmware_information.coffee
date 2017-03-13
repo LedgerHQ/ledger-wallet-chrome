@@ -11,6 +11,7 @@ Firmwares =
   V_L_1_0_2: 0x20010002
   V_L_1_1_0: 0x20010100
   V_B_L_1_1_1: 0x30010101
+  V_B_L_1_1_5: 0x30010105
 
 @ledger.dongle.Firmwares = Firmwares
 
@@ -68,3 +69,5 @@ class ledger.dongle.FirmwareInformation
   hasSecureScreenAndButton: -> @hasFeature(0x02)
   hasUnsafeScreenAndButton: -> @hasFeature(0x04)
   hasScreenAndButton: -> @hasSecureScreenAndButton() || @hasUnsafeScreenAndButton()
+
+  hasVerifyAddressOnScreen: -> @getIntFirmwareVersion() >= Firmwares.V_B_L_1_1_5

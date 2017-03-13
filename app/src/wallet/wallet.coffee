@@ -46,6 +46,9 @@ class ledger.wallet.Wallet
      paths = paths.concat(account.getAllObservedAddressesPaths())
     paths
 
+  getAllAddresses: ->
+    @cache._cache.toJSON()
+
   initialize: (store, callback) ->
     @_store = store
     @_store.get ['accounts'], (result) =>

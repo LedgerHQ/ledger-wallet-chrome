@@ -2,6 +2,7 @@ class @WalletMessageIndexDialogViewController extends ledger.common.DialogViewCo
 
   view:
     derivationPath: '#derivation_path'
+    addressSelect: '#address'
     message: '#message'
     confirmButton: '#confirm_button'
     error: "#error_container"
@@ -15,6 +16,14 @@ class @WalletMessageIndexDialogViewController extends ledger.common.DialogViewCo
     unless @_isEditable
       @view.message.attr("readonly", on)
       @view.derivationPath.attr("readonly", on)
+      @view.addressSelect.hide()
+    else
+      @view.derivationPath.hide()
+      @view.addressSelect.show()
+      for pair in ledger.wallet.Wallet.instance.getAllAddresses()
+        @view.addressSelect.append("<option value=\"#{pair.key}\">#{pair.value}</option>")
+      @view.addressSelect.chosen()
+      $('.chosen-container').css(width: '100%')
 
   cancel: ->
     unless @_isEditable
@@ -23,6 +32,8 @@ class @WalletMessageIndexDialogViewController extends ledger.common.DialogViewCo
 
   confirm: ->
     path = Api.cleanPath(@view.derivationPath.val())
+    if @_isEditable
+      path = Api.cleanPath(@view.addressSelect.val())
     message = @view.message.val()
     if !ledger.app.dongle.getFirmwareInformation().hasScreenAndButton() and !path.startsWith(ledger.bitcoin.bitid.ROOT_PATH)
       @view.error.text(t("wallet.message.index.unsupported_path"))

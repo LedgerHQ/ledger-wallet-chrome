@@ -469,6 +469,20 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   restoreSwappedBip39: (pin, restoreSeed, callback = undefined) -> @_setupSwappedBip39({pin, restoreSeed, callback})
 
+  verifyAddressOnScreen: (path, callback) ->
+    Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
+    _btchipQueue.enqueue "getPublicAddress", =>
+      d = ledger.defer(callback)
+      @_btchip.getWalletPublicKey_async(path, true)
+      .then (result) =>
+        #ledger.wallet.Wallet.instance?.cache?.set [[path, result.bitcoinAddress.value]]
+        _.defer -> d.resolve(result)
+      .fail (err) =>
+        _.defer -> d.resolve({})
+      .done()
+      d.promise
+
+
   _setupSwappedBip39: ({pin, userEntropy, restoreSeed, callback}) ->
     Errors.throw(Errors.DongleNotBlank) if @state isnt States.BLANK
     userEntropy ||= ledger.bitcoin.bip39.generateEntropy()
@@ -516,7 +530,7 @@ class @ledger.dongle.Dongle extends EventEmitter
     Errors.throw(Errors.DongleLocked, 'Cannot get a public while the key is not unlocked') if @state isnt States.UNLOCKED && @state isnt States.UNDEFINED
     _btchipQueue.enqueue "getPublicAddress", =>
       d = ledger.defer(callback)
-      @_btchip.getWalletPublicKey_async(path)
+      @_btchip.getWalletPublicKey_async(path, false)
       .then (result) =>
         #ledger.wallet.Wallet.instance?.cache?.set [[path, result.bitcoinAddress.value]]
         _.defer -> d.resolve(result)

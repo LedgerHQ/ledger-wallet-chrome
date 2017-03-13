@@ -198,7 +198,7 @@ ledger.bitcoin.Networks =
 
   stratis:
     name: 'stratis'
-    plural: 'statis'
+    plural: 'stratis'
     scheme: 'stratis:'
     bolosAppName: 'Stratis'
     ticker: 'strat'

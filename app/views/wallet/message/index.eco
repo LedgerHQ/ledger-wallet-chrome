@@ -5,9 +5,10 @@
   <table class="no-table-head">
     <tbody>
       <tr class="no-border">
-        <td class="row-title"><%= t 'wallet.message.index.path' %></td>
+        <td class="row-title"><%= t 'wallet.bitid.index.address' %></td>
         <td>
           <input class="text-input" placeholder="<%= t 'wallet.message.index.path' %>" id="derivation_path" />
+          <select id="address"></select>
         </td>
       </tr>
     </tbody>

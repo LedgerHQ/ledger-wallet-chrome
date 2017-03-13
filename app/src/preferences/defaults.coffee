@@ -269,7 +269,7 @@ ledger.preferences.peercoin =
     units:
       bitcoin:
         symbol: 'PPC'
-        unit: 8
+        unit: 6
 
 # Coin preferences
   Coin:
