@@ -48,6 +48,9 @@ class ledger.tasks.FeesComputationTask extends ledger.tasks.Task
 
   update: -> @_update(no)
 
+  getFeesForNumberOfBlocks: (numberOfBlock) ->
+    @_fees["#{numberOfBlock}"]
+
   getFeesForLevel: (level) ->
     value = @_fees["#{level.numberOfBlock}"] or level.defaultValue
     new @constructor.Fee(value, level)
@@ -58,10 +61,12 @@ class ledger.tasks.FeesComputationTask extends ledger.tasks.Task
 
   _update: (scheduleNext) ->
     return unless @isRunning()
+    d = ledger.defer()
     @_client.getEstimatedFees (fees, error) =>
       @_updateFeesAndSave(fees) if fees?
+      d.resolve()
       setTimeout((=> @_update(yes)), ledger.tasks.FeesComputationTask.UpdateRate) if scheduleNext
-    return
+    d.promise
 
   _updateFeesAndSave: (newFees) ->
     @_fees = newFees

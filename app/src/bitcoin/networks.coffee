@@ -231,7 +231,7 @@ ledger.bitcoin.Networks =
       XPUB: 0xe6e8e9e5
     bitcoinjs: bitcoin.networks.peercoin
     dust: 10000
-    handleFeePerByte: yes
+    handleFeePerByte: no
     areTransactionTimestamped: yes
 
   komodo:

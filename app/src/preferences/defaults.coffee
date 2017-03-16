@@ -270,6 +270,9 @@ ledger.preferences.peercoin =
       bitcoin:
         symbol: 'PPC'
         unit: 6
+      milibitcoin:
+        symbol: 'mPPC'
+        unit: 3
 
 # Coin preferences
   Coin:

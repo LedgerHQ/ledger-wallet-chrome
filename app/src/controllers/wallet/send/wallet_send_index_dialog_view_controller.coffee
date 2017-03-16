@@ -227,9 +227,10 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       estimatedSize = ledger.bitcoin.estimateTransactionSize(selectedUtxo.length, 2).max # For now always consider we need a change output
       if (@_dataValue().length > 0)
         estimatedSize += @_dataValue().length / 2 + 4 + 1
-      unless ledger.config.network.handleFeePerByte
-        estimatedSize = (estimatedSize + 1000) - ((estimatedSize + 1000) % 1000)
-      fees = feePerByte.multiply(estimatedSize)
+      if ledger.config.network.handleFeePerByte
+        fees = feePerByte.multiply(estimatedSize)
+      else
+        fees = feePerByte.multiply(1000).multiply(Math.floor(estimatedSize / 1000) + (if estimatedSize % 1000 != 0 then 1 else 0))
       if desiredAmount.gt(0) and total.lt(desiredAmount.add(fees)) and selectedUtxo.length is utxo.length
         # Not enough funds
         total: total, amount: desiredAmount.add(fees), fees: fees, utxo: selectedUtxo, size: estimatedSize
@@ -259,8 +260,11 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @_scheduledRefresh = _.delay(@_ensureDatabaseUpToDate.bind(this), 30 * 1000)
       throw er
     .then () =>
-      return unless @isShown()
-      @_updateSendButton(no)
+      ledger.tasks.FeesComputationTask.instance.update().then =>
+        @_updateSendButton(no)
+        @_updateFeesSelect()
+        @_updateTotalLabel()
+        return unless @isShown()
     return
 
   _updateSendButton: (syncing = ledger.tasks.WalletLayoutRecoveryTask.instance.isRunning()) ->

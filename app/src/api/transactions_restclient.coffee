@@ -27,6 +27,15 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
         callback?(response[0].hex)
       onError: @networkErrorCallback(callback)
 
+  getTransactionSize: (transactionHash) ->
+    d = ledger.defer()
+    @getRawTransaction transactionHash, (tx, error) =>
+      if error?
+        d.reject(error)
+      else
+        d.resolve(tx.length / 2)
+    d.promise
+
   getTransactionsFromPaths: (paths, batchsize, callback) ->
     ledger.wallet.pathsToAddresses paths, (addresses) =>
       @getTransactions(_(addresses).values(), batchsize, callback)
@@ -92,6 +101,19 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
       onSuccess: (response) ->
         callback?(response.transaction_hash)
       onError: @networkErrorCallback(callback)
+
+  getTransactionByHash: (transactionHash) ->
+    d = ledger.defer()
+    @http().get
+      url: "blockchain/v2/#{ledger.config.network.ticker}/transactions/#{transactionHash}"
+      onSuccess: (response) ->
+        if response.length == 0
+          d.reject("Transaction '#{transactionHash}' not found.")
+        else
+          d.resolve(response[0])
+      onError: (ex) ->
+        d.reject(ex)
+    d.promise
 
   refreshTransaction: (transactions, callback) ->
     outTransactions = []

@@ -65,6 +65,10 @@ _.extend ledger.errors,
   InvalidRecipientAmount: 704
   UnsafeUnspentOutputs: 705
 
+  # CPFP
+  TransactionAlreadyConfirmed: 801
+  TransactionNotEligible: 802
+
   DefaultMessages:
     0: "StandardError"
 

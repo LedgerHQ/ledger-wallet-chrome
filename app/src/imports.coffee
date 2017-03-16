@@ -197,6 +197,7 @@
         ## Wallet
         'wallet/utils'
         'wallet/transaction'
+        'wallet/cpfp'
         'wallet/wallet'
         'wallet/cache'
         'wallet/extended_public_key'

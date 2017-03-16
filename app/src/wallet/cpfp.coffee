@@ -1,0 +1,84 @@
+
+window.ledger ?= {}
+ledger.bitcoin ?= {}
+
+gatherAllUnconfirmedTransactions = (client, rootTxHash, txs = [], deffer = ledger.defer()) ->
+  p = client.getTransactionByHash(rootTxHash).then (transaction) ->
+    if transaction["block"]?
+      txs
+    else
+      txs.push(transaction)
+      Q.all(gatherAllUnconfirmedTransactions(client, input["output_hash"]) for input in transaction["inputs"]).then (unconfirmed) ->
+        unconfirmed = _.flatten(unconfirmed)
+        txs = txs.concat(unconfirmed)
+        txs
+  deffer.resolve(p)
+  deffer.promise
+
+extendTransactionWithSize = (client, tx) ->
+  client.getTransactionSize(tx["hash"]).then (size) ->
+    tx.size = size
+    tx
+
+ledger.bitcoin.cpfp =
+
+  fetchUnconfirmedTransactions: (rootTxHash) ->
+    client = new ledger.api.TransactionsRestClient()
+    gatherAllUnconfirmedTransactions(client, rootTxHash).then (transactions) ->
+      throw ledger.errors.new(ledger.errors.TransactionNotEligible) if !ledger.bitcoin.cpfp.isEligibleToCpfp(rootTxHash)
+      if transactions.length is 0
+        throw ledger.errors.new(ledger.errors.TransactionAlreadyConfirmed)
+      Q.all(extendTransactionWithSize(client, tx) for tx in transactions)
+    .then (transactions) ->
+      # We have every unconfirmed transactions with their associated size, we need to compute the total size (of all transactions)
+      # and the total associated fee. Finally compute a fee sufficient to support the size of all transaction plus the size of CPFP
+      # transaction.
+      l transactions
+      totalSize = ledger.Amount.fromSatoshi(0)
+      totalFees = ledger.Amount.fromSatoshi(0)
+      for transaction in transactions
+        totalSize = totalSize.add(transaction.size)
+        totalFees = totalFees.add(transaction.fees)
+      {transactions: transactions, size: totalSize, fees: totalFees}
+
+
+  isEligibleToCpfp: (rootTxHash) ->
+    for output in Output.find(transaction_hash: rootTxHash).data()
+      if !_.isEmpty(output.get("path"))
+        return yes
+    return no
+
+  createTransaction: (account, rootTxHash) ->
+    utxo = _(account.getUtxo()).sortBy (o) -> o.get('transaction').get('confirmations')
+    findUtxo = (hash) ->
+      for output in utxo
+        return output if output.get("transaction_hash")
+    ledger.tasks.FeesComputationTask.instance.update().then ->
+      feePerByte = ledger.tasks.FeesComputationTask.instance.getFeesForNumberOfBlocks(1) / 1000 + 100
+      ledger.bitcoin.cpfp.fetchUnconfirmedTransactions(rootTxHash).then (unconfirmed) ->
+        # Coin selection
+        inputs = []
+        hasInput = (input) ->
+          for i in inputs
+            if input.get("hash") is i.get("hash")
+              return yes
+          return no
+        inputs.push(findUtxo(unconfirmed.transactions[0]["hash"]))
+        collectedAmount = ledger.Amount.fromSatoshi(inputs[0].get("value"))
+        index = 0
+        while on
+          totalSize = unconfirmed.size.add(ledger.bitcoin.estimateTransactionSize(inputs.length, 2).max)
+          feeAmount = totalSize.multiply(feePerByte).subtract(unconfirmed.fees)
+          requiredAmount = feeAmount.add(5430)
+          if collectedAmount.gte(requiredAmount)
+            return {unconfirmed, inputs, collectedAmount, fees: feeAmount}
+          input = utxo[index]
+          if not input? and not hasInput(input)
+            inputs.push(input)
+            collectedAmount = collectedAmount.add(ledger.Amount.fromSatoshi(input.get("value")))
+          index += 1
+          break unless input?
+        throw ledger.errors.new(ledger.errors.NotEnoughFunds)
+    .then (preparedTransaction) ->
+      preparedTransaction.amount = preparedTransaction.collectedAmount.subtract(preparedTransaction.fees)
+      preparedTransaction
