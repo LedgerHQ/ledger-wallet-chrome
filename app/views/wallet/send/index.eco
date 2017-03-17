@@ -45,6 +45,13 @@
           </div>
         </td>
       </tr>
+      <tr id="custom_fees_row">
+        <td class="row-title"><%= t 'wallet.send.index.custom_fees' %></td>
+        <td class="align-right">
+          <input id="amount_input" class="text-input" placeholder="<%= t 'wallet.defaults.operations.amount' %>" value=""/>
+          <label class="text-input"><%= t 'wallet.send.index.satoshi_per_byte' %></label>
+        </td>
+      </tr>
       <tr class="no-border">
         <td class="row-title optional"><%= t 'wallet.send.index.total_spent' %></td>
         <td class="align-right regular-grey-text-small">

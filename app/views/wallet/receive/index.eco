@@ -14,7 +14,7 @@
           </div>
         </td>
       </tr>
-      <tr>
+      <tr class="no-print">
         <td class="row-title"><%= t 'wallet.receive.index.account_to_credit' %></td>
         <td class="align-right">
           <div class="regular-select">
@@ -36,9 +36,10 @@
     <p class="regular-grey-text-small"><%- _.str.sprintf(t('wallet.receive.index.qr_code_explanation'), ledger.config.network.plural) %></p>
   </div>
 </section>
-<div class="dialog-actions-bar">
-  <a class="action-rounded-button" href="#mail"><%= t 'common.send_by_email' %></a>
-  <a class="action-rounded-button" href="#print"><%= t 'common.print' %></a>
+<div class="dialog-actions-bar no-print">
+  <a class="action-rounded-button" href="#mail"><i class="fa fa-envelope"></i></a>
+  <a class="action-rounded-button" href="#print"><i class="fa fa-print"></i></a>
+  <a id="verify_button" class="action-rounded-button" href="#verify"><i class="fa fa-desktop"></i></a>
   <div class="left-spacer"></div>
   <a class="cancel-rounded-button" href="#dismiss"><%= t 'common.close' %></a>
 </div>

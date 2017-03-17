@@ -2,7 +2,7 @@
   <div class="spacer"></div>
   <div class="content-container">
     <img src="../assets/images/common/large_question.png" width="50" height="50" />
-    <div class="uppercase-section-title"><%= t 'common.confirmation' %></div>
+    <div class="uppercase-section-title"><%= t @titleLocalizableKey %></div>
     <div class="regular-text-small"><%- if @message? then @message else t(@messageLocalizableKey) %></div>
     <div class="dialog-actions-bar">
       <div class="left-spacer"></div>

@@ -43,6 +43,7 @@ ledger.bitcoin.cpfp =
 
 
   isEligibleToCpfp: (rootTxHash) ->
+    return no if Input.find(previous_tx: rootTxHash).data().length ? 0
     for output in Output.find(transaction_hash: rootTxHash).data()
       if !_.isEmpty(output.get("path"))
         return yes
@@ -54,13 +55,13 @@ ledger.bitcoin.cpfp =
       for output in utxo
         return output if output.get("transaction_hash")
     ledger.tasks.FeesComputationTask.instance.update().then ->
-      feePerByte = ledger.tasks.FeesComputationTask.instance.getFeesForNumberOfBlocks(1) / 1000 + 100
+      feePerByte = ledger.tasks.FeesComputationTask.instance.getFeesForNumberOfBlocks(1) / 1000 * 1.5
       ledger.bitcoin.cpfp.fetchUnconfirmedTransactions(rootTxHash).then (unconfirmed) ->
         # Coin selection
         inputs = []
         hasInput = (input) ->
           for i in inputs
-            if input.get("hash") is i.get("hash")
+            if input.get("transaction_hash") == i.get("transaction_hash") and input.get("index") == i.get("index")
               return yes
           return no
         inputs.push(findUtxo(unconfirmed.transactions[0]["hash"]))
@@ -73,11 +74,11 @@ ledger.bitcoin.cpfp =
           if collectedAmount.gte(requiredAmount)
             return {unconfirmed, inputs, collectedAmount, fees: feeAmount}
           input = utxo[index]
-          if not input? and not hasInput(input)
+          if input? and !hasInput(input)
             inputs.push(input)
             collectedAmount = collectedAmount.add(ledger.Amount.fromSatoshi(input.get("value")))
           index += 1
-          break unless input?
+          break if not input?
         throw ledger.errors.new(ledger.errors.NotEnoughFunds)
     .then (preparedTransaction) ->
       preparedTransaction.amount = preparedTransaction.collectedAmount.subtract(preparedTransaction.fees)

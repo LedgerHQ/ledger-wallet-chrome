@@ -15,12 +15,12 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     accountsSelect: '#accounts_select'
     colorSquare: '#color_square'
     maxButton: '#max_button'
+    customFeesRow: '#custom_fees_row'
 
   RefreshWalletInterval: 15 * 60 * 1000 # 15 Minutes
 
   onAfterRender: () ->
     super
-
     @view.dataRow.hide()
 
     # apply params
@@ -31,7 +31,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     if @params.data? && @params.data.length > 0
       @view.dataInput.val @params.data
       @view.dataRow.show()
-
+    @view.customFeesRow.hide()
     # configure view
     @view.amountInput.amountInput(ledger.preferences.instance.getBitcoinUnitMaximumDecimalDigitsCount())
     @view.errorContainer.hide()
@@ -131,7 +131,18 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
         @_updateExchangeValue()
     @view.openScannerButton.on 'click', =>
       @openScanner()
+    @view.customFeesRow.find('input').keypress (e) =>
+      if (e.which < 48 || 57 < e.which)
+        e.preventDefault()
+    @view.customFeesRow.find('input').on 'keyup', =>
+      _.defer =>
+        @view.feesSelect.find(":selected").attr('value', parseInt(@view.customFeesRow.find('input').val()) * 1000)
+        @_updateTotalLabel()
     @view.feesSelect.on 'change', =>
+      if @view.feesSelect.find(":selected").text() is t("wallet.send.index.custom_fees")
+        @view.customFeesRow.show()
+      else
+        @view.customFeesRow.hide()
       @_updateTotalLabel()
     @view.accountsSelect.on 'change', =>
       @_updateCurrentAccount()
@@ -139,6 +150,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     ledger.app.on 'wallet:operations:changed', =>
       @_updateUtxo()
       @_updateTotalLabel()
+
+  _updateCustomFees: ->
 
   _receiverBitcoinAddress: ->
     _.str.trim(@view.receiverInput.val())
@@ -161,6 +174,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       return _.str.sprintf(t('common.errors.invalid_receiver_address'), ledger.config.network.name)
     else if @_dataValue().length > 0 && not @_isDataValid()
       return t 'common.errors.invalid_op_return_data'
+    else if ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000).lt(100)
+      return t 'wallet.send.index.satoshi_per_byte_too_low'
     undefined
 
   _updateFeesSelect: ->
@@ -172,6 +187,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       if fee.value == ledger.preferences.instance.getMiningFee()
         node.attr 'selected', true
       @view.feesSelect.append node
+    node = $("<option></option>").text(t("wallet.send.index.custom_fees")).attr('value', 0)
+    @view.feesSelect.append node
 
   _updateTotalLabel: ->
     {amount, fees} = @_computeAmount()

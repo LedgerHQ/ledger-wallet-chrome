@@ -6,6 +6,7 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
     receiverAddress: "#receiver_address"
     accountsSelect: '#accounts_select'
     colorSquare: '#color_square'
+    verifyButton: '#verify_button'
 
   onAfterRender: ->
     super
@@ -28,6 +29,9 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
     @_updateQrCode()
     @_updateReceiverAddress()
     @_listenEvents()
+
+    if !ledger.app.dongle.getFirmwareInformation().hasVerifyAddressOnScreen()
+      @view.verifyButton.hide()
 
   onShow: ->
     super
@@ -89,3 +93,8 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
 
   _receivingAddress: ->
     @_selectedAccount().getWalletAccount().getCurrentPublicAddress()
+
+  verify: ->
+    return if @_verifyQueue?.inspect().state is "pending"
+    @_verifyQueue = ledger.app.dongle.verifyAddressOnScreen(@_selectedAccount().getWalletAccount().getCurrentPublicAddressPath())
+    return

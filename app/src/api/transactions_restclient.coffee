@@ -27,9 +27,19 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
         callback?(response[0].hex)
       onError: @networkErrorCallback(callback)
 
+  safeGetRawTransaction: (transactionHash, callback) ->
+    @http().get
+      url: "blockchain/v2/#{ledger.config.network.ticker}/transactions/#{transactionHash}/hex"
+      onSuccess: (response) ->
+        if (response.length == 0)
+          callback?(_.str.pad("", 1000, "00"))
+        else
+          callback?(response[0].hex)
+      onError: @networkErrorCallback(callback)
+
   getTransactionSize: (transactionHash) ->
     d = ledger.defer()
-    @getRawTransaction transactionHash, (tx, error) =>
+    @safeGetRawTransaction transactionHash, (tx, error) =>
       if error?
         d.reject(error)
       else
