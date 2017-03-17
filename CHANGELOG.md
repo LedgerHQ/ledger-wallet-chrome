@@ -1,4 +1,14 @@
 # Changelog
+1.6.17
+===
+- Better fee update mechanism
+- Change fee computation algorithm for "fees per kb" coins
+- Add the ability to display a wallet address directly on the Ledger Blue or the Ledger Nano S
+- Add CPFP support to accelerate confirmation
+- Users can now enter custom fees (fees must be greater than 100 satoshi/B)
+- Hide account information when printing the reception dialog
+- Better signature tool (you can choose which address you want to use instead of typing in the derivation path)
+
 1.6.15 / 1.6.16
 ===
 - Lock application when the device is locked
