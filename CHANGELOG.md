@@ -1,5 +1,5 @@
 # Changelog
-1.6.17
+1.6.17 / 1.6.18
 ===
 - Better fee update mechanism
 - Change fee computation algorithm for "fees per kb" coins

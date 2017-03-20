@@ -174,7 +174,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       return _.str.sprintf(t('common.errors.invalid_receiver_address'), ledger.config.network.name)
     else if @_dataValue().length > 0 && not @_isDataValid()
       return t 'common.errors.invalid_op_return_data'
-    else if ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000).lt(100)
+    else if ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000).lt(100) && @view.customFeesRow.is(':visible')
       return t 'wallet.send.index.satoshi_per_byte_too_low'
     undefined
 
