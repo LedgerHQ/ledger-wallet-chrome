@@ -1,4 +1,8 @@
 # Changelog
+1.6.19
+===
+- Use an old timestamp in Stratis transactions
+
 1.6.17 / 1.6.18
 ===
 - Better fee update mechanism
