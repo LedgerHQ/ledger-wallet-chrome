@@ -45,7 +45,7 @@ ledger.dongle.VersatilePlugUpCard = Class.extend(Card,
   openLogicalChannel: (channel) ->
     throw 'Not supported'
     return
-  exchange_async: (apdu, retru)
+  exchange_async: (apdu, returnLength) ->
 
   exchange_async_fido: (apdu, returnLength) ->
 
