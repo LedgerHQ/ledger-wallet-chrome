@@ -1213,7 +1213,7 @@ var BTChip = Class.create({
         if (ledger.config.network.areTransactionTimestamped !== true) {
             timestamp = new ByteString("", HEX);
         } else if (ledger.config.network.name === "stratis") {
-          timestamp = new ByteString(Convert.toHexInt((new Date().getTime() / 1000) - (12 * 60 * 60)).match(/([0-9a-f]{2})/g).reverse().join(''), HEX); // Well... Stratis node doesn't like on-time transaction. Only late transaction can go though ><
+          timestamp = new ByteString(Convert.toHexInt((new Date().getTime() / 1000) - (15 * 60)).match(/([0-9a-f]{2})/g).reverse().join(''), HEX); // Well... Stratis node doesn't like on-time transaction. Only late transaction can go through ><
         }
         var resuming = (typeof authorization != "undefined");
         var self = this;
