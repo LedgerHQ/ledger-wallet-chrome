@@ -1275,6 +1275,14 @@ var BTChip = Class.create({
                 regularOutputs.push(input[0].outputs[input[1]]);
             });
         }).then(function () {
+          return ledger.api.TransactionsRestClient.instance.getTime()
+        }).then(function (time) {
+          if (ledger.config.network.areTransactionTimestamped !== true) {
+
+          } else {
+            timestamp = new ByteString(Convert.toHexInt(time).match(/([0-9a-f]{2})/g).reverse().join(''), HEX);
+          }
+        }).then(function () {
             if (resuming) {
                 trustedInputs = resumeData['trustedInputs'];
                 publicKeys = resumeData['publicKeys'];

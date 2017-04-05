@@ -135,3 +135,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
           callback? outTransactions unless hasNext
           do done
         onError: @networkErrorCallback(callback)
+
+  getTime: () ->
+    ledger.defer().resolve(@http().get(url: "timestamp")).promise.then (result) ->
+      result['timestamp']
