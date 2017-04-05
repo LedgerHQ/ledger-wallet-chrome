@@ -1,5 +1,5 @@
 # Changelog
-1.6.19
+1.6.19/1.6.20
 ===
 - Use an old timestamp in Stratis transactions
 
