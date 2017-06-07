@@ -69,7 +69,7 @@ ledger.bitcoin.Networks =
     handleFeePerByte: yes
 
   bitcoinTOTO:  
-    name: 'bitcoin'
+    name: 'bitcoinTOTO'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
     ticker: 'btc'

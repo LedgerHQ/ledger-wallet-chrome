@@ -1,8 +1,7 @@
 class @OnboardingDeviceChainsViewController extends @OnboardingViewController
 
-
 	view:
-	  chainSelected: "#chainSleected",
+	  chainSelected: "#chainSelected",
 	  chain: "#chain"
 
   onAfterRender: ->
@@ -13,7 +12,7 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
   	chain = {}
   	for network in ledger.bitcoin.Networks
   		chain = network if network.name == @view.chain
-		ledger.app.onChainSelected(chain)
+		ledger.app.onChainChosen(chain)
 
   openSupport: ->
     window.open t 'application.support_url'
@@ -21,4 +20,4 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
   onDetach: ->
     super
     ledger.app.off 'wallet:initialized', @onWalletInitialized
-    ledger.app.off 'wallet:initialization:creation', @onWalletIsSynchronizing 
+    ledger.app.off 'wallet:initialization:creation', @onWalletIsSynchronizing

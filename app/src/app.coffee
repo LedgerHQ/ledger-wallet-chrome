@@ -84,12 +84,15 @@ require @ledger.imports, ->
       return unless @isInWalletMode()
       @emit 'dongle:unlocked', @dongle
       @emit 'wallet:initializing'
-      ledger.app.dongle.getCoinVersion().then ({P2PKH, P2SH, message}) =>
-        l "Looking for #{P2PKH} #{P2SH}"
-        networks = []
-        for k, v of ledger.bitcoin.Networks
-          if v.version.regular is P2PKH and v.version.P2SH is P2SH
-            networks.push(v) 
+      _.defer => 
+        ledger.app.dongle.getCoinVersion().then ({P2PKH, P2SH, message}) =>
+          l "Looking for #{P2PKH} #{P2SH}"
+          networks = []
+          for k, v of ledger.bitcoin.Networks
+            if v.version.regular is P2PKH and v.version.P2SH is P2SH
+              networks.push(v) 
+
+          l "Possible chains found are :#{networks}"
           if networks.length >1
             ###
             Redirect to chain selection
@@ -100,6 +103,7 @@ require @ledger.imports, ->
               
 
     onChainChosen: (network) ->
+      l "inside chosen"
       ledger.config.network = network
       ledger.app.dongle.setCoinVersion(ledger.config.network.version.regular, ledger.config.network.version.P2SH)
       .then =>
