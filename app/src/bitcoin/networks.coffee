@@ -68,6 +68,25 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
 
+  bitcoinTOTO:  
+    name: 'bitcoin'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
+    ticker: 'btc'
+    scheme: 'bitcoin:'
+    tickerKey:
+      from: 'fromBTC'
+      to: 'toBTC'
+    bip44_coin_type: '0'
+    version:
+      regular: 0
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.bitcoin
+    ws_chain: 'bitcoin'
+    dust: 5430
+    handleFeePerByte: yes
+
   testnet:
     name: 'testnet'
     plural: 'bitcoins'
