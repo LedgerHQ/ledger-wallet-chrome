@@ -92,7 +92,9 @@ require @ledger.imports, ->
             if v.version.regular is P2PKH and v.version.P2SH is P2SH
               networks.push(v) 
 
-          l "Possible chains found are :#{networks}"
+          l "Possible chains found are :"
+          l networks
+
           if networks.length >1
             ###
             Redirect to chain selection

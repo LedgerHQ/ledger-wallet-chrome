@@ -1,18 +1,18 @@
 class @OnboardingDeviceChainsViewController extends @OnboardingViewController
 
-	view:
-	  chainSelected: "#chainSelected",
-	  chain: "#chain"
+  view:
+    chainSelected: "#chainSelected",
+    chain: "#chain"
 
   onAfterRender: ->
     super
     @view.chainSelected.once "click", @onChainSelected
 
   onChainSelected: ->
-  	chain = {}
-  	for network in ledger.bitcoin.Networks
-  		chain = network if network.name == @view.chain
-		ledger.app.onChainChosen(chain)
+    chain = {}
+    for network in ledger.bitcoin.Networks
+      chain = network if network.name == @view.chain
+    ledger.app.onChainChosen(chain)
 
   openSupport: ->
     window.open t 'application.support_url'
