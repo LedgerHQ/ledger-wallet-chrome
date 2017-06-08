@@ -31,7 +31,7 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/device/pin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDevicePinViewController
 
-  route '/onboarding/device/chains', (params) ->               
+  route '/onboarding/device/chains', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceChainsViewController
 
   route '/onboarding/device/opening', (params) ->
@@ -142,6 +142,11 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/wallet/settings/index', (params) ->
     dialog = new WalletSettingsIndexDialogViewController()
     dialog.show()
+
+  # Chains
+  route '/wallet/switch/chains', (params) ->
+    ledger.app.releaseWallet()
+    ledger.app.onDongleIsUnlocked ledger.app.dongle
 
   # Help
   route '/wallet/help/index', (params) ->

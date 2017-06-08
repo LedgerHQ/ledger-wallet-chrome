@@ -14,3 +14,6 @@
   for key, storage of ledger.storage when _(storage).isKindOf(ledger.storage.Store)
     storage.close()
     ledger.storage[key] = null
+
+@ledger.storage.global = {}
+@ledger.storage.global.chainSelector = new ledger.storage.ChromeStore("chainSelector")

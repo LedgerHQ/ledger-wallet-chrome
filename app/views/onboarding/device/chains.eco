@@ -5,11 +5,12 @@
   <div class="greyed-container">
     <span class="black-indication">Choose a chain to use</span>
     <select id="chain">
-      <% for chain in @networks: %>
-        <option value=<%= chain.name %>><%= chain.name %></option>
+      <% for chain,i in @networks : %>
+        <option value=<%= i %>> <%= chain.name %> </option>
       <% end %>
-    </select>
-    <button type="button" id="chainSelected">Confirm/button>
+    </select><br><br>
+    <input type="checkbox" id="remember" value="True"> Remember my choice<br><br>
+    <button type="button" id="chainSelected">Confirm</button>
   </div>
   <div class="actions-container">
     <a href="#openHelpCenter" class="greyed-action medium-indication"><%= t 'onboading.common.help' %></a>

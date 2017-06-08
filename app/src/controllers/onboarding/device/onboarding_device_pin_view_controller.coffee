@@ -18,7 +18,6 @@ class @OnboardingDevicePinViewController extends @OnboardingViewController
           else
             ledger.app.notifyDongleIsUnlocked()
             ledger.utils.Logger.setPrivateModeEnabled on
-            ledger.app.router.go '/onboarding/device/opening'
         else if error.code == ledger.errors.WrongPinCode and error['retryCount'] > 0
           ledger.app.router.go '/onboarding/device/wrongpin', {tries_left: error['retryCount']}
         else if error.code == ledger.errors.NotSupportedDongle

@@ -35,7 +35,6 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
           else if state == ledger.dongle.States.UNLOCKED
             ledger.app.notifyDongleIsUnlocked()
             ledger.utils.Logger.setPrivateModeEnabled on
-            ledger.app.router.go '/onboarding/device/opening'
           else
             ledger.app.router.go '/onboarding/management/welcome'
 

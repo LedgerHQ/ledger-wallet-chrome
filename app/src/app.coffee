@@ -31,7 +31,7 @@ require @ledger.imports, ->
       @_currentMode = newMode
       if @isInFirmwareUpdateMode()
         @donglesManager.pause()
-        _.defer => @_releaseWallet(no)
+        _.defer => @releaseWallet(no)
         ledger.utils.Logger.setGlobalLoggersPersistentLogsEnabled(off)
         ledger.utils.Logger.updateGlobalLoggersLevel()
       else
@@ -82,52 +82,66 @@ require @ledger.imports, ->
 
     onDongleIsUnlocked: (dongle) ->
       return unless @isInWalletMode()
-      @emit 'dongle:unlocked', @dongle
-      @emit 'wallet:initializing'
-      _.defer => 
+      _.defer =>
+        @emit 'dongle:unlocked', @dongle
         ledger.app.dongle.getCoinVersion().then ({P2PKH, P2SH, message}) =>
           l "Looking for #{P2PKH} #{P2SH}"
           networks = []
           for k, v of ledger.bitcoin.Networks
             if v.version.regular is P2PKH and v.version.P2SH is P2SH
-              networks.push(v) 
-
-          l "Possible chains found are :"
-          l networks
+              networks.push(v)
 
           if networks.length >1
-            ###
-            Redirect to chain selection
-            ###   
-            ledger.app.router.go '/onboarding/device/chains', networks
+            l "many chains available"
+            _.defer =>
+              ledger.app.dongle.getPublicAddress "44'/#{networks[0].bip44_coin_type}'/0'/0/0", (addr) =>
+                address = ledger.crypto.SHA256.hashString addr
+                ledger.storage.global.chainSelector.get address, (result) =>
+                  l result
+                  l address
+                  if result[address]?
+                    l "remember my choice found"
+                    l result[address]
+                    exists = false
+                    for k, v of ledger.bitcoin.Networks
+                      if v.name == result[address].name
+                        exists = true
+                    if exists
+                      @onChainChosen result[address]
+                    else
+                      ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
+                  else
+                    ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
           else
             @onChainChosen networks[0]
-              
+
 
     onChainChosen: (network) ->
-      l "inside chosen"
-      ledger.config.network = network
-      ledger.app.dongle.setCoinVersion(ledger.config.network.version.regular, ledger.config.network.version.P2SH)
-      .then =>
-        ledger.tasks.WalletOpenTask.instance.startIfNeccessary()
-        ledger.tasks.WalletOpenTask.instance.onComplete (result, error) =>
-          if error?
-            # TODO: Handle wallet opening fatal error
-            e "Raise", error
-          ledger.tasks.FeesComputationTask.instance.startIfNeccessary()
-          @_listenPreferencesEvents()
-          @_listenCountervalueEvents(true)
-          ledger.utils.Logger.updateGlobalLoggersLevel()
-          @emit 'wallet:initialized'
-          _.defer =>
-            ledger.tasks.TransactionObserverTask.instance.startIfNeccessary()
-            ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() unless result.operation_consumption
+      ledger.app.router.go '/onboarding/device/opening'
+      _.defer =>
+        @emit 'wallet:initializing'
+        ledger.config.network = network
+        ledger.app.dongle.setCoinVersion(ledger.config.network.version.regular, ledger.config.network.version.P2SH)
+        .then =>
+          ledger.tasks.WalletOpenTask.instance.startIfNeccessary()
+          ledger.tasks.WalletOpenTask.instance.onComplete (result, error) =>
+            if error?
+              # TODO: Handle wallet opening fatal error
+              e "Raise", error
+            ledger.tasks.FeesComputationTask.instance.startIfNeccessary()
+            @_listenPreferencesEvents()
+            @_listenCountervalueEvents(true)
+            ledger.utils.Logger.updateGlobalLoggersLevel()
+            @emit 'wallet:initialized'
+            _.defer =>
+              ledger.tasks.TransactionObserverTask.instance.startIfNeccessary()
+              ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() unless result.operation_consumption
 
     onDongleIsDisconnected: (dongle) ->
       @emit 'dongle:disconnected'
       ledger.utils.Logger.setPrivateModeEnabled off
       return unless @isInWalletMode()
-      @_releaseWallet()
+      @releaseWallet()
 
     onCommandFirmwareUpdate: -> @router.go '/' if @setExecutionMode(ledger.app.Modes.FirmwareUpdate)
 
@@ -150,7 +164,7 @@ require @ledger.imports, ->
       ledger.preferences.instance.on 'btcUnit:changed language:changed locale:changed confirmationsCount:changed', => @scheduleReloadUi()
       ledger.preferences.instance.on 'logActive:changed', => ledger.utils.Logger.updateGlobalLoggersLevel()
 
-    _releaseWallet: (removeDongle = yes) ->
+    releaseWallet: (removeDongle = yes) ->
       @emit 'dongle:disconnected'
       @_listenCountervalueEvents(false)
       _.defer =>

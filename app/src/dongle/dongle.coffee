@@ -212,7 +212,7 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   getSw: -> @_btchip.card.SW
 
-  # Called when 
+  # Called when
   disconnect: ->
     clearTimeout(@_ensureDeviceIsUnlockedTimeout) if @_ensureDeviceIsUnlockedTimeout?
     @_ensureDeviceIsUnlockedTimeout = undefined
@@ -221,7 +221,7 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   # @return [String] Firmware version, 1.0.0 for example.
   getStringFirmwareVersion: -> Try(=> @getFirmwareInformation().getStringFirmwareVersion()).getOrElse('unknown')
-  
+
   # @return [Integer] Firmware version, 0x20010000010f for example.
   getIntFirmwareVersion: -> @getFirmwareInformation().getIntFirmwareVersion()
 
