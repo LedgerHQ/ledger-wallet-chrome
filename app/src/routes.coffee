@@ -145,8 +145,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   # Chains
   route '/wallet/switch/chains', (params) ->
-    ledger.app.releaseWallet()
-    ledger.app.onDongleIsUnlocked ledger.app.dongle
+    ledger.app.releaseWallet(no, no)
+    ledger.storage.global.chainSelector.remove ledger.app.chains.currentKey, =>
+      ledger.app.onDongleIsUnlocked(ledger.app.dongle)
 
   # Help
   route '/wallet/help/index', (params) ->

@@ -2,6 +2,9 @@ require @ledger.imports, ->
 
   class Application extends ledger.common.application.BaseApplication
 
+    chains:
+      currentKey: ""
+
     Modes:
       Wallet: "Wallet"
       FirmwareUpdate: "FirmwareUpdate"
@@ -90,12 +93,12 @@ require @ledger.imports, ->
           for k, v of ledger.bitcoin.Networks
             if v.version.regular is P2PKH and v.version.P2SH is P2SH
               networks.push(v)
-
           if networks.length >1
             l "many chains available"
             _.defer =>
               ledger.app.dongle.getPublicAddress "44'/#{networks[0].bip44_coin_type}'/0'/0/0", (addr) =>
                 address = ledger.crypto.SHA256.hashString addr
+                ledger.app.chains.currentKey = address
                 ledger.storage.global.chainSelector.get address, (result) =>
                   l result
                   l address
@@ -113,6 +116,7 @@ require @ledger.imports, ->
                   else
                     ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
           else
+            ledger.app.chains.currentKey = ""
             @onChainChosen networks[0]
 
 
@@ -164,8 +168,8 @@ require @ledger.imports, ->
       ledger.preferences.instance.on 'btcUnit:changed language:changed locale:changed confirmationsCount:changed', => @scheduleReloadUi()
       ledger.preferences.instance.on 'logActive:changed', => ledger.utils.Logger.updateGlobalLoggersLevel()
 
-    releaseWallet: (removeDongle = yes) ->
-      @emit 'dongle:disconnected'
+    releaseWallet: (removeDongle = yes, reroute = yes) ->
+      @emit 'dongle:disconnected' if reroute
       @_listenCountervalueEvents(false)
       _.defer =>
         ledger.bitcoin.bitid.reset()
@@ -181,13 +185,13 @@ require @ledger.imports, ->
         ledger.api.resetAuthentication()
         ledger.utils.Logger._secureWriter = null
         ledger.utils.Logger._secureReader = null
-        if removeDongle
+        if removeDongle and reroute
           @dongle?.disconnect()
           @dongle = null
-        else
+        else if reroute
           @dongle?.lock()
       ledger.dialogs.manager.dismissAll(no)
-      @router.go '/onboarding/device/plug' if @isInWalletMode()
+      @router.go '/onboarding/device/plug' if @isInWalletMode() and reroute
 
     _listenCountervalueEvents: (listen) ->
       if !listen
