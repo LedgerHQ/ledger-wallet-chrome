@@ -51,6 +51,7 @@ ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
   bitcoin:
     name: 'bitcoin'
+    chain: 'bitcoin'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
     ticker: 'btc'
@@ -68,8 +69,9 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
 
-  bitcoinTOTO:  
-    name: 'bitcoinTOTO'
+  bitcoin_seg_1:
+    name: 'bitcoin'
+    chain: 'bitcoin segwit'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
     ticker: 'btc'
@@ -89,6 +91,7 @@ ledger.bitcoin.Networks =
 
   testnet:
     name: 'testnet'
+    chain: 'bitcoin'
     plural: 'bitcoins'
     ticker: 'btctest'
     scheme: 'bitcoin:'

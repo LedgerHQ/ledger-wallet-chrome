@@ -107,7 +107,7 @@ require @ledger.imports, ->
                     l result[address]
                     exists = false
                     for k, v of ledger.bitcoin.Networks
-                      if v.name == result[address].name
+                      if v.chain == result[address].chain
                         exists = true
                     if exists
                       @onChainChosen result[address]
