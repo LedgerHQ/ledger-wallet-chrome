@@ -52,7 +52,7 @@ ledger.bitcoin.Networks =
   bitcoin:
     name: 'bitcoin'
     bolosAppName: 'Bitcoin'
-    plural: 'bitcoins'
+    plural: -> t('common.bitcoin_plural')
     ticker: 'btc'
     scheme: 'bitcoin:'
     tickerKey:
@@ -70,7 +70,7 @@ ledger.bitcoin.Networks =
 
   testnet:
     name: 'testnet'
-    plural: 'bitcoins'
+    plural: -> t('common.bitcoin_plural')
     ticker: 'btctest'
     scheme: 'bitcoin:'
     bip44_coin_type: '1'
@@ -85,7 +85,7 @@ ledger.bitcoin.Networks =
 
   segnet:
     name: 'segnet'
-    plural: 'bitcoins'
+    plural: -> t('common.bitcoin_plural')
     ticker: 'segtest'
     scheme: 'bitcoin:'
     bip44_coin_type: '1'
@@ -108,7 +108,7 @@ ledger.bitcoin.Networks =
 
   litecoin:
     name: 'litecoin'
-    plural: 'litecoins'
+    plural: -> t('common.litecoin_plural')
     scheme: 'litecoin:'
     bolosAppName: 'Litecoin'
     ticker: 'ltc'
@@ -126,7 +126,7 @@ ledger.bitcoin.Networks =
 
   dogecoin:
     name: 'dogecoin'
-    plural: 'dogecoins'
+    plural: -> t('common.dogecoin_plural')
     scheme: 'dogecoin:'
     bolosAppName: 'Dogecoin'
     ticker: 'doge'
@@ -144,7 +144,7 @@ ledger.bitcoin.Networks =
 
   dash:
     name: 'dash'
-    plural: 'dash'
+    plural: -> t('common.dash_plural')
     scheme: 'dash:'
     bolosAppName: 'Dash'
     ticker: 'dash'
@@ -162,7 +162,7 @@ ledger.bitcoin.Networks =
 
   zcash:
     name: 'zcash'
-    plural: 'zcash'
+    plural: -> t('common.zcash_plural')
     scheme: 'zcash:'
     bolosAppName: 'Zcash'
     ticker: 'zec'
@@ -180,7 +180,7 @@ ledger.bitcoin.Networks =
 
   clubcoin:
     name: 'clubcoin'
-    plural: 'clubcoins'
+    plural: -> t('common.clubcoin_plural')
     scheme: 'clubcoin:'
     bolosAppName: 'ClubCoin'
     ticker: 'club'
