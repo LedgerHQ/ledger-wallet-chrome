@@ -93,7 +93,7 @@ ledger.bitcoin.Networks =
     name: 'testnet'
     chain: 'bitcoin'
     plural: 'bitcoins'
-    ticker: 'btctest'
+    ticker: 'btc_testnet'
     scheme: 'bitcoin:'
     bip44_coin_type: '1'
     version:

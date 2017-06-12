@@ -126,7 +126,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
 
   _listenEvents: ->
     @view.amountInput.on 'keyup', =>
-      _.defer => 
+      _.defer =>
         @_updateTotalLabel()
         @_updateExchangeValue()
     @view.openScannerButton.on 'click', =>
@@ -174,7 +174,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       return _.str.sprintf(t('common.errors.invalid_receiver_address'), ledger.config.network.name)
     else if @_dataValue().length > 0 && not @_isDataValid()
       return t 'common.errors.invalid_op_return_data'
-    else if ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000).lt(100) && @view.customFeesRow.is(':visible')
+    else if ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000).lt(10) && @view.customFeesRow.is(':visible')
       return t 'wallet.send.index.satoshi_per_byte_too_low'
     undefined
 
