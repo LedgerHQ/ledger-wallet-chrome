@@ -1,0 +1,43 @@
+<section id="send_cpfp_dialog">
+  <header>
+    <h1><%= t('wallet.cpfp.title') %></h1>
+  </header>
+  <div id="message"></div>
+  <table class="no-table-head">
+    <tbody>
+      <tr id="amount_row">
+        <td class="row-title"><%= t 'wallet.defaults.operations.amount' %></td>
+        <td class="align-right">
+          <input id="amount_input" class="large-text-input" disabled value="<%= @amount %>"/>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-title"><%= _.str.sprintf(t('wallet.send.index.receiver_address'), _.str.capitalize(ledger.config.network.name)) %></td>
+        <td class="align-right">
+          <input class="text-input" id="receiver_input" disabled value="<%= @account.getWalletAccount().getCurrentPublicAddress() %>"/>
+        </td>
+      </tr>
+      <tr id="custom_fees_row">
+        <td class="row-title"><%= t 'wallet.send.index.custom_fees' %></td>
+        <td class="align-right">
+          <input id="fees_per_byte" class="text-input" value="<%= @feesPerByte %>"/>
+          <label class="text-input"><%= t 'wallet.send.index.satoshi_per_byte' %></label>
+        </td>
+      </tr>
+      <tr class="no-border">
+        <td class="row-title optional"><%= t 'wallet.send.index.total_spent' %></td>
+        <td class="align-right regular-grey-text-small">
+          <p id="total_label"></p>
+          <p id="countervalue_total_label" style="margin-top: 10px;"></p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div id="check"></div>
+</section>
+<div id="error_container"></div>
+<div class="dialog-actions-bar">
+  <div class="left-spacer"></div>
+  <a class="cancel-rounded-button" href="#cancel"><%= t 'common.cancel' %></a>
+  <a class="action-rounded-button" href="#send" id="send_button"><%= t 'common.send' %></a>
+</div>

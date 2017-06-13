@@ -95,6 +95,9 @@ ledger.bitcoin.Networks =
     plural: 'bitcoins'
     ticker: 'btc_testnet'
     scheme: 'bitcoin:'
+    tickerKey:
+      from: 'fromBTC'
+      to: 'toBTC'
     bip44_coin_type: '1'
     version:
       regular: 111

@@ -21,22 +21,7 @@ class @WalletDialogsOperationdetailDialogViewController extends ledger.common.Di
     @_createTransaction = ledger.bitcoin.cpfp.createTransaction(account, @operation.get("hash")).then (transaction) =>
       @view.cpfpButton.removeClass('disabled')
       return if not @isShown()
-      dialog = new CommonDialogsConfirmationDialogViewController()
-      #dialog.showsCancelButton = yes
-      dialog.dismissAfterClick = no
-      #dialog.negativeText = _.str.sprintf(t('wallet.send.index.no_use'), "")
-      dialog.positiveLocalizableKey = 'common.yes'
-      dialog.titleLocalizableKey = 'wallet.cpfp.title'
-      amount = ledger.formatters.formatValue(ledger.Amount.fromSatoshi(10000))
-      address = account.getWalletAccount().getCurrentPublicAddress()
-      fees = ledger.formatters.formatValue(transaction.fees)
-      countervalue = ledger.converters.satoshiToCurrencyFormatted(transaction.fees)
-      dialog.message = _.str.sprintf(t('wallet.cpfp.message'), amount, address, fees, countervalue)
-      dialog.once 'click:positive', =>
-        preparingDialog = new WalletSendPreparingDialogViewController amount: 10000, address: account.getWalletAccount().getCurrentPublicAddress(), fees: transaction.fees, account: account, utxo: transaction.inputs
-        dialog.getDialog().push preparingDialog
-      dialog.once 'click:negative', ->
-        dialog.dismiss()
+      dialog = new WalletSendCpfpDialogViewController({transaction, account, operation: @operation})
       dialog.show()
     .fail (error) =>
       return if not @isShown()

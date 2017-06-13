@@ -49,13 +49,16 @@ ledger.bitcoin.cpfp =
         return yes
     return no
 
-  createTransaction: (account, rootTxHash) ->
+  createTransaction: (account, rootTxHash, fees) ->
     utxo = _(account.getUtxo()).sortBy (o) -> o.get('transaction').get('confirmations')
     findUtxo = (hash) ->
       for output in utxo
         return output if output.get("transaction_hash")
     ledger.tasks.FeesComputationTask.instance.update().then ->
-      feePerByte = ledger.tasks.FeesComputationTask.instance.getFeesForNumberOfBlocks(1) / 1000 * 1.5
+      if fees?
+        feePerByte = fees
+      else
+        feePerByte = ledger.tasks.FeesComputationTask.instance.getFeesForNumberOfBlocks(1) / 1000
       ledger.bitcoin.cpfp.fetchUnconfirmedTransactions(rootTxHash).then (unconfirmed) ->
         # Coin selection
         inputs = []
@@ -72,7 +75,7 @@ ledger.bitcoin.cpfp =
           feeAmount = totalSize.multiply(feePerByte).subtract(unconfirmed.fees)
           requiredAmount = feeAmount.add(5430)
           if collectedAmount.gte(requiredAmount)
-            return {unconfirmed, inputs, collectedAmount, fees: feeAmount}
+            return {unconfirmed, inputs, collectedAmount, fees: feeAmount, size: totalSize}
           input = utxo[index]
           if input? and !hasInput(input)
             inputs.push(input)
