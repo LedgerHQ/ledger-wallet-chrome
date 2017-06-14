@@ -173,6 +173,7 @@
         ## Rest clients
         'api/authentication'
         'api/restclient'
+        'api/warning_restclient'
         'api/unspent_outputs_restclient'
         'api/transactions_restclient'
         'api/sync_rest_client'

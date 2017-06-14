@@ -1,15 +1,24 @@
 @import (reference) "../../constants";
+@import (reference) "../../mixins";
 
 div.greyed-container {
   text-align: center;
 
-  .spinner {
-    margin-top: @metrics-small-padding;
-    margin-bottom: @metrics-extra-large-padding;
+  .medium-indication {
+    margin-top: 20px;
+    line-height: 20px;
   }
 
-  > .medium-indication {
-    margin-top: @metrics-small-padding;
-    display: block;
+
+  .chain-selector {
+    margin-top: 20px;
+  }
+
+  .action-rounded-button {
+    margin-right: @metrics-very-small-padding;
+  }
+
+  #remember {
+    margin-top: 20px;
   }
 }

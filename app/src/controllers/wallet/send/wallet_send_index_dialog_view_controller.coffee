@@ -16,13 +16,23 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     colorSquare: '#color_square'
     maxButton: '#max_button'
     customFeesRow: '#custom_fees_row'
+    warning: '#warning'
 
   RefreshWalletInterval: 15 * 60 * 1000 # 15 Minutes
 
   onAfterRender: () ->
     super
     @view.dataRow.hide()
-
+    _.defer =>
+      ledger.api.WarningRestClient.getWarning().then((json) ->
+        if json.message?
+          @view.warning.text(json.message)
+          @view.warning.show()
+        if json.link?
+          @view.link.on "click", open("json.link")
+          @view.link.show()
+      )
+    @view.warning.show()
     # apply params
     if @params.amount?
       @view.amountInput.val @params.amount
@@ -174,7 +184,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       return _.str.sprintf(t('common.errors.invalid_receiver_address'), ledger.config.network.name)
     else if @_dataValue().length > 0 && not @_isDataValid()
       return t 'common.errors.invalid_op_return_data'
-    else if ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000).lt(10) && @view.customFeesRow.is(':visible')
+    else if ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000).lt(1) && @view.customFeesRow.is(':visible')
       return t 'wallet.send.index.satoshi_per_byte_too_low'
     undefined
 

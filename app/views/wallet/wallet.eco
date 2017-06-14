@@ -41,7 +41,6 @@
           <div class="selector" />
         </div>
       </li>
-      <% if (ledger.app.chains.currentKey != ""): %>
       <li id="chains-item" class="menu-item" >
         <div>
           <a href="/wallet/switch/chains">
@@ -52,7 +51,6 @@
           <div class="selector" />
         </div>
       </li>
-      <% end %>
       <li id="help-item" class="menu-item">
         <div>
           <a href="/wallet/help/index">

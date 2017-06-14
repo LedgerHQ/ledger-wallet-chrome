@@ -71,7 +71,27 @@ ledger.bitcoin.Networks =
 
   bitcoin_seg_1:
     name: 'bitcoin'
-    chain: 'bitcoin segwit'
+    chain: 'bitcoin uasf'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
+    ticker: 'btc'
+    scheme: 'bitcoin:'
+    tickerKey:
+      from: 'fromBTC'
+      to: 'toBTC'
+    bip44_coin_type: '0'
+    version:
+      regular: 0
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.bitcoin
+    ws_chain: 'bitcoin'
+    dust: 5430
+    handleFeePerByte: yes
+
+  bitcoin_seg_2:
+    name: 'bitcoin'
+    chain: 'bitcoin segwit2x'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
     ticker: 'btc'

@@ -2,6 +2,7 @@
 @import (reference) "../../constants";
 
 section#send_index_dialog {
+  max-width: 600px;
   #receiver_input {
     width: 300px;
   }
@@ -15,5 +16,21 @@ section#send_index_dialog {
     margin-top: -20px;
     position: relative;
     bottom: 4px;
+  }
+
+  #warning {
+    margin-top: 10px;
+    color: @color-invalid-red;
+    font-size: @font-size-very-small;
+    line-height: 20px;
+
+  }
+
+  #link {
+    line-height: 20px;
+    font-weight: @font-weight-bold;
+    color: @color-invalid-red;
+    font-size: @font-size-very-small;
+    text-decoration: none;
   }
 }

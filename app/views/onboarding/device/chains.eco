@@ -3,14 +3,14 @@
     <img src="../../assets/images/onboarding/large_logo.png" width="191" height="96">
   </div>
   <div class="greyed-container">
-    <span class="black-indication">Choose a chain to use</span>
-    <select id="chain">
+    <span class="black-indication"><%= t 'onboarding.device.chains.title'%></span>
+    <p class="medium-indication"><%- t 'onboarding.device.chains.message'%><p>
+    <div class="chain-selector">
       <% for chain,i in @networks : %>
-        <option value=<%= i %>> <%= chain.name %> </option>
+        <a class="action-rounded-button" value=<%= i %>><%= chain.chain %></a>
       <% end %>
-    </select><br><br>
-    <input type="checkbox" id="remember" value="True"> Remember my choice<br><br>
-    <button type="button" id="chainSelected">Confirm</button>
+    </div>
+    <input type="checkbox" id="remember" value="True"> Remember my choice </input>
   </div>
   <div class="actions-container">
     <a href="#openHelpCenter" class="greyed-action medium-indication"><%= t 'onboading.common.help' %></a>

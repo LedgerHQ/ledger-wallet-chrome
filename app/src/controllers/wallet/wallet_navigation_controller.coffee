@@ -12,6 +12,7 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
     reloadIcon: '#reload_icon'
     currencyContainer: '#currency_container'
     flashContainer: '.flash-container'
+    chainsItem: '#chains-item'
 
   constructor: () ->
     super
@@ -23,6 +24,9 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
 
   onAfterRender: () ->
     super
+    if ledger.app.chains.currentKey == ""
+      @view.chainsItem.css('opacity', '0.0')
+      @view.chainsItem.css('pointer-events', 'none')
     @view.flashContainer.hide()
     url = ledger.application.router.currentUrl
     @updateMenu url
