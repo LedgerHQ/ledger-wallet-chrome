@@ -33,6 +33,7 @@ You can build the chrome application for other coins. Run `gulp clean build pack
  - testnet
  - litecoin
  - litecoin_test
+ - viacoin
  - dogecoin
  - dogecoin_test
 
