@@ -189,6 +189,26 @@ ledger.preferences.litecoin =
         address: 'https://bchain.info/LTC/tx/%s'
     discoveryGap: 20
 
+ledger.prefrences.viacoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'VIA'
+        unit: 8
+      milibitcoin:
+        symbol: 'mVIA'
+        unit: 5
+      microbitcoin:
+        symbol: 'μVIA'
+        unit: 2
+  
+  #Coin preferences
+  Coin:
+      explorers:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/via/tx.dws?%s.html'
+      discoveryGap: 20
+
 ledger.preferences.dogecoin =
   Display:
     units:

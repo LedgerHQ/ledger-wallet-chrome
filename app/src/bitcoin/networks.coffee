@@ -124,6 +124,24 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
 
+  viacoin:
+    name: 'viacoin'
+    plural: 'viacoins'
+    scheme: 'viacoin'
+    bolosAppName: 'Viacoin'
+    ticker: 'via'
+    tickerKey:
+      from: 'fromVIA'
+      to: 'toVIA'
+    bip44_coin_type: '14'
+    version:
+      regular: 71
+      P2SH: 33
+      XPUB: 0X0488B21E
+    bitcoinjs: bitcoin.networks.viacoin
+    dust: 1000
+    handleFeePerByte: no
+
   dogecoin:
     name: 'dogecoin'
     plural: 'dogecoins'
