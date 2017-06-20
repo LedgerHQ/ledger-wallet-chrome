@@ -124,7 +124,8 @@ require @ledger.imports, ->
       ledger.app.router.go '/onboarding/device/opening'
       _.defer =>
         @emit 'wallet:initializing'
-        ledger.config.network = ledger.bitcoin.Networks.testnet #network
+        ledger.config.network = network
+        l ledger.config.network
         ledger.app.dongle.setCoinVersion(ledger.config.network.version.regular, ledger.config.network.version.P2SH)
         .then =>
           ledger.tasks.WalletOpenTask.instance.startIfNeccessary()

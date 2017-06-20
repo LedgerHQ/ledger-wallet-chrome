@@ -23,15 +23,16 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
   onAfterRender: () ->
     super
     @view.dataRow.hide()
-    _.defer =>
-      ledger.api.WarningRestClient.getWarning().then((json) ->
-        if json.message?
-          @view.warning.text(json.message)
-          @view.warning.show()
-        if json.link?
-          @view.link.on "click", open("json.link")
-          @view.link.show()
-      )
+    if ledger.config.network.name == "bitcoin"
+      _.defer =>
+        ledger.api.WarningRestClient.getWarning().then((json) ->
+          if json.message?
+            @view.warning.text(json.message)
+            @view.warning.show()
+          if json.link?
+            @view.link.on "click", open("json.link")
+            @view.link.show()
+        )
     @view.warning.show()
     # apply params
     if @params.amount?
