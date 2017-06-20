@@ -33,7 +33,7 @@ class @WalletSendCpfpDialogViewController extends ledger.common.DialogViewContro
     @view.check.text(t('wallet.cpfp.check'))
     @_updateTotalLabel(@fees, @countervalue)
     @view.feesPerByte.keypress (e) =>
-      if (e.which < 48 || 57 < e.which || @view.feesPerByte.val() > 999)
+      if (e.which < 48 || 57 < e.which || @view.feesPerByte.val() > 99999)
         e.preventDefault()
     @view.feesPerByte.on 'keyup', _.debounce(
       () =>

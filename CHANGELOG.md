@@ -1,4 +1,9 @@
 # Changelog
+1.7.0
+===
+- Minimum fees is now 0
+- Custom fees for CPFP
+
 1.6.19/1.6.20
 ===
 - Use an old timestamp in Stratis transactions
