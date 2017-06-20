@@ -49,8 +49,7 @@ class ledger.tasks.FeesComputationTask extends ledger.tasks.Task
   update: -> @_update(no)
 
   getFeesForNumberOfBlocks: (numberOfBlock) ->
-    #@_fees["#{numberOfBlock}"]
-    100000
+    @_fees["#{numberOfBlock}"]
 
   getFeesForLevel: (level) ->
     value = @_fees["#{level.numberOfBlock}"] or level.defaultValue
