@@ -279,6 +279,25 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: yes
+    
+  verge:
+    name: 'verge'
+    plural: 'xvgs'
+    scheme: 'verge:'
+    bolosAppName: 'Verge'
+    ticker: 'xvg'
+    tickerKey:
+      from: 'fromXVG'
+      to: 'toXVG'
+    bip44_coin_type: '77'
+    version:
+      regular: 30
+      P2SH: 33
+      XPUB: 0xcdf2c0ef
+    bitcoinjs: bitcoin.networks.peercoin
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: yes
 
   komodo:
     name: 'komodo'

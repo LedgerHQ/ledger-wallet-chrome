@@ -212,6 +212,27 @@ ledger.preferences.dogecoin =
         name: 'SoChain'
         address: 'https://chain.so/tx/DOGE/%s'
     discoveryGap: 20
+    
+ledger.preferences.verge =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'XVG'
+        unit: 8
+      milibitcoin:
+        symbol: 'mXVG'
+        unit: 5
+
+  # Coin preferences
+  Coin:
+    explorers:
+      vergecurrency:
+        name: 'VergeCurrency.info'
+        address: 'http://vergecurrency.info/tx/%s'
+      blockexperts:
+        name: 'BlockExperts.com'
+        address: 'https://www.blockexperts.com/xvg/tx/%s'
+    discoveryGap: 20
 
 ledger.preferences.zcash =
   Display:
