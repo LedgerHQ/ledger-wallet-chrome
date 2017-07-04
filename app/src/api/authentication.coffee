@@ -90,7 +90,7 @@ class AuthenticatedHttpClient extends @HttpClient
     .fail (error) =>
       throw error if _.isArray(error) and error.length is 3
       throw [null, "Unable to sign message", error]
-    .then (signature) => @_client.jqAjax(type: "POST", url: 'bitid/authenticate', data: {address: bitidAddress, signature: signature}, contentType: 'application/json', dataType: 'json')
+    .then (signature) => @_client.jqAjax(type: "POST", url: 'bitid/authenticate', data: {address: bitidAddress, coin: ledger.network.ticker, signature: signature}, contentType: 'application/json', dataType: 'json')
     .then (data) =>
       @_authToken = data['token']
       ledger.app.emit 'wallet:authenticated'
