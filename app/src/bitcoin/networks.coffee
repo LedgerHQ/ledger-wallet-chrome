@@ -47,6 +47,14 @@ bitcoin.networks.komodo =
   pubKeyHash: 60
   scriptHash: 85
 
+bitcoin.networks.poswallet =
+  magicPrefix: '\x1aPoSWallet Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x05358394
+  pubKeyHash: 55
+  scriptHash: 85
+
 ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
   bitcoin:
@@ -295,5 +303,23 @@ ledger.bitcoin.Networks =
       P2SH: 85
       XPUB: 0xf9eee48d
     bitcoinjs: bitcoin.networks.komodo
+    dust: 10000
+    handleFeePerByte: no
+
+  poswallet:
+    name: 'poswallet'
+    plural: 'poswallets'
+    scheme: 'poswallet:'
+    bolosAppName: 'poswallet'
+    ticker: 'posw'
+    tickerKey:
+      from: 'fromPOSW'
+      to: 'toPOSW'
+    bip44_coin_type: '47'
+    version:
+      regular: 55
+      P2SH: 85
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.poswallet
     dust: 10000
     handleFeePerByte: no

@@ -129,7 +129,7 @@ ledger.preferences.bitcoin =
         address: 'https://insight.bitpay.com/tx/%s'
       blockonomics:
         name: 'Blockonomics.co'
-        address: 'https://www.blockonomics.co/api/tx?txid=%s'  
+        address: 'https://www.blockonomics.co/api/tx?txid=%s'
     discoveryGap: 20
 
 ledger.preferences.testnet =
@@ -292,6 +292,21 @@ ledger.preferences.komodo =
       kpx:
         name: 'KPX'
         address: 'https://kpx.io/transactions/%s'
+    discoveryGap: 20
+
+ledger.preferences.poswallet =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'POSW'
+        unit: 8
+
+# Coin preferences
+  Coin:
+    explorers:
+      poswallet:
+        name: 'PoSWallet'
+        address: 'https://poswallet.com/blockChain/posw/%s'
     discoveryGap: 20
 
 ledger.preferences.peercoin =
