@@ -33,7 +33,6 @@ ledger.bitcoin.cpfp =
       # We have every unconfirmed transactions with their associated size, we need to compute the total size (of all transactions)
       # and the total associated fee. Finally compute a fee sufficient to support the size of all transaction plus the size of CPFP
       # transaction.
-      l transactions
       totalSize = ledger.Amount.fromSatoshi(0)
       totalFees = ledger.Amount.fromSatoshi(0)
       for transaction in transactions
@@ -56,6 +55,9 @@ ledger.bitcoin.cpfp =
         return output if output.get("transaction_hash")
     ledger.tasks.FeesComputationTask.instance.update().then ->
       if fees?
+        if fees.lte(0)
+          feePerByte = ledger.tasks.FeesComputationTask.instance.getFeesForNumberOfBlocks(1) / 1000
+          throw ledger.errors.new(ledger.errors.WrongFeesFormat)
         feePerByte = fees
       else
         feePerByte = ledger.tasks.FeesComputationTask.instance.getFeesForNumberOfBlocks(1) / 1000
@@ -81,7 +83,7 @@ ledger.bitcoin.cpfp =
             inputs.push(input)
             collectedAmount = collectedAmount.add(ledger.Amount.fromSatoshi(input.get("value")))
           index += 1
-          break if not input?
+          break if not input? 
         throw ledger.errors.new(ledger.errors.NotEnoughFunds)
     .then (preparedTransaction) ->
       preparedTransaction.amount = preparedTransaction.collectedAmount.subtract(preparedTransaction.fees)

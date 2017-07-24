@@ -35,6 +35,7 @@ _.extend ledger.errors,
   TransactionNotInitialized: 303
   DustTransaction: 304
   ChangeDerivationError: 305
+  WrongFeesFormat: 306
 
   # Firmware update errors
   UnableToRetrieveVersion: 400

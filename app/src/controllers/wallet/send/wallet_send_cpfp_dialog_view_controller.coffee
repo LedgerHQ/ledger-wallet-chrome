@@ -13,7 +13,6 @@ class @WalletSendCpfpDialogViewController extends ledger.common.DialogViewContro
 
   initialize: () ->
     super
-    l @params
     @operation = @params.operation
     @account = @params.account
     @transaction = @params.transaction
@@ -35,15 +34,18 @@ class @WalletSendCpfpDialogViewController extends ledger.common.DialogViewContro
     @view.feesPerByte.keypress (e) =>
       if (e.which < 48 || 57 < e.which || @view.feesPerByte.val() > 99999)
         e.preventDefault()
+    @view.feesPerByte.on('paste', (e) =>
+      e.preventDefault()  
+    )
     @view.feesPerByte.on 'keyup', _.debounce(
       () =>
-        ledger.bitcoin.cpfp.createTransaction(@account, @operation.get("hash"), @view.feesPerByte.val() * @transaction.size)
+        ledger.bitcoin.cpfp.createTransaction(@account, @operation.get("hash"), ledger.Amount.fromSatoshi(@view.feesPerByte.val()))
           .then((transaction) =>
             @view.sendButton.removeClass('disabled')
             @view.feesPerByte.removeClass('red')
             @transaction = transaction
-            @feesPerByte = @view.feesPerByte.val()
-            @fees = @feesPerByte * @transaction.size
+            @fees = @transaction.fees
+            @feesPerByte = @fees.divide(@transaction.size)
             @countervalue = ledger.converters.satoshiToCurrencyFormatted(@fees)
             @_updateTotalLabel(@fees, @countervalue)
           ).catch((err) =>

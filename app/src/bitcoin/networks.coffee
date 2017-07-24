@@ -117,7 +117,7 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes###
 
-  ###testnet:
+  testnet:
     name: 'testnet'
     chain: 'bitcoin'
     plural: 'bitcoins'
@@ -134,7 +134,7 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.testnet
     ws_chain: 'testnet3'
     dust: 5430
-    handleFeePerByte: yes###
+    handleFeePerByte: yes
 
   segnet:
     name: 'segnet'
