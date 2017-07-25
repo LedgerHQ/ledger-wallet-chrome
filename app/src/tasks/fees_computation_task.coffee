@@ -50,7 +50,6 @@ class ledger.tasks.FeesComputationTask extends ledger.tasks.Task
 
   getFeesForNumberOfBlocks: (numberOfBlock) ->
     @_fees["#{numberOfBlock}"]
-    #ledger.Amount.fromSatoshi(250000)
 
   getFeesForLevel: (level) ->
     value = @_fees["#{level.numberOfBlock}"] or level.defaultValue
