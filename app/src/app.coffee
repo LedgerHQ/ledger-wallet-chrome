@@ -90,11 +90,8 @@ require @ledger.imports, ->
         ledger.app.dongle.getCoinVersion().then ({P2PKH, P2SH, message}) =>
           l "Looking for #{P2PKH} #{P2SH}"
 
-          networks = []
-          ledger.app.chains.currentKey = ""
-          @onChainChosen ledger.bitcoin.Networks.testnet
-          
-          ###for k, v of ledger.bitcoin.Networks
+          networks = []     
+          for k, v of ledger.bitcoin.Networks
             if v.version.regular is P2PKH and v.version.P2SH is P2SH
               networks.push(v)
           if networks.length >1
@@ -105,23 +102,29 @@ require @ledger.imports, ->
                 ledger.app.chains.currentKey = address
                 ledger.storage.global.chainSelector.get address, (result) =>
                   l result
-                  l address
                   if result[address]?
                     l "remember my choice found"
                     l result[address]
                     exists = false
-                    for k, v of ledger.bitcoin.Networks
-                      if v.chain == result[address].chain
-                        exists = true
+                    if result[address] != 0
+                      for k, v of ledger.bitcoin.Networks
+                        if v.version.XPUB == result[address].version.XPUB
+                          l v
+                          exists = true
+                    l "reset"
+                    l exists
                     if exists
                       @onChainChosen result[address]
                     else
                       ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
                   else
-                    ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
+                    tmp = {}
+                    tmp[address]= ledger.bitcoin.Networks.bitcoin
+                    ledger.storage.global.chainSelector.set tmp, =>
+                      ledger.app.onChainChosen(ledger.bitcoin.Networks.bitcoin)
           else
             ledger.app.chains.currentKey = ""
-            @onChainChosen networks[0]###
+            @onChainChosen networks[0]
 
 
     onChainChosen: (network) ->

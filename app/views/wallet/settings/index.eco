@@ -23,6 +23,10 @@
       <i class="fa fa-wrench"></i>
       <div class="uppercase-action"><%= t 'wallet.settings.common.tools' %></div>
     </a>
+    <a id="chain" class="panel" href="/wallet/switch/chains">
+      <i class="fa fa-chain"></i>
+      <div class="uppercase-action"><%= t 'wallet.settings.common.forks' %></div>
+    </a>
   </div>
 </section>
 <div class="dialog-actions-bar">

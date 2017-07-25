@@ -77,12 +77,12 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
 
-  ###bitcoin_seg_1:
-    name: 'bitcoin'
-    chain: 'bitcoin uasf'
+  bitcoin_cash:
+    name: 'bitcoin cash'
+    chain: 'bitcoin cash'
     bolosAppName: 'Bitcoin'
-    plural: 'bitcoins'
-    ticker: 'btc'
+    plural: 'bitcoin cash'
+    ticker: 'abc'
     scheme: 'bitcoin:'
     tickerKey:
       from: 'fromBTC'
@@ -95,7 +95,7 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.bitcoin
     ws_chain: 'bitcoin'
     dust: 5430
-    handleFeePerByte: yes###
+    handleFeePerByte: yes
 
   ###bitcoin_seg_2:
     name: 'bitcoin'
@@ -117,7 +117,7 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes###
 
-  testnet:
+  ###testnet:
     name: 'testnet'
     chain: 'bitcoin'
     plural: 'bitcoins'
@@ -134,7 +134,7 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.testnet
     ws_chain: 'testnet3'
     dust: 5430
-    handleFeePerByte: yes
+    handleFeePerByte: yes###
 
   segnet:
     name: 'segnet'

@@ -41,16 +41,6 @@
           <div class="selector" />
         </div>
       </li>
-      <li id="chains-item" class="menu-item" >
-        <div>
-          <a href="/wallet/switch/chains">
-            <img src="../assets/images/wallet/chains_icon.png" />
-            <span><%= t('wallet.top_menu.items.chains') %></span>
-          </a>
-          <div class="spacer" />
-          <div class="selector" />
-        </div>
-      </li>
       <li id="help-item" class="menu-item">
         <div>
           <a href="/wallet/help/index">

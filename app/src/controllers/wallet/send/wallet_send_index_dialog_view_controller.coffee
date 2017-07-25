@@ -23,7 +23,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
   onAfterRender: () ->
     super
     @view.dataRow.hide()
-    if ledger.config.network.name == "bitcoin"
+    if ledger.config.network.version.XPUB == "0x0488B21E"
       _.defer =>
         ledger.api.WarningRestClient.instance.getWarning().then((json) ->
           if json.message?

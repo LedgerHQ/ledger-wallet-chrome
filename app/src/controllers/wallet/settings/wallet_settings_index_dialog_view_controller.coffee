@@ -1,5 +1,15 @@
 class @WalletSettingsIndexDialogViewController extends ledger.common.DialogViewController
 
+  view:
+    chain: '#chain'
+
+  onAfterRender: () ->
+    super
+    if ledger.app.chains.currentKey == ""
+      @view.chain.css('opacity', '0.0')
+      @view.chain.css('pointer-events', 'none')
+  
+
   openHardware: ->
     @getDialog().push new WalletSettingsHardwareSectionDialogViewController()
 
