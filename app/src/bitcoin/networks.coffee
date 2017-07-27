@@ -59,6 +59,7 @@ ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
   bitcoin:
     name: 'bitcoin'
+    display_name: 'bitcoin'
     chain: 'bitcoin'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
@@ -78,10 +79,11 @@ ledger.bitcoin.Networks =
     handleFeePerByte: yes
 
   bitcoin_cash:
-    name: 'bitcoin cash'
+    name: 'bitcoin_cash'
+    display_name: 'bitcoin'
     chain: 'bitcoin cash'
     bolosAppName: 'Bitcoin'
-    plural: 'bitcoin cash'
+    plural: 'bitcoins'
     ticker: 'abc'
     scheme: 'bitcoin:'
     tickerKey:
@@ -96,13 +98,16 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
+    notCompatible: yes
+    greyed: yes
 
-  ###bitcoin_seg_2:
-    name: 'bitcoin'
-    chain: 'bitcoin segwit2x'
+  bitcoin_uasf:
+    name: 'bitcoin_uasf'
+    display_name: 'bitcoin'
+    chain: 'bitcoin uasf'
     bolosAppName: 'Bitcoin'
-    plural: 'bitcoins'
-    ticker: 'btc'
+    plural: 'bitcoins uasf'
+    ticker: 'uasf'
     scheme: 'bitcoin:'
     tickerKey:
       from: 'fromBTC'
@@ -115,7 +120,9 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.bitcoin
     ws_chain: 'bitcoin'
     dust: 5430
-    handleFeePerByte: yes###
+    handleFeePerByte: yes
+    notCompatible: yes
+    greyed: yes
 
   ###testnet:
     name: 'testnet'
@@ -138,6 +145,7 @@ ledger.bitcoin.Networks =
 
   segnet:
     name: 'segnet'
+    display_name: 'testnet'
     plural: 'bitcoins'
     ticker: 'segtest'
     scheme: 'bitcoin:'
@@ -161,6 +169,7 @@ ledger.bitcoin.Networks =
 
   litecoin:
     name: 'litecoin'
+    display_name: 'litecoin'
     plural: 'litecoins'
     scheme: 'litecoin:'
     bolosAppName: 'Litecoin'
@@ -168,7 +177,7 @@ ledger.bitcoin.Networks =
     tickerKey:
       from: 'fromLTC'
       to: 'toLTC'
-    bip44_coin_type: '2'
+    l: '2'
     version:
       regular: 48
       P2SH: 5
@@ -179,6 +188,7 @@ ledger.bitcoin.Networks =
 
   dogecoin:
     name: 'dogecoin'
+    display_name: 'dogecoin'
     plural: 'dogecoins'
     scheme: 'dogecoin:'
     bolosAppName: 'Dogecoin'
@@ -197,6 +207,7 @@ ledger.bitcoin.Networks =
 
   dash:
     name: 'dash'
+    display_name: 'dash'
     plural: 'dash'
     scheme: 'dash:'
     bolosAppName: 'Dash'
@@ -215,6 +226,7 @@ ledger.bitcoin.Networks =
 
   zcash:
     name: 'zcash'
+    display_name: 'zcash'
     plural: 'zcash'
     scheme: 'zcash:'
     bolosAppName: 'Zcash'
@@ -233,6 +245,7 @@ ledger.bitcoin.Networks =
 
   clubcoin:
     name: 'clubcoin'
+    display_name: 'clubcoin'
     plural: 'clubcoins'
     scheme: 'clubcoin:'
     bolosAppName: 'ClubCoin'
@@ -252,6 +265,7 @@ ledger.bitcoin.Networks =
 
   stratis:
     name: 'stratis'
+    display_name: 'stratis'
     plural: 'stratis'
     scheme: 'stratis:'
     bolosAppName: 'Stratis'
@@ -271,6 +285,7 @@ ledger.bitcoin.Networks =
 
   peercoin:
     name: 'peercoin'
+    display_name: 'peercoin'
     plural: 'peercoins'
     scheme: 'peercoin:'
     bolosAppName: 'Peercoin'
@@ -290,6 +305,7 @@ ledger.bitcoin.Networks =
 
   komodo:
     name: 'komodo'
+    display_name: 'komodo'
     plural: 'komodos'
     scheme: 'komodo:'
     bolosAppName: 'Komodo'
@@ -308,6 +324,7 @@ ledger.bitcoin.Networks =
 
   poswallet:
     name: 'poswallet'
+    display_name: 'posw'
     plural: 'poswallets'
     scheme: 'poswallet:'
     bolosAppName: 'poswallet'
@@ -323,3 +340,5 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.poswallet
     dust: 10000
     handleFeePerByte: no
+    areTransactionTimestamped: yes
+

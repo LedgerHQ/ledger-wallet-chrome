@@ -7,7 +7,12 @@
     <p class="medium-indication"><%- t 'onboarding.device.chains.message'%><p>
     <div class="chain-selector">
       <% for chain,i in @networks : %>
-        <a class="action-rounded-button" value=<%= i %>><%= chain.chain %></a>
+        <a class="choice <% if chain.greyed is yes: %>
+            cancel-rounded-button
+          <% else: %>
+            action-rounded-button
+          <% end %>"
+        value=<%= i %>><%= chain.chain %></a>
       <% end %>
     </div>
     <input type="checkbox" id="remember" value="True"> Remember my choice </input>

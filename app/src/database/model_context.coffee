@@ -52,7 +52,6 @@ class Collection
     # part is to update the relationships with our new ids.
     $loki = model._object.$loki
     impostors = @_modelize(@_collection.find($loki: $loki))
-    debugger
     return if impostors.length is 0
     @_collection.idIndex = _(@_collection.idIndex).reject (v) -> v is $loki
     @_collection.data = _(@_collection.data).reject (v) -> v.$loki is $loki

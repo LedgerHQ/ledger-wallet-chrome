@@ -109,7 +109,6 @@ require @ledger.imports, ->
                     if result[address] != 0
                       for k, v of ledger.bitcoin.Networks
                         if v.version.XPUB == result[address].version.XPUB
-                          l v
                           exists = true
                     l "reset"
                     l exists
@@ -130,6 +129,7 @@ require @ledger.imports, ->
     onChainChosen: (network) ->
       ledger.app.router.go '/onboarding/device/opening'
       _.defer =>
+        l " on chain chosen"
         @emit 'wallet:initializing'
         ledger.config.network = network
         l ledger.config.network

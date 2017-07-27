@@ -6,10 +6,17 @@ class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewC
   initialize: ->
     super
     # fetch amount
+    l "initiliase"
+    l @
+
     account = @_getAccount()
     account.createTransaction amount: @params.amount, fees: @params.fees, address: @params.address, utxo: @params.utxo, data: @params.data, (transaction, error) =>
       return if not @isShown()
       if error?
+        l "error"
+        l error
+        l transaction
+        l @params
         reason = switch error.code
           when ledger.errors.NetworkError then 'network_no_response'
           when ledger.errors.NotEnoughFunds then 'unsufficient_balance'
@@ -17,7 +24,10 @@ class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewC
           when ledger.errors.DustTransaction then 'dust_transaction'
           when ledger.errors.ChangeDerivationError then 'change_derivation_error'
           else 'error_occurred'
+        l "reason"
+        l reason  
         @dismiss =>
+          l " dismiss"
           errorMessage = switch reason
             when 'dust_transaction' then _.str.sprintf(t("common.errors." + reason), ledger.formatters.formatValue(ledger.wallet.Transaction.MINIMUM_OUTPUT_VALUE))
             else t("common.errors." + reason)

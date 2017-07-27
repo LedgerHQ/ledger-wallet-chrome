@@ -16,9 +16,9 @@
         </td>
       </tr>
       <tr>
-        <td class="row-title"><%= _.str.sprintf(t('wallet.send.index.receiver_address'), _.str.capitalize(ledger.config.network.name)) %></td>
+        <td class="row-title"><%= _.str.sprintf(t('wallet.send.index.receiver_address'), _.str.capitalize(ledger.config.network.display_name)) %></td>
         <td class="align-right">
-          <input class="text-input" placeholder="<%= _.str.sprintf(t('wallet.defaults.operations.bitcoin_address'), _.str.capitalize(ledger.config.network.name)) %>" id="receiver_input" value=""/>
+          <input class="text-input" placeholder="<%= _.str.sprintf(t('wallet.defaults.operations.bitcoin_address'), _.str.capitalize(ledger.config.network.display_name)) %>" id="receiver_input" value=""/>
         </td>
       </tr>
       <tr id="data_row">
