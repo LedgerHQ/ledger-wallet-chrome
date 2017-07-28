@@ -132,7 +132,28 @@ ledger.preferences.bitcoin =
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
     discoveryGap: 20
 
-ledger.preferences.bitcoin_cash =
+ledger.preferences.bitcoin_cash_unsplit =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'BTC'
+        unit: 8
+      milibitcoin:
+        symbol: 'mBTC'
+        unit: 5
+      microbitcoin:
+        symbol: 'bits'
+        unit: 2
+
+  # Coin preferences
+  Coin:
+    explorers:
+      blockchain:
+        name: 'blockdozer.com'
+        address: 'http://blockdozer.com/insight/tx/%s'
+    discoveryGap: 20  
+
+ledger.preferences.bitcoin_cash_split =
   Display:
     units:
       bitcoin:
@@ -152,6 +173,7 @@ ledger.preferences.bitcoin_cash =
         name: 'blockdozer.com'
         address: 'http://blockdozer.com/insight/tx/%s'
     discoveryGap: 20    
+
 
 ledger.preferences.bitcoin_uasf =
   Display:

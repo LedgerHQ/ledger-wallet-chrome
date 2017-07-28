@@ -78,8 +78,8 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
 
-  bitcoin_cash:
-    name: 'bitcoin_cash'
+  bitcoin_cash_unsplit:
+    name: 'bitcoin_cash_unsplit'
     display_name: 'bitcoin'
     chain: 'bitcoin cash'
     bolosAppName: 'Bitcoin'
@@ -100,6 +100,29 @@ ledger.bitcoin.Networks =
     handleFeePerByte: yes
     notCompatible: yes
     greyed: yes
+
+  bitcoin_cash_split:
+    name: 'bitcoin_cash_split'
+    display_name: 'bitcoin'
+    chain: 'bitcoin cash (split)'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
+    ticker: 'abc'
+    scheme: 'bitcoin:'
+    tickerKey:
+      from: 'fromBTC'
+      to: 'toBTC'
+    bip44_coin_type: '145'
+    version:
+      regular: 0
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.bitcoin
+    ws_chain: 'bitcoin'
+    dust: 5430
+    handleFeePerByte: yes
+    notCompatible: yes
+    greyed: yes  
 
   bitcoin_uasf:
     name: 'bitcoin_uasf'

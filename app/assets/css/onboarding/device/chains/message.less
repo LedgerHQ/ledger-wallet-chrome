@@ -1,0 +1,27 @@
+@import (reference) "../../../common";
+@import (reference) "../../../mixins";
+@import (reference) "../../../constants";
+
+section#dialogs_message_dialog {
+  display:flex;
+  max-width: 450px;
+
+  > .content-container {
+
+    > .uppercase-section-title {
+      margin-top: @metrics-small-padding;
+    }
+
+    > .regular-text-small {
+      margin-top: 20px;
+      line-height: 20px;
+    }
+
+    > .cancel-rounded-button {
+      margin-top: @metrics-almost-medium-padding;
+    }
+  }
+  > .spacer {
+    width: 10 px;
+  }
+}

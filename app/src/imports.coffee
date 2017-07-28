@@ -352,6 +352,7 @@
         'controllers/onboarding/device/onboarding_device_unplug_view_controller'
         'controllers/onboarding/device/onboarding_device_pin_view_controller'
         'controllers/onboarding/device/onboarding_device_chains_view_controller'
+        'controllers/onboarding/device/chains/onboarding_device_chains_message_dialog_view_controller'
         'controllers/onboarding/device/onboarding_device_opening_view_controller'
         'controllers/onboarding/device/onboarding_device_error_view_controller'
         'controllers/onboarding/device/onboarding_device_connecting_view_controller'

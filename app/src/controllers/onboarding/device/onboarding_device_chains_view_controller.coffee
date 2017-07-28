@@ -9,7 +9,6 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
   initialize: ->
     super
     @networks = JSON.parse @params.networks
-    l "netwooooooooooooooo"
     l @networks
 
   onAfterRender: ->
@@ -17,12 +16,11 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
     @view.chainSelected.on "click", @onChainSelected
 
   bitcoinCashSelected: (e) ->
-    dialog = new CommonDialogsConfirmationDialogViewController()
-    dialog.setMessageLocalizableKey 'onboarding.device.chains.bitcoin_cash_warning'
-    dialog.positiveLocalizableKey = 'common.yes'
-    dialog.negativeLocalizableKey = 'common.no'
-    dialog.once 'click:positive', =>
-      @chainChoosen(e)
+    dialog = new OnboardingDeviceChainsMessageDialogViewController()
+    dialog.once 'click:split', =>
+      @chainChoosen(@networks[2])
+    dialog.once 'click:un_split', =>
+      @chainChoosen(@networks[3])
     dialog.show()
 
   incompatible: () ->
@@ -30,26 +28,25 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
     dialog.show()
 
   onChainSelected: (e) ->
-    if @networks[e.target.attributes.value.value].name == 'bitcoin_cash'
+    if @networks[e.target.attributes.value.value].name != 'bitcoin_cash_unsplit'
+      @chainChoosen(@networks[e.target.attributes.value.value])
+    else
       if !ledger.app.dongle.getFirmwareInformation().hasScreenAndButton()
         @incompatible()
       else
         @bitcoinCashSelected(e)
-    else
-      @chainChoosen(e)
-
 
   chainChoosen: (e) ->
     if @view.remember.is(":checked")
       ledger.app.dongle.getPublicAddress "44'/#{@networks[0].bip44_coin_type}'/0'/0/0", (addr) =>
         address = ledger.crypto.SHA256.hashString addr
         tmp = {}
-        tmp[address]= @networks[e.target.attributes.value.value]
+        tmp[address]= e
         ledger.storage.global.chainSelector.set tmp, =>
           ledger.storage.global.chainSelector.get address, (result) =>
-            ledger.app.onChainChosen(@networks[e.target.attributes.value.value])
+            ledger.app.onChainChosen(e)
     else
-      ledger.app.onChainChosen(@networks[e.target.attributes.value.value])
+      ledger.app.onChainChosen(e)
 
 
   openSupport: ->
