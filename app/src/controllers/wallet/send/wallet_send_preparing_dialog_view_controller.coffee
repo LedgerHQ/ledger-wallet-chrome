@@ -13,10 +13,6 @@ class @WalletSendPreparingDialogViewController extends ledger.common.DialogViewC
     account.createTransaction amount: @params.amount, fees: @params.fees, address: @params.address, utxo: @params.utxo, data: @params.data, (transaction, error) =>
       return if not @isShown()
       if error?
-        l "error"
-        l error
-        l transaction
-        l @params
         reason = switch error.code
           when ledger.errors.NetworkError then 'network_no_response'
           when ledger.errors.NotEnoughFunds then 'unsufficient_balance'
