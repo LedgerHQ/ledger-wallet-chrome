@@ -3,17 +3,25 @@
     <img src="../../assets/images/onboarding/large_logo.png" width="191" height="96">
   </div>
   <div class="greyed-container">
-    <span class="black-indication"><%= t 'onboarding.device.chains.title'%></span>
-    <p class="medium-indication"><%- t 'onboarding.device.chains.message'%><p>
+    <div class="black-indication"><%= t 'onboarding.device.chains.title'%></div>
+    <p class="medium-indication"><%- t 'onboarding.device.chains.message1'%><p>
+    <p class="medium-indication"><%- t 'onboarding.device.chains.message2'%><p>
+    <p class="medium-indication"><%- t 'onboarding.device.chains.message3'%><p>
     <div class="chain-selector">
       <% for chain,i in @networks : %>
-        <% if chain.chain != "bitcoin cash (split)": %>
+        <% if chain.name != "bitcoin_cash_split": %>
           <a class="choice <% if chain.greyed is yes: %>
               cancel-rounded-button
             <% else: %>
               action-rounded-button
             <% end %>"
-          value=<%= i %>><%= chain.chain %></a>
+            value=<%= i %>>
+            <% if chain.ticker == "abc": %>
+              bitcoin cash
+            <% else: %>
+              <%= chain.chain %>
+            <% end %>
+          </a>
         <% end %>  
       <% end %>
     </div>

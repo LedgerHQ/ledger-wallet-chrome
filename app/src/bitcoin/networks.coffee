@@ -60,7 +60,7 @@ ledger.bitcoin.Networks =
   bitcoin:
     name: 'bitcoin'
     display_name: 'bitcoin'
-    chain: 'bitcoin'
+    chain: 'Bitcoin'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
     ticker: 'btc'
@@ -81,7 +81,7 @@ ledger.bitcoin.Networks =
   bitcoin_cash_unsplit:
     name: 'bitcoin_cash_unsplit'
     display_name: 'bitcoin'
-    chain: 'bitcoin cash'
+    chain: 'Bitcoin Cash (Main)'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
     ticker: 'abc'
@@ -104,7 +104,7 @@ ledger.bitcoin.Networks =
   bitcoin_cash_split:
     name: 'bitcoin_cash_split'
     display_name: 'bitcoin'
-    chain: 'bitcoin cash (split)'
+    chain: 'Bitcoin Cash (Split)'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
     ticker: 'abc'
@@ -127,9 +127,9 @@ ledger.bitcoin.Networks =
   bitcoin_uasf:
     name: 'bitcoin_uasf'
     display_name: 'bitcoin'
-    chain: 'bitcoin uasf'
+    chain: 'Bitcoin UASF'
     bolosAppName: 'Bitcoin'
-    plural: 'bitcoins uasf'
+    plural: 'bitcoins'
     ticker: 'uasf'
     scheme: 'bitcoin:'
     tickerKey:
@@ -144,8 +144,29 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    notCompatible: yes
     greyed: yes
+
+  bitcoin_segwit2x:
+    name: 'bitcoin_segwit2x'
+    display_name: 'bitcoin'
+    chain: 'Bitcoin Segwit2x'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
+    ticker: 'segwit2x'
+    scheme: 'bitcoin:'
+    tickerKey:
+      from: 'fromBTC'
+      to: 'toBTC'
+    bip44_coin_type: '0'
+    version:
+      regular: 0
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.bitcoin
+    ws_chain: 'bitcoin'
+    dust: 5430
+    handleFeePerByte: yes
+    greyed: yes  
 
   ###testnet:
     name: 'testnet'

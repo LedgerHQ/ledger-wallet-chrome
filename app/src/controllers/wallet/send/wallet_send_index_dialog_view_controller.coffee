@@ -182,7 +182,7 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     if @_transactionAmount().length == 0 or not ledger.Amount.fromSatoshi(@_transactionAmount()).gt(0)
       return t 'common.errors.invalid_amount'
     else if not ledger.bitcoin.checkAddress @_receiverBitcoinAddress() || @_receiverBitcoinAddress().startsWith("z")
-      return _.str.sprintf(t('common.errors.invalid_receiver_address'), ledger.config.network.name)
+      return _.str.sprintf(t('common.errors.invalid_receiver_address'), ledger.config.network.display_name)
     else if @_dataValue().length > 0 && not @_isDataValid()
       return t 'common.errors.invalid_op_return_data'
     else if ledger.Amount.fromSatoshi(@view.feesSelect.val()).divide(1000).lt(0) && @view.customFeesRow.is(':visible')

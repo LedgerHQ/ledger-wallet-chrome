@@ -645,9 +645,7 @@ class @ledger.dongle.Dongle extends EventEmitter
 
   _createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
     _btchipQueue.enqueue "createPaymentTransaction", =>
-      if ledger.config.network.ticker == 'abc'
-        l "abc signing"
-        promise = @_btchip.createPaymentTransactionNewBitcoinCash_async(
+      @_btchip.createPaymentTransaction_async(
           inputs, associatedKeysets, changePath,
           new ByteString(recipientAddress, ASCII),
           amount.toByteString(),
@@ -656,19 +654,7 @@ class @ledger.dongle.Dongle extends EventEmitter
           sighashType && new ByteString(Convert.toHexInt(sighashType), HEX),
           authorization && new ByteString(authorization, HEX),
           resumeData
-        )
-      else
-        promise = @_btchip.createPaymentTransaction_async(
-          inputs, associatedKeysets, changePath,
-          new ByteString(recipientAddress, ASCII),
-          amount.toByteString(),
-          fees.toByteString(),
-          lockTime && new ByteString(Convert.toHexInt(lockTime), HEX),
-          sighashType && new ByteString(Convert.toHexInt(sighashType), HEX),
-          authorization && new ByteString(authorization, HEX),
-          resumeData
-        )
-      promise.then( (result) ->
+        ).then( (result) ->
         if result instanceof ByteString
           result = result.toString(HEX)
         else
@@ -756,15 +742,25 @@ class @ledger.dongle.Dongle extends EventEmitter
           .concat(OpReturnScript(data))
 
       task = =>
-        @_btchip.createPaymentTransactionNew_async(
-          inputs, associatedKeysets, changePath,
-          outputScript,
-          lockTime && new ByteString(Convert.toHexInt(lockTime), HEX),
-          sighashType && new ByteString(Convert.toHexInt(sighashType), HEX),
-          authorization && new ByteString(authorization, HEX),
-          resumeData
-        )
-        .then( (result) ->
+        if ledger.config.network.ticker == 'abc'
+          promise = @_btchip.createPaymentTransactionNewBitcoinCash_async(
+            inputs, associatedKeysets, changePath,
+            outputScript,
+            lockTime && new ByteString(Convert.toHexInt(lockTime), HEX),
+            sighashType && new ByteString(Convert.toHexInt(sighashType), HEX),
+            authorization && new ByteString(authorization, HEX),
+            resumeData
+          )
+        else  
+          promise = @_btchip.createPaymentTransactionNew_async(
+            inputs, associatedKeysets, changePath,
+            outputScript,
+            lockTime && new ByteString(Convert.toHexInt(lockTime), HEX),
+            sighashType && new ByteString(Convert.toHexInt(sighashType), HEX),
+            authorization && new ByteString(authorization, HEX),
+            resumeData
+          )
+        promise.then( (result) ->
           if result instanceof ByteString
             result = result.toString(HEX)
           else

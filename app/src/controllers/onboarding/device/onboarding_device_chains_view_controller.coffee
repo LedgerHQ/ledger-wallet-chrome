@@ -20,7 +20,7 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
     dialog.once 'click:split', =>
       @chainChoosen(@networks[2])
     dialog.once 'click:un_split', =>
-      @chainChoosen(@networks[3])
+      @chainChoosen(@networks[1])
     dialog.show()
 
   incompatible: () ->
@@ -31,7 +31,7 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
     if @networks[e.target.attributes.value.value].name != 'bitcoin_cash_unsplit'
       @chainChoosen(@networks[e.target.attributes.value.value])
     else
-      if !ledger.app.dongle.getFirmwareInformation().hasScreenAndButton()
+      if !ledger.app.dongle.getFirmwareInformation().isUsingInputFinalizeFull()
         @incompatible()
       else
         @bitcoinCashSelected(e)

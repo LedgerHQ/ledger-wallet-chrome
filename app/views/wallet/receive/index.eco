@@ -24,7 +24,7 @@
         </td>
       </tr>
       <tr class="no-border">
-        <td class="row-title"><%= _.str.sprintf(t('wallet.receive.index.receiver_address'), _.str.capitalize(ledger.config.network.name)) %></td>
+        <td class="row-title"><%= _.str.sprintf(t('wallet.receive.index.receiver_address'), _.str.capitalize(ledger.config.network.display_name)) %></td>
         <td class="align-right" id="receiver_address"></td>
       </tr>
     </tbody>

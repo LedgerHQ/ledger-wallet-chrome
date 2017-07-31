@@ -41,6 +41,13 @@
           <div class="selector" />
         </div>
       </li>
+      <li id="chains-item" class="menu-item">
+        <div>
+          <div id="chains-title"><%= t('wallet.top_menu.items.chains') %></div>
+          <div id="chains-id"><%= ledger.config.network.chain %></div>
+          
+        </div>
+      </li>
       <li id="help-item" class="menu-item">
         <div>
           <a href="/wallet/help/index">
