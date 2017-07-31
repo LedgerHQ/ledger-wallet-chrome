@@ -61,7 +61,7 @@
       </tr>
     </tbody>
   </table>
-  <div id="warning" hidden></div><a id="link" hidden>Learn more.</a>
+  <span id="warning" style="visibility: hidden;"></span><a href="#openLink" id="link" style="visibility: hidden; margin-left: 5px;" >Learn more.</a>
 </section>
 <div id="error_container"></div>
 <div class="dialog-actions-bar">
