@@ -1286,6 +1286,7 @@ var BTChip = Class.create({
             if (resuming) {
                 trustedInputs = resumeData['trustedInputs'];
                 publicKeys = resumeData['publicKeys'];
+                scriptData = resumeData['scriptData'];
                 firstRun = false;
             }
 
@@ -1378,6 +1379,9 @@ var BTChip = Class.create({
             var result = self.serializeTransaction(targetTransaction, timestamp);
             result = result.concat(scriptData);
             result = result.concat(self.reverseBytestring(lockTime));
+
+console.log("Signed TX " + result.toString(HEX));
+            
             return result;
         }).fail(function (failure) {
             if ((typeof failure) != "undefined" && (typeof failure.authorizationRequired) != "undefined") {
@@ -1481,7 +1485,6 @@ var BTChip = Class.create({
     },
 
     createPaymentTransactionNewBitcoinCash_async: function(inputs, associatedKeysets, changePath, outputScript, lockTime, sighashType, authorization, resumeData) {
-
         // Implementation starts here
 
         // Inputs are provided as arrays of [transaction, output_index, optional redeem script]
@@ -1561,6 +1564,7 @@ var BTChip = Class.create({
             if (resuming) {
                 trustedInputs = resumeData['trustedInputs'];
                 publicKeys = resumeData['publicKeys'];
+                scriptData = resumeData['scriptData'];
                 firstRun = false;
             }
 
@@ -1668,6 +1672,9 @@ var BTChip = Class.create({
             var result = self.serializeTransaction(targetTransaction, timestamp);
             result = result.concat(scriptData);
             result = result.concat(self.reverseBytestring(lockTime));
+
+	    console.log("Signed TX " + result.toString(HEX));
+
             return result;
         }).fail(function (failure) {
             if ((typeof failure) != "undefined" && (typeof failure.authorizationRequired) != "undefined") {
