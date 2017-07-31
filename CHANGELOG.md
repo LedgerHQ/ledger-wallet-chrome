@@ -1,5 +1,5 @@
 # Changelog
-1.8.0
+1.8.0 / 1.8.1
 ===
 - Add support for Bitcoin UASF, Segwit2x and cash
 - Add support for POSW
@@ -9,7 +9,7 @@
 - Minimum fees is now 0
 - Custom fees for CPFP
 
-1.6.19/1.6.20
+1.6.19 / 1.6.20
 ===
 - Use an old timestamp in Stratis transactions
 
