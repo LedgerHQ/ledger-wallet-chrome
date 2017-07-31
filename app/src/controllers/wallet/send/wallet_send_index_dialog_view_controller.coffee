@@ -17,22 +17,26 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     maxButton: '#max_button'
     customFeesRow: '#custom_fees_row'
     warning: '#warning'
+    link: '#link'
 
+  blogLink = ""
   RefreshWalletInterval: 15 * 60 * 1000 # 15 Minutes
 
   onAfterRender: () ->
     super
     @view.dataRow.hide()
-    if ledger.config.network.version.XPUB == "0x0488B21E"
-      _.defer =>
-        ledger.api.WarningRestClient.instance.getWarning().then((json) ->
-          if json.message?
-            @view.warning.text(json.message)
-            @view.warning.show()
-          if json.link?
-            @view.link.on "click", open("json.link")
-            @view.link.show()
-        )
+    l ledger.config.network
+    ledger.api.WarningRestClient.instance.getWarning().then((json) =>
+      if json[ledger.config.network.ticker]?
+        if json[ledger.config.network.ticker].message?
+          @view.warning.css('visibility', 'visible')
+          @view.warning.text(json[ledger.config.network.ticker].message)
+          #@view.warning.show()
+        if json[ledger.config.network.ticker].link?
+          @blogLink = json[ledger.config.network.ticker].link
+          @view.link.css('visibility', 'visible')
+          #@view.link.show()
+    )
     @view.warning.show()
     # apply params
     if @params.amount?
@@ -55,6 +59,9 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     @_ensureDatabaseUpToDate()
     @_updateSendButton()
     @_updateTotalLabel = _.debounce(@_updateTotalLabel.bind(this), 500)
+
+  openLink: ->
+    open(@blogLink)
 
   onShow: ->
     super

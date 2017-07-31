@@ -77,6 +77,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
+    message: yes
 
   bitcoin_cash_unsplit:
     name: 'bitcoin_cash_unsplit'
@@ -100,6 +101,7 @@ ledger.bitcoin.Networks =
     handleFeePerByte: yes
     notCompatible: yes
     greyed: yes
+    message: yes
 
   bitcoin_cash_split:
     name: 'bitcoin_cash_split'
@@ -123,6 +125,7 @@ ledger.bitcoin.Networks =
     handleFeePerByte: yes
     notCompatible: yes
     greyed: yes  
+    message: yes
 
   bitcoin_uasf:
     name: 'bitcoin_uasf'
@@ -145,6 +148,7 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
     greyed: yes
+    message: yes
 
   bitcoin_segwit2x:
     name: 'bitcoin_segwit2x'
@@ -167,6 +171,7 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
     greyed: yes  
+    message: yes
 
   ###testnet:
     name: 'testnet'

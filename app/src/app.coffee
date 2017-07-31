@@ -108,12 +108,10 @@ require @ledger.imports, ->
                     exists = false
                     if result[address] != 0
                       for k, v of ledger.bitcoin.Networks
-                        if v.version.XPUB == result[address].version.XPUB
-                          exists = true
-                    l "reset"
-                    l exists
+                        if v.name == result[address].name
+                          exists = k
                     if exists
-                      @onChainChosen result[address]
+                      @onChainChosen ledger.bitcoin.Networks[exists]
                     else
                       ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
                   else

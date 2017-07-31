@@ -1,4 +1,9 @@
 # Changelog
+1.8.0
+===
+- Add support for Bitcoin UASF, Segwit2x and cash
+- Add support for POSW
+
 1.7.0
 ===
 - Minimum fees is now 0
