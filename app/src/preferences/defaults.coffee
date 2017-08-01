@@ -136,10 +136,10 @@ ledger.preferences.bitcoin_cash_unsplit =
   Display:
     units:
       bitcoin:
-        symbol: 'BTC'
+        symbol: 'BCH'
         unit: 8
       milibitcoin:
-        symbol: 'mBTC'
+        symbol: 'mBCH'
         unit: 5
       microbitcoin:
         symbol: 'bits'
@@ -157,10 +157,10 @@ ledger.preferences.bitcoin_cash_split =
   Display:
     units:
       bitcoin:
-        symbol: 'BTC'
+        symbol: 'BCH'
         unit: 8
       milibitcoin:
-        symbol: 'mBTC'
+        symbol: 'mBCH'
         unit: 5
       microbitcoin:
         symbol: 'bits'

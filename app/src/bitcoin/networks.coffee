@@ -226,7 +226,7 @@ ledger.bitcoin.Networks =
     tickerKey:
       from: 'fromLTC'
       to: 'toLTC'
-    l: '2'
+    bip44_coin_type: '2'
     version:
       regular: 48
       P2SH: 5

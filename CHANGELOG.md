@@ -1,5 +1,10 @@
 # Changelog
-1.8.0 / 1.8.1
+1.8.3
+===
+- Changed start screen
+- Changed symbol for Bitcoin Cash
+
+1.8.0 / 1.8.1 / 1.8.2
 ===
 - Add support for Bitcoin UASF, Segwit2x and cash
 - Add support for POSW
