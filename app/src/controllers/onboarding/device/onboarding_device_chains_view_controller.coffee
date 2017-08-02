@@ -60,7 +60,7 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
           ledger.storage.global.chainSelector.get address, (result) =>
             ledger.app.onChainChosen(e)
       else
-        tmp[address]= @networks[0]
+        tmp[address]= 0
         ledger.storage.global.chainSelector.set tmp, =>
           ledger.storage.global.chainSelector.get address, (result) =>
             ledger.app.onChainChosen(e)
