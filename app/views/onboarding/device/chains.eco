@@ -7,10 +7,12 @@
     <p class="medium-indication"><%- t 'onboarding.device.chains.message1'%><p>
     <p class="medium-indication"><%- t 'onboarding.device.chains.message2'%><p>
     <p class="medium-indication"><%- t 'onboarding.device.chains.message3'%><p>
+    <p class="medium-indication"><b><%- t 'onboarding.device.chains.message4'%></b><p>
     <div class="chain-selector">
       <% for chain,i in @networks : %>
         <% if chain.name != "bitcoin_cash_split": %>
-          <a class="choice <% if chain.greyed is yes: %>
+          <a id="<%= chain.ticker %>"
+            class="choice <% if chain.greyed is yes: %>
               cancel-rounded-button
             <% else: %>
               action-rounded-button
@@ -25,6 +27,8 @@
         <% end %>  
       <% end %>
     </div>
+    <input type="checkbox" id="advanced" value="True"> Show advanced options </input>
+    <br>
     <input type="checkbox" id="remember" value="True"> Remember my choice </input>
   </div>
   <div class="actions-container">
