@@ -8,6 +8,8 @@ class ledger.api.SyncRestClient extends ledger.api.AuthRestClient
 
   constructor: (addr) ->
     super
+    if ledger.config.network.name != 'bitcoin' and (ledger.config.network.bip44_coin_type == '0' or ledger.config.network.bip44_coin_type == '145')
+      addr = addr + '?chain=' + ledger.config.network.name
     @basePath = "accountsettings/#{addr}"
 
   # @param [Function] cb A callback function with object.md5 as argument.
