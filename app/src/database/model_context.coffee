@@ -218,11 +218,11 @@ class ledger.database.contexts.Context extends EventEmitter
           collectionData = _(data).pick (v, k) -> k.match("__sync_#{_.str.underscored(name).toLowerCase()}")?
           unless _(collectionData).isEmpty()
             collection.updateSynchronizedProperties(collectionData)
-          else
+          ###else
             # delete all
             $info 'Delete all', collectionData
             $info 'Received data', data
-            collection.getModelClass().chain(this).remove()
+            collection.getModelClass().chain(this).remove()###
         @emit 'synchronized'
 
   refresh: ->
