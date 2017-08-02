@@ -3,6 +3,9 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
   view:
     chainSelected: ".choice"
     remember: "#remember"
+    advanced: "#advanced"
+    uasf: "#uasf"
+    segwit2x: "#segwit2x"
 
   networks: []
 
@@ -14,6 +17,16 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
   onAfterRender: ->
     super
     @view.chainSelected.on "click", @onChainSelected
+    @view.advanced.change(@toggleAdvanced.bind(this))
+    @toggleAdvanced()
+
+  toggleAdvanced: () ->
+    if @view.advanced.is(":checked")
+      @view.uasf.show()
+      @view.segwit2x.show()
+    else
+      @view.uasf.hide()
+      @view.segwit2x.hide()
 
   bitcoinCashSelected: (e) ->
     dialog = new OnboardingDeviceChainsMessageDialogViewController()
