@@ -115,10 +115,11 @@ require @ledger.imports, ->
                     else
                       ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
                   else
-                    tmp = {}
+                    ###tmp = {}
                     tmp[address]= ledger.bitcoin.Networks.bitcoin
                     ledger.storage.global.chainSelector.set tmp, =>
-                      ledger.app.onChainChosen(ledger.bitcoin.Networks.bitcoin)
+                      ledger.app.onChainChosen(ledger.bitcoin.Networks.bitcoin)###
+                    ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}  
           else
             ledger.app.chains.currentKey = ""
             @onChainChosen networks[0]
@@ -178,6 +179,7 @@ require @ledger.imports, ->
       @emit 'dongle:disconnected' if reroute
       @_listenCountervalueEvents(false)
       _.defer =>
+        ledger.api.SyncRestClient.reset()
         ledger.bitcoin.bitid.reset()
         ledger.preferences.close()
         ledger.utils.Logger.updateGlobalLoggersLevel()

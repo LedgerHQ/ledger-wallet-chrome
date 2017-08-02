@@ -1,4 +1,8 @@
 # Changelog
+1.8.4
+===
+- Corrected metadata conflicts
+
 1.8.3
 ===
 - Changed start screen
