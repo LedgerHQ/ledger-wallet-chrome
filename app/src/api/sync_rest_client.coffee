@@ -35,3 +35,6 @@ class ledger.api.SyncRestClient extends ledger.api.AuthRestClient
   # @return A promise
   delete_settings: ->
     @http().delete(url: @basePath+@chain)
+
+  @reset: ->
+    @_instances = {}  

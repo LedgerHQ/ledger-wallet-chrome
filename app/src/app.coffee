@@ -179,6 +179,7 @@ require @ledger.imports, ->
       @emit 'dongle:disconnected' if reroute
       @_listenCountervalueEvents(false)
       _.defer =>
+        ledger.api.SyncRestClient.reset()
         ledger.bitcoin.bitid.reset()
         ledger.preferences.close()
         ledger.utils.Logger.updateGlobalLoggersLevel()
