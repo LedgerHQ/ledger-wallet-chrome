@@ -198,6 +198,8 @@ require @ledger.imports, ->
           @dongle = null
         else if reroute
           @dongle?.lock()
+        else 
+          ledger.tasks.TickerTask.instance.startIfNeccessary()
       ledger.dialogs.manager.dismissAll(no)
       @router.go '/onboarding/device/plug' if @isInWalletMode() and reroute
 
