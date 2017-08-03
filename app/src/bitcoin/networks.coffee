@@ -79,6 +79,28 @@ ledger.bitcoin.Networks =
     handleFeePerByte: yes
     message: yes
 
+  bitcoin_recover:
+    name: 'bitcoin_recover'
+    display_name: 'bitcoin'
+    chain: 'Bitcoin Recovery Tool'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
+    ticker: 'btc'
+    scheme: 'bitcoin:'
+    tickerKey:
+      from: 'fromBTC'
+      to: 'toBTC'
+    bip44_coin_type: '145'
+    version:
+      regular: 0
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.bitcoin
+    ws_chain: 'bitcoin'
+    dust: 5430
+    handleFeePerByte: yes
+    message: yes  
+
   bitcoin_cash_unsplit:
     name: 'bitcoin_cash_unsplit'
     display_name: 'bitcoin'
@@ -88,8 +110,8 @@ ledger.bitcoin.Networks =
     ticker: 'abc'
     scheme: 'bitcoin:'
     tickerKey:
-      from: 'fromBTC'
-      to: 'toBTC'
+      from: 'fromBCH'
+      to: 'toBCH'
     bip44_coin_type: '0'
     version:
       regular: 0
@@ -112,8 +134,8 @@ ledger.bitcoin.Networks =
     ticker: 'abc'
     scheme: 'bitcoin:'
     tickerKey:
-      from: 'fromBTC'
-      to: 'toBTC'
+      from: 'fromBCH'
+      to: 'toBCH'
     bip44_coin_type: '145'
     version:
       regular: 0
