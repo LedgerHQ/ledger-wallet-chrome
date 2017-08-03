@@ -1,4 +1,8 @@
 # Changelog
+1.8.5
+===
+- Recover tool for BTC sent on the BCH split chain
+
 1.8.4
 ===
 - Corrected metadata conflicts

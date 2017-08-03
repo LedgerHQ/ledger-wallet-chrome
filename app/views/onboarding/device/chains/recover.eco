@@ -1,0 +1,11 @@
+<section id="dialogs_message_dialog">
+  <div class="content-container">
+    <div class="uppercase-section-title"><%= t 'onboarding.device.chains.recover_title' %></div>
+    <div class="regular-text-small"><%= t 'onboarding.device.chains.recover_message' %></div>
+    <div class="dialog-actions-bar">
+      <a class="cancel-rounded-button" href="#dismiss" ><%= t 'common.cancel' %></a>
+      <div class="left-spacer"></div>
+      <a class="action-rounded-button recover" ><%= t 'onboarding.device.chains.recover_button' %></a>
+    </div>
+  </div>
+</section>

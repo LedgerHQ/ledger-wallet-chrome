@@ -6,6 +6,8 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
     advanced: "#advanced"
     uasf: "#uasf"
     segwit2x: "#segwit2x"
+    openHelpCenter: "#help"
+    recoverTool: "#recover"
 
   networks: []
 
@@ -24,17 +26,27 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
     if @view.advanced.is(":checked")
       @view.uasf.show()
       @view.segwit2x.show()
+      @view.openHelpCenter.hide()
+      @view.recoverTool.show()
     else
       @view.uasf.hide()
       @view.segwit2x.hide()
+      @view.openHelpCenter.show()
+      @view.recoverTool.hide()
 
   bitcoinCashSelected: (e) ->
     dialog = new OnboardingDeviceChainsMessageDialogViewController()
     dialog.once 'click:split', =>
-      @chainChoosen(@networks[2])
+      @chainChoosen(@networks[3])
     dialog.once 'click:un_split', =>
-      @chainChoosen(@networks[1])
+      @chainChoosen(@networks[2])
     dialog.show()
+
+  recoverTool: (e) ->
+    dialog = new OnboardingDeviceChainsRecoverDialogViewController()
+    dialog.once 'click:recover', =>
+      @chainChoosen(ledger.bitcoin.Networks.bitcoin_recover)
+    dialog.show()  
 
   incompatible: () ->
     dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("onboarding.device.chains.bad_device_title"), subtitle: t('onboarding.device.chains.bad_device_message'))

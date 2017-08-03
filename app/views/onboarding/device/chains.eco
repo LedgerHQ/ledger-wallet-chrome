@@ -10,7 +10,7 @@
     <p class="medium-indication"><b><%- t 'onboarding.device.chains.message4'%></b><p>
     <div class="chain-selector">
       <% for chain,i in @networks : %>
-        <% if chain.name != "bitcoin_cash_split": %>
+        <% if chain.name != "bitcoin_cash_split" and chain.name != "bitcoin_recover": %>
           <a id="<%= chain.ticker %>"
             class="choice <% if chain.greyed is yes: %>
               cancel-rounded-button
@@ -27,11 +27,12 @@
         <% end %>  
       <% end %>
     </div>
-    <input type="checkbox" id="advanced" value="True"> Show advanced options </input>
+    <label><input type="checkbox" id="remember" value="True" name=""> Remember my choice </input></label>
     <br>
-    <input type="checkbox" id="remember" value="True"> Remember my choice </input>
+    <label><input type="checkbox" id="advanced" value="True"> Show advanced options </input></label>
   </div>
   <div class="actions-container">
-    <a href="#openHelpCenter" class="greyed-action medium-indication"><%= t 'onboading.common.help' %></a>
+    <a id="help" href="#openHelpCenter" class="greyed-action medium-indication"><%= t 'onboading.common.help' %></a>
+    <a id="recover" href="#recoverTool" class="greyed-action medium-indication"><%= t 'onboarding.device.chains.recover' %></a>
   </div>
 </div>
