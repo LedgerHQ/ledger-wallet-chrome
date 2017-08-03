@@ -1,4 +1,12 @@
 
+bitcoin.networks.fujicoin =
+  magicPrefix: '\x19FujiCoin Signed Message:\n',
+  bip32:
+    public: 0x0488b21e,
+    private: 0x0488ade4
+  pubKeyHash: 36
+  scriptHash: 16
+
 bitcoin.networks.dash =
   magicPrefix: '\x19DarkCoin Signed Message:\n',
   bip32:
@@ -237,6 +245,24 @@ ledger.bitcoin.Networks =
       dustThreshold: 546
     dust: 5430
     handleFeePerByte: yes
+
+  fujicoin:
+    name: 'FujiCoin'
+    plural: 'fujicoins'
+    scheme: 'fujicoin:'
+    bolosAppName: 'Fujicoin'
+    ticker: 'FJC'
+    tickerKey:
+      from: 'fromFJC'
+      to: 'toFJC'
+    bip44_coin_type: '75'
+    version:
+      regular: 36
+      P2SH: 16
+      XPUB: 0x0488b21e
+    bitcoinjs: bitcoin.networks.fujicoin
+    dust: 10000
+    handleFeePerByte: no
 
   litecoin:
     name: 'litecoin'

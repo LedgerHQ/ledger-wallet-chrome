@@ -304,6 +304,27 @@ ledger.preferences.testnet =
         address: 'https://test-insight.bitpay.com/tx/%s'
     discoveryGap: 20
 
+ledger.preferences.fujicoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'FJC'
+        unit: 8
+      milibitcoin:
+        symbol: 'mFJC'
+        unit: 5
+      microbitcoin:
+        symbol: 'μFJC'
+        unit: 2
+
+  # Coin preferences
+  Coin:
+    explorers:
+      fuji_explorer:
+        name: 'Fujicoin Explorer'
+        address: 'http://explorer.fujicoin.org/tx/%s'
+    discoveryGap: 20
+
 ledger.preferences.litecoin =
   Display:
     units:

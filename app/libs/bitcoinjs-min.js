@@ -14763,6 +14763,20 @@
           feePerKb: 1e4,
           estimateFee: estimateFee("testnet")
         },
+        fujicoin: {
+          magicPrefix: "FujiCoin Signed Message:\n",
+          bip32: {
+            "public": 76067358,
+            "private": 76066276
+          },
+          pubKeyHash: 36,
+          scriptHash: 16,
+          wif: 164,
+          dustThreshold: 0,
+          dustSoftThreshold: 1e5,
+          feePerKb: 1e5,
+          estimateFee: estimateFee("fujicoin")
+        },
         litecoin: {
           magicPrefix: "Litecoin Signed Message:\n",
           bip32: {
