@@ -1,7 +1,8 @@
 # Changelog
 1.8.5
 ===
-- Recover tool for BTC sent on the BCH split chain
+- Add recovery tool for BTC sent to BCH Split address
+- Corrected counter values being lost when switching chains
 
 1.8.4
 ===
