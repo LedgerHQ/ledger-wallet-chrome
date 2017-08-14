@@ -73,7 +73,12 @@ class ledger.wallet.Wallet
 
   isInitialized: no
 
-  getRootDerivationPath: () -> "44'/#{ledger.config.network.bip44_coin_type}'"
+  getRootDerivationPath: () -> 
+    if ledger.config.network.handleSegwit
+      path = "49'/#{ledger.config.network.bip44_coin_type}'"
+    else
+      path = "44'/#{ledger.config.network.bip44_coin_type}'"
+    path
 
   getAccountsCount: () ->
     count = 0

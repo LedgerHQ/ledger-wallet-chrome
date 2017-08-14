@@ -95,6 +95,15 @@ class ledger.wallet.ExtendedPublicKey
     result = @__b58chars[long_value.toNumber()] + result
     result
 
+  _pubKeyToSegwitAddress: (pubKey) ->
+    pk = (parseInt(byte, 16) for byte in pubKey.match(/../g))
+    pkHash160 = Bitcoin.Util.sha256ripe160(pk)
+    script = [0x00, 0x14].concat(pkHash160)
+    networkVersion = [ledger.config.network.version.P2SH]
+    hash160 = networkVersion.concat(Bitcoin.Util.sha256ripe160(script))
+    checkSum = Bitcoin.Crypto.SHA256(Bitcoin.Crypto.SHA256(hash160, asBytes: yes), asBytes: yes).slice(0, 4)
+    Bitcoin.base58.encode(hash160.concat(checkSum))
+
   getPublicAddress: (path) ->
     throw 'Extended public key must initialized before it can perform any derivation' unless @_hdnode?
     throw 'Path should begin by the index of derivation' if isNaN(parseInt(path[0]))
@@ -111,7 +120,10 @@ class ledger.wallet.ExtendedPublicKey
         hdnode = hdnode.deriveHardened parseInt(index)
       else
         hdnode = hdnode.derive parseInt(index)
-    address = hdnode.getAddress().toString()
+    if ledger.config.network.handleSegwit
+      address = @_pubKeyToSegwitAddress(hdnode.pubKey.toHex())
+    else
+      address = hdnode.getAddress().toString()
     @_insertPublicAddressInCache partialPath, address
     address
 
