@@ -623,6 +623,7 @@ class @ledger.dongle.Dongle extends EventEmitter
   @param [Array<Object>] inputs
   @param [Array] associatedKeysets
   @param changePath
+  @param [String] changeAddress
   @param [String] recipientAddress
   @param [Amount] amount
   @param [Amount] fee
@@ -632,14 +633,14 @@ class @ledger.dongle.Dongle extends EventEmitter
   @param [Object] resumeData
   @return [Q.Promise] Resolve with resumeData
   ###
-  createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, data, lockTime, sighashType, authorization, resumeData) ->
+  createPaymentTransaction: (inputs, associatedKeysets, changePath, changeAddress, recipientAddress, amount, fees, data, lockTime, sighashType, authorization, resumeData) ->
     if resumeData?
       resumeData = _.clone(resumeData)
       resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)
       resumeData.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in resumeData.trustedInputs)
       resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
     if @getFirmwareInformation().isUsingInputFinalizeFull()
-      @_createPaymentTransactionNew(inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, data, resumeData)
+      @_createPaymentTransactionNew(inputs, associatedKeysets, changePath, changeAddress, recipientAddress, amount, fees, lockTime, sighashType, authorization, data, resumeData)
     else
       @_createPaymentTransaction(inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData)
 
@@ -666,9 +667,9 @@ class @ledger.dongle.Dongle extends EventEmitter
         return result
       )
 
-  _createPaymentTransactionNew: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, data, resumeData) ->
+  _createPaymentTransactionNew: (inputs, associatedKeysets, changePath, changeAddress, recipientAddress, amount, fees, lockTime, sighashType, authorization, data, resumeData) ->
     @getPublicAddress(changePath).then (result) =>
-      changeAddress = result.bitcoinAddress.toString(ASCII)
+      changeAddress2 = result.bitcoinAddress.toString(ASCII)
       inputAmounts = do =>
         for [prevTx, index], i in inputs
           ledger.Amount.fromSatoshi(prevTx.outputs[index].amount)
