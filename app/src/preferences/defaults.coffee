@@ -132,6 +132,39 @@ ledger.preferences.bitcoin =
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
     discoveryGap: 20
 
+ledger.preferences.bitcoin_segwit =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'BTC'
+        unit: 8
+      milibitcoin:
+        symbol: 'mBTC'
+        unit: 5
+      microbitcoin:
+        symbol: 'bits'
+        unit: 2
+
+  # Coin preferences
+  Coin:
+    explorers:
+      blockchain:
+        name: 'Blockchain.info'
+        address: 'https://blockchain.info/tx/%s'
+      blockr:
+        name: 'Blockr.io'
+        address: 'https://btc.blockr.io/tx/info/%s'
+      biteasy:
+        name: 'Biteasy.com'
+        address: 'https://www.biteasy.com/blockchain/transactions/%s'
+      insight:
+        name: 'Insight.is'
+        address: 'https://insight.bitpay.com/tx/%s'
+      blockonomics:
+        name: 'Blockonomics.co'
+        address: 'https://www.blockonomics.co/api/tx?txid=%s'
+    discoveryGap: 20
+
 
 ledger.preferences.bitcoin_recover =
   Display:
@@ -241,6 +274,39 @@ ledger.preferences.bitcoin_segwit2x =
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
     discoveryGap: 20  
 
+ledger.preferences.bitcoin_segwit2x_segwit =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'BTC'
+        unit: 8
+      milibitcoin:
+        symbol: 'mBTC'
+        unit: 5
+      microbitcoin:
+        symbol: 'bits'
+        unit: 2
+
+  # Coin preferences
+  Coin:
+    explorers:
+      blockchain:
+        name: 'Blockchain.info'
+        address: 'https://blockchain.info/tx/%s'
+      blockr:
+        name: 'Blockr.io'
+        address: 'https://btc.blockr.io/tx/info/%s'
+      biteasy:
+        name: 'Biteasy.com'
+        address: 'https://www.biteasy.com/blockchain/transactions/%s'
+      insight:
+        name: 'Insight.is'
+        address: 'https://insight.bitpay.com/tx/%s'
+      blockonomics:
+        name: 'Blockonomics.co'
+        address: 'https://www.blockonomics.co/api/tx?txid=%s'
+    discoveryGap: 20      
+
 ledger.preferences.bitcoin_uasf =
   Display:
     units:
@@ -330,6 +396,33 @@ ledger.preferences.litecoin =
         name: 'Bchain.info'
         address: 'https://bchain.info/LTC/tx/%s'
     discoveryGap: 20
+
+ledger.preferences.litecoin_segwit =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'LTC'
+        unit: 8
+      milibitcoin:
+        symbol: 'mLTC'
+        unit: 5
+      microbitcoin:
+        symbol: 'μLTC'
+        unit: 2
+
+  # Coin preferences
+  Coin:
+    explorers:
+      blockr:
+        name: 'Blockr.io'
+        address: 'https://ltc.blockr.io/tx/info/%s'
+      sochain:
+        name: 'SoChain'
+        address: 'https://chain.so/tx/LTC/%s'
+      bchain:
+        name: 'Bchain.info'
+        address: 'https://bchain.info/LTC/tx/%s'
+    discoveryGap: 20    
 
 ledger.preferences.dogecoin =
   Display:

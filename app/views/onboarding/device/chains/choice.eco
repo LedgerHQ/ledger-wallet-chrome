@@ -1,0 +1,14 @@
+<section id="dialogs_message_dialog">
+<% if true || (console.log('test')): %>
+<% end %>
+  <div class="content-container">
+    <div class="uppercase-section-title"><%= @title %></div>
+    <div class="regular-text-small"><%- @text %></div>
+    <div class="dialog-actions-bar">
+      <a class="cancel-rounded-button cancel" ><%= @cancel %></a>
+      <div class="left-spacer"></div>
+      <a class="action-rounded-button first" ><%= @firstChoice %></a>
+      <a class="action-rounded-button second" ><%= @secondChoice %></a>
+    </div>
+  </div>
+</section>

@@ -1,16 +1,17 @@
 <div id="content-container">
   <div class="logo-container">
-    <img src="../../assets/images/onboarding/large_logo.png" width="191" height="96">
+    <img src="../../../assets/images/onboarding/large_logo.png" width="191" height="96">
   </div>
   <div class="greyed-container">
-    <div class="black-indication"><%= t 'onboarding.device.chains.title'%></div>
-    <p class="medium-indication"><%- t 'onboarding.device.chains.message1'%><p>
-    <p class="medium-indication"><%- t 'onboarding.device.chains.message2'%><p>
-    <p class="medium-indication"><%- t 'onboarding.device.chains.message3'%><p>
-    <p class="medium-indication"><b><%- t 'onboarding.device.chains.message4'%></b><p>
+    <div class="black-indication"><%= t 'onboarding.device.chains.segwit_title'%></div>
+    <p class="medium-indication"><%- t 'onboarding.device.chains.segwit_message'%><p>
     <div class="chain-selector">
+      <a    class="choice cancel-rounded-button"
+            value="0">
+            <%- t('onboarding.device.chains.segwit_cancel') %>
+      </a>
       <% for chain,i in @networks : %>
-        <% if chain.name != "bitcoin_cash_split" and chain.name != "bitcoin_recover" and chain.name != "bitcoin_segwit" and chain.name != "bitcoin_segwit2x_segwit": %>
+        <% if true: %>
           <a id="<%= chain.ticker %>"
             class="choice <% if chain.greyed is yes: %>
               cancel-rounded-button
@@ -28,8 +29,6 @@
       <% end %>
     </div>
     <label><input type="checkbox" id="remember" value="True" name=""> Remember my choice </input></label>
-    <br>
-    <label><input type="checkbox" id="advanced" value="True"> Show advanced options </input></label>
   </div>
   <div class="actions-container">
     <a id="help" href="#openHelpCenter" class="greyed-action medium-indication"><%= t 'onboading.common.help' %></a>

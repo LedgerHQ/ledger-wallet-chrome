@@ -1,4 +1,3 @@
-
 bitcoin.networks.dash =
   magicPrefix: '\x19DarkCoin Signed Message:\n',
   bip32:
@@ -69,6 +68,7 @@ ledger.bitcoin.Networks =
       from: 'fromBTC'
       to: 'toBTC'
     bip44_coin_type: '0'
+    handleSegwit: no
     version:
       regular: 0
       P2SH: 5
@@ -78,6 +78,29 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
     message: yes
+
+  bitcoin_segwit:
+    name: 'bitcoin_segwit'
+    display_name: 'bitcoin'
+    chain: 'Bitcoin Segwit'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
+    ticker: 'btc'
+    scheme: 'bitcoin:'
+    tickerKey:
+      from: 'fromBTC'
+      to: 'toBTC'
+    bip44_coin_type: '0'
+    handleSegwit: no
+    version:
+      regular: 0
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.bitcoin
+    ws_chain: 'bitcoin'
+    dust: 5430
+    handleFeePerByte: yes
+    message: yes  
 
   bitcoin_recover:
     name: 'bitcoin_recover'
@@ -91,6 +114,7 @@ ledger.bitcoin.Networks =
       from: 'fromBTC'
       to: 'toBTC'
     bip44_coin_type: '145'
+    handleSegwit: no
     version:
       regular: 0
       P2SH: 5
@@ -113,6 +137,7 @@ ledger.bitcoin.Networks =
       from: 'fromBCH'
       to: 'toBCH'
     bip44_coin_type: '0'
+    handleSegwit: no
     version:
       regular: 0
       P2SH: 5
@@ -137,6 +162,7 @@ ledger.bitcoin.Networks =
       from: 'fromBCH'
       to: 'toBCH'
     bip44_coin_type: '145'
+    handleSegwit: no
     version:
       regular: 0
       P2SH: 5
@@ -161,6 +187,7 @@ ledger.bitcoin.Networks =
       from: 'fromBTC'
       to: 'toBTC'
     bip44_coin_type: '0'
+    handleSegwit: no
     version:
       regular: 0
       P2SH: 5
@@ -184,6 +211,7 @@ ledger.bitcoin.Networks =
       from: 'fromBTC'
       to: 'toBTC'
     bip44_coin_type: '0'
+    handleSegwit: no
     version:
       regular: 0
       P2SH: 5
@@ -195,9 +223,33 @@ ledger.bitcoin.Networks =
     greyed: yes  
     message: yes
 
-  ###testnet:
+  bitcoin_segwit2x_segwit:
+    name: 'bitcoin_segwit2x_segwit'
+    display_name: 'bitcoin'
+    chain: 'Bitcoin Segwit2x'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
+    ticker: 'segwit2x'
+    scheme: 'bitcoin:'
+    tickerKey:
+      from: 'fromBTC'
+      to: 'toBTC'
+    bip44_coin_type: '0'
+    handleSegwit: no
+    version:
+      regular: 0
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.bitcoin
+    ws_chain: 'bitcoin'
+    dust: 5430
+    handleFeePerByte: yes
+    greyed: yes  
+    message: yes  
+
+  testnet:
     name: 'testnet'
-    chain: 'bitcoin'
+    chain: 'bitcoin testnet'
     plural: 'bitcoins'
     ticker: 'btc_testnet'
     scheme: 'bitcoin:'
@@ -205,6 +257,7 @@ ledger.bitcoin.Networks =
       from: 'fromBTC'
       to: 'toBTC'
     bip44_coin_type: '1'
+    handleSegwit: yes
     version:
       regular: 111
       P2SH: 196
@@ -212,35 +265,12 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.testnet
     ws_chain: 'testnet3'
     dust: 5430
-    handleFeePerByte: yes###
-
-  segnet:
-    name: 'segnet'
-    display_name: 'testnet'
-    plural: 'bitcoins'
-    ticker: 'segtest'
-    scheme: 'bitcoin:'
-    bip44_coin_type: '1'
-    version:
-      regular: 30
-      P2SH: 50
-      XPUB: 0x053587CF
-    bitcoinjs:
-      messagePrefix: '\x18Bitcoin Signed Message:\n',
-      bip32: {
-        public: 0x053587CF,
-        private: 0x05358394
-      },
-      pubKeyHash: 30,
-      scriptHash: 50,
-      wif: 158,
-      dustThreshold: 546
-    dust: 5430
     handleFeePerByte: yes
 
   litecoin:
     name: 'litecoin'
     display_name: 'litecoin'
+    chain: 'Legacy'
     plural: 'litecoins'
     scheme: 'litecoin:'
     bolosAppName: 'Litecoin'
@@ -249,9 +279,31 @@ ledger.bitcoin.Networks =
       from: 'fromLTC'
       to: 'toLTC'
     bip44_coin_type: '2'
+    handleSegwit: no
     version:
       regular: 48
-      P2SH: 5
+      P2SH: 50
+      XPUB: 0x19DA462
+    bitcoinjs: bitcoin.networks.litecoin
+    dust: 10000
+    handleFeePerByte: no
+
+  litecoin_segwit:
+    name: 'litecoin_segwit'
+    display_name: 'litecoin'
+    chain: 'Segwit'
+    plural: 'litecoins'
+    scheme: 'litecoin:'
+    bolosAppName: 'Litecoin'
+    ticker: 'ltc'
+    tickerKey:
+      from: 'fromLTC'
+      to: 'toLTC'
+    bip44_coin_type: '2'
+    handleSegwit: yes
+    version:
+      regular: 48
+      P2SH: 50
       XPUB: 0x19DA462
     bitcoinjs: bitcoin.networks.litecoin
     dust: 10000
@@ -268,6 +320,7 @@ ledger.bitcoin.Networks =
       from: 'fromDOGE'
       to: 'toDOGE'
     bip44_coin_type: '3'
+    handleSegwit: no
     version:
       regular: 30
       P2SH: 22
@@ -287,6 +340,7 @@ ledger.bitcoin.Networks =
       from: 'fromDASH'
       to: 'toDASH'
     bip44_coin_type: '5'
+    handleSegwit: no
     version:
       regular: 76
       P2SH: 16
@@ -306,6 +360,7 @@ ledger.bitcoin.Networks =
       from: 'fromZEC'
       to: 'toZEC'
     bip44_coin_type: '133'
+    handleSegwit: no
     version:
       regular: 0x1CB8
       P2SH: 0x1CBD
@@ -325,6 +380,7 @@ ledger.bitcoin.Networks =
       from: 'fromCLUB'
       to: 'toCLUB'
     bip44_coin_type: '79'
+    handleSegwit: no
     version:
       regular: 28
       P2SH: 85
@@ -345,6 +401,7 @@ ledger.bitcoin.Networks =
       from: 'fromSTRAT'
       to: 'toSTRAT'
     bip44_coin_type: '105'
+    handleSegwit: no
     version:
       regular: 63
       P2SH: 125
@@ -365,6 +422,7 @@ ledger.bitcoin.Networks =
       from: 'fromPPC'
       to: 'toPPC'
     bip44_coin_type: '6'
+    handleSegwit: no
     version:
       regular: 55
       P2SH: 117
@@ -385,6 +443,7 @@ ledger.bitcoin.Networks =
       from: 'fromKMD'
       to: 'toKMD'
     bip44_coin_type: '141'
+    handleSegwit: no
     version:
       regular: 60
       P2SH: 85
@@ -404,6 +463,7 @@ ledger.bitcoin.Networks =
       from: 'fromPOSW'
       to: 'toPOSW'
     bip44_coin_type: '47'
+    handleSegwit: no
     version:
       regular: 55
       P2SH: 85
@@ -412,4 +472,3 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: yes
-

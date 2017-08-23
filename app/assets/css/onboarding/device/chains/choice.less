@@ -1,0 +1,33 @@
+@import (reference) "../../../common";
+@import (reference) "../../../mixins";
+@import (reference) "../../../constants";
+
+section#dialogs_message_dialog {
+  display:flex;
+  max-width: 450px;
+
+  > .content-container {
+    margin-top: 0px;
+
+    > .uppercase-section-title {
+      margin-top: 0px;
+    }
+
+    > .regular-text-small {
+      margin-top: 20px;
+      line-height: 20px;
+      #link {
+        font-weight: @font-weight-semibold;
+        color: inherit;
+        text-decoration: none;
+      }
+    }
+
+    > .cancel-rounded-button {
+      margin-top: @metrics-almost-medium-padding;
+    }
+  }
+  > .spacer {
+    width: 10 px;
+  }
+}

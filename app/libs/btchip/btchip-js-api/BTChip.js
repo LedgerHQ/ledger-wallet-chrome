@@ -1379,8 +1379,6 @@ var BTChip = Class.create({
             var result = self.serializeTransaction(targetTransaction, timestamp);
             result = result.concat(scriptData);
             result = result.concat(self.reverseBytestring(lockTime));
-
-console.log("Signed TX " + result.toString(HEX));
             
             return result;
         }).fail(function (failure) {
@@ -1429,9 +1427,9 @@ console.log("Signed TX " + result.toString(HEX));
     },
 
 
-    getTrustedInputBitcoinCash_async: function (indexLookup, transaction) {
+    getTrustedInputBIP143_async: function (indexLookup, transaction) {
         sha = new JSUCrypt.hash.SHA256();
-        hash = sha.finalize(this.serializeTransaction(transaction).toString(HEX));        
+        hash = sha.finalize(this.serializeTransaction(transaction, undefined, true).toString(HEX));        
         hash = new ByteString(JSUCrypt.utils.byteArrayToHexStr(hash), HEX)
         hash = sha.finalize(hash.toString(HEX));        
         hash = new ByteString(JSUCrypt.utils.byteArrayToHexStr(hash), HEX)
@@ -1443,16 +1441,16 @@ console.log("Signed TX " + result.toString(HEX));
         });
     },
 
-    startUntrustedHashTransactionInputRawBitcoinCash_async: function (newTransaction, firstRound, transactionData) {
+    startUntrustedHashTransactionInputRawBIP143_async: function (newTransaction, firstRound, transactionData) {
         return this.card.sendApdu_async(0xe0, 0x44, (firstRound ? 0x00 : 0x80), (newTransaction ? 0x02 : 0x80), transactionData, [0x9000]);
     },
 
 
-    startUntrustedHashTransactionInputBitcoinCash_async: function (newTransaction, transaction, trustedInputs) {
+    startUntrustedHashTransactionInputBIP143_async: function (newTransaction, transaction, trustedInputs) {
         var currentObject = this;
         var data = transaction['version'].concat(transaction['timestamp']).concat(currentObject.createVarint(transaction['inputs'].length));
         var deferred = Q.defer();
-        currentObject.startUntrustedHashTransactionInputRawBitcoinCash_async(newTransaction, true, data).then(function (result) {
+        currentObject.startUntrustedHashTransactionInputRawBIP143_async(newTransaction, true, data).then(function (result) {
             var i = 0;
             async.eachSeries(
                 transaction['inputs'],
@@ -1460,9 +1458,9 @@ console.log("Signed TX " + result.toString(HEX));
                     var inputKey;
                     data = new ByteString(Convert.toHexByte(0x02), HEX);
                     data = data.concat(trustedInputs[i]).concat(currentObject.createVarint(input['script'].length));
-                    currentObject.startUntrustedHashTransactionInputRawBitcoinCash_async(newTransaction, false, data).then(function (result) {
+                    currentObject.startUntrustedHashTransactionInputRawBIP143_async(newTransaction, false, data).then(function (result) {
                         data = input['script'].concat(input['sequence']);
-                        currentObject.startUntrustedHashTransactionInputRawBitcoinCash_async(newTransaction, false, data).then(function (result) {
+                        currentObject.startUntrustedHashTransactionInputRawBIP143_async(newTransaction, false, data).then(function (result) {
                             // TODO notify progress
                             i++;
                             finishedCallback();
@@ -1484,7 +1482,20 @@ console.log("Signed TX " + result.toString(HEX));
         return deferred.promise;
     },
 
-    createPaymentTransactionNewBitcoinCash_async: function(inputs, associatedKeysets, changePath, outputScript, lockTime, sighashType, authorization, resumeData) {
+    hashPublicKey: function(publicKey) {
+        var tmp = [];
+        for (var i=0; i<publicKey.length; i++) {
+            tmp.push(publicKey.byteAt(i));
+        }
+        var compressedKey = Bitcoin.Util.sha256ripe160(tmp);
+        tmp = "";
+        for (var i=0; i<compressedKey.length; i++) {
+            tmp = tmp + Convert.toHexByte(compressedKey[i]);
+        }
+        return new ByteString(tmp, HEX);
+    },
+
+    createPaymentTransactionNewBIP143_async: function(segwit, inputs, associatedKeysets, changePath, outputScript, lockTime, sighashType, authorization, resumeData) {
         // Implementation starts here
 
         // Inputs are provided as arrays of [transaction, output_index, optional redeem script]
@@ -1546,7 +1557,7 @@ console.log("Signed TX " + result.toString(HEX));
         };
         foreach(inputs, function (input, i) {
             return doIf(!resuming, function () {
-                return self.getTrustedInputBitcoinCash_async(input[1], input[0])
+                return self.getTrustedInputBIP143_async(input[1], input[0])
                     .progress(function (p) {
                         var inputProgress = {stage: "getTrustedInputsRaw"};
                         inputProgress["currentTrustedInputProgress_" + (i)] = p.inputIndex + p.outputIndex;
@@ -1603,7 +1614,7 @@ console.log("Signed TX " + result.toString(HEX));
             return doIf(!resuming, function () {
                 var notifyHashOutputBase58 = {stage: "hashTransaction", currentHashOutputBase58: 1};
                 var notifyStartUntrustedHash = {stage: "hashTransaction", currentUntrustedHash: 1};
-                return self.startUntrustedHashTransactionInputBitcoinCash_async(true, targetTransaction, trustedInputs).then(function () {
+                return self.startUntrustedHashTransactionInputBIP143_async(true, targetTransaction, trustedInputs).then(function () {
                     notify(notifyHashOutputBase58);
                     return doIf(!resuming && (typeof changePath != "undefined"), function () {
                         return self.provideOutputFullChangePath_async(changePath);
@@ -1636,7 +1647,13 @@ console.log("Signed TX " + result.toString(HEX));
                     usedScript = inputs[i][2];
                 }
                 else {
-                    usedScript = regularOutputs[i]['script'];
+                    if (!segwit) {
+                        usedScript = regularOutputs[i]['script'];
+                    }
+                    else {
+                        var hashedPublicKey = self.hashPublicKey(publicKeys[i]);
+                        usedScript = new ByteString("76a914", HEX).concat(hashedPublicKey).concat(new ByteString("88ac", HEX));
+                    }
                 }
                 var pseudoTransaction = {};
                 pseudoTransaction['version'] = targetTransaction['version'];
@@ -1649,9 +1666,10 @@ console.log("Signed TX " + result.toString(HEX));
                 var pseudoTrustedInputs = [ trustedInputs [i] ];
                 var notifyHashOutputBase58 = {stage: "hashTransaction", currentHashOutputBase58: i + 1};
                 var notifyStartUntrustedHash = {stage: "hashTransaction", currentUntrustedHash: i + 1};
-                return self.startUntrustedHashTransactionInputBitcoinCash_async(false, pseudoTransaction, pseudoTrustedInputs).then(function () {
+                return self.startUntrustedHashTransactionInputBIP143_async(false, pseudoTransaction, pseudoTrustedInputs).then(function () {
                     notify(notifyStartUntrustedHash);
-                    return self.signTransaction_async(associatedKeysets[i], authorization, undefined, 0x41).then(function (signature) {
+                    var hashType = (segwit ? 0x01 : 0x41);
+                    return self.signTransaction_async(associatedKeysets[i], authorization, undefined, hashType).then(function (signature) {
                         notify({stage: "getTrustedInput", currentSignTransaction: i + 1});
                         signatures.push(signature);
                         targetTransaction['inputs'][i]['script'] = new ByteString("", HEX);
@@ -1661,19 +1679,42 @@ console.log("Signed TX " + result.toString(HEX));
         }).then(function () {
             // Populate the final input scripts
             for (var i=0; i < inputs.length; i++) {
-                var tmpScriptData = new ByteString(Convert.toHexByte(signatures[i].length), HEX);
-                tmpScriptData = tmpScriptData.concat(signatures[i]);
-                var publicKey = publicKeys[i];
-                tmpScriptData = tmpScriptData.concat(new ByteString(Convert.toHexByte(publicKey.length), HEX));
-                tmpScriptData = tmpScriptData.concat(publicKey);
+                var tmpScriptData;
+                if (segwit) {
+                    tmpScriptData = new ByteString("160014", HEX);
+                    tmpScriptData = tmpScriptData.concat(self.hashPublicKey(publicKeys[i]));
+                }
+                else {
+                    tmpScriptData = new ByteString(Convert.toHexByte(signatures[i].length), HEX);
+                    tmpScriptData = tmpScriptData.concat(signatures[i]);
+                    var publicKey = publicKeys[i];
+                    tmpScriptData = tmpScriptData.concat(new ByteString(Convert.toHexByte(publicKey.length), HEX));
+                    tmpScriptData = tmpScriptData.concat(publicKey);
+                }
                 targetTransaction['inputs'][i]['script'] = tmpScriptData;
                 targetTransaction['inputs'][i]['prevout'] = trustedInputs[i].bytes(0, 0x24);
             }
+            if (segwit) {
+                targetTransaction['witness'] = "";
+            }
             var result = self.serializeTransaction(targetTransaction, timestamp);
             result = result.concat(scriptData);
+            if (segwit) {
+                witness = new ByteString("", HEX);
+                for (var i=0; i < inputs.length; i++) {
+                    var tmpScriptData = new ByteString("02", HEX);
+                    tmpScriptData = tmpScriptData.concat(new ByteString(Convert.toHexByte(signatures[i].length), HEX));
+                    tmpScriptData = tmpScriptData.concat(signatures[i]);
+                    var publicKey = publicKeys[i];
+                    tmpScriptData = tmpScriptData.concat(new ByteString(Convert.toHexByte(publicKey.length), HEX));
+                    tmpScriptData = tmpScriptData.concat(publicKey);
+                    witness = witness.concat(tmpScriptData);
+                }
+                result = result.concat(witness);
+            }
             result = result.concat(self.reverseBytestring(lockTime));
 
-	    console.log("Signed TX " + result.toString(HEX));
+            console.log("SIGNED TX " + result.toString(HEX));
 
             return result;
         }).fail(function (failure) {
@@ -1811,8 +1852,12 @@ console.log("Signed TX " + result.toString(HEX));
         return data.toString();
     },
 
-    serializeTransaction: function (transaction, timestamp) {
-        var data = transaction['version'];
+    serializeTransaction: function (transaction, timestamp, skipWitness) {
+        var data = transaction['version'];        
+        var useWitness = ((typeof transaction['witness'] != "undefined") && !skipWitness);
+        if (useWitness) {
+            data = data.concat(new ByteString("0001", HEX));
+        }
         if (ledger.config.network.areTransactionTimestamped === true) {
             data = data.concat(timestamp);
         }
@@ -1828,6 +1873,9 @@ console.log("Signed TX " + result.toString(HEX));
                 var output = transaction['outputs'][i];
                 data = data.concat(output['amount']);
                 data = data.concat(this.createVarint(output['script'].length).concat(output['script']));
+            }
+            if (useWitness) {
+                data = data.concat(transaction['witness']);
             }
             data = data.concat(transaction['locktime']);
         }
@@ -1870,8 +1918,13 @@ console.log("Signed TX " + result.toString(HEX));
         var inputs = [];
         var outputs = [];
         var offset = 0;
+        var witness = false;
         var version = transaction.bytes(offset, 4);
         offset += 4;
+        if (!hasTimestamp && (transaction.byteAt(offset) == 0) && (transaction.byteAt(offset + 1) != 0)) {
+            offset += 2;
+            witness = true;
+        }        
         if (hasTimestamp === true) {
             result['timestamp'] = transaction.bytes(offset, 4);
             offset += 4;
@@ -1906,11 +1959,23 @@ console.log("Signed TX " + result.toString(HEX));
             offset += varint[0];
             outputs.push(output);
         }
-        var locktime = transaction.bytes(offset, 4);
+        var locktime;
+        var witnessScript;
+        if (witness) {
+            witnessScript = transaction.bytes(offset, transaction.length - offset - 4);
+            locktime = transaction.bytes(transaction.length - 4);            
+        }
+        else {
+            locktime = transaction.bytes(offset, 4);
+        }
         result['version'] = version;
         result['inputs'] = inputs;
         result['outputs'] = outputs;
         result['locktime'] = locktime;
+        if (witness) {
+            result['witness'] = witnessScript;
+        }        
+        // TODO : This conflicts with witness transactions - worry about it later, only affects Zcash so far
         offset += 4;
         if (offset != transaction.length) {
             result['extraData'] = transaction.bytes(offset);
@@ -1919,16 +1984,19 @@ console.log("Signed TX " + result.toString(HEX));
     },
 
     displayTransactionDebug: function (transaction) {
-        alert("version " + transaction['version'].toString(HEX));
+        console.log("version " + transaction['version'].toString(HEX));
         for (var i = 0; i < transaction['inputs'].length; i++) {
             var input = transaction['inputs'][i];
-            alert("input " + i + " prevout " + input['prevout'].toString(HEX) + " script " + input['script'].toString(HEX) + " sequence " + input['sequence'].toString(HEX));
+            console.log("input " + i + " prevout " + input['prevout'].toString(HEX) + " script " + input['script'].toString(HEX) + " sequence " + input['sequence'].toString(HEX));
         }
         for (var i = 0; i < transaction['outputs'].length; i++) {
             var output = transaction['outputs'][i];
-            alert("output " + i + " amount " + output['amount'].toString(HEX) + " script " + output['script'].toString(HEX));
+            console.log("output " + i + " amount " + output['amount'].toString(HEX) + " script " + output['script'].toString(HEX));
         }
-        alert("locktime " + transaction['locktime'].toString(HEX));
+        console.log("locktime " + transaction['locktime'].toString(HEX));
+        if (typeof transaction['witness'] != "undefined") {
+            console.log("witness " + transaction['witness'].toString(HEX));
+        }        
     },
 
     setDriverMode_async: function (mode) {

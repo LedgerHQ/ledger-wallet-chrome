@@ -53,27 +53,6 @@ _.extend ledger.wallet,
             push(null, [path, result])
           do next
 
-  pathsToSegwitAddressesStream: (paths) ->
-    ledger.wallet.pathsToAddressesStream(paths).map ledger.wallet.pubKeyAddressToSegwitAddress
-
-  pathsToSegwitAddresses: (paths, callback = undefined) ->
-    ledger.wallet.pathsToSegwitAddressesStream(paths)
-    .stopOnError (err) ->
-      callback?([], err)
-    .toArray (array) ->
-      callback(_.object(array), []) if callback?
-    return
-
-  pubKeyAddressToSegwitAddress: (pubKeyAddress) ->
-    pkHash160 = ledger.bitcoin.addressToHash160(pubKeyAddress)
-    OP_0 = new ByteString('00', HEX)
-    OP_EQUAL = new ByteString('87', HEX)
-    script = (parseInt(byte, 16) for byte in OP_0.concat(pkHash160).concat(OP_EQUAL).toString(HEX).match(/../g))
-    networkVersion = [ledger.config.network.version.P2SH]
-    hash160 = networkVersion.concat(Bitcoin.Util.sha256ripe160(script))
-    checkSum = Bitcoin.Crypto.SHA256(Bitcoin.Crypto.SHA256(hash160, asBytes: yes), asBytes: yes).slice(0, 4)
-    ledger.crypto.Base58.encode(hash160.concat(checkSum))
-
   checkSetup: (dongle, seed, pin, callback = undefined ) ->
     ledger.defer(callback)
     .resolve do ->

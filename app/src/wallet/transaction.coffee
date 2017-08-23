@@ -37,6 +37,8 @@ class ledger.wallet.Transaction
   # @property [String]
   changePath: undefined
   # @property [String]
+  changeAddress: undefined
+  # @property [String]
   hash: undefined
   # @property [String]
   authorizationPaired: undefined
@@ -59,7 +61,7 @@ class ledger.wallet.Transaction
   # @param [ledger.Amount] amount
   # @param [ledger.Amount] fees
   # @param [String] recipientAddress
-  constructor: (@dongle, @amount, @fees, @recipientAddress, @inputs, @changePath, @data) ->
+  constructor: (@dongle, @amount, @fees, @recipientAddress, @inputs, @changePath, @changeAddress, @data) ->
     @_btInputs = []
     @_btcAssociatedKeyPath = []
     for input in inputs
@@ -147,7 +149,7 @@ class ledger.wallet.Transaction
       Errors.throw('Transaction must me initialized before preparation')
     d = ledger.defer(callback)
     l "Prepare", @_btInputs, @_btcAssociatedKeyPath
-    @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees, @data)
+    @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @changeAddress, @recipientAddress, @amount, @fees, @data)
     .progress (progress) =>
       currentStep = progress.currentPublicKey + progress.currentSignTransaction + progress.currentTrustedInput + progress.currentHashOutputBase58 + progress.currentUntrustedHash
       stepsCount = progress.publicKeyCount + progress.transactionSignCount + progress.trustedInputsCount + progress.hashOutputBase58Count + progress.untrustedHashCount
@@ -173,7 +175,7 @@ class ledger.wallet.Transaction
   sign: (callback = undefined, progressCallback = undefined) ->
     d = ledger.defer(callback)
     l "Prepare", @_btInputs, @_btcAssociatedKeyPath
-    @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees, @data)
+    @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @changeAddress, @recipientAddress, @amount, @fees, @data)
     .progress (progress) =>
       d.notify(progress)
     .then (@_signedRawTransaction) =>
@@ -213,7 +215,7 @@ class ledger.wallet.Transaction
       Errors.throw('Transaction must me prepared before validation')
     d = ledger.defer(callback)
     @dongle.createPaymentTransaction(
-      @_btInputs, @_btcAssociatedKeyPath, @changePath, @recipientAddress, @amount, @fees, @data,
+      @_btInputs, @_btcAssociatedKeyPath, @changePath, @changeAddress, @recipientAddress, @amount, @fees, @data,
       undefined, # Default lockTime
       undefined, # Default sigHash
       validationKey,
@@ -257,10 +259,11 @@ class ledger.wallet.Transaction
     @param {String} address The recipient address
     @param {Array<Output>} utxo The list of utxo to sign in order to perform the transaction
     @param {String} changePath The path to use for the change
+    @param {String} changeAddress The change address
     @option [Function] callback The callback called once the transaction is created
     @return [Q.Promise] A closure
   ###
-  @create: ({amount, fees, address, utxo, changePath, data}, callback = null) ->
+  @create: ({amount, fees, address, utxo, changePath, changeAddress, data}, callback = null) ->
     l "create"
     d = ledger.defer(callback)
     dust = Amount.fromSatoshi(ledger.config.network.dust)
@@ -278,6 +281,7 @@ class ledger.wallet.Transaction
     $info("Address: ", address)
     $info("UTXO: ", utxo)
     $info("Change path: ", changePath)
+    $info("Change address: ", changeAddress)
     $info("Data: ", data)
 
     changeAmount = totalUtxoAmount.subtract(amount.add(fees))
@@ -307,8 +311,9 @@ class ledger.wallet.Transaction
       l address
       l inputs
       l changePath
+      l changeAddress
       l data
-      new Transaction(ledger.app.dongle, amount, fees, address, inputs, changePath, data)
+      new Transaction(ledger.app.dongle, amount, fees, address, inputs, changePath, changeAddress, data)
     )
     d.promise
 

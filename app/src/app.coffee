@@ -112,8 +112,11 @@ require @ledger.imports, ->
                           exists = k
                     if exists
                       @onChainChosen ledger.bitcoin.Networks[exists]
-                    else
-                      ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
+                    else 
+                      if networks[0].name == 'litecoin'
+                        ledger.app.router.go '/onboarding/device/chains/litecoin', {networks: JSON.stringify(networks)}
+                      else
+                        ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
                   else
                     ###tmp = {}
                     tmp[address]= ledger.bitcoin.Networks.bitcoin
@@ -131,6 +134,7 @@ require @ledger.imports, ->
         l " on chain chosen"
         @emit 'wallet:initializing'
         ledger.config.network = network
+        #ledger.config.network = ledger.bitcoin.Networks.testnet
         l ledger.config.network
         ledger.app.dongle.setCoinVersion(ledger.config.network.version.regular, ledger.config.network.version.P2SH)
         .then =>

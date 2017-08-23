@@ -9,7 +9,7 @@ class @WalletDialogsOperationdetailDialogViewController extends ledger.common.Di
 
   onAfterRender: ->
     super
-    @view.cpfpButton.hide() if @operation.get("confirmations") > 0 or !ledger.bitcoin.cpfp.isEligibleToCpfp(@operation.get("hash")) or ledger.config.network.bip44_coin_type != '0'
+    @view.cpfpButton.hide() if @operation.get("confirmations") > 0 or !ledger.bitcoin.cpfp.isEligibleToCpfp(@operation.get("hash")) or !["0", "1", "145"].includes(ledger.config.network.bip44_coin_type)
 
   openBlockchain: ->
     exploreURL = ledger.preferences.instance.getBlockchainExplorerAddress()

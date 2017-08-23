@@ -1,4 +1,4 @@
-class @OnboardingDeviceChainsViewController extends @OnboardingViewController
+class @OnboardingDeviceChainsLitecoinViewController extends @OnboardingViewController
 
   view:
     chainSelected: ".choice"
@@ -8,6 +8,7 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
     segwit2x: "#segwit2x"
     openHelpCenter: "#help"
     recoverTool: "#recover"
+    link: '#link'
 
   networks: []
 
@@ -43,11 +44,11 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
     dialog.show()
 
   chooseSegwit: (e) ->
-    dialog = new OnboardingDeviceChainsChoiceDialogViewController({title: t("onboarding.device.chains.segwit_title"), text: t('onboarding.device.chains.segwit_message'), firstChoice: t('onboarding.device.chains.segwit_legacy'), secondChoice: t('onboarding.device.chains.segwit_segwit'), cancel: t('onboarding.device.chains.segwit_cancel')})
+    dialog = new OnboardingDeviceChainsChoiceDialogViewController(title: t("onboarding.device.chains.segwit_title"), text: t('onboarding.device.chains.segwit_message'), firstChoice: t('onboarding.device.chains.segwit_deactivate'), secondChoice: t('onboarding.device.chains.segwit_activate'))
     dialog.once 'click:first', =>
       @chainChoosen(@networks[e.target.attributes.value.value])
     dialog.once 'click:second', =>
-      @chainChoosen(@networks[parseInt(e.target.attributes.value.value,10)+1])
+      @chainChoosen(@networks[e.target.attributes.value.value+1])
     dialog.show()
 
   recoverTool: (e) ->
@@ -61,20 +62,9 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
     dialog.show()
 
   onChainSelected: (e) ->
-    l e
-    if @networks[e.target.attributes.value.value].name != 'bitcoin_cash_unsplit'
-      if @networks[e.target.attributes.value.value].name == 'bitcoin' ||  @networks[e.target.attributes.value.value].name == 'bitcoin_segwit2x' ||@networks[e.target.attributes.value.value].name == 'litecoin'
-        @chooseSegwit(e)
-      else
-        @chainChoosen(@networks[e.target.attributes.value.value])
-    else
-      if !ledger.app.dongle.getFirmwareInformation().isUsingInputFinalizeFull()
-        @incompatible()
-      else
-        @bitcoinCashSelected(e)
+    @chainChoosen(@networks[e.target.attributes.value.value])
 
   chainChoosen: (e) ->
-    
     ledger.app.dongle.getPublicAddress "44'/#{@networks[0].bip44_coin_type}'/0'/0/0", (addr) =>
       address = ledger.crypto.SHA256.hashString addr
       tmp = {}
@@ -95,3 +85,6 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
 
   onDetach: ->
     super
+
+  openLink: ->
+    open("https://bitcoincore.org/en/2016/01/26/segwit-benefits/")

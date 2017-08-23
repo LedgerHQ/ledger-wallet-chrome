@@ -31,6 +31,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/device/pin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDevicePinViewController
 
+  route '/onboarding/device/chains/litecoin', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceChainsLitecoinViewController
+
   route '/onboarding/device/chains', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceChainsViewController
 
@@ -150,6 +153,7 @@ ledger.router.pluggedWalletRoutesExceptions = [
     tmp[ledger.app.chains.currentKey]= 0
     ledger.storage.global.chainSelector.set tmp, =>
       ledger.app.onDongleIsUnlocked(ledger.app.dongle)
+
 
   # Help
   route '/wallet/help/index', (params) ->
