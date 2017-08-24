@@ -402,11 +402,11 @@ var BTChip = Class.create({
         });
     },
 
-    getWalletPublicKey_async: function (path, verify) {
+    getWalletPublicKey_async: function (path, verify, segwit) {
         var data;
         var path = this.parseBIP32Path(path);
         var p1;
-        var p2;
+        var p2 = 0x00;
 
         if (this.deprecatedBIP32Derivation) {
             var account, chainIndex, internalChain;
@@ -429,8 +429,11 @@ var BTChip = Class.create({
         if (verify === true) {
             p1 = 0x01;
         }
+        if (segwit == true) {
+            p2 = 0x01;
+        }
 
-        return this.card.sendApdu_async(0xe0, 0x40, p1, 0x00, data, [0x9000]).then(function (result) {
+        return this.card.sendApdu_async(0xe0, 0x40, p1, p2, data, [0x9000]).then(function (result) {
             var resultList = {};
             var offset = 0;
             resultList['publicKey'] = result.bytes(offset + 1, result.byteAt(offset));

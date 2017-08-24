@@ -63,7 +63,7 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
   onChainSelected: (e) ->
     l e
     if @networks[e.target.attributes.value.value].name != 'bitcoin_cash_unsplit'
-      if ledger.app.dongle.getFirmwareInformation().getArchitecture() >= 0x30 && (@networks[e.target.attributes.value.value].name == 'bitcoin' ||  @networks[e.target.attributes.value.value].name == 'bitcoin_segwit2x' ||@networks[e.target.attributes.value.value].name == 'litecoin')
+      if (ledger.app.dongle.getFirmwareInformation().getIntFirmwareVersion() >= 0x30010105 or (ledger.app.dongle.getFirmwareInformation().getArchitecture() < 0x30 and ledger.app.dongle.getFirmwareInformation().getIntFirmwareVersion() >= 0x20010003)) && (@networks[e.target.attributes.value.value].name == 'bitcoin' ||  @networks[e.target.attributes.value.value].name == 'bitcoin_segwit2x' ||@networks[e.target.attributes.value.value].name == 'litecoin')
         @chooseSegwit(e)
       else
         @chainChoosen(@networks[e.target.attributes.value.value])

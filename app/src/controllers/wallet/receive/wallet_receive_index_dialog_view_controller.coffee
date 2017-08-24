@@ -30,7 +30,7 @@ class @WalletReceiveIndexDialogViewController extends ledger.common.DialogViewCo
     @_updateReceiverAddress()
     @_listenEvents()
 
-    if !ledger.app.dongle.getFirmwareInformation().hasVerifyAddressOnScreen() or (ledger.app.dongle.getFirmwareInformation().getArchitecture() < 0x30010105 and ledger.config.network.handleSegwit)
+    if !ledger.app.dongle.getFirmwareInformation().hasVerifyAddressOnScreen() or (ledger.app.dongle.getFirmwareInformation().getIntFirmwareVersion() < 0x30010109 and ledger.config.network.handleSegwit)
       @view.verifyButton.hide()
 
   onShow: ->
