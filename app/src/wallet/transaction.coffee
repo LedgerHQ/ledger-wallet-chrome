@@ -180,16 +180,7 @@ class ledger.wallet.Transaction
       d.notify(progress)
     .then (@_signedRawTransaction) =>
       @_isValidated = yes
-      tx = ledger.bitcoin.decodeTransaction(@getSignedTransaction())
-      $info("Raw TX: ", @getSignedTransaction())
-      ledger.wallet.pathsToAddresses [@changePath], (addresses) =>
-        changeAddress = _(addresses).chain().values().first().value()
-        result = ledger.bitcoin.verifyRawTx(@getSignedTransaction(), @inputs, @amount, @fees, @recipientAddress, changeAddress)
-        if result.isSuccess()
-          _.defer => d.resolve(@)
-        else
-          $error("Invalid signed tx ", result.getError().message)
-          return d.rejectWithError(Errors.ChangeDerivationError)
+      _.defer => d.resolve(@)
     .fail (error) =>
       e "GOT ERROR", error
       d.rejectWithError(Errors.SignatureError)
@@ -233,18 +224,8 @@ class ledger.wallet.Transaction
       progressCallback?({currentStep, stepsCount, percent})
     .then (@_signedRawTransaction) =>
       @_isValidated = yes
-      tx = ledger.bitcoin.decodeTransaction(@getSignedTransaction())
-      $info("Raw TX: ", @getSignedTransaction())
-      ledger.wallet.pathsToAddresses [@changePath], (addresses) =>
-        changeAddress = _(addresses).chain().values().first().value()
-        _.defer => d.resolve(@)
-        return
-        result = ledger.bitcoin.verifyRawTx(@getSignedTransaction(), @inputs, @amount, @fees, @recipientAddress, changeAddress)
-        if result.isSuccess() or no
-          _.defer => d.resolve(@)
-        else
-          $error("Invalid signed tx ", result.getError().message)
-          return d.rejectWithError(Errors.ChangeDerivationError)
+      _.defer => d.resolve(@)
+      return
     .catch (error) =>
       _.defer => d.rejectWithError(Errors.SignatureError, error)
     .done()

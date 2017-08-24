@@ -1,7 +1,7 @@
 # Changelog
 1.9.0
 ===
-- Add Segwit suppport for Bitcoin, Bitcoin segwit2x and Litecoin
+- Add Segwit support for Bitcoin, Bitcoin segwit2x and Litecoin
 
 1.8.5
 ===
