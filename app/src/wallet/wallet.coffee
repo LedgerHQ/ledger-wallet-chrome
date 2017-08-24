@@ -79,7 +79,6 @@ class ledger.wallet.Wallet
     else
       path = "44'/#{ledger.config.network.bip44_coin_type}'"
     path
-    
   getAccountsCount: () ->
     count = 0
     for account in @_accounts when account?

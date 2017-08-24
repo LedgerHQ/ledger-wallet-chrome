@@ -26,18 +26,17 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     super
     @view.dataRow.hide()
     l ledger.config.network
-    if ledger.config.network.message
-      l "dedans"
-      ledger.api.WarningRestClient.instance.getWarning().then((json) =>
-        if json.message?
+    ledger.api.WarningRestClient.instance.getWarning().then((json) =>
+      if json[ledger.config.network.ticker]?
+        if json[ledger.config.network.ticker].message?
           @view.warning.css('visibility', 'visible')
-          @view.warning.text(json.message)
+          @view.warning.text(json[ledger.config.network.ticker].message)
           #@view.warning.show()
-        if json.link?
-          @blogLink = json.link
+        if json[ledger.config.network.ticker].link?
+          @blogLink = json[ledger.config.network.ticker].link
           @view.link.css('visibility', 'visible')
           #@view.link.show()
-      )
+    )
     @view.warning.show()
     # apply params
     if @params.amount?
