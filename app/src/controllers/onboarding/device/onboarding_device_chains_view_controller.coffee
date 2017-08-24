@@ -37,9 +37,9 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
   bitcoinCashSelected: (e) ->
     dialog = new OnboardingDeviceChainsMessageDialogViewController()
     dialog.once 'click:split', =>
-      @chainChoosen(@networks[3])
+      @chainChoosen(@networks[parseInt(e.target.attributes.value.value,10)+1])
     dialog.once 'click:un_split', =>
-      @chainChoosen(@networks[2])
+      @chainChoosen(@networks[e.target.attributes.value.value])
     dialog.show()
 
   chooseSegwit: (e) ->
