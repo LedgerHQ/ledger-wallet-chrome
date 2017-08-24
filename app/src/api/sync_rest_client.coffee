@@ -9,7 +9,7 @@ class ledger.api.SyncRestClient extends ledger.api.AuthRestClient
   constructor: (addr) ->
     super
     @chain=''
-    if ledger.config.network.name != 'bitcoin' ledger.config.network.name != 'litecoin' and (ledger.config.network.bip44_coin_type == '2' or ledger.config.network.bip44_coin_type == '0' or ledger.config.network.bip44_coin_type == '145')
+    if ledger.config.network.name != 'bitcoin' and ledger.config.network.name != 'litecoin' and (ledger.config.network.bip44_coin_type == '2' or ledger.config.network.bip44_coin_type == '0' or ledger.config.network.bip44_coin_type == '145')
       @chain = '?chain=' + ledger.config.network.name
     @basePath = "accountsettings/#{addr}"
 

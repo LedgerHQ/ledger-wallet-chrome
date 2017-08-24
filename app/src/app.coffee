@@ -93,7 +93,7 @@ require @ledger.imports, ->
           networks = []     
           for k, v of ledger.bitcoin.Networks
             if v.version.regular is P2PKH and v.version.P2SH is P2SH
-              networks.push(v)
+              networks.push(v)  
           if networks.length >1
             l "many chains available"
             _.defer =>
@@ -122,7 +122,10 @@ require @ledger.imports, ->
                     tmp[address]= ledger.bitcoin.Networks.bitcoin
                     ledger.storage.global.chainSelector.set tmp, =>
                       ledger.app.onChainChosen(ledger.bitcoin.Networks.bitcoin)###
-                    ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}  
+                    if networks[0].name == 'litecoin'
+                        ledger.app.router.go '/onboarding/device/chains/litecoin', {networks: JSON.stringify(networks)}
+                      else
+                        ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}  
           else
             ledger.app.chains.currentKey = ""
             @onChainChosen networks[0]

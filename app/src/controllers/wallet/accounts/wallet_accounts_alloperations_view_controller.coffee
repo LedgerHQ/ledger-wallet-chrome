@@ -23,7 +23,11 @@ class @WalletAccountsAlloperationsViewController extends ledger.common.ActionBar
     dialog.show()
 
   _updateOperations: ->
+    #l 'operations'
+    #l Operation.find().where((op) -> true).data()
+    
     operations = Operation.find().where((op) -> !op['double_spent_priority']? or op['double_spent_priority'] is 0).sort(Operation.defaultSort).data()
+    
     @view.emptyContainer.hide() if operations.length > 0
     render 'wallet/accounts/_operations_table', {operations: operations, showAccounts: true}, (html) =>
       @view.operationsList.html html

@@ -91,7 +91,7 @@ ledger.bitcoin.Networks =
       from: 'fromBTC'
       to: 'toBTC'
     bip44_coin_type: '0'
-    handleSegwit: no
+    handleSegwit: yes
     version:
       regular: 0
       P2SH: 5
@@ -235,7 +235,7 @@ ledger.bitcoin.Networks =
       from: 'fromBTC'
       to: 'toBTC'
     bip44_coin_type: '0'
-    handleSegwit: no
+    handleSegwit: yes
     version:
       regular: 0
       P2SH: 5
