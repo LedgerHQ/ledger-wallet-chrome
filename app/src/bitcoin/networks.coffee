@@ -267,6 +267,27 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
 
+  litecoin_old:
+    name: 'litecoin'
+    display_name: 'litecoin'
+    chain: 'Litecoin'
+    plural: 'litecoins'
+    scheme: 'litecoin:'
+    bolosAppName: 'Litecoin'
+    ticker: 'ltc'
+    tickerKey:
+      from: 'fromLTC'
+      to: 'toLTC'
+    bip44_coin_type: '2'
+    handleSegwit: no
+    version:
+      regular: 48
+      P2SH: 5
+      XPUB: 0x19DA462
+    bitcoinjs: bitcoin.networks.litecoin
+    dust: 10000
+    handleFeePerByte: no
+
   litecoin:
     name: 'litecoin'
     display_name: 'litecoin'
