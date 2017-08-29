@@ -69,6 +69,7 @@ ledger.bitcoin.Networks =
       to: 'toBTC'
     bip44_coin_type: '0'
     handleSegwit: no
+    isSegwitSupported: yes
     version:
       regular: 0
       P2SH: 5
@@ -92,6 +93,7 @@ ledger.bitcoin.Networks =
       to: 'toBTC'
     bip44_coin_type: '0'
     handleSegwit: yes
+    isSegwitSupported: yes
     version:
       regular: 0
       P2SH: 5
@@ -115,6 +117,7 @@ ledger.bitcoin.Networks =
       to: 'toBTC'
     bip44_coin_type: '145'
     handleSegwit: no
+    isSegwitSupported: yes
     version:
       regular: 0
       P2SH: 5
@@ -138,6 +141,7 @@ ledger.bitcoin.Networks =
       to: 'toBCH'
     bip44_coin_type: '0'
     handleSegwit: no
+    isSegwitSupported: no
     version:
       regular: 0
       P2SH: 5
@@ -163,6 +167,7 @@ ledger.bitcoin.Networks =
       to: 'toBCH'
     bip44_coin_type: '145'
     handleSegwit: no
+    isSegwitSupported: no
     version:
       regular: 0
       P2SH: 5
@@ -188,6 +193,7 @@ ledger.bitcoin.Networks =
       to: 'toBTC'
     bip44_coin_type: '0'
     handleSegwit: no
+    isSegwitSupported: yes
     version:
       regular: 0
       P2SH: 5
@@ -212,6 +218,7 @@ ledger.bitcoin.Networks =
       to: 'toBTC'
     bip44_coin_type: '0'
     handleSegwit: no
+    isSegwitSupported: yes
     version:
       regular: 0
       P2SH: 5
@@ -236,6 +243,7 @@ ledger.bitcoin.Networks =
       to: 'toBTC'
     bip44_coin_type: '0'
     handleSegwit: yes
+    isSegwitSupported: yes
     version:
       regular: 0
       P2SH: 5
@@ -258,6 +266,7 @@ ledger.bitcoin.Networks =
       to: 'toBTC'
     bip44_coin_type: '1'
     handleSegwit: yes
+    isSegwitSupported: yes
     version:
       regular: 111
       P2SH: 196
@@ -280,6 +289,7 @@ ledger.bitcoin.Networks =
       to: 'toLTC'
     bip44_coin_type: '2'
     handleSegwit: no
+    isSegwitSupported: yes
     version:
       regular: 48
       P2SH: 5
@@ -301,6 +311,7 @@ ledger.bitcoin.Networks =
       to: 'toLTC'
     bip44_coin_type: '2'
     handleSegwit: no
+    isSegwitSupported: yes
     version:
       regular: 48
       P2SH: 50
@@ -322,6 +333,7 @@ ledger.bitcoin.Networks =
       to: 'toLTC'
     bip44_coin_type: '2'
     handleSegwit: yes
+    isSegwitSupported: yes
     version:
       regular: 48
       P2SH: 50
@@ -342,6 +354,7 @@ ledger.bitcoin.Networks =
       to: 'toDOGE'
     bip44_coin_type: '3'
     handleSegwit: no
+    isSegwitSupported: no
     version:
       regular: 30
       P2SH: 22
@@ -362,6 +375,7 @@ ledger.bitcoin.Networks =
       to: 'toDASH'
     bip44_coin_type: '5'
     handleSegwit: no
+    isSegwitSupported: no
     version:
       regular: 76
       P2SH: 16
@@ -382,6 +396,7 @@ ledger.bitcoin.Networks =
       to: 'toZEC'
     bip44_coin_type: '133'
     handleSegwit: no
+    isSegwitSupported: no
     version:
       regular: 0x1CB8
       P2SH: 0x1CBD
@@ -402,6 +417,7 @@ ledger.bitcoin.Networks =
       to: 'toCLUB'
     bip44_coin_type: '79'
     handleSegwit: no
+    isSegwitSupported: no
     version:
       regular: 28
       P2SH: 85
@@ -423,6 +439,7 @@ ledger.bitcoin.Networks =
       to: 'toSTRAT'
     bip44_coin_type: '105'
     handleSegwit: no
+    isSegwitSupported: no
     version:
       regular: 63
       P2SH: 125
@@ -444,6 +461,7 @@ ledger.bitcoin.Networks =
       to: 'toPPC'
     bip44_coin_type: '6'
     handleSegwit: no
+    isSegwitSupported: no
     version:
       regular: 55
       P2SH: 117
@@ -465,6 +483,7 @@ ledger.bitcoin.Networks =
       to: 'toKMD'
     bip44_coin_type: '141'
     handleSegwit: no
+    isSegwitSupported: no
     version:
       regular: 60
       P2SH: 85
@@ -485,6 +504,7 @@ ledger.bitcoin.Networks =
       to: 'toPOSW'
     bip44_coin_type: '47'
     handleSegwit: no
+    isSegwitSupported: no
     version:
       regular: 55
       P2SH: 85

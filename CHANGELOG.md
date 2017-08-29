@@ -1,7 +1,12 @@
 # Changelog
+1.9.3
+===
+- Update for HW and Nano devices
+- Fix parsing issues
+
 1.9.1 / 1.9.2
 ===
-- Fixed compatibility isues with old Litecoin app
+- Fixed compatibility issues with old Litecoin app
 
 1.9.0
 ===

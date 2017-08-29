@@ -65,7 +65,7 @@ class ledger.wallet.Transaction
     @_btInputs = []
     @_btcAssociatedKeyPath = []
     for input in inputs
-      splitTransaction = @dongle.splitTransaction(input, ledger.config.network.areTransactionTimestamped)
+      splitTransaction = @dongle.splitTransaction(input, ledger.config.network.areTransactionTimestamped, ledger.config.network.isSegwitSupported)
       @_btInputs.push [splitTransaction, input.output_index]
       @_btcAssociatedKeyPath.push input.paths[0]
 
