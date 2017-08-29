@@ -812,8 +812,8 @@ class @ledger.dongle.Dongle extends EventEmitter
       [Array<Byte>] script var length
     [Array<Byte>] locktime length is 4
   ###
-  splitTransaction: (input, areTransactionTimestamped) ->
-    @_btchip.splitTransaction(new ByteString(input.raw, HEX), areTransactionTimestamped)
+  splitTransaction: (input, areTransactionTimestamped, isSegwitSupported) ->
+    @_btchip.splitTransaction(new ByteString(input.raw, HEX), areTransactionTimestamped, isSegwitSupported)
 
   _sendApdu: (args...) ->
     apdu = new ByteString('', HEX)

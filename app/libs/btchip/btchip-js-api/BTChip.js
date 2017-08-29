@@ -1916,7 +1916,7 @@ var BTChip = Class.create({
         return new ByteString("fe" + Convert.toHexByte(value & 0xff) + Convert.toHexByte((value >> 8) & 0xff) + Convert.toHexByte((value >> 16) & 0xff) + Convert.toHexByte((value >> 24) & 0xff));
     },
 
-    splitTransaction: function (transaction, hasTimestamp) {
+    splitTransaction: function (transaction, hasTimestamp, isSegwitSupported) {
         var result = {};
         var inputs = [];
         var outputs = [];
@@ -1924,7 +1924,7 @@ var BTChip = Class.create({
         var witness = false;
         var version = transaction.bytes(offset, 4);
         offset += 4;
-        if (!hasTimestamp && (transaction.byteAt(offset) == 0) && (transaction.byteAt(offset + 1) != 0)) {
+        if (!hasTimestamp && isSegwitSupported && ((transaction.byteAt(offset) == 0) && (transaction.byteAt(offset + 1) != 0))) {
             offset += 2;
             witness = true;
         }        
@@ -1977,11 +1977,13 @@ var BTChip = Class.create({
         result['locktime'] = locktime;
         if (witness) {
             result['witness'] = witnessScript;
-        }        
-        // TODO : This conflicts with witness transactions - worry about it later, only affects Zcash so far
-        offset += 4;
-        if (offset != transaction.length) {
-            result['extraData'] = transaction.bytes(offset);
+        }      
+        else {  
+            // TODO : This conflicts with witness transactions - worry about it later, only affects Zcash so far
+            offset += 4;
+            if (offset != transaction.length) {
+                result['extraData'] = transaction.bytes(offset);
+            }
         }
         return result;
     },
