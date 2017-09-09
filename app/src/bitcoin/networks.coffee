@@ -126,6 +126,7 @@ ledger.bitcoin.Networks =
 
   viacoin:
     name: 'viacoin'
+    chain: 'Segwit'
     plural: 'viacoins'
     scheme: 'viacoin'
     bolosAppName: 'Viacoin'
@@ -134,6 +135,8 @@ ledger.bitcoin.Networks =
       from: 'fromVIA'
       to: 'toVIA'
     bip44_coin_type: '14'
+    handleSegwit: yes
+    isSegwitSupported: yes
     version:
       regular: 71
       P2SH: 33
