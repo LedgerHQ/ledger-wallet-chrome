@@ -24,7 +24,7 @@ class @WalletNavigationController extends ledger.common.ActionBarNavigationContr
 
   onAfterRender: () ->
     super
-    if !["0","1","145"].includes(ledger.config.network.bip44_coin_type)
+    if !["0","1","145", "2"].includes(ledger.config.network.bip44_coin_type)
       @view.chainsItem.css('opacity', '0.0')
     @view.flashContainer.hide()
     url = ledger.application.router.currentUrl

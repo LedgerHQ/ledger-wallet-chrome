@@ -1,4 +1,8 @@
 # Changelog
+1.9.4
+===
+- Fix faulty "remember me"
+
 1.9.3
 ===
 - Update for HW and Nano devices
