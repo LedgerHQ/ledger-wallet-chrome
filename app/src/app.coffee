@@ -90,15 +90,15 @@ require @ledger.imports, ->
         ledger.app.dongle.getCoinVersion().then ({P2PKH, P2SH, message}) =>
           l "Looking for #{P2PKH} #{P2SH}"
 
-          networks = []     
+          networks = []
           for k, v of ledger.bitcoin.Networks
             if v.version.regular is P2PKH and v.version.P2SH is P2SH
-              networks.push(v)  
+              networks.push(v)
           if networks.length >1
             l "many chains available"
             _.defer =>
               ledger.app.dongle.getPublicAddress "44'/#{networks[0].bip44_coin_type}'/0'/0/0", (addr) =>
-                address = ledger.crypto.SHA256.hashString addr
+                address = ledger.crypto.SHA256.hashString addr.bitcoinAddress.toString(ASCII)
                 ledger.app.chains.currentKey = address
                 ledger.storage.global.chainSelector.get address, (result) =>
                   l result
@@ -112,7 +112,7 @@ require @ledger.imports, ->
                           exists = k
                     if exists
                       @onChainChosen ledger.bitcoin.Networks[exists]
-                    else 
+                    else
                       if networks[0].name == 'litecoin'
                         ledger.app.router.go '/onboarding/device/chains/litecoin', {networks: JSON.stringify(networks)}
                       else
@@ -125,7 +125,7 @@ require @ledger.imports, ->
                     if networks[0].name == 'litecoin'
                         ledger.app.router.go '/onboarding/device/chains/litecoin', {networks: JSON.stringify(networks)}
                       else
-                        ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}  
+                        ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
           else
             ledger.app.chains.currentKey = ""
             @onChainChosen networks[0]
@@ -205,7 +205,7 @@ require @ledger.imports, ->
           @dongle = null
         else if reroute
           @dongle?.lock()
-        else 
+        else
           ledger.tasks.TickerTask.instance.startIfNeccessary()
       ledger.dialogs.manager.dismissAll(no)
       @router.go '/onboarding/device/plug' if @isInWalletMode() and reroute

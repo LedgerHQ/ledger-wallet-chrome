@@ -54,7 +54,7 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
     dialog = new OnboardingDeviceChainsRecoverDialogViewController()
     dialog.once 'click:recover', =>
       @chainChoosen(ledger.bitcoin.Networks.bitcoin_recover)
-    dialog.show()  
+    dialog.show()
 
   incompatible: () ->
     dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("onboarding.device.chains.bad_device_title"), subtitle: t('onboarding.device.chains.bad_device_message'))
@@ -74,9 +74,9 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
         @bitcoinCashSelected(e)
 
   chainChoosen: (e) ->
-    
+
     ledger.app.dongle.getPublicAddress "44'/#{@networks[0].bip44_coin_type}'/0'/0/0", (addr) =>
-      address = ledger.crypto.SHA256.hashString addr
+      address = ledger.crypto.SHA256.hashString addr.bitcoinAddress.toString(ASCII)
       tmp = {}
       if @view.remember.is(":checked")
         tmp[address]= e
