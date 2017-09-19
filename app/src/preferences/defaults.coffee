@@ -564,5 +564,20 @@ ledger.preferences.peercoin =
         name: 'Peercoin Blockchain Explorer'
         address: 'https://peercoin.mintr.org/tx/%s'
     discoveryGap: 20
+    
+ledger.preferences.qtum =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'QTUM'
+        unit: 8
+
+# Coin preferences
+  Coin:
+    explorers:
+      qtuminfo:
+        name: 'qtum.info'
+        address: 'https://qtum.info/tx/%s'
+    discoveryGap: 20
 
 ledger.preferences.common.setCoin("bitcoin")
