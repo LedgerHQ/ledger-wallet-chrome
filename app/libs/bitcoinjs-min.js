@@ -14777,6 +14777,20 @@
           feePerKb: 1e5,
           estimateFee: estimateFee("litecoin")
         },
+        gamecredits: {
+          magicPrefix: "Gamecredits Signed Message:\n",
+          bip32: {
+            "public": 27108450,
+            "private": 27106558
+          },
+          pubKeyHash: 38,
+          scriptHash: 5,
+          wif: 166,
+          dustThreshold: 0,
+          dustSoftThreshold: 1e5,
+          feePerKb: 1e5,
+          estimateFee: estimateFee("gamecredits")
+        },
         dogecoin: {
           magicPrefix: "Dogecoin Signed Message:\n",
           bip32: {
