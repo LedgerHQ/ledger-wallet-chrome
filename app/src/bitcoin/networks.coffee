@@ -521,7 +521,7 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: yes
-	
+
   gamecredits:
     name: 'gamecredits'
     display_name: 'gamecredits'
