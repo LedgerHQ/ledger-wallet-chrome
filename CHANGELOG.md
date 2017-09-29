@@ -1,4 +1,8 @@
 # Changelog
+1.9.5
+===
+- Add "Gamecredits support"
+
 1.9.4
 ===
 - Fix faulty "remember me"
