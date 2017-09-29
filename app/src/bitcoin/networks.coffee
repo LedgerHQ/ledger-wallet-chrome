@@ -1,3 +1,11 @@
+bitcoin.networks.gamecredits =
+  magicPrefix: '\x19Gamecredits Signed Message:\n',
+  bip32:
+    public: 0x019da462,
+    private: 0x05358394
+  pubKeyHash: 26
+  scriptHash: 5
+  
 bitcoin.networks.dash =
   magicPrefix: '\x19DarkCoin Signed Message:\n',
   bip32:
@@ -513,3 +521,26 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: yes
+
+  gamecredits:
+    name: 'gamecredits'
+    display_name: 'gamecredits'
+    chain: 'Gamecredits'
+    plural: 'gamecredits'
+    scheme: 'gamecredits:'
+    bolosAppName: 'Gamecredits'
+    ticker: 'game'
+    tickerKey:
+      from: 'fromGAME'
+      to: 'toGAME'
+    bip44_coin_type: '101'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 38
+      P2SH: 5
+      XPUB: 0x019D9CFE
+    bitcoinjs: bitcoin.networks.gamecredits
+    dust: 10000
+    handleFeePerByte: no
+
