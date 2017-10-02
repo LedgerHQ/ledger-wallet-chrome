@@ -150,9 +150,9 @@ class ledger.common.application.BaseApplication extends @EventEmitter
     self = @
     # Redirect every in-app link with our router
     $('body').delegate 'a', 'click', (e) ->
-      if @href? and @protocol == 'chrome-extension:'
+      if @href? #and @protocol == 'chrome-extension:'
         url = null
-        if  _.str.startsWith(@pathname, '/views/') and self.currentUrl?
+        if  @pathname.match(/.*\.html.*/) and self.currentUrl?
           url = ledger.url.createRelativeUrlWithFragmentedUrl(self.currentUrl, @href)
         else
           url = @pathname + @search + @hash
@@ -164,7 +164,7 @@ class ledger.common.application.BaseApplication extends @EventEmitter
       href = $(this).attr('data-href')
       if href? and href.length > 0
         parser = href.parseAsUrl()
-        if  _.str.startsWith(parser.pathname, '/views/') and self.currentUrl?
+        if  parser.pathname.match(/.*\.html.*/) and self.currentUrl?
           url = ledger.url.createRelativeUrlWithFragmentedUrl(self.currentUrl, href)
         else
           url = parser.pathname + parser.search + parser.hash

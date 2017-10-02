@@ -89,7 +89,7 @@ class ledger.i18n
     url = '/_locales/' + tag + '/messages.json'
     $.ajax
       dataType: "json",
-      url: url,
+      url: window.path + url,
       success: (data) ->
         ledger.i18n.translations[tag] = data
         d.resolve()
