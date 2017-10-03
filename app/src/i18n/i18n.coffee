@@ -87,6 +87,8 @@ class ledger.i18n
   @_loadTranslationFile: (tag) ->
     d = ledger.defer()
     url = '/_locales/' + tag + '/messages.json'
+    if (chrome.runtime.getBackgroundPage(() -> {} == 'electron-wrapper'))
+      url = window.path + url
     $.ajax
       dataType: "json",
       url: url,

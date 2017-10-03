@@ -10,11 +10,11 @@
 
 1.9.1 / 1.9.2
 ===
-- Fixed compatibility isues with old Litecoin app
+- Fixed compatibility issues with old Litecoin app
 
 1.9.0
 ===
-- Add Segwit suppport for Bitcoin, Bitcoin segwit2x and Litecoin
+- Add Segwit support for Bitcoin, Bitcoin segwit2x and Litecoin
 
 1.8.5
 ===
