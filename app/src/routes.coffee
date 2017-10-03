@@ -157,8 +157,7 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   # Help
   route '/wallet/help/index', (params) ->
-    dialog = new CommonDialogsHelpDialogViewController()
-    dialog.show()
+    window.open t 'application.support_url'
 
   ## Firmware Update
   route '/update/index', (params) ->
