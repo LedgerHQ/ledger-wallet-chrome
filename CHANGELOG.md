@@ -1,4 +1,8 @@
 # Changelog
+1.9.5
+===
+- Change customer support tab
+
 1.9.4
 ===
 - Fix faulty "remember me"
