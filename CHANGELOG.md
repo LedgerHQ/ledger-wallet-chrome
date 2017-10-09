@@ -1,4 +1,9 @@
 # Changelog
+1.9.5
+===
+- Change customer support tab
+- Changes to facilitate integration into an eletron environment
+
 1.9.4
 ===
 - Fix faulty "remember me"
