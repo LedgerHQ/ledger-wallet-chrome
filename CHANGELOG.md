@@ -1,7 +1,12 @@
 # Changelog
+1.9.6
+===
+- Add Gamecredits Support
+
 1.9.5
 ===
-- Add "Gamecredits support"
+- Change customer support tab
+- Changes to facilitate integration into an eletron environment
 
 1.9.4
 ===
