@@ -1,7 +1,7 @@
 # Changelog
 1.9.5
 ===
-- Change customer support tab
+- Change customer support tab and links
 - Changes to facilitate integration into an electron environment
 
 1.9.4
