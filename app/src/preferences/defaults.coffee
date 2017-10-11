@@ -463,6 +463,22 @@ ledger.preferences.zcash =
         address: 'https://explorer.zcha.in/transactions/%s'
     discoveryGap: 20
 
+ledger.preferences.zencash =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'ZEN'
+        unit: 8
+
+  # Coin preferences
+  Coin:
+    explorers:
+      zensystem:
+        name: 'ZenSystem Block Explorer'
+        address: 'https://explorer.zensystem.io/tx/%s'
+    discoveryGap: 20
+
+
 ledger.preferences.dash =
   Display:
     units:
