@@ -22,7 +22,6 @@ bitcoin.networks.zencash =
   pubKeyHash: 0x2089
   scriptHash: 0x2096
 
-
 bitcoin.networks.clubcoin =
   magicPrefix: '\x19ClubCoin Signed Message:\n'
   bip32:
