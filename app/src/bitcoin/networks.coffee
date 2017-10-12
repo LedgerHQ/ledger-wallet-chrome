@@ -588,7 +588,7 @@ ledger.bitcoin.Networks =
       to: 'toVTC'
     bip44_coin_type: '128'
     handleSegwit: no
-    isSegwitSupported: no
+    isSegwitSupported: yes
     version:
       regular: 0x073f
       P2SH: 0x071a
@@ -654,7 +654,7 @@ ledger.bitcoin.Networks =
       to: 'toVIA'
     bip44_coin_type: '14'
     handleSegwit: no
-    isSegwitSupported: no
+    isSegwitSupported: yes
     version:
       regular: 71
       P2SH: 33
