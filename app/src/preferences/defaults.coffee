@@ -565,4 +565,96 @@ ledger.preferences.peercoin =
         address: 'https://peercoin.mintr.org/tx/%s'
     discoveryGap: 20
 
+ledger.preferences.decred =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'DCR'
+        unit: 6
+      milibitcoin:
+        symbol: 'mDCR'
+        unit: 3
+
+# Coin preferences
+  Coin:
+    explorers:
+      decred:
+        name: 'Decred'
+        address: 'https://mainnet.decred.org/tx/%s'
+    discoveryGap: 20
+
+ledger.preferences.vertcoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'VTC'
+        unit: 6
+      milibitcoin:
+        symbol: 'mVTC'
+        unit: 3
+
+# Coin preferences
+  Coin:
+    explorers:
+      bitinfocharts:
+        name: 'BitInfoCharts'
+        address: 'https://bitinfocharts.com/vertcoin/tx/%s'
+    discoveryGap: 20
+
+ledger.preferences.stealthcoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'XST'
+        unit: 6
+      milibitcoin:
+        symbol: 'mXST'
+        unit: 3
+
+# Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'cryptoID'
+        address: 'https://chainz.cryptoid.info/xst/tx.dws?%s.htm'
+    discoveryGap: 20
+
+ledger.preferences.pivx =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'PIVX'
+        unit: 6
+      milibitcoin:
+        symbol: 'mPIVX'
+        unit: 3
+
+# Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/pivx/tx.dws?%s.htm'
+    discoveryGap: 20
+
+ledger.preferences.viacoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'VIA'
+        unit: 6
+      milibitcoin:
+        symbol: 'mVIA'
+        unit: 3
+
+# Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/via/tx.dws?%s.htm'
+    discoveryGap: 20
+
+
+
 ledger.preferences.common.setCoin("bitcoin")
