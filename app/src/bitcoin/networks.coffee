@@ -578,6 +578,7 @@ ledger.bitcoin.Networks =
 
   vertcoin:
     name: 'vertcoin'
+    chain: 'Vertcoin'
     display_name: 'vertcoin'
     plural: 'vertcoins'
     scheme: 'vertcoin:'
@@ -588,6 +589,29 @@ ledger.bitcoin.Networks =
       to: 'toVTC'
     bip44_coin_type: '128'
     handleSegwit: no
+    isSegwitSupported: yes
+    version:
+      regular: 0x073f
+      P2SH: 0x071a
+      XPUB: 0x02fda926
+    bitcoinjs: bitcoin.networks.vertcoin
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+  vertcoin_segwit:
+    name: 'vertcoin_segwit'
+    chain: 'Vertcoin Segwit'
+    display_name: 'vertcoin'
+    plural: 'vertcoins'
+    scheme: 'vertcoin:'
+    bolosAppName: 'vertcoin'
+    ticker: 'vtc'
+    tickerKey:
+      from: 'fromVTC'
+      to: 'toVTC'
+    bip44_coin_type: '128'
+    handleSegwit: yes
     isSegwitSupported: yes
     version:
       regular: 0x073f
@@ -644,6 +668,7 @@ ledger.bitcoin.Networks =
 
   viacoin:
     name: 'viacoin'
+    chain: 'Viacoin'
     display_name: 'viacoin'
     plural: 'viacoins'
     scheme: 'viacoin:'
@@ -663,3 +688,26 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: no
+
+    viacoin_segwit:
+      name: 'viacoin_segwit'
+      display_name: 'viacoin'
+      chain: 'Viacoin Segwit'
+      plural: 'viacoins'
+      scheme: 'viacoin:'
+      bolosAppName: 'viacoin'
+      ticker: 'via'
+      tickerKey:
+        from: 'fromVIA'
+        to: 'toVIA'
+      bip44_coin_type: '14'
+      handleSegwit: yes
+      isSegwitSupported: yes
+      version:
+        regular: 71
+        P2SH: 33
+        XPUB: 0x0488b21e
+      bitcoinjs: bitcoin.networks.pivx
+      dust: 10000
+      handleFeePerByte: no
+      areTransactionTimestamped: no

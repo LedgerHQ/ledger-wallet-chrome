@@ -601,6 +601,8 @@ ledger.preferences.vertcoin =
         address: 'https://bitinfocharts.com/vertcoin/tx/%s'
     discoveryGap: 20
 
+ledger.preferences.vertcoin_segwit = ledger.preferences.vertcoin
+
 ledger.preferences.stealthcoin =
   Display:
     units:
@@ -655,6 +657,6 @@ ledger.preferences.viacoin =
         address: 'https://chainz.cryptoid.info/via/tx.dws?%s.htm'
     discoveryGap: 20
 
-
+ledger.preferences.viacoin_segwit = ledger.preferences.viacoin
 
 ledger.preferences.common.setCoin("bitcoin")
