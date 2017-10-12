@@ -6,7 +6,11 @@ _.extend ledger.bitcoin,
   # Checks if a bitcoin address is valid or not
   # @param [String] address The bitcoin address to check
   # @return [Boolean] true if the address is valid otherwise no
-  verifyAddress: (address) -> ledger.bitcoin.checkAddress(address)
+  verifyAddress: (address) ->
+                if ledger.config.network.name == 'decred'
+                        ledger.bitcoin.checkAddressBlake(address)
+                else
+                        ledger.bitcoin.checkAddress(address)
 
   estimateTransactionSize: (inputsCount, outputsCount) ->
   	if inputsCount < 0xfd

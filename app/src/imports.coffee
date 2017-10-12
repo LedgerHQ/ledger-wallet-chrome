@@ -1,6 +1,7 @@
 @ledger =
       imports: [
         'build'
+        '../libs/blake_hash_browserified'
         '../libs/base64'
         '../libs/jquery-2.1.1.min'
         '../libs/jquery.color'

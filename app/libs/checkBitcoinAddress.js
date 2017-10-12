@@ -103,4 +103,19 @@
         return true;
     }
 
+    ledger.bitcoin.checkAddressBlake = function (address) {
+        var decoded = hex2a(ia2hex(bs58.decode(address)));
+        var cksum = decoded.substr(-4);
+        var rest = decoded.substr(0, decoded.length - 4);
+        var blake256 = blake.createhash('blake256')
+        var hash = blake256.update(rest).digest()
+        blake256 = blake.createhash('blake256')
+        hash = blake256.update(hash).digest('hex')
+        var good_cksum = hex2a(hash).substr(0, 4);
+
+        var version = parseInt(new ByteString(rest.substr(0, rest.length - 20), ASCII).toString(HEX), 16);
+        if (cksum != good_cksum || (version !== ledger.config.network.version.P2SH && version !== ledger.config.network.version.regular)) return false;
+        return true;
+    }
+
 })()
