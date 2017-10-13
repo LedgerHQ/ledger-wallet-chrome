@@ -93,9 +93,9 @@ registerExtendedPublicKeyForPath = (path) ->
     return
   sendCommand 'private:getXpubFromCache', [path], (xpu58, error) =>
     ExtendedPublicKeys[path] = new ledger.wallet.ExtendedPublicKey(ledger.app.dongle, path)
-    #xpu58 = {
-    #  "44'/0'/0'": "xpub6D4VVWVaKLG3RWGmyKZyjnEbDJuHyjXLZ86X2fGmqYmziMQiALeEF3wEJYrqXqaHrPnqVXWER6Y1jbBbpcG5SvQvmbg1bJCrCo1qCHtCSmU"
-    #}[path]
+    # xpu58 = {
+    #   "49'/0'/0'": "xpub6C5Wnmut8VuqtkzDUVNiHYK7mb4Y4c8Z3PyqpTFoYRYtcDhF8N9DepXoP2dtSsohSAW9oAU4fmmctnq4jxB6j3nF7cdUguEFgPzQoTwsX3T"
+    # }[path]
     if xpu58?
       ExtendedPublicKeys[path].initializeWithBase58(xpu58)
       postResult 'registered'
