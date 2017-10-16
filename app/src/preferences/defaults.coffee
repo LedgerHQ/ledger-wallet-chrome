@@ -565,23 +565,6 @@ ledger.preferences.peercoin =
         address: 'https://peercoin.mintr.org/tx/%s'
     discoveryGap: 20
 
-ledger.preferences.decred =
-  Display:
-    units:
-      bitcoin:
-        symbol: 'DCR'
-        unit: 6
-      milibitcoin:
-        symbol: 'mDCR'
-        unit: 3
-
-# Coin preferences
-  Coin:
-    explorers:
-      decred:
-        name: 'Decred'
-        address: 'https://mainnet.decred.org/tx/%s'
-    discoveryGap: 20
 
 ledger.preferences.vertcoin =
   Display:
@@ -599,6 +582,9 @@ ledger.preferences.vertcoin =
       bitinfocharts:
         name: 'BitInfoCharts'
         address: 'https://bitinfocharts.com/vertcoin/tx/%s'
+      vertcoin:
+        name: 'Vertcoin.com'
+        address: 'https://explorer.vertcoin.org/tx/%s'
     discoveryGap: 20
 
 ledger.preferences.vertcoin_segwit = ledger.preferences.vertcoin
@@ -619,6 +605,9 @@ ledger.preferences.stealthcoin =
       cryptoID:
         name: 'cryptoID'
         address: 'https://chainz.cryptoid.info/xst/tx.dws?%s.htm'
+      stealthcoin:
+        name: 'Stealthcoin.com'
+        address: 'http://chain.stealthcoin.com:3001/tx/%s'
     discoveryGap: 20
 
 ledger.preferences.pivx =
@@ -637,6 +626,9 @@ ledger.preferences.pivx =
       cryptoID:
         name: 'CryptoID'
         address: 'https://chainz.cryptoid.info/pivx/tx.dws?%s.htm'
+      pivxscan:
+        name: 'PivxScan'
+        address: 'https://pivxscan.io/tx/%s'
     discoveryGap: 20
 
 ledger.preferences.viacoin =
@@ -655,6 +647,9 @@ ledger.preferences.viacoin =
       cryptoID:
         name: 'CryptoID'
         address: 'https://chainz.cryptoid.info/via/tx.dws?%s.htm'
+      prohashing:
+        name: 'prohashing.com'
+        address: 'https://prohashing.com/explorer/Viacoin/%s'
     discoveryGap: 20
 
 ledger.preferences.viacoin_segwit = ledger.preferences.viacoin
