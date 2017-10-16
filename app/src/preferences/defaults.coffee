@@ -571,10 +571,10 @@ ledger.preferences.vertcoin =
     units:
       bitcoin:
         symbol: 'VTC'
-        unit: 6
+        unit: 8
       milibitcoin:
         symbol: 'mVTC'
-        unit: 3
+        unit: 5
 
 # Coin preferences
   Coin:
@@ -594,10 +594,10 @@ ledger.preferences.stealthcoin =
     units:
       bitcoin:
         symbol: 'XST'
-        unit: 6
+        unit: 8
       milibitcoin:
         symbol: 'mXST'
-        unit: 3
+        unit: 5
 
 # Coin preferences
   Coin:
@@ -615,10 +615,10 @@ ledger.preferences.pivx =
     units:
       bitcoin:
         symbol: 'PIVX'
-        unit: 6
+        unit: 8
       milibitcoin:
         symbol: 'mPIVX'
-        unit: 3
+        unit: 5
 
 # Coin preferences
   Coin:
@@ -636,10 +636,10 @@ ledger.preferences.viacoin =
     units:
       bitcoin:
         symbol: 'VIA'
-        unit: 6
+        unit: 8
       milibitcoin:
         symbol: 'mVIA'
-        unit: 3
+        unit: 5
 
 # Coin preferences
   Coin:

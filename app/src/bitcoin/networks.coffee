@@ -55,7 +55,7 @@ bitcoin.networks.poswallet =
   scriptHash: 85
 
 bitcoin.networks.vertcoin =
-  magicPrefix: '\x1aVertcoin Signed Message:\n'
+  magicPrefix: '\x19Vertcoin Signed Message:\n'
   bip32:
     public: 0x0488B21E,
     private: 0x05358394
@@ -63,7 +63,7 @@ bitcoin.networks.vertcoin =
   scriptHash: 5
 
 bitcoin.networks.stealthcoin =
-  magicPrefix: '\x1aStealthCoin Signed Message:\n'
+  magicPrefix: '\x1cStealthCoin Signed Message:\n'
   bip32:
     public: 0x8f624b66,
     private: 0x05358394
@@ -71,7 +71,7 @@ bitcoin.networks.stealthcoin =
   scriptHash: 85
 
 bitcoin.networks.pivx =
-  magicPrefix: '\x1aPIVX Signed Message:\n'
+  magicPrefix: '\x18DarkNet Signed Message:\n'
   bip32:
     public: 0x022D2533,
     private: 0x05358394
@@ -79,9 +79,9 @@ bitcoin.networks.pivx =
   scriptHash: 13
 
 bitcoin.networks.viacoin =
-  magicPrefix: '\x1aViacoin Signed Message:\n'
+  magicPrefix: '\x18Viacoin Signed Message:\n'
   bip32:
-    public: 0x0488b21e,
+    public: 0x0488B21E,
     private: 0x05358394
   pubKeyHash: 71
   scriptHash: 33
@@ -563,7 +563,7 @@ ledger.bitcoin.Networks =
     version:
       regular: 71
       P2SH: 5
-      XPUB: 0x02fda926
+      XPUB: 0x0488B21E
     bitcoinjs: bitcoin.networks.vertcoin
     dust: 10000
     handleFeePerByte: no
@@ -586,7 +586,7 @@ ledger.bitcoin.Networks =
     version:
       regular: 71
       P2SH: 5
-      XPUB: 0x02fda926
+      XPUB: 0x0488B21E
     bitcoinjs: bitcoin.networks.vertcoin
     dust: 10000
     handleFeePerByte: no
@@ -653,8 +653,8 @@ ledger.bitcoin.Networks =
     version:
       regular: 71
       P2SH: 33
-      XPUB: 0x0488b21e
-    bitcoinjs: bitcoin.networks.pivx
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.viacoin
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: no
@@ -676,8 +676,8 @@ ledger.bitcoin.Networks =
       version:
         regular: 71
         P2SH: 33
-        XPUB: 0x0488b21e
-      bitcoinjs: bitcoin.networks.pivx
+        XPUB: 0x0488B21E
+      bitcoinjs: bitcoin.networks.viacoin
       dust: 10000
       handleFeePerByte: no
       areTransactionTimestamped: no
