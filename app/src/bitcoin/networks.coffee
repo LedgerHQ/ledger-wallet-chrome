@@ -561,8 +561,8 @@ ledger.bitcoin.Networks =
     handleSegwit: no
     isSegwitSupported: yes
     version:
-      regular: 0x073f
-      P2SH: 0x071a
+      regular: 71
+      P2SH: 5
       XPUB: 0x02fda926
     bitcoinjs: bitcoin.networks.vertcoin
     dust: 10000
@@ -584,8 +584,8 @@ ledger.bitcoin.Networks =
     handleSegwit: yes
     isSegwitSupported: yes
     version:
-      regular: 0x073f
-      P2SH: 0x071a
+      regular: 71
+      P2SH: 5
       XPUB: 0x02fda926
     bitcoinjs: bitcoin.networks.vertcoin
     dust: 10000
@@ -659,7 +659,7 @@ ledger.bitcoin.Networks =
     handleFeePerByte: no
     areTransactionTimestamped: no
 
-    viacoin_segwit:
+  viacoin_segwit:
       name: 'viacoin_segwit'
       display_name: 'viacoin'
       chain: 'Viacoin Segwit'
