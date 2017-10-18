@@ -130,6 +130,9 @@ ledger.preferences.bitcoin =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin/transaction/'
     discoveryGap: 20
 
 ledger.preferences.bitcoin_segwit =
@@ -218,6 +221,9 @@ ledger.preferences.bitcoin_cash_unsplit =
       blockchain:
         name: 'blockdozer.com'
         address: 'http://blockdozer.com/insight/tx/%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin-cash/transaction/'
     discoveryGap: 20  
 
 ledger.preferences.bitcoin_cash_split =
@@ -239,6 +245,9 @@ ledger.preferences.bitcoin_cash_split =
       blockchain:
         name: 'blockdozer.com'
         address: 'http://blockdozer.com/insight/tx/%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin-cash/transaction/'
     discoveryGap: 20    
 
 ledger.preferences.bitcoin_segwit2x =
@@ -272,6 +281,9 @@ ledger.preferences.bitcoin_segwit2x =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin/transaction/'
     discoveryGap: 20  
 
 ledger.preferences.bitcoin_segwit2x_segwit =
@@ -338,6 +350,9 @@ ledger.preferences.bitcoin_uasf =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin/transaction/'
     discoveryGap: 20    
 
 ledger.preferences.testnet =
@@ -368,6 +383,9 @@ ledger.preferences.testnet =
       insight:
         name: 'Insight.is'
         address: 'https://test-insight.bitpay.com/tx/%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin/transaction/'
     discoveryGap: 20
 
 ledger.preferences.litecoin =
