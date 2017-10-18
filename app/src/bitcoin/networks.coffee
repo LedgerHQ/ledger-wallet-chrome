@@ -612,7 +612,7 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.stealthcoin
     dust: 10000
     handleFeePerByte: no
-    areTransactionTimestamped: yes
+    areTransactionTimestamped: yes 
 
   pivx:
     name: 'pivx'

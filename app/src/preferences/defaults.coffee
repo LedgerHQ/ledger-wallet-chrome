@@ -594,10 +594,10 @@ ledger.preferences.stealthcoin =
     units:
       bitcoin:
         symbol: 'XST'
-        unit: 8
+        unit: 6
       milibitcoin:
         symbol: 'mXST'
-        unit: 5
+        unit: 3
 
 # Coin preferences
   Coin:
