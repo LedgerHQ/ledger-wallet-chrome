@@ -1,4 +1,8 @@
 # Changelog
+1.9.6
+===
+- Add support for PIVX, Vertcoin, Viacoin
+
 1.9.5
 ===
 - Change customer support tab and links

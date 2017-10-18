@@ -113,7 +113,7 @@ require @ledger.imports, ->
                     if exists
                       @onChainChosen ledger.bitcoin.Networks[exists]
                     else
-                      if networks[0].name == 'litecoin'
+                      if networks[0].name != 'bitcoin'
                         ledger.app.router.go '/onboarding/device/chains/litecoin', {networks: JSON.stringify(networks)}
                       else
                         ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
@@ -122,10 +122,10 @@ require @ledger.imports, ->
                     tmp[address]= ledger.bitcoin.Networks.bitcoin
                     ledger.storage.global.chainSelector.set tmp, =>
                       ledger.app.onChainChosen(ledger.bitcoin.Networks.bitcoin)###
-                    if networks[0].name == 'litecoin'
-                        ledger.app.router.go '/onboarding/device/chains/litecoin', {networks: JSON.stringify(networks)}
-                      else
-                        ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
+                    if networks[0].name != 'bitcoin'
+                      ledger.app.router.go '/onboarding/device/chains/litecoin', {networks: JSON.stringify(networks)}
+                    else
+                      ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
           else
             ledger.app.chains.currentKey = ""
             @onChainChosen networks[0]
