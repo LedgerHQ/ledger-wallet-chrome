@@ -614,10 +614,10 @@ ledger.preferences.pivx =
   Display:
     units:
       bitcoin:
-        symbol: 'PIVX'
+        symbol: 'PIV'
         unit: 8
       milibitcoin:
-        symbol: 'mPIVX'
+        symbol: 'mPIV'
         unit: 5
 
 # Coin preferences
@@ -626,9 +626,9 @@ ledger.preferences.pivx =
       cryptoID:
         name: 'CryptoID'
         address: 'https://chainz.cryptoid.info/pivx/tx.dws?%s.htm'
-      pivxscan:
-        name: 'PivxScan'
-        address: 'https://pivxscan.io/tx/%s'
+      Presstab:
+        name: 'Presstab'
+        address: 'http://presstab.pw/phpexplorer/PIVX/tx.php?tx=%s'
     discoveryGap: 20
 
 ledger.preferences.viacoin =
