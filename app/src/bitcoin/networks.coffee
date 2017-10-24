@@ -62,6 +62,38 @@ bitcoin.networks.poswallet =
   pubKeyHash: 55
   scriptHash: 85
 
+bitcoin.networks.vertcoin =
+  magicPrefix: '\x19Vertcoin Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x05358394
+  pubKeyHash: 71
+  scriptHash: 5
+
+bitcoin.networks.stealthcoin =
+  magicPrefix: '\x1cStealthCoin Signed Message:\n'
+  bip32:
+    public: 0x8f624b66,
+    private: 0x05358394
+  pubKeyHash: 62
+  scriptHash: 85
+
+bitcoin.networks.pivx =
+  magicPrefix: '\x18DarkNet Signed Message:\n'
+  bip32:
+    public: 0x022D2533,
+    private: 0x05358394
+  pubKeyHash: 30
+  scriptHash: 13
+
+bitcoin.networks.viacoin =
+  magicPrefix: '\x18Viacoin Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x05358394
+  pubKeyHash: 71
+  scriptHash: 33
+
 ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
   bitcoin:
@@ -543,3 +575,139 @@ zencash:
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: yes
+
+  vertcoin:
+    name: 'vertcoin'
+    chain: 'Vertcoin'
+    display_name: 'vertcoin'
+    plural: 'vertcoins'
+    scheme: 'vertcoin:'
+    bolosAppName: 'vertcoin'
+    ticker: 'vtc'
+    tickerKey:
+      from: 'fromVTC'
+      to: 'toVTC'
+    bip44_coin_type: '128'
+    handleSegwit: no
+    isSegwitSupported: yes
+    version:
+      regular: 71
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.vertcoin
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+  vertcoin_segwit:
+    name: 'vertcoin_segwit'
+    chain: 'Vertcoin Segwit'
+    display_name: 'vertcoin'
+    plural: 'vertcoins'
+    scheme: 'vertcoin:'
+    bolosAppName: 'vertcoin'
+    ticker: 'vtc'
+    tickerKey:
+      from: 'fromVTC'
+      to: 'toVTC'
+    bip44_coin_type: '128'
+    handleSegwit: yes
+    isSegwitSupported: yes
+    version:
+      regular: 71
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.vertcoin
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+  stealthcoin:
+    name: 'stealthcoin'
+    display_name: 'stealthcoin'
+    plural: 'stealthcoins'
+    scheme: 'stealthcoin:'
+    bolosAppName: 'stealthcoin'
+    ticker: 'xst'
+    tickerKey:
+      from: 'fromXST'
+      to: 'toXST'
+    bip44_coin_type: '125'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 62
+      P2SH: 85
+      XPUB: 0x8f624b66
+    bitcoinjs: bitcoin.networks.stealthcoin
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: yes 
+
+  pivx:
+    name: 'pivx'
+    display_name: 'pivx'
+    plural: 'pivx'
+    scheme: 'pivx:'
+    bolosAppName: 'pivx'
+    ticker: 'pivx'
+    tickerKey:
+      from: 'fromPIVX'
+      to: 'toPIVX'
+    bip44_coin_type: '77'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 30
+      P2SH: 13
+      XPUB: 0x022D2533
+    bitcoinjs: bitcoin.networks.pivx
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+  viacoin:
+    name: 'viacoin'
+    chain: 'Viacoin'
+    display_name: 'viacoin'
+    plural: 'viacoins'
+    scheme: 'viacoin:'
+    bolosAppName: 'viacoin'
+    ticker: 'via'
+    tickerKey:
+      from: 'fromVIA'
+      to: 'toVIA'
+    bip44_coin_type: '14'
+    handleSegwit: no
+    isSegwitSupported: yes
+    version:
+      regular: 71
+      P2SH: 33
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.viacoin
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+  viacoin_segwit:
+      name: 'viacoin_segwit'
+      display_name: 'viacoin'
+      chain: 'Viacoin Segwit'
+      plural: 'viacoins'
+      scheme: 'viacoin:'
+      bolosAppName: 'viacoin'
+      ticker: 'via'
+      tickerKey:
+        from: 'fromVIA'
+        to: 'toVIA'
+      bip44_coin_type: '14'
+      handleSegwit: yes
+      isSegwitSupported: yes
+      version:
+        regular: 71
+        P2SH: 33
+        XPUB: 0x0488B21E
+      bitcoinjs: bitcoin.networks.viacoin
+      dust: 10000
+      handleFeePerByte: no
+      areTransactionTimestamped: no

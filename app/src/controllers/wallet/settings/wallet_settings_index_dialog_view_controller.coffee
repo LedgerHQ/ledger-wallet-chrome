@@ -5,7 +5,7 @@ class @WalletSettingsIndexDialogViewController extends ledger.common.DialogViewC
 
   onAfterRender: () ->
     super
-    if ledger.app.chains.currentKey == ""
+    if !ledger.config.network.chain?
       @view.chain.css('opacity', '0.0')
       @view.chain.css('pointer-events', 'none')
   

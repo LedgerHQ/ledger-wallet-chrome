@@ -22,6 +22,8 @@
         <td class="align-right">
           <input id="fees_per_byte" class="text-input" value="<%= @feesPerByte %>"/>
           <label class="text-input"><%= t 'wallet.send.index.satoshi_per_byte' %></label>
+          </br>
+          <div id="fees_validation" class="regular-grey-text-small">
         </td>
       </tr>
       <tr class="no-border">
@@ -34,6 +36,7 @@
     </tbody>
   </table>
   <div id="check"></div>
+  
 </section>
 <div id="error_container"></div>
 <div class="dialog-actions-bar">

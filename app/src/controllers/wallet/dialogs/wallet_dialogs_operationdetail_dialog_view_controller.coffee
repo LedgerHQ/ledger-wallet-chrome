@@ -27,18 +27,24 @@ class @WalletDialogsOperationdetailDialogViewController extends ledger.common.Di
       return if not @isShown()
       e error
       if error?
-        reason = switch error.code
-          when ledger.errors.NetworkError then 'network_no_response'
-          when ledger.errors.NotEnoughFunds then 'unsufficient_balance'
-          when ledger.errors.NotEnoughFundsConfirmed then 'unsufficient_balance'
-          when ledger.errors.TransactionAlreadyConfirmed then 'transaction_already_confirmed'
-          when ledger.errors.DustTransaction then 'dust_transaction'
-          when ledger.errors.TransactionNotEligible then 'transaction_not_eligible'
-          when ledger.errors.ChangeDerivationError then 'change_derivation_error'
-          else 'error_occurred'
+        if error.code == ledger.errors.FeesTooLow
+          @view.cpfpButton.removeClass('disabled')
+          return if not @isShown()
+          dialog = new WalletSendCpfpDialogViewController({transaction: error.payload, account, operation: @operation})
+          dialog.show()
+        else
+          reason = switch error.code
+            when ledger.errors.NetworkError then 'network_no_response'
+            when ledger.errors.NotEnoughFunds then 'unsufficient_balance'
+            when ledger.errors.NotEnoughFundsConfirmed then 'unsufficient_balance'
+            when ledger.errors.TransactionAlreadyConfirmed then 'transaction_already_confirmed'
+            when ledger.errors.DustTransaction then 'dust_transaction'
+            when ledger.errors.TransactionNotEligible then 'transaction_not_eligible'
+            when ledger.errors.ChangeDerivationError then 'change_derivation_error'
+            else 'error_occurred'
 
-        errorMessage = switch reason
-          when 'dust_transaction' then _.str.sprintf(t("common.errors." + reason), ledger.formatters.formatValue(ledger.wallet.Transaction.MINIMUM_OUTPUT_VALUE))
-          else t("common.errors." + reason)
-        dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.cpfp_failed"), subtitle: errorMessage)
-        dialog.show()
+          errorMessage = switch reason
+            when 'dust_transaction' then _.str.sprintf(t("common.errors." + reason), ledger.formatters.formatValue(ledger.wallet.Transaction.MINIMUM_OUTPUT_VALUE))
+            else t("common.errors." + reason)
+          dialog = new CommonDialogsMessageDialogViewController(kind: "error", title: t("wallet.send.errors.cpfp_failed"), subtitle: errorMessage)
+          dialog.show()

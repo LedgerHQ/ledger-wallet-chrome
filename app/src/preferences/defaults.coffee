@@ -581,4 +581,93 @@ ledger.preferences.peercoin =
         address: 'https://peercoin.mintr.org/tx/%s'
     discoveryGap: 20
 
+
+ledger.preferences.vertcoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'VTC'
+        unit: 8
+      milibitcoin:
+        symbol: 'mVTC'
+        unit: 5
+
+# Coin preferences
+  Coin:
+    explorers:
+      bitinfocharts:
+        name: 'BitInfoCharts'
+        address: 'https://bitinfocharts.com/vertcoin/tx/%s'
+      vertcoin:
+        name: 'Vertcoin.com'
+        address: 'https://explorer.vertcoin.org/tx/%s'
+    discoveryGap: 20
+
+ledger.preferences.vertcoin_segwit = ledger.preferences.vertcoin
+
+ledger.preferences.stealthcoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'XST'
+        unit: 6
+      milibitcoin:
+        symbol: 'mXST'
+        unit: 3
+
+# Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'cryptoID'
+        address: 'https://chainz.cryptoid.info/xst/tx.dws?%s.htm'
+      stealthcoin:
+        name: 'Stealthcoin.com'
+        address: 'http://chain.stealthcoin.com:3001/tx/%s'
+    discoveryGap: 20
+
+ledger.preferences.pivx =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'PIV'
+        unit: 8
+      milibitcoin:
+        symbol: 'mPIV'
+        unit: 5
+
+# Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/pivx/tx.dws?%s.htm'
+      Presstab:
+        name: 'Presstab'
+        address: 'http://presstab.pw/phpexplorer/PIVX/tx.php?tx=%s'
+    discoveryGap: 20
+
+ledger.preferences.viacoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'VIA'
+        unit: 8
+      milibitcoin:
+        symbol: 'mVIA'
+        unit: 5
+
+# Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/via/tx.dws?%s.htm'
+      prohashing:
+        name: 'prohashing.com'
+        address: 'https://prohashing.com/explorer/Viacoin/%s'
+    discoveryGap: 20
+
+ledger.preferences.viacoin_segwit = ledger.preferences.viacoin
+
 ledger.preferences.common.setCoin("bitcoin")

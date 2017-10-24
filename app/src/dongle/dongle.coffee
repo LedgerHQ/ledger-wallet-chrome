@@ -741,7 +741,6 @@ class @ledger.dongle.Dongle extends EventEmitter
         outputScript = outputScript
           .concat(ledger.Amount.fromSatoshi(0).toScriptByteString())
           .concat(OpReturnScript(data))
-
       task = =>
         if ledger.config.network.ticker == 'abc'
           promise = @_btchip.createPaymentTransactionNewBIP143_async(
