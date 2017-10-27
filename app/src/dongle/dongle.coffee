@@ -633,16 +633,16 @@ class @ledger.dongle.Dongle extends EventEmitter
   @param [Object] resumeData
   @return [Q.Promise] Resolve with resumeData
   ###
-  createPaymentTransaction: (inputs, associatedKeysets, changePath, changeAddress, recipientAddress, amount, fees, data, lockTime, sighashType, authorization, resumeData) ->
+  createPaymentTransaction: (inputs, associatedKeysets, changePath, changeAddress, outputs, fees, data, lockTime, sighashType, authorization, resumeData) ->
     if resumeData?
       resumeData = _.clone(resumeData)
       resumeData.scriptData = new ByteString(resumeData.scriptData, HEX)
       resumeData.trustedInputs = (new ByteString(trustedInput, HEX) for trustedInput in resumeData.trustedInputs)
       resumeData.publicKeys = (new ByteString(publicKey, HEX) for publicKey in resumeData.publicKeys)
     if @getFirmwareInformation().isUsingInputFinalizeFull()
-      @_createPaymentTransactionNew(inputs, associatedKeysets, changePath, changeAddress, recipientAddress, amount, fees, lockTime, sighashType, authorization, data, resumeData)
+      @_createPaymentTransactionNew(inputs, associatedKeysets, changePath, changeAddress, outputs, fees, lockTime, sighashType, authorization, data, resumeData)
     else
-      @_createPaymentTransaction(inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData)
+      @_createPaymentTransaction(inputs, associatedKeysets, changePath, outputs[0][0], outputs[0][1], fees, lockTime, sighashType, authorization, resumeData)
 
   _createPaymentTransaction: (inputs, associatedKeysets, changePath, recipientAddress, amount, fees, lockTime, sighashType, authorization, resumeData) ->
     _btchipQueue.enqueue "createPaymentTransaction", =>
@@ -667,8 +667,11 @@ class @ledger.dongle.Dongle extends EventEmitter
         return result
       )
 
-  _createPaymentTransactionNew: (inputs, associatedKeysets, changePath, changeAddress, recipientAddress, amount, fees, lockTime, sighashType, authorization, data, resumeData) ->
+  _createPaymentTransactionNew: (inputs, associatedKeysets, changePath, changeAddress, outputs, fees, lockTime, sighashType, authorization, data, resumeData) ->
     @getPublicAddress(changePath).then (result) =>
+      amount = new ledger.Amount()
+      for pair in outputs
+        amount = amount.add(pair[1])
       changeAddress2 = result.bitcoinAddress.toString(ASCII)
       inputAmounts = do =>
         for [prevTx, index], i in inputs
@@ -727,11 +730,11 @@ class @ledger.dongle.Dongle extends EventEmitter
         VI(script.length).concat(script)
 
 
-      numberOfOutputs = 1 + (if (changeAmount.lte(0)) then 0 else 1) + (if (data?) then 1 else 0)
+      numberOfOutputs = outputs.length + (if (changeAmount.lte(0)) then 0 else 1) + (if (data?) then 1 else 0)
       outputScript =
         VI(numberOfOutputs)
-        .concat(amount.toScriptByteString())
-        .concat(PkScript(recipientAddress))
+      for pair in outputs
+        outputScript = outputScript.concat(pair[1].toScriptByteString()).concat(PkScript(pair[0]))
 
       if changeAmount.gt(0)
         outputScript = outputScript

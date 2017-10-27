@@ -34,6 +34,7 @@ class ledger.wallet.Transaction
   recipientAddress: undefined
   # @property [Array<Object>]
   inputs: undefined
+
   # @property [String]
   changePath: undefined
   # @property [String]
@@ -148,7 +149,7 @@ class ledger.wallet.Transaction
     if not @amount? or not @fees? or not @recipientAddress?
       Errors.throw('Transaction must me initialized before preparation')
     d = ledger.defer(callback)
-    @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @changeAddress, @recipientAddress, @amount, @fees, @data)
+    @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @changeAddress, [[@recipientAddress, @amount]], @fees, @data)
     .progress (progress) =>
       currentStep = progress.currentPublicKey + progress.currentSignTransaction + progress.currentTrustedInput + progress.currentHashOutputBase58 + progress.currentUntrustedHash
       stepsCount = progress.publicKeyCount + progress.transactionSignCount + progress.trustedInputsCount + progress.hashOutputBase58Count + progress.untrustedHashCount
@@ -173,7 +174,7 @@ class ledger.wallet.Transaction
 
   sign: (callback = undefined, progressCallback = undefined) ->
     d = ledger.defer(callback)
-    @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @changeAddress, @recipientAddress, @amount, @fees, @data)
+    @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @changeAddress, [[@recipientAddress, @amount]], @fees, @data)
     .progress (progress) =>
       d.notify(progress)
     .then (@_signedRawTransaction) =>
@@ -205,7 +206,7 @@ class ledger.wallet.Transaction
       Errors.throw('Transaction must me prepared before validation')
     d = ledger.defer(callback)
     @dongle.createPaymentTransaction(
-      @_btInputs, @_btcAssociatedKeyPath, @changePath, @changeAddress, @recipientAddress, @amount, @fees, @data,
+      @_btInputs, @_btcAssociatedKeyPath, @changePath, @changeAddress, [[@recipientAddress, @amount]], @fees, @data,
       undefined, # Default lockTime
       undefined, # Default sigHash
       validationKey,

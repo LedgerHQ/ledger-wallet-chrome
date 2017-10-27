@@ -16,7 +16,7 @@ class @Api
         @hasSession(data)
       when 'bitid'
         @bitid(data)
-      when  'send_payment'
+      when 'send_payment'
         @sendPayment(data)
       when 'sign_message'
         @signMessage(data)
