@@ -305,7 +305,7 @@ ledger.bitcoin.Networks =
       XPUB: 0x043587CF
     bitcoinjs: bitcoin.networks.testnet
     ws_chain: 'testnet3'
-    dust: 5430
+    dust: -1
     handleFeePerByte: yes
 
   litecoin_old:

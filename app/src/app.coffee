@@ -156,6 +156,7 @@ require @ledger.imports, ->
               ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() unless result.operation_consumption
 
     onDongleIsDisconnected: (dongle) ->
+      return if @hodl
       @emit 'dongle:disconnected'
       ledger.utils.Logger.setPrivateModeEnabled off
       return unless @isInWalletMode()
