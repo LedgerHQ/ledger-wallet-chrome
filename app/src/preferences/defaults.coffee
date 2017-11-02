@@ -130,6 +130,9 @@ ledger.preferences.bitcoin =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin/transaction/%s'
     discoveryGap: 20
 
 ledger.preferences.bitcoin_segwit =
@@ -163,6 +166,9 @@ ledger.preferences.bitcoin_segwit =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin/transaction/%s'
     discoveryGap: 20
 
 
@@ -197,6 +203,9 @@ ledger.preferences.bitcoin_recover =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin/transaction/%s'        
     discoveryGap: 20    
 
 ledger.preferences.bitcoin_cash_unsplit =
@@ -218,6 +227,9 @@ ledger.preferences.bitcoin_cash_unsplit =
       blockchain:
         name: 'blockdozer.com'
         address: 'http://blockdozer.com/insight/tx/%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin-cash/transaction/%s'        
     discoveryGap: 20  
 
 ledger.preferences.bitcoin_cash_split =
@@ -239,6 +251,9 @@ ledger.preferences.bitcoin_cash_split =
       blockchain:
         name: 'blockdozer.com'
         address: 'http://blockdozer.com/insight/tx/%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin-cash/transaction/%s'                
     discoveryGap: 20    
 
 ledger.preferences.bitcoin_segwit2x =
@@ -272,6 +287,9 @@ ledger.preferences.bitcoin_segwit2x =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin/transaction/%s'                
     discoveryGap: 20  
 
 ledger.preferences.bitcoin_segwit2x_segwit =
@@ -305,6 +323,9 @@ ledger.preferences.bitcoin_segwit2x_segwit =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin/transaction/%s'                
     discoveryGap: 20      
 
 ledger.preferences.bitcoin_uasf =
@@ -338,6 +359,9 @@ ledger.preferences.bitcoin_uasf =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
+      blockchair:
+        name: 'Blockchair.com'
+        address: 'https://blockchair.com/bitcoin/transaction/%s'            
     discoveryGap: 20    
 
 ledger.preferences.testnet =
