@@ -2,11 +2,14 @@
 class ledger.api.TransactionsRestClient extends ledger.api.RestClient
   @singleton()
 
+  constructor: (@ticker = -> ledger.config.network.ticker) ->
+    super
+
   DefaultBatchSize: 20
 
   getSyncToken: (callback) ->
     @http().get
-      url: "blockchain/v2/#{ledger.config.network.ticker}/syncToken"
+      url: "blockchain/v2/#{@ticker()}/syncToken"
       onSuccess: (response) ->
         callback?(response['token'])
       onError: @networkErrorCallback(callback)
@@ -14,7 +17,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
   deleteSyncToken: (token, callback) ->
     @http().setHttpHeader("X-LedgerWallet-SyncToken", token)
     @http().delete
-      url: "blockchain/v2/#{ledger.config.network.ticker}/syncToken"
+      url: "blockchain/v2/#{@ticker()}/syncToken"
       onSuccess: (response) ->
         callback?()
       onError: @networkErrorCallback(callback)
@@ -22,14 +25,14 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
 
   getRawTransaction: (transactionHash, callback) ->
     @http().get
-      url: "blockchain/v2/#{ledger.config.network.ticker}/transactions/#{transactionHash}/hex"
+      url: "blockchain/v2/#{@ticker()}/transactions/#{transactionHash}/hex"
       onSuccess: (response) ->
         callback?(response[0].hex)
       onError: @networkErrorCallback(callback)
 
   safeGetRawTransaction: (transactionHash, callback) ->
     @http().get
-      url: "blockchain/v2/#{ledger.config.network.ticker}/transactions/#{transactionHash}/hex"
+      url: "blockchain/v2/#{@ticker()}/transactions/#{transactionHash}/hex"
       onSuccess: (response) ->
         if (response.length == 0)
           callback?(_.str.pad("", 1000, "00"))
@@ -58,7 +61,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     transactions = []
     _.async.eachBatch addresses, batchSize, (batch, done, hasNext, batchIndex, batchCount) =>
       @http().get
-        url: "blockchain/v2/#{ledger.config.network.ticker}/addresses/#{batch.join(',')}/transactions"
+        url: "blockchain/v2/#{@ticker()}/addresses/#{batch.join(',')}/transactions"
         onSuccess: (response) ->
           transactions = transactions.concat(response)
           callback(transactions) unless hasNext
@@ -69,7 +72,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     data = _.pick({blockHash: blockHash}, _.identity)
     @http().setHttpHeader("X-LedgerWallet-SyncToken", syncToken)
     @http().get
-      url: "blockchain/v2/#{ledger.config.network.ticker}/addresses/#{addresses.join(',')}/transactions"
+      url: "blockchain/v2/#{@ticker()}/addresses/#{addresses.join(',')}/transactions"
       data: data
       onSuccess: (response) ->
         callback?(response)
@@ -85,7 +88,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
       .consume (err, batch, push, next) =>
         return push null, batch if batch is ledger.stream.nil
         @http().get
-          url: "blockchain/v2/#{ledger.config.network.ticker}/addresses/#{batch.join(',')}/transactions"
+          url: "blockchain/v2/#{@ticker()}/addresses/#{batch.join(',')}/transactions"
           onSuccess: (transactions) ->
             push(null, transaction) for transaction in transactions
             do next
@@ -97,7 +100,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
 
   postTransaction: (transaction, callback) ->
     @http().post
-      url: "blockchain/v2/#{ledger.config.network.ticker}/transactions/send",
+      url: "blockchain/v2/#{@ticker()}/transactions/send",
       data: {tx: transaction.getSignedTransaction()}
       onSuccess: (response) ->
         transaction.setHash(response.transaction_hash)
@@ -106,7 +109,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
 
   postTransactionHex: (txHex, callback) ->
     @http().post
-      url: "blockchain/#{ledger.config.network.ticker}/pushtx",
+      url: "blockchain/#{@ticker()}/pushtx",
       data: {tx: txHex}
       onSuccess: (response) ->
         callback?(response.transaction_hash)
@@ -115,7 +118,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
   getTransactionByHash: (transactionHash) ->
     d = ledger.defer()
     @http().get
-      url: "blockchain/v2/#{ledger.config.network.ticker}/transactions/#{transactionHash}"
+      url: "blockchain/v2/#{@ticker()}/transactions/#{transactionHash}"
       onSuccess: (response) ->
         if response.length == 0
           d.reject("Transaction '#{transactionHash}' not found.")
@@ -129,7 +132,7 @@ class ledger.api.TransactionsRestClient extends ledger.api.RestClient
     outTransactions = []
     _.async.each transactions, (transaction, done, hasNext) =>
       @http().get
-        url: "blockchain/v2/#{ledger.config.network.ticker}/transactions/#{transaction.get('hash')}"
+        url: "blockchain/v2/#{@ticker()}/transactions/#{transaction.get('hash')}"
         onSuccess: (response) =>
           outTransactions.push response
           callback? outTransactions unless hasNext

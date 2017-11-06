@@ -137,7 +137,6 @@ require @ledger.imports, ->
         l " on chain chosen"
         @emit 'wallet:initializing'
         ledger.config.network = network
-        #ledger.config.network = ledger.bitcoin.Networks.testnet
         l ledger.config.network
         ledger.app.dongle.setCoinVersion(ledger.config.network.version.regular, ledger.config.network.version.P2SH)
         .then =>
