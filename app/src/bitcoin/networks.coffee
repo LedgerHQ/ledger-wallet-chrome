@@ -134,7 +134,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    message: yes  
+    message: yes
 
   bitcoin_recover:
     name: 'bitcoin_recover'
@@ -158,7 +158,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    message: yes  
+    message: yes
 
   bitcoin_cash_unsplit:
     name: 'bitcoin_cash_unsplit'
@@ -209,7 +209,7 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
     notCompatible: yes
-    greyed: yes  
+    greyed: yes
     message: yes
 
   bitcoin_uasf:
@@ -259,7 +259,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    greyed: yes  
+    greyed: yes
     message: yes
 
   bitcoin_segwit2x_segwit:
@@ -284,8 +284,8 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    greyed: yes  
-    message: yes  
+    greyed: yes
+    message: yes
 
   testnet:
     name: 'testnet'
@@ -612,7 +612,7 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.stealthcoin
     dust: 10000
     handleFeePerByte: no
-    areTransactionTimestamped: yes 
+    areTransactionTimestamped: yes
 
   pivx:
     name: 'pivx'
