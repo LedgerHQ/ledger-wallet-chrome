@@ -1,4 +1,9 @@
 # Changelog
+1.9.7
+===
+- Add stealthcoin support
+- Fix CPFP on fees computation
+
 1.9.6
 ===
 - Add support for PIVX, Vertcoin, Viacoin
