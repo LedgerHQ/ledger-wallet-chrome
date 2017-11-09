@@ -87,8 +87,21 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       pushDialogBlock = (fees) =>
         {utxo, fees} = @_computeAmount(ledger.Amount.fromSatoshi(fees).divide(1000))
         data = if (@_dataValue().length > 0) then @_dataValue() else undefined
-        dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount(), utxo: utxo, data: data
-        @getDialog().push dialog
+        #Checking Utxo on Bitcoin for Bitcoin 2x
+        d = ledger.defer()
+        if ['bitcoin', 'bitcoin_segwit'].includes(network.name)
+          conflict = ledger.split2x.proofCheckUtxo(utxo)
+          if conflict != []
+            ledger.split2x.startSplit(d, true)
+          else
+            d.resolve()
+        else
+          d.resolve()
+        d.promise.then () ->
+          dialog = new WalletSendPreparingDialogViewController amount: @_transactionAmount(), address: @_receiverBitcoinAddress(), fees: fees, account: @_selectedAccount(), utxo: utxo, data: data
+          @getDialog().push dialog
+        .fail () ->
+          l "transaction cancelled for split"
 
       {amount, fees} = @_computeAmount()
       # check transactions fees

@@ -134,7 +134,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    message: yes  
+    message: yes
 
   bitcoin_recover:
     name: 'bitcoin_recover'
@@ -158,7 +158,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    message: yes  
+    message: yes
 
   bitcoin_cash_unsplit:
     name: 'bitcoin_cash_unsplit'
@@ -183,7 +183,7 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
     notCompatible: yes
-    greyed: yes
+    greyed: no
     message: yes
 
   bitcoin_cash_split:
@@ -209,10 +209,10 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
     notCompatible: yes
-    greyed: yes  
+    greyed: no
     message: yes
 
-  bitcoin_uasf:
+  ###bitcoin_uasf:
     name: 'bitcoin_uasf'
     display_name: 'bitcoin'
     chain: 'Bitcoin UASF'
@@ -235,12 +235,12 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
     greyed: yes
-    message: yes
+    message: yes###
 
-  bitcoin_segwit2x:
-    name: 'bitcoin_segwit2x'
+  bitcoin_2x:
+    name: 'bitcoin_2x'
     display_name: 'bitcoin'
-    chain: 'Bitcoin Segwit2x'
+    chain: 'Bitcoin 2x'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
     ticker: 'segwit2x'
@@ -259,13 +259,13 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    greyed: yes  
+    greyed: no
     message: yes
 
-  bitcoin_segwit2x_segwit:
-    name: 'bitcoin_segwit2x_segwit'
+  bitcoin_2x_segwit:
+    name: 'bitcoin_2x_segwit'
     display_name: 'bitcoin'
-    chain: 'Bitcoin Segwit2x'
+    chain: 'Bitcoin 2x Segwit'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
     ticker: 'segwit2x'
@@ -284,8 +284,8 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    greyed: yes  
-    message: yes  
+    greyed: no
+    message: yes
 
   testnet:
     name: 'testnet'
@@ -612,7 +612,7 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.stealthcoin
     dust: 10000
     handleFeePerByte: no
-    areTransactionTimestamped: yes 
+    areTransactionTimestamped: yes
 
   pivx:
     name: 'pivx'

@@ -146,13 +146,32 @@ require @ledger.imports, ->
               # TODO: Handle wallet opening fatal error
               e "Raise", error
             ledger.tasks.FeesComputationTask.instance.startIfNeccessary()
-            @_listenPreferencesEvents()
-            @_listenCountervalueEvents(true)
-            ledger.utils.Logger.updateGlobalLoggersLevel()
-            @emit 'wallet:initialized'
-            _.defer =>
-              ledger.tasks.TransactionObserverTask.instance.startIfNeccessary()
-              ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() unless result.operation_consumption
+            d = ledger.defer()
+            #Checking Utxo on Bitcoin for Bitcoin 2x
+            if ['bitcoin', 'bitcoin_segwit'].includes(network.name)
+              l 'looking utxo'
+              ledger.split2x.checkUtxoOn2x().then (utxo) ->
+                l utxo
+                l 'was utxo'
+                if utxo != []
+                  #launch flow
+                else
+                  d.resolve()
+              .fail (e) ->
+                l 'errorrororro'
+                l e
+            else
+              d.resolve()
+
+            d.promise.then =>
+              l 'then'
+              @_listenPreferencesEvents()
+              @_listenCountervalueEvents(true)
+              ledger.utils.Logger.updateGlobalLoggersLevel()
+              @emit 'wallet:initialized'
+              _.defer =>
+                ledger.tasks.TransactionObserverTask.instance.startIfNeccessary()
+                ledger.tasks.OperationsSynchronizationTask.instance.startIfNeccessary() unless result.operation_consumption
 
     onDongleIsDisconnected: (dongle) ->
       return if @hodl

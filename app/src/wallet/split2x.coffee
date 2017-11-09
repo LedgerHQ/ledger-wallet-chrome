@@ -1,8 +1,8 @@
-_txoledger.split2x ?= {}
+ledger.split2x ?= {}
 
-class ledger.split2x
+_.extend ledger.split2x,
 
-  @checkUtxoOn2x: () ->
+  checkUtxoOn2x: ->
     _txo = {}
     _blockHash = "0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
     _syncToken = null
@@ -21,14 +21,19 @@ class ledger.split2x
       xcache = new ledger.wallet.Wallet.Cache('ops_cache', hdWallet)
       xcache.initialize ->
         hdWallet.xpubCache = xcache
-        hdWallet.initialize _walletStore, () =>
-          _findUnconfirmedTransaction: ->
+        hdWallet.initialize _walletStore, () ->
+
+          $log = l
+          $info = l
+          $error = l
+
+          _findUnconfirmedTransaction = ->
             unconfirmedTxs =_blocks['unconfirmedTxs'].txo
             for key in _blocks['unconfirmedTxs'].txi
               unconfirmedTxs.push(key)
             unconfirmedTxs
 
-          _loadSynchronizationData: ->
+          _loadSynchronizationData = ->
             d = ledger.defer()
             _store.get 'blocks', (result) =>
               if result?
@@ -45,7 +50,7 @@ class ledger.split2x
             d.promise.then (data) =>
               data
 
-          _migrateSavedState: (state = {}) ->
+          _migrateSavedState = (state = {}) ->
             oldBatchSize = state["batch_size"] or 20
             if (oldBatchSize != BatchSize)
               idx = 0
@@ -58,7 +63,7 @@ class ledger.split2x
             state["batch_size"] = BatchSize
             state
 
-          _requestSynchronizationToken: () ->
+          _requestSynchronizationToken= ->
             d = ledger.defer()
             _restClient.getSyncToken (token, error) ->
               if (error?)
@@ -67,13 +72,13 @@ class ledger.split2x
                 d.resolve(token)
             d.promise
 
-          _numberOfAccountInState: (savedState) ->
+          _numberOfAccountInState= (savedState) ->
             accountIndex = 0
             while savedState["account_#{accountIndex}"]?
               accountIndex += 1
             accountIndex
 
-          _recoverAddresses: (root, from, to, blockHash, syncToken) ->
+          _recoverAddresses= (root, from, to, blockHash, syncToken) ->
             paths = _.map [from...to], (i) -> "#{root}/#{0}/#{i}"
             paths = paths.concat(_.map [from...to], (i) -> "#{root}/#{1}/#{i}")
             d = ledger.defer()
@@ -85,13 +90,13 @@ class ledger.split2x
               _restClient.getPaginatedTransactions(_.values(addresses), blockHash, syncToken, callback)
             d.promise
 
-          _requestDerivations: ->
+          _requestDerivations= ->
               d = ledger.defer()
               ledger.wallet.pathsToAddresses hdWallet.getAllObservedAddressesPaths(), (addresses) ->
                 d.resolve(_.invert(addresses))
               d.promise
 
-          _recoverBatch: (batch, accountIndex, syncToken) ->
+          _recoverBatch= (batch, accountIndex, syncToken) ->
             wallet = hdWallet
             account = wallet.getOrCreateAccount(accountIndex)
             blockHash = batch['blockHash']
@@ -112,6 +117,7 @@ class ledger.split2x
                       if !_txo[tx.hash]?
                         _txo[tx.hash] = {}
                       _txo[tx.hash][ouput.output_index].output = output
+                      _txo[tx.hash][ouput.output_index].output.hash = tx.hash
                       if tx.block
                         _txo[tx.hash][ouput.output_index].confirmed = yes
                         if !_blocks[tx.block.height]?
@@ -147,7 +153,7 @@ class ledger.split2x
               er.block = batch
               throw er
 
-          _recoverAccount: (account, savedState, syncToken) ->
+          _recoverAccount= (account, savedState, syncToken) ->
             $info "Recover account #{account.index}"
             savedAccountState = savedState["account_#{account.index}"] or {}
             savedState["account_#{account.index}"] = savedAccountState
@@ -182,7 +188,7 @@ class ledger.split2x
                   promises.push recoverUntilEnd()
               Q.all(promises)
 
-          _recoverAccounts: (unconfirmedTransactions, savedState, syncToken) ->
+          _recoverAccounts= (unconfirmedTransactions, savedState, syncToken) ->
             accountsCount = _numberOfAccountInState(savedState)
 
             recover = (fromIndex, toIndex = 0) =>
@@ -214,14 +220,14 @@ class ledger.split2x
 
             recoverUntilEmpty()
 
-          _handleReorgs: (savedState, failedBlock) ->
+          _handleReorgs= (savedState, failedBlock) ->
             # Iterate through the state and delete any block higher or equal to failedBlock.height
             # Remove from the database all orphan transaction and blocks
             # Save the new state
             $info("Handle reorg for block #{failedBlock.blockHash} at #{failedBlock.blockHeight}")
 
             getPreviousBlock = (height) ->
-              _blocks[height-1] ? _blocks[height-1] : getPreviousBlock(height-1)
+              if _blocks[height-1] then _blocks[height-1] else getPreviousBlock(height-1)
 
             previousBlock = getPreviousBlock(failedBlock.blockHeight)
             $info("Revert to block #{previousBlock.block.hash} at #{previousBlock.block.height}")
@@ -236,7 +242,7 @@ class ledger.split2x
               if height >= failedBlock.blockHeight or height == 'unconfirmedTxs'
                 for tx in _blocks[height].txi
                   for txi in tx
-                    try _txo[txi[0]][txi[1]].spent = undefined catch e then () -> ()
+                    try _txo[txi[0]][txi[1]].spent = undefined catch e then () -> true
                 for tx in _blocks[height].txo
                   delete _txo[tx]
 
@@ -244,7 +250,7 @@ class ledger.split2x
 
             _saveSynchronizationData(savedState)
 
-          _saveSynchronizationData: (data) ->
+          _saveSynchronizationData= (data) ->
             d = ledger.defer()
             l "Saving state", data
             save = {}
@@ -259,7 +265,7 @@ class ledger.split2x
                   d.resolve()
             d.promise
 
-          _performRecovery: (unconfirmedTransactions, retryCount = 0) ->
+          _performRecovery= (unconfirmedTransactions, retryCount = 0) ->
             savedState = {}
             persistState = no
             lastBlock = undefined
@@ -301,15 +307,19 @@ class ledger.split2x
             .then =>
               unconfirmedTransactions
 
-          _discardTransactions: (transactions) ->
+          _discardTransactions= (transactions) ->
             for transaction in transactions
               for hash, tx in _blocks['unconfirmedTxs'].txi when hash == transaction
                 for txi in tx
-                  try _txo[txi[0]][txi[1]].spent = undefined catch e then () -> ()
+                  try _txo[txi[0]][txi[1]].spent = undefined catch e then () -> true
                 delete _blocks['unconfirmedTxs'].txi[hash]
               delete _txo[transaction][key]
 
-
+          _deleteSynchronizationToken= (token) ->
+            d = ledger.defer()
+            _restClient.deleteSyncToken token, ->
+              d.resolve()
+            d.promise
 
           startDate = new Date()
           _loadSynchronizationData().then (data) =>
@@ -325,8 +335,8 @@ class ledger.split2x
               $error "Synchronization failed split", er
             .fin =>
               # Delete sync token and stop
-              @_deleteSynchronizationToken(_syncToken) if _syncToken?
-              @_syncToken = null
+              _deleteSynchronizationToken(_syncToken) if _syncToken?
+              _syncToken = null
               duration = moment.duration(new Date().getTime() - startDate.getTime())
               $info "Stop synchronization. Synchronization took #{duration.get("minutes")}:#{duration.get("seconds")}:#{duration.get("milliseconds")}"
               utxoOn2x = []
@@ -334,9 +344,9 @@ class ledger.split2x
                 utxoOn2x.push(tx)
               $info "Found these utxo on 2x #{utxoOn2x}"
               d.resolve(utxoOn2x)
-    d.promise.then () =>
+    d.promise
 
-  @getCoinbasesUtxo2x: () ->
+  getCoinbasesUtxo2x: ->
     _txo = {}
     _blockHash = "0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
     _address = "1Hq79PZF2KwfUaXBkUSTJ6cXRTVQCQHhWF"
@@ -349,7 +359,7 @@ class ledger.split2x
     NumberOfRetry: 1
     d = ledger.defer()
 
-    _loadSynchronizationData: ->
+    _loadSynchronizationData= ->
       d = ledger.defer()
       _store.get 'blocks', (result) =>
         if result?
@@ -367,13 +377,15 @@ class ledger.split2x
         data
 
     getPreviousBlock = (height) ->
-      _blocks[height-1] ? _blocks[height-1] : getPreviousBlock(height-1)
+      if _blocks[height-1] then _blocks[height-1] else getPreviousBlock(height-1)
 
     getHighestBlock = () ->
-      Object.keys(_blocks).reduce(function(a, b){ return _blocks[a] > _blocks[b] ? a : b });
+      Object.keys(_blocks).reduce((a, b) ->
+        if _blocks[a] > _blocks[b] then a else b
+        );
 
 
-    _requestSynchronizationToken: () ->
+    _requestSynchronizationToken= ->
       d = ledger.defer()
       _restClient.getSyncToken (token, error) ->
         if (error?)
@@ -382,7 +394,7 @@ class ledger.split2x
           d.resolve(token)
       d.promise
 
-    _prune: (txo, depth) ->
+    _prune= (txo, depth) ->
       if !depth? or txo.confirmed?
         depth = 0
       if txo.spent?
@@ -393,16 +405,15 @@ class ledger.split2x
                 delete _blocks[txo.spent.block.height].txi[hash]
 
       if depth > _limitDepth && _txo[txo.hash]?
-        delete _txo[txo.hash][txo.index]
+        delete _txo[txo.hash][txo.output_index]
 
-    _filterUtxo: (new_txs) ->
+    _filterUtxo= (new_txs) ->
       for tx in new_txs
         for ouput in tx.outputs
           if !_txo[tx.hash]?
             _txo[tx.hash] = {}
           _txo[tx.hash][ouput.output_index].output = output
           _txo[tx.hash][ouput.output_index].output.hash = tx.hash
-          _txo[tx.hash][ouput.output_index].output.index = ouput.output_index
           if tx.block
             _txo[tx.hash][ouput.output_index].confirmed = yes
             if !_blocks[tx.block.height]?
@@ -434,21 +445,21 @@ class ledger.split2x
           if output.confirmed && output.spent
             _prune(output)
 
-    _getAllTxs: () ->
-      ledger.api.TransactionsRestClient.getPaginatedTransactions(_address, getHighestBlock().hash, _syncToken)
+    _getAllTxs= ->
+      _restClient.getPaginatedTransactions(_address, getHighestBlock().hash, _syncToken)
       .then (reponse) =>
         _filterUtxo(response.txs)
         if response?.truncated
           _getAllTxs()
 
-    _handleReorgs: (failedBlock) ->
+    _handleReorgs= (failedBlock) ->
       # Iterate through the state and delete any block higher or equal to failedBlock.height
       # Remove from the database all orphan transaction and blocks
       # Save the new state
       $info("Handle reorg for block #{failedBlock.blockHash} at #{failedBlock.blockHeight}")
 
       getPreviousBlock = (height) ->
-        _blocks[height-1] ? _blocks[height-1] : getPreviousBlock(height-1)
+        if _blocks[height-1] then _blocks[height-1] else getPreviousBlock(height-1)
 
       previousBlock = getPreviousBlock(failedBlock.blockHeight)
       $info("Revert to block #{previousBlock.block.hash} at #{previousBlock.block.height}")
@@ -458,16 +469,16 @@ class ledger.split2x
         if height >= failedBlock.blockHeight or height == 'unconfirmedTxs'
           for hash, txi in _blocks[height].txi
             for tx in txi
-              try _txo[tx[0]][tx[1]].spent = undefined catch e then () -> ()
+              try _txo[tx[0]][tx[1]].spent = undefined catch e then () -> true
           for tx in _blocks[height].txo
             delete _txo[tx]
 
           delete _blocks[height]
 
-    _discardUnconfirmed: () ->
+    _discardUnconfirmed= ->
       for hash, txi in _blocks['unconfirmedTxs'].txi
         for tx in txi
-          try _txo[tx[0]][tx[1]].spent = undefined catch e then () -> ()
+          try _txo[tx[0]][tx[1]].spent = undefined catch e then () -> true
       for tx in _blocks['unconfirmedTxs'].txo
         delete _txo[tx]
 
@@ -476,7 +487,7 @@ class ledger.split2x
 
       _saveSynchronizationData(savedState)
 
-    _saveSynchronizationData: (data) ->
+    _saveSynchronizationData= (data) ->
       d = ledger.defer()
       l "Saving state", data
       save = {}
@@ -499,7 +510,7 @@ class ledger.split2x
             result.push(txo.output)
       result
 
-    _performRecovery: (retryCount = 0) ->
+    _performRecovery= (retryCount = 0) ->
       savedState = {}
       persistState = no
       _loadSynchronizationData().then (data) =>
@@ -534,7 +545,11 @@ class ledger.split2x
       .then =>
         _getUtxo()
 
-
+    _deleteSynchronizationToken= (token) ->
+      d = ledger.defer()
+      _restClient.deleteSyncToken token, ->
+        d.resolve()
+      d.promise
 
 
     startDate = new Date()
@@ -546,8 +561,8 @@ class ledger.split2x
         $error "Synchronization failed split", er
       .fin =>
         # Delete sync token and stop
-        @_deleteSynchronizationToken(_syncToken) if _syncToken?
-        @_syncToken = null
+        _deleteSynchronizationToken(_syncToken) if _syncToken?
+        _syncToken = null
         duration = moment.duration(new Date().getTime() - startDate.getTime())
         $info "Stop synchronization. Synchronization took #{duration.get("minutes")}:#{duration.get("seconds")}:#{duration.get("milliseconds")}"
         utxoOn2x = []
@@ -556,3 +571,29 @@ class ledger.split2x
         $info "Found these utxo on 2x #{utxoOn2x}"
         d.resolve(utxoOn2x)
     d.promise.then () =>
+
+  proofCheckUtxo: (utxoToCheck) ->
+    conflict = false
+    if !utxoToCheck
+      utxoToCheck=[]
+      accounts = Account.all()
+      for account in accounts
+        utxoToCheck.concatenate(account().getUtxo())
+    utxoOn2x = ledger.split2x.checkUtxoOn2x()
+    for utxo in utxoToCheck
+      for utxo2x in utxoOn2x
+        if utxo.transaction_hash == utxo2x.hash && utxo.index == utxo2x.output_index
+          conflict = true
+          break
+      if conflict
+        break
+    return conflict
+
+  startSplit: (promise, tx = false) ->
+    dialog = new WalletSplit2xAlertViewController({tx: tx})
+    dialog.once 'click:ignore', =>
+      promise.resolve()
+    dialog.once 'click:split', =>
+      promise.reject()
+
+    dialog.show()

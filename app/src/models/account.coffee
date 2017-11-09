@@ -189,6 +189,7 @@ class @Account extends ledger.database.Model
       result.updates.push update if update?
 
     if hasAddressesInOutput
+      
       [insert, update] = @_addRawReceptionTransaction rawTransaction, publicAddresses
       result.inserts.push insert if insert?
       result.updates.push update if update?

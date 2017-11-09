@@ -8,5 +8,7 @@
       <a class="action-rounded-button un_split" ><%= t 'onboarding.device.chains.bitcoin_unsplit' %></a>
       <a class="action-rounded-button split" ><%= t 'onboarding.device.chains.bitcoin_split' %></a>
     </div>
+    <a id="recover" href="#recoverTool" class="greyed-action medium-indication"><%= t 'onboarding.device.chains.recover' %></a>
+
   </div>
 </section>

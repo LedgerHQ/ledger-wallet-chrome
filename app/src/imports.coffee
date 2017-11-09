@@ -199,6 +199,7 @@
         'wallet/utils'
         'wallet/transaction'
         'wallet/cpfp'
+        'wallet/split2x'
         'wallet/wallet'
         'wallet/cache'
         'wallet/extended_public_key'
@@ -289,6 +290,9 @@
         'controllers/wallet/send/wallet_send_validating_dialog_view_controller'
         'controllers/wallet/send/wallet_send_method_dialog_view_controller'
         'controllers/wallet/send/wallet_send_sign_dialog_view_controller'
+
+        # Split 2x
+        'controllers/wallet/split2x/wallet_split2x_alert_view_controller'
 
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'

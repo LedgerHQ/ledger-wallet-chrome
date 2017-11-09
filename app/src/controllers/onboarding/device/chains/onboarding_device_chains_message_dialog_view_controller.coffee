@@ -23,3 +23,9 @@ class @OnboardingDeviceChainsMessageDialogViewController extends ledger.common.D
   un_split: (e) ->
     @emit 'click:un_split'
     @dismiss()
+
+  recoverTool: (e) ->
+    dialog = new OnboardingDeviceChainsRecoverDialogViewController()
+    dialog.once 'click:recover', =>
+      @chainChoosen(ledger.bitcoin.Networks.bitcoin_recover)
+    dialog.show()

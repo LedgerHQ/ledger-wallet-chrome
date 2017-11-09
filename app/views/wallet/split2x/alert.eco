@@ -1,0 +1,17 @@
+<section id="dialogs_message_dialog">
+<% if true || (console.log('test')): %>
+<% end %>
+  <div class="content-container">
+    <div class="uppercase-section-title"><%= t 'split2x.alert.title'%></div>
+    <div class="amount">B2X <%= @amount%></div>
+    <div class="regular-text-small"><%= @message %></div>
+    <div class="greyed-text-small"><%= t 'split2x.alert.recommendation' %></div>
+
+    <div class="dialog-actions-bar">
+      <a href="#wsid"><%= t 'split2x.alert.wsid' %></a>
+      <div class="left-spacer"></div>
+      <a class="cancel-rounded-button ignore" ><%= t 'split2x.alert.ignore' %></a>
+      <a class="action-rounded-button split" ><%= t 'split2x.alert.split' %></a>
+    </div>
+  </div>
+</section>
