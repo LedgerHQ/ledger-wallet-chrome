@@ -197,7 +197,40 @@ ledger.preferences.bitcoin_recover =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
-    discoveryGap: 20    
+    discoveryGap: 20
+
+ledger.preferences.bitcoin_recover =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'BTC'
+        unit: 8
+      milibitcoin:
+        symbol: 'mBTC'
+        unit: 5
+      microbitcoin:
+        symbol: 'bits'
+        unit: 2
+
+  # Coin preferences
+  Coin:
+    explorers:
+      blockchain:
+        name: 'Blockchain.info'
+        address: 'https://blockchain.info/tx/%s'
+      blockr:
+        name: 'Blockr.io'
+        address: 'https://btc.blockr.io/tx/info/%s'
+      biteasy:
+        name: 'Biteasy.com'
+        address: 'https://www.biteasy.com/blockchain/transactions/%s'
+      insight:
+        name: 'Insight.is'
+        address: 'https://insight.bitpay.com/tx/%s'
+      blockonomics:
+        name: 'Blockonomics.co'
+        address: 'https://www.blockonomics.co/api/tx?txid=%s'
+    discoveryGap: 20
 
 ledger.preferences.bitcoin_cash_unsplit =
   Display:
@@ -218,7 +251,7 @@ ledger.preferences.bitcoin_cash_unsplit =
       blockchain:
         name: 'blockdozer.com'
         address: 'http://blockdozer.com/insight/tx/%s'
-    discoveryGap: 20  
+    discoveryGap: 20
 
 ledger.preferences.bitcoin_cash_split =
   Display:
@@ -239,7 +272,7 @@ ledger.preferences.bitcoin_cash_split =
       blockchain:
         name: 'blockdozer.com'
         address: 'http://blockdozer.com/insight/tx/%s'
-    discoveryGap: 20    
+    discoveryGap: 20
 
 ledger.preferences.bitcoin_segwit2x =
   Display:
@@ -272,7 +305,7 @@ ledger.preferences.bitcoin_segwit2x =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
-    discoveryGap: 20  
+    discoveryGap: 20
 
 ledger.preferences.bitcoin_segwit2x_segwit =
   Display:
@@ -305,7 +338,7 @@ ledger.preferences.bitcoin_segwit2x_segwit =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
-    discoveryGap: 20      
+    discoveryGap: 20
 
 ledger.preferences.bitcoin_uasf =
   Display:
@@ -338,7 +371,7 @@ ledger.preferences.bitcoin_uasf =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
-    discoveryGap: 20    
+    discoveryGap: 20
 
 ledger.preferences.testnet =
   Display:
@@ -422,7 +455,7 @@ ledger.preferences.litecoin_segwit =
       bchain:
         name: 'Bchain.info'
         address: 'https://bchain.info/LTC/tx/%s'
-    discoveryGap: 20    
+    discoveryGap: 20
 
 ledger.preferences.dogecoin =
   Display:

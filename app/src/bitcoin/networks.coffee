@@ -134,7 +134,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    message: yes  
+    message: yes
 
   bitcoin_recover:
     name: 'bitcoin_recover'
@@ -158,7 +158,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    message: yes  
+    message: yes
 
   bitcoin_cash_unsplit:
     name: 'bitcoin_cash_unsplit'
@@ -183,7 +183,7 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
     notCompatible: yes
-    greyed: yes
+    greyed: no
     message: yes
 
   bitcoin_cash_split:
@@ -209,10 +209,63 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
     notCompatible: yes
-    greyed: yes  
+    greyed: yes
     message: yes
 
-  bitcoin_uasf:
+
+  bitcoin_gold_unsplit:
+    name: 'bitcoin_gold_unsplit'
+    display_name: 'bitcoin'
+    chain: 'Bitcoin gold (Main)'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
+    ticker: 'gold'
+    scheme: 'bitcoin:'
+    tickerKey:
+      from: 'fromBTG'
+      to: 'toBTG'
+    bip44_coin_type: '0'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 0
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.bitcoin
+    ws_chain: 'bitcoin'
+    dust: 5430
+    handleFeePerByte: yes
+    notCompatible: yes
+    greyed: no
+    message: yes
+
+  bitcoin_gold_split:
+    name: 'bitcoin_gold_split'
+    display_name: 'bitcoin'
+    chain: 'Bitcoin gold (Split)'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
+    ticker: 'gold'
+    scheme: 'bitcoin:'
+    tickerKey:
+      from: 'fromBTG'
+      to: 'toBTG'
+    bip44_coin_type: '145'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 0
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.bitcoin
+    ws_chain: 'bitcoin'
+    dust: 5430
+    handleFeePerByte: yes
+    notCompatible: yes
+    greyed: yes
+    message: yes
+
+  ###bitcoin_uasf:
     name: 'bitcoin_uasf'
     display_name: 'bitcoin'
     chain: 'Bitcoin UASF'
@@ -259,7 +312,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    greyed: yes  
+    greyed: yes
     message: yes
 
   bitcoin_segwit2x_segwit:
@@ -284,8 +337,8 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    greyed: yes  
-    message: yes  
+    greyed: yes
+    message: yes  ###
 
   testnet:
     name: 'testnet'
@@ -612,7 +665,7 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.stealthcoin
     dust: 10000
     handleFeePerByte: no
-    areTransactionTimestamped: yes 
+    areTransactionTimestamped: yes
 
   pivx:
     name: 'pivx'
