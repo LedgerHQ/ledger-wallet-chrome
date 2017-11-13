@@ -5,10 +5,13 @@
     <div class="uppercase-section-title"><%= @title %></div>
     <div class="regular-text-small"><%- @text %></div>
     <div class="dialog-actions-bar">
-      <a class="cancel-rounded-button cancel" ><%= @cancel %></a>
+      <a class="cancel-rounded-button cancel" ><%= @cancelChoice %></a>
       <div class="left-spacer"></div>
       <a class="action-rounded-button first" ><%= @firstChoice %></a>
       <a class="action-rounded-button second" ><%= @secondChoice %></a>
     </div>
+    <% if @optionChoice : %>
+      <a id="recover" href="#option" class="option greyed-action medium-indication"><%= @optionChoice %></a>
+    <% end %>
   </div>
 </section>

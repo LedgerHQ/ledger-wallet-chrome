@@ -17,25 +17,23 @@ class @OnboardingDeviceChainsViewController extends @OnboardingViewController
     @view.chainSelected.on "click", @onChainSelected
 
   bitcoinCashSelected: (e) ->
-    dialog = new OnboardingDeviceChainsMessageDialogViewController()
-    dialog.once 'click:split', =>
+    dialog = new OnboardingDeviceChainsChoiceDialogViewController({title: t("onboarding.device.chains.choose_chain"), text: t('onboarding.device.chains.bitcoin_cash_warning'), firstChoice: t('onboarding.device.chains.bitcoin_unsplit'), secondChoice: t('onboarding.device.chains.bitcoin_split'), cancelChoice: t('common.cancel'), optionChoice: t('onboarding.device.chains.recover')})
+    dialog.once 'click:second', =>
       @chainChoosen(@networks[parseInt(e.target.attributes.value.value,10)+1])
-    dialog.once 'click:un_split', =>
+    dialog.once 'click:first', =>
       @chainChoosen(@networks[e.target.attributes.value.value])
+    dialog.once 'click:option', =>
+      @chainChoosen(ledger.bitcoin.Networks.bitcoin_recover)
     dialog.show()
 
   chooseSegwit: (e) ->
-    dialog = new OnboardingDeviceChainsChoiceDialogViewController({title: t("onboarding.device.chains.segwit_title"), text: t('onboarding.device.chains.segwit_message'), firstChoice: t('onboarding.device.chains.segwit_legacy'), secondChoice: t('onboarding.device.chains.segwit_segwit'), cancel: t('onboarding.device.chains.segwit_cancel')})
+    dialog = new OnboardingDeviceChainsChoiceDialogViewController({title: t("onboarding.device.chains.segwit_title"), text: t('onboarding.device.chains.segwit_message'), firstChoice: t('onboarding.device.chains.segwit_legacy'), secondChoice: t('onboarding.device.chains.segwit_segwit'), cancelChoice: t('onboarding.device.chains.segwit_cancel')})
     dialog.once 'click:first', =>
       @chainChoosen(@networks[e.target.attributes.value.value])
     dialog.once 'click:second', =>
       @chainChoosen(@networks[parseInt(e.target.attributes.value.value,10)+1])
-    dialog.show()
-
-  recoverTool: (e) ->
-    dialog = new OnboardingDeviceChainsRecoverDialogViewController()
-    dialog.once 'click:recover', =>
-      @chainChoosen(ledger.bitcoin.Networks.bitcoin_recover)
+    dialog.once 'click:cancel', =>
+      @chainChoosen(@networks[parseInt(e.target.attributes.value.value,10)+1])
     dialog.show()
 
   incompatible: () ->

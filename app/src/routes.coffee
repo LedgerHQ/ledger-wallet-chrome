@@ -33,7 +33,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   route '/onboarding/device/chains/litecoin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceChainsLitecoinViewController
-  
+
+  route '/onboarding/device/chains/btg', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceChainsBtgViewController
+
   route '/onboarding/device/chains', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceChainsViewController
 
