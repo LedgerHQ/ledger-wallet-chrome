@@ -78,6 +78,14 @@ bitcoin.networks.pivx =
   pubKeyHash: 30
   scriptHash: 13
 
+  bitcoin.networks.rubycoin =
+    magicPrefix: '\x19RubyCoin Signed Message:\n'
+    bip32:
+      public: 0x0488B21E,
+      private: 0x05358394
+    pubKeyHash: 60
+    scriptHash: 85
+
 bitcoin.networks.viacoin =
   magicPrefix: '\x18Viacoin Signed Message:\n'
   bip32:
@@ -632,6 +640,28 @@ ledger.bitcoin.Networks =
       P2SH: 13
       XPUB: 0x022D2533
     bitcoinjs: bitcoin.networks.pivx
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+  rubycoin:
+    name: 'rubycoin'
+    display_name: 'rubycoin'
+    plural: 'rubyoins'
+    scheme: 'rubycoin:'
+    bolosAppName: 'rubycoin'
+    ticker: 'rby'
+    tickerKey:
+      from: 'fromRBY'
+      to: 'toRBY'
+    bip44_coin_type: '16'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 60
+      P2SH: 85
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.rubycoin
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: no
