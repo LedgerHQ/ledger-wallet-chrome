@@ -14847,6 +14847,20 @@
           feePerKb: 1e4,
           estimateFee: estimateFee("jumbucks")
         },
+        rubycoin: {
+          magicPrefix: "Rubycoin Signed Message:\n",
+          bip32: {
+            "public": 76067358,
+            "private": 76066276
+          },
+          pubKeyHash: 60,
+          scriptHash: 85,
+          wif: 188,
+          dustThreshold: 0,
+          dustSoftThreshold: 1e8,
+          feePerKb: 1e8,
+          estimateFee: estimateFee("rubycoin")
+        },
         zetacoin: {
           magicPrefix: "Zetacoin Signed Message:\n",
           bip32: {

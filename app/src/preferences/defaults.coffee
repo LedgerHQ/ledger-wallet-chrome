@@ -218,7 +218,7 @@ ledger.preferences.bitcoin_cash_unsplit =
       blockchain:
         name: 'blockdozer.com'
         address: 'http://blockdozer.com/insight/tx/%s'
-    discoveryGap: 20  
+    discoveryGap: 20
 
 ledger.preferences.bitcoin_cash_split =
   Display:
@@ -239,7 +239,7 @@ ledger.preferences.bitcoin_cash_split =
       blockchain:
         name: 'blockdozer.com'
         address: 'http://blockdozer.com/insight/tx/%s'
-    discoveryGap: 20    
+    discoveryGap: 20
 
 ledger.preferences.bitcoin_segwit2x =
   Display:
@@ -272,7 +272,7 @@ ledger.preferences.bitcoin_segwit2x =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
-    discoveryGap: 20  
+    discoveryGap: 20
 
 ledger.preferences.bitcoin_segwit2x_segwit =
   Display:
@@ -305,7 +305,7 @@ ledger.preferences.bitcoin_segwit2x_segwit =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
-    discoveryGap: 20      
+    discoveryGap: 20
 
 ledger.preferences.bitcoin_uasf =
   Display:
@@ -338,7 +338,7 @@ ledger.preferences.bitcoin_uasf =
       blockonomics:
         name: 'Blockonomics.co'
         address: 'https://www.blockonomics.co/api/tx?txid=%s'
-    discoveryGap: 20    
+    discoveryGap: 20
 
 ledger.preferences.testnet =
   Display:
@@ -422,7 +422,7 @@ ledger.preferences.litecoin_segwit =
       bchain:
         name: 'Bchain.info'
         address: 'https://bchain.info/LTC/tx/%s'
-    discoveryGap: 20    
+    discoveryGap: 20
 
 ledger.preferences.dogecoin =
   Display:
@@ -629,6 +629,27 @@ ledger.preferences.pivx =
       Presstab:
         name: 'Presstab'
         address: 'http://presstab.pw/phpexplorer/PIVX/tx.php?tx=%s'
+    discoveryGap: 20
+
+ledger.preferences.rubycoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'RBY'
+        unit: 8
+      milibitcoin:
+        symbol: 'mRBY'
+        unit: 5
+      microbitcoin:
+        symbol: 'μRBY'
+        unit: 2
+
+# Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/rby/tx.dws?%s.htm'
     discoveryGap: 20
 
 ledger.preferences.viacoin =
