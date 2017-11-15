@@ -7,7 +7,7 @@
     <p class="medium-indication"><%- t 'onboarding.device.chains.segwit_message'%><p>
     <div class="chain-selector">
       <a    class="choice cancel-rounded-button"
-            value="0">
+            value="3">
             <%- t('onboarding.device.chains.segwit_cancel') %>
       </a>
       <% for chain,i in @networks : %>
