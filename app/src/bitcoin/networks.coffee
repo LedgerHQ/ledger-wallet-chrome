@@ -227,7 +227,7 @@ ledger.bitcoin.Networks =
     chain: 'Bitcoin gold (Split)'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
-    ticker: 'btg_testnet'
+    ticker: 'btg'
     scheme: 'bitcoingold:'
     tickerKey:
       from: 'fromBTG'
@@ -253,7 +253,7 @@ ledger.bitcoin.Networks =
     chain: 'Legacy'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
-    ticker: 'btg_testnet'
+    ticker: 'btg'
     scheme: 'bitcoingold:'
     tickerKey:
       from: 'fromBTG'
@@ -278,7 +278,7 @@ ledger.bitcoin.Networks =
     chain: 'Bitcoin gold (Split/Segwit)'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
-    ticker: 'btg_testnet'
+    ticker: 'btg'
     scheme: 'bitcoingold:'
     tickerKey:
       from: 'fromBTG'
@@ -304,7 +304,7 @@ ledger.bitcoin.Networks =
     chain: 'Segwit'
     bolosAppName: 'Bitcoin'
     plural: 'bitcoins'
-    ticker: 'btg_testnet'
+    ticker: 'btg'
     scheme: 'bitcoingold:'
     tickerKey:
       from: 'fromBTG'
