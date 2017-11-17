@@ -231,7 +231,7 @@ ledger.bitcoin.Networks =
     tickerKey:
       from: 'fromBTG'
       to: 'toBTG'
-    bip44_coin_type: '156'
+    bip44_coin_type: '0'
     handleSegwit: no
     isSegwitSupported: yes
     version:
@@ -282,7 +282,7 @@ ledger.bitcoin.Networks =
     tickerKey:
       from: 'fromBTG'
       to: 'toBTG'
-    bip44_coin_type: '156'
+    bip44_coin_type: '0'
     handleSegwit: yes
     isSegwitSupported: yes
     version:
