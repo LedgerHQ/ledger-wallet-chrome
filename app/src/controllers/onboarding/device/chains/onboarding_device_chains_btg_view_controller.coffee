@@ -1,4 +1,4 @@
-class @OnboardingDeviceChainsLitecoinViewController extends @OnboardingViewController
+class @OnboardingDeviceChainsBtgViewController extends @OnboardingViewController
 
   view:
     chainSelected: ".choice"
@@ -16,6 +16,15 @@ class @OnboardingDeviceChainsLitecoinViewController extends @OnboardingViewContr
   onAfterRender: ->
     super
     @view.chainSelected.on "click", @onChainSelected
+
+
+  splitTool: (e) ->
+    dialog = new OnboardingDeviceChainsChoiceDialogViewController({title: t("onboarding.device.chains.split_btg_title"), text: t('onboarding.device.chains.split_btg_message'), firstChoice: t('onboarding.device.chains.segwit_legacy'), secondChoice: t('onboarding.device.chains.segwit_segwit'), cancelChoice: t('onboarding.management.cancel')})
+    dialog.once 'click:first', =>
+      @chainChoosen(@networks[0])
+    dialog.once 'click:second', =>
+      @chainChoosen(@networks[2])
+    dialog.show()
 
   onChainSelected: (e) ->
     @chainChoosen(@networks[e.target.attributes.value.value])

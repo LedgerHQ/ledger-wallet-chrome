@@ -1,4 +1,8 @@
 # Changelog
+1.9.8
+===
+- Add bitcoin gold support
+
 1.9.7
 ===
 - Add stealthcoin support

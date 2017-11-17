@@ -1502,7 +1502,7 @@ var BTChip = Class.create({
         return new ByteString(tmp, HEX);
     },
 
-    createPaymentTransactionNewBIP143_async: function(segwit, inputs, associatedKeysets, changePath, outputScript, lockTime, sighashType, authorization, resumeData) {
+    createPaymentTransactionNewBIP143_async: function(segwit, forkid, inputs, associatedKeysets, changePath, outputScript, lockTime, sighashType, authorization, resumeData) {
         // Implementation starts here
 
         // Inputs are provided as arrays of [transaction, output_index, optional redeem script]
@@ -1675,7 +1675,7 @@ var BTChip = Class.create({
                 var notifyStartUntrustedHash = {stage: "hashTransaction", currentUntrustedHash: i + 1};
                 return self.startUntrustedHashTransactionInputBIP143_async(false, pseudoTransaction, pseudoTrustedInputs).then(function () {
                     notify(notifyStartUntrustedHash);
-                    var hashType = (segwit ? 0x01 : 0x41);
+                    var hashType = ((segwit && !forkId) ? 0x01 : 0x41);
                     return self.signTransaction_async(associatedKeysets[i], authorization, undefined, hashType).then(function (signature) {
                         notify({stage: "getTrustedInput", currentSignTransaction: i + 1});
                         signatures.push(signature);
