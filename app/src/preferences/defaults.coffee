@@ -672,4 +672,19 @@ ledger.preferences.viacoin =
 
 ledger.preferences.viacoin_segwit = ledger.preferences.viacoin
 
+ledger.preferences.qtum =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'QTUM'
+        unit: 8
+
+# Coin preferences
+  Coin:
+    explorers:
+      qtuminfo:
+        name: 'qtum.info'
+        address: 'https://qtum.info/tx/%s'
+    discoveryGap: 20
+
 ledger.preferences.common.setCoin("bitcoin")

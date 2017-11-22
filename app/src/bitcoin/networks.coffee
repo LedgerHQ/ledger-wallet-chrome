@@ -30,6 +30,14 @@ bitcoin.networks.clubcoin =
   pubKeyHash: 28
   scriptHash: 85
 
+bitcoin.networks.qtum =
+  magicPrefix: '\x15Qtum Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x05358394
+  pubKeyHash: 58
+  scriptHash: 50
+
 bitcoin.networks.stratis =
   magicPrefix: '\x18Stratis Signed Message:\n'
   bip32:
@@ -790,3 +798,23 @@ ledger.bitcoin.Networks =
       dust: 10000
       handleFeePerByte: no
       areTransactionTimestamped: no
+
+  qtum:
+    name: 'qtum'
+    display_name: 'qtum'
+    plural: 'qtums'
+    scheme: 'qtum:'
+    bolosAppName: 'qtum'
+    ticker: 'qtum'
+    tickerKey:
+      from: 'fromQTUM'
+      to: 'toQTUM'
+    bip44_coin_type: '88'
+    isSegwitSupported: yes
+    version:
+      regular: 58
+      P2SH: 50
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.qtum
+    dust: 10000
+    handleFeePerByte: no
