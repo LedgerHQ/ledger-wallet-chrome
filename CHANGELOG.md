@@ -2,6 +2,7 @@
 1.9.11
 ===
 - Corrected counter values calculation
+- Add Qtum support
 
 1.9.8/1.9.9/1.9.10
 ===
