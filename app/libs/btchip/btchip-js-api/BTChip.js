@@ -1675,7 +1675,7 @@ var BTChip = Class.create({
                 var notifyStartUntrustedHash = {stage: "hashTransaction", currentUntrustedHash: i + 1};
                 return self.startUntrustedHashTransactionInputBIP143_async(false, pseudoTransaction, pseudoTrustedInputs).then(function () {
                     notify(notifyStartUntrustedHash);
-                    var hashType = ((segwit && !forkId) ? 0x01 : 0x41);
+                    var hashType = ((segwit && !forkid) ? 0x01 : 0x41);
                     return self.signTransaction_async(associatedKeysets[i], authorization, undefined, hashType).then(function (signature) {
                         notify({stage: "getTrustedInput", currentSignTransaction: i + 1});
                         signatures.push(signature);
