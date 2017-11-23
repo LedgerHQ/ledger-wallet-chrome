@@ -94,7 +94,7 @@ class @ledger.dongle.Manager extends EventEmitter
     @["_scanDongle#{scanner}"](device).then ([terminal, isInBootloaderMode]) =>
       terminal.getCard_async().then (card) =>
         if (device.vendorId is 0x2c97)
-          new BTChip(card).getWalletPublicKey_async("0'/0").then =>
+          new BTChip(card).getWalletPublicKey_async("0'/0xb11e'").then =>
             @emit 'connecting', device
             @_connectDongle(card, device, isInBootloaderMode)
         else

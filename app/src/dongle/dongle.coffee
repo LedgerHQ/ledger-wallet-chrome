@@ -161,7 +161,7 @@ class @ledger.dongle.Dongle extends EventEmitter
   ensureDeviceIsUnlocked: (runForever = no) ->
     return if @_ensureDeviceIsUnlockedTimeout?
     @_ensureDeviceIsUnlockedTimeout = _.delay(() =>
-      @getPublicAddress("0'/0").then =>
+      @getPublicAddress("0'/0xb11e'").then =>
         yes
       .fail (err) =>
         if @state is States.LOCKED
