@@ -687,4 +687,34 @@ ledger.preferences.qtum =
         address: 'https://qtum.info/tx/%s'
     discoveryGap: 20
 
+ledger.preferences.hcash =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'HSR'
+        unit: 8
+
+# Coin preferences
+  Coin:
+    explorers:
+      qtuminfo:
+        name: 'explorer.h'
+        address: 'http://explorer.h.cash/tx/%s'
+    discoveryGap: 20
+
+ledger.preferences.digibyte =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'DGB'
+        unit: 8
+
+# Coin preferences
+  Coin:
+    explorers:
+      qtuminfo:
+        name: 'digiexplorer'
+        address: 'https://digiexplorer.info/tx/%s'
+    discoveryGap: 20
+
 ledger.preferences.common.setCoin("bitcoin")

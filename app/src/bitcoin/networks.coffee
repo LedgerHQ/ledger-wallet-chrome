@@ -102,6 +102,22 @@ bitcoin.networks.viacoin =
   pubKeyHash: 71
   scriptHash: 33
 
+bitcoin.networks.hcash =
+  magicPrefix: '\x17HShare Signed Message:\n'
+  bip32:
+    public: 0x0488c21e,
+    private: 0x05358394
+  pubKeyHash: 40
+  scriptHash: 100
+
+bitcoin.networks.digibyte =
+  magicPrefix: '\x19DigiByte Signed Message:\n'
+  bip32:
+    public: 0x0488b21e,
+    private: 0x05358394
+  pubKeyHash: 30
+  scriptHash: 5
+
 ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
   bitcoin:
@@ -818,3 +834,45 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.qtum
     dust: 10000
     handleFeePerByte: no
+
+  hcash:
+    name: 'hcash'
+    display_name: 'hcash'
+    plural: 'hcash'
+    scheme: 'hcash:'
+    bolosAppName: 'hcash'
+    ticker: 'hsr'
+    tickerKey:
+      from: 'fromHSR'
+      to: 'toHSR'
+    bip44_coin_type: '171'
+    isSegwitSupported: no
+    version:
+      regular: 40
+      P2SH: 100
+      XPUB: 0x0488c21E
+    bitcoinjs: bitcoin.networks.hcash
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: yes
+
+  digibyte:
+    name: 'digibyte'
+    display_name: 'digibyte'
+    plural: 'digibytes'
+    scheme: 'digibyte:'
+    bolosAppName: 'digibyte'
+    ticker: 'dgb'
+    tickerKey:
+      from: 'fromDGB'
+      to: 'toDGB'
+    bip44_coin_type: '20'
+    isSegwitSupported: no
+    version:
+      regular: 30
+      P2SH: 5
+      XPUB: 0x0488b21E
+    bitcoinjs: bitcoin.networks.digibyte
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no

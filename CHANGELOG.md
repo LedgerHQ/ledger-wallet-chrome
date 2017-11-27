@@ -3,6 +3,8 @@
 ===
 - Corrected counter values calculation
 - Add Qtum support
+- Add HCash support
+- Add DigiByte support
 
 1.9.8/1.9.9/1.9.10
 ===
