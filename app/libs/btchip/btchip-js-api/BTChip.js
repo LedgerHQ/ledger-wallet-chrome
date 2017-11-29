@@ -542,7 +542,7 @@ var BTChip = Class.create({
             var scriptBlocks = [];
             var offset = 0;
             var scriptResult;
-            while (offset != script.length) {
+            do {
                 var blockSize = (script.length - offset > 251 ? 251 : script.length - offset);
                 if (((offset + blockSize) != script.length) || (typeof sequence == 'undefined')) {
                     scriptBlocks.push(script.bytes(offset, blockSize));
@@ -551,7 +551,7 @@ var BTChip = Class.create({
                     scriptBlocks.push(script.bytes(offset, blockSize).concat(sequence));
                 }
                 offset += blockSize;
-            }
+            }  while (offset < script.length)
             async.eachSeries(
                 scriptBlocks,
                 function (scriptBlock, finishedCallback) {
