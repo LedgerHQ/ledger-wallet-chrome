@@ -27,7 +27,7 @@ class @WalletDialogsOperationdetailDialogViewController extends ledger.common.Di
       return if not @isShown()
       e error
       if error?
-        if error.code == ledger.errors.FeesTooLow
+        if error.code == ledger.errors.FeesTooLowCpfp
           @view.cpfpButton.removeClass('disabled')
           return if not @isShown()
           dialog = new WalletSendCpfpDialogViewController({transaction: error.payload, account, operation: @operation})
