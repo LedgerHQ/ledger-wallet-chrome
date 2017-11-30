@@ -250,7 +250,7 @@ ledger.preferences.bitcoin_cash_unsplit =
     explorers:
       blockchain:
         name: 'blockdozer.com'
-        address: 'http://blockdozer.com/insight/tx/%s'
+        address: 'https://blockdozer.com/insight/tx/%s'
     discoveryGap: 20
 
 ledger.preferences.bitcoin_cash_split =
@@ -271,7 +271,7 @@ ledger.preferences.bitcoin_cash_split =
     explorers:
       blockchain:
         name: 'blockdozer.com'
-        address: 'http://blockdozer.com/insight/tx/%s'
+        address: 'https://blockdozer.com/insight/tx/%s'
     discoveryGap: 20
 
 ledger.preferences.bitcoin_gold_unsplit =
@@ -292,7 +292,7 @@ ledger.preferences.bitcoin_gold_unsplit =
     explorers:
       btgexp:
         name: 'btgexp.com'
-        address: 'http://btgexp.com/tx/%s'
+        address: 'https://btgexp.com/tx/%s'
     discoveryGap: 20
 
 ledger.preferences.bitcoin_gold_split =
@@ -313,7 +313,7 @@ ledger.preferences.bitcoin_gold_split =
     explorers:
       btgexp:
         name: 'btgexp.com'
-        address: 'http://btgexp.com/tx/%s'
+        address: 'https://btgexp.com/tx/%s'
     discoveryGap: 20
 
 ledger.preferences.bitcoin_gold_unsplit_segwit =
@@ -334,7 +334,7 @@ ledger.preferences.bitcoin_gold_unsplit_segwit =
     explorers:
       btgexp:
         name: 'btgexp.com'
-        address: 'http://btgexp.com/tx/%s'
+        address: 'https://btgexp.com/tx/%s'
     discoveryGap: 20
 
 ledger.preferences.bitcoin_gold_split_segwit =
@@ -355,7 +355,7 @@ ledger.preferences.bitcoin_gold_split_segwit =
     explorers:
       btgexp:
         name: 'btgexp.com'
-        address: 'http://btgexp.com/tx/%s'
+        address: 'https://btgexp.com/tx/%s'
     discoveryGap: 20
 
 ledger.preferences.testnet =
