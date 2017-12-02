@@ -1,4 +1,8 @@
 # Changelog
+1.9.12
+===
+- Fix a bug in P2SH transactions for ZEC
+
 1.9.11
 ===
 - Corrected counter values calculation
