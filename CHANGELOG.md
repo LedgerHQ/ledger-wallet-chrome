@@ -1,7 +1,7 @@
 # Changelog
 1.9.12
 ===
-- Fix a bug in P2SH transactions for ZEC
+- Fix wrong P2SH output generation for ZEC
 
 1.9.11
 ===
