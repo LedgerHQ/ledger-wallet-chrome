@@ -35,6 +35,8 @@ module.exports = (configuration) ->
       manifest = require "../#{configuration.buildDir}/manifest.json"
       fs.writeFileSync("dist/ledger-wallet-#{manifest.version}.crx", crxBuffer)
       defer.resolve()
-      crx.destroy()
       return
+    .catch (err) ->
+      console.error(err)
+      defer.promise.reject(err)
   defer.promise

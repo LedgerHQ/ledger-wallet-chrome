@@ -5,8 +5,9 @@ class @OnboardingDeviceChainsChoiceDialogViewController extends ledger.common.Di
     second: ".second"
     link: '#link'
     cancel: ".cancel"
+    option: ".option"
 
-  constructor: ({@title, @text, @firstChoice, @secondChoice, @cancel}) ->
+  constructor: ({@title, @text, @firstChoice, @secondChoice, @cancelChoice, @optionChoice}) ->
     super
 
 
@@ -17,7 +18,8 @@ class @OnboardingDeviceChainsChoiceDialogViewController extends ledger.common.Di
     super
     @view.first.on "click", @first
     @view.second.on "click", @second
-    @view.cancel.on "click", @first
+    @view.cancel.on "click", @cancel
+    @view.option.on "click", @option
 
   onDismiss:  ->
     super
@@ -32,4 +34,12 @@ class @OnboardingDeviceChainsChoiceDialogViewController extends ledger.common.Di
 
   second: (e) ->
     @emit 'click:second'
+    @dismiss()
+
+  option: (e) ->
+    @emit 'click:option'
+    @dismiss()
+
+  cancel: (e) ->
+    @emit 'click:cancel'
     @dismiss()

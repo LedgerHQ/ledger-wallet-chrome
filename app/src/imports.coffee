@@ -353,6 +353,7 @@
         'controllers/onboarding/device/onboarding_device_pin_view_controller'
         'controllers/onboarding/device/onboarding_device_chains_view_controller'
         'controllers/onboarding/device/chains/onboarding_device_chains_litecoin_view_controller'
+        'controllers/onboarding/device/chains/onboarding_device_chains_btg_view_controller'
         'controllers/onboarding/device/chains/onboarding_device_chains_message_dialog_view_controller'
         'controllers/onboarding/device/chains/onboarding_device_chains_recover_dialog_view_controller'
         'controllers/onboarding/device/chains/onboarding_device_chains_choice_dialog_view_controller'

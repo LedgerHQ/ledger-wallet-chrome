@@ -1,4 +1,23 @@
 # Changelog
+1.9.12
+===
+- Fix wrong P2SH output generation for ZEC
+
+1.9.11
+===
+- Corrected counter values calculation
+- Add Qtum support
+- Add HCash support
+- Add DigiByte support
+
+1.9.8/1.9.9/1.9.10
+===
+- Add bitcoin gold support
+
+1.9.7
+===
+- Add stealthcoin support
+
 1.9.6
 ===
 - Add support for PIVX, Vertcoin, Viacoin

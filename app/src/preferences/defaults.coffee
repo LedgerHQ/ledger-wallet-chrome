@@ -206,7 +206,40 @@ ledger.preferences.bitcoin_recover =
       blockchair:
         name: 'Blockchair.com'
         address: 'https://blockchair.com/bitcoin/transaction/%s'        
-    discoveryGap: 20    
+    discoveryGap: 20
+
+ledger.preferences.bitcoin_recover =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'BTC'
+        unit: 8
+      milibitcoin:
+        symbol: 'mBTC'
+        unit: 5
+      microbitcoin:
+        symbol: 'bits'
+        unit: 2
+
+  # Coin preferences
+  Coin:
+    explorers:
+      blockchain:
+        name: 'Blockchain.info'
+        address: 'https://blockchain.info/tx/%s'
+      blockr:
+        name: 'Blockr.io'
+        address: 'https://btc.blockr.io/tx/info/%s'
+      biteasy:
+        name: 'Biteasy.com'
+        address: 'https://www.biteasy.com/blockchain/transactions/%s'
+      insight:
+        name: 'Insight.is'
+        address: 'https://insight.bitpay.com/tx/%s'
+      blockonomics:
+        name: 'Blockonomics.co'
+        address: 'https://www.blockonomics.co/api/tx?txid=%s'
+    discoveryGap: 20
 
 ledger.preferences.bitcoin_cash_unsplit =
   Display:
@@ -230,7 +263,7 @@ ledger.preferences.bitcoin_cash_unsplit =
       blockchair:
         name: 'Blockchair.com'
         address: 'https://blockchair.com/bitcoin-cash/transaction/%s'        
-    discoveryGap: 20  
+    discoveryGap: 20
 
 ledger.preferences.bitcoin_cash_split =
   Display:
@@ -254,16 +287,16 @@ ledger.preferences.bitcoin_cash_split =
       blockchair:
         name: 'Blockchair.com'
         address: 'https://blockchair.com/bitcoin-cash/transaction/%s'                
-    discoveryGap: 20    
+    discoveryGap: 20
 
-ledger.preferences.bitcoin_segwit2x =
+ledger.preferences.bitcoin_gold_unsplit =
   Display:
     units:
       bitcoin:
-        symbol: 'BTC'
+        symbol: 'BTG'
         unit: 8
       milibitcoin:
-        symbol: 'mBTC'
+        symbol: 'mBTG'
         unit: 5
       microbitcoin:
         symbol: 'bits'
@@ -290,16 +323,19 @@ ledger.preferences.bitcoin_segwit2x =
       blockchair:
         name: 'Blockchair.com'
         address: 'https://blockchair.com/bitcoin/transaction/%s'                
-    discoveryGap: 20  
+      btgexp:
+        name: 'btgexp.com'
+        address: 'http://btgexp.com/tx/%s'
+    discoveryGap: 20
 
-ledger.preferences.bitcoin_segwit2x_segwit =
+ledger.preferences.bitcoin_gold_split =
   Display:
     units:
       bitcoin:
-        symbol: 'BTC'
+        symbol: 'BTG'
         unit: 8
       milibitcoin:
-        symbol: 'mBTC'
+        symbol: 'mBTG'
         unit: 5
       microbitcoin:
         symbol: 'bits'
@@ -326,16 +362,19 @@ ledger.preferences.bitcoin_segwit2x_segwit =
       blockchair:
         name: 'Blockchair.com'
         address: 'https://blockchair.com/bitcoin/transaction/%s'                
-    discoveryGap: 20      
+      btgexp:
+        name: 'btgexp.com'
+        address: 'http://btgexp.com/tx/%s'
+    discoveryGap: 20
 
-ledger.preferences.bitcoin_uasf =
+ledger.preferences.bitcoin_gold_unsplit_segwit =
   Display:
     units:
       bitcoin:
-        symbol: 'BTC'
+        symbol: 'BTG'
         unit: 8
       milibitcoin:
-        symbol: 'mBTC'
+        symbol: 'mBTG'
         unit: 5
       microbitcoin:
         symbol: 'bits'
@@ -362,7 +401,31 @@ ledger.preferences.bitcoin_uasf =
       blockchair:
         name: 'Blockchair.com'
         address: 'https://blockchair.com/bitcoin/transaction/%s'            
-    discoveryGap: 20    
+      btgexp:
+        name: 'btgexp.com'
+        address: 'http://btgexp.com/tx/%s'
+    discoveryGap: 20
+
+ledger.preferences.bitcoin_gold_split_segwit =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'BTG'
+        unit: 8
+      milibitcoin:
+        symbol: 'mBTG'
+        unit: 5
+      microbitcoin:
+        symbol: 'bits'
+        unit: 2
+
+  # Coin preferences
+  Coin:
+    explorers:
+      btgexp:
+        name: 'btgexp.com'
+        address: 'http://btgexp.com/tx/%s'
+    discoveryGap: 20
 
 ledger.preferences.testnet =
   Display:
@@ -446,7 +509,7 @@ ledger.preferences.litecoin_segwit =
       bchain:
         name: 'Bchain.info'
         address: 'https://bchain.info/LTC/tx/%s'
-    discoveryGap: 20    
+    discoveryGap: 20
 
 ledger.preferences.dogecoin =
   Display:
@@ -638,10 +701,10 @@ ledger.preferences.pivx =
   Display:
     units:
       bitcoin:
-        symbol: 'PIVX'
+        symbol: 'PIV'
         unit: 8
       milibitcoin:
-        symbol: 'mPIVX'
+        symbol: 'mPIV'
         unit: 5
 
 # Coin preferences
@@ -650,9 +713,9 @@ ledger.preferences.pivx =
       cryptoID:
         name: 'CryptoID'
         address: 'https://chainz.cryptoid.info/pivx/tx.dws?%s.htm'
-      pivxscan:
-        name: 'PivxScan'
-        address: 'https://pivxscan.io/tx/%s'
+      Presstab:
+        name: 'Presstab'
+        address: 'http://presstab.pw/phpexplorer/PIVX/tx.php?tx=%s'
     discoveryGap: 20
 
 ledger.preferences.viacoin =
@@ -677,5 +740,50 @@ ledger.preferences.viacoin =
     discoveryGap: 20
 
 ledger.preferences.viacoin_segwit = ledger.preferences.viacoin
+
+ledger.preferences.qtum =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'QTUM'
+        unit: 8
+
+# Coin preferences
+  Coin:
+    explorers:
+      qtuminfo:
+        name: 'qtum.info'
+        address: 'https://qtum.info/tx/%s'
+    discoveryGap: 20
+
+ledger.preferences.hcash =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'HSR'
+        unit: 8
+
+# Coin preferences
+  Coin:
+    explorers:
+      qtuminfo:
+        name: 'explorer.h'
+        address: 'http://explorer.h.cash/tx/%s'
+    discoveryGap: 20
+
+ledger.preferences.digibyte =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'DGB'
+        unit: 8
+
+# Coin preferences
+  Coin:
+    explorers:
+      qtuminfo:
+        name: 'digiexplorer'
+        address: 'https://digiexplorer.info/tx/%s'
+    discoveryGap: 20
 
 ledger.preferences.common.setCoin("bitcoin")
