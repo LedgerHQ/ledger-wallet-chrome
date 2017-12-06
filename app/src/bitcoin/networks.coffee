@@ -466,7 +466,6 @@ zencash:
     dust: 10000
     handleFeePerByte: no
 
-
   clubcoin:
     name: 'clubcoin'
     display_name: 'clubcoin'
