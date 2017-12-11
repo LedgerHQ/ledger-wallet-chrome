@@ -1,4 +1,10 @@
 # Changelog
+1.9.12
+===
+- Corrected old redirection to support page
+- Fees now are defaulted to their last value when API fails
+- Changed Litecoin explorer
+
 1.9.11
 ===
 - Corrected counter values calculation
