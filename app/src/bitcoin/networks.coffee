@@ -445,7 +445,7 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
 
-zencash:
+  zencash:
     name: 'zencash'
     display_name: 'zencash'
     plural: 'zencash'
