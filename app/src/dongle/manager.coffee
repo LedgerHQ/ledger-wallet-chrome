@@ -32,8 +32,8 @@ class @ledger.dongle.Manager extends EventEmitter
     @_factoryDongleOS = new ChromeapiPlugupCardTerminalFactory(0x1b7c);
     @_factoryDongleOSHID = new ChromeapiPlugupCardTerminalFactory(0x2b7c);
     @_factoryDongleOSHIDLedger = new ChromeapiPlugupCardTerminalFactory(0x3b7c, undefined, true);
-    @_factoryDongleOSHIDLedgerBlue = new ChromeapiPlugupCardTerminalFactory(0x0000, undefined, true, 0x2c97);
-    @_factoryDongleOSHIDLedgerNanoS = new ChromeapiPlugupCardTerminalFactory(0x0001, undefined, true, 0x2c97);
+    @_factoryDongleOSHIDLedgerBlue = new ChromeapiPlugupCardTerminalFactory(0x0000, 0xffa0, true, 0x2c97);
+    @_factoryDongleOSHIDLedgerNanoS = new ChromeapiPlugupCardTerminalFactory(0x0001, 0xffa0, true, 0x2c97);
     @_isPaused = yes
 
   # Start observing if dongles are plugged in or unnplugged

@@ -63,7 +63,9 @@ class ledger.tasks.FeesComputationTask extends ledger.tasks.Task
     return unless @isRunning()
     d = ledger.defer()
     @_client.getEstimatedFees (fees, error) =>
-      @_updateFeesAndSave(fees) if fees?
+      if fees?
+        if Object.keys(fees).length > 0
+          @_updateFeesAndSave(fees)
       d.resolve()
       setTimeout((=> @_update(yes)), ledger.tasks.FeesComputationTask.UpdateRate) if scheduleNext
     d.promise
