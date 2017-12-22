@@ -757,7 +757,7 @@ ledger.bitcoin.Networks =
     tickerKey:
       from: 'fromPIVX'
       to: 'toPIVX'
-    bip44_coin_type: '77'
+    bip44_coin_type: '119'
     handleSegwit: no
     isSegwitSupported: no
     version:
