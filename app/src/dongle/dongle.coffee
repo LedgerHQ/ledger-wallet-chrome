@@ -691,8 +691,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       if ledger.config.network.name is "zencash"
         # Hight and Hash values probably incorrect!!!
         OP_CHECKBLOCKATHEIGHT = newByteString('B4', HEX)
-        ParamBlockHeight = NewByteString('2f0f0', HEX)
-        ParamBlockHeighLength = NewByteString('3, HEX)
+        ParamBlockHeight = NewByteString('2f0f03', HEX)
         ParamBlockHash = NewByteString('815d6e4a7044868b7641aaa96b51889670a9da99f9b320806cc807e100000000', Hex)
 
 
@@ -718,7 +717,6 @@ class @ledger.dongle.Dongle extends EventEmitter
           .concat(OP_CHECKSIG)
           if ledger.config.network.name is "zencash"
             .concat(ParamBlockHash)
-            .concat(ParamBlockHeightLength)
             .concat(ParamBlockHeight)
             .concat(OP_CHECKBLOCKATHEIGHT)
         VI(script.length).concat(script)
@@ -731,7 +729,6 @@ class @ledger.dongle.Dongle extends EventEmitter
           .concat(OP_EQUAL)
           if ledger.config.network.name is "zencash"
             .concat(ParamBlockHash)
-            .concat(ParamBlockHeightLength)
             .concat(ParamBlockHeight)
             .concat(OP_CHECKBLOCKATHEIGHT)
         VI(script.length).concat(script)
