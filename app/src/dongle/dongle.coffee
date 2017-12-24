@@ -705,26 +705,42 @@ class @ledger.dongle.Dongle extends EventEmitter
           return P2shScript(hash160) if hash160WithNetwork.byteAt(0) is ledger.config.network.version.P2SH
         else
           return P2shScript(hash160) if (hash160WithNetwork.byteAt(0) << 8 + hash160WithNetwork.byteAt(1)) is ledger.config.network.version.P2SH
-        script =
-          OP_DUP
-          .concat(OP_HASH160)
-          .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
-          .concat(hash160)
-          .concat(OP_EQUALVERIFY)
-          .concat(OP_CHECKSIG)
-          if ledger.config.network.name is "zencash"
+        if ledger.config.network.name is "zencash"
+          script =
+            OP_DUP
+            .concat(OP_HASH160)
+            .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
+            .concat(hash160)
+            .concat(OP_EQUALVERIFY)
+            .concat(OP_CHECKSIG)
             .concat(ZenReplayProtection)
-        VI(script.length).concat(script)
+          VI(script.length).concat(script)
+        else
+          script =
+            OP_DUP
+            .concat(OP_HASH160)
+            .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
+            .concat(hash160)
+            .concat(OP_EQUALVERIFY)
+            .concat(OP_CHECKSIG)
+          VI(script.length).concat(script)
 
       P2shScript = (hash160) =>
-        script =
-          OP_HASH160
-          .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
-          .concat(hash160)
-          .concat(OP_EQUAL)
-          if ledger.config.network.name is "zencash"
+        if ledger.config.network.name is "zencash"
+          script =
+            OP_HASH160
+            .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
+            .concat(hash160)
+            .concat(OP_EQUAL)
             .concat(ZenReplayProtection)
-        VI(script.length).concat(script)
+          VI(script.length).concat(script)
+        else
+          script =
+            OP_HASH160
+            .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
+            .concat(hash160)
+            .concat(OP_EQUAL)
+          VI(script.length).concat(script)
 
       OpReturnScript = (data) =>
         script =
