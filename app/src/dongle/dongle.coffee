@@ -689,10 +689,7 @@ class @ledger.dongle.Dongle extends EventEmitter
       OP_CHECKSIG = new ByteString('AC', HEX)
       OP_RETURN = new ByteString('6A', HEX)
       if ledger.config.network.name is "zencash"
-        # Hight and Hash values probably incorrect!!!
-        OP_CHECKBLOCKATHEIGHT = newByteString('B4', HEX)
-        ParamBlockHeight = NewByteString('2f0f03', HEX)
-        ParamBlockHash = NewByteString('815d6e4a7044868b7641aaa96b51889670a9da99f9b320806cc807e100000000', Hex)
+        ZenReplayProtection = NewByteString('209ec9845acb02fab24e1c0368b3b517c1a4488fba97f0e3459ac053ea0100000003c01f02b4', HEX)
 
 
       ###
@@ -716,9 +713,7 @@ class @ledger.dongle.Dongle extends EventEmitter
           .concat(OP_EQUALVERIFY)
           .concat(OP_CHECKSIG)
           if ledger.config.network.name is "zencash"
-            .concat(ParamBlockHash)
-            .concat(ParamBlockHeight)
-            .concat(OP_CHECKBLOCKATHEIGHT)
+            .concat(ZenReplayProtection)
         VI(script.length).concat(script)
 
       P2shScript = (hash160) =>
@@ -728,9 +723,7 @@ class @ledger.dongle.Dongle extends EventEmitter
           .concat(hash160)
           .concat(OP_EQUAL)
           if ledger.config.network.name is "zencash"
-            .concat(ParamBlockHash)
-            .concat(ParamBlockHeight)
-            .concat(OP_CHECKBLOCKATHEIGHT)
+            .concat(ZenReplayProtection)
         VI(script.length).concat(script)
 
       OpReturnScript = (data) =>
