@@ -492,7 +492,7 @@ ledger.preferences.zclassic =
       Coin:
         explorers:
           zchain:
-            name: 'Zcl-explorer.com'
+            name: 'Zcl-explorer.com/insight'
             address: 'http://zcl-explorer.com/insight/tx/%s'
         discoveryGap: 20
 
