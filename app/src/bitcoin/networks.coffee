@@ -26,7 +26,7 @@ bitcoin.networks.zclassic =
     magicPrefix: '\x16Zclassic Signed Message:\n'
     bip32:
       public: 0x0488B21E,
-      private: 0x05358394
+      private: 0x0488ADE4
     pubKeyHash: 0x1CB8
     scriptHash: 0x1CBD
 
