@@ -9,6 +9,8 @@ _.extend @ledger.config,
     baseUrl: 'wss://ws.ledgerwallet.com/2fa/channels'
   restClient:
     baseUrl: 'https://api.ledgerwallet.com/'
+  wsNotification:
+    baseUrl: 'wss://ws.ledgerwallet.com/blockchain/v2/'
   syncRestClient:
     pullIntervalDelay: 60000
     pullThrottleDelay: 1000
