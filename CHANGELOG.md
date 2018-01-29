@@ -1,4 +1,8 @@
 # Changelog
+1.9.14
+===
+- Fix fee estimation
+
 1.9.13
 ===
 - Corrected old redirection to support page
