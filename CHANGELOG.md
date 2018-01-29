@@ -2,6 +2,7 @@
 1.9.14
 ===
 - Fix fee estimation
+- Use the current timestamp minus 15 minutes for XST
 
 1.9.13
 ===
