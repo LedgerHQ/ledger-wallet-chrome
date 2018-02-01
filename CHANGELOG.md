@@ -1,4 +1,8 @@
 # Changelog
+1.9.15
+===
+- Fix cpfp fees being wrongly initialized
+
 1.9.14
 ===
 - Fix fee estimation
