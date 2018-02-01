@@ -38,7 +38,7 @@ class ledger.converters
     currency ?= ledger.preferences.instance.getCurrency()
     currencies = ledger.tasks.TickerTask.instance.getCache()
     # satoshiValueCurrency is the amount in Satoshi for 1 in the given currency
-    satoshiValueCurrency = findRate(ledger.config.network.tickerKey.to, currency) * Math.pow(10, 8)
+    satoshiValueCurrency = findRate(ledger.config.network.tickerKey.to, currency) * Math.pow(10, ledger.preferences.defaults.Display.units.bitcoin.unit)
     satoshiValue = satoshiValueCurrency * currencyValue
     Math.round(satoshiValue)
 
@@ -56,7 +56,7 @@ class ledger.converters
 
     # currencyValueBTC is the amount in the given currency for 1 BTC
     currencyValueBTC = findRate(ledger.config.network.tickerKey.from, currency)
-    val = currencyValueBTC * Math.pow(10, -8)
+    val = currencyValueBTC * Math.pow(10, -ledger.preferences.defaults.Display.units.bitcoin.unit)
     currencyValueSatoshi = val * satoshiValue
     ledger.i18n.formatNumber(parseFloat(currencyValueSatoshi.toFixed(2)))
 
@@ -74,7 +74,7 @@ class ledger.converters
     if rate > 0
       # currencyValueBTC is the amount in the given currency for 1 BTC
       currencyValueBTC = rate
-      val = currencyValueBTC * Math.pow(10, -8)
+      val = currencyValueBTC * Math.pow(10, -ledger.preferences.defaults.Display.units.bitcoin.unit)
       currencyValueSatoshi = val * satoshiValue
       res = parseFloat(currencyValueSatoshi.toFixed(2))
     else

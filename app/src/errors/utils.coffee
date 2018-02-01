@@ -15,7 +15,7 @@ _.extend ledger.errors,
     self.name = _.invert(ledger.errors)[code]
     self.payload = payload
     self.localizedMessage = -> t(@_i18nId())
-    self._i18nId = -> "common.errors.#{_.underscore(@name)}"
+    self._i18nId = -> "common.errors.#{_.str.underscored(@name)}"
     return self
 
   throw: (code, msg) -> throw @new(code, msg)

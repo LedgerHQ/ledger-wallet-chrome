@@ -11,14 +11,14 @@ var BitcoinExternal = Class.create({
 		return new ByteString(Convert.toHexByte((number >> 24) & 0xff) + Convert.toHexByte((number >> 16) & 0xff) + Convert.toHexByte((number >> 8) & 0xff) + Convert.toHexByte(number & 0xff), HEX);
 	},
 
-	createBip32Key : function(seed) {		
+	createBip32Key : function(seed) {
 		var key = new ByteString("Bitcoin seed", ASCII);
-		var sha = new JSUCrypt.hash.SHA512();		
+		var sha = new JSUCrypt.hash.SHA512();
 		var hmac = new JSUCrypt.signature.HMAC(sha);
 		hmac.init(new JSUCrypt.key.HMACKey(key.toString(HEX)), JSUCrypt.signature.MODE_SIGN);
 		var result = hmac.sign(seed.toString(HEX));
 		result = new ByteString(JSUCrypt.utils.byteArrayToHexStr(result), HEX);
-		return [ result.bytes(0, 32), result.bytes(32, 32) ];		
+		return [ result.bytes(0, 32), result.bytes(32, 32) ];
 	},
 
 	derivePrivateBip32Key : function(key, chain, indexBigInt) {
@@ -36,7 +36,7 @@ var BitcoinExternal = Class.create({
 			data = this.compressPublicKey(this.getPublicKey(key));
 		}
 		data = data.concat(index);
-		var sha = new JSUCrypt.hash.SHA512();		
+		var sha = new JSUCrypt.hash.SHA512();
 		var hmac = new JSUCrypt.signature.HMAC(sha);
 		hmac.init(new JSUCrypt.key.HMACKey(chain.toString(HEX)), JSUCrypt.signature.MODE_SIGN);
 		var result = hmac.sign(data.toString(HEX));
@@ -44,7 +44,7 @@ var BitcoinExternal = Class.create({
 		var derivedPrivate = new BigInteger(key.toString(HEX), 16);
 		derivedPrivate = derivedPrivate.add(new BigInteger(result.bytes(0, 32).toString(HEX), 16));
 		derivedPrivate = derivedPrivate.mod(domain.order);
-		return [ new ByteString(derivedPrivate.toString(16), HEX), result.bytes(32, 32) ];		
+		return [ new ByteString(derivedPrivate.toString(16), HEX), result.bytes(32, 32) ];
 	},
 
 	derivePublicBip32Key : function(key, chain, indexBigInt) {
@@ -53,17 +53,17 @@ var BitcoinExternal = Class.create({
 		while (index.length < 8) {
 			index = "0" + index;
 		}
-		var index = new ByteString(index, HEX);		
+		var index = new ByteString(index, HEX);
 		if (key.byteAt(0) != 0x04) {
 			throw "Public key must be uncompressed";
 		}
 		var publicKey = new JSUCrypt.key.EcFpPublicKey(256, domain, new JSUCrypt.ECFp.AffinePoint(key.bytes(1, 32).toString(HEX), key.bytes(33, 32).toString(HEX)));
-		key = this.compressPublicKey(key);		
+		key = this.compressPublicKey(key);
 		if (indexBigInt.testBit(31)) {
 			throw "Hardened derivation not possible";
 		}
 		var data = key.concat(index);
-		var sha = new JSUCrypt.hash.SHA512();		
+		var sha = new JSUCrypt.hash.SHA512();
 		var hmac = new JSUCrypt.signature.HMAC(sha);
 		hmac.init(new JSUCrypt.key.HMACKey(chain.toString(HEX)), JSUCrypt.signature.MODE_SIGN);
 		var result = hmac.sign(data.toString(HEX));
@@ -86,16 +86,16 @@ var BitcoinExternal = Class.create({
 		if (typeof version == "undefined") {
 			version = 0x00;
 		}
-		var sha = new JSUCrypt.hash.SHA256();		
+		var sha = new JSUCrypt.hash.SHA256();
 		var ripemd = new JSUCrypt.hash.RIPEMD160();
 		var result = sha.finalize(publicKey.toString(HEX));
 		result = new ByteString(JSUCrypt.utils.byteArrayToHexStr(result), HEX);
 		result = ripemd.finalize(result.toString(HEX));
 		result = new ByteString(Convert.toHexByte(version) + JSUCrypt.utils.byteArrayToHexStr(result), HEX);
 		var checksum = sha.finalize(result.toString(HEX));
-		checksum = new ByteString(JSUCrypt.utils.byteArrayToHexStr(checksum), HEX);				
+		checksum = new ByteString(JSUCrypt.utils.byteArrayToHexStr(checksum), HEX);
 		checksum = sha.finalize(checksum.toString(HEX));
-		checksum = new ByteString(JSUCrypt.utils.byteArrayToHexStr(checksum), HEX);				
+		checksum = new ByteString(JSUCrypt.utils.byteArrayToHexStr(checksum), HEX);
 		result = result.concat(checksum.bytes(0, 4));
 		return result;
 	},
@@ -127,7 +127,7 @@ var BitcoinExternal = Class.create({
 		var messageLength;
 	    if (message.length < 0xfd) {
       		messageLength = new ByteString(Convert.toHexByte(message.length), HEX);
-    	} else 
+    	} else
     	if (message.length <= 0xffff) {
       		messageLength = new ByteString("FD" + Convert.toHexByte(message.length & 0xff) + Convert.toHexByte((message.length >> 8) & 0xff), HEX);
       	}
@@ -135,7 +135,7 @@ var BitcoinExternal = Class.create({
       		throw "Message too long";
       	}
 
-		var sha = new JSUCrypt.hash.SHA256();		
+		var sha = new JSUCrypt.hash.SHA256();
 
 		var messageToSign = new ByteString(prefix, ASCII);
 		messageToSign = messageToSign.concat(messageLength).concat(message);
@@ -151,7 +151,7 @@ var BitcoinExternal = Class.create({
 		privateKeys = undefined;
 
 		var domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1");
-		var hashNone = new JSUCrypt.hash.HASHNONE();		
+		var hashNone = new JSUCrypt.hash.HASHNONE();
 
 		var sha = new JSUCrypt.hash.SHA256();
 		var transaction = this.splitTransaction(transactionParam);
@@ -164,8 +164,8 @@ var BitcoinExternal = Class.create({
 			hash = new ByteString(JSUCrypt.utils.byteArrayToHexStr(sha.finalize(hash.toString(HEX))), HEX);
 			hashedTransactionPool[hash.toString(HEX).toUpperCase()] = this.splitTransaction(transactionPool[i]);
 		}
-		
-		var targetTransaction = {};				
+
+		var targetTransaction = {};
 		targetTransaction['version'] = transaction['version'];
 		targetTransaction['inputs'] = [];
 		for (var i=0; i<inputs.length; i++) {
@@ -181,11 +181,11 @@ var BitcoinExternal = Class.create({
 			var prevTransaction = hashedTransactionPool[prevoutHash.toString(HEX).toUpperCase()];
 			if (typeof prevTransaction == "undefined") {
 				throw "Missing parent transaction " + prevoutHash.toString(HEX);
-			}			
+			}
 			var prevScript = prevTransaction.outputs[prevoutIndex]['script'];
 			targetTransaction['inputs'][i]['script'] = prevScript;
-			targetTransaction['inputs'][i]['prevout'] = inputs[i]['prevout'];			
-			targetTransaction['inputs'][i]['sequence'] = inputs[i]['sequence'];			
+			targetTransaction['inputs'][i]['prevout'] = inputs[i]['prevout'];
+			targetTransaction['inputs'][i]['sequence'] = inputs[i]['sequence'];
 			var data = targetTransaction['version'].concat(this.createVarint(targetTransaction['inputs'].length));
 			for (var j=0; j<targetTransaction['inputs'].length; j++) {
 				var input = targetTransaction['inputs'][j];
@@ -199,9 +199,9 @@ var BitcoinExternal = Class.create({
 				data = data.concat(output['amount']);
 				data = data.concat(this.createVarint(output['script'].length).concat(output['script']));
 			}
-			data = data.concat(transaction['locktime']);			
+			data = data.concat(transaction['locktime']);
 			var inputScript = this.splitInputScript(transaction['inputs'][i]['script']);
-			data = data.concat(new ByteString(Convert.toHexByte(inputScript['sigHashType']) + "000000", HEX));			
+			data = data.concat(new ByteString(Convert.toHexByte(inputScript['sigHashType']) + "000000", HEX));
 			var hash = sha.finalize(data.toString(HEX));
 			hash = new ByteString(JSUCrypt.utils.byteArrayToHexStr(hash), HEX);
 
@@ -226,8 +226,8 @@ var BitcoinExternal = Class.create({
 					throw "Invalid signature, expected " + result.toString(HEX) + " got " + inputScript['signature'].toString(HEX);
 				}
 			}
-			targetTransaction['inputs'][i]['script'] = new ByteString("", HEX);			
-		}		
+			targetTransaction['inputs'][i]['script'] = new ByteString("", HEX);
+		}
 	},
 
 	getVarint : function(data, offset) {
@@ -238,7 +238,7 @@ var BitcoinExternal = Class.create({
 			return [ ((data.byteAt(offset + 2) << 8) + data.byteAt(offset + 1)), 3 ];
 		}
 		if (data.byteAt(offset) == 0xfe) {
-			return [ ((data.byteAt(offset + 4) << 24) + (data.byteAt(offset + 3) << 16) + 
+			return [ ((data.byteAt(offset + 4) << 24) + (data.byteAt(offset + 3) << 16) +
 				  (data.byteAt(offset + 2) << 8) + data.byteAt(offset + 1)), 5 ];
 		}
 	},
@@ -290,9 +290,9 @@ var BitcoinExternal = Class.create({
 			input['script'] = transaction.bytes(offset, varint[0]);
 			offset += varint[0];
 			input['sequence'] = transaction.bytes(offset, 4);
-			offset += 4;			
+			offset += 4;
 			inputs.push(input);
-		}		
+		}
 		varint = this.getVarint(transaction, offset);
 		var numberOutputs = varint[0];
 		offset += varint[1];
@@ -318,7 +318,7 @@ var BitcoinExternal = Class.create({
 		alert("version " + transaction['version'].toString(HEX));
 		for (var i=0; i<transaction['inputs'].length; i++) {
 			var input = transaction['inputs'][i];
-			alert("input " + i + " prevout " + input['prevout'].toString(HEX) + " script " + input['script'].toString(HEX) + " sequence " + input['sequence'].toString(HEX)); 
+			alert("input " + i + " prevout " + input['prevout'].toString(HEX) + " script " + input['script'].toString(HEX) + " sequence " + input['sequence'].toString(HEX));
 		}
 		for (var i=0; i<transaction['outputs'].length; i++) {
 			var output = transaction['outputs'][i];
@@ -333,18 +333,28 @@ var BitcoinExternal = Class.create({
 		}
 		var rLength = asn1Signature.byteAt(3);
 		if (asn1Signature.byteAt(4 + rLength) != 0x02) {
-			throw "Invalid signature format";			
-		}		
+			throw "Invalid signature format";
+		}
 		var r = asn1Signature.bytes(4, rLength);
 		var s = asn1Signature.bytes(4 + rLength + 2, asn1Signature.byteAt(4 + rLength + 1));
+		
+		while (r.length < 32) {
+			r = new ByteString("00", HEX).concat(r)
+		}
+		while (s.length < 32) {
+			s = new ByteString("00", HEX).concat(s)
+		}
+
 		if (r.length == 33) {
 			r = r.bytes(1);
 		}
 		if (s.length == 33) {
 			s = s.bytes(1);
 		}
+
+
 		if ((r.length != 32) || (s.length != 32)) {
-			throw "Invalid signature format";			
+			throw "Invalid signature format";
 		}
 		return [ r, s ];
 	},
@@ -354,7 +364,7 @@ var BitcoinExternal = Class.create({
 		var compressedKey;
 		if (publicKey.byteAt(0) != 0x04) {
 			throw "Invalid public key format";
-		}		
+		}
 		if ((publicKey.byteAt(64) & 1) != 0) {
 			compressedKeyIndex = 0x03;
 		}
@@ -370,7 +380,7 @@ var BitcoinExternal = Class.create({
 		var recBN = new BigInteger("" + rec, 10);
 		var BN2 = new BigInteger("2", 10);
 		var BN4 = new BigInteger("4", 10);
-		var domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1");		
+		var domain = JSUCrypt.ECFp.getEcDomainByName("secp256k1");
 		var a = domain.curve.a;
 		var b = domain.curve.b;
 		var p = domain.curve.field;
@@ -392,5 +402,3 @@ var BitcoinExternal = Class.create({
 	}
 
 });
-
-

@@ -542,7 +542,7 @@ var BTChip = Class.create({
             var scriptBlocks = [];
             var offset = 0;
             var scriptResult;
-            while (offset != script.length) {
+            do {
                 var blockSize = (script.length - offset > 251 ? 251 : script.length - offset);
                 if (((offset + blockSize) != script.length) || (typeof sequence == 'undefined')) {
                     scriptBlocks.push(script.bytes(offset, blockSize));
@@ -551,7 +551,7 @@ var BTChip = Class.create({
                     scriptBlocks.push(script.bytes(offset, blockSize).concat(sequence));
                 }
                 offset += blockSize;
-            }
+            }  while (offset < script.length)
             async.eachSeries(
                 scriptBlocks,
                 function (scriptBlock, finishedCallback) {
@@ -1284,7 +1284,7 @@ var BTChip = Class.create({
 
           } else {
             if (ledger.config.network.name === "stealthcoin") {
-              timestamp = new ByteString(Convert.toHexInt(time - (10 * 60)).match(/([0-9a-f]{2})/g).reverse().join(''), HEX);
+              timestamp = new ByteString(Convert.toHexInt(time - (15 * 60)).match(/([0-9a-f]{2})/g).reverse().join(''), HEX);
             } else {
               timestamp = new ByteString(Convert.toHexInt(time).match(/([0-9a-f]{2})/g).reverse().join(''), HEX);
             }
@@ -1502,7 +1502,7 @@ var BTChip = Class.create({
         return new ByteString(tmp, HEX);
     },
 
-    createPaymentTransactionNewBIP143_async: function(segwit, inputs, associatedKeysets, changePath, outputScript, lockTime, sighashType, authorization, resumeData) {
+    createPaymentTransactionNewBIP143_async: function(segwit, forkid, inputs, associatedKeysets, changePath, outputScript, lockTime, sighashType, authorization, resumeData) {
         // Implementation starts here
 
         // Inputs are provided as arrays of [transaction, output_index, optional redeem script]
@@ -1675,7 +1675,7 @@ var BTChip = Class.create({
                 var notifyStartUntrustedHash = {stage: "hashTransaction", currentUntrustedHash: i + 1};
                 return self.startUntrustedHashTransactionInputBIP143_async(false, pseudoTransaction, pseudoTrustedInputs).then(function () {
                     notify(notifyStartUntrustedHash);
-                    var hashType = (segwit ? 0x01 : 0x41);
+                    var hashType = ((segwit && !forkid) ? 0x01 : 0x41);
                     return self.signTransaction_async(associatedKeysets[i], authorization, undefined, hashType).then(function (signature) {
                         notify({stage: "getTrustedInput", currentSignTransaction: i + 1});
                         signatures.push(signature);

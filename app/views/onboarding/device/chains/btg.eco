@@ -7,23 +7,15 @@
     <p class="medium-indication"><%- t 'onboarding.device.chains.segwit_message'%><p>
     <div class="chain-selector">
       <a    class="choice cancel-rounded-button"
-            value="0">
+            value="3">
             <%- t('onboarding.device.chains.segwit_cancel') %>
       </a>
       <% for chain,i in @networks : %>
-        <% if true: %>
+        <% if !chain.hidden: %>
           <a id="<%= chain.ticker %>"
-            class="choice <% if chain.greyed is yes: %>
-              cancel-rounded-button
-            <% else: %>
-              action-rounded-button
-            <% end %>"
+            class="choice action-rounded-button"
             value=<%= i %>>
-            <% if chain.ticker == "abc": %>
-              bitcoin cash
-            <% else: %>
-              <%= chain.chain %>
-            <% end %>
+            <%= chain.chain %>
           </a>
         <% end %>
       <% end %>
@@ -32,5 +24,6 @@
   </div>
   <div class="actions-container">
     <a id="help" href="#openHelpCenter" class="greyed-action medium-indication"><%= t 'onboading.common.help' %></a>
+    <a id="recover" href="#splitTool" class="greyed-action medium-indication"> | <%= t 'onboarding.device.chains.split_btg_title' %></a>
   </div>
 </div>
