@@ -588,7 +588,7 @@ ledger.bitcoin.Networks =
     tickerKey:
       from: 'fromZEN'
       to: 'toZEN'
-    bip44_coin_type: '133'
+    bip44_coin_type: '121'
     handleSegwit: no
     isSegwitSupported: no
     version:
