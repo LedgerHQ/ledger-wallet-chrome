@@ -292,6 +292,8 @@
 
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'
+        'controllers/wallet/receive/enforce/wallet_receive_enforce_index_dialog_view_controller'
+        'controllers/wallet/receive/enforce/wallet_receive_enforce_alert_dialog_view_controller'
 
         # BitID
         'controllers/wallet/bitid/wallet_bitid_index_dialog_view_controller'

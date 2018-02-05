@@ -1,0 +1,34 @@
+@import (reference) "../../../constants";
+@import (reference) "../../../mixins";
+@import (reference) "../../../common";
+
+section#dialogs_confirmation_dialog {
+  display:flex;
+  max-width: 320px;
+
+  > .content-container {
+    text-align: center;
+
+    > i {
+      color: #cccccc;
+      font-size: 40px;
+    }
+
+    > .uppercase-section-title {
+      margin-top: @metrics-small-padding;
+    }
+
+    > .regular-text-small {
+      margin-top: @metrics-very-small-padding;
+      line-height: 20px;
+    }
+
+    > .dialog-actions-bar {
+      margin-top: @metrics-almost-medium-padding;
+    }
+  }
+
+  > .spacer {
+    width: @metrics-medium-padding;
+  }
+}

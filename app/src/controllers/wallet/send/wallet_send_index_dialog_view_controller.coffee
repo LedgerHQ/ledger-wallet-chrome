@@ -142,6 +142,10 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @_updateTotalLabel()
     dialog.show()
 
+  openSensitive: ->
+    window.open t 'application.sensitive_url'
+
+
   _listenEvents: ->
     @view.amountInput.on 'keyup', =>
       _.defer =>
