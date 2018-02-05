@@ -15,7 +15,7 @@ bitcoin.networks.btcgpu =
   scriptHash: 23
 
 bitcoin.networks.zcash =
-  magicPrefix: '\x16Zcash Signed Message:\n'
+  magicPrefix: '\x18Zcash Signed Message:\n'
   bip32:
     public: 0x0488B21E,
     private: 0x05358394
