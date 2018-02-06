@@ -1,4 +1,9 @@
 # Changelog
+1.10.0
+===
+- New receive funds flow
+- Detect unsupported bitcoin cash address format
+
 1.9.15
 ===
 - Fix cpfp fees being wrongly initialized
