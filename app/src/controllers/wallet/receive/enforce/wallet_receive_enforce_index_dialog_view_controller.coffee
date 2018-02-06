@@ -54,6 +54,10 @@ class @WalletReceiveEnforceIndexDialogViewController extends ledger.common.Dialo
       _.defer => 
         @_updateQrCode()
         @_updateExchangeValue()
+    @view.accountsSelect.on 'change', =>
+      @_updateColorSquare()
+      @_updateQrCode()
+      @_updateReceiverAddress()
 
   _updateQrCode: () ->
     @view.qrcode.makeCode(@_bitcoinAddressUri());

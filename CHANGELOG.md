@@ -1,5 +1,5 @@
 # Changelog
-1.10.0
+1.10.0/1.10.1
 ===
 - New receive funds flow
 - Detect unsupported bitcoin cash address format

@@ -2,6 +2,31 @@
 @import (reference) "../../../mixins";
 
 section.receive_index_dialog {
+  max-width: 600px;
+ #receiver_address {
+    .selectable;
+  }
+
+  #please_verify {
+    text-align: center;
+    margin-top: @metrics-small-padding;
+
+    > i {
+      color: #cccccc;
+      font-size: 25px;
+      margin-bottom: @metrics-very-small-padding;
+    }
+    > p {
+      line-height: 20px;
+    }
+    > a {
+      margin-top: @metrics-small-padding;
+    }
+  }
+  
+}
+
+section.receive_address_dialog {
   max-width: 400px;
  #receiver_address {
     .selectable;
@@ -35,26 +60,6 @@ section.receive_index_dialog {
   #qrcode_frame_frame {
     margin-bottom: 10px;
   }
-
-  #please_verify {
-    text-align: center;
-    margin-top: @metrics-small-padding;
-
-    > i {
-      color: #cccccc;
-      font-size: 25px;
-      margin-bottom: @metrics-very-small-padding;
-    }
-
-    > p {
-      line-height: 20px;
-    }
-
-    > a {
-      margin-top: @metrics-small-padding;
-    }
-  }
-  
 }
 .more_info_link {
   text-decoration: underline;
