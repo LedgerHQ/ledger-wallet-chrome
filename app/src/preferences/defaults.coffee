@@ -405,8 +405,8 @@ ledger.preferences.litecoin =
   Coin:
     explorers:
       blockr:
-        name: 'Blockr.io'
-        address: 'https://ltc.blockr.io/tx/info/%s'
+        name: 'insight.litecore.io'
+        address: 'https://insight.litecore.io/tx/%s'
       sochain:
         name: 'SoChain'
         address: 'https://chain.so/tx/LTC/%s'

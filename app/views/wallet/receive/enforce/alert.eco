@@ -1,0 +1,13 @@
+<section id="dialogs_confirmation_dialog" <% if @restrainsDialogWidth is no: %>style="max-width: none"<% end %>>
+  <div class="spacer"></div>
+  <div class="content-container">
+    <img src="../../assets/images/common/large_error.png" width="50" height="50" />
+    <div class="regular-text-small"><%- t 'wallet.receive.enforce.alert' %></div>
+    <div class="dialog-actions-bar">
+      <a href="#clickCancel" class="cancel-rounded-button"><%= t 'common.cancel' %></a>
+      <div class="left-spacer"></div>
+      <a href="#clickPositive" class="action-rounded-button"><%= t 'wallet.receive.enforce.contact' %></a>
+    </div>
+  </div>
+  <div class="spacer"></div>
+</section>

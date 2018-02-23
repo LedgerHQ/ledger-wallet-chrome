@@ -1,4 +1,28 @@
 # Changelog
+1.10.0/1.10.1
+===
+- New receive funds flow
+- Detect unsupported bitcoin cash address format
+
+1.9.15
+===
+- Fix cpfp fees being wrongly initialized
+
+1.9.14
+===
+- Fix fee estimation
+- Use the current timestamp minus 15 minutes for XST
+
+1.9.13
+===
+- Corrected old redirection to support page
+- Fees now are defaulted to their last value when API fails
+- Changed Litecoin explorer
+
+1.9.12
+===
+- Fix wrong P2SH output generation for ZEC
+
 1.9.11
 ===
 - Corrected counter values calculation

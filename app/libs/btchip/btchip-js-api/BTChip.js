@@ -1284,7 +1284,7 @@ var BTChip = Class.create({
 
           } else {
             if (ledger.config.network.name === "stealthcoin") {
-              timestamp = new ByteString(Convert.toHexInt(time - (10 * 60)).match(/([0-9a-f]{2})/g).reverse().join(''), HEX);
+              timestamp = new ByteString(Convert.toHexInt(time - (15 * 60)).match(/([0-9a-f]{2})/g).reverse().join(''), HEX);
             } else {
               timestamp = new ByteString(Convert.toHexInt(time).match(/([0-9a-f]{2})/g).reverse().join(''), HEX);
             }

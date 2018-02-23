@@ -701,7 +701,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         if p2pkhNetworkVersionSize is 1
           return P2shScript(hash160) if hash160WithNetwork.byteAt(0) is ledger.config.network.version.P2SH
         else
-          return P2shScript(hash160) if (hash160WithNetwork.byteAt(0) << 8 + hash160WithNetwork.byteAt(1)) is ledger.config.network.version.P2SH
+          return P2shScript(hash160) if (hash160WithNetwork.byteAt(0) << 8 | hash160WithNetwork.byteAt(1)) is ledger.config.network.version.P2SH
         script =
           OP_DUP
           .concat(OP_HASH160)

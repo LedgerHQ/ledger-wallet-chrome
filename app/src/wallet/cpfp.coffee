@@ -75,15 +75,14 @@ ledger.bitcoin.cpfp =
         while on
           totalSize = unconfirmed.size.add(ledger.bitcoin.estimateTransactionSize(inputs.length, 2).max)
           feeAmount = totalSize.multiply(feePerByte).subtract(unconfirmed.fees)
-          requiredAmount = feeAmount.add(5430)
-          if collectedAmount.gte(requiredAmount)
+          if collectedAmount.gte(feeAmount) && collectedAmount.gte(5430)
             return {unconfirmed, inputs, collectedAmount, fees: feeAmount, size: totalSize}
           input = utxo[index]
           if input? and !hasInput(input)
             inputs.push(input)
             collectedAmount = collectedAmount.add(ledger.Amount.fromSatoshi(input.get("value")))
           index += 1
-          break if not input? 
+          break if not input?
         throw ledger.errors.new(ledger.errors.NotEnoughFunds)
     .then (preparedTransaction) ->
       if !preparedTransaction.fees.gte(1)

@@ -2,6 +2,11 @@
   <header>
     <h1><%= _.str.sprintf(t('wallet.send.common.send_bitcoins'), ledger.config.network.plural) %></h1>
   </header>
+  <div id="sensitive">
+    <i class="fa fa-warning"></i>
+    <div><p><%= t 'wallet.send.sensitive' %> <a href="#openSensitive"><%= t 'common.more_information' %></a></p></div>
+  </div>
+  <div id="divider"></div>
   <table class="no-table-head">
     <tbody>
       <tr id="amount_row">
