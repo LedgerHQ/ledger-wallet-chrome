@@ -141,7 +141,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   # Receive
   route '/wallet/receive/index:?params:', (params = {}) ->
-    dialog = new WalletReceiveIndexDialogViewController(params["?params"] or {})
+    if !ledger.app.dongle.getFirmwareInformation().hasVerifyAddressOnScreen() or (ledger.app.dongle.getFirmwareInformation().getIntFirmwareVersion() < 0x30010109 and ledger.config.network.handleSegwit)
+      dialog = new WalletReceiveIndexDialogViewController(params["?params"] or {})
+    else
+      dialog = new WalletReceiveEnforceIndexDialogViewController(params["?params"] or {})
     dialog.show()
 
   # Settings
