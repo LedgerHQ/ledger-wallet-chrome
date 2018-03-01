@@ -118,6 +118,14 @@ bitcoin.networks.digibyte =
   pubKeyHash: 30
   scriptHash: 5
 
+bitcoin.networks.monacoin =
+  magicPrefix: '\x19Monacoin Signed Message:\n'
+  bip32:
+    public: 0x0488b21e,
+    private: 0x0488ade4
+  pubKeyHash: 50
+  scriptHash: 55
+
 ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
   bitcoin:
@@ -526,6 +534,27 @@ ledger.bitcoin.Networks =
       XPUB: 0x02facafd
     bitcoinjs: bitcoin.networks.dogecoin
     dust: 10000
+    handleFeePerByte: no
+
+  monacoin:
+    name: 'monacoin'
+    display_name: 'monacoin'
+    plural: 'monacoins'
+    scheme: 'monacoin:'
+    bolosAppName: 'Monacoin'
+    ticker: 'mona'
+    tickerKey:
+      from: 'fromMONA'
+      to: 'toMONA'
+    bip44_coin_type: '22'
+    handleSegwit: yes
+    isSegwitSupported: yes
+    version:
+      regular: 50
+      P2SH: 55
+      XPUB: 0x0488b21e
+    bitcoinjs: bitcoin.networks.monacoin
+    dust: 5430
     handleFeePerByte: no
 
   dash:

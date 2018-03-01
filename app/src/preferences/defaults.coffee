@@ -466,6 +466,24 @@ ledger.preferences.dogecoin =
         address: 'https://chain.so/tx/DOGE/%s'
     discoveryGap: 20
 
+ledger.preferences.monacoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'MONA'
+        unit: 8
+      milibitcoin:
+        symbol: 'mMONA'
+        unit: 5
+
+  # Coin preferences
+  Coin:
+    explorers:
+      insight:
+        name: 'Insight monaco-ex.org'
+        address: 'https://mona.insight.monaco-ex.org/insight/tx/%s'
+    discoveryGap: 20
+
 ledger.preferences.zcash =
   Display:
     units:
