@@ -83,56 +83,59 @@ require @ledger.imports, ->
     onReconnectingDongle: () ->
       @_currentMode = ledger.app.Modes.Wallet
 
-    onDongleIsUnlocked: (dongle) ->
+    onDongleIsUnlocked: (dongle, skipFirmCheck) ->
       return unless @isInWalletMode()
-      _.defer =>
-        @emit 'dongle:unlocked', @dongle
-        ledger.app.dongle.getCoinVersion().then ({P2PKH, P2SH, message}) =>
-          l "Looking for #{P2PKH} #{P2SH}"
+      if (ledger.app.dongle.isNanoS && !skipFirmCheck)
+        ledger.app.router.go '/onboarding/device/firmware'
+      else 
+        _.defer =>
+          @emit 'dongle:unlocked', @dongle
+          ledger.app.dongle.getCoinVersion().then ({P2PKH, P2SH, message}) =>
+            l "Looking for #{P2PKH} #{P2SH}"
 
-          networks = []
-          for k, v of ledger.bitcoin.Networks
-            if v.version.regular is P2PKH and v.version.P2SH is P2SH
-              networks.push(v)
-          if networks.length >1
-            l "many chains available"
-            _.defer =>
-              ledger.app.dongle.getPublicAddress "44'/#{networks[0].bip44_coin_type}'/0'/0/0", (addr) =>
-                address = ledger.crypto.SHA256.hashString addr.bitcoinAddress.toString(ASCII)
-                ledger.app.chains.currentKey = address
-                ledger.storage.global.chainSelector.get address, (result) =>
-                  l result
-                  if result[address]?
-                    l "remember my choice found"
-                    l result[address]
-                    exists = false
-                    if result[address] != 0
-                      for k, v of ledger.bitcoin.Networks
-                        if v.name == result[address].name
-                          exists = k
-                    if exists
-                      @onChainChosen ledger.bitcoin.Networks[exists]
+            networks = []
+            for k, v of ledger.bitcoin.Networks
+              if v.version.regular is P2PKH and v.version.P2SH is P2SH
+                networks.push(v)
+            if networks.length >1
+              l "many chains available"
+              _.defer =>
+                ledger.app.dongle.getPublicAddress "44'/#{networks[0].bip44_coin_type}'/0'/0/0", (addr) =>
+                  address = ledger.crypto.SHA256.hashString addr.bitcoinAddress.toString(ASCII)
+                  ledger.app.chains.currentKey = address
+                  ledger.storage.global.chainSelector.get address, (result) =>
+                    l result
+                    if result[address]?
+                      l "remember my choice found"
+                      l result[address]
+                      exists = false
+                      if result[address] != 0
+                        for k, v of ledger.bitcoin.Networks
+                          if v.name == result[address].name
+                            exists = k
+                      if exists
+                        @onChainChosen ledger.bitcoin.Networks[exists]
+                      else
+                        if networks[0].name == 'litecoin'
+                          ledger.app.router.go '/onboarding/device/chains/litecoin', {networks: JSON.stringify(networks)}
+                        else if networks[0].name == 'bitcoin_gold_unsplit'
+                          ledger.app.router.go '/onboarding/device/chains/btg', {networks: JSON.stringify(networks)}
+                        else
+                          ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
                     else
+                      ###tmp = {}
+                      tmp[address]= ledger.bitcoin.Networks.bitcoin
+                      ledger.storage.global.chainSelector.set tmp, =>
+                        ledger.app.onChainChosen(ledger.bitcoin.Networks.bitcoin)###
                       if networks[0].name == 'litecoin'
                         ledger.app.router.go '/onboarding/device/chains/litecoin', {networks: JSON.stringify(networks)}
                       else if networks[0].name == 'bitcoin_gold_unsplit'
                         ledger.app.router.go '/onboarding/device/chains/btg', {networks: JSON.stringify(networks)}
                       else
                         ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
-                  else
-                    ###tmp = {}
-                    tmp[address]= ledger.bitcoin.Networks.bitcoin
-                    ledger.storage.global.chainSelector.set tmp, =>
-                      ledger.app.onChainChosen(ledger.bitcoin.Networks.bitcoin)###
-                    if networks[0].name == 'litecoin'
-                      ledger.app.router.go '/onboarding/device/chains/litecoin', {networks: JSON.stringify(networks)}
-                    else if networks[0].name == 'bitcoin_gold_unsplit'
-                      ledger.app.router.go '/onboarding/device/chains/btg', {networks: JSON.stringify(networks)}
-                    else
-                      ledger.app.router.go '/onboarding/device/chains', {networks: JSON.stringify(networks)}
-          else
-            ledger.app.chains.currentKey = ""
-            @onChainChosen networks[0]
+            else
+              ledger.app.chains.currentKey = ""
+              @onChainChosen networks[0]
 
 
     onChainChosen: (network) ->
@@ -276,6 +279,7 @@ require @ledger.imports, ->
   @WALLET_LAYOUT = 'WalletNavigationController'
   @ONBOARDING_LAYOUT = 'OnboardingNavigationController'
   @UPDATE_LAYOUT = 'UpdateNavigationController'
+  @FIRMWARE_LAYOUT = 'UpdateNavigationController'
   @COINKITE_LAYOUT = 'AppsCoinkiteNavigationController'
   @SPECS_LAYOUT = 'SpecNavigationController'
 

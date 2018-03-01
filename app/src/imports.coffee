@@ -363,6 +363,7 @@
         'controllers/onboarding/device/onboarding_device_error_view_controller'
         'controllers/onboarding/device/onboarding_device_connecting_view_controller'
         'controllers/onboarding/device/onboarding_device_update_view_controller'
+        'controllers/onboarding/device/onboarding_device_firmware_view_controller'
         'controllers/onboarding/device/onboarding_device_unsupported_view_controller'
         'controllers/onboarding/device/onboarding_device_failed_view_controller'
         'controllers/onboarding/device/onboarding_device_switch_firmware_view_controller'
