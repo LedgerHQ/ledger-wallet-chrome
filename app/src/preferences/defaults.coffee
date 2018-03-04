@@ -481,6 +481,21 @@ ledger.preferences.zcash =
         address: 'https://explorer.zcha.in/transactions/%s'
     discoveryGap: 20
 
+ledger.preferences.bitcoinz =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'BTCZ'
+        unit: 8
+
+  # Coin preferences
+  Coin:
+    explorers:
+      zchain:
+        name: 'BTCZ.rocks'
+        address: 'https://explorer.btcz.rocks/tx/%s'
+    discoveryGap: 20
+
 ledger.preferences.dash =
   Display:
     units:

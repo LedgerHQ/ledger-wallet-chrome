@@ -22,6 +22,14 @@ bitcoin.networks.zcash =
   pubKeyHash: 0x1CB8
   scriptHash: 0x1CBD
 
+bitcoin.networks.bitcoinz =
+  magicPrefix: '\x16BitcoinZ Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x0488ADE4
+  pubKeyHash: 0x1CB8
+  scriptHash: 0x1CBD
+
 bitcoin.networks.clubcoin =
   magicPrefix: '\x19ClubCoin Signed Message:\n'
   bip32:
@@ -567,6 +575,27 @@ ledger.bitcoin.Networks =
       P2SH: 0x1CBD
       XPUB: 0x0488B21E
     bitcoinjs: bitcoin.networks.zcash
+    dust: 10000
+    handleFeePerByte: no
+
+  bitcoinz:
+    name: 'bitcoinz'
+    display_name: 'bitcoinz'
+    plural: 'bitcoinz'
+    scheme: 'bitcoinz:'
+    bolosAppName: 'BitcoinZ'
+    ticker: 'btcz'
+    tickerKey:
+      from: 'fromBTCZ'
+      to: 'toBTCZ'
+    bip44_coin_type: '147'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 0x1CB8
+      P2SH: 0x1CBD
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.bitcoinz
     dust: 10000
     handleFeePerByte: no
 
