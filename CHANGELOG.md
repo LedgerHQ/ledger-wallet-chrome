@@ -1,4 +1,9 @@
 # Changelog
+1.10.2
+===
+- Update firmware screen
+- usagePage discrimination
+
 1.10.0/1.10.1
 ===
 - New receive funds flow
