@@ -4,6 +4,7 @@ class @OnboardingDeviceFirmwareViewController extends @OnboardingViewController
     notNowButton: "#not_now_button"
 
   updateNow: ->
+    window.open("https://chrome.google.com/webstore/detail/ledger-manager/beimhnaefocolcplfimocfiaiefpkgbf")
     window.close()
 
 

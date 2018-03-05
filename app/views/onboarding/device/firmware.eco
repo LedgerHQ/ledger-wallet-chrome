@@ -4,11 +4,11 @@
   </div>
   <div class="greyed-container">
     <img src="../../assets/images/common/large_settings.png" width="50" height="50" />
-    <div class="black-indication"><%= t 'onboarding.device.firmware.new_firmware_available' %></div>
+    <div class="black-indication"><%= t 'onboarding.device.firmware.new_firmware_available' %></br><%= t 'onboarding.device.firmware.new_firmware_available_2' %></div>
     <div class="medium-indication"><%= t 'onboarding.device.firmware.indications' %></div>
     <div class="actions-container">
       <a class="cancel-rounded-button" href="#notNow" id="not_now_button"><%= t 'common.later' %></a>
-      <a class="action-rounded-button" href="#updateNow"><%= t 'common.update' %></a>
+      <a class="action-rounded-button" href="#updateNow"><%= t 'onboarding.device.firmware.open_manager' %></a>
     </div>
   </div>
   <div class="actions-container">
