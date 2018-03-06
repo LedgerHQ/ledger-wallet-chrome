@@ -13,6 +13,14 @@ bitcoin.networks.btcgpu =
     private: 0x0488ADE4
   pubKeyHash: 38
   scriptHash: 23
+  
+bitcoin.networks.denarius =
+  magicPrefix: '\x19Denarius Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x0488ADE4
+  pubKeyHash: 30
+  scriptHash: 90
 
 bitcoin.networks.zcash =
   magicPrefix: '\x16Zcash Signed Message:\n'
@@ -525,6 +533,27 @@ ledger.bitcoin.Networks =
       P2SH: 22
       XPUB: 0x02facafd
     bitcoinjs: bitcoin.networks.dogecoin
+    dust: 10000
+    handleFeePerByte: no
+    
+  denarius:
+    name: 'denarius'
+    display_name: 'denarius'
+    plural: 'denarii'
+    scheme: 'denarius:'
+    bolosAppName: 'Denarius'
+    ticker: 'dnr'
+    tickerKey:
+      from: 'fromDNR'
+      to: 'toDNR'
+    bip44_coin_type: '0'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 30
+      P2SH: 158
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.denarius
     dust: 10000
     handleFeePerByte: no
 
