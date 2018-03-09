@@ -23,7 +23,7 @@ _.extend ledger.bitcoin,
   		minSize = (minNoWitness * 3 + minWitness) / 4
   		maxSize = (maxNoWitness * 3 + maxWitness) / 4
   	else
-  	  minSize = varintLength + 4 + (146 * inputsCount) + 1 + (31 * outputsCount) + 4
-  	  maxSize = varintLength + 4 + (148 * inputsCount) + 1 + (33 * outputsCount) + 4
+  	  minSize = varintLength + 4 + (146 * inputsCount) + 1 + (32 * outputsCount) + 4
+  	  maxSize = varintLength + 4 + (148 * inputsCount) + 1 + (34 * outputsCount) + 4
 
     min: minSize, max: maxSize
