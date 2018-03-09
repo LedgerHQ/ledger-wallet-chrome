@@ -1,4 +1,9 @@
 # Changelog
+1.10.2
+===
+- Filtering devices by usage page
+- Fix transaction size estimation
+
 1.10.0/1.10.1
 ===
 - New receive funds flow
