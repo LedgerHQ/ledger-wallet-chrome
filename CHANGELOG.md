@@ -3,6 +3,8 @@
 ===
 - Update firmware screen
 - usagePage discrimination
+- Filtering devices by usage page
+- Fix transaction size estimation
 
 1.10.0/1.10.1
 ===
