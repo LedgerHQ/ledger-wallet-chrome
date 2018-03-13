@@ -1,4 +1,8 @@
 # Changelog
+1.10.3
+===
+- Fix missing filter for device filtering
+
 1.10.2
 ===
 - Filtering devices by usage page
