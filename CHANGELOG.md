@@ -1,8 +1,14 @@
 # Changelog
+1.10.3
+===
+- Fix missing filter for device filtering
+
 1.10.2
 ===
 - Update firmware screen
 - usagePage discrimination
+- Filtering devices by usage page
+- Fix transaction size estimation
 
 1.10.0/1.10.1
 ===
