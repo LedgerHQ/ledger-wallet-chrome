@@ -551,7 +551,7 @@ ledger.bitcoin.Networks =
     isSegwitSupported: no
     version:
       regular: 30
-      P2SH: 158
+      P2SH: 90
       XPUB: 0x0488B21E
     bitcoinjs: bitcoin.networks.denarius
     dust: 10000
