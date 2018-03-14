@@ -546,7 +546,7 @@ ledger.bitcoin.Networks =
     tickerKey:
       from: 'fromDNR'
       to: 'toDNR'
-    bip44_coin_type: '0'
+    bip44_coin_type: '116'
     handleSegwit: no
     isSegwitSupported: no
     version:
