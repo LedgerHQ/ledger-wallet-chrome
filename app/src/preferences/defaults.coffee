@@ -649,6 +649,24 @@ ledger.preferences.pivx =
         address: 'http://presstab.pw/phpexplorer/PIVX/tx.php?tx=%s'
     discoveryGap: 20
 
+ledger.preferences.phore =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'PHR'
+        unit: 8
+      milibitcoin:
+        symbol: 'mPIV'
+        unit: 5
+
+# Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/phr/tx.dws?%s.htm'
+    discoveryGap: 20
+
 ledger.preferences.viacoin =
   Display:
     units:
