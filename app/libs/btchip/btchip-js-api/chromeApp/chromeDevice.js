@@ -318,7 +318,7 @@ if (typeof chromeDevice == "undefined") {
     function enumerated(deviceArray) {
       var probedDevices = [];
       for (var i = 0; i < deviceArray.length; i++) {
-        if (deviceArray[i].collections[0].usagePage == usagePage)
+        if (deviceArray[i].collections[0].usagePage == usagePage || !usagePage)
           probedDevices.push({
             device: deviceArray[i],
             transport: "hid",
