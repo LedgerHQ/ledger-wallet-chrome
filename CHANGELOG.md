@@ -1,4 +1,8 @@
 # Changelog
+1.10.4
+===
+- Firmware update info screen
+
 1.10.3
 ===
 - Fix missing filter for device filtering
