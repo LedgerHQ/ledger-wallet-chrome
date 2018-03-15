@@ -22,7 +22,15 @@ bitcoin.networks.zcash =
   pubKeyHash: 0x1CB8
   scriptHash: 0x1CBD
 
-bitcoin.networks.clubcoin =
+bitcoin.networks.zclassic =
+    magicPrefix: '\x16Zclassic Signed Message:\n'
+    bip32:
+      public: 0x0488B21E,
+      private: 0x0488ADE4
+    pubKeyHash: 0x1CB8
+    scriptHash: 0x1CBD
+
+ bitcoin.networks.clubcoin =
   magicPrefix: '\x19ClubCoin Signed Message:\n'
   bip32:
     public: 0x0488B21E,
@@ -569,6 +577,28 @@ ledger.bitcoin.Networks =
     bitcoinjs: bitcoin.networks.zcash
     dust: 10000
     handleFeePerByte: no
+
+   zclassic:
+          name: 'zclassic'
+          display_name: 'zclassic'
+          plural: 'zclassic'
+          scheme: 'zclassic:'
+          bolosAppName: 'Zclassic'
+          ticker: 'zcl'
+          tickerKey:
+            from: 'fromZCL'
+            to: 'toZCL'
+          bip44_coin_type: '147'
+          handleSegwit: no
+          isSegwitSupported: no
+          version:
+            regular: 0x1CB8
+            P2SH: 0x1CBD
+            XPUB: 0x0488B21E
+          bitcoinjs: bitcoin.networks.zclassic
+          dust: 10000
+          handleFeePerByte: no
+
 
   clubcoin:
     name: 'clubcoin'
