@@ -1,4 +1,8 @@
 # Changelog
+1.10.6
+===
+- Fix old devices detection
+
 1.10.4/1.10.5
 ===
 - Firmware update info screen
