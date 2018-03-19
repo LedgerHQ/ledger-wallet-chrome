@@ -35,6 +35,7 @@ You can build the chrome application for other coins. Run `gulp clean build pack
  - litecoin_test
  - dogecoin
  - dogecoin_test
+ - monacoin
 
 Note: that the API is only available for bitcoin and testnet right now.
 
