@@ -158,6 +158,8 @@ class @ledger.dongle.Dongle extends EventEmitter
     else
       ledger.delay(0).then(=> @_setState States.BLANK).then(-> States.BLANK)
 
+  isNanoS: -> @productId == 0x0001
+
   ensureDeviceIsUnlocked: (runForever = no) ->
     return if @_ensureDeviceIsUnlockedTimeout?
     @_ensureDeviceIsUnlockedTimeout = _.delay(() =>
