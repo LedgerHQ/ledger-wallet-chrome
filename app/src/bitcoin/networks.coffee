@@ -243,6 +243,58 @@ ledger.bitcoin.Networks =
     notCompatible: yes
     greyed: yes
     message: yes
+	
+  bitcore_unsplit:
+    name: 'bitcore_unsplit'
+    display_name: 'bitcore'
+    chain: 'Bitcore (Main)'
+    bolosAppName: 'Bitcore'
+    plural: 'bitcores'
+    ticker: 'btx'
+    scheme: 'bitcore:'
+    tickerKey:
+      from: 'fromBTX'
+      to: 'toBTX'
+    bip44_coin_type: '0'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 0
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.bitcore
+    ws_chain: 'bitcoin'
+    dust: 5430
+    handleFeePerByte: yes
+    notCompatible: yes
+    greyed: no
+    message: yes
+
+  bitcore_split:
+    name: 'bitcore_split'
+    display_name: 'bitcore'
+    chain: 'Bitcore (Main)'
+    bolosAppName: 'Bitcore'
+    plural: 'bitcores'
+    ticker: 'btc'
+    scheme: 'bitcore:'
+    tickerKey:
+      from: 'fromBTX'
+      to: 'toBTX'
+    bip44_coin_type: '160'
+    handleSegwit: yes
+    isSegwitSupported: yes
+    version:
+      regular: 0
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.bitcore
+    ws_chain: 'bitcoin'
+    dust: 5430
+    handleFeePerByte: yes
+    notCompatible: yes
+    greyed: yes
+    message: yes
 
   bitcoin_gold_unsplit:
     name: 'bitcoin_gold_unsplit'
