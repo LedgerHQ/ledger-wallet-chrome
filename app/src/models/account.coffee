@@ -58,7 +58,11 @@ class @Account extends ledger.database.Model
     if (xpub = ledger.wallet.Wallet.instance?.xpubCache.get(hdAccount.getRootDerivationPath()))?
       d.resolve(xpub)
     else
-      new ledger.wallet.ExtendedPublicKey(ledger.app.dongle, hdAccount.getRootDerivationPath()).initialize (xpub, error) =>
+      if ledger.config.network.name == 'decred'
+        xpub_ = new ledger.wallet.ExtendedPublicKeyBlake(ledger.app.dongle, hdAccount.getRootDerivationPath())
+      else 
+        xpub_ = new ledger.wallet.ExtendedPublicKey(ledger.app.dongle, hdAccount.getRootDerivationPath())
+      xpub_.initialize (xpub, error) =>
         unless error then d.resolve(xpub.toString()) else d.reject(error)
     d.promise
 
