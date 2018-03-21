@@ -717,4 +717,22 @@ ledger.preferences.digibyte =
         address: 'https://digiexplorer.info/tx/%s'
     discoveryGap: 20
 
+ledger.preferences.decred =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'DCR'
+        unit: 6
+      milibitcoin:
+        symbol: 'mDCR'
+        unit: 3
+
+# Coin preferences
+  Coin:
+    explorers:
+      decred:
+        name: 'Decred'
+        address: 'https://mainnet.decred.org/tx/%s'
+    discoveryGap: 20
+
 ledger.preferences.common.setCoin("bitcoin")

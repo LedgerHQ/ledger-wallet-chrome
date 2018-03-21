@@ -6,6 +6,14 @@ bitcoin.networks.dash =
   pubKeyHash: 76
   scriptHash: 16
 
+bitcoin.networks.decred =
+  magicPrefix: '\x1aDecred Signed Message:\n'
+  bip32:
+    public: 0x02fda926,
+    private: 0x05358394
+  pubKeyHash: 0x073f
+  scriptHash: 0x071a
+
 bitcoin.networks.btcgpu =
   magicPrefix: '\x18Bitcoin gold Signed Message:\n'
   bip32:
@@ -876,3 +884,25 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: no
+  decred:
+      name: 'decred'
+      display_name: 'decred'
+      plural: 'decred'
+      scheme: 'decred:'
+      bolosAppName: 'decred'
+      ticker: 'dcr'
+      tickerKey:
+        from: 'fromDCR'
+        to: 'toDCR'
+      bip44_coin_type: '42'
+      handleSegwit: no
+      isSegwitSupported: no
+      version:
+        regular: 0x073f
+        P2SH: 0x071a
+        XPUB: 0x02fda926
+      bitcoinjs: bitcoin.networks.decred
+      dust: 10000
+      handleFeePerByte: no
+      areTransactionTimestamped: no
+  
