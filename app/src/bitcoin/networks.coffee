@@ -423,7 +423,6 @@ ledger.bitcoin.Networks =
 
   testnet:
     name: 'testnet'
-    chain: 'bitcoin testnet'
     plural: 'bitcoins'
     ticker: 'btc_testnet'
     scheme: 'bitcoin:'
