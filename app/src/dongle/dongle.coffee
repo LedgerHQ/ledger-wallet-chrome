@@ -691,7 +691,11 @@ class @ledger.dongle.Dongle extends EventEmitter
       OP_CHECKSIG = new ByteString('AC', HEX)
       OP_RETURN = new ByteString('6A', HEX)
       if ledger.config.network.name is "zencash"
-        ZenReplayProtection = new ByteString('209ec9845acb02fab24e1c0368b3b517c1a4488fba97f0e3459ac053ea0100000003c01f02b4', HEX)
+        ParamHash = new ByteString('209ec9845acb02fab24e1c0368b3b517c1a4488fba97f0e3459ac053ea01000000', HEX)
+        AdjustAlign = new ByteString('03', HEX)
+        ParamHeight = new ByteString('c01f02', HEX)
+        OP_CHECKBLOCKATHEIGHT = new ByteString('b4', HEX)
+        ZenReplayProtection = ParamHash.concat(AdjustAlign).concat(ParamHeight).concat(OP_CHECKBLOCKATHEIGHT)
 
       ###
         Create the output script
