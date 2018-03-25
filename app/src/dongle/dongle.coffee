@@ -676,7 +676,7 @@ class @ledger.dongle.Dongle extends EventEmitter
         for [prevTx, index], i in inputs
           ledger.Amount.fromSatoshi(prevTx.outputs[index].amount)
 
-      totalInputAmount = ledger.Amount.fromSatoshi(0j)
+      totalInputAmount = ledger.Amount.fromSatoshi(0)
       for inputAmount in inputAmounts
         totalInputAmount = totalInputAmount.add(inputAmount)
 
