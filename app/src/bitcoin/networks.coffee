@@ -23,7 +23,7 @@ bitcoin.networks.zcash =
   scriptHash: 0x1CBD
 
 bitcoin.networks.zencash =
-  magicPrefix: '\x16ZenCash Signed Message:\n'
+  magicPrefix: '\x18Zencash Signed Message:\n'
   bip32:
     public: 0x0488B21E,
     private: 0x0488ADE4

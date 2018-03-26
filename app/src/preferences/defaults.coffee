@@ -496,7 +496,6 @@ ledger.preferences.zencash =
         address: 'https://explorer.zensystem.io/tx/%s'
     discoveryGap: 20
 
-
 ledger.preferences.dash =
   Display:
     units:
