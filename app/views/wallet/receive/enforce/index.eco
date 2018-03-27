@@ -1,0 +1,72 @@
+<div id="not_verified">
+  <section class="receive_index_dialog">
+    <header>
+      <h1><%= _.str.sprintf(t('wallet.receive.index.title'), ledger.config.network.plural) %></h1>
+    </header>
+    <table class="no-table-head">
+      <tbody>
+        <tr class="no-print">
+          <td class="row-title"><%= t 'wallet.receive.index.account_to_credit' %></td>
+          <td class="align-right">
+            <div class="regular-select">
+              <select id="accounts_select"></select>
+            </div>
+            <i class="fa fa-circle small-dot" id="color_square"></i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div id="please_verify">
+      <i class="fa fa-warning"></i>
+      <p><%= t 'wallet.receive.enforce.to_receive' %></p>
+      <p><%= t 'wallet.receive.enforce.reveal' %></p>
+      <a class="action-rounded-button" href="#verify"><%= t 'wallet.receive.enforce.display' %></a>
+    </div>
+  </section>
+  <div class="dialog-actions-bar no-print">
+    <a class="more_info_link" href="#openSensitive"><%= t 'common.more_information' %></a>
+    <div class="left-spacer"></div>
+    <a id="cancel_button" class="cancel-rounded-button" href="#dismiss"><%= t 'common.close' %></a>
+  </div>
+</div>
+<div id="verified">
+  <section class="receive_address_dialog">
+    <header>
+      <h1><%= _.str.sprintf(t('wallet.receive.index.title'), ledger.config.network.plural) %></h1>
+    </header>
+    <table class="no-table-head">
+      <tbody>
+        <tr id="amount_row">
+          <td class="row-title optional"><%= t 'wallet.defaults.operations.amount' %></td>
+          <td class="align-right">
+            <input id="amount_input" class="large-text-input optional" placeholder="<%= t 'wallet.defaults.operations.amount' %>"/>
+            <label class="large-text-input optional"><%= ledger.formatters.getUnitSymbol() %></label>
+            <div class="align-right regular-grey-text-small">
+              <p class="balance-label" id="currency_container">&nbsp;</p>
+            </div>
+          </td>
+        </tr>
+        <tr class="no-border">
+          <td class="row-title"><%= t 'wallet.receive.enforce.receiver_address' %></td>
+          <td class="align-right" id="receiver_address"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div id="instruction">
+      <p><%= t 'wallet.receive.enforce.instruction_1' %></p>
+    </div>
+    <div id="qrcode_container">
+      <div id="qrcode_frame_frame">
+        <div id="qrcode_frame"></div>
+      </div>
+      <p class="regular-grey-text-small"><%= t 'wallet.receive.enforce.qr_code_explanation_1' %></p>
+      <p class="regular-grey-text-small"><%= t 'wallet.receive.enforce.qr_code_explanation_2' %></p>
+    </div>
+  </section>
+  <div class="dialog-actions-bar no-print">
+    <a class="more_info_link" href="#openSensitive"><%= t 'common.more_information' %></a>
+    <div class="left-spacer"></div>
+    <a class="action-rounded-button" href="#mail"><i class="fa fa-envelope"></i></a>
+    <a class="action-rounded-button" href="#print"><i class="fa fa-print"></i></a>
+  </div>
+</div>

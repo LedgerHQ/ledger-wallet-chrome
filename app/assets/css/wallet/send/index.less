@@ -3,6 +3,14 @@
 
 section#send_index_dialog {
   max-width: 600px;
+
+  #divider {
+    background-color: #eee;
+    height: 1px;
+    position: relative;
+    bottom: -10px;
+
+  }
   #receiver_input {
     width: 300px;
   }
@@ -28,6 +36,45 @@ section#send_index_dialog {
 
   #link {
     line-height: 20px;
+    font-weight: @font-weight-bold;
+    color: @color-invalid-red;
+    font-size: @font-size-very-small;
+    text-decoration: none;
+  }
+
+  .errorLink {
+    font-weight: @font-weight-bold;
+    color: @color-invalid-red;
+    font-size: @font-size-very-small;
+    text-decoration: none;
+  }
+
+  
+
+  #sensitive {
+    margin-top: 25px;
+    margin-bottom: 10px;
+    > i {
+      font-size: 15px;
+      color: #cccccc;
+      margin-right: 8px;
+    }
+
+    > div {
+      display: inline-block;
+      > p {
+        > a {
+          font-weight: 600;
+          color: black;
+        }
+      }
+      
+    }
+
+    
+  }
+
+  .errorLink {
     font-weight: @font-weight-bold;
     color: @color-invalid-red;
     font-size: @font-size-very-small;

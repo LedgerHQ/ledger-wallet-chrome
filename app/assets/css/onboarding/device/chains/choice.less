@@ -23,6 +23,21 @@ section#dialogs_message_dialog {
       }
     }
 
+    .medium-indication {
+      line-height: 20px;
+    }
+
+    .greyed-action {
+      font-size: @font-size-very-small;
+      color: @color-soft-grey;
+      text-decoration: none;
+      margin: 40%;
+    }
+    
+    a.greyed-action:hover {
+      color: darken(@color-soft-grey, @color-strong-darken-value);
+    }
+
     > .cancel-rounded-button {
       margin-top: @metrics-almost-medium-padding;
     }

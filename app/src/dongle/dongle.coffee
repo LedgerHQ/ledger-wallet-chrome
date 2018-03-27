@@ -158,10 +158,12 @@ class @ledger.dongle.Dongle extends EventEmitter
     else
       ledger.delay(0).then(=> @_setState States.BLANK).then(-> States.BLANK)
 
+  isNanoS: -> @productId == 0x0001
+
   ensureDeviceIsUnlocked: (runForever = no) ->
     return if @_ensureDeviceIsUnlockedTimeout?
     @_ensureDeviceIsUnlockedTimeout = _.delay(() =>
-      @getPublicAddress("0'/0").then =>
+      @getPublicAddress("0'/0xb11e'").then =>
         yes
       .fail (err) =>
         if @state is States.LOCKED
@@ -688,6 +690,12 @@ class @ledger.dongle.Dongle extends EventEmitter
       OP_EQUALVERIFY = new ByteString('88', HEX)
       OP_CHECKSIG = new ByteString('AC', HEX)
       OP_RETURN = new ByteString('6A', HEX)
+      if ledger.config.network.name is "zencash"
+        ParamHash = new ByteString('209ec9845acb02fab24e1c0368b3b517c1a4488fba97f0e3459ac053ea01000000', HEX)
+        AdjustAlign = new ByteString('03', HEX)
+        ParamHeight = new ByteString('c01f02', HEX)
+        OP_CHECKBLOCKATHEIGHT = new ByteString('b4', HEX)
+        ZenReplayProtection = ParamHash.concat(AdjustAlign).concat(ParamHeight).concat(OP_CHECKBLOCKATHEIGHT)
 
       ###
         Create the output script
@@ -701,30 +709,58 @@ class @ledger.dongle.Dongle extends EventEmitter
         if p2pkhNetworkVersionSize is 1
           return P2shScript(hash160) if hash160WithNetwork.byteAt(0) is ledger.config.network.version.P2SH
         else
-          return P2shScript(hash160) if (hash160WithNetwork.byteAt(0) << 8 + hash160WithNetwork.byteAt(1)) is ledger.config.network.version.P2SH
-        script =
-          OP_DUP
-          .concat(OP_HASH160)
-          .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
-          .concat(hash160)
-          .concat(OP_EQUALVERIFY)
-          .concat(OP_CHECKSIG)
-        VI(script.length).concat(script)
+          return P2shScript(hash160) if (hash160WithNetwork.byteAt(0) << 8 | hash160WithNetwork.byteAt(1)) is ledger.config.network.version.P2SH
+        if ledger.config.network.name is "zencash"
+          script =
+            OP_DUP
+            .concat(OP_HASH160)
+            .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
+            .concat(hash160)
+            .concat(OP_EQUALVERIFY)
+            .concat(OP_CHECKSIG)
+            .concat(ZenReplayProtection)
+          VI(script.length).concat(script)
+        else
+          script =
+            OP_DUP
+            .concat(OP_HASH160)
+            .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
+            .concat(hash160)
+            .concat(OP_EQUALVERIFY)
+            .concat(OP_CHECKSIG)
+          VI(script.length).concat(script)
 
       P2shScript = (hash160) =>
-        script =
-          OP_HASH160
-          .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
-          .concat(hash160)
-          .concat(OP_EQUAL)
-        VI(script.length).concat(script)
+        if ledger.config.network.name is "zencash"
+          script =
+            OP_HASH160
+            .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
+            .concat(hash160)
+            .concat(OP_EQUAL)
+            .concat(ZenReplayProtection)
+          VI(script.length).concat(script)
+        else
+          script =
+            OP_HASH160
+            .concat(new ByteString(Convert.toHexByte(hash160.length), HEX))
+            .concat(hash160)
+            .concat(OP_EQUAL)
+          VI(script.length).concat(script)
 
       OpReturnScript = (data) =>
-        script =
-          OP_RETURN
-          .concat(new ByteString(Convert.toHexByte(data.length / 2), HEX))
-          .concat(new ByteString(data, HEX))
-        VI(script.length).concat(script)
+        if ledger.config.network.name is "zencash"
+          script =
+            OP_RETURN
+            .concat(new ByteString(Convert.toHexByte(data.length / 2), HEX))
+            .concat(new ByteString(data, HEX))
+            .concat(ZenReplayProtection)
+          VI(script.length).concat(script)
+        else
+          script =
+            OP_RETURN
+            .concat(new ByteString(Convert.toHexByte(data.length / 2), HEX))
+            .concat(new ByteString(data, HEX))
+          VI(script.length).concat(script)
 
 
       numberOfOutputs = 1 + (if (changeAmount.lte(0)) then 0 else 1) + (if (data?) then 1 else 0)
@@ -741,11 +777,10 @@ class @ledger.dongle.Dongle extends EventEmitter
         outputScript = outputScript
           .concat(ledger.Amount.fromSatoshi(0).toScriptByteString())
           .concat(OpReturnScript(data))
-
       task = =>
-        if ledger.config.network.ticker == 'abc'
+        if ledger.config.network.ticker == 'abc' || (ledger.config.network.ticker == 'btg' && !ledger.config.network.handleSegwit)
           promise = @_btchip.createPaymentTransactionNewBIP143_async(
-            false,
+            false, false,
             inputs, associatedKeysets, changePath,
             outputScript,
             lockTime && new ByteString(Convert.toHexInt(lockTime), HEX),
@@ -753,10 +788,10 @@ class @ledger.dongle.Dongle extends EventEmitter
             authorization && new ByteString(authorization, HEX),
             resumeData
           )
-        else  
+        else
           if ledger.config.network.handleSegwit
             promise = @_btchip.createPaymentTransactionNewBIP143_async(
-              true,
+              true, ledger.config.network.ticker == 'btg',
               inputs, associatedKeysets, changePath,
               outputScript,
               lockTime && new ByteString(Convert.toHexInt(lockTime), HEX),

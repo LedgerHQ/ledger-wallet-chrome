@@ -542,7 +542,7 @@ var BTChip = Class.create({
             var scriptBlocks = [];
             var offset = 0;
             var scriptResult;
-            while (offset != script.length) {
+            do {
                 var blockSize = (script.length - offset > 251 ? 251 : script.length - offset);
                 if (((offset + blockSize) != script.length) || (typeof sequence == 'undefined')) {
                     scriptBlocks.push(script.bytes(offset, blockSize));
@@ -551,7 +551,7 @@ var BTChip = Class.create({
                     scriptBlocks.push(script.bytes(offset, blockSize).concat(sequence));
                 }
                 offset += blockSize;
-            }
+            }  while (offset < script.length)
             async.eachSeries(
                 scriptBlocks,
                 function (scriptBlock, finishedCallback) {
@@ -1283,7 +1283,11 @@ var BTChip = Class.create({
           if (ledger.config.network.areTransactionTimestamped !== true) {
 
           } else {
-            timestamp = new ByteString(Convert.toHexInt(time).match(/([0-9a-f]{2})/g).reverse().join(''), HEX);
+            if (ledger.config.network.name === "stealthcoin") {
+              timestamp = new ByteString(Convert.toHexInt(time - (15 * 60)).match(/([0-9a-f]{2})/g).reverse().join(''), HEX);
+            } else {
+              timestamp = new ByteString(Convert.toHexInt(time).match(/([0-9a-f]{2})/g).reverse().join(''), HEX);
+            }
           }
         }).then(function () {
             if (resuming) {
@@ -1382,7 +1386,7 @@ var BTChip = Class.create({
             var result = self.serializeTransaction(targetTransaction, timestamp);
             result = result.concat(scriptData);
             result = result.concat(self.reverseBytestring(lockTime));
-            
+
             return result;
         }).fail(function (failure) {
             if ((typeof failure) != "undefined" && (typeof failure.authorizationRequired) != "undefined") {
@@ -1432,9 +1436,9 @@ var BTChip = Class.create({
 
     getTrustedInputBIP143_async: function (indexLookup, transaction) {
         sha = new JSUCrypt.hash.SHA256();
-        hash = sha.finalize(this.serializeTransaction(transaction, undefined, true).toString(HEX));        
+        hash = sha.finalize(this.serializeTransaction(transaction, undefined, true).toString(HEX));
         hash = new ByteString(JSUCrypt.utils.byteArrayToHexStr(hash), HEX)
-        hash = sha.finalize(hash.toString(HEX));        
+        hash = sha.finalize(hash.toString(HEX));
         hash = new ByteString(JSUCrypt.utils.byteArrayToHexStr(hash), HEX)
         data = Convert.toHexByte(indexLookup & 0xff) + Convert.toHexByte((indexLookup >> 8) & 0xff) + Convert.toHexByte((indexLookup >> 16) & 0xff) + Convert.toHexByte((indexLookup >> 24) & 0xff);
         hash = hash.concat(new ByteString(data, HEX));
@@ -1498,7 +1502,7 @@ var BTChip = Class.create({
         return new ByteString(tmp, HEX);
     },
 
-    createPaymentTransactionNewBIP143_async: function(segwit, inputs, associatedKeysets, changePath, outputScript, lockTime, sighashType, authorization, resumeData) {
+    createPaymentTransactionNewBIP143_async: function(segwit, forkid, inputs, associatedKeysets, changePath, outputScript, lockTime, sighashType, authorization, resumeData) {
         // Implementation starts here
 
         // Inputs are provided as arrays of [transaction, output_index, optional redeem script]
@@ -1613,7 +1617,7 @@ var BTChip = Class.create({
                 });
             })
         }).then(function () {
-            // Do the first run with all inputs            
+            // Do the first run with all inputs
             return doIf(!resuming, function () {
                 var notifyHashOutputBase58 = {stage: "hashTransaction", currentHashOutputBase58: 1};
                 var notifyStartUntrustedHash = {stage: "hashTransaction", currentUntrustedHash: 1};
@@ -1671,7 +1675,7 @@ var BTChip = Class.create({
                 var notifyStartUntrustedHash = {stage: "hashTransaction", currentUntrustedHash: i + 1};
                 return self.startUntrustedHashTransactionInputBIP143_async(false, pseudoTransaction, pseudoTrustedInputs).then(function () {
                     notify(notifyStartUntrustedHash);
-                    var hashType = (segwit ? 0x01 : 0x41);
+                    var hashType = ((segwit && !forkid) ? 0x01 : 0x41);
                     return self.signTransaction_async(associatedKeysets[i], authorization, undefined, hashType).then(function (signature) {
                         notify({stage: "getTrustedInput", currentSignTransaction: i + 1});
                         signatures.push(signature);
@@ -1763,7 +1767,7 @@ var BTChip = Class.create({
             }
             return deferred.promise;
         }
-    },    
+    },
 
     // Inputs : [ [ prevout tx hash, prevout index ] ]
     // Scripts : [ redeem scripts ] for each input
@@ -1856,7 +1860,7 @@ var BTChip = Class.create({
     },
 
     serializeTransaction: function (transaction, timestamp, skipWitness) {
-        var data = transaction['version'];        
+        var data = transaction['version'];
         var useWitness = ((typeof transaction['witness'] != "undefined") && !skipWitness);
         if (useWitness) {
             data = data.concat(new ByteString("0001", HEX));
@@ -1927,7 +1931,7 @@ var BTChip = Class.create({
         if (!hasTimestamp && isSegwitSupported && ((transaction.byteAt(offset) == 0) && (transaction.byteAt(offset + 1) != 0))) {
             offset += 2;
             witness = true;
-        }        
+        }
         if (hasTimestamp === true) {
             result['timestamp'] = transaction.bytes(offset, 4);
             offset += 4;
@@ -1966,7 +1970,7 @@ var BTChip = Class.create({
         var witnessScript;
         if (witness) {
             witnessScript = transaction.bytes(offset, transaction.length - offset - 4);
-            locktime = transaction.bytes(transaction.length - 4);            
+            locktime = transaction.bytes(transaction.length - 4);
         }
         else {
             locktime = transaction.bytes(offset, 4);
@@ -1977,8 +1981,8 @@ var BTChip = Class.create({
         result['locktime'] = locktime;
         if (witness) {
             result['witness'] = witnessScript;
-        }      
-        else {  
+        }
+        else {
             // TODO : This conflicts with witness transactions - worry about it later, only affects Zcash so far
             offset += 4;
             if (offset != transaction.length) {
@@ -2001,7 +2005,7 @@ var BTChip = Class.create({
         console.log("locktime " + transaction['locktime'].toString(HEX));
         if (typeof transaction['witness'] != "undefined") {
             console.log("witness " + transaction['witness'].toString(HEX));
-        }        
+        }
     },
 
     setDriverMode_async: function (mode) {

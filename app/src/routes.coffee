@@ -34,6 +34,9 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/device/chains/litecoin', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceChainsLitecoinViewController
 
+  route '/onboarding/device/chains/btg', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceChainsBtgViewController
+
   route '/onboarding/device/chains', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceChainsViewController
 
@@ -51,6 +54,12 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   route '/onboarding/device/failed', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingDeviceFailedViewController
+
+  route '/onboarding/device/firmware', (param) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingDeviceFirmwareViewController
+
+  route '/onboarding/device/continue', (param) ->
+    ledger.app.onDongleIsUnlocked(ledger.app.dongle, true)
 
   route '/onboarding/device/wrongpin', (params) ->
     app.router.go '/onboarding/device/error',
@@ -138,7 +147,10 @@ ledger.router.pluggedWalletRoutesExceptions = [
 
   # Receive
   route '/wallet/receive/index:?params:', (params = {}) ->
-    dialog = new WalletReceiveIndexDialogViewController(params["?params"] or {})
+    if !ledger.app.dongle.getFirmwareInformation().hasVerifyAddressOnScreen() or (ledger.app.dongle.getFirmwareInformation().getIntFirmwareVersion() < 0x30010109 and ledger.config.network.handleSegwit)
+      dialog = new WalletReceiveIndexDialogViewController(params["?params"] or {})
+    else
+      dialog = new WalletReceiveEnforceIndexDialogViewController(params["?params"] or {})
     dialog.show()
 
   # Settings

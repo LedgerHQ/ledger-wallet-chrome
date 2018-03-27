@@ -75,12 +75,15 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
   cancel: ->
     Api.callback_cancel 'send_payment', t('wallet.send.errors.cancelled')
     @dismiss()
+  
+  openCashConverter: ->
+    window.open "https\://cashaddr.bitcoincash.org/"
 
   send: ->
     nextError = @_nextFormError()
     if nextError?
       @view.errorContainer.show()
-      @view.errorContainer.text nextError
+      @view.errorContainer.html nextError
     else
       @view.errorContainer.hide()
 
@@ -142,6 +145,10 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
       @_updateTotalLabel()
     dialog.show()
 
+  openSensitive: ->
+    window.open t 'application.sensitive_url'
+
+
   _listenEvents: ->
     @view.amountInput.on 'keyup', =>
       _.defer =>
@@ -188,6 +195,8 @@ class @WalletSendIndexDialogViewController extends ledger.common.DialogViewContr
     # check amount
     if @_transactionAmount().length == 0 or not ledger.Amount.fromSatoshi(@_transactionAmount()).gt(0)
       return t 'common.errors.invalid_amount'
+    else if ledger.config.network.ticker == 'abc' && @_receiverBitcoinAddress().startsWith("bitcoincash")
+      return t 'abc.convert_address'
     else if not ledger.bitcoin.checkAddress @_receiverBitcoinAddress() || @_receiverBitcoinAddress().startsWith("z")
       return _.str.sprintf(t('common.errors.invalid_receiver_address'), ledger.config.network.display_name)
     else if @_dataValue().length > 0 && not @_isDataValid()

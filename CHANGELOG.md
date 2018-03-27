@@ -1,7 +1,67 @@
 # Changelog
+1.10.6
+===
+- Fix old devices detection
+
+1.10.4/1.10.5
+===
+- Firmware update info screen
+
+1.10.3
+===
+- Fix missing filter for device filtering
+
+1.10.2
+===
+- Filtering devices by usage page
+- Fix transaction size estimation
+
+1.10.0/1.10.1
+===
+- New receive funds flow
+- Detect unsupported bitcoin cash address format
+
+1.9.15
+===
+- Fix cpfp fees being wrongly initialized
+
+1.9.14
+===
+- Fix fee estimation
+- Use the current timestamp minus 15 minutes for XST
+
+1.9.13
+===
+- Corrected old redirection to support page
+- Fees now are defaulted to their last value when API fails
+- Changed Litecoin explorer
+
+1.9.12
+===
+- Fix wrong P2SH output generation for ZEC
+
+1.9.11
+===
+- Corrected counter values calculation
+- Add Qtum support
+- Add HCash support
+- Add DigiByte support
+
+1.9.8/1.9.9/1.9.10
+===
+- Add bitcoin gold support
+
+1.9.7
+===
+- Add stealthcoin support
+
+1.9.6
+===
+- Add support for PIVX, Vertcoin, Viacoin
+
 1.9.5
 ===
-- Change customer support tab
+- Change customer support tab and links
 - Changes to facilitate integration into an electron environment
 
 1.9.4

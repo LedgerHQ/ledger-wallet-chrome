@@ -1,0 +1,60 @@
+@import (reference) "../../../constants";
+@import (reference) "../../../mixins";
+
+div.greyed-container {
+  text-align: center;
+
+  .black-indication {
+    margin-bottom: 20px;
+  }
+
+  .medium-indication {
+    line-height: 20px;
+    padding-left: 180px;
+    padding-right: 180px;
+
+    #link {
+      font-weight: @font-weight-regular;
+      color: inherit;
+      text-decoration: none;
+    }
+  }
+
+
+  .chain-selector {
+    margin-top: 20px;
+  }
+
+  #advanced {
+    margin-top: 20px;
+  }
+
+  .choice {
+    margin-right: @metrics-very-small-padding;
+    width: 160px;
+  }
+
+
+  #remember {
+    margin-top: 20px;
+  }
+
+  b {
+    line-height: 30px;
+    font-weight: @font-weight-semibold;
+  }
+}
+
+#content-container {
+  >.logo-container {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+
+  >.actions-container {
+    padding-top: 40px;
+  }
+}
+
+
+

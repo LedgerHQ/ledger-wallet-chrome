@@ -292,6 +292,8 @@
 
         # Receive
         'controllers/wallet/receive/wallet_receive_index_dialog_view_controller'
+        'controllers/wallet/receive/enforce/wallet_receive_enforce_index_dialog_view_controller'
+        'controllers/wallet/receive/enforce/wallet_receive_enforce_alert_dialog_view_controller'
 
         # BitID
         'controllers/wallet/bitid/wallet_bitid_index_dialog_view_controller'
@@ -353,6 +355,7 @@
         'controllers/onboarding/device/onboarding_device_pin_view_controller'
         'controllers/onboarding/device/onboarding_device_chains_view_controller'
         'controllers/onboarding/device/chains/onboarding_device_chains_litecoin_view_controller'
+        'controllers/onboarding/device/chains/onboarding_device_chains_btg_view_controller'
         'controllers/onboarding/device/chains/onboarding_device_chains_message_dialog_view_controller'
         'controllers/onboarding/device/chains/onboarding_device_chains_recover_dialog_view_controller'
         'controllers/onboarding/device/chains/onboarding_device_chains_choice_dialog_view_controller'
@@ -360,6 +363,7 @@
         'controllers/onboarding/device/onboarding_device_error_view_controller'
         'controllers/onboarding/device/onboarding_device_connecting_view_controller'
         'controllers/onboarding/device/onboarding_device_update_view_controller'
+        'controllers/onboarding/device/onboarding_device_firmware_view_controller'
         'controllers/onboarding/device/onboarding_device_unsupported_view_controller'
         'controllers/onboarding/device/onboarding_device_failed_view_controller'
         'controllers/onboarding/device/onboarding_device_switch_firmware_view_controller'

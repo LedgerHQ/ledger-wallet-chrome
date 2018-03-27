@@ -148,7 +148,6 @@ class ledger.wallet.Transaction
     if not @amount? or not @fees? or not @recipientAddress?
       Errors.throw('Transaction must me initialized before preparation')
     d = ledger.defer(callback)
-    l "Prepare", @_btInputs, @_btcAssociatedKeyPath
     @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @changeAddress, @recipientAddress, @amount, @fees, @data)
     .progress (progress) =>
       currentStep = progress.currentPublicKey + progress.currentSignTransaction + progress.currentTrustedInput + progress.currentHashOutputBase58 + progress.currentUntrustedHash
@@ -174,12 +173,12 @@ class ledger.wallet.Transaction
 
   sign: (callback = undefined, progressCallback = undefined) ->
     d = ledger.defer(callback)
-    l "Prepare", @_btInputs, @_btcAssociatedKeyPath
     @dongle.createPaymentTransaction(@_btInputs, @_btcAssociatedKeyPath, @changePath, @changeAddress, @recipientAddress, @amount, @fees, @data)
     .progress (progress) =>
       d.notify(progress)
     .then (@_signedRawTransaction) =>
       @_isValidated = yes
+      $info("Raw TX: ", @getSignedTransaction())
       _.defer => d.resolve(@)
     .fail (error) =>
       e "GOT ERROR", error
@@ -224,6 +223,7 @@ class ledger.wallet.Transaction
       progressCallback?({currentStep, stepsCount, percent})
     .then (@_signedRawTransaction) =>
       @_isValidated = yes
+
       _.defer => d.resolve(@)
       return
     .catch (error) =>
@@ -245,14 +245,12 @@ class ledger.wallet.Transaction
     @return [Q.Promise] A closure
   ###
   @create: ({amount, fees, address, utxo, changePath, changeAddress, data}, callback = null) ->
-    l "create"
     d = ledger.defer(callback)
     dust = Amount.fromSatoshi(ledger.config.network.dust)
     return d.rejectWithError(Errors.DustTransaction) && d.promise if amount.lte(dust)
     totalUtxoAmount = _(utxo).chain().map((u) -> ledger.Amount.fromSatoshi(u.get('value'))).reduce(((a, b) -> a.add(b)), ledger.Amount.fromSatoshi(0)).value()
     return d.rejectWithError(Errors.NotEnoughFunds) && d.promise if totalUtxoAmount.lt(amount.add(fees))
     # Check if UTXO are safe to spend
-    l "check utf0"
     
     #return d.rejectWithError(Errors.No)
     $info("--- CREATE TRANSACTION ---")
@@ -272,7 +270,6 @@ class ledger.wallet.Transaction
       $info("Applied fees: ", fees)
 
     # Get each raw tx
-    l "get each row tx"
     iterate = (index, inputs) ->
       output = utxo[index]
       return d.resolve(inputs) unless output?
@@ -285,15 +282,6 @@ class ledger.wallet.Transaction
         d.resolve(iterate(index + 1, inputs.concat([result])))
       d.promise
     d.resolve(iterate(0, []).then (inputs) =>
-      l "resolve"
-      l ledger.app.dongle 
-      l amount
-      l fees
-      l address
-      l inputs
-      l changePath
-      l changeAddress
-      l data
       new Transaction(ledger.app.dongle, amount, fees, address, inputs, changePath, changeAddress, data)
     )
     d.promise

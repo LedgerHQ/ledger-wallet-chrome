@@ -5,7 +5,7 @@ _.extend ledger.errors,
   # @exemple Initializations
   #   ledger.error.new("an error message")
   #   ledger.error.new(NotFound, "an error message")
-  new: (code, msg) ->
+  new: (code, msg, payload) ->
     code = +code if _(code).isNumber()
     errorName = _.findKey(ledger.errors, (c) -> +c is code)
     defaultMessage =  ledger.errors.DefaultMessages[code] or _.str.humanize(errorName)
@@ -13,8 +13,9 @@ _.extend ledger.errors,
     self = new Error(msg || defaultMessage)
     self.code = ledger.errors[errorName] or code
     self.name = _.invert(ledger.errors)[code]
+    self.payload = payload
     self.localizedMessage = -> t(@_i18nId())
-    self._i18nId = -> "common.errors.#{_.underscore(@name)}"
+    self._i18nId = -> "common.errors.#{_.str.underscored(@name)}"
     return self
 
   throw: (code, msg) -> throw @new(code, msg)

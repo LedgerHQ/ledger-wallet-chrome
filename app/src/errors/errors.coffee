@@ -69,6 +69,7 @@ _.extend ledger.errors,
   # CPFP
   TransactionAlreadyConfirmed: 801
   TransactionNotEligible: 802
+  FeesTooLowCpfp: 803
 
   DefaultMessages:
     0: "StandardError"

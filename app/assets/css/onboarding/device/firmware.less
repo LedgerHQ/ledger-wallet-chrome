@@ -1,0 +1,25 @@
+@import (reference) "../../constants";
+
+div.greyed-container {
+  text-align: center;
+
+  > .black-indication {
+    margin-top: @metrics-small-padding;
+    line-height: 30px;
+  }
+
+  > .medium-indication {
+    margin-top: @metrics-small-padding;
+  }
+
+  > .actions-container {
+    margin-top: @metrics-medium-padding;
+
+    > .action-rounded-button {
+      margin-left: @metrics-very-small-padding;
+    }
+  }
+}
+#content-container > .actions-container {
+  padding-top: 50px;
+}

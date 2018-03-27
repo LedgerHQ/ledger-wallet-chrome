@@ -55,8 +55,8 @@ ledger.bitcoin.cpfp =
         return output if output.get("transaction_hash")
     ledger.tasks.FeesComputationTask.instance.update().then ->
       if fees?
-        if fees.lte(0)
-          feePerByte = ledger.tasks.FeesComputationTask.instance.getFeesForNumberOfBlocks(1) / 1000
+        if !fees.gt(0)
+          #feePerByte = ledger.tasks.FeesComputationTask.instance.getFeesForNumberOfBlocks(1) / 1000
           throw ledger.errors.new(ledger.errors.WrongFeesFormat)
         feePerByte = fees
       else
@@ -75,16 +75,17 @@ ledger.bitcoin.cpfp =
         while on
           totalSize = unconfirmed.size.add(ledger.bitcoin.estimateTransactionSize(inputs.length, 2).max)
           feeAmount = totalSize.multiply(feePerByte).subtract(unconfirmed.fees)
-          requiredAmount = feeAmount.add(5430)
-          if collectedAmount.gte(requiredAmount)
+          if collectedAmount.gte(feeAmount) && collectedAmount.gte(5430)
             return {unconfirmed, inputs, collectedAmount, fees: feeAmount, size: totalSize}
           input = utxo[index]
           if input? and !hasInput(input)
             inputs.push(input)
             collectedAmount = collectedAmount.add(ledger.Amount.fromSatoshi(input.get("value")))
           index += 1
-          break if not input? 
+          break if not input?
         throw ledger.errors.new(ledger.errors.NotEnoughFunds)
     .then (preparedTransaction) ->
+      if !preparedTransaction.fees.gte(1)
+        throw ledger.errors.new(ledger.errors.FeesTooLowCpfp, '', preparedTransaction)
       preparedTransaction.amount = preparedTransaction.collectedAmount.subtract(preparedTransaction.fees)
       preparedTransaction

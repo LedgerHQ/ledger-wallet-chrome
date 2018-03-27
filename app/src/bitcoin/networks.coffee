@@ -6,6 +6,14 @@ bitcoin.networks.dash =
   pubKeyHash: 76
   scriptHash: 16
 
+bitcoin.networks.btcgpu =
+  magicPrefix: '\x18Bitcoin gold Signed Message:\n'
+  bip32:
+    public: 0x0488B21E
+    private: 0x0488ADE4
+  pubKeyHash: 38
+  scriptHash: 23
+
 bitcoin.networks.zcash =
   magicPrefix: '\x16Zcash Signed Message:\n'
   bip32:
@@ -14,6 +22,14 @@ bitcoin.networks.zcash =
   pubKeyHash: 0x1CB8
   scriptHash: 0x1CBD
 
+bitcoin.networks.zencash =
+  magicPrefix: '\x18Zencash Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x0488ADE4
+  pubKeyHash: 0x2089
+  scriptHash: 0x2096
+
 bitcoin.networks.clubcoin =
   magicPrefix: '\x19ClubCoin Signed Message:\n'
   bip32:
@@ -21,6 +37,14 @@ bitcoin.networks.clubcoin =
     private: 0x05358394
   pubKeyHash: 28
   scriptHash: 85
+
+bitcoin.networks.qtum =
+  magicPrefix: '\x15Qtum Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x05358394
+  pubKeyHash: 58
+  scriptHash: 50
 
 bitcoin.networks.stratis =
   magicPrefix: '\x18Stratis Signed Message:\n'
@@ -53,6 +77,54 @@ bitcoin.networks.poswallet =
     private: 0x05358394
   pubKeyHash: 55
   scriptHash: 85
+
+bitcoin.networks.vertcoin =
+  magicPrefix: '\x19Vertcoin Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x05358394
+  pubKeyHash: 71
+  scriptHash: 5
+
+bitcoin.networks.stealthcoin =
+  magicPrefix: '\x1cStealthCoin Signed Message:\n'
+  bip32:
+    public: 0x8f624b66,
+    private: 0x05358394
+  pubKeyHash: 62
+  scriptHash: 85
+
+bitcoin.networks.pivx =
+  magicPrefix: '\x18DarkNet Signed Message:\n'
+  bip32:
+    public: 0x022D2533,
+    private: 0x05358394
+  pubKeyHash: 30
+  scriptHash: 13
+
+bitcoin.networks.viacoin =
+  magicPrefix: '\x18Viacoin Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x05358394
+  pubKeyHash: 71
+  scriptHash: 33
+
+bitcoin.networks.hcash =
+  magicPrefix: '\x17HShare Signed Message:\n'
+  bip32:
+    public: 0x0488c21e,
+    private: 0x05358394
+  pubKeyHash: 40
+  scriptHash: 100
+
+bitcoin.networks.digibyte =
+  magicPrefix: '\x19DigiByte Signed Message:\n'
+  bip32:
+    public: 0x0488b21e,
+    private: 0x05358394
+  pubKeyHash: 30
+  scriptHash: 5
 
 ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
@@ -102,7 +174,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    message: yes  
+    message: yes
 
   bitcoin_recover:
     name: 'bitcoin_recover'
@@ -126,7 +198,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    message: yes  
+    message: yes
 
   bitcoin_cash_unsplit:
     name: 'bitcoin_cash_unsplit'
@@ -151,7 +223,7 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
     notCompatible: yes
-    greyed: yes
+    greyed: no
     message: yes
 
   bitcoin_cash_split:
@@ -177,10 +249,112 @@ ledger.bitcoin.Networks =
     dust: 5430
     handleFeePerByte: yes
     notCompatible: yes
-    greyed: yes  
+    greyed: yes
     message: yes
 
-  bitcoin_uasf:
+  bitcoin_gold_unsplit:
+    name: 'bitcoin_gold_unsplit'
+    display_name: 'bitcoin'
+    chain: 'Bitcoin gold (Split)'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
+    ticker: 'btg'
+    scheme: 'bitcoingold:'
+    tickerKey:
+      from: 'fromBTG'
+      to: 'toBTG'
+    bip44_coin_type: '0'
+    handleSegwit: no
+    isSegwitSupported: yes
+    version:
+      regular: 38
+      P2SH: 23
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.btcgpu
+    ws_chain: 'btcgpu'
+    dust: 5430
+    handleFeePerByte: yes
+    notCompatible: yes
+    message: yes
+    hidden: yes
+
+  bitcoin_gold_split:
+    name: 'bitcoin_gold_split'
+    display_name: 'bitcoin'
+    chain: 'Legacy'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
+    ticker: 'btg'
+    scheme: 'bitcoingold:'
+    tickerKey:
+      from: 'fromBTG'
+      to: 'toBTG'
+    bip44_coin_type: '156'
+    handleSegwit: no
+    isSegwitSupported: yes
+    version:
+      regular: 38
+      P2SH: 23
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.btcgpu
+    ws_chain: 'btcgpu'
+    dust: 5430
+    handleFeePerByte: yes
+    notCompatible: yes
+    message: yes
+
+  bitcoin_gold_unsplit_segwit:
+    name: 'bitcoin_gold_unsplit_segwit'
+    display_name: 'bitcoin'
+    chain: 'Bitcoin gold (Split/Segwit)'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
+    ticker: 'btg'
+    scheme: 'bitcoingold:'
+    tickerKey:
+      from: 'fromBTG'
+      to: 'toBTG'
+    bip44_coin_type: '0'
+    handleSegwit: yes
+    isSegwitSupported: yes
+    version:
+      regular: 38
+      P2SH: 23
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.btcgpu
+    ws_chain: 'btcgpu'
+    dust: 5430
+    handleFeePerByte: yes
+    notCompatible: yes
+    message: yes
+    hidden: yes
+
+  bitcoin_gold_split_segwit:
+    name: 'bitcoin_gold_split_segwit'
+    display_name: 'bitcoin'
+    chain: 'Segwit'
+    bolosAppName: 'Bitcoin'
+    plural: 'bitcoins'
+    ticker: 'btg'
+    scheme: 'bitcoingold:'
+    tickerKey:
+      from: 'fromBTG'
+      to: 'toBTG'
+    bip44_coin_type: '156'
+    handleSegwit: yes
+    isSegwitSupported: yes
+    version:
+      regular: 38
+      P2SH: 23
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.btcgpu
+    ws_chain: 'btcgpu'
+    dust: 5430
+    handleFeePerByte: yes
+    notCompatible: yes
+    message: yes
+
+  ###bitcoin_uasf:
     name: 'bitcoin_uasf'
     display_name: 'bitcoin'
     chain: 'Bitcoin UASF'
@@ -227,7 +401,7 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    greyed: yes  
+    greyed: yes
     message: yes
 
   bitcoin_segwit2x_segwit:
@@ -252,8 +426,8 @@ ledger.bitcoin.Networks =
     ws_chain: 'bitcoin'
     dust: 5430
     handleFeePerByte: yes
-    greyed: yes  
-    message: yes  
+    greyed: yes
+    message: yes  ###
 
   testnet:
     name: 'testnet'
@@ -279,7 +453,6 @@ ledger.bitcoin.Networks =
   litecoin_old:
     name: 'litecoin'
     display_name: 'litecoin'
-    chain: 'Litecoin'
     plural: 'litecoins'
     scheme: 'litecoin:'
     bolosAppName: 'Litecoin'
@@ -405,6 +578,27 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
 
+  zencash:
+    name: 'zencash'
+    display_name: 'zencash'
+    plural: 'zencash'
+    scheme: 'zencash:'
+    bolosAppName: 'ZenCash'
+    ticker: 'zen'
+    tickerKey:
+      from: 'fromZEN'
+      to: 'toZEN'
+    bip44_coin_type: '121'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 0x2089
+      P2SH: 0x2096
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.zencash
+    dust: 10000
+    handleFeePerByte: no
+
   clubcoin:
     name: 'clubcoin'
     display_name: 'clubcoin'
@@ -513,3 +707,201 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: yes
+
+  vertcoin:
+    name: 'vertcoin'
+    chain: 'Vertcoin'
+    display_name: 'vertcoin'
+    plural: 'vertcoins'
+    scheme: 'vertcoin:'
+    bolosAppName: 'vertcoin'
+    ticker: 'vtc'
+    tickerKey:
+      from: 'fromVTC'
+      to: 'toVTC'
+    bip44_coin_type: '128'
+    handleSegwit: no
+    isSegwitSupported: yes
+    version:
+      regular: 71
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.vertcoin
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+  vertcoin_segwit:
+    name: 'vertcoin_segwit'
+    chain: 'Vertcoin Segwit'
+    display_name: 'vertcoin'
+    plural: 'vertcoins'
+    scheme: 'vertcoin:'
+    bolosAppName: 'vertcoin'
+    ticker: 'vtc'
+    tickerKey:
+      from: 'fromVTC'
+      to: 'toVTC'
+    bip44_coin_type: '128'
+    handleSegwit: yes
+    isSegwitSupported: yes
+    version:
+      regular: 71
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.vertcoin
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+  stealthcoin:
+    name: 'stealthcoin'
+    display_name: 'stealthcoin'
+    plural: 'stealthcoins'
+    scheme: 'stealthcoin:'
+    bolosAppName: 'stealthcoin'
+    ticker: 'xst'
+    tickerKey:
+      from: 'fromXST'
+      to: 'toXST'
+    bip44_coin_type: '125'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 62
+      P2SH: 85
+      XPUB: 0x8f624b66
+    bitcoinjs: bitcoin.networks.stealthcoin
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: yes
+
+  pivx:
+    name: 'pivx'
+    display_name: 'pivx'
+    plural: 'pivx'
+    scheme: 'pivx:'
+    bolosAppName: 'pivx'
+    ticker: 'pivx'
+    tickerKey:
+      from: 'fromPIVX'
+      to: 'toPIVX'
+    bip44_coin_type: '77'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 30
+      P2SH: 13
+      XPUB: 0x022D2533
+    bitcoinjs: bitcoin.networks.pivx
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+  viacoin:
+    name: 'viacoin'
+    chain: 'Viacoin'
+    display_name: 'viacoin'
+    plural: 'viacoins'
+    scheme: 'viacoin:'
+    bolosAppName: 'viacoin'
+    ticker: 'via'
+    tickerKey:
+      from: 'fromVIA'
+      to: 'toVIA'
+    bip44_coin_type: '14'
+    handleSegwit: no
+    isSegwitSupported: yes
+    version:
+      regular: 71
+      P2SH: 33
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.viacoin
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+  viacoin_segwit:
+      name: 'viacoin_segwit'
+      display_name: 'viacoin'
+      chain: 'Viacoin Segwit'
+      plural: 'viacoins'
+      scheme: 'viacoin:'
+      bolosAppName: 'viacoin'
+      ticker: 'via'
+      tickerKey:
+        from: 'fromVIA'
+        to: 'toVIA'
+      bip44_coin_type: '14'
+      handleSegwit: yes
+      isSegwitSupported: yes
+      version:
+        regular: 71
+        P2SH: 33
+        XPUB: 0x0488B21E
+      bitcoinjs: bitcoin.networks.viacoin
+      dust: 10000
+      handleFeePerByte: no
+      areTransactionTimestamped: no
+
+  qtum:
+    name: 'qtum'
+    display_name: 'qtum'
+    plural: 'qtums'
+    scheme: 'qtum:'
+    bolosAppName: 'qtum'
+    ticker: 'qtum'
+    tickerKey:
+      from: 'fromQTUM'
+      to: 'toQTUM'
+    bip44_coin_type: '88'
+    isSegwitSupported: yes
+    version:
+      regular: 58
+      P2SH: 50
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.qtum
+    dust: 10000
+    handleFeePerByte: no
+
+  hcash:
+    name: 'hcash'
+    display_name: 'hcash'
+    plural: 'hcash'
+    scheme: 'hcash:'
+    bolosAppName: 'hcash'
+    ticker: 'hsr'
+    tickerKey:
+      from: 'fromHSR'
+      to: 'toHSR'
+    bip44_coin_type: '171'
+    isSegwitSupported: no
+    version:
+      regular: 40
+      P2SH: 100
+      XPUB: 0x0488c21E
+    bitcoinjs: bitcoin.networks.hcash
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: yes
+
+  digibyte:
+    name: 'digibyte'
+    display_name: 'digibyte'
+    plural: 'digibytes'
+    scheme: 'digibyte:'
+    bolosAppName: 'digibyte'
+    ticker: 'dgb'
+    tickerKey:
+      from: 'fromDGB'
+      to: 'toDGB'
+    bip44_coin_type: '20'
+    isSegwitSupported: no
+    version:
+      regular: 30
+      P2SH: 5
+      XPUB: 0x0488b21E
+    bitcoinjs: bitcoin.networks.digibyte
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
