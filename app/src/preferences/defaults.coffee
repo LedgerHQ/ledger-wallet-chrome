@@ -543,8 +543,8 @@ ledger.preferences.komodo =
   Coin:
     explorers:
       kpx:
-        name: 'KPX'
-        address: 'https://kpx.io/transactions/%s'
+        name: 'KMD Explorer'
+        address: 'https://kmd.explorer.supernet.org/tx/%s'
     discoveryGap: 20
 
 ledger.preferences.poswallet =
