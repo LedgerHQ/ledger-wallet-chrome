@@ -1,4 +1,10 @@
 # Changelog
+1.11.0
+===
+- Removed wrongly displayed "hardware" menu in settings
+- Fixed log extraction
+- ZenCash support
+
 1.10.6
 ===
 - Fix old devices detection
