@@ -85,9 +85,9 @@ require @ledger.imports, ->
 
     onDongleIsUnlocked: (dongle, skipFirmCheck) ->
       return unless @isInWalletMode()
-      if (ledger.app.dongle.isNanoS && ledger.app.dongle.getIntFirmwareVersion()<805372417 && !skipFirmCheck)
+      if (ledger.app.dongle.isNanoS() && ledger.app.dongle.getIntFirmwareVersion()<805372417 && !skipFirmCheck)
         ledger.app.router.go '/onboarding/device/firmware'
-      else 
+      else
         _.defer =>
           @emit 'dongle:unlocked', @dongle
           ledger.app.dongle.getCoinVersion().then ({P2PKH, P2SH, message}) =>

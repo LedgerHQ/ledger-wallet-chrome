@@ -323,7 +323,7 @@ if (typeof chromeDevice == "undefined") {
           transport: "hid",
           ledger: ledger
         });
-        if (deviceArray[i].collections[0].usagePage == usagePage)
+        if (deviceArray[i].collections[0].usagePage == usagePage || !usagePage)
           probedDevices.push({
             device: deviceArray[i],
             transport: "hid",

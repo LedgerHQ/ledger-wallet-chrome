@@ -1,4 +1,18 @@
 # Changelog
+1.11.0
+===
+- Removed wrongly displayed "hardware" menu in settings
+- Fixed log extraction
+- ZenCash support
+
+1.10.6
+===
+- Fix old devices detection
+
+1.10.4/1.10.5
+===
+- Firmware update info screen
+
 1.10.3
 ===
 - Fix missing filter for device filtering
