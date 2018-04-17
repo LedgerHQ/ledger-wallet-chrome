@@ -119,13 +119,16 @@ class @ledger.utils.Logger
       callback?(name: name, url: zip.url())
 
   @downloadLogsToZip: ->
-    @exportLogsToZip (data) ->
-      chrome.fileSystem.chooseEntry {"type": "saveFile", "suggestedName": data.name},
-        (file) =>
-          file.createWriter (writer) =>
-            writer.onwriteend = (e) =>
-              console.log("logs saved")
-            writer.write(data.zip)
+    ledger.managers.permissions.request {permissions: [
+      "fileSystem.write"
+    ]}, (granted) =>
+      @exportLogsToZip (data) ->
+        chrome.fileSystem.chooseEntry {"type": "saveFile", "suggestedName": data.name},
+          (file) =>
+            file.createWriter (writer) =>
+              writer.onwriteend = (e) =>
+                console.log("logs saved")
+              writer.write(data.zip)
 
   @downloadLogsWithLink: ->
     @exportLogsWithLink (data) ->

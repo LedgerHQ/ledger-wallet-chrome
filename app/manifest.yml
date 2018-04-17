@@ -1,6 +1,6 @@
 name: "__MSG_application_name__"
 description: "__MSG_application_small_description__"
-version: "1.11.0"
+version: "1.11.1"
 manifest_version: 2
 minimum_chrome_version: "50"
 default_locale: "en"
@@ -23,10 +23,7 @@ permissions:
   - "notifications"
   - "usb"
   - "hid"
-  - fileSystem:
-    - "write"
-    - "retainEntries"
-    - "directory"
+  - "fileSystem"
   -
     usbDevices:
       -
@@ -56,6 +53,10 @@ permissions:
 
 optional_permissions:
   - "videoCapture"
+  -
+    fileSystem:
+      - "write"
+
 
 externally_connectable:
   ids:

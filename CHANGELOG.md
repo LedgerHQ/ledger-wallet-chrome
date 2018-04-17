@@ -1,4 +1,8 @@
 # Changelog
+1.11.1
+===
+- Changed the filesystem permissions to optional
+
 1.11.0
 ===
 - Removed wrongly displayed "hardware" menu in settings
