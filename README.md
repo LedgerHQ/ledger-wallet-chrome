@@ -36,6 +36,7 @@ You can build the chrome application for other coins. Run `gulp clean build pack
  - dogecoin
  - dogecoin_test
  - zencash
+ - gamecredits
 
 Note: that the API is only available for bitcoin and testnet right now.
 
