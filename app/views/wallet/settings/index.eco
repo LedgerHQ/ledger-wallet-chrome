@@ -11,10 +11,13 @@
       <i class="fa fa-globe"></i>
       <div class="uppercase-action"><%= t 'wallet.settings.common.coin' %></div>
     </a>
-    <a class="panel" href="#openHardware">
-      <i class="fa fa-rocket"></i>
-      <div class="uppercase-action"><%= t 'wallet.settings.common.hardware' %></div>
-    </a>
+    <% if @hardware == true : %>
+      <a class="panel" href="#openHardware">
+        <i class="fa fa-rocket"></i>
+        <div class="uppercase-action"><%= t 'wallet.settings.common.hardware' %></div>
+      </a>
+    <% else: %>
+    <% end %>
     <a class="panel" href="#openApps">
       <i class="fa fa-th"></i>
       <div class="uppercase-action"><%= t 'wallet.settings.common.apps' %></div>
@@ -23,7 +26,7 @@
       <i class="fa fa-wrench"></i>
       <div class="uppercase-action"><%= t 'wallet.settings.common.tools' %></div>
     </a>
-    <a id="chain" class="panel" href="/wallet/switch/chains">
+    <a id="chain" class="panel last-child" href="/wallet/switch/chains">
       <i class="fa fa-chain"></i>
       <div class="uppercase-action"><%= t 'wallet.settings.common.forks' %></div>
     </a>

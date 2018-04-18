@@ -3,6 +3,10 @@ class @WalletSettingsIndexDialogViewController extends ledger.common.DialogViewC
   view:
     chain: '#chain'
 
+  initialize: ->
+    super
+    @hardware = ledger.app.dongle.getIntFirmwareVersion()<0x30010101
+    console.log("test is)", @hardware)
   onAfterRender: () ->
     super
     if !ledger.config.network.chain?

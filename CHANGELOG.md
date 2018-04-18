@@ -1,4 +1,25 @@
 # Changelog
+<<<<<<< HEAD
+=======
+1.11.1
+===
+- Changed the filesystem permissions to optional
+
+1.11.0
+===
+- Removed wrongly displayed "hardware" menu in settings
+- Fixed log extraction
+- ZenCash support
+
+1.10.6
+===
+- Fix old devices detection
+
+1.10.4/1.10.5
+===
+- Firmware update info screen
+
+>>>>>>> 28a6c23dc03b8cd052ffcb0701e396a37c947949
 1.10.3
 ===
 - Fix missing filter for device filtering
