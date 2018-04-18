@@ -1,6 +1,4 @@
 # Changelog
-<<<<<<< HEAD
-=======
 1.11.1
 ===
 - Changed the filesystem permissions to optional
@@ -19,7 +17,6 @@
 ===
 - Firmware update info screen
 
->>>>>>> 28a6c23dc03b8cd052ffcb0701e396a37c947949
 1.10.3
 ===
 - Fix missing filter for device filtering
