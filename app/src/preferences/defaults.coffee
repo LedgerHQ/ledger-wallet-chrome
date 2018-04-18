@@ -732,4 +732,22 @@ ledger.preferences.digibyte =
         address: 'https://digiexplorer.info/tx/%s'
     discoveryGap: 20
 
+ledger.preferences.btcprivate =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'BTCP'
+        unit: 8
+      milibitcoin:
+        symbol: 'mBTCP'
+        unit: 5
+
+# Coin preferences
+  Coin:
+    explorers:
+      btcpexplorer:
+        name: 'explorer.btcprivate.org'
+        address: 'https://explorer.btcprivate.org/tx/%s'
+    discoveryGap: 20
+
 ledger.preferences.common.setCoin("bitcoin")
