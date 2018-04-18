@@ -22,6 +22,14 @@ bitcoin.networks.zcash =
   pubKeyHash: 0x1CB8
   scriptHash: 0x1CBD
 
+bitcoin.networks.zencash =
+  magicPrefix: '\x18Zencash Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x0488ADE4
+  pubKeyHash: 0x2089
+  scriptHash: 0x2096
+
 bitcoin.networks.clubcoin =
   magicPrefix: '\x19ClubCoin Signed Message:\n'
   bip32:
@@ -85,6 +93,14 @@ bitcoin.networks.stealthcoin =
     private: 0x05358394
   pubKeyHash: 62
   scriptHash: 85
+
+bitcoin.networks.phore =
+  magicPrefix: '\x18DarkNet Signed Message:\n'
+  bip32:
+    public: 0x022D2533,
+    private: 0x05358394
+  pubKeyHash: 55
+  scriptHash: 13
 
 bitcoin.networks.pivx =
   magicPrefix: '\x18DarkNet Signed Message:\n'
@@ -423,7 +439,6 @@ ledger.bitcoin.Networks =
 
   testnet:
     name: 'testnet'
-    chain: 'bitcoin testnet'
     plural: 'bitcoins'
     ticker: 'btc_testnet'
     scheme: 'bitcoin:'
@@ -567,6 +582,27 @@ ledger.bitcoin.Networks =
       P2SH: 0x1CBD
       XPUB: 0x0488B21E
     bitcoinjs: bitcoin.networks.zcash
+    dust: 10000
+    handleFeePerByte: no
+
+  zencash:
+    name: 'zencash'
+    display_name: 'zencash'
+    plural: 'zencash'
+    scheme: 'zencash:'
+    bolosAppName: 'ZenCash'
+    ticker: 'zen'
+    tickerKey:
+      from: 'fromZEN'
+      to: 'toZEN'
+    bip44_coin_type: '121'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 0x2089
+      P2SH: 0x2096
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.zencash
     dust: 10000
     handleFeePerByte: no
 
@@ -765,6 +801,28 @@ ledger.bitcoin.Networks =
       P2SH: 13
       XPUB: 0x022D2533
     bitcoinjs: bitcoin.networks.pivx
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+  phore:
+    name: 'phore'
+    display_name: 'phore'
+    plural: 'phore'
+    scheme: 'phore:'
+    bolosAppName: 'phore'
+    ticker: 'phr'
+    tickerKey:
+      from: 'fromPHR'
+      to: 'toPHR'
+    bip44_coin_type: '444'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 55
+      P2SH: 13
+      XPUB: 0x022D2533
+    bitcoinjs: bitcoin.networks.phore
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: no

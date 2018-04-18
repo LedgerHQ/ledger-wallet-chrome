@@ -1,4 +1,51 @@
 # Changelog
+1.11.1
+===
+- Changed the filesystem permissions to optional
+
+1.11.0
+===
+- Removed wrongly displayed "hardware" menu in settings
+- Fixed log extraction
+- ZenCash support
+
+1.10.6
+===
+- Fix old devices detection
+
+1.10.4/1.10.5
+===
+- Firmware update info screen
+
+1.10.3
+===
+- Fix missing filter for device filtering
+
+1.10.2
+===
+- Filtering devices by usage page
+- Fix transaction size estimation
+
+1.10.0/1.10.1
+===
+- New receive funds flow
+- Detect unsupported bitcoin cash address format
+
+1.9.15
+===
+- Fix cpfp fees being wrongly initialized
+
+1.9.14
+===
+- Fix fee estimation
+- Use the current timestamp minus 15 minutes for XST
+
+1.9.13
+===
+- Corrected old redirection to support page
+- Fees now are defaulted to their last value when API fails
+- Changed Litecoin explorer
+
 1.9.12
 ===
 - Fix wrong P2SH output generation for ZEC

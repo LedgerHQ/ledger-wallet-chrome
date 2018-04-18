@@ -16,7 +16,7 @@ class @WalletSendCpfpDialogViewController extends ledger.common.DialogViewContro
     super
     @operation = @params.operation
     @account = @params.account
-    @feesPerByte = ledger.tasks.FeesComputationTask.instance.getFeesForNumberOfBlocks(1) / 1000
+    @feesPerByte = ledger.Amount.fromSatoshi(parseInt(ledger.tasks.FeesComputationTask.instance.getFeesForNumberOfBlocks(1) / 1000))
     @transaction = @params.transaction
     @amount = ledger.formatters.formatValue(ledger.Amount.fromSatoshi(10000))
     @address = @params.account.getWalletAccount().getCurrentPublicAddress()
@@ -41,14 +41,15 @@ class @WalletSendCpfpDialogViewController extends ledger.common.DialogViewContro
     @view.feesPerByte.on('paste', (e) =>
       e.preventDefault()
     )
-    @view.feesPerByte.on 'keyup', _.debounce(
-        @_checkFees
-    ,50)
+    @view.feesPerByte.on 'keyup', _.debounce (() =>
+        @feesPerByte = ledger.Amount.fromSatoshi(parseInt(@view.feesPerByte.val() || 0))
+        @_checkFees()   
+      ), 50
 
 
   _checkFees: ->
     @view.sendButton.addClass('disabled')
-    ledger.bitcoin.cpfp.createTransaction(@account, @operation.get("hash"), ledger.Amount.fromSatoshi(@view.feesPerByte.val()))
+    ledger.bitcoin.cpfp.createTransaction(@account, @operation.get("hash"), ledger.Amount.fromSatoshi(@feesPerByte))
     .then((transaction) =>
       @view.check.text(t('wallet.cpfp.check'))
       @view.check.removeClass('red')
@@ -75,7 +76,7 @@ class @WalletSendCpfpDialogViewController extends ledger.common.DialogViewContro
       @view.feesPerByte.addClass('red')
       @view.check.text(err.localizedMessage())
       @view.check.addClass('red')
-      @fees = ledger.Amount.fromSatoshi(@view.feesPerByte.val()).multiply(@transaction.size)
+      @fees = @feesPerByte.multiply(@transaction.size)
       @countervalue = ledger.converters.satoshiToCurrencyFormatted(@fees)
       @_updateTotalLabel(@fees, @countervalue)
     )

@@ -405,8 +405,8 @@ ledger.preferences.litecoin =
   Coin:
     explorers:
       blockr:
-        name: 'Blockr.io'
-        address: 'https://ltc.blockr.io/tx/info/%s'
+        name: 'insight.litecore.io'
+        address: 'https://insight.litecore.io/tx/%s'
       sochain:
         name: 'SoChain'
         address: 'https://chain.so/tx/LTC/%s'
@@ -479,6 +479,21 @@ ledger.preferences.zcash =
       zchain:
         name: 'ZChain'
         address: 'https://explorer.zcha.in/transactions/%s'
+    discoveryGap: 20
+
+ledger.preferences.zencash =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'ZEN'
+        unit: 8
+
+  # Coin preferences
+  Coin:
+    explorers:
+      zensystem:
+        name: 'ZenSystem Block Explorer'
+        address: 'https://explorer.zensystem.io/tx/%s'
     discoveryGap: 20
 
 ledger.preferences.dash =
@@ -647,6 +662,24 @@ ledger.preferences.pivx =
       Presstab:
         name: 'Presstab'
         address: 'http://presstab.pw/phpexplorer/PIVX/tx.php?tx=%s'
+    discoveryGap: 20
+
+ledger.preferences.phore =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'PHR'
+        unit: 8
+      milibitcoin:
+        symbol: 'mPIV'
+        unit: 5
+
+# Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/phr/tx.dws?%s.htm'
     discoveryGap: 20
 
 ledger.preferences.viacoin =

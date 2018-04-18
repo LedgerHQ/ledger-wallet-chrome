@@ -1,6 +1,6 @@
 
 @ledger.dongle ?= {}
-
+ledger.dongle.usagePage = 0xffa0
 DevicesInfo = [
   {productId: 0x1b7c, vendorId: 0x2581, type: 'usb', scanner: 'WinUsb'}
   {productId: 0x2b7c, vendorId: 0x2581, type: 'hid', scanner: 'LegacyHid'}
@@ -32,8 +32,8 @@ class @ledger.dongle.Manager extends EventEmitter
     @_factoryDongleOS = new ChromeapiPlugupCardTerminalFactory(0x1b7c);
     @_factoryDongleOSHID = new ChromeapiPlugupCardTerminalFactory(0x2b7c);
     @_factoryDongleOSHIDLedger = new ChromeapiPlugupCardTerminalFactory(0x3b7c, undefined, true);
-    @_factoryDongleOSHIDLedgerBlue = new ChromeapiPlugupCardTerminalFactory(0x0000, undefined, true, 0x2c97);
-    @_factoryDongleOSHIDLedgerNanoS = new ChromeapiPlugupCardTerminalFactory(0x0001, undefined, true, 0x2c97);
+    @_factoryDongleOSHIDLedgerBlue = new ChromeapiPlugupCardTerminalFactory(0x0000, ledger.dongle.usagePage, true, 0x2c97);
+    @_factoryDongleOSHIDLedgerNanoS = new ChromeapiPlugupCardTerminalFactory(0x0001, ledger.dongle.usagePage, true, 0x2c97);
     @_isPaused = yes
 
   # Start observing if dongles are plugged in or unnplugged
@@ -83,7 +83,9 @@ class @ledger.dongle.Manager extends EventEmitter
       type = if device.type is "usb" then chrome.usb else chrome.hid
       info = {productId: device.productId, vendorId: device.vendorId}
       type.getDevices info, (d) ->
-        devices = devices.concat(d)
+        for dev in d
+          if (dev.collections[0].usagePage == ledger.dongle.usagePage)
+            devices = [dev]
         cb?(devices) if !hasNext or devices.length > 0
         next()
 
