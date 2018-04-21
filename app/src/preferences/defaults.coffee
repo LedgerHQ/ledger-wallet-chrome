@@ -732,4 +732,28 @@ ledger.preferences.digibyte =
         address: 'https://digiexplorer.info/tx/%s'
     discoveryGap: 20
 
+ledger.preferences.ravencoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'RVN'
+        unit: 8
+      milibitcoin:
+        symbol: 'mRVN'
+        unit: 5
+
+  # Coin preferences
+  Coin:
+    explorers:
+      hash4life:
+        name: 'Hash4Life'
+        address: 'https://rvn.hash4.life/tx/%s'
+      rvnblockchain:
+        name: 'raven-blockchain.info'
+        address: 'http://raven-blockchain.info/tx/%s'
+      rvnhodl:
+        name: 'rvnhodl'
+        address: 'http://rvnhodl.com/tx/%s'
+    discoveryGap: 20
+
 ledger.preferences.common.setCoin("bitcoin")

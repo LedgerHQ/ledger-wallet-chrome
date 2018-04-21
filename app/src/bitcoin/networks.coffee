@@ -126,6 +126,14 @@ bitcoin.networks.digibyte =
   pubKeyHash: 30
   scriptHash: 5
 
+bitcoin.networks.ravencoin =
+  magicPrefix: '\x16Raven Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x0488ADE4
+  pubKeyHash: 60
+  scriptHash: 122
+
 ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
   bitcoin:
@@ -901,6 +909,27 @@ ledger.bitcoin.Networks =
       P2SH: 5
       XPUB: 0x0488b21E
     bitcoinjs: bitcoin.networks.digibyte
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+  ravencoin:
+    name: 'ravencoin'
+    display_name: 'ravencoin'
+    plural: 'ravencoins'
+    scheme: 'ravencoin:'
+    bolosAppName: 'ravencoin'
+    ticker: 'rvn'
+    tickerKey:
+      from: 'fromRVN'
+      to: 'toRVN'
+    bip44_coin_type: '175'
+    isSegwitSupported: no
+    version:
+      regular: 60
+      P2SH: 122
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.ravencoin
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: no
