@@ -1,4 +1,8 @@
 # Changelog
+1.11.2
+===
+- Fix chain selection for VTC and VIA
+
 1.11.1
 ===
 - Changed the filesystem permissions to optional
