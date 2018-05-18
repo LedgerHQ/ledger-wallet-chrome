@@ -129,7 +129,7 @@ bitcoin.networks.digibyte =
 bitcoin.networks.syscoin =
   magicPrefix: '\x19Syscoin Signed Message:\n'
   bip32:
-    public: 0x0488b21e,
+    public: 0x0488B21E,
     private: 0x0488ADE4
   pubKeyHash: 63
   scriptHash: 5
