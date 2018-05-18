@@ -732,4 +732,22 @@ ledger.preferences.digibyte =
         address: 'https://digiexplorer.info/tx/%s'
     discoveryGap: 20
 
+ledger.preferences.syscoin =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'SYS'
+        unit: 8
+      milibitcoin:
+        symbol: 'mSYS'
+        unit: 5
+
+# Coin preferences
+  Coin:
+    explorers:
+      qtuminfo:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/sys/tx.dws?%s.htm'
+    discoveryGap: 20
+
 ledger.preferences.common.setCoin("bitcoin")
