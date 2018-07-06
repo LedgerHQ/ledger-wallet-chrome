@@ -852,7 +852,7 @@ var BTChip = Class.create({
         return this.hashOutputInternal_async(0x02, path, outputAddress, amount, fees);
     },
 
-    signTransaction_async: function (path, transactionAuthorization, lockTime, sigHashType) {
+    signTransaction_async: function (path, transactionAuthorization, lockTime, sigHashType, expiryHeight) {
         if (typeof transactionAuthorization == "undefined") {
             transactionAuthorization = new ByteString("", HEX);
         }
@@ -885,8 +885,16 @@ var BTChip = Class.create({
         data = data.concat(transactionAuthorization);
         data = data.concat(lockTime);
         data = data.concat(new ByteString(Convert.toHexByte(sigHashType), HEX));
+        if (ledger.config.network.name == 'zcash') {
+            data = data.concat(expiryHeight);
+        }
         return this.card.sendApdu_async(0xe0, 0x48, 0x00, 0x00, data, [0x9000]).then(function (signature) {
-            return new ByteString("30", HEX).concat(signature.bytes(1));
+            if (signature.length > 0) {
+                return new ByteString("30", HEX).concat(signature.bytes(1));
+            }
+            else {
+                return signature;
+            }
         });
     },
 
@@ -1449,13 +1457,15 @@ var BTChip = Class.create({
     },
 
     startUntrustedHashTransactionInputRawBIP143_async: function (newTransaction, firstRound, transactionData) {
-        return this.card.sendApdu_async(0xe0, 0x44, (firstRound ? 0x00 : 0x80), (newTransaction ? 0x02 : 0x80), transactionData, [0x9000]);
+        var overwinter = (ledger.config.network.name == 'zcash');
+        var p2_new = (overwinter ? 0x04 : 0x02);
+        return this.card.sendApdu_async(0xe0, 0x44, (firstRound ? 0x00 : 0x80), (newTransaction ? p2_new : 0x80), transactionData, [0x9000]);
     },
 
 
     startUntrustedHashTransactionInputBIP143_async: function (newTransaction, transaction, trustedInputs) {
         var currentObject = this;
-        var data = transaction['version'].concat(transaction['timestamp']).concat(currentObject.createVarint(transaction['inputs'].length));
+        var data = transaction['version'].concat(transaction['timestamp']).concat(transaction['nVersionGroupId']).concat(currentObject.createVarint(transaction['inputs'].length));
         var deferred = Q.defer();
         currentObject.startUntrustedHashTransactionInputRawBIP143_async(newTransaction, true, data).then(function (result) {
             var i = 0;
@@ -1507,8 +1517,10 @@ var BTChip = Class.create({
 
         // Inputs are provided as arrays of [transaction, output_index, optional redeem script]
         // associatedKeysets are provided as arrays of [path]
-        var defaultVersion = new ByteString("01000000", HEX);
+        var overwinter = (ledger.config.network.name == 'zcash');
+        var defaultVersion = (overwinter ? new ByteString("03000080", HEX) : new ByteString("01000000", HEX));
         var defaultSequence = new ByteString("FFFFFFFF", HEX);
+        var defaultnExpiryHeight = new ByteString("00000000", HEX);
         var trustedInputs = [];
         var regularOutputs = [];
         var signatures = [];
@@ -1590,6 +1602,11 @@ var BTChip = Class.create({
             targetTransaction['version'] = defaultVersion;
             targetTransaction['timestamp'] = timestamp;
             targetTransaction['inputs'] = [];
+            if (overwinter) {
+                targetTransaction['nVersionGroupId'] = new ByteString("7082c403", HEX);
+                targetTransaction['nExpiryHeight'] = defaultnExpiryHeight;
+                targetTransaction['extraData'] = new ByteString("00", HEX); // no joinsplits
+            }
 
             for (var i = 0; i < inputs.length; i++) {
                 var tmpInput = {};
@@ -1647,6 +1664,11 @@ var BTChip = Class.create({
                 });
             })
         }).then(function () {
+            return doIf(overwinter, function() {
+                // Fill up the missing elements for Overwinter
+                return self.signTransaction_async("", authorization, undefined, 0x01, defaultnExpiryHeight);
+            })
+        }).then(function () {
             // Do the second run with the individual transaction
             return foreach(inputs, function (input, i) {
                 var usedScript;
@@ -1665,6 +1687,7 @@ var BTChip = Class.create({
                 var pseudoTransaction = {};
                 pseudoTransaction['version'] = targetTransaction['version'];
                 pseudoTransaction['timestamp'] = targetTransaction['timestamp'];
+                pseudoTransaction['nVersionGroupId'] = targetTransaction['nVersionGroupId'];
                 pseudoTransaction['inputs'] = [];
                 var pseudoInput = {};
                 pseudoInput['script'] = usedScript;
@@ -1675,8 +1698,8 @@ var BTChip = Class.create({
                 var notifyStartUntrustedHash = {stage: "hashTransaction", currentUntrustedHash: i + 1};
                 return self.startUntrustedHashTransactionInputBIP143_async(false, pseudoTransaction, pseudoTrustedInputs).then(function () {
                     notify(notifyStartUntrustedHash);
-                    var hashType = ((segwit && !forkid) ? 0x01 : 0x41);
-                    return self.signTransaction_async(associatedKeysets[i], authorization, undefined, hashType).then(function (signature) {
+                    var hashType = ((overwinter || (segwit && !forkid)) ? 0x01 : 0x41);
+                    return self.signTransaction_async(associatedKeysets[i], authorization, undefined, hashType, defaultnExpiryHeight).then(function (signature) {
                         notify({stage: "getTrustedInput", currentSignTransaction: i + 1});
                         signatures.push(signature);
                         targetTransaction['inputs'][i]['script'] = new ByteString("", HEX);
@@ -1720,6 +1743,10 @@ var BTChip = Class.create({
                 result = result.concat(witness);
             }
             result = result.concat(self.reverseBytestring(lockTime));
+            if (overwinter) {
+                result = result.concat(targetTransaction['nExpiryHeight']);
+                result = result.concat(targetTransaction['extraData']);
+            }
 
             console.log("SIGNED TX " + result.toString(HEX));
 
@@ -1860,13 +1887,17 @@ var BTChip = Class.create({
     },
 
     serializeTransaction: function (transaction, timestamp, skipWitness) {
-        var data = transaction['version'];
+        var overwinter = ((ledger.config.network.name == 'zcash') && (transaction['version'].byteAt(3) == 0x80));
+        var data = transaction['version'];        
         var useWitness = ((typeof transaction['witness'] != "undefined") && !skipWitness);
         if (useWitness) {
             data = data.concat(new ByteString("0001", HEX));
         }
         if (ledger.config.network.areTransactionTimestamped === true) {
             data = data.concat(timestamp);
+        }
+        if (overwinter) {
+            data = data.concat(transaction['nVersionGroupId']);
         }
         data = data.concat(this.createVarint(transaction['inputs'].length));
         for (var i = 0; i < transaction['inputs'].length; i++) {
@@ -1885,6 +1916,12 @@ var BTChip = Class.create({
                 data = data.concat(transaction['witness']);
             }
             data = data.concat(transaction['locktime']);
+            if (overwinter) {
+                data = data.concat(transaction['nExpiryHeight']);
+                if (typeof transaction['extraData'] != 'undefined') {
+                    data = data.concat(transaction['extraData']);
+                }
+            }
         }
         return data;
     },
@@ -1926,7 +1963,9 @@ var BTChip = Class.create({
         var outputs = [];
         var offset = 0;
         var witness = false;
+        var overwinter = false;
         var version = transaction.bytes(offset, 4);
+        overwinter = ((ledger.config.network.name == 'zcash') && (version.byteAt(3) == 0x80));
         offset += 4;
         if (!hasTimestamp && isSegwitSupported && ((transaction.byteAt(offset) == 0) && (transaction.byteAt(offset + 1) != 0))) {
             offset += 2;
@@ -1937,6 +1976,13 @@ var BTChip = Class.create({
             offset += 4;
         } else {
             result['timestamp'] = new ByteString("", HEX);
+        }
+        if (overwinter) {
+            result['nVersionGroupId'] = transaction.bytes(offset, 4);
+            offset += 4;
+        }
+        else {
+            result['nVersionGroupId'] = new ByteString("", HEX);
         }
         var varint = this.getVarint(transaction, offset);
         var numberInputs = varint[0];
@@ -1974,6 +2020,10 @@ var BTChip = Class.create({
         }
         else {
             locktime = transaction.bytes(offset, 4);
+        }
+        if (overwinter) {
+            offset += 4;
+            result['nExpiryHeight'] = transaction.bytes(offset, 4);
         }
         result['version'] = version;
         result['inputs'] = inputs;
