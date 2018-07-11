@@ -1,4 +1,8 @@
 # Changelog
+1.11.3
+===
+- Add overwinter support for ZEC
+
 1.11.2
 ===
 - Fix chain selection for VTC and VIA
