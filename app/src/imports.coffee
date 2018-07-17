@@ -383,6 +383,9 @@
         'controllers/onboarding/management/onboarding_management_recoverydevice_view_controller'
         'controllers/onboarding/management/onboarding_management_convert_view_controller'
 
+        # Go Live
+        'controllers/onboarding/live/onboarding_live_go_view_controller'
+
         # Pairing
         'controllers/wallet/pairing/wallet_pairing_index_dialog_view_controller'
         'controllers/wallet/pairing/wallet_pairing_progress_dialog_view_controller'
