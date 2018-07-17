@@ -1,4 +1,8 @@
 # Changelog
+1.12.0
+===
+- Start migration from chrome apps to Ledger Live
+
 1.11.3
 ===
 - Add overwinter support for ZEC
