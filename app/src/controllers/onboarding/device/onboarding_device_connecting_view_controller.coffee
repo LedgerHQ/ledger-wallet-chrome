@@ -25,18 +25,19 @@ class @OnboardingDeviceConnectingViewController extends @OnboardingViewControlle
 
   _navigateContinue: ->
     @_stopTimer()
-    ledger.app.dongle?.isFirmwareUpdateAvailable (isAvailable) =>
-      if isAvailable
-        ledger.app.router.go '/onboarding/device/update'
-      else
-        ledger.app.dongle.getState (state) =>
-          if state == ledger.dongle.States.LOCKED
-            ledger.app.router.go '/onboarding/device/pin'
-          else if state == ledger.dongle.States.UNLOCKED
-            ledger.app.notifyDongleIsUnlocked()
-            ledger.utils.Logger.setPrivateModeEnabled on
-          else
-            ledger.app.router.go '/onboarding/management/welcome'
+    OnboardingLiveGoViewController.go ->
+      ledger.app.dongle?.isFirmwareUpdateAvailable (isAvailable) =>
+        if isAvailable
+          ledger.app.router.go '/onboarding/device/update'
+        else
+          ledger.app.dongle.getState (state) =>
+            if state == ledger.dongle.States.LOCKED
+              ledger.app.router.go '/onboarding/device/pin'
+            else if state == ledger.dongle.States.UNLOCKED
+              ledger.app.notifyDongleIsUnlocked()
+              ledger.utils.Logger.setPrivateModeEnabled on
+            else
+              ledger.app.router.go '/onboarding/management/welcome'
 
   _navigateForged: ->
     @_stopTimer()

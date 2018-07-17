@@ -1,0 +1,135 @@
+
+@live-color-white: #FFFFFF;
+@live-color-black: #000000;
+@live-color-blue: #6490f1;
+@live-color-grey: #999999;
+@live-color-dark-grey: #666666;
+@live-color-soft-grey: #d8d8d8;
+
+.go-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: @live-color-white;
+
+  .content-frame {
+    display: flex;
+    width: 1000px;
+
+    > div:first-child {
+      margin-left: 90px;
+      flex-shrink: 0;
+      display: flex;
+      width: 463px;
+      flex-direction: column;
+
+      .live-text-museo {
+        font-family: MuseoSans;
+        font-size: 14px;
+        font-weight: 500;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: normal;
+        letter-spacing: normal;
+      }
+
+      .live-text-opensans {
+        font-family: 'Open Sans';
+        font-size: 14px;
+        font-weight: 500;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: normal;
+        letter-spacing: normal;
+      }
+
+      h1 {
+        .live-text-museo();
+        font-size: 40px;
+        font-weight: 300;
+        margin-top: 23px;
+
+        letter-spacing: -1.5px;
+        color: @live-color-black;
+        b {
+          font-weight: 500;
+        }
+      }
+
+      h2 {
+        .live-text-museo();
+        font-size: 20px;
+        font-weight: 300;
+        line-height: 1.5;
+        margin-top: 15px;
+        color: @live-color-grey;
+      }
+
+      h3 {
+        .live-text-museo();
+        color: @live-color-blue;
+        margin-top: 16px;
+      }
+
+      p {
+        max-width: 463px;
+        .live-text-opensans();
+        font-size: 14px;
+        line-height: 2.14;
+        margin-top: 20px;
+        color: @live-color-dark-grey;
+      }
+
+      a {
+        text-decoration: none;
+        &:hover {
+          cursor: pointer;
+        }
+      }
+
+      #go {
+        width: 184px;
+        .live-text-museo();
+        color: @live-color-white;
+        background-color: @live-color-blue;
+        border-radius: 4px;
+        padding-left: 23px;
+        padding-right: 23px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        margin-top: 38px;
+        text-decoration: none;
+
+        &.larger {
+          width: 210px;
+        }
+      }
+
+      #skip {
+        .live-text-museo();
+        font-size: 13px;
+        color: @live-color-blue;
+        margin-top: 21px;
+      }
+
+      #support {
+        .live-text-museo();
+        font-size: 13px;
+        color: @live-color-grey;
+        margin-top: 17px;
+      }
+
+    }
+
+    img {
+      margin-left: 50px;
+      &.no-margin {
+        margin-left: 0px;
+      }
+    }
+
+  }
+
+}
