@@ -1919,9 +1919,9 @@ var BTChip = Class.create({
             data = data.concat(transaction['locktime']);
             if (overwinter) {
                 data = data.concat(transaction['nExpiryHeight']);
-                if (typeof transaction['extraData'] != 'undefined') {
-                    data = data.concat(transaction['extraData']);
-                }
+            }
+            if (typeof transaction['extraData'] != 'undefined') {
+                data = data.concat(transaction['extraData']);
             }
         }
         return data;
