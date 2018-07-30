@@ -1,4 +1,8 @@
 # Changelog
+1.12.1
+===
+- Fix Zcash serialization
+
 1.12.0
 ===
 - Start migration from chrome apps to Ledger Live
