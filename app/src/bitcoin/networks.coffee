@@ -126,6 +126,14 @@ bitcoin.networks.digibyte =
   pubKeyHash: 30
   scriptHash: 5
 
+bitcoin.networks.btcprivate =
+  magicPrefix: '\x18BitcoinPrivate Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x05358394
+  pubKeyHash: 0x1325
+  scriptHash: 0x13AF
+
 ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
   bitcoin:
@@ -577,6 +585,32 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
 
+# not tested, verified or ready for prime time
+  bitcoin_private:
+    name: 'bitcoin_private'
+    display_name: 'bitcoin private'
+    plural: 'bitcoin private'
+    scheme: 'bitcoin private:'
+    bolosAppName: 'Bitcoin Private'
+    ticker: 'btcp'
+    tickerKey:
+      from: 'fromBTCP'
+      to: 'toBTCP'
+    bip44_coin_type: '183'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 0
+      P2SH: 5
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.btcprivate
+    ws_chain: 'bitcoin'
+    dust: 5430
+    handleFeePerByte: yes
+    notCompatible: yes
+    greyed: no
+    message: yes
+
   zencash:
     name: 'zencash'
     display_name: 'zencash'
@@ -821,27 +855,28 @@ ledger.bitcoin.Networks =
     areTransactionTimestamped: no
 
   viacoin_segwit:
-      name: 'viacoin_segwit'
-      display_name: 'viacoin'
-      chain: 'Segwit'
-      plural: 'viacoins'
-      scheme: 'viacoin:'
-      bolosAppName: 'viacoin'
-      ticker: 'via'
-      tickerKey:
-        from: 'fromVIA'
-        to: 'toVIA'
-      bip44_coin_type: '14'
-      handleSegwit: yes
-      isSegwitSupported: yes
-      version:
-        regular: 71
-        P2SH: 33
-        XPUB: 0x0488B21E
-      bitcoinjs: bitcoin.networks.viacoin
-      dust: 10000
-      handleFeePerByte: no
-      areTransactionTimestamped: no
+
+    name: 'viacoin_segwit'
+    display_name: 'viacoin'
+    chain: 'Viacoin Segwit'
+    plural: 'viacoins'
+    scheme: 'viacoin:'
+    bolosAppName: 'viacoin'
+    ticker: 'via'
+    tickerKey:
+      from: 'fromVIA'
+      to: 'toVIA'
+    bip44_coin_type: '14'
+    handleSegwit: yes
+    isSegwitSupported: yes
+    version:
+      regular: 71
+      P2SH: 33
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.viacoin
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
 
   qtum:
     name: 'qtum'
