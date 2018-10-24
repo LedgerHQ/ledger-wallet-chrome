@@ -285,8 +285,8 @@ ledger.bitcoin.Networks =
     handleSegwit: yes
     isSegwitSupported: yes
     version:
-      regular: 0
-      P2SH: 5
+      regular: 3
+      P2SH: 125
       XPUB: 0x0488B21E
     bitcoinjs: bitcoin.networks.bitcore
     ws_chain: 'bitcoin'
