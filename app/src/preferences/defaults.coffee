@@ -732,4 +732,19 @@ ledger.preferences.digibyte =
         address: 'https://digiexplorer.info/tx/%s'
     discoveryGap: 20
 
+ledger.preferences.cryptoescudo =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'CESC'
+        unit: 8
+
+  # Coin preferences
+  Coin:
+    explorers:
+      zchain:
+        name: 'Cryptoescudo'
+        address: 'https://explorer.cryptoescudo.eu/tx/%s'
+    discoveryGap: 20
+
 ledger.preferences.common.setCoin("bitcoin")
