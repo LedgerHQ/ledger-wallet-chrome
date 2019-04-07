@@ -927,8 +927,8 @@ ledger.bitcoin.Networks =
     handleSegwit: no
     isSegwitSupported: no
     version:
-      regular: ??
-      P2SH: ??
+      regular: 28
+      P2SH: 88
       XPUB: 0x0488b21e
     bitcoinjs: bitcoin.networks.cryptoescudo
     dust: 10000
