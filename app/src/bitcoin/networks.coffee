@@ -125,6 +125,14 @@ bitcoin.networks.digibyte =
     private: 0x05358394
   pubKeyHash: 30
   scriptHash: 5
+  
+bitcoin.networks.cryptoescudo =
+  magicPrefix: '\x18Cryptoescudo Signed Message:\n'
+  bip32:
+    public: 0x0488b21e,
+    private: 0x0488ade4
+  pubKeyHash: 28
+  scriptHash: 5
 
 ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
@@ -904,3 +912,25 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: no
+    
+  cryptoescudo:
+    name: 'cryptoescudo'
+    display_name: 'cryptoescudo'
+    plural: 'cryptoescudos'
+    scheme: 'cryptoescudo:'
+    bolosAppName: 'Cryptoescudo'
+    ticker: 'cesc'
+    tickerKey:
+      from: 'fromCESC'
+      to: 'toCESC'
+    bip44_coin_type: '11'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 28
+      P2SH: 88
+      XPUB: 0x0488b21e
+    bitcoinjs: bitcoin.networks.cryptoescudo
+    dust: 10000
+    handleFeePerByte: no
+
