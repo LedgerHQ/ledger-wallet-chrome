@@ -6,11 +6,11 @@
         Ledger <b>Live</b>
       </h1>
       <h2>
-      The all-in-one companion app<br />
-      for Ledger Nano S and Ledger Blue
+      Ledger is discontinuing Chrome apps
       </h2>
       <p>
-      With Google soon discontinuing its Chrome Apps, we've developed Ledger Live, a new all-in-one computer application for Ledger devices. Ledger Live support the Ledger Nano S and the Ledger Blue. If you are using an older Ledger device, please get in touch with Ledger Support.
+      Please download Ledger live, the all-in-one companion app for your Ledger device from <a class="go-link" href="https://www.ledger.com/ledger-live/" target="_blank">https://www.ledger.com/ledger-live</a></br>
+      We invite you to shift to Ledger Live as all of our Chrome application will stop working by <b class="go-bold-date">September 2020</b>.
       </p>
       <a id="go" class="larger" href="#go">
         Contact Ledger support
