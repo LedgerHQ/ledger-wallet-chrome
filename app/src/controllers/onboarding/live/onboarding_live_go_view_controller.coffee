@@ -32,10 +32,7 @@ class @OnboardingLiveGoViewController extends ledger.common.ViewController
   # Beware big ugly stuff
   ledger.storage.global.live.get("live_count", (result) ->
     count = result.live_count or 0
-    if (count < 2)
-      ledger.storage.global.live.set(live_count: count + 1)
-      OnboardingLiveGoViewController._next = next
-      ledger.app.router.go '/onboarding/live/go'
-    else
-      next()
+    ledger.storage.global.live.set(live_count: count + 1)
+    OnboardingLiveGoViewController._next = next
+    ledger.app.router.go '/onboarding/live/go'
   )
