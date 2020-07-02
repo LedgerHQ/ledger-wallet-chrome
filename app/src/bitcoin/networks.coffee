@@ -738,7 +738,7 @@ ledger.bitcoin.Networks =
 
   vertcoin:
     name: 'vertcoin'
-    chain: 'Vertcoin'
+    chain: 'Legacy'
     display_name: 'vertcoin'
     plural: 'vertcoins'
     scheme: 'vertcoin:'
@@ -761,7 +761,7 @@ ledger.bitcoin.Networks =
 
   vertcoin_segwit:
     name: 'vertcoin_segwit'
-    chain: 'Vertcoin Segwit'
+    chain: 'Segwit'
     display_name: 'vertcoin'
     plural: 'vertcoins'
     scheme: 'vertcoin:'
@@ -828,7 +828,7 @@ ledger.bitcoin.Networks =
 
   viacoin:
     name: 'viacoin'
-    chain: 'Viacoin'
+    chain: 'Legacy'
     display_name: 'viacoin'
     plural: 'viacoins'
     scheme: 'viacoin:'
@@ -852,7 +852,7 @@ ledger.bitcoin.Networks =
   viacoin_segwit:
       name: 'viacoin_segwit'
       display_name: 'viacoin'
-      chain: 'Viacoin Segwit'
+      chain: 'Segwit'
       plural: 'viacoins'
       scheme: 'viacoin:'
       bolosAppName: 'viacoin'

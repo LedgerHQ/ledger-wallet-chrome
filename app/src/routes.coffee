@@ -120,6 +120,11 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/onboarding/management/convert', (params) ->
     app.navigate ONBOARDING_LAYOUT, OnboardingManagementConvertViewController
 
+  # Live
+
+  route '/onboarding/live/go', (params) ->
+    app.navigate ONBOARDING_LAYOUT, OnboardingLiveGoViewController
+
   ## Wallet
   # Accounts
   route 'wallet/accounts/index', ->

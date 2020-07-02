@@ -1,0 +1,23 @@
+<div class="go-container">
+  <div class="content-frame">
+    <div>
+      <h3>NOW AVAILABLE</h3>
+      <h1>
+        Ledger <b>Live</b>
+      </h1>
+      <h2>
+      The all-in-one companion app<br/>for your Ledger devices
+      </h2>
+      <p>
+      Ledger Live is a new all-in-one computer application for your Ledger device that runs on Windows, Mac and Linux.<br/>
+      With a feature-packed, yet user-friendly experience for both power users and newbies, it is designed to replace the Ledger Chrome Apps.
+      </p>
+      <a id="go" href="#go">
+        Get Ledger Live now!
+      </a>
+      <a id="skip" href="#skip">Install Ledger Live later</a>
+      <a id="support" href="#support">Contact support</a>
+    </div>
+    <img src="../../assets/images/onboarding/live/screenshot.png" height="515">
+  </div>
+</div>

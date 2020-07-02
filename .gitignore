@@ -12,3 +12,4 @@ signature/
 .compilation_preferences.json
 crowdin.yaml
 package-lock.json
+MuseoSans*.woff

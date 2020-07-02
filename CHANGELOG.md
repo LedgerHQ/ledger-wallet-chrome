@@ -1,4 +1,24 @@
 # Changelog
+1.12.1
+===
+- Fix Zcash serialization
+
+1.12.0
+===
+- Start migration from chrome apps to Ledger Live
+
+1.11.3
+===
+- Add overwinter support for ZEC
+
+1.11.2
+===
+- Fix chain selection for VTC and VIA
+
+1.11.1
+===
+- Changed the filesystem permissions to optional
+
 1.11.0
 ===
 - Removed wrongly displayed "hardware" menu in settings

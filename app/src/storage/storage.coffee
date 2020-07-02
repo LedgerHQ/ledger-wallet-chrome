@@ -17,3 +17,4 @@
 
 @ledger.storage.global = {}
 @ledger.storage.global.chainSelector = new ledger.storage.ChromeStore("chainSelector")
+@ledger.storage.global.live = new ledger.storage.ChromeStore("live")
