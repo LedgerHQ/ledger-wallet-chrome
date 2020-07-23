@@ -1,4 +1,8 @@
 # Changelog
+1.13.0
+===
+- Chrome application end of life.
+
 1.12.1
 ===
 - Fix Zcash serialization
