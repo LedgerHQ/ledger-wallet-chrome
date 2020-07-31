@@ -126,6 +126,14 @@ bitcoin.networks.digibyte =
   pubKeyHash: 30
   scriptHash: 5
 
+bitcoin.networks.syscoin =
+  magicPrefix: '\x19Syscoin Signed Message:\n'
+  bip32:
+    public: 0x0488B21E,
+    private: 0x0488ADE4
+  pubKeyHash: 63
+  scriptHash: 5
+
 ledger.bitcoin ||= {}
 ledger.bitcoin.Networks =
   bitcoin:
@@ -902,5 +910,26 @@ ledger.bitcoin.Networks =
       XPUB: 0x0488b21E
     bitcoinjs: bitcoin.networks.digibyte
     dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+ syscoin:
+    name: 'syscoin'
+    display_name: 'syscoin'
+    plural: 'syscoins'
+    scheme: 'syscoin:'
+    bolosAppName: 'syscoin'
+    ticker: 'sys'
+    tickerKey:
+      from: 'fromSYS'
+      to: 'toSYS'
+    bip44_coin_type: '57'
+    isSegwitSupported: no
+    version:
+      regular: 63
+      P2SH: 5
+      XPUB: 0x0488b21E
+    bitcoinjs: bitcoin.networks.syscoin
+    dust: 5430
     handleFeePerByte: no
     areTransactionTimestamped: no
