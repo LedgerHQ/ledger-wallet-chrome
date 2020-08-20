@@ -727,6 +727,9 @@ ledger.preferences.digibyte =
 # Coin preferences
   Coin:
     explorers:
+      cryptoID:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/dgb/tx.dws?%s.htm'
       qtuminfo:
         name: 'digiexplorer'
         address: 'https://digiexplorer.info/tx/%s'
