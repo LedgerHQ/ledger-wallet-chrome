@@ -14777,6 +14777,20 @@
           feePerKb: 1e5,
           estimateFee: estimateFee("litecoin")
         },
+        denarius: {
+          magicPrefix: "Denarius Signed Message:\n",
+          bip32: {
+            "public": 76067358,
+            "private": 76066276
+          },
+          pubKeyHash: 30,
+          scriptHash: 90,
+          wif: 158,
+          dustThreshold: 0,
+          dustSoftThreshold: 1e8,
+          feePerKb: 1e8,
+          estimateFee: estimateFee("denarius")
+        },
         dogecoin: {
           magicPrefix: "Dogecoin Signed Message:\n",
           bip32: {

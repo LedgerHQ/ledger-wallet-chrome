@@ -227,6 +227,8 @@ class @ledger.dongle.Dongle extends EventEmitter
   # @return [Integer] Firmware version, 0x20010000010f for example.
   getIntFirmwareVersion: -> @getFirmwareInformation().getIntFirmwareVersion()
 
+  isNanoS: -> @productId == 0x0001
+
   ###
     Gets the raw version {ByteString} of the dongle.
 

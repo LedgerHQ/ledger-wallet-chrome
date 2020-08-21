@@ -43,6 +43,8 @@
 
 1.10.2
 ===
+- Update firmware screen
+- usagePage discrimination
 - Filtering devices by usage page
 - Fix transaction size estimation
 

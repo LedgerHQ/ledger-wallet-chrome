@@ -465,6 +465,30 @@ ledger.preferences.dogecoin =
         name: 'SoChain'
         address: 'https://chain.so/tx/DOGE/%s'
     discoveryGap: 20
+    
+ledger.preferences.denarius =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'DNR'
+        unit: 8
+      milibitcoin:
+        symbol: 'mDNR'
+        unit: 5
+
+  # Coin preferences
+  Coin:
+    explorers:
+      denariusexplorer:
+        name: 'DenariusExplorer'
+        address: 'https://denariusexplorer.org/tx/%s'
+      chainzcryptoid:
+        name: 'Chainz.CryptoID.Info'
+        address: 'https://chainz.cryptoid.info/dnr/tx.dws?%s'
+      denariusname:
+        name: 'Denarius.name'
+        address: 'https://denarius.name/tx/%s'
+    discoveryGap: 20
 
 ledger.preferences.zcash =
   Display:

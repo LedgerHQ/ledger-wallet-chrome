@@ -216,6 +216,7 @@ ledger.router.pluggedWalletRoutesExceptions = [
   route '/update/welcome', (param) ->
     app.navigate UPDATE_LAYOUT, UpdateWelcomeViewController
 
+
   # BitID
   route '/wallet/bitid/index', (params = {}) ->
     dialog = new WalletBitidIndexDialogViewController({ uri: params["?params"]?.uri, silent: params["?params"]?.silent })
