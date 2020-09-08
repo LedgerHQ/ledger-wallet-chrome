@@ -731,5 +731,48 @@ ledger.preferences.digibyte =
         name: 'digiexplorer'
         address: 'https://digiexplorer.info/tx/%s'
     discoveryGap: 20
+	
+ledger.preferences.gamecredits =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'GAME'
+        unit: 8
+      milibitcoin:
+        symbol: 'mGAME'
+        unit: 5
+      microbitcoin:
+        symbol: 'μGAME'
+        unit: 2
+
+  # Coin preferences
+  Coin:
+    explorers:
+      blockexplorer:
+        name: 'blockexplorer.gamecredits.com'
+        address: 'https://blockexplorer.gamecredits.com/transactions/%s'
+    discoveryGap: 20
+
+ledger.preferences.gamecredits_segwit =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'GAME'
+        unit: 8
+      milibitcoin:
+        symbol: 'mGAME'
+        unit: 5
+      microbitcoin:
+        symbol: 'μGAME'
+        unit: 2
+
+  # Coin preferences
+  Coin:
+    explorers:
+      blockexplorer:
+        name: 'blockexplorer.gamecredits.com'
+        address: 'https://blockexplorer.gamecredits.com/transactions/%s'
+    discoveryGap: 20
+
 
 ledger.preferences.common.setCoin("bitcoin")

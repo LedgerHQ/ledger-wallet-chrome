@@ -904,3 +904,47 @@ ledger.bitcoin.Networks =
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: no
+
+  gamecredits:
+    name: 'gamecredits'
+    display_name: 'gamecredits'
+    chain: 'Legacy'
+    plural: 'gamecredits'
+    scheme: 'gamecredits:'
+    bolosAppName: 'GameCredits'
+    ticker: 'game'
+    tickerKey:
+      from: 'fromGAME'
+      to: 'toGAME'
+    bip44_coin_type: '101'
+    handleSegwit: no
+    isSegwitSupported: yes
+    version:
+      regular: 38
+      P2SH: 62
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.gamecredits
+    dust: 10000
+    handleFeePerByte: no
+	
+  gamecredits_segwit:
+    name: 'gamecredits_segwit'
+    display_name: 'gamecredits'
+    chain: 'Segwit'
+    plural: 'gamecredits'
+    scheme: 'gamecredits:'
+    bolosAppName: 'GameCredits'
+    ticker: 'game'
+    tickerKey:
+      from: 'fromGAME'
+      to: 'toGAME'
+    bip44_coin_type: '101'
+    handleSegwit: yes
+    isSegwitSupported: yes
+    version:
+      regular: 38
+      P2SH: 62
+      XPUB: 0x0488B21E
+    bitcoinjs: bitcoin.networks.gamecredits
+    dust: 10000
+    handleFeePerByte: no

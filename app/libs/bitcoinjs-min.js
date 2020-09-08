@@ -14819,19 +14819,19 @@
           feePerKb: 1e5,
           estimateFee: estimateFee("viacointestnet")
         },
-        gamerscoin: {
-          magicPrefix: "Gamerscoin Signed Message:\n",
+        gamecredits: {
+          magicPrefix: "gamecredits Signed Message:\n",
           bip32: {
             "public": 27108450,
             "private": 27106558
           },
           pubKeyHash: 38,
-          scriptHash: 5,
+          scriptHash: 62,
           wif: 166,
           dustThreshold: 0,
           dustSoftThreshold: 1e5,
           feePerKb: 1e5,
-          estimateFee: estimateFee("gamerscoin")
+          estimateFee: estimateFee("gamecredits")
         },
         jumbucks: {
           magicPrefix: "Jumbucks Signed Message:\n",
