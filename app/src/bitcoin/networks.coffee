@@ -49,8 +49,8 @@ bitcoin.networks.qtum =
 bitcoin.networks.stratis =
   magicPrefix: '\x18Stratis Signed Message:\n'
   bip32:
-    public: 0x0488c21e,
-    private: 0x05358394
+    public: 0x0488B21E,
+    private: 0x0488ADE4
   pubKeyHash: 63
   scriptHash: 125
 
@@ -636,7 +636,7 @@ ledger.bitcoin.Networks =
     version:
       regular: 63
       P2SH: 125
-      XPUB: 0x0488c21e
+      XPUB: 0x0488B21E
     bitcoinjs: bitcoin.networks.stratis
     dust: 10000
     handleFeePerByte: no
