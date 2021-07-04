@@ -94,6 +94,14 @@ bitcoin.networks.stealthcoin =
   pubKeyHash: 62
   scriptHash: 85
 
+bitcoin.networks.phore =
+  magicPrefix: '\x18DarkNet Signed Message:\n'
+  bip32:
+    public: 0x022D2533,
+    private: 0x05358394
+  pubKeyHash: 55
+  scriptHash: 13
+
 bitcoin.networks.pivx =
   magicPrefix: '\x18DarkNet Signed Message:\n'
   bip32:
@@ -793,6 +801,28 @@ ledger.bitcoin.Networks =
       P2SH: 13
       XPUB: 0x022D2533
     bitcoinjs: bitcoin.networks.pivx
+    dust: 10000
+    handleFeePerByte: no
+    areTransactionTimestamped: no
+
+  phore:
+    name: 'phore'
+    display_name: 'phore'
+    plural: 'phore'
+    scheme: 'phore:'
+    bolosAppName: 'phore'
+    ticker: 'phr'
+    tickerKey:
+      from: 'fromPHR'
+      to: 'toPHR'
+    bip44_coin_type: '444'
+    handleSegwit: no
+    isSegwitSupported: no
+    version:
+      regular: 55
+      P2SH: 13
+      XPUB: 0x022D2533
+    bitcoinjs: bitcoin.networks.phore
     dust: 10000
     handleFeePerByte: no
     areTransactionTimestamped: no
