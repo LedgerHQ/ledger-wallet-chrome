@@ -731,5 +731,42 @@ ledger.preferences.digibyte =
         name: 'digiexplorer'
         address: 'https://digiexplorer.info/tx/%s'
     discoveryGap: 20
+	
+	
+ledger.preferences.bitcore_unsplit =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'BTX'
+        unit: 8
+
+  # Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/btx/tx.dws?%s.htm'
+      coresight_explorer:
+        name: 'Insight Block Explorer'
+        address: 'http://insight.bitcore.cc/tx/%s'
+    discoveryGap: 20
+	
+ledger.preferences.bitcore_split =
+  Display:
+    units:
+      bitcoin:
+        symbol: 'BTX'
+        unit: 8
+
+  # Coin preferences
+  Coin:
+    explorers:
+      cryptoID:
+        name: 'CryptoID'
+        address: 'https://chainz.cryptoid.info/btx/tx.dws?%s.htm'
+      coresight_explorer:
+        name: 'Insight Block Explorer'
+        address: 'http://insight.bitcore.cc/tx/%s'
+    discoveryGap: 20
 
 ledger.preferences.common.setCoin("bitcoin")
